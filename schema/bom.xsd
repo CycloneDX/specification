@@ -1,12 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
            xmlns:bom="http://cyclonedx.org/schema/bom"
            xmlns:spdx="http://cyclonedx.org/schema/spdx"
            elementFormDefault="qualified"
-           targetNamespace="http://cyclonedx.org/schema/bom" version="1.0-M1">
-    
+           targetNamespace="http://cyclonedx.org/schema/bom"
+           vc:minVersion="1.1"
+           version="1.0-M2">
+
     <xs:import namespace="http://cyclonedx.org/schema/spdx" schemaLocation="http://cyclonedx.org/schema/spdx"/>
-    
+
     <xs:complexType name="component">
         <xs:sequence>
             <xs:element name="publisher" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
@@ -16,8 +19,8 @@
             </xs:element>
             <xs:element name="group" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation>The grouping name or identifier. This will often be a shortened, single 
-                        name of the company or project that produced the component, or the source package or 
+                    <xs:documentation>The grouping name or identifier. This will often be a shortened, single
+                        name of the company or project that produced the component, or the source package or
                         domain name. Whitespace and special characters should be avoided. Examples include:
                         apache, org.apache.commons, and apache.org.</xs:documentation>
                 </xs:annotation>
@@ -84,7 +87,7 @@
             <xs:element name="modified" type="xs:boolean" minOccurs="1" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>
-                        A boolean value indicating is the component has been modified from the original. 
+                        A boolean value indicating is the component has been modified from the original.
                         A value of true indicates the component is a derivative of the original.
                         A value of false indicates the component has not been modified from the original.
                     </xs:documentation>
@@ -93,7 +96,7 @@
             <xs:element name="components" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>
-                        Specifies optional sub-components. This is not a dependency tree. It simply provides 
+                        Specifies optional sub-components. This is not a dependency tree. It simply provides
                         an optional way to group large sets of components together.
                     </xs:documentation>
                 </xs:annotation>
@@ -107,13 +110,19 @@
         <xs:attribute name="type" type="bom:classification" use="required">
             <xs:annotation>
                 <xs:documentation>
-                    Specifies the type of component. Software applications, libraries, frameworks, and 
+                    Specifies the type of component. Software applications, libraries, frameworks, and
                     other dependencies should be classified as 'application'.
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
+        <xs:anyAttribute namespace="##other" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
     </xs:complexType>
-           
+
     <xs:complexType name="hashType">
         <xs:annotation>
             <xs:documentation>Specifies the file hash of the component</xs:documentation>
@@ -128,7 +137,7 @@
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
-        
+
     <xs:simpleType name="scope">
         <xs:restriction base="xs:string">
             <xs:enumeration value="required">
@@ -146,7 +155,7 @@
             </xs:enumeration>
         </xs:restriction>
     </xs:simpleType>
-    
+
     <xs:simpleType name="classification">
         <xs:restriction base="xs:string">
             <xs:enumeration value="application"/>
@@ -154,7 +163,7 @@
             <xs:enumeration value="device"/>
         </xs:restriction>
     </xs:simpleType>
-    
+
     <xs:simpleType name="hashAlg">
         <xs:restriction base="xs:string">
             <xs:enumeration value="MD5"/>
@@ -166,7 +175,7 @@
             <xs:enumeration value="SHA3-512"/>
         </xs:restriction>
     </xs:simpleType>
-    
+
     <xs:simpleType name="semver">
         <xs:restriction base="xs:token">
             <xs:pattern value="(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?"/>
@@ -194,6 +203,12 @@
                     made to the BOMs, then each BOM will have a version of '1'.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
+            <xs:anyAttribute namespace="##other" processContents="lax">
+                <xs:annotation>
+                    <xs:documentation>User-defined attributes may be used on this element as long as they
+                        do not have the same name as an existing attribute used by the schema.</xs:documentation>
+                </xs:annotation>
+            </xs:anyAttribute>
         </xs:complexType>
     </xs:element>
 </xs:schema>
