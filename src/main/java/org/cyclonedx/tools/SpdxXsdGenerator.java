@@ -17,6 +17,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.File;
@@ -88,7 +89,7 @@ public class SpdxXsdGenerator {
         for (Map.Entry<String, String> license : set) {
             sb.append(indent(12)).append("<xs:enumeration value=\"").append(license.getKey()).append("\">").append("\n");
             sb.append(indent(16)).append("<xs:annotation>").append("\n");
-            sb.append(indent(20)).append("<xs:documentation>").append(license.getValue()).append("</xs:documentation>").append("\n");
+            sb.append(indent(20)).append("<xs:documentation>").append(StringEscapeUtils.escapeXml10(license.getValue())).append("</xs:documentation>").append("\n");
             sb.append(indent(16)).append("</xs:annotation>").append("\n");
             sb.append(indent(12)).append("</xs:enumeration>").append("\n");
         }
