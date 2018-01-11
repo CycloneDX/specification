@@ -38,6 +38,19 @@ The simplest use case involves an author of a component. The author would easily
 
 Today, this information may or may not be available depending on the development language used. If available, the information is often extracted from components as a set of evidence. The fields and their meanings are typically not enforced and vary between language and build system. CycloneDX provides a standards-based method of self-identifying components without adding additional complexity.
 
+Namespaces
+-------------------
+
+CycloneDX defines two unique namespaces, a bill-of-material (bom) namespace and a SPDX namespace. The SPDX namespace
+evolves independently from the bom namespace. As new SPDX licenses are added to the SPDX specification, those changes 
+will be reflected in the bom namespace automatically, without having to change namespaces.
+
+CycloneDX is a versioned namespace and operates as follows:
+
+* `http://cyclonedx.org/schema/bom` will always reference the latest version of the spec.
+* Supplying a version after /bom such as `http://cyclonedx.org/schema/bom/1.0` will specify a specific version of the namespace.
+
+
 Related Work
 -------------------
 
