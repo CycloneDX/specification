@@ -48,7 +48,7 @@ will be reflected in the bom namespace automatically, without having to change n
 CycloneDX is a versioned namespace and operates as follows:
 
 * `http://cyclonedx.org/schema/bom` will always reference the latest version of the spec.
-* Supplying a version after /bom such as `http://cyclonedx.org/schema/bom/1.0` will specify a specific version of the namespace.
+* Supplying a version after /bom such as `http://cyclonedx.org/schema/bom/1.0` will specify a specific version of the spec.
 
 
 Related Work
