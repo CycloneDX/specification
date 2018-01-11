@@ -4,8 +4,9 @@
            xmlns:bom="http://cyclonedx.org/schema/bom"
            xmlns:spdx="http://cyclonedx.org/schema/spdx"
            elementFormDefault="qualified"
-           targetNamespace="http://cyclonedx.org/schema/bom"
-           vc:minVersion="1.1"
+           targetNamespace="http://cyclonedx.org/schema/bom/1.0"
+           vc:minVersion="1.0"
+           vc:maxVersion="1.1"
            version="1.0-M2">
 
     <xs:import namespace="http://cyclonedx.org/schema/spdx" schemaLocation="http://cyclonedx.org/schema/spdx"/>
@@ -37,7 +38,7 @@
                     specification.</xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="description" type="xs:normalizedString" minOccurs="1" maxOccurs="1">
+            <xs:element name="description" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>Specifies a description for the component</xs:documentation>
                 </xs:annotation>
@@ -67,7 +68,7 @@
                                                 <xs:documentation>A valid SPDX license ID</xs:documentation>
                                             </xs:annotation>
                                         </xs:element>
-                                        <xs:element name="other" type="xs:normalizedString" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:element name="name" type="xs:normalizedString" minOccurs="0" maxOccurs="unbounded">
                                             <xs:annotation>
                                                 <xs:documentation>If SPDX does not define the license used, this field may be used to provide the license name</xs:documentation>
                                             </xs:annotation>
@@ -78,6 +79,11 @@
                         </xs:element>
                     </xs:sequence>
                 </xs:complexType>
+            </xs:element>
+            <xs:element name="copyright" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>An optional copyright notice informing users of the underlying claims to copyright ownership in a published work.</xs:documentation>
+                </xs:annotation>
             </xs:element>
             <xs:element name="cpe" type="xs:string" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
@@ -167,6 +173,8 @@
     <xs:simpleType name="classification">
         <xs:restriction base="xs:string">
             <xs:enumeration value="application"/>
+            <xs:enumeration value="framework"/>
+            <xs:enumeration value="library"/>
             <xs:enumeration value="operating-system"/>
             <xs:enumeration value="device"/>
         </xs:restriction>
