@@ -50,6 +50,16 @@ CycloneDX is a versioned namespace and operates as follows:
 * `http://cyclonedx.org/schema/bom` will always reference the latest version of the spec.
 * Supplying a version after /bom such as `http://cyclonedx.org/schema/bom/1.0` will specify a specific version of the spec.
 
+Adopters
+-------------------
+
+The idea behind CycloneDX originated from the OWASP [Dependency-Track][odc-url] project. There are many benefits of
+being able to easily create BOMs and push the data to the Dependency-Track platform through automation. There are,
+of course, many other uses of this format. 
+
+If you know of a project that has adopted CycloneDX, feel free to submit a pull request by adding it to the list below:
+
+* [Dependency-Track][odc-url]
 
 Related Work
 -------------------
@@ -69,3 +79,4 @@ Permission to modify and redistribute is granted under the terms of the [Apache 
   [license-url]: https://github.com/CycloneDX/specification/blob/master/LICENSE
   [spdx-url]: https://spdx.org
   [cpe-url]: https://nvd.nist.gov/products/cpe
+  [odc-url]: https://dependencytrack.org
