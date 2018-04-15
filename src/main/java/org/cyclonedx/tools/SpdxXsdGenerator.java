@@ -29,11 +29,13 @@ import java.util.Set;
 
 public class SpdxXsdGenerator {
 
+    private static final String SPDX_VERSION = "3.1";
+
     public static void main(String args[]) throws Exception {
 
         //todo : make configurable
-        String licenseUrl = "https://raw.githubusercontent.com/spdx/license-list-data/v3.0/json/licenses.json";
-        String exceptionsUrl = "https://raw.githubusercontent.com/spdx/license-list-data/v3.0/json/exceptions.json";
+        String licenseUrl = "https://raw.githubusercontent.com/spdx/license-list-data/v" + SPDX_VERSION + "/json/licenses.json";
+        String exceptionsUrl = "https://raw.githubusercontent.com/spdx/license-list-data/v" + SPDX_VERSION + "/json/exceptions.json";
 
         HttpResponse<JsonNode> licenseResponse = Unirest.get(licenseUrl).asJson();
         final JSONObject licenseRoot = licenseResponse.getBody().getObject();
@@ -66,7 +68,7 @@ public class SpdxXsdGenerator {
             .append("<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"").append("\n")
             .append(indent(11)).append("elementFormDefault=\"qualified\"").append("\n")
             .append(indent(11)).append("targetNamespace=\"http://cyclonedx.org/schema/spdx\"").append("\n")
-            .append(indent(11)).append("version=\"1.0-M2\">").append("\n\n")
+            .append(indent(11)).append("version=\"1.0-" + SPDX_VERSION + "\">").append("\n\n")
             .append(indent(4)).append("<xs:simpleType name=\"licenseId\">").append("\n")
             .append(indent(8)).append("<xs:restriction base=\"xs:string\">").append("\n");
 
