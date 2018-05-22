@@ -58,6 +58,7 @@ public class SpdxXsdGenerator {
         }
 
         createSchema(licenseMap, exceptionMap);
+        createLicenseListJson(licenseMap, exceptionMap);
     }
 
 
@@ -84,6 +85,23 @@ public class SpdxXsdGenerator {
 
         //todo : make configurable
         File file = new File("/Users/steve/Development/CycloneDX/specification/schema/spdx.xsd");
+        FileUtils.writeStringToFile(file, sb.toString(), StandardCharsets.UTF_8);
+    }
+
+    private static void createLicenseListJson(Map<String, String> licenses, Map<String, String> exceptions) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[").append("\n");
+        for (Map.Entry<String, String> license : licenses.entrySet()) {
+            sb.append("\"").append(license.getKey()).append("\"").append(",").append("\n");
+        }
+        for (Map.Entry<String, String> license : exceptions.entrySet()) {
+            sb.append("\"").append(license.getKey()).append("\"").append(",").append("\n");
+        }
+        sb.delete(sb.length() - 2, sb.length());
+        sb.append("\n").append("]").append("\n");
+
+        //todo : make configurable
+        File file = new File("/Users/steve/Development/CycloneDX/cyclonedx-node-module/spdx-licenses.json");
         FileUtils.writeStringToFile(file, sb.toString(), StandardCharsets.UTF_8);
     }
 
