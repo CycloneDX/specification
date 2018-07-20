@@ -3,24 +3,32 @@
 CycloneDX Specification
 =====================================
 
-CycloneDX is a data exchange specification intended to easily identify software components as bill of materials.
+CycloneDX is a lightweight software bill-of-material (S-BoM) specification designed for use in application security contexts and software composition analysis (SCA).
 
 Background
 -------------------
 
-In software development, it is common to build new software by leveraging existing components. In doing so, it is often necessary to provide a bill of materials that describes the components that are packaged with an application. This necessity of generally driven by legal or software security requirements.
+In software engineering, it is common to build new software by leveraging existing components. In doing so, it is 
+often necessary to provide a bill of material that describes the components that are packaged with an application. 
 
-Today, most build systems provide some form of dependency tree that documents or illustrates the software components used in a specific build. Depending on the build system, this may or may not be accurate or representative of the final delivery.
+Today, most build systems provide some form of dependency tree that documents or illustrates the software components 
+used in a specific build. Depending on the build system, this may or may not be accurate or representative of the 
+final delivery.
 
-It is also common to combine multiple languages or development platforms in creating new types of applications. The use of multiple build systems is often required in these scenarios.
+It is also common to combine multiple languages or development platforms in creating new types of applications. The 
+use of multiple build systems is often required in these scenarios.
 
 Project Goals
 -------------------
 
-* Define a specification independent of language, platform, or build system
-* Specification should be human and machine readable and simple to implement
-* Provide schema definitions for JSON and XML
-* Reuse parts of existing specs, if beneficial
+- Define a vendor agnostic specification independent of language or ecosystem
+- Specification should be simultaneously human and machine readable
+- Specification should be simple to implement with minimal effort
+- Specification should provide lightweight schema definitions for JSON and XML
+- Specification should reuse parts of existing specs where beneficial
+- Specification should be decentralized, authoritative, and security focused
+- Specification should promote continuous component analysis
+- Specification should support hardware, libraries, frameworks, applications, and operating systems
 
 Features
 -------------------
