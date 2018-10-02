@@ -1,4 +1,6 @@
 [![License][license-image]][license-url]
+[![Website](https://img.shields.io/badge/https://-cyclonedx.org-blue.svg)](https://cyclonedx.org/)
+[![Twitter](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&label=Follow)](https://twitter.com/CycloneDX_Spec)
 
 CycloneDX Specification
 =====================================
