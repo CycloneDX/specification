@@ -211,6 +211,17 @@
         </xs:restriction>
     </xs:simpleType>
 
+    <xs:simpleType name="urnUuid">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+                Defines a string representation of a UUID which conforms to RFC 4122.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:pattern value="urn:uuid:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})|(\{[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\})"/>
+        </xs:restriction>
+    </xs:simpleType>
+
     <xs:element name="bom">
         <xs:complexType>
             <xs:sequence>
@@ -237,6 +248,13 @@
                         version of the BOM. The default version is '1' and should be incremented for each version of the
                         BOM that is published. Each version of a component should have a unique BOM and if no changes are
                         made to the BOMs, then each BOM will have a version of '1'.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="serialNumber" type="bom:urnUuid" use="required">
+                <xs:annotation>
+                    <xs:documentation>Every BOM generated must have a unique serial number, even if the contents
+                        of the BOM being generated have not changed over time. The process or tool responsible for
+                        creating the BOM must create random UUID's for every BOM generated.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:anyAttribute namespace="##other" processContents="lax">
