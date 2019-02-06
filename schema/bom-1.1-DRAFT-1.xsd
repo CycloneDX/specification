@@ -109,6 +109,12 @@
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="externalReferences" type="bom:externalReferences" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Provides the ability to document external references related to the 
+                        component or to the project the component describes.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:element name="components" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>
@@ -230,6 +236,124 @@
         </xs:restriction>
     </xs:simpleType>
 
+    <xs:simpleType name="externalReferenceType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="vcs">
+                <xs:annotation>
+                    <xs:documentation>Version Conttrol System</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="issue-tracker">
+                <xs:annotation>
+                    <xs:documentation>Issue or defect tracker or Application Lifecycle Management (ALM) system</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="website">
+                <xs:annotation>
+                    <xs:documentation>Website</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="advisories">
+                <xs:annotation>
+                    <xs:documentation>Security advisories</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="spdx">
+                <xs:annotation>
+                    <xs:documentation>SPDX bill-of-material document (tag, rdf, etc)</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="mailing-list">
+                <xs:annotation>
+                    <xs:documentation>Mailing list of discussion group</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="social">
+                <xs:annotation>
+                    <xs:documentation>Social media account</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="chat">
+                <xs:annotation>
+                    <xs:documentation>Real-time chat platform</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="documentation">
+                <xs:annotation>
+                    <xs:documentation>Documentation, guides, or how-to instructions</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="support">
+                <xs:annotation>
+                    <xs:documentation>Community or commercial support</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="distribution">
+                <xs:annotation>
+                    <xs:documentation>Direct download or repository download location</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="license-text">
+                <xs:annotation>
+                    <xs:documentation>External license file</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="build-meta">
+                <xs:annotation>
+                    <xs:documentation>Build-system specific meta file (i.e. pom.xml, package.json, .nuspec, etc)</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="build-system">
+                <xs:annotation>
+                    <xs:documentation>URL to an automated build system</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="other">
+                <xs:annotation>
+                    <xs:documentation>Use this if no other types accurately describe the purpose of the external resources</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:complexType name="externalReferences">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+                External references provide a way to document systems, sites, and inforamtion that may be relevant but which 
+                are not included with the BOM.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="reference" type="bom:externalReference">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Zero or more external references can be defined</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="externalReference">
+        <xs:sequence>
+            <xs:element name="url" type="xs:anyURI" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The URL to the external reference</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="comment" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">An optional comment describing the external reference</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="type" type="bom:externalReferenceType" use="required">
+            <xs:annotation>
+                <xs:documentation>Specifies the type of external reference. There are built-in types to describe common
+                    references. If a type does not exist for the reference being referred to, use the "other" type.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+    
     <xs:element name="bom">
         <xs:complexType>
             <xs:sequence>
@@ -245,6 +369,12 @@
                             </xs:annotation>
                         </xs:anyAttribute>
                     </xs:complexType>
+                </xs:element>
+                <xs:element name="externalReferences" type="bom:externalReferences" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>Provides the ability to document external references related to the BOM or 
+                            to the project the BOM describes.</xs:documentation>
+                    </xs:annotation>
                 </xs:element>
                 <xs:element ref="ds:Signature" minOccurs="0" maxOccurs="1"/>
             </xs:sequence>
