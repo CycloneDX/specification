@@ -13,6 +13,18 @@
     <xs:import namespace="http://cyclonedx.org/schema/spdx" schemaLocation="http://cyclonedx.org/schema/spdx"/>
     <xs:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd"/>
 
+    <xs:complexType name="componentsType">
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="component" type="bom:component"/>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##other" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+    
     <xs:complexType name="component">
         <xs:sequence>
             <xs:element name="publisher" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
@@ -100,12 +112,20 @@
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="modified" type="xs:boolean" minOccurs="1" maxOccurs="1">
+            <xs:element name="modified" type="xs:boolean" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>
                         A boolean value indicating is the component has been modified from the original.
                         A value of true indicates the component is a derivative of the original.
                         A value of false indicates the component has not been modified from the original.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="pedigree" type="bom:pedigreeType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Component pedigree is a way to document complex supply chain scenarios where components are
+                        created, distributed, modified, redistributed, combined with other components, etc.
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
@@ -354,22 +374,123 @@
         </xs:attribute>
     </xs:complexType>
     
+    <xs:complexType name="commitsType">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Zero or more commits can be specified.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="commit" type="bom:commitType">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Specifies an individual commit.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="commitType">
+        <xs:sequence>
+            <xs:element name="uid" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">A unique identifier of the commit. This may be version control 
+                        specific. For example, Subversion uses revision numbers whereas git uses commit hashes.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="url" type="xs:anyURI" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The URL to the commit. This URL will typically point to a commit
+                        in a version control system.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="author" type="bom:identifiableActionType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The author who created the changes in the commit</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="committer" type="bom:identifiableActionType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The person who committed or pushed the commit</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="message" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The text description of the contents of the commit</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="identifiableActionType">
+        <xs:sequence>
+            <xs:element name="timestamp" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The timestamp in which the action occurred</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="name" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The name of the individual who performed the action</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="email" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The email address of the individual who performed the action</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="pedigreeType">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+                Component pedigree is a way to document complex supply chain scenarios where components are created,
+                distributed, modified, redistributed, combined with other components, etc. Pedigree supports viewing
+                this complex chain from the beginning, the end, or anywhere in the middle. It also provides a way to
+                document variants where the exact relation may not be unknown.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="ancestors" type="bom:componentsType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Describes zero or more components in which a component is derived
+                        from. This is commonly used to describe forks from existing projects where the forked version
+                        contains a ancestor node containing the original component it was forked from. For example,
+                        Component A is the original component. Component B is the component being used and documented
+                        in the BOM. However, Component B contains a pedigree node with a single ancestor documenting
+                        Component A - the original component from which Component B is derived from.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="descendants" type="bom:componentsType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Descendants are the exact opposite of ancestors. This provides a
+                    way to document all forks (and their forks) of an original or root component.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="variants" type="bom:componentsType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Variants describe relations where the relationship between the
+                        components are not known. For example, if Component A contains nearly identical code to
+                        Component B. They are both related, but it is unclear if one is derived from the other,
+                        or if they share a common ancestor.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="commits" type="bom:commitsType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">A list of zero or more commits which provide a trail describing
+                    how the component deviates from an ancestor, descendant, or variant.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    
     <xs:element name="bom">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="components">
-                    <xs:complexType>
-                        <xs:sequence minOccurs="0" maxOccurs="unbounded">
-                            <xs:element name="component" type="bom:component"/>
-                        </xs:sequence>
-                        <xs:anyAttribute namespace="##other" processContents="lax">
-                            <xs:annotation>
-                                <xs:documentation>User-defined attributes may be used on this element as long as they
-                                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
-                            </xs:annotation>
-                        </xs:anyAttribute>
-                    </xs:complexType>
-                </xs:element>
+                <xs:element name="components" type="bom:componentsType"/>
                 <xs:element name="externalReferences" type="bom:externalReferences" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Provides the ability to document external references related to the BOM or 
