@@ -85,8 +85,8 @@ CycloneDX is Copyright (c) Steve Springett. All Rights Reserved.
 
 Permission to modify and redistribute is granted under the terms of the [Apache License 2.0][license-url]
 
-  [license-image]: https://img.shields.io/badge/license-apache%20v2-brightgreen.svg
-  [license-url]: https://github.com/CycloneDX/specification/blob/master/LICENSE
-  [spdx-url]: https://spdx.org
-  [cpe-url]: https://nvd.nist.gov/products/cpe
-  [odc-url]: https://dependencytrack.org
+[license-image]: https://img.shields.io/badge/license-apache%20v2-brightgreen.svg
+[license-url]: https://github.com/CycloneDX/specification/blob/master/LICENSE
+[spdx-url]: https://spdx.org
+[cpe-url]: https://nvd.nist.gov/products/cpe
+[odc-url]: https://dependencytrack.org
