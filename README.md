@@ -5,7 +5,7 @@
 CycloneDX Specification
 =====================================
 
-CycloneDX is a lightweight software bill-of-material (S-BoM) specification designed for use in application security contexts and software composition analysis (SCA).
+CycloneDX is a lightweight software bill-of-material (SBOM) specification designed for use in application security contexts and supply chain component analysis.
 
 Background
 -------------------
