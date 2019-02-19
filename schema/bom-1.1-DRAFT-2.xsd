@@ -93,6 +93,11 @@
                                             </xs:annotation>
                                         </xs:element>
                                     </xs:choice>
+                                    <xs:element name="text" type="bom:licenseTextType" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>Specifies the optional full text of the license</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
@@ -170,6 +175,26 @@
         </xs:anyAttribute>
     </xs:complexType>
 
+    <xs:complexType name="licenseTextType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Specifies attributes of the license text</xs:documentation>
+                </xs:annotation>
+                <xs:attribute name="content-type" type="xs:normalizedString" default="text/plain">
+                    <xs:annotation>
+                        <xs:documentation>Specifies the content type of the license text. Defaults to text/plain if not specified.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="encoding" type="bom:encoding">
+                    <xs:annotation>
+                        <xs:documentation>Specified the optional encoding the license text is represented in</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
     <xs:complexType name="hashType">
         <xs:annotation>
             <xs:documentation>Specifies the file hash of the component</xs:documentation>
@@ -236,6 +261,12 @@
     <xs:simpleType name="hashValue">
         <xs:restriction base="xs:token">
             <xs:pattern value="([a-fA-F0-9]{32})|([a-fA-F0-9]{40})|([a-fA-F0-9]{64})|([a-fA-F0-9]{96})|([a-fA-F0-9]{128})"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:simpleType name="encoding">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="base64"/>
         </xs:restriction>
     </xs:simpleType>
 
