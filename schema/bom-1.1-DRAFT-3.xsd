@@ -8,7 +8,7 @@
            targetNamespace="http://cyclonedx.org/schema/bom/1.1"
            vc:minVersion="1.0"
            vc:maxVersion="1.1"
-           version="1.1-DRAFT-2">
+           version="1.1-DRAFT-3">
 
     <xs:import namespace="http://cyclonedx.org/schema/spdx" schemaLocation="http://cyclonedx.org/schema/spdx"/>
     <xs:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd"/>
@@ -72,42 +72,14 @@
             </xs:element>
             <xs:element name="licenses" minOccurs="0" maxOccurs="1">
                 <xs:complexType>
-                    <xs:sequence minOccurs="1" maxOccurs="unbounded">
-                        <xs:element name="license">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:choice>
-                                        <xs:element name="id" type="spdx:licenseId" minOccurs="0" maxOccurs="1">
-                                            <xs:annotation>
-                                                <xs:documentation>A valid SPDX license ID</xs:documentation>
-                                            </xs:annotation>
-                                        </xs:element>
-                                        <xs:element name="expression" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
-                                            <xs:annotation>
-                                                <xs:documentation>A valid SPDX license expression. Refer to https://spdx.org/specifications for syntax requirements</xs:documentation>
-                                            </xs:annotation>
-                                        </xs:element>
-                                        <xs:element name="name" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
-                                            <xs:annotation>
-                                                <xs:documentation>If SPDX does not define the license used, this field may be used to provide the license name</xs:documentation>
-                                            </xs:annotation>
-                                        </xs:element>
-                                    </xs:choice>
-                                    <xs:element name="text" type="bom:licenseTextType" minOccurs="0" maxOccurs="1">
-                                        <xs:annotation>
-                                            <xs:documentation>Specifies the optional full text of the license</xs:documentation>
-                                        </xs:annotation>
-                                    </xs:element>
-                                    <xs:element name="url" type="xs:anyURI" minOccurs="0" maxOccurs="1">
-                                        <xs:annotation>
-                                            <xs:documentation>The URL to the license file. If specified, a 'license-text'
-                                                externalReference should also be specified for completeness.</xs:documentation>
-                                        </xs:annotation>
-                                    </xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
+                    <xs:choice>
+                        <xs:element name="license" type="bom:licenseType" minOccurs="0" maxOccurs="unbounded"/>
+                        <xs:element name="expression" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>A valid SPDX license expression. Refer to https://spdx.org/specifications for syntax requirements</xs:documentation>
+                            </xs:annotation>
                         </xs:element>
-                    </xs:sequence>
+                    </xs:choice>
                 </xs:complexType>
             </xs:element>
             <xs:element name="copyright" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
@@ -180,6 +152,34 @@
                     do not have the same name as an existing attribute used by the schema.</xs:documentation>
             </xs:annotation>
         </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:complexType name="licenseType">
+        <xs:sequence>
+            <xs:choice>
+                <xs:element name="id" type="spdx:licenseId" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>A valid SPDX license ID</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="name" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>If SPDX does not define the license used, this field may be used to provide the license name</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:choice>
+            <xs:element name="text" type="bom:licenseTextType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Specifies the optional full text of the license</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="url" type="xs:anyURI" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The URL to the license file. If specified, a 'license-text'
+                        externalReference should also be specified for completeness.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
     </xs:complexType>
 
     <xs:complexType name="licenseTextType">
