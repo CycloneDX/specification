@@ -3,7 +3,6 @@
            xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
            xmlns:bom="http://cyclonedx.org/schema/bom/1.1"
            xmlns:spdx="http://cyclonedx.org/schema/spdx"
-           xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
            elementFormDefault="qualified"
            targetNamespace="http://cyclonedx.org/schema/bom/1.1"
            vc:minVersion="1.0"
@@ -11,7 +10,6 @@
            version="1.1-DRAFT-3">
 
     <xs:import namespace="http://cyclonedx.org/schema/spdx" schemaLocation="http://cyclonedx.org/schema/spdx"/>
-    <xs:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd"/>
 
     <xs:complexType name="componentsType">
         <xs:sequence minOccurs="0" maxOccurs="unbounded">
@@ -137,6 +135,15 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements in the component element as long as the element is
+                        placed in a different namespace. This may include support for digital signatures
+                        using the ds:Signature element or any other element from an external namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
         </xs:sequence>
         <xs:attribute name="type" type="bom:classification" use="required">
             <xs:annotation>
@@ -547,7 +554,15 @@
                             to the project the BOM describes.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element ref="ds:Signature" minOccurs="0" maxOccurs="1"/>
+                <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Allows any undeclared elements in the component element as long as the element is
+                            placed in a different namespace. This may include support for digital signatures
+                            using the ds:Signature element or any other element from an external namespace.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:any>
             </xs:sequence>
             <xs:attribute name="version" type="xs:integer" default="1">
                 <xs:annotation>
