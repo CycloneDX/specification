@@ -133,7 +133,7 @@ public class SchemaVerificationTest {
     }
 
     @Test
-    public void testInvalidNameCount() {
+    public void testInvalidLicenseNameCount() {
         Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-license-name-count-1.1.xml"));
     }
 /*
