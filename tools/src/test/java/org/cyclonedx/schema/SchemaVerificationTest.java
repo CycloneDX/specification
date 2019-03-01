@@ -126,15 +126,17 @@ public class SchemaVerificationTest {
     public void testInvalidLicenseChoice() {
         Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-license-choice-1.1.xml"));
     }
+
+    @Test
+    public void testInvalidLicenseIdCount() {
+        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-license-id-count-1.1.xml"));
+    }
+
+    @Test
+    public void testInvalidNameCount() {
+        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-license-name-count-1.1.xml"));
+    }
 /*
-    @Test
-    public void test() {
-    }
-
-    @Test
-    public void test() {
-    }
-
     @Test
     public void test() {
     }
