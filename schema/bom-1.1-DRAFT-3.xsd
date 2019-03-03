@@ -41,6 +41,13 @@ limitations under the License.
     <xs:complexType name="componentsType">
         <xs:sequence minOccurs="0" maxOccurs="unbounded">
             <xs:element name="component" type="bom:component"/>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
         </xs:sequence>
         <xs:anyAttribute namespace="##any" processContents="lax">
             <xs:annotation>
@@ -49,7 +56,7 @@ limitations under the License.
             </xs:annotation>
         </xs:anyAttribute>
     </xs:complexType>
-    
+
     <xs:complexType name="component">
         <xs:sequence>
             <xs:element name="publisher" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
@@ -145,29 +152,35 @@ limitations under the License.
             </xs:element>
             <xs:element name="externalReferences" type="bom:externalReferences" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation>Provides the ability to document external references related to the 
+                    <xs:documentation>Provides the ability to document external references related to the
                         component or to the project the component describes.</xs:documentation>
                 </xs:annotation>
             </xs:element>
             <xs:element name="components" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>
-                        Specifies optional sub-components. This is not a dependency tree. It simply provides
-                        an optional way to group large sets of components together.
+                        Specifies optional sub-components. This is not a dependency tree. It provides a way
+                        to specify a hierarchical representation of component assemblies, similar to
+                        system -> subsystem -> parts assembly in physical supply chains.
                     </xs:documentation>
                 </xs:annotation>
                 <xs:complexType>
                     <xs:sequence minOccurs="0" maxOccurs="unbounded">
                         <xs:element name="component" type="bom:component"/>
+                        <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Allows any undeclared elements as long as the elements are placed in a different namespace.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:any>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
             <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                     <xs:documentation>
-                        Allows any undeclared elements in the component element as long as the element is
-                        placed in a different namespace. This may include support for digital signatures
-                        using the ds:Signature element or any other element from an external namespace.
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
                     </xs:documentation>
                 </xs:annotation>
             </xs:any>
@@ -177,6 +190,14 @@ limitations under the License.
                 <xs:documentation>
                     Specifies the type of component. Software applications, libraries, frameworks, and
                     other dependencies should be classified as 'application'.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="bom-ref" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>
+                    An optional identifier which can be used to reference the component elsewhere in the BOM.
+                    Uniqueness is enforced within all elements and children of the root-level bom element.
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
@@ -213,6 +234,13 @@ limitations under the License.
                         externalReference should also be specified for completeness.</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
         </xs:sequence>
     </xs:complexType>
 
@@ -269,8 +297,8 @@ limitations under the License.
             <xs:enumeration value="excluded">
                 <xs:annotation>
                     <xs:documentation>Components that are excluded provide the ability to document component usage
-                    for test and other non-runtime purposes. Excluded components are not reachable within a call
-                    graph at runtime.</xs:documentation>
+                        for test and other non-runtime purposes. Excluded components are not reachable within a call
+                        graph at runtime.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
         </xs:restriction>
@@ -304,7 +332,7 @@ limitations under the License.
             <xs:pattern value="([a-fA-F0-9]{32})|([a-fA-F0-9]{40})|([a-fA-F0-9]{64})|([a-fA-F0-9]{96})|([a-fA-F0-9]{128})"/>
         </xs:restriction>
     </xs:simpleType>
-    
+
     <xs:simpleType name="encoding">
         <xs:restriction base="xs:string">
             <xs:enumeration value="base64"/>
@@ -413,7 +441,7 @@ limitations under the License.
             </xs:enumeration>
         </xs:restriction>
     </xs:simpleType>
-    
+
     <xs:complexType name="externalReferences">
         <xs:annotation>
             <xs:documentation xml:lang="en">
@@ -457,7 +485,7 @@ limitations under the License.
             </xs:annotation>
         </xs:anyAttribute>
     </xs:complexType>
-    
+
     <xs:complexType name="commitsType">
         <xs:annotation>
             <xs:documentation xml:lang="en">Zero or more commits can be specified.</xs:documentation>
@@ -468,14 +496,21 @@ limitations under the License.
                     <xs:documentation xml:lang="en">Specifies an individual commit.</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
         </xs:sequence>
     </xs:complexType>
-    
+
     <xs:complexType name="commitType">
         <xs:sequence>
             <xs:element name="uid" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation xml:lang="en">A unique identifier of the commit. This may be version control 
+                    <xs:documentation xml:lang="en">A unique identifier of the commit. This may be version control
                         specific. For example, Subversion uses revision numbers whereas git uses commit hashes.
                     </xs:documentation>
                 </xs:annotation>
@@ -502,9 +537,16 @@ limitations under the License.
                     <xs:documentation xml:lang="en">The text description of the contents of the commit</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
         </xs:sequence>
     </xs:complexType>
-    
+
     <xs:complexType name="identifiableActionType">
         <xs:sequence>
             <xs:element name="timestamp" type="xs:dateTime" minOccurs="0" maxOccurs="1">
@@ -522,9 +564,16 @@ limitations under the License.
                     <xs:documentation xml:lang="en">The email address of the individual who performed the action</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
         </xs:sequence>
     </xs:complexType>
-    
+
     <xs:complexType name="pedigreeType">
         <xs:annotation>
             <xs:documentation xml:lang="en">
@@ -549,7 +598,7 @@ limitations under the License.
             <xs:element name="descendants" type="bom:componentsType" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">Descendants are the exact opposite of ancestors. This provides a
-                    way to document all forks (and their forks) of an original or root component.
+                        way to document all forks (and their forks) of an original or root component.
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
@@ -565,7 +614,7 @@ limitations under the License.
             <xs:element name="commits" type="bom:commitsType" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">A list of zero or more commits which provide a trail describing
-                    how the component deviates from an ancestor, descendant, or variant.</xs:documentation>
+                        how the component deviates from an ancestor, descendant, or variant.</xs:documentation>
                 </xs:annotation>
             </xs:element>
             <xs:element name="notes" type="xs:string" minOccurs="0" maxOccurs="1">
@@ -575,25 +624,30 @@ limitations under the License.
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
         </xs:sequence>
     </xs:complexType>
-    
+
     <xs:element name="bom">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="components" type="bom:componentsType"/>
                 <xs:element name="externalReferences" type="bom:externalReferences" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
-                        <xs:documentation>Provides the ability to document external references related to the BOM or 
+                        <xs:documentation>Provides the ability to document external references related to the BOM or
                             to the project the BOM describes.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
                 <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
                     <xs:annotation>
                         <xs:documentation>
-                            Allows any undeclared elements in the component element as long as the element is
-                            placed in a different namespace. This may include support for digital signatures
-                            using the ds:Signature element or any other element from an external namespace.
+                            Allows any undeclared elements as long as the elements are placed in a different namespace.
                         </xs:documentation>
                     </xs:annotation>
                 </xs:any>
@@ -622,5 +676,9 @@ limitations under the License.
                 </xs:annotation>
             </xs:anyAttribute>
         </xs:complexType>
+        <xs:unique name="bom-ref">
+            <xs:selector xpath=".//*"/>
+            <xs:field xpath="@bom-ref"/>
+        </xs:unique>
     </xs:element>
 </xs:schema>
