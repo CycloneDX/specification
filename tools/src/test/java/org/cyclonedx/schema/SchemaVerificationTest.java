@@ -136,55 +136,27 @@ public class SchemaVerificationTest {
     public void testInvalidLicenseNameCount() {
         Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-license-name-count-1.1.xml"));
     }
-/*
+
     @Test
-    public void test() {
+    public void testValidComponentRef() {
+        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_11, "/valid-component-ref-1.1.xml"));
     }
 
     @Test
-    public void test() {
+    public void testInvalidComponentRef() {
+        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-component-ref-1.1.xml"));
     }
 
     @Test
-    public void test() {
+    public void testValidExternalElements() {
+        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_11, "/valid-external-elements-1.1.xml"));
     }
-
-    @Test
-    public void test() {
-    }
-
-    @Test
-    public void test() {
-    }
-
-    @Test
-    public void test() {
-    }
-
-    @Test
-    public void test() {
-    }
-
-    @Test
-    public void test() {
-    }
-
-    @Test
-    public void test() {
-    }
-
-    @Test
-    public void test() {
-    }
-
-
-
-
-
-      */
 
     @Test
     public void testValidXmlSignature() {
+        // NOTE: Doesn't actually validate XML Signature. That is a business-case detail, not an
+        // implementation requirement. If the business case requires signature validation, it should
+        // be performed after document validation.
         Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_11, "/valid-xml-signature-1.1.xml"));
     }
 
