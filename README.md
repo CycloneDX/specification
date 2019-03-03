@@ -28,12 +28,10 @@ often necessary to provide a bill of material that describes the components that
 - Outdated component analysis
 - License identification and compliance
 - File verification
-- Track component usage and risk with optional hierarchical representation
-- Generate automatically from multiple development ecosystems
-- Portable, single file which can be supplied by development teams, business partners, and vendors
-- Document a components pedigree including ancestors, descendants, and variants, representing a components lineage from any viewpoint
-- Analyze modified open source libraries without any loss of fidelity 
-- Validate the integrity of BOMs from suppliers
+- Hierarchical representation of component assemblies
+- Document a components pedigree including ancestors, descendants, variants, and commits, representing a components lineage from any viewpoint and what attributes make it unique
+- Analyze modified open source libraries without any loss of fidelity
+- Human and machine readable format designed to be simple to use, extensible, and easily adoptable
 
 
 ## Namespaces
@@ -44,7 +42,7 @@ will be reflected in the bom namespace automatically, without having to change n
 CycloneDX is a versioned namespace and operates as follows:
 
 * `http://cyclonedx.org/schema/bom` will always reference the latest version of the spec.
-* Supplying a version after /bom such as `http://cyclonedx.org/schema/bom/1.0` will specify a specific version of the spec.
+* Supplying a version after /bom such as `http://cyclonedx.org/schema/bom/1.1` will specify a specific version of the spec.
 
 
 ## Specification Overview
@@ -58,37 +56,39 @@ CycloneDX is a versioned namespace and operates as follows:
 |description| A description of the component | |
 |scope| Specifies the scope of the component. If scope is not specified, 'runtime' scope will be assumed. | |
 |hashes| File hashes supporting MD5, SHA1, SHA2, and SHA3 | |
-|license| Zero or more license names or SPDX license IDs | |
+|license| A node describing zero or more license names, SPDX license IDs or expressions | |
 |copyright| An optional copyright notice informing users of the underlying claims to copyright ownership in a published work| |
 |purl| The Package URL of the component | |
 |cpe| An optional mapping to an existing CPE identifier | |
-|modified| Indicates if the component has been modified from the official distribution | &#x2714; |
-|components| Specifies optional sub-components. This is not a dependency tree. It simply provides an optional way to group large sets of components together. | |
+|modified| Indicates if the component has been modified from the official distribution | |
+|pedigree| A node which contains component ancestors, descendants, variants, and the commit which make it unique | |
+|externalReferences| A node which contains various types of references to external resources | |
+|components| Specifies optional sub-components. This is not a dependency tree. It provides a hierarchical representation of component assemblies | |
 
 ## Example BOM
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<bom xmlns="http://cyclonedx.org/schema/bom/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1" xsi:schemaLocation="http://cyclonedx.org/schema/bom/1.0 http://cyclonedx.org/schema/bom/1.0">
+<bom xmlns="http://cyclonedx.org/schema/bom/1.1" serialNumber="urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79" version="1">
   <components>
     <component type="library">
-      <group>org.jboss.resteasy</group>
-      <name>resteasy-jaxrs</name>
-      <version>3.1.0.Final</version>
-      <description>JAX-RS bindings for RestEasy</description>
+      <publisher>Apache</publisher>
+      <group>org.apache.tomcat</group>
+      <name>tomcat-catalina</name>
+      <version>9.0.14</version>
       <hashes>
-        <hash alg="SHA-1">6427a9a622bff4dbe99d6f08dabd0dd89af85235</hash>
-        <hash alg="SHA-256">97bb6890cea26ed6f107603426fdb19f1444932c310705895ecf9cc24992da0d</hash>
+        <hash alg="MD5">3942447fac867ae5cdb3229b658f4d48</hash>
+        <hash alg="SHA-1">e6b1000b94e835ffd37f4c6dcbdad43f4b48a02a</hash>
+        <hash alg="SHA-256">f498a8ff2dd007e29c2074f5e4b01a9a01775c3ff3aeaf6906ea503bc5791b7b</hash>
+        <hash alg="SHA-512">e8f33e424f3f4ed6db76a482fde1a5298970e442c531729119e37991884bdffab4f9426b7ee11fccd074eeda0634d71697d6f88a460dce0ac8d627a29f7d1282</hash>
       </hashes>
       <licenses>
         <license>
           <id>Apache-2.0</id>
         </license>
       </licenses>
-      <purl>pkg:maven/org.jboss.resteasy/resteasy-jaxrs@3.1.0-Final?type=jar</purl>
-      <cpe>cpe:2.3:a:redhat:resteasy:3.1.0:*:*:*:*:*:*:*</cpe>
-      <modified>false</modified>
+      <purl>pkg:maven/org.apache.tomcat/tomcat-catalina@9.0.14?packaging=jar</purl>
     </component>
-    <!-- More components here -->
+      <!-- More components here -->
   </components>
 </bom>
 ```
