@@ -309,13 +309,27 @@
             <div class="navbar navbar-fixed-top navbar-inverse" role="navigation">
                <div class="container">
                   <div class="navbar-header">
+                     <!-- Hamburger menu
                       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                          <span class="sr-only">Toggle navigation</span>
-                         <span class="icon-bar"><xsl:text>Blah 1</xsl:text></span>
-                         <span class="icon-bar"><xsl:text>Blah 2</xsl:text></span>
-                         <span class="icon-bar"><xsl:text>Blah 3</xsl:text></span>
+                         <span class="icon-bar"><xsl:text> </xsl:text></span>
+                         <span class="icon-bar"><xsl:text> </xsl:text></span>
+                         <span class="icon-bar"><xsl:text> </xsl:text></span>
                       </button>
+                      -->
                       <a class="navbar-brand xs3p-navbar-title"><xsl:value-of select="$actualTitle"/></a>
+
+                     <!-- Version selection dropdown -->
+                     <ul class="nav navbar-nav navbar-right">
+                        <li class="dropdown">
+                           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Version <span class="caret"></span></a>
+                           <ul class="dropdown-menu">
+                              <li><a href="../1.1">CycloneDX v1.1</a></li>
+                              <li><a href="../1.0">CycloneDX v1.0</a></li>
+                           </ul>
+                        </li>
+                     </ul>
+
                   </div>
                </div>
             </div>
