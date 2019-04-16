@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/CycloneDX/specification.svg?branch=master)](https://travis-ci.org/CycloneDX/specification)
 [![License][license-image]][license-url]
 [![Website](https://img.shields.io/badge/https://-cyclonedx.org-blue.svg)](https://cyclonedx.org/)
-[![Group Discussion](https://img.shields.io/badge/groups.io-discussion-337ab7.svg)](https://groups.io/g/CycloneDX)
+[![Group Discussion](https://img.shields.io/badge/discussion-groups.io-blue.svg)](https://groups.io/g/CycloneDX)
 [![Twitter](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&label=Follow)](https://twitter.com/CycloneDX_Spec)
 
 # CycloneDX Specification
