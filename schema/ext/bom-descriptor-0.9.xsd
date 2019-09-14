@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+CycloneDX Dependency Graph Extension
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+           xmlns:bom="http://cyclonedx.org/schema/bom/1.1"
+           xmlns:desc="http://cyclonedx.org/schema/ext/bom-descriptor/0.9"
+           elementFormDefault="qualified"
+           targetNamespace="http://cyclonedx.org/schema/ext/bom-descriptor/0.9"
+           vc:minVersion="1.0"
+           vc:maxVersion="1.1"
+           version="0.9">
+
+    <xs:annotation>
+        <xs:documentation>
+            <name>CycloneDX BOM Descriptor Extension</name>
+            <url>https://cyclonedx.org/ext/bom-descriptor</url>
+            <license uri="http://www.apache.org/licenses/LICENSE-2.0"
+                     version="2.0">Apache License, Version 2.0</license>
+            <authors>
+                <author>Steve Springett</author>
+            </authors>
+        </xs:documentation>
+    </xs:annotation>
+
+    <xs:complexType name="metadata">
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="softwareName" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Specifies the name of the software the BOM describes.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="softwareVersion" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Specifies the version of the software the BOM describes.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="softwareEdition" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Specifies the edition of the software the BOM describes.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="hashes" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="hash" type="bom:hashType"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="licenses" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:choice>
+                        <xs:element name="license" type="bom:licenseType" minOccurs="0" maxOccurs="unbounded"/>
+                        <xs:element name="expression" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>A valid SPDX license expression.
+                                    Refer to https://spdx.org/specifications for syntax requirements</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:choice>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="copyright" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>An optional copyright notice informing users of the underlying claims to
+                        copyright ownership in a published work.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="cpe" type="bom:cpe" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Specifies a well-formed CPE name. See https://nvd.nist.gov/products/cpe
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="purl" type="xs:anyURI" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Specifies the package-url (PURL). The purl, if specified, must be valid and conform
+                        to the specification defined at: https://github.com/package-url/purl-spec
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="manufacture" type="desc:organizationalEntity" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>The organization that manufactured the software for which the BOM describes.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="supplier" type="desc:organizationalEntity" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>The organization that supplied the software for which the BOM describes. The
+                    supplier may often be the manufacture, but may also be a distributor or repackager.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##other" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:complexType name="organizationalEntity">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element name="name" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The name of the organization</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="url" type="xs:anyURI" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>The URL of the organization. Multiple URLs are allowed.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="contact" type="desc:organizationalPerson" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>A contact person at the organization. Multiple contacts are allowed.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##other" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:complexType name="organizationalPerson">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element name="name" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The name of the person</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="email" type="xs:normalizedString" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>The email address of the person. Multiple email addresses are allowed.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="phone" type="xs:normalizedString" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>The phone number of the person. Multiple phone numbers are allowed.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##other" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:element name="metadata" type="desc:metadata">
+        <xs:annotation>
+            <xs:documentation>Provides additional information about a BOM.</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+</xs:schema>
