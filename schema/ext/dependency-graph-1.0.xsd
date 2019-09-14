@@ -1,4 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+CycloneDX Dependency Graph Extension
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
            xmlns:dg="http://cyclonedx.org/schema/ext/dependency-graph/1.0"
@@ -7,6 +22,18 @@
            vc:minVersion="1.0"
            vc:maxVersion="1.1"
            version="1.0.0-SNAPSHOT">
+
+    <xs:annotation>
+        <xs:documentation>
+            <name>CycloneDX Dependency Graph Extension</name>
+            <url>https://cyclonedx.org/ext/dependency-graph</url>
+            <license uri="http://www.apache.org/licenses/LICENSE-2.0"
+                version="2.0">Apache License, Version 2.0</license>
+            <authors>
+                <author>Steve Springett</author>
+            </authors>
+        </xs:documentation>
+    </xs:annotation>
 
     <xs:complexType name="dependency">
         <xs:sequence minOccurs="0" maxOccurs="unbounded">
@@ -28,7 +55,14 @@
     <xs:element name="dependencies">
         <xs:complexType>
             <xs:sequence minOccurs="0" maxOccurs="unbounded">
-                <xs:element name="dependency" type="dg:dependency"/>
+                <xs:element name="dependency" type="dg:dependency">
+                    <xs:annotation>
+                        <xs:documentation>Components that do not have their own dependencies MUST be declared as empty
+                            elements within the graph. Components that are not represented in the dependency graph MAY
+                            have unknown dependencies. It is RECOMMENDED that implementations assume this to be opaque
+                            and not an indicator of a component being dependency-free.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
