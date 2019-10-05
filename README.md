@@ -68,7 +68,7 @@ CycloneDX is a versioned namespace and operates as follows:
 
 ## Example BOM
 ```xml
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <bom xmlns="http://cyclonedx.org/schema/bom/1.1" serialNumber="urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79" version="1">
   <components>
     <component type="library">
