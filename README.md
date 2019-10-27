@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/CycloneDX/specification.svg?branch=master)](https://travis-ci.org/CycloneDX/specification)
+[![Build Status](https://github.com/CycloneDX/specification/workflows/Maven%20CI/badge.svg)](https://github.com/CycloneDX/specification/actions?workflow=Maven+CI)
 [![License][license-image]][license-url]
 [![Website](https://img.shields.io/badge/https://-cyclonedx.org-blue.svg)](https://cyclonedx.org/)
 [![Group Discussion](https://img.shields.io/badge/discussion-groups.io-blue.svg)](https://groups.io/g/CycloneDX)
