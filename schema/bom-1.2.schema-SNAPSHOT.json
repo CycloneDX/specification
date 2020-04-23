@@ -3,12 +3,30 @@
   "$id": "http://cyclonedx.org/schema/bom-1.2.schema.json",
   "type": "object",
   "title": "CycloneDX Software Bill-of-Material Specification",
+  "$comment" : "CycloneDX JSON schema is published under the terms of the Apache License 2.0.",
   "required": [
-    "components",
+    "bomFormat",
+    "specVersion",
     "version",
-    "schemaVersion"
+    "components"
   ],
   "properties": {
+    "bomFormat": {
+      "$id": "#/properties/bomFormat",
+      "type": "string",
+      "title": "BOM Format",
+      "description": "Specifies the format of the BOM. This helps to identify the file as CycloneDX since BOMs do not have a filename convention nor does JSON schema support namespaces.",
+      "enum": [
+        "CycloneDX"
+      ]
+    },
+    "specVersion": {
+      "$id": "#/properties/specVersion",
+      "type": "string",
+      "title": "CycloneDX Specification Version",
+      "description": "The version of the CycloneDX specification a BOM is written to (starting at version 1.2)",
+      "examples": ["1.2"]
+    },
     "serialNumber": {
       "$id": "#/properties/serialNumber",
       "type": "string",
@@ -26,12 +44,10 @@
       "default": 1,
       "examples": [1]
     },
-    "schemaVersion": {
-      "$id": "#/properties/schemaVersion",
-      "type": "string",
-      "title": "CycloneDX Schema Version",
-      "description": "The version of the CycloneDX Schema a BOM is written to (starting at version 1.2)",
-      "examples": ["1.2"]
+    "metadata": {
+      "$id": "#/properties/metadata",
+      "$ref": "#/definitions/metadata",
+      "title": "BOM Metadata"
     },
     "components": {
       "$id": "#/properties/components",
@@ -47,6 +63,139 @@
     }
   },
   "definitions": {
+    "metadata": {
+      "type": "object",
+      "title": "BOM Metadata Object",
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Timestamp",
+          "description": "The date and time (timestamp) when the document was created."
+        },
+        "tools": {
+          "type": "array",
+          "title": "Creation Tools",
+          "description": "The tool(s) used in the creation of the BOM.",
+          "items": {"$ref": "#/definitions/tool"}
+        },
+        "authors" :{
+          "type": "array",
+          "title": "Authors",
+          "description": "The person(s) who created the BOM. Authors are common in BOMs created through manual processes. BOMs created through automated means may not have authors.",
+          "items": {"$ref": "#/definitions/organizationalPerson"}
+        },
+        "component": {
+          "title": "Component",
+          "description": "The component that the BOM describes.",
+          "$ref": "#/definitions/component"
+        },
+        "manufacture": {
+          "title": "Manufacture",
+          "description": "The organization that manufactured the component that the BOM describes.",
+          "$ref": "#/definitions/organizationalEntity"
+        },
+        "supplier": {
+          "title": "Supplier",
+          "description": " The organization that supplied the component that the BOM describes. The supplier may often be the manufacture, but may also be a distributor or repackager.",
+          "$ref": "#/definitions/organizationalEntity"
+        }
+      }
+    },
+    "tool": {
+      "type": "object",
+      "title": "Tool",
+      "description": "The tool used to create the BOM.",
+      "properties": {
+        "vendor": {
+          "type": "string",
+          "format": "string",
+          "title": "Tool Vendor",
+          "description": "The date and time (timestamp) when the document was created."
+        },
+        "name": {
+          "type": "string",
+          "format": "string",
+          "title": "Tool Name",
+          "description": "The date and time (timestamp) when the document was created."
+        },
+        "version": {
+          "type": "string",
+          "format": "string",
+          "title": "Tool Version",
+          "description": "The date and time (timestamp) when the document was created."
+        },
+        "hashes": {
+          "$id": "#/properties/hashes",
+          "type": "array",
+          "items": {"$ref": "#/definitions/hash"},
+          "title": "Hashes",
+          "description": "The hashes of the tool (if applicable)."
+        }
+      }
+    },
+    "organizationalEntity": {
+      "type": "object",
+      "title": "Organizational Entity Object",
+      "description": "",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name of the organization",
+          "default": "",
+          "examples": [
+            "Example Inc."
+          ],
+          "pattern": "^(.*)$"
+        },
+        "url": {
+          "type": "array",
+          "title": "URL",
+          "description": "The URL of the organization. Multiple URLs are allowed.",
+          "default": "",
+          "examples": ["https://example.com"],
+          "pattern": "^(.*)$"
+        },
+        "contact": {
+          "type": "array",
+          "title": "Contact",
+          "description": "A contact person at the organization. Multiple contacts are allowed.",
+          "items": {"$ref": "#/definitions/organizationalPerson"}
+        }
+      }
+    },
+    "organizationalPerson": {
+      "type": "object",
+      "title": "Organizational Person Object",
+      "description": "",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name of the person",
+          "default": "",
+          "examples": ["First name Last name"],
+          "pattern": "^(.*)$"
+        },
+        "email": {
+          "type": "string",
+          "title": "Email Address",
+          "description": "The email address of the person. Multiple email addresses are allowed.",
+          "default": "",
+          "examples": ["firstname.lastname@example.com"],
+          "pattern": "^(.*)$"
+        },
+        "phone": {
+          "type": "string",
+          "title": "Phone",
+          "description": "The phone number of the person. Multiple phone numbers are allowed.",
+          "default": "",
+          "examples": ["800-555-1212"],
+          "pattern": "^(.*)$"
+        }
+      }
+    },
     "component": {
       "type": "object",
       "title": "Component Object",
@@ -144,30 +293,13 @@
           ],
           "title": "Component Scope",
           "description": "Specifies the scope of the component. If scope is not specified, 'required' scope should be assumed by the consumer of the BOM",
-          "default": "",
+          "default": "required",
           "pattern": "^(.*)$"
         },
         "hashes": {
           "type": "array",
           "title": "Component Hashes",
-          "items": {
-            "type": "object",
-            "title": "Hash Objects",
-            "required": [
-              "alg",
-              "content"
-            ],
-            "properties": {
-              "alg": {
-                "type": "string",
-                "$ref": "#/definitions/hash-alg"
-              },
-              "content": {
-                "type": "string",
-                "$ref": "#/definitions/hash-content"
-              }
-            }
-          }
+          "items": {"$ref": "#/definitions/hash"}
         },
         "licenses": {
           "type": "array",
@@ -175,7 +307,6 @@
           "items": {
             "properties": {
               "license": {
-                "type": "object",
                 "$ref": "#/definitions/license"
               },
               "expression": {
@@ -257,6 +388,22 @@
           "type": "array",
           "items": {"$ref": "#/definitions/externalReference"},
           "title": "External References"
+        }
+      }
+    },
+    "hash": {
+      "type": "object",
+      "title": "Hash Objects",
+      "required": [
+        "alg",
+        "content"
+      ],
+      "properties": {
+        "alg": {
+          "$ref": "#/definitions/hash-alg"
+        },
+        "content": {
+          "$ref": "#/definitions/hash-content"
         }
       }
     },
@@ -366,13 +513,11 @@
           "format": "iri-reference"
         },
         "author": {
-          "type": "string",
           "title": "Author",
           "description": "The author who created the changes in the commit",
           "$ref": "#/definitions/identifiableAction"
         },
         "committer": {
-          "type": "string",
           "title": "Committer",
           "description": "The person who committed or pushed the commit",
           "$ref": "#/definitions/identifiableAction"
