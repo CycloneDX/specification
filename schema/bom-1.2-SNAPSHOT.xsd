@@ -283,6 +283,13 @@ limitations under the License.
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="swid" type="bom:swidType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Specifies metadata and content for ISO-IEC 19770-2 Software Identification (SWID) Tags.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:element name="modified" type="xs:boolean" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>
@@ -386,7 +393,7 @@ limitations under the License.
                     </xs:annotation>
                 </xs:element>
             </xs:choice>
-            <xs:element name="text" type="bom:licenseTextType" minOccurs="0" maxOccurs="1">
+            <xs:element name="text" type="bom:attachedTextType" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>Specifies the optional full text of the license</xs:documentation>
                 </xs:annotation>
@@ -407,22 +414,22 @@ limitations under the License.
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="licenseTextType">
+    <xs:complexType name="attachedTextType">
         <xs:simpleContent>
             <xs:extension base="xs:string">
                 <xs:annotation>
-                    <xs:documentation>Specifies attributes of the license text</xs:documentation>
+                    <xs:documentation>Specifies attributes of the text</xs:documentation>
                 </xs:annotation>
                 <xs:attribute name="content-type" type="xs:normalizedString" default="text/plain">
                     <xs:annotation>
-                        <xs:documentation>Specifies the content type of the license text. Defaults to text/plain
+                        <xs:documentation>Specifies the content type of the text. Defaults to text/plain
                             if not specified.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
                 <xs:attribute name="encoding" type="bom:encoding">
                     <xs:annotation>
                         <xs:documentation>
-                            Specifies the optional encoding the license text is represented in
+                            Specifies the optional encoding the text is represented in
                         </xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
@@ -564,6 +571,53 @@ limitations under the License.
             <xs:pattern value="([c][pP][eE]:/[AHOaho]?(:[A-Za-z0-9\._\-~%]*){0,6})|(cpe:2\.3:[aho\*\-](:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!&quot;#$$%&amp;'\(\)\+,/:;&lt;=&gt;@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){5}(:(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-]))(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!&quot;#$$%&amp;'\(\)\+,/:;&lt;=&gt;@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){4})"/>
         </xs:restriction>
     </xs:simpleType>
+
+    <xs:complexType name="swidType">
+        <xs:sequence>
+            <xs:element name="text" type="bom:attachedTextType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Specifies the optional full text of the SWID tag.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="url" type="xs:anyURI" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The URL to the SWID file.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:attribute name="tagId" type="xs:string" use="required">
+            <xs:annotation>
+                <xs:documentation>Maps to the tagId of a SoftwareIdentity.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="name" type="xs:string" use="required">
+            <xs:annotation>
+                <xs:documentation>Maps to the name of a SoftwareIdentity.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="version" type="xs:string" use="optional" default="0.0">
+            <xs:annotation>
+                <xs:documentation>Maps to the version of a SoftwareIdentity.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="tagVersion" type="xs:integer" use="optional" default="0">
+            <xs:annotation>
+                <xs:documentation>Maps to the tagVersion of a SoftwareIdentity.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="patch" type="xs:boolean" use="optional" default="false">
+            <xs:annotation>
+                <xs:documentation>Maps to the patch of a SoftwareIdentity.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
 
     <xs:simpleType name="urnUuid">
         <xs:annotation>
