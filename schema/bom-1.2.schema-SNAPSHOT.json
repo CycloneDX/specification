@@ -47,19 +47,30 @@
     "metadata": {
       "$id": "#/properties/metadata",
       "$ref": "#/definitions/metadata",
-      "title": "BOM Metadata"
+      "title": "BOM Metadata",
+      "description": "Provides additional information about a BOM."
     },
     "components": {
       "$id": "#/properties/components",
       "type": "array",
       "items": {"$ref": "#/definitions/component"},
+      "uniqueItems": true,
       "title": "Components"
     },
     "externalReferences": {
       "$id": "#/properties/externalReferences",
       "type": "array",
       "items": {"$ref": "#/definitions/externalReference"},
-      "title": "External References"
+      "title": "External References",
+      "description": "External references provide a way to document systems, sites, and information that may be relevant but which are not included with the BOM."
+    },
+    "dependencies": {
+      "$id": "#/properties/dependencies",
+      "type": "array",
+      "items": {"$ref": "#/definitions/dependency"},
+      "uniqueItems": true,
+      "title": "Dependencies",
+      "description": "Provides the ability to document dependency relationships."
     }
   },
   "definitions": {
@@ -233,7 +244,7 @@
         "bom-ref": {
           "type": "string",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.",
+          "description": "An optional identifier which can be used to reference the component elsewhere in the BOM. Every bom-ref should be unique.",
           "default": "",
           "pattern": "^(.*)$"
         },
@@ -597,6 +608,28 @@
             "build-system",
             "other"
           ]
+        }
+      }
+    },
+    "dependency": {
+      "type": "object",
+      "title": "Dependency",
+      "description": "Defines the direct dependencies of a component. Components that do not have their own dependencies MUST be declared as empty elements within the graph. Components that are not represented in the dependency graph MAY have unknown dependencies. It is RECOMMENDED that implementations assume this to be opaque and not an indicator of a component being dependency-free.",
+      "properties": {
+        "ref": {
+          "type": "string",
+          "format": "string",
+          "title": "Reference",
+          "description": "References a component by the components bom-ref attribute"
+        },
+        "dependsOn": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "title": "Depends On",
+          "description": "The bom-ref identifiers of the components that are dependencies of this dependency object."
         }
       }
     }
