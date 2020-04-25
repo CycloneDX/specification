@@ -353,6 +353,11 @@
           "examples": ["pkg:maven/com.acme/tomcat-catalina@9.0.14?packaging=jar"],
           "pattern": "^(.*)$"
         },
+        "swid": {
+          "$ref": "#/definitions/swid",
+          "title": "SWID Tag",
+          "description": "Specifies metadata and content for ISO-IEC 19770-2 Software Identification (SWID) Tags."
+        },
         "modified": {
           "type": "boolean",
           "title": "Component Modified From Original",
@@ -399,6 +404,87 @@
           "type": "array",
           "items": {"$ref": "#/definitions/externalReference"},
           "title": "External References"
+        }
+      }
+    },
+    "swid": {
+      "type": "object",
+      "title": "SWID Tag",
+      "description": "Specifies metadata and content for ISO-IEC 19770-2 Software Identification (SWID) Tags.",
+      "required": [
+        "tagId",
+        "name"
+      ],
+      "properties": {
+        "tagId": {
+          "type": "string",
+          "title": "Tag ID",
+          "description": "Maps to the tagId of a SoftwareIdentity."
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "Maps to the name of a SoftwareIdentity."
+        },
+        "version": {
+          "type": "string",
+          "title": "Version",
+          "default": "0.0",
+          "description": "Maps to the version of a SoftwareIdentity."
+        },
+        "tagVersion": {
+          "type": "integer",
+          "title": "Tag Version",
+          "default": 0,
+          "description": "Maps to the tagVersion of a SoftwareIdentity."
+        },
+        "patch": {
+          "type": "boolean",
+          "title": "Patch",
+          "default": false,
+          "description": "Maps to the patch of a SoftwareIdentity."
+        },
+        "attachment": {
+          "title": "Attachment",
+          "description": "Specifies the metadata and content of the SWID tag.",
+          "$ref": "#/definitions/attachment"
+        },
+        "url": {
+          "type": "string",
+          "title": "URL",
+          "default": "The URL to the SWID file.",
+          "pattern": "^(.*)$"
+        }
+      }
+    },
+    "attachment": {
+      "type": "object",
+      "title": "Attachment",
+      "description": "Specifies the metadata and content for an attachment.",
+      "required": [
+        "content"
+      ],
+      "properties": {
+        "content-type": {
+          "type": "string",
+          "title": "Content-Type",
+          "description": "Specifies the content type of the text. Defaults to text/plain if not specified.",
+          "default": "text/plain"
+        },
+        "encoding": {
+          "type": "string",
+          "title": "Encoding",
+          "description": "Specifies the optional encoding the text is represented in.",
+          "enum": [
+            "base64"
+          ],
+          "default": "",
+          "pattern": "^(.*)$"
+        },
+        "content": {
+          "type": "string",
+          "title": "Content",
+          "description": "The attachment data"
         }
       }
     },
