@@ -22,145 +22,185 @@ import java.io.File;
 public class SchemaVerificationTest {
 
     @Test
-    public void testExamples() {
+    public void testValid_10() throws Exception {
         Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_10, "/bom-1.0.xml"));
+    }
+
+    @Test
+    public void testValid_11() throws Exception {
         Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_11, "/bom-1.1.xml"));
     }
 
     @Test
-    public void testInvalidSerialNumber() {
+    public void testValid_12() throws Exception {
+        //Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/bom-1.2.xml"));
+    }
+
+    @Test
+    public void testInvalidSerialNumber() throws Exception {
         Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-serialnumber-1.1.xml"));
     }
 
     @Test
-    public void testInvalidNamespace() {
+    public void testInvalidNamespace() throws Exception {
         Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-namespace-1.1.xml"));
     }
 
     @Test
-    public void testValidRandomAttributes() {
+    public void testValidRandomAttributes() throws Exception {
         Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_11, "/valid-random-attributes-1.1.xml"));
     }
 
     @Test
-    public void testInvalidEmptyComponent() {
+    public void testInvalidEmptyComponent() throws Exception {
         Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-empty-component-1.1.xml"));
     }
 
     @Test
-    public void testValidEmptyComponents() {
+    public void testValidEmptyComponents() throws Exception {
         Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_11, "/valid-empty-components-1.1.xml"));
     }
 
     @Test
-    public void testMinimalViable() {
+    public void testMinimalViable() throws Exception {
         Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_11, "/valid-minimal-viable-1.1.xml"));
     }
 
     @Test
-    public void testInvalidComponentType() {
+    public void testInvalidComponentType() throws Exception {
         Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-component-type-1.1.xml"));
     }
 
     @Test
-    public void testMissingComponentType() {
+    public void testMissingComponentType() throws Exception {
         Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-missing-component-type-1.1.xml"));
     }
 
     @Test
-    public void testInvalidScope() {
+    public void testInvalidScope() throws Exception {
         Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-scope-1.1.xml"));
     }
 
     @Test
-    public void testInvalidHashAlg() {
+    public void testInvalidHashAlg() throws Exception {
         Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-hash-alg-1.1.xml"));
     }
 
     @Test
-    public void testInvalidHashMd5() {
+    public void testInvalidHashMd5() throws Exception {
         Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-hash-md5-1.1.xml"));
     }
 
     @Test
-    public void testInvalidHashSha1() {
+    public void testInvalidHashSha1() throws Exception {
         Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-hash-sha1-1.1.xml"));
     }
 
     @Test
-    public void testInvalidHashSha256() {
+    public void testInvalidHashSha256() throws Exception {
         Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-hash-sha256-1.1.xml"));
     }
 
     @Test
-    public void testHashSha512() {
+    public void testHashSha512() throws Exception {
         Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-hash-sha512-1.1.xml"));
     }
 
     @Test
-    public void testInvalidLicenseId() {
+    public void testInvalidLicenseId() throws Exception {
         Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-license-id-1.1.xml"));
     }
 
     @Test
-    public void testInvalidEncoding() {
+    public void testInvalidEncoding() throws Exception {
         Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-license-encoding-1.1.xml"));
     }
 
     @Test
-    public void testValidLicenseId() {
+    public void testValidLicenseId() throws Exception {
         Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_11, "/valid-license-id-1.1.xml"));
     }
 
     @Test
-    public void testValidLicenseName() {
+    public void testValidLicenseName() throws Exception {
         Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_11, "/valid-license-name-1.1.xml"));
     }
 
     @Test
-    public void testValidLicenseExpression() {
+    public void testValidLicenseExpression() throws Exception {
         Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_11, "/valid-license-expression-1.1.xml"));
     }
 
     @Test
-    public void testInvalidLicenseChoice() {
+    public void testInvalidLicenseChoice() throws Exception {
         Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-license-choice-1.1.xml"));
     }
 
     @Test
-    public void testInvalidLicenseIdCount() {
+    public void testInvalidLicenseIdCount() throws Exception {
         Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-license-id-count-1.1.xml"));
     }
 
     @Test
-    public void testInvalidLicenseNameCount() {
+    public void testInvalidLicenseNameCount() throws Exception {
         Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-license-name-count-1.1.xml"));
     }
 
     @Test
-    public void testValidComponentRef() {
+    public void testValidComponentRef() throws Exception {
         Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_11, "/valid-component-ref-1.1.xml"));
     }
 
     @Test
-    public void testInvalidComponentRef() {
+    public void testInvalidComponentRef() throws Exception {
         Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-component-ref-1.1.xml"));
     }
 
     @Test
-    public void testValidExternalElements() {
+    public void testValidExternalElements() throws Exception {
         Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_11, "/valid-external-elements-1.1.xml"));
     }
 
     @Test
-    public void testValidXmlSignature() {
+    public void testValidXmlSignature() throws Exception {
         // NOTE: Doesn't actually validate XML Signature. That is a business-case detail, not an
         // implementation requirement. If the business case requires signature validation, it should
         // be performed after document validation.
         Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_11, "/valid-xml-signature-1.1.xml"));
     }
 
-    private boolean isValid(CycloneDxSchema.Version version, String resource) {
+    @Test
+    public void testValidMetadataAuthors() throws Exception {
+        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-metadata-author-1.2.xml"));
+    }
+
+    @Test
+    public void testValidMetadataManufacture() throws Exception {
+        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-metadata-manufacture-1.2.xml"));
+    }
+
+    @Test
+    public void testValidMetadataSupplier() throws Exception {
+        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-metadata-supplier-1.2.xml"));
+    }
+
+    @Test
+    public void testValidMetadataTimestamp() throws Exception {
+        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-metadata-timestamp-1.2.xml"));
+    }
+
+    @Test
+    public void testInValidMetadataTimestamp() throws Exception {
+        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_12, "/invalid-metadata-timestamp-1.2.xml"));
+    }
+
+    @Test
+    public void testValidMetadataTool() throws Exception {
+        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-metadata-tool-1.2.xml"));
+    }
+
+
+    private boolean isValid(CycloneDxSchema.Version version, String resource) throws Exception {
         final File file = new File(this.getClass().getResource(resource).getFile());
         final BomParser parser = new BomParser();
         return parser.isValid(file, version);
