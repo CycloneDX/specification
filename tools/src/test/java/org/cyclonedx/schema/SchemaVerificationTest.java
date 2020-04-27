@@ -33,7 +33,7 @@ public class SchemaVerificationTest {
 
     @Test
     public void testValid_12() throws Exception {
-        //Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/bom-1.2.xml"));
+        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/bom-1.2.xml"));
     }
 
     @Test
