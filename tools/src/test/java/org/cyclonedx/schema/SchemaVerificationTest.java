@@ -199,6 +199,15 @@ public class SchemaVerificationTest {
         Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-metadata-tool-1.2.xml"));
     }
 
+    @Test
+    public void testValidDependency() throws Exception {
+        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-dependency-1.2.xml"));
+    }
+
+    @Test
+    public void testInValidDependency() throws Exception {
+        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_12, "/invalid-dependency-1.2.xml"));
+    }
 
     private boolean isValid(CycloneDxSchema.Version version, String resource) throws Exception {
         final File file = new File(this.getClass().getResource(resource).getFile());
