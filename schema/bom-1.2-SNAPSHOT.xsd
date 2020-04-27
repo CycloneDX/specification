@@ -62,7 +62,7 @@ limitations under the License.
                 </xs:annotation>
                 <xs:complexType>
                     <xs:sequence minOccurs="0" maxOccurs="unbounded">
-                        <xs:element name="author" type="bom:organizationalPerson"/>
+                        <xs:element name="author" type="bom:organizationalContact"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -82,6 +82,13 @@ limitations under the License.
                         supplier may often be the manufacture, but may also be a distributor or repackager.</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
         </xs:sequence>
         <xs:anyAttribute namespace="##other" processContents="lax">
             <xs:annotation>
@@ -103,11 +110,18 @@ limitations under the License.
                     <xs:documentation>The URL of the organization. Multiple URLs are allowed.</xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="contact" type="bom:organizationalPerson" minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="contact" type="bom:organizationalContact" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                     <xs:documentation>A contact person at the organization. Multiple contacts are allowed.</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
         </xs:sequence>
         <xs:anyAttribute namespace="##other" processContents="lax">
             <xs:annotation>
@@ -144,6 +158,13 @@ limitations under the License.
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
         </xs:sequence>
         <xs:anyAttribute namespace="##other" processContents="lax">
             <xs:annotation>
@@ -153,23 +174,30 @@ limitations under the License.
         </xs:anyAttribute>
     </xs:complexType>
 
-    <xs:complexType name="organizationalPerson">
+    <xs:complexType name="organizationalContact">
         <xs:sequence minOccurs="0" maxOccurs="1">
             <xs:element name="name" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation>The name of the person</xs:documentation>
+                    <xs:documentation>The name of the contact</xs:documentation>
                 </xs:annotation>
             </xs:element>
             <xs:element name="email" type="xs:normalizedString" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
-                    <xs:documentation>The email address of the person. Multiple email addresses are allowed.</xs:documentation>
+                    <xs:documentation>The email address of the contact. Multiple email addresses are allowed.</xs:documentation>
                 </xs:annotation>
             </xs:element>
             <xs:element name="phone" type="xs:normalizedString" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
-                    <xs:documentation>The phone number of the person. Multiple phone numbers are allowed.</xs:documentation>
+                    <xs:documentation>The phone number of the contact. Multiple phone numbers are allowed.</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
         </xs:sequence>
         <xs:anyAttribute namespace="##other" processContents="lax">
             <xs:annotation>
@@ -521,7 +549,7 @@ limitations under the License.
             </xs:enumeration>
             <xs:enumeration value="firmware">
                 <xs:annotation>
-                    <xs:documentation>A special type of software that provides low-level control over a devices 
+                    <xs:documentation>A special type of software that provides low-level control over a devices
                         hardware. Refer to https://en.wikipedia.org/wiki/Firmware</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
@@ -578,7 +606,7 @@ limitations under the License.
 
     <xs:complexType name="swidType">
         <xs:sequence>
-            <xs:element name="attachment" type="bom:attachedTextType" minOccurs="0" maxOccurs="1">
+            <xs:element name="text" type="bom:attachedTextType" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>Specifies the full content of the SWID tag.</xs:documentation>
                 </xs:annotation>
@@ -940,7 +968,7 @@ limitations under the License.
     <xs:element name="bom">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="metadata" type="bom:metadata">
+                <xs:element name="metadata" type="bom:metadata" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Provides additional information about a BOM.</xs:documentation>
                     </xs:annotation>
