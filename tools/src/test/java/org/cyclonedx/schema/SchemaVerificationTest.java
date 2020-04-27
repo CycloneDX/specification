@@ -224,6 +224,16 @@ public class SchemaVerificationTest {
         Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_12, "/invalid-component-swid-1.2.xml"));
     }
 
+    @Test
+    public void testValidComponentType11() throws Exception {
+        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-component-types-1.1.xml"));
+    }
+
+    @Test
+    public void testValidComponentType12() throws Exception {
+        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-component-types-1.2.xml"));
+    }
+
     private boolean isValid(CycloneDxSchema.Version version, String resource) throws Exception {
         final File file = new File(this.getClass().getResource(resource).getFile());
         final BomParser parser = new BomParser();
