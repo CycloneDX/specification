@@ -13,29 +13,24 @@
  */
 package org.cyclonedx.schema;
 
+import org.apache.commons.io.FileUtils;
 import org.cyclonedx.BomParser;
 import org.cyclonedx.CycloneDxSchema;
+import org.everit.json.schema.ValidationException;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 
-public class SchemaVerificationTest {
-
-    @Test
-    public void testValid_10() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_10, "/bom-1.0.xml"));
-    }
-
-    @Test
-    public void testValid_11() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_11, "/bom-1.1.xml"));
-    }
+public class JsonSchemaVerificationTest {
 
     @Test
     public void testValid_12() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/bom-1.2.xml"));
+        Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/bom-1.2.json"));
     }
 
+    /*
     @Test
     public void testInvalidSerialNumber() throws Exception {
         Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-serialnumber-1.1.xml"));
@@ -233,10 +228,20 @@ public class SchemaVerificationTest {
     public void testValidComponentType12() throws Exception {
         Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-component-types-1.2.xml"));
     }
-
-    private boolean isValid(CycloneDxSchema.Version version, String resource) throws Exception {
+*/
+    private boolean isValidJson(CycloneDxSchema.Version version, String resource) throws Exception {
         final File file = new File(this.getClass().getResource(resource).getFile());
         final BomParser parser = new BomParser();
-        return parser.isValid(file, version);
+        return parser.isValidJson(file, version);
+        /*
+        try {
+            final String jsonString = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+            parser.getJsonSchema(version).validate(new JSONObject(jsonString));
+            return true;
+        } catch (ValidationException e) {
+            e.printStackTrace();
+            return false;
+        }
+        */
     }
 }
