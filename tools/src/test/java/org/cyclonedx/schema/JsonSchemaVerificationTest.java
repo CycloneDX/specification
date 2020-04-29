@@ -187,47 +187,42 @@ public class JsonSchemaVerificationTest {
     public void testValidMetadataTool() throws Exception {
         Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-metadata-tool-1.2.xml"));
     }
-
+*/
     @Test
     public void testValidDependency() throws Exception {
-        Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-dependency-1.2.xml"));
+        Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-dependency-1.2.json"));
     }
 
     @Test
     public void testInValidDependency() throws Exception {
-        Assert.assertFalse(isValidJson(CycloneDxSchema.Version.VERSION_12, "/invalid-dependency-1.2.xml"));
+        Assert.assertFalse(isValidJson(CycloneDxSchema.Version.VERSION_12, "/invalid-dependency-1.2.json"));
     }
 
     @Test
     public void testValidSwid() throws Exception {
-        Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-component-swid-1.2.xml"));
+        Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-component-swid-1.2.json"));
     }
 
     @Test
     public void testValidSwidFull() throws Exception {
-        Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-component-swid-full-1.2.xml"));
+        Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-component-swid-full-1.2.json"));
     }
 
     @Test
     public void testInValidSwid() throws Exception {
-        Assert.assertFalse(isValidJson(CycloneDxSchema.Version.VERSION_12, "/invalid-component-swid-1.2.xml"));
-    }
-
-    @Test
-    public void testValidComponentType11() throws Exception {
-        Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-component-types-1.1.xml"));
+        Assert.assertFalse(isValidJson(CycloneDxSchema.Version.VERSION_12, "/invalid-component-swid-1.2.json"));
     }
 
     @Test
     public void testValidComponentType12() throws Exception {
-        Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-component-types-1.2.xml"));
+        Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-component-types-1.2.json"));
     }
-*/
+
     private boolean isValidJson(CycloneDxSchema.Version version, String resource) throws Exception {
         final File file = new File(this.getClass().getResource(resource).getFile());
         final BomParser parser = new BomParser();
         return parser.isValidJson(file, version);
-        /*
+/*
         try {
             final String jsonString = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
             parser.getJsonSchema(version).validate(new JSONObject(jsonString));
@@ -236,6 +231,6 @@ public class JsonSchemaVerificationTest {
             e.printStackTrace();
             return false;
         }
-        */
+*/
     }
 }
