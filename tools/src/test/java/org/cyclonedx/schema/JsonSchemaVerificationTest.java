@@ -146,23 +146,18 @@ public class JsonSchemaVerificationTest {
     }
 
     @Test
-    public void testValidExternalElements() throws Exception {
-        Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-external-elements-1.1.json"));
-    }
-
-    @Test
     public void testValidXmlSignature() throws Exception {
         // NOTE: Doesn't actually validate XML Signature. That is a business-case detail, not an
         // implementation requirement. If the business case requires signature validation, it should
         // be performed after document validation.
         Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-xml-signature-1.1.json"));
     }
-
+*/
     @Test
     public void testValidMetadataAuthors() throws Exception {
         Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-metadata-author-1.2.json"));
     }
-*/
+
     @Test
     public void testValidMetadataManufacture() throws Exception {
         Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-metadata-manufacture-1.2.json"));
