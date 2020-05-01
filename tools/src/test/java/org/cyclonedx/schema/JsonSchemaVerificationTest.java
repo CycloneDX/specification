@@ -94,22 +94,22 @@ public class JsonSchemaVerificationTest {
     public void testHashSha512() throws Exception {
         Assert.assertFalse(isValidJson(CycloneDxSchema.Version.VERSION_12, "/invalid-hash-sha512-1.2.json"));
     }
-/*
+
     @Test
-    public void testInvalidLicenseId() throws Exception { // TODO
-        Assert.assertFalse(isValidJson(CycloneDxSchema.Version.VERSION_12, "/invalid-license-id-1.1.json"));
+    public void testInvalidLicenseId() throws Exception {
+        Assert.assertFalse(isValidJson(CycloneDxSchema.Version.VERSION_12, "/invalid-license-id-1.2.json"));
     }
-*/
+
     @Test
     public void testInvalidEncoding() throws Exception {
         Assert.assertFalse(isValidJson(CycloneDxSchema.Version.VERSION_12, "/invalid-license-encoding-1.2.json"));
     }
-/*
+
     @Test
     public void testValidLicenseId() throws Exception {
-        Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-license-id-1.1.json"));
+        Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-license-id-1.2.json"));
     }
-
+/*
     @Test
     public void testValidLicenseName() throws Exception {
         Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-license-name-1.1.json"));
