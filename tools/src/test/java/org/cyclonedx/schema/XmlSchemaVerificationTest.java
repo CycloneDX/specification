@@ -170,6 +170,14 @@ public class XmlSchemaVerificationTest {
     }
 
     @Test
+    public void testValidXmlSignature12() throws Exception {
+        // NOTE: Doesn't actually validate XML Signature. That is a business-case detail, not an
+        // implementation requirement. If the business case requires signature validation, it should
+        // be performed after document validation.
+        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-xml-signature-1.2.xml"));
+    }
+
+    @Test
     public void testValidMetadataAuthors() throws Exception {
         Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-metadata-author-1.2.xml"));
     }
