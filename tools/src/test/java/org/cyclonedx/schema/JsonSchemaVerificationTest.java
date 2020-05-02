@@ -109,22 +109,22 @@ public class JsonSchemaVerificationTest {
     public void testValidLicenseId() throws Exception {
         Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-license-id-1.2.json"));
     }
-/*
+
     @Test
     public void testValidLicenseName() throws Exception {
-        Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-license-name-1.1.json"));
+        Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-license-name-1.2.json"));
     }
 
     @Test
     public void testValidLicenseExpression() throws Exception {
-        Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-license-expression-1.1.json"));
+        Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-license-expression-1.2.json"));
     }
 
     @Test
     public void testInvalidLicenseChoice() throws Exception {
-        Assert.assertFalse(isValidJson(CycloneDxSchema.Version.VERSION_12, "/invalid-license-choice-1.1.json"));
+        Assert.assertFalse(isValidJson(CycloneDxSchema.Version.VERSION_12, "/invalid-license-choice-1.2.json"));
     }
-
+/*
     @Test
     public void testInvalidLicenseIdCount() throws Exception {
         Assert.assertFalse(isValidJson(CycloneDxSchema.Version.VERSION_12, "/invalid-license-id-count-1.1.json"));
