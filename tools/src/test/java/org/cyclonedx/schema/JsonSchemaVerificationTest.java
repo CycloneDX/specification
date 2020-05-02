@@ -13,15 +13,11 @@
  */
 package org.cyclonedx.schema;
 
-import org.apache.commons.io.FileUtils;
 import org.cyclonedx.BomParser;
 import org.cyclonedx.CycloneDxSchema;
-import org.everit.json.schema.ValidationException;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 
 public class JsonSchemaVerificationTest {
 
@@ -124,17 +120,7 @@ public class JsonSchemaVerificationTest {
     public void testInvalidLicenseChoice() throws Exception {
         Assert.assertFalse(isValidJson(CycloneDxSchema.Version.VERSION_12, "/invalid-license-choice-1.2.json"));
     }
-/*
-    @Test
-    public void testInvalidLicenseIdCount() throws Exception {
-        Assert.assertFalse(isValidJson(CycloneDxSchema.Version.VERSION_12, "/invalid-license-id-count-1.1.json"));
-    }
 
-    @Test
-    public void testInvalidLicenseNameCount() throws Exception {
-        Assert.assertFalse(isValidJson(CycloneDxSchema.Version.VERSION_12, "/invalid-license-name-count-1.1.json"));
-    }
-*/
     @Test
     public void testValidComponentRef() throws Exception {
         Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-component-ref-1.2.json"));
@@ -209,15 +195,5 @@ public class JsonSchemaVerificationTest {
         final File file = new File(this.getClass().getResource(resource).getFile());
         final BomParser parser = new BomParser();
         return parser.isValidJson(file, version);
-/*
-        try {
-            final String jsonString = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-            parser.getJsonSchema(version).validate(new JSONObject(jsonString));
-            return true;
-        } catch (ValidationException e) {
-            e.printStackTrace();
-            return false;
-        }
-*/
     }
 }
