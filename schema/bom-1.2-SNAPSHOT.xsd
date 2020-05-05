@@ -965,6 +965,180 @@ limitations under the License.
         </xs:sequence>
     </xs:complexType>
 
+    <xs:complexType name="servicesType">
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="service" type="bom:service"/>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##any" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:complexType name="service">
+        <xs:sequence>
+            <xs:element name="provider" type="bom:organizationalEntity" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>The organization that provides the service.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="group" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The grouping name, namespace, or identifier. This will often be a shortened,
+                        single name of the company or project that produced the service or domain name.
+                        Whitespace and special characters should be avoided.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="name" type="xs:normalizedString" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The name of the service. This will often be a shortened, single name
+                        of the service.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="version" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The service version.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="description" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Specifies a description for the service.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="endpoints" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="endpoint" type="xs:anyURI" minOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>A service endpoint URI.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="authenticated" type="xs:boolean" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>A boolean value indicating if the service requires authentication.
+                        A value of true indicates the service requires authentication prior to use.
+                        A value of false indicates the service does not require authentication.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="x-trust-boundary" type="xs:boolean" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>A boolean value indicating if use of the service crosses a trust zone or boundary.
+                        A value of true indicates that by using the service, a trust boundary is crossed.
+                        A value of false indicates that by using the service, a trust boundary is not crossed.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="data" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="classification" type="bom:dataClassificationType">
+                            <xs:annotation>
+                                <xs:documentation>Specifies the data classification.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="licenses" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:choice>
+                        <xs:element name="license" type="bom:licenseType" minOccurs="0" maxOccurs="unbounded"/>
+                        <xs:element name="expression" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>A valid SPDX license expression.
+                                    Refer to https://spdx.org/specifications for syntax requirements</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:choice>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="services" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Specifies optional sub-service. This is not a dependency tree. It provides a way
+                        to specify a hierarchical representation of service assemblies, similar to
+                        system -> subsystem -> parts assembly in physical supply chains.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="service" type="bom:service"/>
+                        <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Allows any undeclared elements as long as the elements are placed in a different namespace.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:any>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:attribute name="bom-ref" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>
+                    An optional identifier which can be used to reference the service elsewhere in the BOM.
+                    Uniqueness is enforced within all elements and children of the root-level bom element.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:anyAttribute namespace="##any" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:complexType name="dataClassificationType">
+        <xs:annotation>
+            <xs:documentation>Specifies the data classification.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleContent>
+            <xs:extension base="xs:normalizedString">
+                <xs:attribute name="flow" type="bom:dataFlowType" use="required">
+                    <xs:annotation>
+                        <xs:documentation>Specifies the flow direction of the data.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:simpleType name="dataFlowType">
+        <xs:annotation>
+            <xs:documentation>Specifies the flow direction of the data. Valid values are:
+                inbound, outbound, bi-directional, and unknown. Direction is relative to the service.
+                Inbound flow states that data enters the service. Outbound flow states that data
+                leaves the service. Bi-directional states that data flows both ways, and unknown
+                states that the direction is not known.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="inbound"/>
+            <xs:enumeration value="outbound"/>
+            <xs:enumeration value="bi-directional"/>
+            <xs:enumeration value="unknown"/>
+        </xs:restriction>
+    </xs:simpleType>
+
     <xs:element name="bom">
         <xs:complexType>
             <xs:sequence>
@@ -973,7 +1147,16 @@ limitations under the License.
                         <xs:documentation>Provides additional information about a BOM.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element name="components" type="bom:componentsType"/>
+                <xs:element name="components" type="bom:componentsType" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>Provides the ability to document a list of components.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="services" type="bom:servicesType" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>Provides the ability to document a list of external services.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
                 <xs:element name="externalReferences" type="bom:externalReferences" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Provides the ability to document external references related to the BOM or
