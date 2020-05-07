@@ -7,8 +7,7 @@
   "required": [
     "bomFormat",
     "specVersion",
-    "version",
-    "components"
+    "version"
   ],
   "properties": {
     "bomFormat": {
@@ -56,6 +55,13 @@
       "items": {"$ref": "#/definitions/component"},
       "uniqueItems": true,
       "title": "Components"
+    },
+    "services": {
+      "$id": "#/properties/services",
+      "type": "array",
+      "items": {"$ref": "#/definitions/service"},
+      "uniqueItems": true,
+      "title": "Services"
     },
     "externalReferences": {
       "$id": "#/properties/externalReferences",
@@ -704,6 +710,143 @@
           "description": "The bom-ref identifiers of the components that are dependencies of this dependency object."
         }
       }
+    },
+    "service": {
+      "type": "object",
+      "title": "Service Object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "bom-ref": {
+          "type": "string",
+          "title": "BOM Reference",
+          "description": "An optional identifier which can be used to reference the service elsewhere in the BOM. Every bom-ref should be unique.",
+          "default": "",
+          "pattern": "^(.*)$"
+        },
+        "provider": {
+          "title": "Provider",
+          "description": "The organization that provides the service.",
+          "$ref": "#/definitions/organizationalEntity"
+        },
+        "group": {
+          "type": "string",
+          "title": "Service Group",
+          "description": "The grouping name, namespace, or identifier. This will often be a shortened, single name of the company or project that produced the service or domain name. Whitespace and special characters should be avoided.",
+          "default": "",
+          "examples": ["com.acme"],
+          "pattern": "^(.*)$"
+        },
+        "name": {
+          "type": "string",
+          "title": "Service Name",
+          "description": "The name of the service. This will often be a shortened, single name of the service.",
+          "default": "",
+          "examples": ["ticker-service"],
+          "pattern": "^(.*)$"
+        },
+        "version": {
+          "type": "string",
+          "title": "Service Version",
+          "description": "The service version.",
+          "default": "",
+          "examples": ["1.0.0"],
+          "pattern": "^(.*)$"
+        },
+        "description": {
+          "type": "string",
+          "title": "Service Description",
+          "description": "Specifies a description for the service",
+          "default": "",
+          "pattern": "^(.*)$"
+        },
+        "endpoints": {
+          "type": "array",
+          "title": "Endpoints",
+          "description": "The endpoint URIs of the service. Multiple endpoints are allowed.",
+          "default": "",
+          "examples": ["https://example.com/api/v1/ticker"],
+          "pattern": "^(.*)$"
+        },
+        "authenticated": {
+          "type": "boolean",
+          "title": "Authentication Required",
+          "description": "A boolean value indicating if the service requires authentication. A value of true indicates the service requires authentication prior to use. A value of false indicates the service does not require authentication."
+        },
+        "x-trust-boundary": {
+          "type": "boolean",
+          "title": "Crosses Trust Boundary",
+          "description": "A boolean value indicating if use of the service crosses a trust zone or boundary. A value of true indicates that by using the service, a trust boundary is crossed. A value of false indicates that by using the service, a trust boundary is not crossed."
+        },
+        "data": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/dataClassification"},
+          "title": "Data Classification",
+          "description": "Specifies the data classification."
+        },
+        "licenses": {
+          "type": "array",
+          "title": "Component License(s)",
+          "items": {
+            "properties": {
+              "license": {
+                "$ref": "#/definitions/license"
+              },
+              "expression": {
+                "type": "string",
+                "title": "SPDX License Expression",
+                "examples": [
+                  "Apache-2.0 AND (MIT OR GPL-2.0-only)",
+                  "GPL-3.0-only WITH Classpath-exception-2.0"
+                ],
+                "pattern": "^(.*)$"
+              }
+            },
+            "oneOf":[
+              {
+                "required": ["license"]
+              },
+              {
+                "required": ["expression"]
+              }
+            ]
+          }
+        },
+        "externalReferences": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/externalReference"},
+          "title": "External References"
+        }
+      }
+    },
+    "dataClassification": {
+      "type": "object",
+      "title": "Hash Objects",
+      "required": [
+        "flow",
+        "classification"
+      ],
+      "properties": {
+        "flow": {
+          "$ref": "#/definitions/dataFlow"
+        },
+        "classification": {
+          "type": "string"
+        }
+      }
+    },
+    "dataFlow": {
+      "type": "string",
+      "enum": [
+        "inbound",
+        "outbound",
+        "bi-directional",
+        "unknown"
+      ],
+      "title": "Data flow direction",
+      "default": "",
+      "pattern": "^(.*)$"
     }
   }
 }

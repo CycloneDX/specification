@@ -191,9 +191,36 @@ public class JsonSchemaVerificationTest {
         Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-component-types-1.2.json"));
     }
 
+    @Test
+    public void testValidService12() throws Exception {
+        Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-service-1.2.json"));
+    }
+
+    @Test
+    public void testValidServiceEmptyObjects12() throws Exception {
+        Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-service-empty-objects-1.2.json"));
+    }
+
+    @Test
+    public void testInvalidServiceData12() throws Exception {
+        Assert.assertFalse(isValidJson(CycloneDxSchema.Version.VERSION_12, "/invalid-service-data-1.2.json"));
+    }
+
     private boolean isValidJson(CycloneDxSchema.Version version, String resource) throws Exception {
         final File file = new File(this.getClass().getResource(resource).getFile());
         final BomParser parser = new BomParser();
-        return parser.isValidJson(file, version);
+        return parser.isValidJson(file, version, true);
+
+        // Uncomment to provide more detailed validation errors
+        /*
+        try {
+            final String jsonString = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+            parser.getJsonSchema(version, true).validate(new JSONObject(jsonString));
+            return true;
+        } catch (ValidationException e) {
+            e.printStackTrace();
+            return false;
+        }
+        */
     }
 }
