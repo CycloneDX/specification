@@ -206,6 +206,21 @@ public class JsonSchemaVerificationTest {
         Assert.assertFalse(isValidJson(CycloneDxSchema.Version.VERSION_12, "/invalid-service-data-1.2.json"));
     }
 
+    @Test
+    public void testValidPatch12() throws Exception {
+        Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-patch-1.2.json"));
+    }
+
+    @Test
+    public void testInvalidPatchType12() throws Exception {
+        Assert.assertFalse(isValidJson(CycloneDxSchema.Version.VERSION_12, "/invalid-patch-type-1.2.json"));
+    }
+
+    @Test
+    public void testInvalidIssueType12() throws Exception {
+        Assert.assertFalse(isValidJson(CycloneDxSchema.Version.VERSION_12, "/invalid-issue-type-1.2.json"));
+    }
+
     private boolean isValidJson(CycloneDxSchema.Version version, String resource) throws Exception {
         final File file = new File(this.getClass().getResource(resource).getFile());
         final BomParser parser = new BomParser();

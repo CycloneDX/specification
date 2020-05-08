@@ -407,6 +407,12 @@
               "description": "A list of zero or more commits which provide a trail describing how the component deviates from an ancestor, descendant, or variant.",
               "items": {"$ref": "#/definitions/commit"}
             },
+            "patches": {
+              "type": "array",
+              "title": "Patches",
+              "description": ">A list of zero or more patches describing how the component deviates from an ancestor, descendant, or variant. Patches may be complimentary to commits or may be used in place of commits.",
+              "items": {"$ref": "#/definitions/patch"}
+            },
             "notes": {
               "type": "string",
               "title": "Notes",
@@ -612,6 +618,122 @@
           "type": "string",
           "title": "Message",
           "description": "The text description of the contents of the commit",
+          "pattern": "^(.*)$"
+        }
+      }
+    },
+    "patch": {
+      "type": "object",
+      "title": "Patch",
+      "description": "Specifies an individual patch",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "unofficial",
+            "monkey",
+            "backport",
+            "cherry-pick"
+          ],
+          "title": "Type",
+          "description": "Specifies the purpose for the patch including the resolution of defects, security issues, or new behavior or functionality"
+        },
+        "diff": {
+          "type": "object",
+          "title": "Diff",
+          "description": "The patch file (or diff) that show changes. Refer to https://en.wikipedia.org/wiki/Diff",
+          "$ref": "#/definitions/diff"
+        },
+        "resolves": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/issue"},
+          "title": "Resolves",
+          "description": "A collection of issues the patch resolves"
+        }
+      }
+    },
+    "diff": {
+      "type": "object",
+      "title": "Diff",
+      "description": "The patch file (or diff) that show changes. Refer to https://en.wikipedia.org/wiki/Diff",
+      "properties": {
+        "text": {
+          "title": "Diff text",
+          "description": "Specifies the optional text of the diff",
+          "$ref": "#/definitions/attachment"
+        },
+        "url": {
+          "type": "string",
+          "title": "URL",
+          "description": "Specifies the URL to the diff",
+          "pattern": "^(.*)$"
+        }
+      }
+    },
+    "issue": {
+      "type": "object",
+      "title": "Diff",
+      "description": "The patch file (or diff) that show changes. Refer to https://en.wikipedia.org/wiki/Diff",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "defect",
+            "enhancement",
+            "security"
+          ],
+          "title": "Type",
+          "description": "Specifies the type of issue"
+        },
+        "id": {
+          "type": "string",
+          "title": "ID",
+          "description": "The identifier of the issue assigned by the source of the issue",
+          "pattern": "^(.*)$"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name of the issue",
+          "pattern": "^(.*)$"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the issue",
+          "pattern": "^(.*)$"
+        },
+        "source": {
+          "type": "object",
+          "title": "Source",
+          "description": "The source of the issue where it is documented",
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Name",
+              "description": "The name of the source. For example 'National Vulnerability Database', 'NVD', and 'Apache'",
+              "pattern": "^(.*)$"
+            },
+            "url": {
+              "type": "string",
+              "title": "URL",
+              "description": "The url of the issue documentation as provided by the source",
+              "pattern": "^(.*)$"
+            }
+          }
+        },
+        "references": {
+          "type": "array",
+          "title": "References",
+          "description": "A collection of URL's for reference. Multiple URLs are allowed.",
+          "default": "",
+          "examples": ["https://example.com"],
           "pattern": "^(.*)$"
         }
       }
