@@ -848,6 +848,193 @@ limitations under the License.
         </xs:sequence>
     </xs:complexType>
 
+    <xs:complexType name="patchesType">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Zero or more patches can be specified.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="patch" type="bom:patchType">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Specifies an individual patch.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="patchType">
+        <xs:sequence>
+            <xs:element name="diff" type="bom:diffType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The patch file (or diff) that show changes.
+                        Refer to https://en.wikipedia.org/wiki/Diff</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="resolves" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="issue" type="bom:issueType"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:attribute name="type" type="bom:patchClassification" use="required">
+            <xs:annotation>
+                <xs:documentation>Specifies the purpose for the patch including the resolution of defects,
+                    security issues, or new behavior or functionality</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:simpleType name="patchClassification">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="unofficial">
+                <xs:annotation>
+                    <xs:documentation>A patch which is not developed by the creators or maintainers of the software
+                        being patched. Refer to https://en.wikipedia.org/wiki/Unofficial_patch</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="monkey">
+                <xs:annotation>
+                    <xs:documentation>A patch which dynamically modifies runtime behavior.
+                        Refer to https://en.wikipedia.org/wiki/Monkey_patch</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="backport">
+                <xs:annotation>
+                    <xs:documentation>A patch which takes code from a newer version of software and applies
+                    it to older versions of the same software. Refer to https://en.wikipedia.org/wiki/Backporting</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="cherry-pick">
+                <xs:annotation>
+                    <xs:documentation>A patch created by selectively applying commits from other versions or
+                        branches of the same software.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="issueClassification">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="defect">
+                <xs:annotation>
+                    <xs:documentation>A fault, flaw, or bug in software</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="enhancement">
+                <xs:annotation>
+                    <xs:documentation>A new feature or behavior in software</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="security">
+                <xs:annotation>
+                    <xs:documentation>A special type of defect which impacts security</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="diffType">
+        <xs:sequence>
+            <xs:element name="text" type="bom:attachedTextType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Specifies the optional text of the diff</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="url" type="xs:anyURI" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Specifies the URL to the diff</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="issueType">
+        <xs:sequence>
+            <xs:element name="id" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The identifier of the issue assigned by the source of the issue</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="name" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The name of the issue</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="description" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">A description of the issue</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="source" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                            The source of the issue where it is documented.
+                        </xs:documentation>
+                    </xs:annotation>
+                    <xs:sequence>
+                        <xs:element name="name" minOccurs="0" type="xs:normalizedString" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation xml:lang="en">
+                                    The name of the source. For example "National Vulnerability Database",
+                                    "NVD", and "Apache"
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="url" minOccurs="0" type="xs:anyURI" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation xml:lang="en">
+                                    The url of the issue documentation as provided by the source
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="references" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="url" type="xs:anyURI"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:attribute name="type" type="bom:issueClassification" use="required">
+            <xs:annotation>
+                <xs:documentation>Specifies the type of issue</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
     <xs:complexType name="identifiableActionType">
         <xs:sequence>
             <xs:element name="timestamp" type="xs:dateTime" minOccurs="0" maxOccurs="1">
@@ -916,6 +1103,13 @@ limitations under the License.
                 <xs:annotation>
                     <xs:documentation xml:lang="en">A list of zero or more commits which provide a trail describing
                         how the component deviates from an ancestor, descendant, or variant.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="patches" type="bom:patchesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">A list of zero or more patches describing how the component
+                        deviates from an ancestor, descendant, or variant. Patches may be complimentary to commits
+                        or may be used in place of commits.</xs:documentation>
                 </xs:annotation>
             </xs:element>
             <xs:element name="notes" type="xs:string" minOccurs="0" maxOccurs="1">

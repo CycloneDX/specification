@@ -257,6 +257,21 @@ public class XmlSchemaVerificationTest {
         Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_12, "/invalid-service-data-1.2.xml"));
     }
 
+    @Test
+    public void testValidPatch12() throws Exception {
+        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-patch-1.2.xml"));
+    }
+
+    @Test
+    public void testInvalidPatchType12() throws Exception {
+        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_12, "/invalid-patch-type-1.2.xml"));
+    }
+
+    @Test
+    public void testInvalidIssueType12() throws Exception {
+        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_12, "/invalid-issue-type-1.2.xml"));
+    }
+
     private boolean isValid(CycloneDxSchema.Version version, String resource) throws Exception {
         final File file = new File(this.getClass().getResource(resource).getFile());
         final BomParser parser = new BomParser();
