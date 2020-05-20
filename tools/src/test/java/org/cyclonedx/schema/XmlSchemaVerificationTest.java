@@ -82,6 +82,11 @@ public class XmlSchemaVerificationTest {
     }
 
     @Test
+    public void testValidHashes12() throws Exception {
+        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-component-hashes-1.2.xml"));
+    }
+
+    @Test
     public void testInvalidHashAlg() throws Exception {
         Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-hash-alg-1.1.xml"));
     }

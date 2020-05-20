@@ -67,8 +67,8 @@ public class JsonSchemaVerificationTest {
     }
 
     @Test
-    public void testInvalidHashAlg() throws Exception {
-        Assert.assertFalse(isValidJson(CycloneDxSchema.Version.VERSION_12, "/invalid-hash-alg-1.2.json"));
+    public void testValidHashes12() throws Exception {
+        Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-component-hashes-1.2.json"));
     }
 
     @Test
