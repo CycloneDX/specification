@@ -48,7 +48,7 @@ dependency graphs, and services can also be incorporated into a BOM.
 
 | Field | Description | Required |
 | ------|-------------| :------: |
-|type| Describes if the component is a library, framework, application, operating system, or hardware device | 	&#x2714; |
+|type| Describes if the component is a library, framework, application, container, operating system, firmware, or hardware device | 	&#x2714; |
 |supplier| The organization that supplied the component. The supplier may often be the manufacture, but may also be a distributor or repackager. | |
 |author| The person(s) or organization(s) that authored the component | |
 |publisher| The person(s) or organization(s) that published the component | |
