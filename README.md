@@ -138,6 +138,15 @@ of CycloneDX SBOMs.
 - [Reliza Hub](https://relizahub.com)
 
 
+## Release History
+
+| Version | Release Date |
+| ------- | --------- |
+| CycloneDX 1.1 | 03 March 2019 |
+| CycloneDX 1.0 | 26 March 2018 |
+| Initial Prototype | 01 May 2017 |
+
+
 ## Related Work
 [SPDX (Software Package Data Exchange)][spdx-url] is a specification that provides low-level details of components, including all files, hashes, authors, and copyrights. SPDX also defines over 300 open source license IDs. CycloneDX builds on top of the work SPDX has accomplished with license IDs, but varies greatly in its approach towards building a software bill of material specification.
 
