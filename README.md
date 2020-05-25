@@ -100,7 +100,7 @@ dependency graphs, and services can also be incorporated into a BOM.
 ## Official Implementations
 Build plugins for a number of ecosystems have been created which support the automatic identification of all project 
 dependencies and automatically generate CycloneDX SBOMs. The resulting SBOMs may contain many of the elements above 
-including group, name, version, description, file hashes, license, and PackageURL. Additionally, a standalone Java API 
+including group, name, version, description, file hashes, license, and Package URL. Additionally, a standalone Java API 
 was created for the programmatic creation and validation of CycloneDX SBOMs.
 
 - [CycloneDX .NET Core](https://github.com/CycloneDX/cyclonedx-dotnet)
