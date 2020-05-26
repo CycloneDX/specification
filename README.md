@@ -142,6 +142,7 @@ of CycloneDX SBOMs.
 
 | Version | Release Date |
 | ------- | --------- |
+| CycloneDX 1.2 | 26 May 2020 |
 | CycloneDX 1.1 | 03 March 2019 |
 | CycloneDX 1.0 | 26 March 2018 |
 | Initial Prototype | 01 May 2017 |
