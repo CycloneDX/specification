@@ -29,7 +29,7 @@ import java.util.Set;
 
 public class SpdxXsdGenerator {
 
-    private static final String SPDX_VERSION = "3.8";
+    private static final String SPDX_VERSION = "3.9";
 
     public static void main(String args[]) throws Exception {
 
