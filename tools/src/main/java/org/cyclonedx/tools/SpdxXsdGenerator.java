@@ -16,6 +16,7 @@ package org.cyclonedx.tools;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.json.JSONArray;
@@ -29,7 +30,7 @@ import java.util.Set;
 
 public class SpdxXsdGenerator {
 
-    private static final String SPDX_VERSION = "3.9";
+    private static final String SPDX_VERSION = "3.10";
 
     public static void main(String args[]) throws Exception {
 
@@ -60,6 +61,7 @@ public class SpdxXsdGenerator {
         createXmlSchema(licenseMap, exceptionMap);
         createJsonSchema(licenseMap, exceptionMap);
         createLicenseListJson(licenseMap, exceptionMap);
+        mirrorLicenses(licenseRoot);
     }
 
 
@@ -157,6 +159,21 @@ public class SpdxXsdGenerator {
             sb.append(" ");
         }
         return sb.toString();
+    }
+
+    private static void mirrorLicenses(final JSONObject licenseRoot) throws IOException, UnirestException {
+        File file = new File("/Users/steve/Development/CycloneDX/cyclonedx-core-java/src/main/resources/licenses/licenses.json");
+        FileUtils.writeStringToFile(file, licenseRoot.toString(2), StandardCharsets.UTF_8);
+
+        JSONArray licenses = licenseRoot.getJSONArray("licenses");
+        for (int i = 0; i < licenses.length(); i++) {
+            JSONObject license = licenses.getJSONObject(i);
+            String licenseId = license.getString("licenseId");
+            String url = "https://raw.githubusercontent.com/spdx/license-list-data/v" + SPDX_VERSION + "/text/" + licenseId + ".txt";
+            String text = Unirest.get(url).asString().getBody();
+            File textFile = new File("/Users/steve/Development/CycloneDX/cyclonedx-core-java/src/main/resources/licenses/" + licenseId + ".txt");
+            FileUtils.writeStringToFile(textFile, text, StandardCharsets.UTF_8);
+        }
     }
 
 }
