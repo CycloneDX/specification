@@ -13,8 +13,8 @@
  */
 package org.cyclonedx.schema;
 
-import org.cyclonedx.BomParser;
 import org.cyclonedx.CycloneDxSchema;
+import org.cyclonedx.parsers.JsonParser;
 import org.junit.Assert;
 import org.junit.Test;
 import java.io.File;
@@ -223,8 +223,8 @@ public class JsonSchemaVerificationTest {
 
     private boolean isValidJson(CycloneDxSchema.Version version, String resource) throws Exception {
         final File file = new File(this.getClass().getResource(resource).getFile());
-        final BomParser parser = new BomParser();
-        return parser.isValidJson(file, version, true);
+        final JsonParser parser = new JsonParser();
+        return parser.isValid(file, version, true);
 
         // Uncomment to provide more detailed validation errors
         /*

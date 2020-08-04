@@ -13,8 +13,8 @@
  */
 package org.cyclonedx.schema;
 
-import org.cyclonedx.BomParser;
 import org.cyclonedx.CycloneDxSchema;
+import org.cyclonedx.parsers.XmlParser;
 import org.junit.Assert;
 import org.junit.Test;
 import java.io.File;
@@ -279,7 +279,7 @@ public class XmlSchemaVerificationTest {
 
     private boolean isValid(CycloneDxSchema.Version version, String resource) throws Exception {
         final File file = new File(this.getClass().getResource(resource).getFile());
-        final BomParser parser = new BomParser();
+        final XmlParser parser = new XmlParser();
         return parser.isValid(file, version);
     }
 }
