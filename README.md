@@ -6,7 +6,7 @@
 [![Twitter](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&label=Follow)](https://twitter.com/CycloneDX_Spec)
 
 # CycloneDX Specification
-CycloneDX is a lightweight software bill-of-material (SBOM) specification designed for use in application security 
+CycloneDX is a lightweight Software Bill of Materials (SBOM) specification designed for use in application security 
 contexts and supply chain component analysis.
 
 
@@ -36,7 +36,7 @@ free, open source, and proprietary tools and solutions that support the CycloneD
 The following media types are officially registered with IANA:
 
 | Media Type | Format | Assignment |
-| ------- | --------- |
+| ------- | --------- | --------- |
 | vnd.cyclonedx+xml | XML | [IANA](https://www.iana.org/assignments/media-types/application/vnd.cyclonedx+xml) |
 | vnd.cyclonedx+json | JSON | [IANA](https://www.iana.org/assignments/media-types/application/vnd.cyclonedx+json) |
 
