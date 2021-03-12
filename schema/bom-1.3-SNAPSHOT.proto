@@ -11,6 +11,7 @@ message AttachedTextType {
   // SimpleContent value of element
   string value = 3;
 }
+
 message BomType {
   // The version allows component publishers/authors to make changes to existing BOMs to update various aspects of the document such as description or licenses. When a system is presented with multiple BOMs for the same component, the system should use the most recent version of the BOM. The default version is '1' and should be incremented for each version of the BOM that is published. Each version of a component should have a unique BOM and if no changes are made to the BOMs, then each BOM will have a version of '1'.
   int32 version = 1;
@@ -26,9 +27,8 @@ message BomType {
   ExternalReferences external_references = 6;
   // Provides the ability to document dependency relationships.
   DependenciesType dependencies = 7;
-  // Allows any undeclared elements as long as the elements are placed in a different namespace.
-  repeated string any = 8;
 }
+
 enum Classification {
   // Default
   CLASSIFICATION_UNSPECIFIED = 0;
@@ -60,9 +60,8 @@ message CommitType {
   IdentifiableActionType committer = 4;
   // The text description of the contents of the commit
   string message = 5;
-  // Allows any undeclared elements as long as the elements are placed in a different namespace.
-  repeated string any = 6;
 }
+
 // Zero or more commits can be specified.
 message CommitsType {
   repeated SequenceWrapper_CommitsType sequence_wrapper = 1;
@@ -70,10 +69,9 @@ message CommitsType {
   message SequenceWrapper_CommitsType {
     // Specifies an individual commit.
     CommitType commit = 1;
-    // Allows any undeclared elements as long as the elements are placed in a different namespace.
-    repeated string any = 2;
   }
 }
+
 message Component {
   // Specifies the type of component. For software components, classify as application if no more specific appropriate classification is available or cannot be determined for the component.
   Classification type = 1;
@@ -115,8 +113,6 @@ message Component {
   ExternalReferences external_references = 20;
   // Specifies optional sub-components. This is not a dependency tree. It provides a way to specify a hierarchical representation of component assemblies, similar to system -> subsystem -> parts assembly in physical supply chains.
   ComponentsType components = 21;
-  // Allows any undeclared elements as long as the elements are placed in a different namespace.
-  repeated string any = 22;
 
   message HashesType {
     repeated SequenceWrapper_HashesType sequence_wrapper = 1;
@@ -145,8 +141,6 @@ message ComponentsType {
 
   message SequenceWrapper_ComponentsType {
     Component component = 1;
-    // Allows any undeclared elements as long as the elements are placed in a different namespace.
-    repeated string any = 2;
   }
 }
 // Specifies the data classification.
@@ -187,8 +181,6 @@ message DiffType {
   AttachedTextType text = 1;
   // Specifies the URL to the diff
   string url = 2;
-  // Allows any undeclared elements as long as the elements are placed in a different namespace.
-  repeated string any = 3;
 }
 enum Encoding {
   // Default
@@ -276,8 +268,6 @@ message IdentifiableActionType {
   string name = 2;
   // The email address of the individual who performed the action
   string email = 3;
-  // Allows any undeclared elements as long as the elements are placed in a different namespace.
-  repeated string any = 4;
 }
 enum IssueClassification {
   // Default
@@ -300,8 +290,6 @@ message IssueType {
   string description = 4;
   SourceType source = 5;
   ReferencesType references = 6;
-  // Allows any undeclared elements as long as the elements are placed in a different namespace.
-  repeated string any = 7;
 
   // The source of the issue where it is documented.
   message SourceType {
@@ -327,8 +315,6 @@ message LicenseType {
   AttachedTextType text = 11;
   // The URL to the attachment file. If the attachment is a license or BOM, an externalReference should also be specified for completeness.
   string url = 12;
-  // Allows any undeclared elements as long as the elements are placed in a different namespace.
-  repeated string any = 13;
 }
 message Metadata {
   // The date and time (timestamp) when the document was created.
@@ -343,8 +329,6 @@ message Metadata {
   repeated OrganizationalEntity manufacture = 5;
   // The organization that supplied the component that the BOM describes. The supplier may often be the manufacture, but may also be a distributor or repackager.
   repeated OrganizationalEntity supplier = 6;
-  // Allows any undeclared elements as long as the elements are placed in a different namespace.
-  repeated string any = 7;
 
   message ToolsType {
     repeated SequenceWrapper_ToolsType sequence_wrapper = 1;
@@ -368,8 +352,6 @@ message OrganizationalContact {
   repeated string email = 2;
   // The phone number of the contact. Multiple phone numbers are allowed.
   repeated string phone = 3;
-  // Allows any undeclared elements as long as the elements are placed in a different namespace.
-  repeated string any = 4;
 }
 message OrganizationalEntity {
   // The name of the organization
@@ -378,8 +360,6 @@ message OrganizationalEntity {
   repeated string url = 2;
   // A contact person at the organization. Multiple contacts are allowed.
   repeated OrganizationalContact contact = 3;
-  // Allows any undeclared elements as long as the elements are placed in a different namespace.
-  repeated string any = 4;
 }
 enum PatchClassification {
   // Default
@@ -399,8 +379,6 @@ message PatchType {
   // The patch file (or diff) that show changes. Refer to https://en.wikipedia.org/wiki/Diff
   DiffType diff = 2;
   ResolvesType resolves = 3;
-  // Allows any undeclared elements as long as the elements are placed in a different namespace.
-  repeated string any = 4;
 
   message ResolvesType {
     repeated SequenceWrapper_ResolvesType sequence_wrapper = 1;
@@ -417,8 +395,6 @@ message PatchesType {
   message SequenceWrapper_PatchesType {
     // Specifies an individual patch.
     PatchType patch = 1;
-    // Allows any undeclared elements as long as the elements are placed in a different namespace.
-    repeated string any = 2;
   }
 }
 // Component pedigree is a way to document complex supply chain scenarios where components are created, distributed, modified, redistributed, combined with other components, etc. Pedigree supports viewing this complex chain from the beginning, the end, or anywhere in the middle. It also provides a way to document variants where the exact relation may not be known.
@@ -435,8 +411,6 @@ message PedigreeType {
   PatchesType patches = 5;
   // Notes, observations, and other non-structured commentary describing the components pedigree.
   string notes = 6;
-  // Allows any undeclared elements as long as the elements are placed in a different namespace.
-  repeated string any = 7;
 }
 enum Scope {
   // Default
@@ -472,8 +446,6 @@ message Service {
   ExternalReferences external_references = 12;
   // Specifies optional sub-service. This is not a dependency tree. It provides a way to specify a hierarchical representation of service assemblies, similar to system -> subsystem -> parts assembly in physical supply chains.
   ServicesType services = 13;
-  // Allows any undeclared elements as long as the elements are placed in a different namespace.
-  repeated string any = 14;
 
   message EndpointsType {
     repeated SequenceWrapper_EndpointsType sequence_wrapper = 1;
@@ -501,8 +473,6 @@ message Service {
   
     message SequenceWrapper_ServicesType {
       Service service = 1;
-      // Allows any undeclared elements as long as the elements are placed in a different namespace.
-      repeated string any = 2;
     }
   }
 }
@@ -511,8 +481,6 @@ message ServicesType {
 
   message SequenceWrapper_ServicesType {
     Service service = 1;
-    // Allows any undeclared elements as long as the elements are placed in a different namespace.
-    repeated string any = 2;
   }
 }
 message SwidType {
@@ -530,8 +498,6 @@ message SwidType {
   AttachedTextType text = 6;
   // The URL to the SWID file.
   string url = 7;
-  // Allows any undeclared elements as long as the elements are placed in a different namespace.
-  repeated string any = 8;
 }
 // Specifies a tool (manual or automated).
 message ToolType {
@@ -542,8 +508,6 @@ message ToolType {
   // The version of the tool used to create the BOM.
   string version = 3;
   HashesType hashes = 4;
-  // Allows any undeclared elements as long as the elements are placed in a different namespace.
-  repeated string any = 5;
 
   message HashesType {
     repeated SequenceWrapper_HashesType sequence_wrapper = 1;
