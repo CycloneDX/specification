@@ -1,18 +1,17 @@
-// org_cyclonedx_schema_bom__1_2.proto at 0:0
 syntax = "proto3";
-package org.cyclonedx.schema.bom._1_2;
+package org.cyclonedx.schema.bom._1_3;
 
 // Specifies attributes of the text
-message AttachedTextType {
+message AttachedText {
   // Specifies the content type of the text. Defaults to text/plain if not specified.
-  string contenttype = 1;
+  string content_type = 1;
   // Specifies the optional encoding the text is represented in
-  Encoding encoding = 2;
+  string encoding = 2;
   // SimpleContent value of element
   string value = 3;
 }
 
-message BomType {
+message Bom {
   // The version allows component publishers/authors to make changes to existing BOMs to update various aspects of the document such as description or licenses. When a system is presented with multiple BOMs for the same component, the system should use the most recent version of the BOM. The default version is '1' and should be incremented for each version of the BOM that is published. Each version of a component should have a unique BOM and if no changes are made to the BOMs, then each BOM will have a version of '1'.
   int32 version = 1;
   // Every BOM generated should have a unique serial number, even if the contents of the BOM being generated have not changed over time. The process or tool responsible for creating the BOM should create random UUID's for every BOM generated.
@@ -20,13 +19,13 @@ message BomType {
   // Provides additional information about a BOM.
   Metadata metadata = 3;
   // Provides the ability to document a list of components.
-  ComponentsType components = 4;
+  repeated Component components = 4;
   // Provides the ability to document a list of external services.
-  ServicesType services = 5;
+  repeated Service services = 5;
   // Provides the ability to document external references related to the BOM or to the project the BOM describes.
-  ExternalReferences external_references = 6;
+  repeated ExternalReference external_references = 6;
   // Provides the ability to document dependency relationships.
-  DependenciesType dependencies = 7;
+  repeated Dependency dependencies = 7;
 }
 
 enum Classification {
@@ -38,47 +37,38 @@ enum Classification {
   CLASSIFICATION_FRAMEWORK = 2;
   // A software library. Refer to https://en.wikipedia.org/wiki/Library_(computing) for information about libraries. All third-party and open source reusable components will likely be a library. If the library also has key features of a framework, then it should be classified as a framework. If not, or is unknown, then specifying library is recommended.
   CLASSIFICATION_LIBRARY = 3;
-  // A packaging and/or runtime format, not specific to any particular technology, which isolates software inside the container from software outside of a container through virtualization technology. Refer to https://en.wikipedia.org/wiki/OS-level_virtualization
-  CLASSIFICATION_CONTAINER = 4;
   // A software operating system without regard to deployment model (i.e. installed on physical hardware, virtual machine, image, etc) Refer to https://en.wikipedia.org/wiki/Operating_system
-  CLASSIFICATION_OPERATING_SYSTEM = 5;
+  CLASSIFICATION_OPERATING_SYSTEM = 4;
   // A hardware device such as a processor, or chip-set. A hardware device containing firmware should include a component for the physical hardware itself, and another component of type 'firmware' or 'operating-system' (whichever is relevant), describing information about the software running on the device.
-  CLASSIFICATION_DEVICE = 6;
-  // A special type of software that provides low-level control over a devices hardware. Refer to https://en.wikipedia.org/wiki/Firmware
-  CLASSIFICATION_FIRMWARE = 7;
+  CLASSIFICATION_DEVICE = 5;
   // A computer file. Refer to https://en.wikipedia.org/wiki/Computer_file for information about files.
-  CLASSIFICATION_FILE = 8;
+  CLASSIFICATION_FILE = 6;
+  // A packaging and/or runtime format, not specific to any particular technology, which isolates software inside the container from software outside of a container through virtualization technology. Refer to https://en.wikipedia.org/wiki/OS-level_virtualization
+  CLASSIFICATION_CONTAINER = 7;
+  // A special type of software that provides low-level control over a devices hardware. Refer to https://en.wikipedia.org/wiki/Firmware
+  CLASSIFICATION_FIRMWARE = 8;
 }
-message CommitType {
+
+message Commit {
   // A unique identifier of the commit. This may be version control specific. For example, Subversion uses revision numbers whereas git uses commit hashes.
   string uid = 1;
   // The URL to the commit. This URL will typically point to a commit in a version control system.
   string url = 2;
   // The author who created the changes in the commit
-  IdentifiableActionType author = 3;
+  IdentifiableAction author = 3;
   // The person who committed or pushed the commit
-  IdentifiableActionType committer = 4;
+  IdentifiableAction committer = 4;
   // The text description of the contents of the commit
   string message = 5;
-}
-
-// Zero or more commits can be specified.
-message CommitsType {
-  repeated SequenceWrapper_CommitsType sequence_wrapper = 1;
-
-  message SequenceWrapper_CommitsType {
-    // Specifies an individual commit.
-    CommitType commit = 1;
-  }
 }
 
 message Component {
   // Specifies the type of component. For software components, classify as application if no more specific appropriate classification is available or cannot be determined for the component.
   Classification type = 1;
   // The optional mime-type of the component. When used on file components, the mime-type can provide additional context about the kind of file being represented such as an image, font, or executable. Some library or framework components may also have an associated mime-type.
-  string mimetype = 2;
+  string mime_type = 2;
   // An optional identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
-  string bomref = 3;
+  string bom_ref = 3;
   // The organization that supplied the component. The supplier may often be the manufacture, but may also be a distributor or repackager.
   OrganizationalEntity supplier = 4;
   // The person(s) or organization(s) that authored the component
@@ -95,8 +85,8 @@ message Component {
   string description = 10;
   // Specifies the scope of the component. If scope is not specified, 'runtime' scope should be assumed by the consumer of the BOM
   Scope scope = 11;
-  HashesType hashes = 12;
-  LicensesType licenses = 13;
+  repeated Hash hashes = 12;
+  repeated ComponentLicense licenses = 13;
   // An optional copyright notice informing users of the underlying claims to copyright ownership in a published work.
   string copyright = 14;
   // DEPRECATED - DO NOT USE. This will be removed in a future version. Specifies a well-formed CPE name. See https://nvd.nist.gov/products/cpe
@@ -104,89 +94,48 @@ message Component {
   // Specifies the package-url (PURL). The purl, if specified, must be valid and conform to the specification defined at: https://github.com/package-url/purl-spec
   string purl = 16;
   // Specifies metadata and content for ISO-IEC 19770-2 Software Identification (SWID) Tags.
-  SwidType swid = 17;
+  Swid swid = 17;
   // DEPRECATED - DO NOT USE. This will be removed in a future version. Use the pedigree element instead to supply information on exactly how the component was modified. A boolean value indicating is the component has been modified from the original. A value of true indicates the component is a derivative of the original. A value of false indicates the component has not been modified from the original.
   bool modified = 18;
   // Component pedigree is a way to document complex supply chain scenarios where components are created, distributed, modified, redistributed, combined with other components, etc.
-  PedigreeType pedigree = 19;
+  Pedigree pedigree = 19;
   // Provides the ability to document external references related to the component or to the project the component describes.
-  ExternalReferences external_references = 20;
+  repeated ExternalReference external_references = 20;
   // Specifies optional sub-components. This is not a dependency tree. It provides a way to specify a hierarchical representation of component assemblies, similar to system -> subsystem -> parts assembly in physical supply chains.
-  ComponentsType components = 21;
-
-  message HashesType {
-    repeated SequenceWrapper_HashesType sequence_wrapper = 1;
-  
-    message SequenceWrapper_HashesType {
-      HashType hash = 1;
-    }
-  }
-  message LicensesType {
-    repeated LicenseType license = 1;
-    // A valid SPDX license expression. Refer to https://spdx.org/specifications for syntax requirements
-    string expression = 2;
-  }
-  message ComponentsType {
-    repeated SequenceWrapper_ComponentsType sequence_wrapper = 1;
-  
-    message SequenceWrapper_ComponentsType {
-      Component component = 1;
-      // Allows any undeclared elements as long as the elements are placed in a different namespace.
-      repeated string any = 2;
-    }
-  }
+  repeated Component components = 21;
 }
-message ComponentsType {
-  repeated SequenceWrapper_ComponentsType sequence_wrapper = 1;
 
-  message SequenceWrapper_ComponentsType {
-    Component component = 1;
-  }
-}
 // Specifies the data classification.
-message DataClassificationType {
+message DataClassification {
   // Specifies the flow direction of the data.
-  DataFlowType flow = 1;
+  DataFlow flow = 1;
   // SimpleContent value of element
   string value = 2;
 }
-// Specifies the flow direction of the data. Valid values are: inbound, outbound, bi-directional, and unknown. Direction is relative to the service. Inbound flow states that data enters the service. Outbound flow states that data leaves the service. Bi-directional states that data flows both ways, and unknown states that the direction is not known.
-enum DataFlowType {
-  // Default
-  DATA_FLOW_TYPE_UNSPECIFIED = 0;
-  DATA_FLOW_TYPE_INBOUND = 1;
-  DATA_FLOW_TYPE_OUTBOUND = 2;
-  DATA_FLOW_TYPE_BI_DIRECTIONAL = 3;
-  DATA_FLOW_TYPE_UNKNOWN = 4;
-}
-message DependenciesType {
-  repeated SequenceWrapper_DependenciesType sequence_wrapper = 1;
 
-  message SequenceWrapper_DependenciesType {
-    // Components that do not have their own dependencies MUST be declared as empty elements within the graph. Components that are not represented in the dependency graph MAY have unknown dependencies. It is RECOMMENDED that implementations assume this to be opaque and not an indicator of a component being dependency-free.
-    DependencyType dependency = 1;
-  }
+// Specifies the flow direction of the data. Valid values are: inbound, outbound, bi-directional, and unknown. Direction is relative to the service. Inbound flow states that data enters the service. Outbound flow states that data leaves the service. Bi-directional states that data flows both ways, and unknown states that the direction is not known.
+enum DataFlow {
+  // Default
+  DATA_FLOW_UNSPECIFIED = 0;
+  DATA_FLOW_INBOUND = 1;
+  DATA_FLOW_OUTBOUND = 2;
+  DATA_FLOW_BI_DIRECTIONAL = 3;
+  DATA_FLOW_UNKNOWN = 4;
 }
-message DependencyType {
+
+message Dependency {
   // References a component or service by the its bom-ref attribute
   string ref = 1;
-  repeated SequenceWrapper_DependencyType sequence_wrapper = 2;
-
-  message SequenceWrapper_DependencyType {
-    DependencyType dependency = 1;
-  }
+  repeated Dependency dependencies = 2;
 }
-message DiffType {
+
+message Diff {
   // Specifies the optional text of the diff
-  AttachedTextType text = 1;
+  AttachedText text = 1;
   // Specifies the URL to the diff
   string url = 2;
 }
-enum Encoding {
-  // Default
-  ENCODING_UNSPECIFIED = 0;
-  ENCODING_BASE_64 = 1;
-}
+
 message ExternalReference {
   // Specifies the type of external reference. There are built-in types to describe common references. If a type does not exist for the reference being referred to, use the "other" type.
   ExternalReferenceType type = 1;
@@ -195,6 +144,7 @@ message ExternalReference {
   // An optional comment describing the external reference
   string comment = 3;
 }
+
 enum ExternalReferenceType {
   // Default
   EXTERNAL_REFERENCE_TYPE_UNSPECIFIED = 0;
@@ -229,15 +179,7 @@ enum ExternalReferenceType {
   // Use this if no other types accurately describe the purpose of the external reference
   EXTERNAL_REFERENCE_TYPE_OTHER = 15;
 }
-// External references provide a way to document systems, sites, and information that may be relevant but which are not included with the BOM.
-message ExternalReferences {
-  repeated SequenceWrapper_ExternalReferences sequence_wrapper = 1;
 
-  message SequenceWrapper_ExternalReferences {
-    // Zero or more external references can be defined
-    ExternalReference reference = 1;
-  }
-}
 enum HashAlg {
   // Default
   HASH_ALG_UNSPECIFIED = 0;
@@ -254,14 +196,16 @@ enum HashAlg {
   HASH_ALG_BLAKE_2_B_512 = 11;
   HASH_ALG_BLAKE_3 = 12;
 }
+
 // Specifies the file hash of the component
-message HashType {
+message Hash {
   // Specifies the algorithm used to create the hash
   HashAlg alg = 1;
   // SimpleContent value of element
   string value = 2;
 }
-message IdentifiableActionType {
+
+message IdentifiableAction {
   // The timestamp in which the action occurred
   uint64 timestamp = 1;
   // The name of the individual who performed the action
@@ -269,6 +213,7 @@ message IdentifiableActionType {
   // The email address of the individual who performed the action
   string email = 3;
 }
+
 enum IssueClassification {
   // Default
   ISSUE_CLASSIFICATION_UNSPECIFIED = 0;
@@ -279,7 +224,8 @@ enum IssueClassification {
   // A special type of defect which impacts security
   ISSUE_CLASSIFICATION_SECURITY = 3;
 }
-message IssueType {
+
+message Issue {
   // Specifies the type of issue
   IssueClassification type = 1;
   // The identifier of the issue assigned by the source of the issue
@@ -288,71 +234,58 @@ message IssueType {
   string name = 3;
   // A description of the issue
   string description = 4;
-  SourceType source = 5;
-  ReferencesType references = 6;
-
-  // The source of the issue where it is documented.
-  message SourceType {
-    // The name of the source. For example "National Vulnerability Database", "NVD", and "Apache"
-    string name = 1;
-    // The url of the issue documentation as provided by the source
-    string url = 2;
-  }
-  message ReferencesType {
-    repeated SequenceWrapper_ReferencesType sequence_wrapper = 1;
-  
-    message SequenceWrapper_ReferencesType {
-      string url = 1;
-    }
-  }
+  Source source = 5;
+  repeated string references = 6;
 }
-message LicenseType {
+
+// The source of the issue where it is documented.
+message Source {
+  // The name of the source. For example "National Vulnerability Database", "NVD", and "Apache"
+  string name = 1;
+  // The url of the issue documentation as provided by the source
+  string url = 2;
+}
+
+message ComponentLicense {
+  License license = 1;
+  string expression = 2;
+}
+
+message License {
   // A valid SPDX license ID
   string id = 1;
   // If SPDX does not define the license used, this field may be used to provide the license name
   string name = 2;
   // Specifies the optional full text of the attachment
-  AttachedTextType text = 11;
+  AttachedText text = 3;
   // The URL to the attachment file. If the attachment is a license or BOM, an externalReference should also be specified for completeness.
-  string url = 12;
+  string url = 4;
 }
+
 message Metadata {
   // The date and time (timestamp) when the document was created.
   uint64 timestamp = 1;
   // The tool(s) used in the creation of the BOM.
-  ToolsType tools = 2;
+  repeated Tool tools = 2;
   // The person(s) who created the BOM. Authors are common in BOMs created through manual processes. BOMs created through automated means may not have authors.
-  AuthorsType authors = 3;
+  repeated OrganizationalContact authors = 3;
   // The component that the BOM describes.
   Component component = 4;
   // The organization that manufactured the component that the BOM describes.
-  repeated OrganizationalEntity manufacture = 5;
+  OrganizationalEntity manufacture = 5;
   // The organization that supplied the component that the BOM describes. The supplier may often be the manufacture, but may also be a distributor or repackager.
-  repeated OrganizationalEntity supplier = 6;
-
-  message ToolsType {
-    repeated SequenceWrapper_ToolsType sequence_wrapper = 1;
-  
-    message SequenceWrapper_ToolsType {
-      ToolType tool = 1;
-    }
-  }
-  message AuthorsType {
-    repeated SequenceWrapper_AuthorsType sequence_wrapper = 1;
-  
-    message SequenceWrapper_AuthorsType {
-      OrganizationalContact author = 1;
-    }
-  }
+  OrganizationalEntity supplier = 6;
 }
+
 message OrganizationalContact {
   // The name of the contact
   string name = 1;
   // The email address of the contact. Multiple email addresses are allowed.
-  repeated string email = 2;
+  string email = 2;
   // The phone number of the contact. Multiple phone numbers are allowed.
-  repeated string phone = 3;
+  string phone = 3;
 }
+
 message OrganizationalEntity {
   // The name of the organization
   string name = 1;
@@ -361,6 +294,7 @@ message OrganizationalEntity {
   // A contact person at the organization. Multiple contacts are allowed.
   repeated OrganizationalContact contact = 3;
 }
+
 enum PatchClassification {
   // Default
   PATCH_CLASSIFICATION_UNSPECIFIED = 0;
@@ -373,45 +307,31 @@ enum PatchClassification {
   // A patch created by selectively applying commits from other versions or branches of the same software.
   PATCH_CLASSIFICATION_CHERRY_PICK = 4;
 }
-message PatchType {
+
+message Patch {
   // Specifies the purpose for the patch including the resolution of defects, security issues, or new behavior or functionality
   PatchClassification type = 1;
   // The patch file (or diff) that show changes. Refer to https://en.wikipedia.org/wiki/Diff
-  DiffType diff = 2;
-  ResolvesType resolves = 3;
-
-  message ResolvesType {
-    repeated SequenceWrapper_ResolvesType sequence_wrapper = 1;
-  
-    message SequenceWrapper_ResolvesType {
-      IssueType issue = 1;
-    }
-  }
+  Diff diff = 2;
+  repeated Issue resolves = 3;
 }
-// Zero or more patches can be specified.
-message PatchesType {
-  repeated SequenceWrapper_PatchesType sequence_wrapper = 1;
 
-  message SequenceWrapper_PatchesType {
-    // Specifies an individual patch.
-    PatchType patch = 1;
-  }
-}
 // Component pedigree is a way to document complex supply chain scenarios where components are created, distributed, modified, redistributed, combined with other components, etc. Pedigree supports viewing this complex chain from the beginning, the end, or anywhere in the middle. It also provides a way to document variants where the exact relation may not be known.
-message PedigreeType {
+message Pedigree {
   // Describes zero or more components in which a component is derived from. This is commonly used to describe forks from existing projects where the forked version contains a ancestor node containing the original component it was forked from. For example, Component A is the original component. Component B is the component being used and documented in the BOM. However, Component B contains a pedigree node with a single ancestor documenting Component A - the original component from which Component B is derived from.
-  ComponentsType ancestors = 1;
+  repeated Component ancestors = 1;
   // Descendants are the exact opposite of ancestors. This provides a way to document all forks (and their forks) of an original or root component.
-  ComponentsType descendants = 2;
+  repeated Component descendants = 2;
   // Variants describe relations where the relationship between the components are not known. For example, if Component A contains nearly identical code to Component B. They are both related, but it is unclear if one is derived from the other, or if they share a common ancestor.
-  ComponentsType variants = 3;
+  repeated Component variants = 3;
   // A list of zero or more commits which provide a trail describing how the component deviates from an ancestor, descendant, or variant.
-  CommitsType commits = 4;
+  repeated Commit commits = 4;
   // A list of zero or more patches describing how the component deviates from an ancestor, descendant, or variant. Patches may be complimentary to commits or may be used in place of commits.
-  PatchesType patches = 5;
+  repeated Patch patches = 5;
   // Notes, observations, and other non-structured commentary describing the components pedigree.
   string notes = 6;
 }
+
 enum Scope {
   // Default
   SCOPE_UNSPECIFIED = 0;
@@ -422,9 +342,10 @@ enum Scope {
   // Components that are excluded provide the ability to document component usage for test and other non-runtime purposes. Excluded components are not reachable within a call graph at runtime.
   SCOPE_EXCLUDED = 3;
 }
+
 message Service {
   // An optional identifier which can be used to reference the service elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
-  string bomref = 1;
+  string bom_ref = 1;
   // The organization that provides the service.
   OrganizationalEntity provider = 2;
   // The grouping name, namespace, or identifier. This will often be a shortened, single name of the company or project that produced the service or domain name. Whitespace and special characters should be avoided.
@@ -435,55 +356,20 @@ message Service {
   string version = 5;
   // Specifies a description for the service.
   string description = 6;
-  EndpointsType endpoints = 7;
+  repeated string endpoints = 7;
   // A boolean value indicating if the service requires authentication. A value of true indicates the service requires authentication prior to use. A value of false indicates the service does not require authentication.
   bool authenticated = 8;
   // A boolean value indicating if use of the service crosses a trust zone or boundary. A value of true indicates that by using the service, a trust boundary is crossed. A value of false indicates that by using the service, a trust boundary is not crossed.
-  bool xtrustboundary = 9;
-  DataType data = 10;
-  LicensesType licenses = 11;
+  bool x_trust_boundary = 9;
+  repeated DataClassification data = 10;
+  repeated ComponentLicense licenses = 11;
   // Provides the ability to document external references related to the service.
-  ExternalReferences external_references = 12;
+  repeated ExternalReference external_references = 12;
   // Specifies optional sub-service. This is not a dependency tree. It provides a way to specify a hierarchical representation of service assemblies, similar to system -> subsystem -> parts assembly in physical supply chains.
-  ServicesType services = 13;
-
-  message EndpointsType {
-    repeated SequenceWrapper_EndpointsType sequence_wrapper = 1;
-  
-    message SequenceWrapper_EndpointsType {
-      // A service endpoint URI.
-      string endpoint = 1;
-    }
-  }
-  message DataType {
-    repeated SequenceWrapper_DataType sequence_wrapper = 1;
-  
-    message SequenceWrapper_DataType {
-      // Specifies the data classification.
-      DataClassificationType classification = 1;
-    }
-  }
-  message LicensesType {
-    repeated LicenseType license = 1;
-    // A valid SPDX license expression. Refer to https://spdx.org/specifications for syntax requirements
-    string expression = 2;
-  }
-  message ServicesType {
-    repeated SequenceWrapper_ServicesType sequence_wrapper = 1;
-  
-    message SequenceWrapper_ServicesType {
-      Service service = 1;
-    }
-  }
+  repeated Service services = 13;
 }
-message ServicesType {
-  repeated SequenceWrapper_ServicesType sequence_wrapper = 1;
 
-  message SequenceWrapper_ServicesType {
-    Service service = 1;
-  }
-}
-message SwidType {
+message Swid {
   // Maps to the tagId of a SoftwareIdentity.
   string tag_id = 1;
   // Maps to the name of a SoftwareIdentity.
@@ -495,25 +381,18 @@ message SwidType {
   // Maps to the patch of a SoftwareIdentity.
   bool patch = 5;
   // Specifies the full content of the SWID tag.
-  AttachedTextType text = 6;
+  AttachedText text = 6;
   // The URL to the SWID file.
   string url = 7;
 }
+
 // Specifies a tool (manual or automated).
-message ToolType {
+message Tool {
   // The vendor of the tool used to create the BOM.
   string vendor = 1;
   // The name of the tool used to create the BOM.
   string name = 2;
   // The version of the tool used to create the BOM.
   string version = 3;
-  HashesType hashes = 4;
-
-  message HashesType {
-    repeated SequenceWrapper_HashesType sequence_wrapper = 1;
-  
-    message SequenceWrapper_HashesType {
-      HashType hash = 1;
-    }
-  }
+  repeated Hash hashes = 4;
 }
