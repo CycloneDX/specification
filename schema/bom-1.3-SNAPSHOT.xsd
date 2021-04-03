@@ -82,6 +82,13 @@ limitations under the License.
                         supplier may often be the manufacture, but may also be a distributor or repackager.</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Provides the ability to document properties in a key/value store.
+                        This provides flexibility to include data not officially supported in the standard
+                        without having to use additional namespaces or create extensions.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                     <xs:documentation>
@@ -347,6 +354,13 @@ limitations under the License.
                 <xs:annotation>
                     <xs:documentation>Provides the ability to document external references related to the
                         component or to the project the component describes.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Provides the ability to document properties in a key/value store.
+                        This provides flexibility to include data not officially supported in the standard
+                        without having to use additional namespaces or create extensions.</xs:documentation>
                 </xs:annotation>
             </xs:element>
             <xs:element name="components" minOccurs="0" maxOccurs="1">
@@ -1273,6 +1287,13 @@ limitations under the License.
                     <xs:documentation>Provides the ability to document external references related to the service.</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Provides the ability to document properties in a key/value store.
+                        This provides flexibility to include data not officially supported in the standard
+                        without having to use additional namespaces or create extensions.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:element name="services" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>
@@ -1349,6 +1370,38 @@ limitations under the License.
         </xs:restriction>
     </xs:simpleType>
 
+    <xs:complexType name="propertiesType">
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="property" type="bom:propertyType"/>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##any" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:complexType name="propertyType">
+        <xs:attribute name="key" type="xs:string" use="required">
+            <xs:annotation>
+                <xs:documentation>The KEY in a key/value store. Multiple keys with the same name are allowed in the store.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="value" type="xs:string" use="required">
+            <xs:annotation>
+                <xs:documentation>The VALUE in a key/value store.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
     <xs:element name="bom">
         <xs:complexType>
             <xs:sequence>
@@ -1376,6 +1429,13 @@ limitations under the License.
                 <xs:element name="dependencies" type="bom:dependenciesType" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Provides the ability to document dependency relationships.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>Provides the ability to document properties in a key/value store.
+                        This provides flexibility to include data not officially supported in the standard
+                        without having to use additional namespaces or create extensions.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
                 <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
