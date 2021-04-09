@@ -221,6 +221,11 @@ public class JsonSchemaVerificationTest {
         Assert.assertFalse(isValidJson(CycloneDxSchema.Version.VERSION_12, "/invalid-issue-type-1.2.json"));
     }
 
+    @Test
+    public void testValidAssemblies_12() throws Exception {
+        Assert.assertTrue(isValidJson(CycloneDxSchema.Version.VERSION_12, "/valid-assembly-1.2.json"));
+    }
+
     private boolean isValidJson(CycloneDxSchema.Version version, String resource) throws Exception {
         final File file = new File(this.getClass().getResource(resource).getFile());
         final JsonParser parser = new JsonParser();
