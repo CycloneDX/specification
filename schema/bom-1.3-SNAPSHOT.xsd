@@ -82,9 +82,9 @@ limitations under the License.
                         supplier may often be the manufacture, but may also be a distributor or repackager.</xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="attachments" type="bom:attachmentsType" minOccurs="0" maxOccurs="1">
+            <xs:element name="attachments" type="bom:fileAttachmentsType" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation>Attachments provide a way to attach additional docmentation related to the
+                    <xs:documentation>Attachments provide a way to attach additional documentation related to the
                         BOM. This differs to additional documentation about the component that the BOM describes.</xs:documentation>
                 </xs:annotation>
             </xs:element>
@@ -376,10 +376,10 @@ limitations under the License.
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="attachments" type="bom:attachmentsType" minOccurs="0" maxOccurs="1">
+            <xs:element name="attachments" type="bom:fileAttachmentsType" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation>Attachments provide a way to attach additional docmentation related to the
-                        component or to the project the component describes.</xs:documentation>
+                    <xs:documentation>Attachments provide a way to attach additional documentation related to the
+                        component.</xs:documentation>
                 </xs:annotation>
             </xs:element>
             <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
@@ -457,6 +457,7 @@ limitations under the License.
             </xs:any>
         </xs:sequence>
     </xs:complexType>
+
     <xs:complexType name="attachmentsType">
         <xs:annotation>
             <xs:documentation xml:lang="en">
@@ -471,6 +472,7 @@ limitations under the License.
             </xs:element>
         </xs:sequence>
     </xs:complexType>
+
     <xs:complexType name="attachedTextType">
         <xs:simpleContent>
             <xs:extension base="xs:string">
@@ -492,6 +494,41 @@ limitations under the License.
                 </xs:attribute>
             </xs:extension>
         </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="fileAttachmentsType">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+                File attachments provide a way to attach additional files to the BOM.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="attachment" type="bom:attachedFileType">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Zero or more file attachments can be defined</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="attachedFileType">
+        <xs:sequence>
+            <xs:element name="filename" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The original base filename of the attachment.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="description" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>A description for the file attachment.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="contents" type="bom:attachedTextType" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The contents of the attached file.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
     </xs:complexType>
 
     <xs:complexType name="hashType">
