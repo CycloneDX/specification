@@ -279,19 +279,7 @@ limitations under the License.
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="licenses" minOccurs="0" maxOccurs="1">
-                <xs:complexType>
-                    <xs:choice>
-                        <xs:element name="license" type="bom:licenseType" minOccurs="0" maxOccurs="unbounded"/>
-                        <xs:element name="expression" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
-                            <xs:annotation>
-                                <xs:documentation>A valid SPDX license expression.
-                                    Refer to https://spdx.org/specifications for syntax requirements</xs:documentation>
-                            </xs:annotation>
-                        </xs:element>
-                    </xs:choice>
-                </xs:complexType>
-            </xs:element>
+            <xs:element name="licenses" type="bom:licenseChoiceType" minOccurs="0" maxOccurs="1"/>
             <xs:element name="copyright" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>An optional copyright notice informing users of the underlying claims to
@@ -366,6 +354,11 @@ limitations under the License.
                         </xs:any>
                     </xs:sequence>
                 </xs:complexType>
+            </xs:element>
+            <xs:element name="evidence" type="bom:componentEvidenceType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Provides the ability to document evidence collected through various forms of extraction or analysis.</xs:documentation>
+                </xs:annotation>
             </xs:element>
             <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
@@ -1252,19 +1245,7 @@ limitations under the License.
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="licenses" minOccurs="0" maxOccurs="1">
-                <xs:complexType>
-                    <xs:choice>
-                        <xs:element name="license" type="bom:licenseType" minOccurs="0" maxOccurs="unbounded"/>
-                        <xs:element name="expression" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
-                            <xs:annotation>
-                                <xs:documentation>A valid SPDX license expression.
-                                    Refer to https://spdx.org/specifications for syntax requirements</xs:documentation>
-                            </xs:annotation>
-                        </xs:element>
-                    </xs:choice>
-                </xs:complexType>
-            </xs:element>
+            <xs:element name="licenses" type="bom:licenseChoiceType" minOccurs="0" maxOccurs="1"/>
             <xs:element name="externalReferences" type="bom:externalReferences" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>Provides the ability to document external references related to the service.</xs:documentation>
@@ -1345,6 +1326,44 @@ limitations under the License.
             <xs:enumeration value="unknown"/>
         </xs:restriction>
     </xs:simpleType>
+
+    <xs:complexType name="licenseChoiceType">
+        <xs:choice>
+            <xs:element name="license" type="bom:licenseType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="expression" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>A valid SPDX license expression.
+                        Refer to https://spdx.org/specifications for syntax requirements</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:choice>
+    </xs:complexType>
+
+    <xs:complexType name="copyrightsType">
+        <xs:sequence>
+            <xs:element name="text" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="componentEvidenceType">
+        <xs:sequence>
+            <xs:element name="licenses" type="bom:licenseChoiceType" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="copyright" type="bom:copyrightsType" minOccurs="0" maxOccurs="1"/>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##any" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
 
     <xs:element name="bom">
         <xs:complexType>

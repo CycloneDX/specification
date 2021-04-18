@@ -326,31 +326,8 @@
         },
         "licenses": {
           "type": "array",
-          "title": "Component License(s)",
-          "items": {
-            "properties": {
-              "license": {
-                "$ref": "#/definitions/license"
-              },
-              "expression": {
-                "type": "string",
-                "title": "SPDX License Expression",
-                "examples": [
-                  "Apache-2.0 AND (MIT OR GPL-2.0-only)",
-                  "GPL-3.0-only WITH Classpath-exception-2.0"
-                ],
-                "pattern": "^(.*)$"
-              }
-            },
-            "oneOf":[
-              {
-                "required": ["license"]
-              },
-              {
-                "required": ["expression"]
-              }
-            ]
-          }
+          "items": {"$ref": "#/definitions/licenseChoice"},
+          "title": "Component License(s)"
         },
         "copyright": {
           "type": "string",
@@ -437,6 +414,11 @@
           "items": {"$ref": "#/definitions/component"},
           "uniqueItems": true,
           "title": "Components"
+        },
+        "evidence": {
+          "$ref": "#/definitions/componentEvidence",
+          "title": "Evidence",
+          "description": "Provides the ability to document evidence collected through various forms of extraction or analysis."
         }
       }
     },
@@ -603,6 +585,32 @@
           "pattern": "^(.*)$"
         }
       }
+    },
+    "licenseChoice": {
+      "type": "object",
+      "title": "License(s)",
+      "properties": {
+        "license": {
+          "$ref": "#/definitions/license"
+        },
+        "expression": {
+          "type": "string",
+          "title": "SPDX License Expression",
+          "examples": [
+            "Apache-2.0 AND (MIT OR GPL-2.0-only)",
+            "GPL-3.0-only WITH Classpath-exception-2.0"
+          ],
+          "pattern": "^(.*)$"
+        }
+      },
+      "oneOf":[
+        {
+          "required": ["license"]
+        },
+        {
+          "required": ["expression"]
+        }
+      ]
     },
     "commit": {
       "type": "object",
@@ -925,31 +933,8 @@
         },
         "licenses": {
           "type": "array",
-          "title": "Component License(s)",
-          "items": {
-            "properties": {
-              "license": {
-                "$ref": "#/definitions/license"
-              },
-              "expression": {
-                "type": "string",
-                "title": "SPDX License Expression",
-                "examples": [
-                  "Apache-2.0 AND (MIT OR GPL-2.0-only)",
-                  "GPL-3.0-only WITH Classpath-exception-2.0"
-                ],
-                "pattern": "^(.*)$"
-              }
-            },
-            "oneOf":[
-              {
-                "required": ["license"]
-              },
-              {
-                "required": ["expression"]
-              }
-            ]
-          }
+          "items": {"$ref": "#/definitions/licenseChoice"},
+          "title": "Component License(s)"
         },
         "externalReferences": {
           "type": "array",
@@ -992,6 +977,38 @@
       "title": "Data flow direction",
       "default": "",
       "pattern": "^(.*)$"
+    },
+
+    "copyright": {
+      "type": "object",
+      "title": "Copyright",
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "title": "Copyright Text"
+        }
+      }
+    },
+
+    "componentEvidence": {
+      "type": "object",
+      "title": "Evidence",
+      "description": "Provides the ability to document evidence collected through various forms of extraction or analysis.",
+      "properties": {
+        "licenses": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/licenseChoice"},
+          "title": "Component License(s)"
+        },
+        "copyright": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/copyright"},
+          "title": "Copyright"
+        }
+      }
     }
   }
 }
