@@ -29,22 +29,23 @@ message Bom {
 }
 
 enum Classification {
+  CLASSIFICATION_NULL = 0;
   // A software application. Refer to https://en.wikipedia.org/wiki/Application_software for information about applications.
-  CLASSIFICATION_APPLICATION = 0;
+  CLASSIFICATION_APPLICATION = 1;
   // A software framework. Refer to https://en.wikipedia.org/wiki/Software_framework for information on how frameworks vary slightly from libraries.
-  CLASSIFICATION_FRAMEWORK = 1;
+  CLASSIFICATION_FRAMEWORK = 2;
   // A software library. Refer to https://en.wikipedia.org/wiki/Library_(computing) for information about libraries. All third-party and open source reusable components will likely be a library. If the library also has key features of a framework, then it should be classified as a framework. If not, or is unknown, then specifying library is recommended.
-  CLASSIFICATION_LIBRARY = 2;
+  CLASSIFICATION_LIBRARY = 3;
   // A software operating system without regard to deployment model (i.e. installed on physical hardware, virtual machine, image, etc) Refer to https://en.wikipedia.org/wiki/Operating_system
-  CLASSIFICATION_OPERATING_SYSTEM = 3;
+  CLASSIFICATION_OPERATING_SYSTEM = 4;
   // A hardware device such as a processor, or chip-set. A hardware device containing firmware should include a component for the physical hardware itself, and another component of type 'firmware' or 'operating-system' (whichever is relevant), describing information about the software running on the device.
-  CLASSIFICATION_DEVICE = 4;
+  CLASSIFICATION_DEVICE = 5;
   // A computer file. Refer to https://en.wikipedia.org/wiki/Computer_file for information about files.
-  CLASSIFICATION_FILE = 5;
+  CLASSIFICATION_FILE = 6;
   // A packaging and/or runtime format, not specific to any particular technology, which isolates software inside the container from software outside of a container through virtualization technology. Refer to https://en.wikipedia.org/wiki/OS-level_virtualization
-  CLASSIFICATION_CONTAINER = 6;
+  CLASSIFICATION_CONTAINER = 7;
   // A special type of software that provides low-level control over a devices hardware. Refer to https://en.wikipedia.org/wiki/Firmware
-  CLASSIFICATION_FIRMWARE = 7;
+  CLASSIFICATION_FIRMWARE = 8;
 }
 
 message Commit {
@@ -113,10 +114,11 @@ message DataClassification {
 
 // Specifies the flow direction of the data. Valid values are: inbound, outbound, bi-directional, and unknown. Direction is relative to the service. Inbound flow states that data enters the service. Outbound flow states that data leaves the service. Bi-directional states that data flows both ways, and unknown states that the direction is not known.
 enum DataFlow {
-  DATA_FLOW_UNKNOWN = 0;
+  DATA_FLOW_NULL = 0;
   DATA_FLOW_INBOUND = 1;
   DATA_FLOW_OUTBOUND = 2;
   DATA_FLOW_BI_DIRECTIONAL = 3;
+  DATA_FLOW_UNKNOWN = 4;
 }
 
 message Dependency {
@@ -175,18 +177,19 @@ enum ExternalReferenceType {
 }
 
 enum HashAlg {
-  HASH_ALG_MD_5 = 0;
-  HASH_ALG_SHA_1 = 1;
-  HASH_ALG_SHA_256 = 2;
-  HASH_ALG_SHA_384 = 3;
-  HASH_ALG_SHA_512 = 4;
-  HASH_ALG_SHA_3_256 = 5;
-  HASH_ALG_SHA_3_384 = 6;
-  HASH_ALG_SHA_3_512 = 7;
-  HASH_ALG_BLAKE_2_B_256 = 8;
-  HASH_ALG_BLAKE_2_B_384 = 9;
-  HASH_ALG_BLAKE_2_B_512 = 10;
-  HASH_ALG_BLAKE_3 = 11;
+  HASH_ALG_NULL = 0;
+  HASH_ALG_MD_5 = 1;
+  HASH_ALG_SHA_1 = 2;
+  HASH_ALG_SHA_256 = 3;
+  HASH_ALG_SHA_384 = 4;
+  HASH_ALG_SHA_512 = 5;
+  HASH_ALG_SHA_3_256 = 6;
+  HASH_ALG_SHA_3_384 = 7;
+  HASH_ALG_SHA_3_512 = 8;
+  HASH_ALG_BLAKE_2_B_256 = 9;
+  HASH_ALG_BLAKE_2_B_384 = 10;
+  HASH_ALG_BLAKE_2_B_512 = 11;
+  HASH_ALG_BLAKE_3 = 12;
 }
 
 // Specifies the file hash of the component
@@ -207,12 +210,13 @@ message IdentifiableAction {
 }
 
 enum IssueClassification {
+  ISSUE_CLASSIFICATION_NULL = 0;
   // A fault, flaw, or bug in software
-  ISSUE_CLASSIFICATION_DEFECT = 0;
+  ISSUE_CLASSIFICATION_DEFECT = 1;
   // A new feature or behavior in software
-  ISSUE_CLASSIFICATION_ENHANCEMENT = 1;
+  ISSUE_CLASSIFICATION_ENHANCEMENT = 2;
   // A special type of defect which impacts security
-  ISSUE_CLASSIFICATION_SECURITY = 2;
+  ISSUE_CLASSIFICATION_SECURITY = 3;
 }
 
 message Issue {
@@ -286,14 +290,15 @@ message OrganizationalEntity {
 }
 
 enum PatchClassification {
+  PATCH_CLASSIFICATION_NULL = 0;
   // A patch which is not developed by the creators or maintainers of the software being patched. Refer to https://en.wikipedia.org/wiki/Unofficial_patch
-  PATCH_CLASSIFICATION_UNOFFICIAL = 0;
+  PATCH_CLASSIFICATION_UNOFFICIAL = 1;
   // A patch which dynamically modifies runtime behavior. Refer to https://en.wikipedia.org/wiki/Monkey_patch
-  PATCH_CLASSIFICATION_MONKEY = 1;
+  PATCH_CLASSIFICATION_MONKEY = 2;
   // A patch which takes code from a newer version of software and applies it to older versions of the same software. Refer to https://en.wikipedia.org/wiki/Backporting
-  PATCH_CLASSIFICATION_BACKPORT = 2;
+  PATCH_CLASSIFICATION_BACKPORT = 3;
   // A patch created by selectively applying commits from other versions or branches of the same software.
-  PATCH_CLASSIFICATION_CHERRY_PICK = 3;
+  PATCH_CLASSIFICATION_CHERRY_PICK = 4;
 }
 
 message Patch {
