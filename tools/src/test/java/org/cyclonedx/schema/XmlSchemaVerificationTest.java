@@ -13,273 +13,46 @@
  */
 package org.cyclonedx.schema;
 
+import org.apache.commons.io.IOUtils;
 import org.cyclonedx.CycloneDxSchema;
 import org.cyclonedx.parsers.XmlParser;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
 import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class XmlSchemaVerificationTest {
 
-    @Test
-    public void testValid_10() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_10, "/bom-1.0.xml"));
-    }
-
-    @Test
-    public void testValid_11() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_11, "/bom-1.1.xml"));
-    }
-
-    @Test
-    public void testValid_12() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/bom-1.2.xml"));
-    }
-
-    @Test
-    public void testInvalidSerialNumber() throws Exception {
-        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-serialnumber-1.1.xml"));
-    }
-
-    @Test
-    public void testInvalidNamespace() throws Exception {
-        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-namespace-1.1.xml"));
-    }
-
-    @Test
-    public void testValidRandomAttributes() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_11, "/valid-random-attributes-1.1.xml"));
-    }
-
-    @Test
-    public void testInvalidEmptyComponent() throws Exception {
-        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-empty-component-1.1.xml"));
-    }
-
-    @Test
-    public void testValidEmptyComponents() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_11, "/valid-empty-components-1.1.xml"));
-    }
-
-    @Test
-    public void testMinimalViable() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_11, "/valid-minimal-viable-1.1.xml"));
-    }
-
-    @Test
-    public void testInvalidComponentType() throws Exception {
-        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-component-type-1.1.xml"));
-    }
-
-    @Test
-    public void testMissingComponentType() throws Exception {
-        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-missing-component-type-1.1.xml"));
-    }
-
-    @Test
-    public void testInvalidScope() throws Exception {
-        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-scope-1.1.xml"));
-    }
-
-    @Test
-    public void testValidHashes12() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-component-hashes-1.2.xml"));
-    }
-
-    @Test
-    public void testInvalidHashAlg() throws Exception {
-        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-hash-alg-1.1.xml"));
-    }
-
-    @Test
-    public void testInvalidHashMd5() throws Exception {
-        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-hash-md5-1.1.xml"));
-    }
-
-    @Test
-    public void testInvalidHashSha1() throws Exception {
-        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-hash-sha1-1.1.xml"));
-    }
-
-    @Test
-    public void testInvalidHashSha256() throws Exception {
-        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-hash-sha256-1.1.xml"));
-    }
-
-    @Test
-    public void testHashSha512() throws Exception {
-        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-hash-sha512-1.1.xml"));
-    }
-
-    @Test
-    public void testInvalidLicenseId() throws Exception {
-        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-license-id-1.1.xml"));
-    }
-
-    @Test
-    public void testInvalidEncoding() throws Exception {
-        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-license-encoding-1.1.xml"));
-    }
-
-    @Test
-    public void testValidLicenseId() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_11, "/valid-license-id-1.1.xml"));
-    }
-
-    @Test
-    public void testValidLicenseName() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_11, "/valid-license-name-1.1.xml"));
-    }
-
-    @Test
-    public void testValidLicenseExpression() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_11, "/valid-license-expression-1.1.xml"));
-    }
-
-    @Test
-    public void testInvalidLicenseChoice() throws Exception {
-        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-license-choice-1.1.xml"));
-    }
-
-    @Test
-    public void testInvalidLicenseIdCount() throws Exception {
-        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-license-id-count-1.1.xml"));
-    }
-
-    @Test
-    public void testInvalidLicenseNameCount() throws Exception {
-        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-license-name-count-1.1.xml"));
-    }
-
-    @Test
-    public void testValidComponentRef() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_11, "/valid-component-ref-1.1.xml"));
-    }
-
-    @Test
-    public void testInvalidComponentRef() throws Exception {
-        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_11, "/invalid-component-ref-1.1.xml"));
-    }
-
-    @Test
-    public void testValidExternalElements() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_11, "/valid-external-elements-1.1.xml"));
-    }
-
-    @Test
-    public void testValidXmlSignature() throws Exception {
-        // NOTE: Doesn't actually validate XML Signature. That is a business-case detail, not an
-        // implementation requirement. If the business case requires signature validation, it should
-        // be performed after document validation.
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_11, "/valid-xml-signature-1.1.xml"));
-    }
-
-    @Test
-    public void testValidXmlSignature12() throws Exception {
-        // NOTE: Doesn't actually validate XML Signature. That is a business-case detail, not an
-        // implementation requirement. If the business case requires signature validation, it should
-        // be performed after document validation.
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-xml-signature-1.2.xml"));
-    }
-
-    @Test
-    public void testValidMetadataAuthors() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-metadata-author-1.2.xml"));
-    }
-
-    @Test
-    public void testValidMetadataManufacture() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-metadata-manufacture-1.2.xml"));
-    }
-
-    @Test
-    public void testValidMetadataSupplier() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-metadata-supplier-1.2.xml"));
-    }
-
-    @Test
-    public void testValidMetadataTimestamp() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-metadata-timestamp-1.2.xml"));
-    }
-
-    @Test
-    public void testInValidMetadataTimestamp() throws Exception {
-        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_12, "/invalid-metadata-timestamp-1.2.xml"));
-    }
-
-    @Test
-    public void testValidMetadataTool() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-metadata-tool-1.2.xml"));
-    }
-
-    @Test
-    public void testValidDependency() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-dependency-1.2.xml"));
-    }
-
-    @Test
-    public void testInValidDependency() throws Exception {
-        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_12, "/invalid-dependency-1.2.xml"));
-    }
-
-    @Test
-    public void testValidSwid() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-component-swid-1.2.xml"));
-    }
-
-    @Test
-    public void testValidSwidFull() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-component-swid-full-1.2.xml"));
-    }
-
-    @Test
-    public void testInValidSwid() throws Exception {
-        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_12, "/invalid-component-swid-1.2.xml"));
-    }
-
-    @Test
-    public void testValidComponentType11() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-component-types-1.1.xml"));
-    }
-
-    @Test
-    public void testValidComponentType12() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-component-types-1.2.xml"));
-    }
-
-    @Test
-    public void testValidService12() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-service-1.2.xml"));
-    }
-
-    @Test
-    public void testValidServiceEmptyObjects12() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-service-empty-objects-1.2.xml"));
-    }
-
-    @Test
-    public void testInvalidServiceData12() throws Exception {
-        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_12, "/invalid-service-data-1.2.xml"));
-    }
-
-    @Test
-    public void testValidPatch12() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-patch-1.2.xml"));
-    }
-
-    @Test
-    public void testInvalidPatchType12() throws Exception {
-        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_12, "/invalid-patch-type-1.2.xml"));
-    }
-
-    @Test
-    public void testInvalidIssueType12() throws Exception {
-        Assert.assertFalse(isValid(CycloneDxSchema.Version.VERSION_12, "/invalid-issue-type-1.2.xml"));
-    }
-
-    @Test
-    public void testValidAssemblies_12() throws Exception {
-        Assert.assertTrue(isValid(CycloneDxSchema.Version.VERSION_12, "/valid-assembly-1.2.xml"));
+    @TestFactory
+    Collection<DynamicTest> dynamicTestsWithCollection() throws Exception {
+        final List<String> files = IOUtils.readLines(this.getClass().getClassLoader().getResourceAsStream(""), StandardCharsets.UTF_8);
+        final List<DynamicTest> dynamicTests = new ArrayList<>();
+        for (final String file: files) {
+            if (file.endsWith(".xml")) {
+                final CycloneDxSchema.Version schemaVersion;
+                if (file.endsWith("-1.0.xml")) {
+                    schemaVersion = CycloneDxSchema.Version.VERSION_10;
+                } else if (file.endsWith("-1.1.xml")) {
+                    schemaVersion = CycloneDxSchema.Version.VERSION_11;
+                } else if (file.endsWith("-1.2.xml")) {
+                    schemaVersion = CycloneDxSchema.Version.VERSION_12;
+                } else {
+                    schemaVersion = null;
+                }
+                if (file.startsWith("valid") && schemaVersion != null) {
+                    dynamicTests.add(DynamicTest.dynamicTest(file, () -> assertTrue(isValid(schemaVersion, "/" + file))));
+                } else if (file.startsWith("invalid") && schemaVersion != null) {
+                    dynamicTests.add(DynamicTest.dynamicTest(file, () -> assertFalse(isValid(schemaVersion, "/" + file))));
+                }
+            }
+        }
+        return dynamicTests;
     }
 
     private boolean isValid(CycloneDxSchema.Version version, String resource) throws Exception {
