@@ -40,6 +40,10 @@ The following media types are officially registered with IANA:
 | vnd.cyclonedx+xml | XML | [IANA](https://www.iana.org/assignments/media-types/application/vnd.cyclonedx+xml) |
 | vnd.cyclonedx+json | JSON | [IANA](https://www.iana.org/assignments/media-types/application/vnd.cyclonedx+json) |
 
+Specific versions of CycloneDX can be specified by using the version parameter. i.e. `application/vnd.cyclonedx+xml; version=1.3`.
+
+The officially supported media type for Protocol Buffer format is `application/x.vnd.cyclonedx+protobuf`.
+
 
 ## Release History
 

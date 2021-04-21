@@ -122,8 +122,42 @@
         },
         "supplier": {
           "title": "Supplier",
-          "description": " The organization that supplied the component that the BOM describes. The supplier may often be the manufacture, but may also be a distributor or repackager.",
+          "description": " The organization that supplied the component that the BOM describes. The supplier may often be the manufacturer, but may also be a distributor or repackager.",
           "$ref": "#/definitions/organizationalEntity"
+        },
+        "licenses": {
+          "type": "array",
+          "title": "BOM License(s)",
+          "items": {
+            "properties": {
+              "license": {
+                "$ref": "#/definitions/license"
+              },
+              "expression": {
+                "type": "string",
+                "title": "SPDX License Expression",
+                "examples": [
+                  "Apache-2.0 AND (MIT OR GPL-2.0-only)",
+                  "GPL-3.0-only WITH Classpath-exception-2.0"
+                ],
+                "pattern": "^(.*)$"
+              }
+            },
+            "oneOf":[
+              {
+                "required": ["license"]
+              },
+              {
+                "required": ["expression"]
+              }
+            ]
+          }
+        },
+        "properties": {
+          "type": "array",
+          "title": "Properties",
+          "description": "Provides the ability to document properties in a key/value store. This provides flexibility to include data not officially supported in the standard without having to create extensions.",
+          "items": {"$ref": "#/definitions/property"}
         }
       }
     },
@@ -265,7 +299,7 @@
         },
         "supplier": {
           "title": "Component Supplier",
-          "description": " The organization that supplied the component. The supplier may often be the manufacture, but may also be a distributor or repackager.",
+          "description": " The organization that supplied the component. The supplier may often be the manufacturer, but may also be a distributor or repackager.",
           "$ref": "#/definitions/organizationalEntity"
         },
         "author": {
@@ -445,6 +479,12 @@
           "items": {"$ref": "#/definitions/component"},
           "uniqueItems": true,
           "title": "Components"
+        },
+        "properties": {
+          "type": "array",
+          "title": "Properties",
+          "description": "Provides the ability to document properties in a key/value store. This provides flexibility to include data not officially supported in the standard without having to create extensions.",
+          "items": {"$ref": "#/definitions/property"}
         }
       }
     },
@@ -970,6 +1010,12 @@
           "items": {"$ref": "#/definitions/service"},
           "uniqueItems": true,
           "title": "Services"
+        },
+        "properties": {
+          "type": "array",
+          "title": "Properties",
+          "description": "Provides the ability to document properties in a key/value store. This provides flexibility to include data not officially supported in the standard without having to create extensions.",
+          "items": {"$ref": "#/definitions/property"}
         }
       }
     },
@@ -1044,6 +1090,24 @@
         "unknown",
         "not_specified"
       ]
+    },
+    "property": {
+      "type": "object",
+      "title": "Lightweight key/value pair",
+      "properties": {
+        "key": {
+          "type": "string",
+          "title": "Key",
+          "description": "The KEY in a key/value store. Multiple keys with the same name are allowed in the store.",
+          "pattern": "^(.*)$"
+        },
+        "value": {
+          "type": "string",
+          "title": "Value",
+          "description": "The VALUE in a key/value store.",
+          "pattern": "^(.*)$"
+        }
+      }
     }
   }
 }
