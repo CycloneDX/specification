@@ -116,6 +116,34 @@
           "title": "Supplier",
           "description": " The organization that supplied the component that the BOM describes. The supplier may often be the manufacturer, but may also be a distributor or repackager.",
           "$ref": "#/definitions/organizationalEntity"
+        },
+        "licenses": {
+          "type": "array",
+          "title": "BOM License(s)",
+          "items": {
+            "properties": {
+              "license": {
+                "$ref": "#/definitions/license"
+              },
+              "expression": {
+                "type": "string",
+                "title": "SPDX License Expression",
+                "examples": [
+                  "Apache-2.0 AND (MIT OR GPL-2.0-only)",
+                  "GPL-3.0-only WITH Classpath-exception-2.0"
+                ],
+                "pattern": "^(.*)$"
+              }
+            },
+            "oneOf":[
+              {
+                "required": ["license"]
+              },
+              {
+                "required": ["expression"]
+              }
+            ]
+          }
         }
       }
     },
