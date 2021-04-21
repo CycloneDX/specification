@@ -1383,6 +1383,127 @@ limitations under the License.
         </xs:restriction>
     </xs:simpleType>
 
+    <xs:complexType name="compositionsType">
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="composition" type="bom:compositionType"/>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##any" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:complexType name="compositionType">
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="aggregate" type="bom:aggregateType" default="not_specified">
+                <xs:annotation>
+                    <xs:documentation>Specifies an aggregate type that describe how complete a relationship is.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="assemblies" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The bom-ref identifiers of the components or services being described. Assemblies refer to
+                        nested relationships whereby a constituent part may include other constituent parts. References
+                        do not cascade to child parts. References are explicit for the specified constituent part only.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="assembly" type="bom:bomReferenceType"/>
+                        <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Allows any undeclared elements as long as the elements are placed in a different namespace.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:any>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="dependencies" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The bom-ref identifiers of the components or services being described. Dependencies refer to a
+                        relationship whereby an independent constituent part requires another independent constituent
+                        part. References do not cascade to transitive dependencies. References are explicit for the
+                        specified dependency only.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="dependency" type="bom:bomReferenceType"/>
+                        <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Allows any undeclared elements as long as the elements are placed in a different namespace.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:any>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="aggregateType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="complete">
+                <xs:annotation>
+                    <xs:documentation>The relationship is complete. No further relationships including constituent components, services, or dependencies exist.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="incomplete">
+                <xs:annotation>
+                    <xs:documentation>The relationship is incomplete. Additional relationships exist and may include constituent components, services, or dependencies.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="incomplete_first_party_only">
+                <xs:annotation>
+                    <xs:documentation>The relationship is incomplete. Only relationships for first-party components, services, or their dependencies are represented.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="incomplete_third_party_only">
+                <xs:annotation>
+                    <xs:documentation>The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="unknown">
+                <xs:annotation>
+                    <xs:documentation>The relationship may be complete or incomplete. This usually signifies a 'best-effort' to obtain constituent components, services, or dependencies but the completeness is inconclusive.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="not_specified">
+                <xs:annotation>
+                    <xs:documentation>The relationship completeness is not specified.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="bomReferenceType">
+        <xs:attribute name="ref" type="xs:string" use="required">
+            <xs:annotation>
+                <xs:documentation>References a component or service by the its bom-ref attribute</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:anyAttribute namespace="##other" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
     <xs:complexType name="propertiesType">
         <xs:sequence minOccurs="0" maxOccurs="unbounded">
             <xs:element name="property" type="bom:propertyType"/>
@@ -1442,6 +1563,11 @@ limitations under the License.
                 <xs:element name="dependencies" type="bom:dependenciesType" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Provides the ability to document dependency relationships.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="compositions" type="bom:compositionsType" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>Compositions describe constituent parts (including components, services, and dependency relationships) and their completeness.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
                 <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">

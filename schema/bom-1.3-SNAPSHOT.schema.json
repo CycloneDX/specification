@@ -77,6 +77,14 @@
       "uniqueItems": true,
       "title": "Dependencies",
       "description": "Provides the ability to document dependency relationships."
+    },
+    "compositions": {
+      "$id": "#/properties/compositions",
+      "type": "array",
+      "items": {"$ref": "#/definitions/compositions"},
+      "uniqueItems": true,
+      "title": "Compositions",
+      "description": "Compositions describe constituent parts (including components, services, and dependency relationships) and their completeness."
     }
   },
   "definitions": {
@@ -1038,6 +1046,50 @@
       "title": "Data flow direction",
       "default": "",
       "pattern": "^(.*)$"
+    },
+    "compositions": {
+      "type": "object",
+      "title": "Compositions",
+      "required": [
+        "aggregate"
+      ],
+      "properties": {
+        "aggregate": {
+          "$ref": "#/definitions/aggregateType",
+          "title": "Aggregate",
+          "description": "Specifies an aggregate type that describe how complete a relationship is."
+        },
+        "assemblies": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "title": "BOM references",
+          "description": "The bom-ref identifiers of the components or services being described. Assemblies refer to nested relationships whereby a constituent part may include other constituent parts. References do not cascade to child parts. References are explicit for the specified constituent part only."
+        },
+        "dependencies": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "title": "BOM references",
+          "description": "The bom-ref identifiers of the components or services being described. Dependencies refer to a relationship whereby an independent constituent part requires another independent constituent part. References do not cascade to transitive dependencies. References are explicit for the specified dependency only."
+        }
+      }
+    },
+    "aggregateType": {
+      "type": "string",
+      "default": "not_specified",
+      "enum": [
+        "complete",
+        "incomplete",
+        "incomplete_first_party_only",
+        "incomplete_third_party_only",
+        "unknown",
+        "not_specified"
+      ]
     },
     "property": {
       "type": "object",
