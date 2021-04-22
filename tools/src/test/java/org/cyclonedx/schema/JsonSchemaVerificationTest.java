@@ -13,13 +13,11 @@
  */
 package org.cyclonedx.schema;
 
-import org.apache.commons.io.IOUtils;
 import org.cyclonedx.CycloneDxSchema;
 import org.cyclonedx.parsers.JsonParser;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -27,11 +25,11 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class JsonSchemaVerificationTest {
+public class JsonSchemaVerificationTest extends BaseSchemaVerificationTest {
 
     @TestFactory
     Collection<DynamicTest> dynamicTestsWithCollection() throws Exception {
-        final List<String> files = IOUtils.readLines(this.getClass().getClassLoader().getResourceAsStream(""), StandardCharsets.UTF_8);
+        final List<String> files = getAllResources();
         final List<DynamicTest> dynamicTests = new ArrayList<>();
         for (final String file: files) {
             if (file.endsWith(".json")) {
@@ -42,9 +40,11 @@ public class JsonSchemaVerificationTest {
                     schemaVersion = null;
                 }
                 if (file.startsWith("valid") && schemaVersion != null) {
-                    dynamicTests.add(DynamicTest.dynamicTest(file, () -> assertTrue(isValidJson(schemaVersion, "/" + file))));
+                    dynamicTests.add(DynamicTest.dynamicTest(file, () -> assertTrue(
+                            isValidJson(schemaVersion, "/" + schemaVersion.getVersionString() + "/" + file))));
                 } else if (file.startsWith("invalid") && schemaVersion != null) {
-                    dynamicTests.add(DynamicTest.dynamicTest(file, () -> assertFalse(isValidJson(schemaVersion, "/" + file))));
+                    dynamicTests.add(DynamicTest.dynamicTest(file, () -> assertFalse(
+                            isValidJson(schemaVersion, "/" + schemaVersion.getVersionString() + "/" + file))));
                 }
             }
         }
