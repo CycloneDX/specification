@@ -1543,16 +1543,18 @@ limitations under the License.
     </xs:complexType>
 
     <xs:complexType name="propertyType">
-        <xs:attribute name="key" type="xs:string" use="required">
-            <xs:annotation>
-                <xs:documentation>The KEY in a key/value store. Multiple keys with the same name are allowed in the store.</xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
-        <xs:attribute name="value" type="xs:string" use="required">
-            <xs:annotation>
-                <xs:documentation>The VALUE in a key/value store.</xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
+        <xs:annotation>
+            <xs:documentation>Specifies an individual property with a name and value.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleContent>
+            <xs:extension base="xs:normalizedString">
+                <xs:attribute name="name" type="xs:string" use="required">
+                    <xs:annotation>
+                        <xs:documentation>The name of the property. Duplicate names are allowed, each potentially having a different value.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
     </xs:complexType>
 
     <xs:element name="bom">
@@ -1591,9 +1593,10 @@ limitations under the License.
                 </xs:element>
                 <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
-                        <xs:documentation>Provides the ability to document properties in a key/value store.
+                        <xs:documentation>Provides the ability to document properties in a name-value store.
                         This provides flexibility to include data not officially supported in the standard
-                        without having to use additional namespaces or create extensions.</xs:documentation>
+                        without having to use additional namespaces or create extensions. Unlike key-value
+                        stores, properties support duplicate names, each potentially having different values.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
                 <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
