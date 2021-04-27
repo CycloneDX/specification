@@ -250,15 +250,19 @@ message Source {
 }
 
 message LicenseChoice {
-  License license = 1;
-  string expression = 2;
+  oneof choice {
+    License license = 1;
+    string expression = 2;
+  }
 }
 
 message License {
-  // A valid SPDX license ID
-  string id = 1;
-  // If SPDX does not define the license used, this field may be used to provide the license name
-  string name = 2;
+  oneof license {
+    // A valid SPDX license ID
+    string id = 1;
+    // If SPDX does not define the license used, this field may be used to provide the license name
+    string name = 2;
+  }
   // Specifies the optional full text of the attachment
   AttachedText text = 3;
   // The URL to the attachment file. If the attachment is a license or BOM, an externalReference should also be specified for completeness.
