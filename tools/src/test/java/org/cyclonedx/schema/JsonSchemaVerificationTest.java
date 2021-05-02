@@ -43,10 +43,10 @@ public class JsonSchemaVerificationTest extends BaseSchemaVerificationTest {
                 }
                 if (file.startsWith("valid") && schemaVersion != null) {
                     dynamicTests.add(DynamicTest.dynamicTest(file, () -> assertTrue(
-                            isValidJson(schemaVersion, "/" + schemaVersion.getVersionString() + "/" + file))));
+                            isValidJson(schemaVersion, "/" + schemaVersion.getVersionString() + "/" + file), file)));
                 } else if (file.startsWith("invalid") && schemaVersion != null) {
                     dynamicTests.add(DynamicTest.dynamicTest(file, () -> assertFalse(
-                            isValidJson(schemaVersion, "/" + schemaVersion.getVersionString() + "/" + file))));
+                            isValidJson(schemaVersion, "/" + schemaVersion.getVersionString() + "/" + file), file)));
                 }
             }
         }

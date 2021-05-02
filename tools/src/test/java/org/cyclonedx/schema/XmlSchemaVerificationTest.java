@@ -47,10 +47,10 @@ public class XmlSchemaVerificationTest extends BaseSchemaVerificationTest {
                 }
                 if (file.startsWith("valid") && schemaVersion != null) {
                     dynamicTests.add(DynamicTest.dynamicTest(file, () -> assertTrue(
-                            isValid(schemaVersion, "/" + schemaVersion.getVersionString() + "/" + file))));
+                            isValid(schemaVersion, "/" + schemaVersion.getVersionString() + "/" + file), file)));
                 } else if (file.startsWith("invalid") && schemaVersion != null) {
                     dynamicTests.add(DynamicTest.dynamicTest(file, () -> assertFalse(
-                            isValid(schemaVersion, "/" + schemaVersion.getVersionString() + "/" + file))));
+                            isValid(schemaVersion, "/" + schemaVersion.getVersionString() + "/" + file), file)));
                 }
             }
         }
