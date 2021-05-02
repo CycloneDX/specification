@@ -159,12 +159,15 @@
    <xsl:param name="externalCSSURL"></xsl:param>
 
    <!-- Link to JQuery. -->
-   <xsl:param name="jQueryURL">https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js</xsl:param>
+   <xsl:param name="jQueryURL">https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js</xsl:param>
 
    <!-- Link base to Bootstrap CSS and JS. The files
         <bootstrapURL>/css/bootstrap.min.css and
         <bootstrapURL>/js/bootstrap.min.js must exist.-->
-   <xsl:param name="bootstrapURL">https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7</xsl:param>
+   <xsl:param name="bootstrapURL">https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1</xsl:param>
+
+   <xsl:param name="cycloneDxVersion">0.0</xsl:param>
+
 
    <!-- ******** Constants ******** -->
 
@@ -317,12 +320,12 @@
                          <span class="icon-bar"><xsl:text> </xsl:text></span>
                       </button>
                       -->
-                      <a class="navbar-brand xs3p-navbar-title"><xsl:value-of select="$actualTitle"/></a>
+                     <a href="https://cyclonedx.org" class="navbar-brand site-header__logo"><img src="https://cyclonedx.org/theme/assets/images/layout/logo-aqua.svg" width="150" /></a>
 
                      <!-- Version selection dropdown -->
                      <ul class="nav navbar-nav navbar-right">
                         <li class="dropdown">
-                           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Version <span class="caret"></span></a>
+                           <a href="#" class="dropdown-toggle version-selector" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">v<xsl:value-of select="$cycloneDxVersion"/><span class="caret"></span></a>
                            <ul class="dropdown-menu">
                               <li><a href="../1.2">CycloneDX v1.2</a></li>
                               <li><a href="../1.1">CycloneDX v1.1</a></li>
@@ -732,6 +735,36 @@ body {
     background-color: #CCC;
 }
 
+
+.navbar-inverse .navbar-nav>.open>a,
+.navbar-inverse .navbar-nav>.open>a:focus,
+.navbar-inverse .navbar-nav>.open>a:hover,
+.navbar-inverse {
+    background-color: #071525;
+}
+
+.navbar-brand, .navbar-fixed-top {
+    padding: 0 15px 0 15px;
+}
+.navbar-inverse .navbar-nav>li>a {
+    color: #ffffff;
+}
+.site-header__logo img {
+    height: 50px;
+}
+.version-selector {
+    font-size: 1.6rem
+}
+.version-selector .caret {
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid #ffffff;
+    margin-left: 10px;
+}
+ul .dropdown-menu li {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
 code {
     color: #333;
 }
@@ -749,6 +782,9 @@ code {
     padding-left: 30px !important;
 }
 
+a {
+    color: #1e4877;
+}
 a.name {
     padding-top: 65px;
 }
