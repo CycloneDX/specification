@@ -1,0 +1,49 @@
+spec_version: "1.3"
+version: 1
+serial_number: "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79"
+metadata {
+  component {
+    type: CLASSIFICATION_APPLICATION
+    bom_ref: "acme-application-1.0"
+    name: "Acme Application"
+    version: "1.0"
+  }
+}
+components {
+  type: CLASSIFICATION_LIBRARY
+  bom_ref: "pkg:maven/partner/shaded-library@1.0"
+  name: "Partner Shaded Library"
+  version: "1.0"
+  purl: "pkg:maven/partner/shaded-library@1.0"
+  components {
+    type: CLASSIFICATION_LIBRARY
+    bom_ref: "pkg:maven/ossproject/library@2.0"
+    name: "Some Opensource Library"
+    version: "2.0"
+    purl: "pkg:maven/ossproject/library@2.0"
+  }
+}
+components {
+  type: CLASSIFICATION_LIBRARY
+  name: "Acme Library"
+  version: "3.0"
+  purl: "pkg:maven/acme/library@3.0"
+}
+dependencies {
+  ref: "acme-application-1.0"
+  dependencies {
+    ref: "pkg:maven/partner/shaded-library@1.0"
+  }
+  dependencies {
+    ref: "pkg:maven/acme/library@3.0"
+  }
+}
+compositions {
+  aggregate: AGGREGATE_COMPLETE
+  assemblies: "pkg:maven/partner/shaded-library@1.0"
+  dependencies: "acme-application-1.0"
+}
+compositions {
+  aggregate: AGGREGATE_UNKNOWN
+  assemblies: "pkg:maven/acme/library@3.0"
+}
