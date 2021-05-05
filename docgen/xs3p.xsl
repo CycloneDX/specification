@@ -327,6 +327,7 @@
                         <li class="dropdown">
                            <a href="#" class="dropdown-toggle version-selector" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">v<xsl:value-of select="$cycloneDxVersion"/><span class="caret"></span></a>
                            <ul class="dropdown-menu">
+                              <li><a href="../1.3">CycloneDX v1.3</a></li>
                               <li><a href="../1.2">CycloneDX v1.2</a></li>
                               <li><a href="../1.1">CycloneDX v1.1</a></li>
                               <li><a href="../1.0">CycloneDX v1.0</a></li>
