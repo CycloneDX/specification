@@ -64,6 +64,9 @@ The officially supported media type for Protocol Buffer format is `application/x
 [CPE (Common Platform Enumeration)][cpe-url] is a specification that describes the vendor, name, and version for an application, operating system, or hardware device. CPE identifiers are used in the National Vulnerability Database to describe vulnerable components. The CycloneDX specification compliments this work as CycloneDX documents can easily be used to construct exact CPE identifiers that are useful in determining if a specific component has known vulnerabilities.
 
 ## Copyright & License
+
+CycloneDX Specification is Copyright (c) OWASP Foundation. All Rights Reserved.
+
 Permission to modify and redistribute is granted under the terms of the [Apache License 2.0][license-url]
 
 [license-image]: https://img.shields.io/badge/license-apache%20v2-brightgreen.svg
