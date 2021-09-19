@@ -375,6 +375,11 @@ limitations under the License.
                     <xs:documentation>Provides the ability to document evidence collected through various forms of extraction or analysis.</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="releaseNotes" type="bom:releaseNotesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Specifies optional release notes.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                     <xs:documentation>
@@ -1301,6 +1306,11 @@ limitations under the License.
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="releaseNotes" type="bom:releaseNotesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Specifies optional release notes.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                     <xs:documentation>
@@ -1501,6 +1511,163 @@ limitations under the License.
         </xs:restriction>
     </xs:simpleType>
 
+    <xs:simpleType name="localeType">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+                Defines a syntax for representing two character language code (ISO-639) followed by an optional two
+                character country code. The language code MUST be lower case. If the country code is specified, the
+                country code MUST be upper case. The language code and country code MUST be separated by a minus sign.
+                Examples: en, en-US, fr, fr-CA
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:pattern value="([a-z]{2})(-[A-Z]{2})?"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="releaseType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="major">
+                <xs:annotation>
+                    <xs:documentation>A major release may contain significant changes or may introduce breaking changes.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="minor">
+                <xs:annotation>
+                    <xs:documentation>A minor release, also known as an update, may contain a smaller number of changes
+                        than major releases.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="patch">
+                <xs:annotation>
+                    <xs:documentation>Patch releases are typically unplanned and may resolve defects or important
+                        security issues.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="pre-release">
+                <xs:annotation>
+                    <xs:documentation>A pre-release may include alpha, beta, or release candidates and typically have
+                        limited support. They provide the ability to preview a release prior to its general
+                        availability.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="internal">
+                <xs:annotation>
+                    <xs:documentation>Internal releases are not for public consumption and are intended to be used
+                        exclusively by the project or manufacturer that produced it.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="releaseNotesType">
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="type" type="bom:releaseType" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The software versioning type the release note describes.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="title" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The title of the release.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="featuredImage" type="xs:anyURI" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The URL to an image that may be prominently displayed with the release note.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="socialImage" type="xs:anyURI" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The URL to an image that may be used in messaging on social media platforms.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>A short description of the release.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="timestamp" type="xs:dateTime" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>The date and time (timestamp) when the release note was created.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="aliases" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="alias" type="xs:normalizedString">
+                            <xs:annotation>
+                                <xs:documentation>One or more alternate names the release may be referred to. This may
+                                include unofficial terms used by development and marketing teams (e.g. code names).</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="tags" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="tag" type="xs:normalizedString">
+                            <xs:annotation>
+                                <xs:documentation>One or more tags that may aid in search or retrieval of the release note.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="resolves" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>A collection of issues that have been resolved.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="issue" type="bom:issueType"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="notes" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="note">
+                            <xs:annotation>
+                                <xs:documentation>Zero or more release notes containing the locale and content. Multiple
+                                note elements may be specified to support release notes in a wide variety of languages.</xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element name="locale" type="bom:localeType" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>The ISO-639 (or higher) language code and optional ISO-3166
+                                                (or higher) country code. Examples include: "en", "en-US", "fr" and "fr-CA".</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="text" type="bom:attachedTextType" minOccurs="1" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>Specifies the full content of the release note.</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##any" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
     <xs:complexType name="bomReferenceType">
         <xs:attribute name="ref" type="xs:string" use="required">
             <xs:annotation>
@@ -1586,9 +1753,9 @@ limitations under the License.
                 <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Provides the ability to document properties in a name-value store.
-                        This provides flexibility to include data not officially supported in the standard
-                        without having to use additional namespaces or create extensions. Unlike key-value
-                        stores, properties support duplicate names, each potentially having different values.</xs:documentation>
+                            This provides flexibility to include data not officially supported in the standard
+                            without having to use additional namespaces or create extensions. Unlike key-value
+                            stores, properties support duplicate names, each potentially having different values.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
                 <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">

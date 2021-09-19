@@ -111,6 +111,8 @@ message Component {
   repeated Property properties = 22;
   // Specifies optional license and copyright evidence
   repeated Evidence evidence = 23;
+  // Specifies optional release notes.
+  optional ReleaseNotes releaseNotes = 24;
 }
 
 // Specifies the data classification.
@@ -381,6 +383,8 @@ message Service {
   repeated Service services = 13;
   // Specifies optional, custom, properties
   repeated Property properties = 14;
+  // Specifies optional release notes.
+  optional ReleaseNotes releaseNotes = 15;
 }
 
 message Swid {
@@ -449,4 +453,47 @@ message EvidenceCopyright {
 message Evidence {
   repeated LicenseChoice licenses = 1;
   repeated EvidenceCopyright copyright = 2;
+}
+
+enum ReleaseType {
+  // A major release may contain significant changes or may introduce breaking changes.
+  RELEASE_TYPE_MAJOR = 0;
+  // A minor release, also known as an update, may contain a smaller number of changes than major releases.
+  RELEASE_TYPE_MINOR = 1;
+  // Patch releases are typically unplanned and may resolve defects or important security issues.
+  RELEASE_TYPE_PATCH = 2;
+  // A pre-release may include alpha, beta, or release candidates and typically have limited support. They provide the ability to preview a release prior to its general availability.
+  RELEASE_TYPE_PRE_RELEASE = 3;
+  // Internal releases are not for public consumption and are intended to be used exclusively by the project or manufacturer that produced it.
+  RELEASE_TYPE_INTERNAL = 4;
+}
+
+message Note {
+  // The ISO-639 (or higher) language code and optional ISO-3166 (or higher) country code. Examples include: "en", "en-US", "fr" and "fr-CA".
+  optional string locale = 1;
+  // Specifies the full content of the release note.
+  optional AttachedText text = 2;
+}
+
+message ReleaseNotes {
+  // The software versioning type the release note describes.
+  ReleaseType type = 1;
+  // The title of the release.
+  optional string title = 2;
+  // The URL to an image that may be prominently displayed with the release note.
+  optional string featuredImage = 3;
+  // The URL to an image that may be used in messaging on social media platforms.
+  optional string socialImage = 4;
+  // A short description of the release.
+  optional string description = 5;
+  // The date and time (timestamp) when the release note was created.
+  optional google.protobuf.Timestamp timestamp = 6;
+  // Optional alternate names the release may be referred to. This may include unofficial terms used by development and marketing teams (e.g. code names).
+  repeated string aliases = 7;
+  // Optional tags that may aid in search or retrieval of the release note.
+  repeated string tags = 8;
+  // A collection of issues that have been resolved.
+  repeated Issue resolves = 9;
+  // Zero or more release notes containing the locale and content. Multiple note messages may be specified to support release notes in a wide variety of languages.
+  repeated Note notes = 10;
 }
