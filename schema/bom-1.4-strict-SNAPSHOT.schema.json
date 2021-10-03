@@ -85,6 +85,14 @@
       "uniqueItems": true,
       "title": "Compositions",
       "description": "Compositions describe constituent parts (including components, services, and dependency relationships) and their completeness."
+    },
+    "vulnerabilities": {
+      "$id": "#/properties/vulnerabilities",
+      "type": "array",
+      "items": {"$ref": "#/definitions/vulnerability"},
+      "uniqueItems": true,
+      "title": "Vulnerabilities",
+      "description": "Vulnerabilities identified in components or services."
     }
   },
   "definitions": {
@@ -1072,6 +1080,278 @@
           "type": "string",
           "title": "Value",
           "description": "The value of the property."
+        }
+      }
+    },
+    "advisory": {
+      "type": "object",
+      "title": "Advisory",
+      "description": "Location of additional advisory information.",
+      "required": ["url"],
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string",
+          "format": "iri-reference"
+        }
+      }
+    },
+    "cwe": {
+      "type": "integer",
+      "minimum": 1,
+      "title": "CWE",
+      "description": "Integer representation of a Common Weaknesses Enumerations (CWE). For example 399 (of https://cwe.mitre.org/data/definitions/399.html)"
+    },
+    "severity": {
+      "type": "string",
+      "title": "Severity",
+      "description": "Textual representation of the severity of the vulnerability adopted by the risk analysis method. If an other risk analysis method is used other than whats defined in scoreSourceType, the user is expected to translate appropriately to match with an element value below.",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low",
+        "none",
+        "unknown"
+      ]
+    },
+    "scoreMethod": {
+      "type": "string",
+      "title": "method",
+      "description": "Specifies the risk scoring methodology/standard used.",
+      "enum": [
+        "CVSSv2",
+        "CVSSv3",
+        "CVSSv31",
+        "OWASP",
+        "Other"
+      ]
+    },
+    "impactAnalysisState": {
+      "type": "string",
+      "title": "Impact Analysis State",
+      "description": "Textual representation of the state of the impact analysis.",
+      "enum": [
+        "exploitable",
+        "in_triage",
+        "false_positive",
+        "not_affected",
+        "not_set"
+      ]
+    },
+    "rating": {
+      "type": "object",
+      "title": "Rating",
+      "description": "Defines the risk ratings of a vulnerability.",
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "$ref": "#/definitions/vulnerabilitySource",
+          "description": "The source that published the vulnerability."
+        },
+        "score": {
+          "type": "number",
+          "title": "Score",
+          "description": "The numerical score of the rating."
+        },
+        "severity": {
+          "$ref": "#/definitions/severity"
+        },
+        "method": {
+          "$ref": "#/definitions/scoreMethod"
+        },
+        "vector": {
+          "type": "string",
+          "title": "Vector",
+          "description": "Textual representation of the metric values used to score the vulnerability"
+        },
+        "justification": {
+          "type": "string",
+          "title": "Justification",
+          "description": "An optional reason for rating the vulnerability as it was"
+        }
+      }
+    },
+    "vulnerabilitySource": {
+      "type": "object",
+      "title": "Source",
+      "description": "The source of the vulnerability where it is documented. Usually the name of the organization publishing vulnerability information",
+      "additionalProperties": false,
+      "properties": {
+        "url": {
+          "type": "string",
+          "title": "URL",
+          "description": "The url of the vulnerability documentation as provided by the source.",
+          "examples": [
+            "https://nvd.nist.gov/vuln/detail/CVE-2019-15842"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name of the source.",
+          "examples": [
+            "NVD",
+            "National Vulnerability Database",
+            "OSS Index",
+            "VulnDB",
+            "NPM Advisories"
+          ]
+        }
+      }
+    },
+    "vulnerability": {
+      "type": "object",
+      "title": "Vulnerability",
+      "description": "Defines the structure of a vulnerability.",
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "type": "string",
+          "title": "BOM Reference",
+          "description": "An optional identifier which can be used to reference the vulnerability elsewhere in the BOM. Every bom-ref should be unique."
+        },
+        "id": {
+          "type": "string",
+          "title": "ID",
+          "description": "The id of the vulnerability as defined by the risk scoring methodology. For example CVE-2019-15842 (of https://nvd.nist.gov/vuln/detail/CVE-2019-15842)"
+        },
+        "source": {
+          "$ref": "#/definitions/vulnerabilitySource",
+          "description": "The source that published the vulnerability."
+        },
+        "references": {
+          "type": "array",
+          "title": "References",
+          "description": "",
+          "additionalItems": false,
+          "items": {
+            "required": [
+              "id",
+              "source"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "title": "ID",
+                "description": "The id of the vulnerability as defined by the risk scoring methodology. For example CVE-2019-15842 (of https://nvd.nist.gov/vuln/detail/CVE-2019-15842)"
+              },
+              "source": {
+                "$ref": "#/definitions/vulnerabilitySource",
+                "description": "The source that published the vulnerability."
+              }
+            }
+          }
+        },
+        "ratings": {
+          "type": "array",
+          "title": "Ratings",
+          "description": "List of the vulnerability ratings as defined by various risk rating methodologies.",
+          "items": {
+            "$ref": "#/definitions/rating"
+          }
+        },
+        "cwes": {
+          "type": "array",
+          "title": "CWEs",
+          "description": "List of Common Weaknesses Enumerations (CWEs) codes that describes this vulnerability. For example 399 (of https://cwe.mitre.org/data/definitions/399.html)",
+          "items": {
+            "$ref": "#/definitions/cwe"
+          }
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the vulnerability as provided by the source."
+        },
+        "detail": {
+          "type": "string",
+          "title": "Details",
+          "description": "If available, an in-depth description of the vulnerability as provided by the source organization. Details often include examples, proof-of-concepts, and other information useful in understanding root cause."
+        },
+        "recommendation": {
+          "type": "string",
+          "title": "Details",
+          "description": "Recommendations of how the vulnerability can be remediated or mitigated."
+        },
+        "advisories": {
+          "type": "array",
+          "title": "Advisories",
+          "description": "Published advisories of the vulnerability if provided.",
+          "items": {
+            "$ref": "#/definitions/advisory"
+          }
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Created",
+          "description": "The date and time (timestamp) when the vulnerability was created."
+        },
+        "published": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Published",
+          "description": "The date and time (timestamp) when the vulnerability was first published."
+        },
+        "updated": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Updated",
+          "description": "The date and time (timestamp) when the vulnerability was last updated."
+        },
+        "credits": {
+          "type": "string",
+          "title": "Credits",
+          "description": "Individuals or organizations credited by with the discovery of the vulnerability."
+        },
+        "tools": {
+          "type": "array",
+          "title": "Creation Tools",
+          "description": "The tool(s) used in the creation of the BOM.",
+          "items": {"$ref": "#/definitions/tool"}
+        },
+        "analysis": {
+          "type": "object",
+          "title": "Impact Analysis",
+          "description": "An assessment of the impact and exploitability of the vulnerability.",
+          "additionalProperties": false,
+          "properties": {
+            "state": {
+              "$ref": "#/definitions/impactAnalysisState"
+            },
+            "impact": {
+              "type": "string",
+              "title": "Impact",
+              "description": "A description of the impact."
+            },
+            "detail": {
+              "type": "string",
+              "title": "Detail",
+              "description": "Detailed description of the impact including methods used during assessment. If a vulnerability is not exploitable, this field should include specific details on why the component or service is not impacted by this vulnerability."
+            }
+          }
+        },
+        "affects": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "title": "Affects",
+          "description": "The bom-ref identifiers of the components or services that are affected by the vulnerability."
+        },
+        "properties": {
+          "type": "array",
+          "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values.",
+          "items": {
+            "$ref": "#/definitions/property"
+          }
         }
       }
     }
