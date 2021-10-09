@@ -320,7 +320,7 @@
                          <span class="icon-bar"><xsl:text> </xsl:text></span>
                       </button>
                       -->
-                     <a href="https://cyclonedx.org" class="navbar-brand site-header__logo"><img src="https://cyclonedx.org/theme/assets/images/layout/logo-aqua.svg" width="150" /></a>
+                     <a href="https://cyclonedx.org" class="navbar-brand site-header__logo"><img src="https://cyclonedx.org/theme/assets/images/layout/logo-white.svg" width="150" /></a>
 
                      <!-- Version selection dropdown -->
                      <ul class="nav navbar-nav navbar-right">
