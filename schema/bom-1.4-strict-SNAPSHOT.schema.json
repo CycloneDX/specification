@@ -1339,8 +1339,30 @@
         "affects": {
           "type": "array",
           "uniqueItems": true,
+          "additionalItems": false,
           "items": {
-            "type": "string"
+            "required": [
+              "ref"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "ref": {
+                "type": "string",
+                "title": "Reference",
+                "description": "References a component or services by the object bom-ref"
+              },
+              "ranges": {
+                "$ref": "#/definitions/versionRangeArray"
+              },
+              "versions": {
+                "type": "array",
+                "title": "Versions",
+                "description": "Zero or more individual versions. Version can be combined with ranges.",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "title": "Affects",
           "description": "The bom-ref identifiers of the components or services that are affected by the vulnerability."
@@ -1354,6 +1376,21 @@
           }
         }
       }
+    },
+    "versionRangeArray": {
+      "type": "array",
+      "title": "Ranges",
+      "description": "Zero or more version ranges",
+      "additionalItems": false,
+      "items": {
+        "$ref": "#/definitions/versionRange"
+      }
+    },
+    "versionRange": {
+      "type": "string",
+      "title": "Range",
+      "description": "A simplified version range specification derived from node-semver. A version range is a set of comparators which specify versions that satisfy the range. A comparator is composed of an operator and a version. The set of primitive operators is: < Less than, <= Less than or equal to, > Greater than, >= Greater than or equal to, and = Equal. If no operator is specified, then equality is assumed, so this operator is optional, but MAY be included. Comparators can be joined by whitespace to form a comparator set. Only a single comparator set is allowed per range specified in the BOM. No further node-semver syntax is supported. Semver 2.0 and higher is required.",
+      "examples": [ ">=1.2.7 <1.3.0", ">=1.2.7" ]
     }
   }
 }
