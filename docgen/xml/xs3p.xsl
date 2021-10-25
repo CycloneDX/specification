@@ -279,12 +279,12 @@
             <meta charset="UTF-8"/>
             <meta name="twitter:card" content="summary_large_image"/>
             <meta name="twitter:site" content="@CycloneDX_Spec"/>
-            <meta name="twitter:title" content="${title}"/>
+            <meta name="twitter:title"><xsl:attribute name="content"><xsl:value-of select="$actualTitle"/></xsl:attribute></meta>
             <meta name="twitter:image" content="https://cyclonedx.org/theme/assets/images/CycloneDX-Twitter-Card.png"/>
-            <meta name="twitter:description" content="${title}"/>
-            <meta name="description" content="${title}"/>
-            <meta property="og:description" content="${title}"/>
-            <meta property="og:title" content="${title}"/>
+            <meta name="twitter:description"><xsl:attribute name="content"><xsl:value-of select="$actualTitle"/></xsl:attribute></meta>
+            <meta name="description"><xsl:attribute name="content"><xsl:value-of select="$actualTitle"/></xsl:attribute></meta>
+            <meta property="og:description"><xsl:attribute name="content"><xsl:value-of select="$actualTitle"/></xsl:attribute></meta>
+            <meta property="og:title"><xsl:attribute name="content"><xsl:value-of select="$actualTitle"/></xsl:attribute></meta>
             <meta property="og:locale" content="en_US"/>
             <meta property="og:type" content="website" />
             <meta property="og:image" content="https://cyclonedx.org/theme/assets/images/CycloneDX-Twitter-Card.png" />
