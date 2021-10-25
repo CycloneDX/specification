@@ -279,12 +279,12 @@
             <meta charset="UTF-8"/>
             <meta name="twitter:card" content="summary_large_image"/>
             <meta name="twitter:site" content="@CycloneDX_Spec"/>
-            <meta name="twitter:title" content="Participate"/>
+            <meta name="twitter:title" content="${title}"/>
             <meta name="twitter:image" content="https://cyclonedx.org/theme/assets/images/CycloneDX-Twitter-Card.png"/>
-            <meta name="twitter:description" content="Participate"/>
-            <meta name="description" content="Participate"/>
-            <meta property="og:description" content="Participate"/>
-            <meta property="og:title" content="Participate"/>
+            <meta name="twitter:description" content="${title}"/>
+            <meta name="description" content="${title}"/>
+            <meta property="og:description" content="${title}"/>
+            <meta property="og:title" content="${title}"/>
             <meta property="og:locale" content="en_US"/>
             <meta property="og:type" content="website" />
             <meta property="og:image" content="https://cyclonedx.org/theme/assets/images/CycloneDX-Twitter-Card.png" />
