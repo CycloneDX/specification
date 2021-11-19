@@ -1371,15 +1371,64 @@
                 "title": "Reference",
                 "description": "References a component or service by the objects bom-ref"
               },
-              "ranges": {
-                "$ref": "#/definitions/versionRangeArray"
-              },
               "versions": {
                 "type": "array",
                 "title": "Versions",
-                "description": "Zero or more individual versions. Version can be combined with ranges.",
+                "description": "Zero or more individual versions or range of versions. This capability derived from the CVE v5.0 schema available from https://github.com/CVEProject/cve-schema/blob/master/schema/v5.0/CVE_JSON_5.0_schema.json",
                 "items": {
-                  "type": "string"
+                  "properties": {
+                    "version": {
+                      "description": "The single version being described, or the version at the start of the range. By convention, typically 0 denotes the earliest possible version.",
+                      "$ref": "#/definitions/version"
+                    },
+                    "status": {
+                      "description": "The vulnerability status for the version or range of versions. For a range, the status may be refined by the 'changes' list.",
+                      "$ref": "#/definitions/affectedStatus"
+                    },
+                    "versionType": {
+                      "type": "string",
+                      "description": "The version numbering system used for specifying the range. This defines the exact semantics of the comparison (less-than) operation on versions, which is required to understand the range itself. 'Custom' indicates that the version type is unspecified and should be avoided whenever possible. It is included primarily for use in conversion of older data files.",
+                      "minLength": 1,
+                      "maxLength": 128,
+                      "examples": [
+                        "custom",
+                        "git",
+                        "maven",
+                        "python",
+                        "rpm",
+                        "semver"
+                      ]
+                    },
+                    "lessThan": {
+                      "description": "The non-inclusive upper limit of the range. This is the least version NOT in the range. The usual version syntax is expanded to allow a pattern to end in an asterisk `(*)`, indicating an arbitrarily large number in the version ordering. For example, `{version: 1.0 lessThan: 1.*}` would describe the entire 1.X branch for most range kinds, and `{version: 2.0, lessThan: *}` describes all versions starting at 2.0, including 3.0, 5.1, and so on. Only one of lessThan and lessThanOrEqual should be specified.",
+                      "$ref": "#/definitions/version"
+                    },
+                    "lessThanOrEqual": {
+                      "description": "The inclusive upper limit of the range. This is the greatest version contained in the range. Only one of lessThan and lessThanOrEqual should be specified. For example, `{version: 1.0, lessThanOrEqual: 1.3}` covers all versions from 1.0 up to and including 1.3.",
+                      "$ref": "#/definitions/version"
+                    },
+                    "changes": {
+                      "type": "array",
+                      "description": "A list of status changes that take place during the range. The array should be sorted in increasing order by the 'at' field, according to the versionType, but clients must re-sort the list themselves rather than assume it is sorted.",
+                      "minItems": 1,
+                      "uniqueItems": true,
+                      "items": {
+                        "type": "object",
+                        "description": "The start of a single status change during the range.",
+                        "required": ["at", "status"],
+                        "properties": {
+                          "at": {
+                            "description": "The version at which a status change occurs.",
+                            "$ref": "#/definitions/version"
+                          },
+                          "status": {
+                            "description": "The new status in the range starting at the given version.",
+                            "$ref": "#/definitions/affectedStatus"
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -1397,20 +1446,20 @@
         }
       }
     },
-    "versionRangeArray": {
-      "type": "array",
-      "title": "Ranges",
-      "description": "Zero or more version ranges",
-      "additionalItems": false,
-      "items": {
-        "$ref": "#/definitions/versionRange"
-      }
-    },
-    "versionRange": {
+    "affectedStatus": {
+      "description": "The vulnerability status of a given version or range of versions of a product. The statuses 'affected' and 'unaffected' indicate that the version is affected or unaffected by the vulnerability. The status 'unknown' indicates that it is unknown or unspecified whether the given version is affected. There can be many reasons for an 'unknown' status, including that an investigation has not been undertaken or that a vendor has not disclosed the status.",
       "type": "string",
-      "title": "Range",
-      "description": "A simplified version range specification derived from node-semver. A version range is a set of comparators which specify versions that satisfy the range. A comparator is composed of an operator and a version. The set of primitive operators is: < Less than, <= Less than or equal to, > Greater than, >= Greater than or equal to, and = Equal. If no operator is specified, then equality is assumed, so this operator is optional, but MAY be included. Comparators can be joined by whitespace to form a comparator set. Only a single comparator set is allowed per range specified in the BOM. No further node-semver syntax is supported. Semver 2.0 and higher is required.",
-      "examples": [ ">=1.2.7 <1.3.0", ">=1.2.7" ]
+      "enum": [
+        "affected",
+        "unaffected",
+        "unknown"
+      ]
+    },
+    "version": {
+      "description": "A single version of a component or service, as expressed in its own version numbering scheme.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024
     }
   }
 }
