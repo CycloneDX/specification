@@ -1375,7 +1375,9 @@
                 "type": "array",
                 "title": "Versions",
                 "description": "Zero or more individual versions or range of versions. This capability derived from the CVE v5.0 schema available from https://github.com/CVEProject/cve-schema/blob/master/schema/v5.0/CVE_JSON_5.0_schema.json",
+                "additionalItems": false,
                 "items": {
+                  "additionalProperties": false,
                   "properties": {
                     "version": {
                       "description": "The single version being described, or the version at the start of the range. By convention, typically 0 denotes the earliest possible version.",
@@ -1383,7 +1385,8 @@
                     },
                     "status": {
                       "description": "The vulnerability status for the version or range of versions. For a range, the status may be refined by the 'changes' list.",
-                      "$ref": "#/definitions/affectedStatus"
+                      "$ref": "#/definitions/affectedStatus",
+                      "default": "affected"
                     },
                     "versionType": {
                       "type": "string",
@@ -1412,10 +1415,12 @@
                       "description": "A list of status changes that take place during the range. The array should be sorted in increasing order by the 'at' field, according to the versionType, but clients must re-sort the list themselves rather than assume it is sorted.",
                       "minItems": 1,
                       "uniqueItems": true,
+                      "additionalItems": false,
                       "items": {
                         "type": "object",
                         "description": "The start of a single status change during the range.",
                         "required": ["at", "status"],
+                        "additionalProperties": false,
                         "properties": {
                           "at": {
                             "description": "The version at which a status change occurs.",
