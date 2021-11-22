@@ -150,23 +150,23 @@
     "tool": {
       "type": "object",
       "title": "Tool",
-      "description": "The tool used to create the BOM.",
+      "description": "Information about the automated or manual tool used",
       "additionalProperties": false,
       "properties": {
         "vendor": {
           "type": "string",
           "title": "Tool Vendor",
-          "description": "The date and time (timestamp) when the document was created."
+          "description": "The name of the vendor who created the tool"
         },
         "name": {
           "type": "string",
           "title": "Tool Name",
-          "description": "The date and time (timestamp) when the document was created."
+          "description": "The name of the tool"
         },
         "version": {
           "type": "string",
           "title": "Tool Version",
-          "description": "The date and time (timestamp) when the document was created."
+          "description": "The version of the tool"
         },
         "hashes": {
           "$id": "#/properties/hashes",
@@ -271,7 +271,7 @@
         "bom-ref": {
           "type": "string",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the component elsewhere in the BOM. Every bom-ref should be unique."
+          "description": "An optional identifier which can be used to reference the component elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
         },
         "supplier": {
           "title": "Component Supplier",
@@ -880,7 +880,7 @@
         "bom-ref": {
           "type": "string",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the service elsewhere in the BOM. Every bom-ref should be unique."
+          "description": "An optional identifier which can be used to reference the service elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
         },
         "provider": {
           "title": "Provider",
@@ -1086,7 +1086,7 @@
     "advisory": {
       "type": "object",
       "title": "Advisory",
-      "description": "Location of additional advisory information.",
+      "description": "Title and location where advisory information can be obtained. An advisory is a notification of a threat to a component, service, or system.",
       "required": ["url"],
       "additionalProperties": false,
       "properties": {
@@ -1108,7 +1108,7 @@
     "severity": {
       "type": "string",
       "title": "Severity",
-      "description": "Textual representation of the severity of the vulnerability adopted by the risk analysis method. If an other risk analysis method is used other than whats defined in scoreSourceType, the user is expected to translate appropriately to match with an element value below.",
+      "description": "Textual representation of the severity of the vulnerability adopted by the analysis method. If the analysis method uses values other than what is provided, the user is expected to translate appropriately.",
       "enum": [
         "critical",
         "high",
@@ -1120,20 +1120,20 @@
     },
     "scoreMethod": {
       "type": "string",
-      "title": "method",
-      "description": "Specifies the risk scoring methodology/standard used.",
+      "title": "Method",
+      "description": "Specifies the severity or risk scoring methodology or standard used.\n\n* CVSSv2 - [Common Vulnerability Scoring System v2](https://www.first.org/cvss/v2/)\n* CVSSv3 - [Common Vulnerability Scoring System v3](https://www.first.org/cvss/v3-0/)\n* CVSSv31 - [Common Vulnerability Scoring System v3.1](https://www.first.org/cvss/v3-1/)\n* OWASP - [OWASP Risk Rating Methodology](https://owasp.org/www-community/OWASP_Risk_Rating_Methodology)",
       "enum": [
         "CVSSv2",
         "CVSSv3",
         "CVSSv31",
         "OWASP",
-        "Other"
+        "other"
       ]
     },
     "impactAnalysisState": {
       "type": "string",
       "title": "Impact Analysis State",
-      "description": "Declares the current state of an occurrence of a vulnerability, after automated or manual analysis. resolved = the vulnerability has been remediated. resolved_with_pedigree = the vulnerability has been remediated and evidence of the changes are provided in the affected components pedigree containing verifiable commit history and/or diff(s). exploitable = the vulnerability may be directly or indirectly exploitable. in_triage = the vulnerability is being investigated. false_positive = the vulnerability is not specific to the component or service and was falsely identified or associated. not_affected = the component or service is not affected by the vulnerability. Justification should be specified for all not_affected cases.",
+      "description": "Declares the current state of an occurrence of a vulnerability, after automated or manual analysis. \n\n* __resolved__ = the vulnerability has been remediated. \n* __resolved\\_with\\_pedigree__ = the vulnerability has been remediated and evidence of the changes are provided in the affected components pedigree containing verifiable commit history and/or diff(s). \n* __exploitable__ = the vulnerability may be directly or indirectly exploitable. \n* __in\\_triage__ = the vulnerability is being investigated. \n* __false\\_positive__ = the vulnerability is not specific to the component or service and was falsely identified or associated. \n* __not\\_affected__ = the component or service is not affected by the vulnerability. Justification should be specified for all not_affected cases.",
       "enum": [
         "resolved",
         "resolved_with_pedigree",
@@ -1146,7 +1146,7 @@
     "impactAnalysisJustification": {
       "type": "string",
       "title": "Impact Analysis Justification",
-      "description": "The rationale of why the impact analysis state was asserted. code_not_present = the code has been removed, tree-shaked. code_not_reachable = the vulnerable code is not invoked at runtime. requires_configuration = exploitability requires a configurable option to be set/unset. requires_dependency = exploitability requires a dependency that is not present. requires_environment = exploitability requires a certain environment which is not present. protected_by_compiler = exploitability requires a compiler flag to be set/unset. protected_at_runtime = exploits are prevented at runtime. protected_at_perimeter = attacks are blocked at physical, logical, or network perimeter. protected_by_mitigating_control = preventative measures have been implemented that reduce the likelihood and/or impact of the vulnerability.",
+      "description": "The rationale of why the impact analysis state was asserted. \n\n* __code\\_not\\_present__ = the code has been removed or tree-shaked. \n* __code\\_not\\_reachable__ = the vulnerable code is not invoked at runtime. \n* __requires\\_configuration__ = exploitability requires a configurable option to be set/unset. \n* __requires\\_dependency__ = exploitability requires a dependency that is not present. \n* __requires\\_environment__ = exploitability requires a certain environment which is not present. \n* __protected\\_by\\_compiler__ = exploitability requires a compiler flag to be set/unset. \n* __protected\\_at\\_runtime__ = exploits are prevented at runtime. \n* __protected\\_at\\_perimeter__ = attacks are blocked at physical, logical, or network perimeter. \n* __protected\\_by\\_mitigating\\_control__ = preventative measures have been implemented that reduce the likelihood and/or impact of the vulnerability.",
       "enum": [
         "code_not_present",
         "code_not_reachable",
@@ -1162,7 +1162,7 @@
     "rating": {
       "type": "object",
       "title": "Rating",
-      "description": "Defines the risk ratings of a vulnerability.",
+      "description": "Defines the severity or risk ratings of a vulnerability.",
       "additionalProperties": false,
       "properties": {
         "source": {
@@ -1195,7 +1195,7 @@
     "vulnerabilitySource": {
       "type": "object",
       "title": "Source",
-      "description": "The source of the vulnerability where it is documented. Usually the name of the organization publishing vulnerability information",
+      "description": "The source of vulnerability information. This is often the organization that published the vulnerability.",
       "additionalProperties": false,
       "properties": {
         "url": {
@@ -1203,7 +1203,7 @@
           "title": "URL",
           "description": "The url of the vulnerability documentation as provided by the source.",
           "examples": [
-            "https://nvd.nist.gov/vuln/detail/CVE-2019-15842"
+            "https://nvd.nist.gov/vuln/detail/CVE-2021-39182"
           ]
         },
         "name": {
@@ -1215,7 +1215,7 @@
             "National Vulnerability Database",
             "OSS Index",
             "VulnDB",
-            "NPM Advisories"
+            "GitHub Advisories"
           ]
         }
       }
@@ -1223,18 +1223,23 @@
     "vulnerability": {
       "type": "object",
       "title": "Vulnerability",
-      "description": "Defines the structure of a vulnerability.",
+      "description": "Defines a weakness in an component or service that could be exploited or triggered by a threat source.",
       "additionalProperties": false,
       "properties": {
         "bom-ref": {
           "type": "string",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the vulnerability elsewhere in the BOM. Every bom-ref should be unique."
+          "description": "An optional identifier which can be used to reference the vulnerability elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
         },
         "id": {
           "type": "string",
           "title": "ID",
-          "description": "The id of the vulnerability as defined by the risk scoring methodology. For example CVE-2019-15842 (of https://nvd.nist.gov/vuln/detail/CVE-2019-15842)"
+          "description": "The identifier that uniquely identifies the vulnerability.",
+          "examples": [
+            "CVE-2021-39182",
+            "GHSA-35m5-8cvj-8783",
+            "SNYK-PYTHON-ENROCRYPT-1912876"
+          ]
         },
         "source": {
           "$ref": "#/definitions/vulnerabilitySource",
@@ -1255,7 +1260,12 @@
               "id": {
                 "type": "string",
                 "title": "ID",
-                "description": "The id of the vulnerability as defined by the risk scoring methodology. For example CVE-2019-15842 (of https://nvd.nist.gov/vuln/detail/CVE-2019-15842)"
+                "description": "An identifier that uniquely identifies the vulnerability.",
+                "examples": [
+                  "CVE-2021-39182",
+                  "GHSA-35m5-8cvj-8783",
+                  "SNYK-PYTHON-ENROCRYPT-1912876"
+                ]
               },
               "source": {
                 "$ref": "#/definitions/vulnerabilitySource",
@@ -1276,6 +1286,7 @@
           "type": "array",
           "title": "CWEs",
           "description": "List of Common Weaknesses Enumerations (CWEs) codes that describes this vulnerability. For example 399 (of https://cwe.mitre.org/data/definitions/399.html)",
+          "examples": ["399"],
           "items": {
             "$ref": "#/definitions/cwe"
           }
@@ -1324,12 +1335,12 @@
         "credits": {
           "type": "string",
           "title": "Credits",
-          "description": "Individuals or organizations credited by with the discovery of the vulnerability."
+          "description": "Individuals or organizations credited with the discovery of the vulnerability."
         },
         "tools": {
           "type": "array",
           "title": "Creation Tools",
-          "description": "The tool(s) used in the creation of the BOM.",
+          "description": "The tool(s) used to identify, confirm, or score the vulnerability.",
           "items": {"$ref": "#/definitions/tool"}
         },
         "analysis": {
