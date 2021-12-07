@@ -1530,46 +1530,22 @@ limitations under the License.
         </xs:restriction>
     </xs:simpleType>
 
-    <xs:simpleType name="releaseType">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="major">
-                <xs:annotation>
-                    <xs:documentation>A major release may contain significant changes or may introduce breaking changes.</xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="minor">
-                <xs:annotation>
-                    <xs:documentation>A minor release, also known as an update, may contain a smaller number of changes
-                        than major releases.</xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="patch">
-                <xs:annotation>
-                    <xs:documentation>Patch releases are typically unplanned and may resolve defects or important
-                        security issues.</xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="pre-release">
-                <xs:annotation>
-                    <xs:documentation>A pre-release may include alpha, beta, or release candidates and typically have
-                        limited support. They provide the ability to preview a release prior to its general
-                        availability.</xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="internal">
-                <xs:annotation>
-                    <xs:documentation>Internal releases are not for public consumption and are intended to be used
-                        exclusively by the project or manufacturer that produced it.</xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
-        </xs:restriction>
-    </xs:simpleType>
-
     <xs:complexType name="releaseNotesType">
         <xs:sequence minOccurs="0" maxOccurs="unbounded">
-            <xs:element name="type" type="bom:releaseType" minOccurs="1" maxOccurs="1">
+            <xs:element name="type" type="xs:normalizedString" minOccurs="1" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation>The software versioning type the release note describes.</xs:documentation>
+                    <xs:documentation>The software versioning type. It is RECOMMENDED that the release type use one
+                        of 'major', 'minor', 'patch', 'pre-release', or 'internal'. Representing all possible software
+                        release types is not practical, so standardizing on the recommended values, whenever possible,
+                        is strongly encouraged.
+                        * major = A major release may contain significant changes or may introduce breaking changes.
+                        * minor = A minor release, also known as an update, may contain a smaller number of changes than major releases.
+                        * patch = Patch releases are typically unplanned and may resolve defects or important security issues.
+                        * pre-release = A pre-release may include alpha, beta, or release candidates and typically have
+                          limited support. They provide the ability to preview a release prior to its general availability.
+                        * internal = Internal releases are not for public consumption and are intended to be used exclusively
+                          by the project or manufacturer that produced it.
+                    </xs:documentation>
                 </xs:annotation>
             </xs:element>
             <xs:element name="title" type="xs:string" minOccurs="0" maxOccurs="1">

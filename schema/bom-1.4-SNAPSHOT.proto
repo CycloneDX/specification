@@ -457,19 +457,6 @@ message Evidence {
   repeated EvidenceCopyright copyright = 2;
 }
 
-enum ReleaseType {
-  // A major release may contain significant changes or may introduce breaking changes.
-  RELEASE_TYPE_MAJOR = 0;
-  // A minor release, also known as an update, may contain a smaller number of changes than major releases.
-  RELEASE_TYPE_MINOR = 1;
-  // Patch releases are typically unplanned and may resolve defects or important security issues.
-  RELEASE_TYPE_PATCH = 2;
-  // A pre-release may include alpha, beta, or release candidates and typically have limited support. They provide the ability to preview a release prior to its general availability.
-  RELEASE_TYPE_PRE_RELEASE = 3;
-  // Internal releases are not for public consumption and are intended to be used exclusively by the project or manufacturer that produced it.
-  RELEASE_TYPE_INTERNAL = 4;
-}
-
 message Note {
   // The ISO-639 (or higher) language code and optional ISO-3166 (or higher) country code. Examples include: "en", "en-US", "fr" and "fr-CA".
   optional string locale = 1;
@@ -478,8 +465,8 @@ message Note {
 }
 
 message ReleaseNotes {
-  // The software versioning type the release note describes.
-  ReleaseType type = 1;
+  // The software versioning type. It is RECOMMENDED that the release type use one of 'major', 'minor', 'patch', 'pre-release', or 'internal'. Representing all possible software release types is not practical, so standardizing on the recommended values, whenever possible, is strongly encouraged.
+  string type = 1;
   // The title of the release.
   optional string title = 2;
   // The URL to an image that may be prominently displayed with the release note.
