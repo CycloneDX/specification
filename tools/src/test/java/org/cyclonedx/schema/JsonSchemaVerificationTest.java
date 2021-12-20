@@ -38,6 +38,8 @@ public class JsonSchemaVerificationTest extends BaseSchemaVerificationTest {
                     schemaVersion = CycloneDxSchema.Version.VERSION_12;
                 } else if (file.endsWith("-1.3.json")) {
                     schemaVersion = CycloneDxSchema.Version.VERSION_13;
+                } else if (file.endsWith("-1.4.json")) {
+                    schemaVersion = CycloneDxSchema.Version.VERSION_14;
                 } else {
                     schemaVersion = null;
                 }
@@ -56,7 +58,7 @@ public class JsonSchemaVerificationTest extends BaseSchemaVerificationTest {
     private boolean isValidJson(CycloneDxSchema.Version version, String resource) throws Exception {
         final File file = new File(this.getClass().getResource(resource).getFile());
         final JsonParser parser = new JsonParser();
-        return parser.isValid(file, version, true);
+        return parser.isValid(file, version);
 
         // Uncomment to provide more detailed validation errors
         /*
