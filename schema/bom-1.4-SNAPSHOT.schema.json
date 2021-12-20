@@ -163,6 +163,11 @@
           "items": {"$ref": "#/definitions/hash"},
           "title": "Hashes",
           "description": "The hashes of the tool (if applicable)."
+        },
+        "externalReferences": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/externalReference"},
+          "title": "External References"
         }
       }
     },
@@ -227,8 +232,7 @@
       "title": "Component Object",
       "required": [
         "type",
-        "name",
-        "version"
+        "name"
       ],
       "properties": {
         "type": {
@@ -406,6 +410,11 @@
           "title": "Evidence",
           "description": "Provides the ability to document evidence collected through various forms of extraction or analysis."
         },
+        "releaseNotes": {
+          "$ref": "#/definitions/releaseNotes",
+          "title": "Release notes",
+          "description": "Specifies optional release notes."
+        },
         "properties": {
           "type": "array",
           "title": "Properties",
@@ -489,7 +498,7 @@
         "content": {
           "type": "string",
           "title": "Attachment Text",
-          "description": "The attachment data"
+          "description": "The attachment data. Proactive controls such as input validation and sanitization should be employed to prevent misuse of attachment text."
         }
       }
     },
@@ -805,6 +814,7 @@
             "license",
             "build-meta",
             "build-system",
+            "release-notes",
             "other"
           ]
         },
@@ -923,6 +933,11 @@
           "items": {"$ref": "#/definitions/service"},
           "uniqueItems": true,
           "title": "Services"
+        },
+        "releaseNotes": {
+          "$ref": "#/definitions/releaseNotes",
+          "title": "Release notes",
+          "description": "Specifies optional release notes."
         },
         "properties": {
           "type": "array",
@@ -1047,6 +1062,123 @@
           "type": "string",
           "title": "Value",
           "description": "The value of the property."
+        }
+      }
+    },
+    "localeType": {
+      "type": "string",
+      "pattern": "^([a-z]{2})(-[A-Z]{2})?$",
+      "title": "Locale",
+      "description": "Defines a syntax for representing two character language code (ISO-639) followed by an optional two character country code. The language code MUST be lower case. If the country code is specified, the country code MUST be upper case. The language code and country code MUST be separated by a minus sign. Examples: en, en-US, fr, fr-CA"
+    },
+    "releaseType": {
+      "type": "string",
+      "enum": [
+        "major",
+        "minor",
+        "patch",
+        "pre-release",
+        "internal"
+      ],
+      "description": "The software versioning type."
+    },
+    "note": {
+      "type": "object",
+      "title": "Note",
+      "description": "A note containing the locale and content.",
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "locale": {
+          "$ref": "#/definitions/localeType",
+          "title": "Locale",
+          "description": "The ISO-639 (or higher) language code and optional ISO-3166 (or higher) country code. Examples include: \"en\", \"en-US\", \"fr\" and \"fr-CA\""
+        },
+        "text": {
+          "title": "Release note content",
+          "description": "Specifies the full content of the release note.",
+          "$ref": "#/definitions/attachment"
+        }
+      }
+    },
+    "releaseNotes": {
+      "type": "object",
+      "title": "Release notes",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/releaseType",
+          "title": "Type",
+          "description": "The software versioning type the release note describes."
+        },
+        "title": {
+          "type": "string",
+          "title": "Title",
+          "description": "The title of the release."
+        },
+        "featuredImage": {
+          "type": "string",
+          "format": "iri-reference",
+          "title": "Featured image",
+          "description": "The URL to an image that may be prominently displayed with the release note."
+        },
+        "socialImage": {
+          "type": "string",
+          "format": "iri-reference",
+          "title": "Social image",
+          "description": "The URL to an image that may be used in messaging on social media platforms."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A short description of the release."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Timestamp",
+          "description": "The date and time (timestamp) when the release note was created."
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Aliases",
+          "description": "One or more alternate names the release may be referred to. This may include unofficial terms used by development and marketing teams (e.g. code names)."
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "description": "One or more tags that may aid in search or retrieval of the release note."
+        },
+        "resolves": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/issue"
+          },
+          "title": "Resolves",
+          "description": "A collection of issues that have been resolved."
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/note"
+          },
+          "title": "Notes",
+          "description": "Zero or more release notes containing the locale and content. Multiple note objects may be specified to support release notes in a wide variety of languages."
+        },
+        "properties": {
+          "type": "array",
+          "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values.",
+          "items": {"$ref": "#/definitions/property"}
         }
       }
     }
