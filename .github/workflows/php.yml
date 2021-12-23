@@ -1,0 +1,28 @@
+# docs: https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions
+
+name: PHP CI
+
+on: [push, pull_request, workflow_dispatch]
+
+defaults:
+  run:
+    working-directory: tools/src/test/php
+
+jobs:
+  test:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        # see https://github.com/actions/checkout
+        uses: actions/checkout@v2
+      - name: Setup PHP
+        # see https://github.com/shivammathur/setup-php
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.1"
+          tools: composer:v2
+      - name: Install Depenencies
+        run: composer install
+      - name: Run test
+        run: composer run test
