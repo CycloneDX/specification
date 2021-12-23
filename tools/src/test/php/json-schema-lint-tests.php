@@ -10,6 +10,8 @@ const SchemasFiles = [
     SchemaDir.'/bom-1.4-SNAPSHOT.schema.json',
     SchemaDir.'/bom-1.4.schema.json',
     SchemaDir.'/bom-1.4-strict.schema.json',
+    SchemaDir.'/jsf-0.82.schema.json',
+    SchemaDir.'/spdx.schema.json',
 ];
 
 require_once __DIR__.'/vendor/autoload.php';
