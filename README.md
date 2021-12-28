@@ -1,4 +1,4 @@
-[![Build Status](https://github.com/CycloneDX/specification/workflows/Maven%20CI/badge.svg)](https://github.com/CycloneDX/specification/actions?workflow=Maven+CI)
+[![Build Status](https://github.com/CycloneDX/specification/workflows/CI%20Build/badge.svg)](https://github.com/CycloneDX/specification/actions?workflow=CI+Build)
 [![License][license-image]][license-url]
 [![Website](https://img.shields.io/badge/https://-cyclonedx.org-blue.svg)](https://cyclonedx.org/)
 [![Slack Invite](https://img.shields.io/badge/Slack-Join-blue?logo=slack&labelColor=393939)](https://cyclonedx.org/slack/invite)
