@@ -11,7 +11,14 @@ generate () {
   version=$1
   title='CycloneDX v'$version' JSON Reference'
   echo Generating $title
-  generate-schema-doc --config no_link_to_reused_ref --config no_show_breadcrumbs --config title="$title" --config template_name=$(pwd)'/templates/cyclonedx' --minify '../../schema/bom-'$version'-strict.schema.json' 'docs/'$version'/index.html'
+  STRICT_SCHEMA_FILE='../../schema/bom-'$version'-strict.schema.json'
+  if [ -f "$STRICT_SCHEMA_FILE" ]; then
+      SCHEMA_FILE='../../schema/bom-'$version'-strict.schema.json'
+  else
+      SCHEMA_FILE='../../schema/bom-'$version'.schema.json'
+  fi
+  echo $SCHEMA_FILE
+  generate-schema-doc --config no_link_to_reused_ref --config no_show_breadcrumbs --config title="$title" --config template_name=$(pwd)'/templates/cyclonedx' --minify $SCHEMA_FILE 'docs/'$version'/index.html'
   sed -i -e "s/\${quotedTitle}/\"$title\"/g" 'docs/'$version'/index.html'
   sed -i -e "s/\${title}/$title/g" 'docs/'$version'/index.html'
   sed -i -e "s/\${version}/$version/g" 'docs/'$version'/index.html'
