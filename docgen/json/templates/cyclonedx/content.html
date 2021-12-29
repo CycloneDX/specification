@@ -105,7 +105,10 @@
 
             {# Properties, pattern properties, additional properties #}
             {%- for sub_property in schema.iterate_properties -%}
-                {% include "section_properties.html" %}
+                {# Custom modification to remove $ properties from documentation #}
+                {%- if not sub_property.property_display_name.startswith("$") -%}
+                    {% include "section_properties.html" %}
+                {%- endif -%}
             {%- endfor -%}
 
         {%- endif -%}
