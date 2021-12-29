@@ -18,7 +18,7 @@ generate () {
       SCHEMA_FILE='../../schema/bom-'$version'.schema.json'
   fi
   echo $SCHEMA_FILE
-  generate-schema-doc --config no_link_to_reused_ref --config no_show_breadcrumbs --config title="$title" --config custom_template_path=$(pwd)'/templates/cyclonedx/base.html' --minify $SCHEMA_FILE 'docs/'$version'/index.html'
+  generate-schema-doc --config no_link_to_reused_ref --config no_show_breadcrumbs --config no_collapse_long_descriptions --config deprecated_from_description --config title="$title" --config custom_template_path=$(pwd)'/templates/cyclonedx/base.html' --minify $SCHEMA_FILE 'docs/'$version'/index.html'
   sed -i -e "s/\${quotedTitle}/\"$title\"/g" 'docs/'$version'/index.html'
   sed -i -e "s/\${title}/$title/g" 'docs/'$version'/index.html'
   sed -i -e "s/\${version}/$version/g" 'docs/'$version'/index.html'
