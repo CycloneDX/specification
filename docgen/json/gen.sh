@@ -4,7 +4,7 @@ mkdir -p docs/{1.2,1.3,1.4-SNAPSHOT}
 
 # Check to see if generate-schema-doc is executable and is in the path. If not, install JSON Schema for Humans.
 if ! [ -x "$(command -v generate-schema-doc)" ]; then
-  pip3 install json-schema-for-humans==0.39.3
+  pip3 install json-schema-for-humans==0.39.5
 fi
 
 generate () {
