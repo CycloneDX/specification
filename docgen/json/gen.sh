@@ -26,4 +26,4 @@ generate () {
 
 generate 1.2
 generate 1.3
-generate 1.4-SNAPSHOT
+generate 1.4
