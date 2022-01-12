@@ -1,0 +1,47 @@
+name: CI Build
+
+on: [push, pull_request]
+
+env:
+  PYTHON_VERISON_DEFAULT: "3.10"
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+    - name: Build with Maven
+      run: |
+        cd tools
+        mvn -B package --file pom.xml
+        cd ..
+    - name: Setup Python Environment
+      # see https://github.com/actions/setup-python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ env.PYTHON_VERISON_DEFAULT }}
+        architecture: 'x64'
+    - name: Generate JSON Schema documentation
+      run: |
+        cd docgen/json
+        ./gen.sh
+    - name: Generate XML Schema documentation
+      run: |
+        cd docgen/xml
+        ./gen.sh
+    - name: Archive JSON Schema documentation
+      uses: actions/upload-artifact@v2
+      with:
+        name: JSON-Schema-documentation
+        path: docgen/json/docs
+    - name: Archive XML Schema documentation
+      uses: actions/upload-artifact@v2
+      with:
+        name: XML-Schema-documentation
+        path: docgen/xml/docs

@@ -1,0 +1,85 @@
+{% from 'content.html' import content with context %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>${title}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta charset="UTF-8"/>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:site" content="@CycloneDX_Spec"/>
+    <meta name="twitter:title" content="${quotedTitle}"/>
+    <meta name="twitter:image" content="https://cyclonedx.org/theme/assets/images/CycloneDX-Twitter-Card.png"/>
+    <meta name="twitter:description" content="${quotedTitle}"/>
+    <meta name="description" content="${quotedTitle}"/>
+    <meta property="og:description" content="${quotedTitle}"/>
+    <meta property="og:title" content="${quotedTitle}"/>
+    <meta property="og:locale" content="en_US"/>
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://cyclonedx.org/theme/assets/images/CycloneDX-Twitter-Card.png" />
+    <link rel="icon" href="https://cyclonedx.org/cyclonedx-icon.png" type="image/png"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.0/css/bootstrap.min.css" integrity="sha512-P5MgMn1jBN01asBgU0z60Qk4QxiXo86+wlFahKrsQf37c9cro517WzVSPPV1tDKzhku2iJ2FVgL67wG03SGnNA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" type="text/css" href="schema_doc.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.slim.js" integrity="sha512-HNbo1d4BaJjXh+/e6q4enTyezg5wiXvY3p/9Vzb20NIvkJghZxhzaXeffbdJuuZSxFhJP87ORPadwmU9aN3wSA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.0/js/bootstrap.min.js" integrity="sha512-XKa9Hemdy1Ui3KSGgJdgMyYlUg1gM+QhL6cnlyTe2qzMCYm4nAZ1PsVerQzTTXzonUR+dmswHqgJPuwCq1MaAg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/12.2.0/markdown-it.min.js" integrity="sha512-cTQeM/op796Fp1ZUxfech8gSMLT/HvrXMkRGdGZGQnbwuq/obG0UtcL04eByVa99qJik7WlnlQOr5/Fw5B36aw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="schema_doc.min.js"></script>
+</head>
+<body class="blue" data-spy="scroll" data-target=".js-scrollspy" onload="anchorOnLoad();" id="root">
+
+<nav class="navbar fixed-top navbar-expand-sm navbar-inverse">
+    <a href="https://cyclonedx.org" class="navbar-brand site-header__logo"><img src="https://cyclonedx.org/theme/assets/images/layout/logo-white.svg" width="150"></img></a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarScroll">
+        <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarScrollingDropdown" role="button" data-toggle="dropdown" aria-expanded="false">
+                    v${version} (JSON)
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
+                    <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.4/json/">v1.4 (JSON)</a></li>
+                    <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.3/json/">v1.3 (JSON)</a></li>
+                    <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.2/json/">v1.2 (JSON)</a></li>
+                    <li><hr class="dropdown-divider"/></li>
+                    <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.4/xml/">v1.4 (XML)</a></li>
+                    <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.3/xml/">v1.3 (XML)</a></li>
+                    <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.2/xml/">v1.2 (XML)</a></li>
+                    <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.1/xml/">v1.1 (XML)</a></li>
+                    <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.0/xml/">v1.0 (XML)</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+
+<div class="container-fluid" style="margin-top:70px; margin-bottom:3rem">
+    <h1>${title}</h1>
+
+    {%- if title -%}
+        <h1>{{ title }}</h1>
+    {%- endif -%}
+    {%- if config.expand_buttons -%}
+        <div class="text-right">
+            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target=".collapse:not(.show)" aria-expanded="false">Expand all</button>
+            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target=".collapse.show" aria-expanded="false">Collapse all</button>
+        </div>
+    {%- endif -%}
+
+    {{ content(schema) }}
+
+<footer class="site-footer__copyright fixed-bottom">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                &copy; OWASP Foundation - CycloneDX is a <a href="https://owasp.org/cyclonedx">OWASP Flagship Project</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>
