@@ -5,7 +5,7 @@ for validation of a schema
 
 ## requirements
 
-* `php:^7.4`
+* php >= 7.4
 * php composer
 
 ## setup

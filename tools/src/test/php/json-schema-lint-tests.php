@@ -1,57 +1,58 @@
 <?php declare(strict_types=1);
 
-const SchemaDir =  __DIR__.'/../../../../schema/';
+// region config
 
-const SchemasFiles = [
-    SchemaDir.'/bom-1.2.schema.json',
-    SchemaDir.'/bom-1.2-strict.schema.json',
-    SchemaDir.'/bom-1.3.schema.json',
-    SchemaDir.'/bom-1.3-strict.schema.json',
-    SchemaDir.'/bom-1.4-SNAPSHOT.schema.json',
-    SchemaDir.'/bom-1.4.schema.json',
-    SchemaDir.'/bom-1.4-strict.schema.json',
-    SchemaDir.'/jsf-0.82.schema.json',
-    SchemaDir.'/spdx.schema.json',
-];
+const SchemaFileGlob = '*.schema.json';
+const SchemaDir = __DIR__.'/../../../../schema/';
+
+// endregion config
+
+// region pre-check
+
+if (!is_dir(SchemaDir)) {
+    throw new RuntimeException('No such dir: '.SchemaDir);
+}
+
+$schemasFiles = glob(SchemaDir.SchemaFileGlob, GLOB_ERR);
+if (empty($schemasFiles)) {
+    throw new RuntimeException('No schema files found');
+}
+
+// region pre-check
 
 require_once __DIR__.'/vendor/autoload.php';
 
 $errCnt = 0;
-$schemaLoader = new Opis\JsonSchema\SchemaLoader();
 
-foreach (SchemasFiles as $schemasFile) {
-    $schemasFile = realpath($schemasFile);
-    if (!$schemasFile) {
-        // skip
-        continue;
-    }
-    echo PHP_EOL, "Schema: $schemasFile", PHP_EOL;
+foreach ($schemasFiles as $schemasFilePath) {
+    echo PHP_EOL, "SchemaFile: $schemasFilePath", PHP_EOL;
 
     try {
-        $schema = json_decode(file_get_contents($schemasFile), false, 512, JSON_THROW_ON_ERROR);
+        $schema = json_decode(file_get_contents($schemasFilePath), false, 512, JSON_THROW_ON_ERROR);
         if (!is_object($schema)) {
-            throw new DomainException("decode to a non-object");
+            throw new DomainException('decode to a non-object');
         }
-    }
-    catch (Exception $exception)
-    {
+    } catch (Exception $exception) {
         ++$errCnt;
-        echo "JSON DECODE ERROR: ", $exception->getMessage(), PHP_EOL;
+        echo 'JSON DECODE ERROR: ', $exception->getMessage(), PHP_EOL;
         continue;
     }
 
     try {
-        $schemaLoader->loadObjectSchema($schema);
-        echo "OK.", PHP_EOL;
+        // run on individual instances, so no pollution or artifacts can distort tests
+        (new Opis\JsonSchema\SchemaLoader())->loadObjectSchema($schema);
+        echo 'OK.', PHP_EOL;
     } catch (Opis\JsonSchema\Exceptions\SchemaException $exception) {
         ++$errCnt;
-        echo "SCHEMA ERROR: ", $exception->getMessage(), PHP_EOL;
+        echo 'SCHEMA ERROR: ', $exception->getMessage(), PHP_EOL;
         continue;
     } catch (Exception $exception) {
         ++$errCnt;
-        echo "UNEXPECTED ERROR:", $exception->getMessage(), PHP_EOL;
+        echo 'UNEXPECTED ERROR: ', $exception->getMessage(), PHP_EOL;
         continue;
     }
 }
 
-exit($errCnt);
+// Exit statuses should be in the range 0 to 254, the exit status 255 is reserved by PHP and shall not be used.
+// The status 0 is used to terminate the program successfully.
+exit(min($errCnt, 254));
