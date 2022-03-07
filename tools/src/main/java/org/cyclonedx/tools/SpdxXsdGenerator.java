@@ -34,6 +34,7 @@ public class SpdxXsdGenerator {
 
     public static void main(String args[]) throws Exception {
 
+        //todo : automatically obtain latest release from: https://api.github.com/repos/spdx/license-list-data/releases
         //todo : make configurable
         String licenseUrl = "https://raw.githubusercontent.com/spdx/license-list-data/v" + SPDX_VERSION + "/json/licenses.json";
         String exceptionsUrl = "https://raw.githubusercontent.com/spdx/license-list-data/v" + SPDX_VERSION + "/json/exceptions.json";
