@@ -97,6 +97,14 @@
       "title": "Vulnerabilities",
       "description": "Vulnerabilities identified in components or services."
     },
+    "annotations": {
+      "type": "array",
+      "additionalItems": false,
+      "items": {"$ref": "#/definitions/annotations"},
+      "uniqueItems": true,
+      "title": "Annotations",
+      "description": "Comments made by people, organizations, or tools about any object with a bom-ref, such as components, services, vulnerabilities, or the BOM itself. Unlike inventory information, annotations may contain opinion or commentary from various stakeholders. Annotations may be inline (with inventory) or externalized via BOM-Link, and may optionally be signed."
+    },
     "signature": {
       "$ref": "#/definitions/signature",
       "title": "Signature",
@@ -1687,6 +1695,97 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 1024
+    },
+    "annotations": {
+      "type": "object",
+      "title": "Annotations",
+      "description": "A comment, note, explanation, or similar textual content which provides additional context to the object(s) being annotated.",
+      "required": [
+        "subjects",
+        "annotator",
+        "timestamp",
+        "text"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "#/definitions/refType",
+          "title": "BOM Reference",
+          "description": "An optional identifier which can be used to reference the annotation elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+        },
+        "subjects": {
+          "type": "array",
+          "uniqueItems": true,
+          "additionalItems": false,
+          "items": {
+            "$ref": "#/definitions/refType"
+          },
+          "title": "BOM References",
+          "description": "The object in the BOM identified by its bom-ref. This is often a component or service, but may be any object type supporting bom-refs."
+        },
+        "annotator": {
+          "type": "object",
+          "title": "Annotator",
+          "description": "The organization, person, component, or service which created the textual content of the annotation.",
+          "oneOf": [
+            {
+              "required": [
+                "organization"
+              ]
+            },
+            {
+              "required": [
+                "person"
+              ]
+            },
+            {
+              "required": [
+                "component"
+              ]
+            },
+            {
+              "required": [
+                "service"
+              ]
+            }
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "organization": {
+              "description": "The organization that created the annotation",
+              "$ref": "#/definitions/organizationalEntity"
+            },
+            "person": {
+              "description": "The person that created the annotation",
+              "$ref": "#/definitions/organizationalContact"
+            },
+            "component": {
+              "description": "The tool or component that created the annotation",
+              "$ref": "#/definitions/component"
+            },
+            "service": {
+              "description": "The service that created the annotation",
+              "$ref": "#/definitions/service"
+            }
+          }
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Timestamp",
+          "description": "The date and time (timestamp) when the annotation was created."
+        },
+        "text": {
+          "type": "string",
+          "title": "Text",
+          "description": "The textual content of the annotation."
+        },
+        "signature": {
+          "$ref": "#/definitions/signature",
+          "title": "Signature",
+          "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
+        }
+      }
     },
     "signature": {
       "$ref": "jsf-0.82.schema.json#/definitions/signature",

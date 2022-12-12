@@ -2103,6 +2103,111 @@ limitations under the License.
         </xs:sequence>
     </xs:complexType>
 
+    <xs:complexType name="annotationsType">
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="annotation" type="bom:annotationType"/>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##any" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:complexType name="annotatorChoiceType">
+        <xs:choice>
+            <xs:element name="organization" type="bom:organizationalEntity" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The organization that created the annotation</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="person" type="bom:organizationalContact" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The person that created the annotation</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="component" type="bom:component" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The tool or component that created the annotation</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="service" type="bom:service" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The service that created the annotation</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:choice>
+    </xs:complexType>
+    
+    <xs:complexType name="annotationType">
+        <xs:sequence>
+            <xs:element name="subjects" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The objects in the BOM identified by their bom-ref's. This is often components or services, but may be any object type supporting bom-refs.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="subject" type="bom:bomReferenceType"/>
+                        <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Allows any undeclared elements as long as the elements are placed in a different namespace.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:any>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="annotator" type="bom:annotatorChoiceType" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The organization, person, component, or service which created the textual content 
+                        of the annotation.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="timestamp" type="xs:dateTime" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The date and time (timestamp) when the annotation was created.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="text" type="xs:string" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The person(s) or organization(s) that published the component</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:attribute name="bom-ref" type="bom:refType">
+            <xs:annotation>
+                <xs:documentation>
+                    An optional identifier which can be used to reference the annotation elsewhere in the BOM.
+                    Uniqueness is enforced within all elements and children of the root-level bom element.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:anyAttribute namespace="##any" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
     <xs:simpleType name="severityType" final="restriction">
         <xs:annotation>
             <xs:documentation xml:lang="en">
@@ -2377,6 +2482,15 @@ limitations under the License.
                 <xs:element name="vulnerabilities" type="bom:vulnerabilitiesType" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Vulnerabilities identified in components or services.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="annotations" type="bom:annotationsType" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>Comments made by people, organizations, or tools about any object with
+                            a bom-ref, such as components, services, vulnerabilities, or the BOM itself. Unlike
+                            inventory information, annotations may contain opinion or commentary from various
+                            stakeholders. Annotations may be inline (with inventory) or externalized via BOM-Link,
+                            and may optionally be signed.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
                 <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">

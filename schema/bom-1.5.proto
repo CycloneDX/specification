@@ -33,6 +33,8 @@ message Bom {
   repeated Composition compositions = 9;
   // Vulnerabilities identified in components or services.
   repeated Vulnerability vulnerabilities = 10;
+  // Comments made by people, organizations, or tools about any object with a bom-ref, such as components, services, vulnerabilities, or the BOM itself. Unlike inventory information, annotations may contain opinion or commentary from various stakeholders.
+  repeated Annotation annotations = 11;
 }
 
 enum Classification {
@@ -674,4 +676,30 @@ enum VulnerabilityAffectedStatus {
   VULNERABILITY_AFFECTED_STATUS_UNKNOWN = 0;
   VULNERABILITY_AFFECTED_STATUS_AFFECTED = 1;
   VULNERABILITY_AFFECTED_STATUS_NOT_AFFECTED = 2;
+}
+
+message AnnotatorChoice {
+  oneof choice {
+    // The organization that created the annotation
+    OrganizationalEntity organization = 1;
+    // The person that created the annotation
+    OrganizationalContact person = 2;
+    // The tool or component that created the annotation
+    Component component = 3;
+    // The service that created the annotation
+    Service service = 4;
+  }
+}
+
+message Annotation {
+  // An optional identifier which can be used to reference the annotation elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.
+  optional string bom_ref = 1;
+  // The object in the BOM identified by its bom-ref. This is often a component or service, but may be any object type supporting bom-refs.
+  repeated string subjects = 2;
+  // The organization, person, component, or service which created the textual content of the annotation.
+  AnnotatorChoice annotator = 3;
+  // The date and time (timestamp) when the annotation was created.
+  google.protobuf.Timestamp timestamp = 4;
+  // The textual content of the annotation.
+  string text = 5;
 }
