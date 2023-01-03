@@ -6,8 +6,13 @@
 [![Twitter](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&label=Follow)](https://twitter.com/CycloneDX_Spec)
 
 # CycloneDX Specification
-CycloneDX is a lightweight Software Bill of Materials (SBOM) specification designed for use in application security 
-contexts and supply chain component analysis.
+OWASP CycloneDX is a full-stack Bill of Materials (BOM) standard that provides advanced supply chain capabilities for cyber risk reduction. The specification supports:
+* Software Bill of Materials (SBOM)
+* Software-as-a-Service Bill of Materials (SaaSBOM)
+* Hardware Bill of Materials (HBOM)
+* Operations Bill of Materials (OBOM)
+* Vulnerability Disclosure Reports (VDR)
+* Vulnerability Exploitability eXchange (VEX).
 
 
 ## Introduction
@@ -17,8 +22,8 @@ organizations to identify risk, allows for greater transparency, and enables rap
 
 CycloneDX was created for this purpose.
 
-Strategic direction and maintenance of the specification is managed by the CycloneDX Core working group, with origins
-in the [OWASP](https://owasp.org) community.
+Strategic direction and maintenance of the specification is managed by the CycloneDX Core Working Group, is backed by the 
+[OWASP Foundation](https://owasp.org), and is supported by the global information security community.
 
 
 ## Use Cases
@@ -40,7 +45,7 @@ The following media types are officially registered with IANA:
 | application/vnd.cyclonedx+xml | XML | [IANA](https://www.iana.org/assignments/media-types/application/vnd.cyclonedx+xml) |
 | application/vnd.cyclonedx+json | JSON | [IANA](https://www.iana.org/assignments/media-types/application/vnd.cyclonedx+json) |
 
-Specific versions of CycloneDX can be specified by using the version parameter. i.e. `application/vnd.cyclonedx+xml; version=1.3`.
+Specific versions of CycloneDX can be specified by using the version parameter. For example: `application/vnd.cyclonedx+xml; version=1.3`.
 
 The officially supported media type for Protocol Buffer format is `application/x.vnd.cyclonedx+protobuf`.
 
