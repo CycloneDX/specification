@@ -619,6 +619,11 @@
       ],
       "additionalProperties": false,
       "properties": {
+        "bom-ref": {
+          "$ref": "#/definitions/refType",
+          "title": "BOM Reference",
+          "description": "An optional identifier which can be used to reference the license elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+        },
         "id": {
           "$ref": "spdx.schema.json",
           "title": "License ID (SPDX)",
@@ -642,6 +647,142 @@
           "description": "The URL to the license file. If specified, a 'license' externalReference should also be specified for completeness",
           "examples": ["https://www.apache.org/licenses/LICENSE-2.0.txt"],
           "format": "iri-reference"
+        },
+        "licensing": {
+          "type": "object",
+          "title": "Licensing information",
+          "description": "Licensing details describing the licensor/licensee, license type, renewal and expiration dates, and other important metadata",
+          "additionalProperties": false,
+          "properties": {
+            "altIds": {
+              "type": "array",
+              "title": "Alternate License Identifiers",
+              "description": "License identifiers that may be used to manage licenses and their lifecycle",
+              "additionalItems": false,
+              "items": {
+                "type": "string"
+              }
+            },
+            "licensor": {
+              "title": "Licensor",
+              "description": "The individual or organization that grants a license to another individual or organization",
+              "additionalProperties": false,
+              "properties": {
+                "organization": {
+                  "title": "Licensor (Organization)",
+                  "description": "The organization that granted the license",
+                  "$ref": "#/definitions/organizationalEntity"
+                },
+                "individual": {
+                  "title": "Licensor (Individual)",
+                  "description": "The individual, not associated with an organization, that granted the license",
+                  "$ref": "#/definitions/organizationalContact"
+                }
+              },
+              "oneOf":[
+                {
+                  "required": ["organization"]
+                },
+                {
+                  "required": ["individual"]
+                }
+              ]
+            },
+            "licensee": {
+              "title": "Licensee",
+              "description": "The individual or organization for which a license was granted to",
+              "additionalProperties": false,
+              "properties": {
+                "organization": {
+                  "title": "Licensee (Organization)",
+                  "description": "The organization that was granted the license",
+                  "$ref": "#/definitions/organizationalEntity"
+                },
+                "individual": {
+                  "title": "Licensee (Individual)",
+                  "description": "The individual, not associated with an organization, that was granted the license",
+                  "$ref": "#/definitions/organizationalContact"
+                }
+              },
+              "oneOf":[
+                {
+                  "required": ["organization"]
+                },
+                {
+                  "required": ["individual"]
+                }
+              ]
+            },
+            "purchaser": {
+              "title": "Purchaser",
+              "description": "The individual or organization that purchased the license",
+              "additionalProperties": false,
+              "properties": {
+                "organization": {
+                  "title": "Purchaser (Organization)",
+                  "description": "The organization that purchased the license",
+                  "$ref": "#/definitions/organizationalEntity"
+                },
+                "individual": {
+                  "title": "Purchaser (Individual)",
+                  "description": "The individual, not associated with an organization, that purchased the license",
+                  "$ref": "#/definitions/organizationalContact"
+                }
+              },
+              "oneOf":[
+                {
+                  "required": ["organization"]
+                },
+                {
+                  "required": ["individual"]
+                }
+              ]
+            },
+            "purchaseOrder": {
+              "type": "string",
+              "title": "Purchase Order",
+              "description": "The purchase order identifier the purchaser sent to a supplier or vendor to authorize a purchase"
+            },
+            "licenseTypes": {
+              "type": "array",
+              "title": "License Type",
+              "description": "The type of license(s) that was granted to the licensee\n\n* __academic__ = A license that grants use of software solely for the purpose of education or research.\n* __appliance__ = A license covering use of software embedded in a specific piece of hardware.\n* __client-access__ = A Client Access License (CAL) allows client computers to access services provided by server software.\n* __concurrent-user__ = A Concurrent User license (aka floating license) limits the number of licenses for a software application and licenses are shared among a larger number of users.\n* __core-points__ = A license where the core of a computer's processor is assigned a specific number of points.\n* __custom-metric__ = A license for which consumption is measured by non-standard metrics.\n* __device__ = A license which covers a defined number of installations on computers and other types of devices.\n* __evaluation__ = A license which grants permission to install and use software for trial purposes.\n* __named-user__ = A license that grants access to the software to one or more pre-defined users.\n* __node-locked__ = A license that grants access to the software on one or more pre-defined computers or devices.\n* __oem__ = An Original Equipment Manufacturer license that is delivered with hardware, cannot be transferred to other hardware, and is valid for the life of the hardware.\n* __perpetual__ = A license where the software is sold on a one-time basis and the licensee can use a copy of the software indefinitely.\n* __processor-points__ = A license where each installation consumes points per processor.\n* __subscription__ = A license where the licensee pays a fee to use the software or service.\n* __user__ = A license that grants access to the software or service by a specified number of users.\n* __other__ = Another license type.\n",
+              "additionalItems": false,
+              "items": {
+                "type": "string",
+                "enum": [
+                  "academic",
+                  "appliance",
+                  "client-access",
+                  "concurrent-user",
+                  "core-points",
+                  "custom-metric",
+                  "device",
+                  "evaluation",
+                  "named-user",
+                  "node-locked",
+                  "oem",
+                  "perpetual",
+                  "processor-points",
+                  "subscription",
+                  "user",
+                  "other"
+                ]
+              }
+            },
+            "lastRenewal": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Last Renewal",
+              "description": "The timestamp indicating when the license was last renewed. For new purchases, this is often the purchase or acquisition date. For non-perpetual licenses or subscriptions, this is the timestamp of when the license was last renewed."
+            },
+            "expiration": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Expiration",
+              "description": "The timestamp indicating when the current license expires (if applicable)."
+            }
+          }
         }
       }
     },
