@@ -1,6 +1,6 @@
 #!/bin/bash
 rm -f -R docs
-mkdir -p docs/{1.2,1.3,1.4}
+mkdir -p docs/{1.2,1.3,1.4,1.5}
 
 # Check to see if generate-schema-doc is executable and is in the path. If not, install JSON Schema for Humans.
 if ! [ -x "$(command -v generate-schema-doc)" ]; then
@@ -27,3 +27,4 @@ generate () {
 generate 1.2
 generate 1.3
 generate 1.4
+generate 1.5

@@ -89,7 +89,7 @@ limitations under the License.
             <xs:element name="licenses" type="bom:licenseChoiceType" minOccurs="0" maxOccurs="1"/>
             <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation>Provides the ability to document properties in a key/value store.
+                    <xs:documentation>Provides the ability to document properties in a name/value store.
                         This provides flexibility to include data not officially supported in the standard
                         without having to use additional namespaces or create extensions. Property names
                         of interest to the general public are encouraged to be registered in the
@@ -358,7 +358,7 @@ limitations under the License.
             </xs:element>
             <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation>Provides the ability to document properties in a key/value store.
+                    <xs:documentation>Provides the ability to document properties in a name/value store.
                         This provides flexibility to include data not officially supported in the standard
                         without having to use additional namespaces or create extensions. Property names
                         of interest to the general public are encouraged to be registered in the
@@ -463,6 +463,141 @@ limitations under the License.
                         an externalReference should also be specified for completeness.</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="licensing" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Licensing details describing the licensor/licensee, license type, renewal and
+                        expiration dates, and other important metadata</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="altIds" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>License identifiers that may be used to manage licenses and
+                                    their lifecycle</xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="altId" type="xs:normalizedString" minOccurs="0" maxOccurs="unbounded"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="licensor" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>The individual or organization that grants a license to another
+                                    individual or organization</xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:choice>
+                                        <xs:element name="organization" type="bom:organizationalEntity" minOccurs="0" maxOccurs="1">
+                                            <xs:annotation>
+                                                <xs:documentation>The organization that granted the license</xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element name="individual" type="bom:organizationalContact" minOccurs="0" maxOccurs="1">
+                                            <xs:annotation>
+                                                <xs:documentation>The individual, not associated with an organization,
+                                                    that granted the license</xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                    </xs:choice>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="licensee" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>The individual or organization for which a license was granted to</xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:choice>
+                                        <xs:element name="organization" type="bom:organizationalEntity" minOccurs="0" maxOccurs="1">
+                                            <xs:annotation>
+                                                <xs:documentation>The organization that was granted the license</xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element name="individual" type="bom:organizationalContact" minOccurs="0" maxOccurs="1">
+                                            <xs:annotation>
+                                                <xs:documentation>The individual, not associated with an organization,
+                                                    that was granted the license</xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                    </xs:choice>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="purchaser" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>The individual or organization that purchased the license</xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:choice>
+                                        <xs:element name="organization" type="bom:organizationalEntity" minOccurs="0" maxOccurs="1">
+                                            <xs:annotation>
+                                                <xs:documentation>The organization that purchased the license</xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element name="individual" type="bom:organizationalContact" minOccurs="0" maxOccurs="1">
+                                            <xs:annotation>
+                                                <xs:documentation>The individual, not associated with an organization,
+                                                    that purchased the license</xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                    </xs:choice>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="purchaseOrder" type="xs:string" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>The purchase order identifier the purchaser sent to a supplier or
+                                    vendor to authorize a purchase</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="licenseTypes" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>The type of license(s) that was granted to the licensee</xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="licenseType" type="bom:licenseTypeEnum" minOccurs="0" maxOccurs="unbounded"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="lastRenewal" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation xml:lang="en">The timestamp indicating when the license was last
+                                    renewed. For new purchases, this is often the purchase or acquisition date.
+                                    For non-perpetual licenses or subscriptions, this is the timestamp of when the
+                                    license was last renewed.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="expiration" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation xml:lang="en">The timestamp indicating when the current license
+                                    expires (if applicable).</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Allows any undeclared elements as long as the elements are placed in a different namespace.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:any>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Provides the ability to document properties in a name/value store.
+                        This provides flexibility to include data not officially supported in the standard
+                        without having to use additional namespaces or create extensions. Property names
+                        of interest to the general public are encouraged to be registered in the
+                        CycloneDX Property Taxonomy - https://github.com/CycloneDX/cyclonedx-property-taxonomy.
+                        Formal registration is OPTIONAL.</xs:documentation>
+                </xs:annotation>  
+            </xs:element>    
             <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                     <xs:documentation>
@@ -471,6 +606,14 @@ limitations under the License.
                 </xs:annotation>
             </xs:any>
         </xs:sequence>
+        <xs:attribute name="bom-ref" type="bom:refType">
+            <xs:annotation>
+                <xs:documentation>
+                    An optional identifier which can be used to reference the license elsewhere in the BOM.
+                    Uniqueness is enforced within all elements and children of the root-level bom element.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
     </xs:complexType>
 
     <xs:complexType name="attachedTextType">
@@ -612,6 +755,108 @@ limitations under the License.
         </xs:restriction>
     </xs:simpleType>
 
+    <xs:simpleType name="licenseTypeEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="academic">
+                <xs:annotation>
+                    <xs:documentation>A license that grants use of software solely for the purpose
+                        of education or research.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="appliance">
+                <xs:annotation>
+                    <xs:documentation>A license covering use of software embedded in a specific
+                        piece of hardware.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="client-access">
+                <xs:annotation>
+                    <xs:documentation>A Client Access License (CAL) allows client computers to access
+                        services provided by server software.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="concurrent-user">
+                <xs:annotation>
+                    <xs:documentation>A Concurrent User license (aka floating license) limits the
+                        number of licenses for a software application and licenses are shared among
+                        a larger number of users.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="core-points">
+                <xs:annotation>
+                    <xs:documentation>A license where the core of a computer's processor is assigned
+                        a specific number of points.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="custom-metric">
+                <xs:annotation>
+                    <xs:documentation>A license for which consumption is measured by non-standard
+                        metrics.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="device">
+                <xs:annotation>
+                    <xs:documentation>A license which covers a defined number of installations on
+                        computers and other types of devices.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="evaluation">
+                <xs:annotation>
+                    <xs:documentation>A license which grants permission to install and use software
+                        for trial purposes.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="named-user">
+                <xs:annotation>
+                    <xs:documentation>A license that grants access to the software to one or more
+                        pre-defined users.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="node-locked">
+                <xs:annotation>
+                    <xs:documentation>A license that grants access to the software on one or more
+                        pre-defined computers or devices.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="oem">
+                <xs:annotation>
+                    <xs:documentation>An Original Equipment Manufacturer license that is delivered
+                        with hardware, cannot be transferred to other hardware, and is valid for the
+                        life of the hardware.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="perpetual">
+                <xs:annotation>
+                    <xs:documentation>A license where the software is sold on a one-time basis and
+                        the licensee can use a copy of the software indefinitely.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="processor-points">
+                <xs:annotation>
+                    <xs:documentation>A license where each installation consumes points per
+                        processor.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="subscription">
+                <xs:annotation>
+                    <xs:documentation>A license where the licensee pays a fee to use the software
+                        or service.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="user">
+                <xs:annotation>
+                    <xs:documentation>A license that grants access to the software or service by a
+                        specified number of users.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="other">
+                <xs:annotation>
+                    <xs:documentation>Another license type.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+
     <xs:simpleType name="hashValue">
         <xs:restriction base="xs:token">
             <xs:pattern value="([a-fA-F0-9]{32})|([a-fA-F0-9]{40})|([a-fA-F0-9]{64})|([a-fA-F0-9]{96})|([a-fA-F0-9]{128})"/>
@@ -724,7 +969,7 @@ limitations under the License.
             </xs:enumeration>
             <xs:enumeration value="bom">
                 <xs:annotation>
-                    <xs:documentation>Bill-of-material document (CycloneDX, SPDX, SWID, etc)</xs:documentation>
+                    <xs:documentation>Bill-of-materials (SBOM, OBOM, HBOM, SaaSBOM, etc)</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
             <xs:enumeration value="mailing-list">
@@ -789,8 +1034,9 @@ limitations under the License.
     <xs:complexType name="externalReferences">
         <xs:annotation>
             <xs:documentation xml:lang="en">
-                External references provide a way to document systems, sites, and information that may be relevant
-                but which are not included with the BOM.
+                External references provide a way to document systems, sites, and information that may be
+                relevant, but are not included with the BOM. They may also establish specific relationships
+                within or external to the BOM.
             </xs:documentation>
         </xs:annotation>
         <xs:sequence minOccurs="0" maxOccurs="unbounded">
@@ -806,7 +1052,12 @@ limitations under the License.
         <xs:sequence>
             <xs:element name="url" type="xs:anyURI" minOccurs="1" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation xml:lang="en">The URL to the external reference</xs:documentation>
+                    <xs:documentation xml:lang="en">The URI (URL or URN) to the external reference. External references
+                        are URIs and therefore can accept any URL scheme including https, mailto, tel, and dns.
+                        External references may also include formally registered URNs such as CycloneDX BOM-Link to
+                        reference CycloneDX BOMs or any object within a BOM. BOM-Link transforms applicable external
+                        references into relationships that can be expressed in a BOM or across BOMs. Refer to:
+                        https://cyclonedx.org/capabilities/bomlink/</xs:documentation>
                 </xs:annotation>
             </xs:element>
             <xs:element name="comment" type="xs:string" minOccurs="0" maxOccurs="1">
@@ -1307,7 +1558,7 @@ limitations under the License.
             </xs:element>
             <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation>Provides the ability to document properties in a key/value store.
+                    <xs:documentation>Provides the ability to document properties in a name/value store.
                         This provides flexibility to include data not officially supported in the standard
                         without having to use additional namespaces or create extensions. Property names
                         of interest to the general public are encouraged to be registered in the
@@ -1659,7 +1910,7 @@ limitations under the License.
             </xs:element>
             <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation>Provides the ability to document properties in a key/value store.
+                    <xs:documentation>Provides the ability to document properties in a name/value store.
                         This provides flexibility to include data not officially supported in the standard
                         without having to use additional namespaces or create extensions. Property names
                         of interest to the general public are encouraged to be registered in the
@@ -1957,6 +2208,20 @@ limitations under the License.
                                 </xs:documentation>
                             </xs:annotation>
                         </xs:element>
+                        <xs:element name="firstIssued" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation xml:lang="en">
+                                    The date and time (timestamp) when the analysis was first issued.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="lastUpdated" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation xml:lang="en">
+                                    The date and time (timestamp) when the analysis was last updated.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -2016,7 +2281,7 @@ limitations under the License.
             </xs:element>
             <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation>Provides the ability to document properties in a key/value store.
+                    <xs:documentation>Provides the ability to document properties in a name/value store.
                         This provides flexibility to include data not officially supported in the standard
                         without having to use additional namespaces or create extensions. Property names
                         of interest to the general public are encouraged to be registered in the
@@ -2471,7 +2736,7 @@ limitations under the License.
                 </xs:element>
                 <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
-                        <xs:documentation>Provides the ability to document properties in a key/value store.
+                        <xs:documentation>Provides the ability to document properties in a name/value store.
                             This provides flexibility to include data not officially supported in the standard
                             without having to use additional namespaces or create extensions. Property names
                             of interest to the general public are encouraged to be registered in the

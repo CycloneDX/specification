@@ -71,7 +71,7 @@
       "additionalItems": false,
       "items": {"$ref": "#/definitions/externalReference"},
       "title": "External References",
-      "description": "External references provide a way to document systems, sites, and information that may be relevant but which are not included with the BOM."
+      "description": "External references provide a way to document systems, sites, and information that may be relevant, but are not included with the BOM. They may also establish specific relationships within or external to the BOM."
     },
     "dependencies": {
       "type": "array",
@@ -104,6 +104,15 @@
       "uniqueItems": true,
       "title": "Annotations",
       "description": "Comments made by people, organizations, or tools about any object with a bom-ref, such as components, services, vulnerabilities, or the BOM itself. Unlike inventory information, annotations may contain opinion or commentary from various stakeholders. Annotations may be inline (with inventory) or externalized via BOM-Link, and may optionally be signed."
+    },
+    "properties": {
+      "type": "array",
+      "title": "Properties",
+      "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
+      "additionalItems": false,
+      "items": {
+        "$ref": "#/definitions/property"
+      }
     },
     "signature": {
       "$ref": "#/definitions/signature",
@@ -204,7 +213,7 @@
           "additionalItems": false,
           "items": {"$ref": "#/definitions/externalReference"},
           "title": "External References",
-          "description": "External references provide a way to document systems, sites, and information that may be relevant but which are not included with the BOM."
+          "description": "External references provide a way to document systems, sites, and information that may be relevant, but are not included with the BOM. They may also establish specific relationships within or external to the BOM."
         }
       }
     },
@@ -449,7 +458,7 @@
           "additionalItems": false,
           "items": {"$ref": "#/definitions/externalReference"},
           "title": "External References",
-          "description": "External references provide a way to document systems, sites, and information that may be relevant but which are not included with the BOM."
+          "description": "External references provide a way to document systems, sites, and information that may be relevant, but are not included with the BOM. They may also establish specific relationships within or external to the BOM."
         },
         "components": {
           "type": "array",
@@ -618,6 +627,11 @@
       ],
       "additionalProperties": false,
       "properties": {
+        "bom-ref": {
+          "$ref": "#/definitions/refType",
+          "title": "BOM Reference",
+          "description": "An optional identifier which can be used to reference the license elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+        },
         "id": {
           "$ref": "spdx.schema.json",
           "title": "License ID (SPDX)",
@@ -641,6 +655,149 @@
           "description": "The URL to the license file. If specified, a 'license' externalReference should also be specified for completeness",
           "examples": ["https://www.apache.org/licenses/LICENSE-2.0.txt"],
           "format": "iri-reference"
+        },
+        "licensing": {
+          "type": "object",
+          "title": "Licensing information",
+          "description": "Licensing details describing the licensor/licensee, license type, renewal and expiration dates, and other important metadata",
+          "additionalProperties": false,
+          "properties": {
+            "altIds": {
+              "type": "array",
+              "title": "Alternate License Identifiers",
+              "description": "License identifiers that may be used to manage licenses and their lifecycle",
+              "additionalItems": false,
+              "items": {
+                "type": "string"
+              }
+            },
+            "licensor": {
+              "title": "Licensor",
+              "description": "The individual or organization that grants a license to another individual or organization",
+              "additionalProperties": false,
+              "properties": {
+                "organization": {
+                  "title": "Licensor (Organization)",
+                  "description": "The organization that granted the license",
+                  "$ref": "#/definitions/organizationalEntity"
+                },
+                "individual": {
+                  "title": "Licensor (Individual)",
+                  "description": "The individual, not associated with an organization, that granted the license",
+                  "$ref": "#/definitions/organizationalContact"
+                }
+              },
+              "oneOf":[
+                {
+                  "required": ["organization"]
+                },
+                {
+                  "required": ["individual"]
+                }
+              ]
+            },
+            "licensee": {
+              "title": "Licensee",
+              "description": "The individual or organization for which a license was granted to",
+              "additionalProperties": false,
+              "properties": {
+                "organization": {
+                  "title": "Licensee (Organization)",
+                  "description": "The organization that was granted the license",
+                  "$ref": "#/definitions/organizationalEntity"
+                },
+                "individual": {
+                  "title": "Licensee (Individual)",
+                  "description": "The individual, not associated with an organization, that was granted the license",
+                  "$ref": "#/definitions/organizationalContact"
+                }
+              },
+              "oneOf":[
+                {
+                  "required": ["organization"]
+                },
+                {
+                  "required": ["individual"]
+                }
+              ]
+            },
+            "purchaser": {
+              "title": "Purchaser",
+              "description": "The individual or organization that purchased the license",
+              "additionalProperties": false,
+              "properties": {
+                "organization": {
+                  "title": "Purchaser (Organization)",
+                  "description": "The organization that purchased the license",
+                  "$ref": "#/definitions/organizationalEntity"
+                },
+                "individual": {
+                  "title": "Purchaser (Individual)",
+                  "description": "The individual, not associated with an organization, that purchased the license",
+                  "$ref": "#/definitions/organizationalContact"
+                }
+              },
+              "oneOf":[
+                {
+                  "required": ["organization"]
+                },
+                {
+                  "required": ["individual"]
+                }
+              ]
+            },
+            "purchaseOrder": {
+              "type": "string",
+              "title": "Purchase Order",
+              "description": "The purchase order identifier the purchaser sent to a supplier or vendor to authorize a purchase"
+            },
+            "licenseTypes": {
+              "type": "array",
+              "title": "License Type",
+              "description": "The type of license(s) that was granted to the licensee\n\n* __academic__ = A license that grants use of software solely for the purpose of education or research.\n* __appliance__ = A license covering use of software embedded in a specific piece of hardware.\n* __client-access__ = A Client Access License (CAL) allows client computers to access services provided by server software.\n* __concurrent-user__ = A Concurrent User license (aka floating license) limits the number of licenses for a software application and licenses are shared among a larger number of users.\n* __core-points__ = A license where the core of a computer's processor is assigned a specific number of points.\n* __custom-metric__ = A license for which consumption is measured by non-standard metrics.\n* __device__ = A license which covers a defined number of installations on computers and other types of devices.\n* __evaluation__ = A license which grants permission to install and use software for trial purposes.\n* __named-user__ = A license that grants access to the software to one or more pre-defined users.\n* __node-locked__ = A license that grants access to the software on one or more pre-defined computers or devices.\n* __oem__ = An Original Equipment Manufacturer license that is delivered with hardware, cannot be transferred to other hardware, and is valid for the life of the hardware.\n* __perpetual__ = A license where the software is sold on a one-time basis and the licensee can use a copy of the software indefinitely.\n* __processor-points__ = A license where each installation consumes points per processor.\n* __subscription__ = A license where the licensee pays a fee to use the software or service.\n* __user__ = A license that grants access to the software or service by a specified number of users.\n* __other__ = Another license type.\n",
+              "additionalItems": false,
+              "items": {
+                "type": "string",
+                "enum": [
+                  "academic",
+                  "appliance",
+                  "client-access",
+                  "concurrent-user",
+                  "core-points",
+                  "custom-metric",
+                  "device",
+                  "evaluation",
+                  "named-user",
+                  "node-locked",
+                  "oem",
+                  "perpetual",
+                  "processor-points",
+                  "subscription",
+                  "user",
+                  "other"
+                ]
+              }
+            },
+            "lastRenewal": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Last Renewal",
+              "description": "The timestamp indicating when the license was last renewed. For new purchases, this is often the purchase or acquisition date. For non-perpetual licenses or subscriptions, this is the timestamp of when the license was last renewed."
+            },
+            "expiration": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Expiration",
+              "description": "The timestamp indicating when the current license expires (if applicable)."
+            }
+          }
+        },
+        "properties": {
+          "type": "array",
+          "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
+          "additionalItems": false,
+          "items": {"$ref": "#/definitions/property"}
         }
       }
     },
@@ -850,7 +1007,7 @@
     "externalReference": {
       "type": "object",
       "title": "External Reference",
-      "description": "Specifies an individual external reference",
+      "description": "External references provide a way to document systems, sites, and information that may be relevant, but are not included with the BOM. They may also establish specific relationships within or external to the BOM.",
       "required": [
         "url",
         "type"
@@ -860,7 +1017,7 @@
         "url": {
           "type": "string",
           "title": "URL",
-          "description": "The URL to the external reference",
+          "description": "The URI (URL or URN) to the external reference. External references are URIs and therefore can accept any URL scheme including https ([RFC-7230](https://www.ietf.org/rfc/rfc7230.txt)), mailto ([RFC-2368](https://www.ietf.org/rfc/rfc2368.txt)), tel ([RFC-3966](https://www.ietf.org/rfc/rfc3966.txt)), and dns ([RFC-4501](https://www.ietf.org/rfc/rfc4501.txt)). External references may also include formally registered URNs such as [CycloneDX BOM-Link](https://cyclonedx.org/capabilities/bomlink/) to reference CycloneDX BOMs or any object within a BOM. BOM-Link transforms applicable external references into relationships that can be expressed in a BOM or across BOMs.",
           "format": "iri-reference"
         },
         "comment": {
@@ -871,7 +1028,7 @@
         "type": {
           "type": "string",
           "title": "Type",
-          "description": "Specifies the type of external reference. There are built-in types to describe common references. If a type does not exist for the reference being referred to, use the \"other\" type.",
+          "description": "Specifies the type of external reference.\n\n* __vcs__ = Version Control System\n* __issue-tracker__ = Issue or defect tracking system, or an Application Lifecycle Management (ALM) system\n* __website__ = Website\n* __advisories__ = Security advisories\n* __bom__ = Bill of Materials (SBOM, OBOM, HBOM, SaaSBOM, etc)\n* __mailing-list__ = Mailing list or discussion group\n* __social__ = Social media account\n* __chat__ = Real-time chat platform\n* __documentation__ = Documentation, guides, or how-to instructions\n* __support__ = Community or commercial support\n* __distribution__ = Direct or repository download location\n* __license__ = The URL to the license file. If a license URL has been defined in the license node, it should also be defined as an external reference for completeness\n* __build-meta__ = Build-system specific meta file (i.e. pom.xml, package.json, .nuspec, etc)\n* __build-system__ = URL to an automated build system\n* __release-notes__ = URL to release notes\n* __other__ = Use this if no other types accurately describe the purpose of the external reference",
           "enum": [
             "vcs",
             "issue-tracker",
@@ -1005,7 +1162,7 @@
           "additionalItems": false,
           "items": {"$ref": "#/definitions/externalReference"},
           "title": "External References",
-          "description": "External references provide a way to document systems, sites, and information that may be relevant but which are not included with the BOM."
+          "description": "External references provide a way to document systems, sites, and information that may be relevant, but are not included with the BOM. They may also establish specific relationships within or external to the BOM."
         },
         "services": {
           "type": "array",
@@ -1609,6 +1766,18 @@
               "type": "string",
               "title": "Detail",
               "description": "Detailed description of the impact including methods used during assessment. If a vulnerability is not exploitable, this field should include specific details on why the component or service is not impacted by this vulnerability."
+            },
+            "firstIssued": {
+              "type": "string",
+              "format": "date-time",
+              "title": "First Issued",
+              "description": "The date and time (timestamp) when the analysis was first issued."
+            },
+            "lastUpdated": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Last Updated",
+              "description": "The date and time (timestamp) when the analysis was last updated."
             }
           }
         },
