@@ -33,6 +33,8 @@ message Bom {
   repeated Composition compositions = 9;
   // Vulnerabilities identified in components or services.
   repeated Vulnerability vulnerabilities = 10;
+  // Specifies optional, custom, properties
+  repeated Property properties = 11;
 }
 
 enum Classification {
@@ -273,8 +275,74 @@ message License {
   optional AttachedText text = 3;
   // The URL to the attachment file. If the attachment is a license or BOM, an externalReference should also be specified for completeness.
   optional string url = 4;
+  // An optional identifier which can be used to reference the license elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
+  optional string bom_ref = 5;
+  // Licensing details describing the licensor/licensee, license type, renewal and expiration dates, and other important metadata
+  optional Licensing licensing = 6;
   // Specifies optional, custom, properties
-  repeated Property properties = 5;
+  repeated Property properties = 7;  
+}
+
+message Licensing {
+  // License identifiers that may be used to manage licenses and their lifecycle
+  repeated string altIds = 1;
+  // The individual or organization that grants a license to another individual or organization
+  optional OrganizationalEntityOrContact licensor = 2;
+  // The individual or organization for which a license was granted to
+  optional OrganizationalEntityOrContact licensee = 3;
+  // The individual or organization that purchased the license
+  optional OrganizationalEntityOrContact purchaser = 4;
+  // The purchase order identifier the purchaser sent to a supplier or vendor to authorize a purchase
+  optional string purchaseOrder = 5;
+  // The type of license(s) that was granted to the licensee
+  repeated LicensingTypeEnum licenseTypes = 6;
+  // The timestamp indicating when the license was last renewed. For new purchases, this is often the purchase or acquisition date. For non-perpetual licenses or subscriptions, this is the timestamp of when the license was last renewed.
+  optional google.protobuf.Timestamp lastRenewal = 7;
+  // The timestamp indicating when the current license expires (if applicable).
+  optional google.protobuf.Timestamp expiration = 8;
+}
+
+message OrganizationalEntityOrContact {
+  oneof choice {
+    OrganizationalEntity organization = 1;
+    OrganizationalContact individual = 2;
+  }
+}
+
+enum LicensingTypeEnum {
+  LICENSING_TYPE_NULL = 0;
+  // A license that grants use of software solely for the purpose of education or research.
+  LICENSING_TYPE_ACADEMIC = 1;
+  // A license covering use of software embedded in a specific piece of hardware.
+  LICENSING_TYPE_APPLIANCE = 2;
+  // A Client Access License (CAL) allows client computers to access services provided by server software.
+  LICENSING_TYPE_CLIENT_ACCESS = 3;
+  // A Concurrent User license (aka floating license) limits the number of licenses for a software application and licenses are shared among a larger number of users.
+  LICENSING_TYPE_CONCURRENT_USER = 4;
+  // A license where the core of a computer's processor is assigned a specific number of points.
+  LICENSING_TYPE_CORE_POINTS = 5;
+  // A license for which consumption is measured by non-standard metrics.
+  LICENSING_TYPE_CUSTOM_METRIC = 6;
+  // A license which covers a defined number of installations on computers and other types of devices.
+  LICENSING_TYPE_DEVICE = 7;
+  // A license which grants permission to install and use software for trial purposes.
+  LICENSING_TYPE_EVALUATION = 8;
+  // A license that grants access to the software to one or more pre-defined users.
+  LICENSING_TYPE_NAMED_USER = 9;
+  // A license that grants access to the software on one or more pre-defined computers or devices.
+  LICENSING_TYPE_NODE_LOCKED = 10;
+  // An Original Equipment Manufacturer license that is delivered with hardware, cannot be transferred to other hardware, and is valid for the life of the hardware.
+  LICENSING_TYPE_OEM = 11;
+  // A license where the software is sold on a one-time basis and the licensee can use a copy of the software indefinitely.
+  LICENSING_TYPE_PERPETUAL = 12;
+  // A license where each installation consumes points per processor.
+  LICENSING_TYPE_PROCESSOR_POINTS = 13;
+  // A license where the licensee pays a fee to use the software or service.
+  LICENSING_TYPE_SUBSCRIPTION = 14;
+  // A license that grants access to the software or service by a specified number of users.
+  LICENSING_TYPE_USER = 15;
+  // Another license type.
+  LICENSING_TYPE_OTHER = 16;
 }
 
 message Metadata {
@@ -602,6 +670,10 @@ message VulnerabilityAnalysis {
   repeated VulnerabilityResponse response = 3;
   // Detailed description of the impact including methods used during assessment. If a vulnerability is not exploitable, this field should include specific details on why the component or service is not impacted by this vulnerability.
   optional string detail = 4;
+  // The date and time (timestamp) when the analysis was first issued.
+  optional google.protobuf.Timestamp firstIssued = 5;
+  // The date and time (timestamp) when the analysis was last updated.
+  optional google.protobuf.Timestamp lastUpdated = 6;
 }
 
 enum ImpactAnalysisState {
