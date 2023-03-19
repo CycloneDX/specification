@@ -1544,15 +1544,66 @@ limitations under the License.
                         A value of false indicates that by using the service, a trust boundary is not crossed.</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="trustZone" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The name of the trust zone the service resides in.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:element name="data" minOccurs="0" maxOccurs="1">
                 <xs:complexType>
-                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
-                        <xs:element name="classification" type="bom:dataClassificationType">
+                    <xs:choice>
+                        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                            <xs:element name="classification" type="bom:dataClassificationType">
+                                <xs:annotation>
+                                    <xs:documentation>DEPRECATED: Specifies the data classification. THIS FIELD IS DEPRECATED AS OF v1.5. Use dataflow\classification instead</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:sequence>
+                        <xs:element name="dataflow" minOccurs="0" maxOccurs="unbounded">
                             <xs:annotation>
                                 <xs:documentation>Specifies the data classification.</xs:documentation>
                             </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence minOccurs="0" maxOccurs="1">
+                                    <xs:element name="classification" type="bom:dataClassificationType" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>Specifies the data classification.</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>Name for the defined data.</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>Short description of the data content and usage.</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="source" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>The URI, URL, or BOM-Link of the components or services the data came in from.</xs:documentation>
+                                        </xs:annotation>
+                                        <xs:complexType>
+                                            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                                                <xs:element name="url" type="xs:anyURI"/>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                    <xs:element name="destination" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>The URI, URL, or BOM-Link of the components or services the data is sent to.</xs:documentation>
+                                        </xs:annotation>
+                                        <xs:complexType>
+                                            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                                                <xs:element name="url" type="xs:anyURI"/>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
                         </xs:element>
-                    </xs:sequence>
+                    </xs:choice>
                 </xs:complexType>
             </xs:element>
             <xs:element name="licenses" type="bom:licenseChoiceType" minOccurs="0" maxOccurs="1"/>
