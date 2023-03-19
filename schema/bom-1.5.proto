@@ -121,10 +121,10 @@ message Component {
   optional ReleaseNotes releaseNotes = 24;
 }
 
-// Specifies the data classification.
-message DataClassification { // This is actually the data flow, but unable to change the name due to backward compatability
+// Specifies the data flow.
+message DataFlow {
   // Specifies the flow direction of the data.
-  DataFlow flow = 1;
+  DataFlowDirection flow = 1;
   // Data classification tags data according to its type, sensitivity, and value if altered, stolen, or destroyed.
   string value = 2;
   // Name for the defined data
@@ -138,7 +138,7 @@ message DataClassification { // This is actually the data flow, but unable to ch
 }
 
 // Specifies the flow direction of the data. Valid values are: inbound, outbound, bi-directional, and unknown. Direction is relative to the service. Inbound flow states that data enters the service. Outbound flow states that data leaves the service. Bi-directional states that data flows both ways, and unknown states that the direction is not known.
-enum DataFlow {
+enum DataFlowDirection {
   DATA_FLOW_NULL = 0;
   DATA_FLOW_INBOUND = 1;
   DATA_FLOW_OUTBOUND = 2;
@@ -459,7 +459,7 @@ message Service {
   optional bool authenticated = 8;
   // A boolean value indicating if use of the service crosses a trust zone or boundary. A value of true indicates that by using the service, a trust boundary is crossed. A value of false indicates that by using the service, a trust boundary is not crossed.
   optional bool x_trust_boundary = 9;
-  repeated DataClassification data = 10;
+  repeated DataFlow data = 10;
   repeated LicenseChoice licenses = 11;
   // Provides the ability to document external references related to the service.
   repeated ExternalReference external_references = 12;
