@@ -2020,22 +2020,18 @@
             },
 
             "task": {
-              "$comment": "TODO",
               "type": "string",
               "description": "Directly influences the input and/or output. Such as classification, regression, clustering, etc"
             },
-
-            "architecture": {
-              "$comment": "TODO",
-              "description": "The architecture of the model.",
-              "type": "string"
-            },
-
             "architectureFamily": {
-              "$comment": "TODO",
-              "description": "transformer network, convolutional neural network, residual neural network, LSTM neural network, etc.",
+              "description": "The model architecture family such as transformer network, convolutional neural network, residual neural network, LSTM neural network, etc.",
               "type": "string"
             },
+            "modelArchitecture": {
+              "description": "The specific architecture of the model such as GPT-1, ResNet-50, YOLOv3, etc.",
+              "type": "string"
+            },
+
 
             "datasets": {
               "description": "The datasets used to train and evaluate the model.",
@@ -2049,8 +2045,12 @@
               "additionalProperties": false,
               "properties": {
                 "format": {
-                  "description": "The data format for inputs to the model.",
-                  "type": "string"
+                  "$comment": "https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/user_guide/model_configuration.html#datatypes",
+                  "description": "The data format for inputs to the model. Example formats include string, image, time-series",
+                  "type": "string",
+                  "enum": [
+                    ""
+                  ]
                 }
               }
             },
@@ -2060,8 +2060,12 @@
               "additionalProperties": false,
               "properties": {
                 "format": {
-                  "description": "The data format for outputs from the model.",
-                  "type": "string"
+                  "$comment": "https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/user_guide/model_configuration.html#datatypes",
+                  "description": "The data format for outputs from the model. Example formats include string, image, time-series",
+                  "type": "string",
+                  "enum": [
+                    ""
+                  ]
                 }
               }
             }
@@ -2073,7 +2077,7 @@
           "additionalProperties": false,
           "properties": {
             "performanceMetrics": {
-              "description": "The model performance metrics being reported.",
+              "description": "The model performance metrics being reported. Examples may include accuracy, F1 score, precision, top-3 error rates, MSC, etc",
               "type": "array",
               "additionalItems": false,
               "items": { "$ref": "#/definitions/performanceMetric" }
@@ -2344,7 +2348,7 @@
     "fairnessAssessment": {
       "type": "object",
       "title": "Fairness Assessment",
-      "description": "Information about the benefits and harms of the model to an identified at risk group.\n The next tag number is 5.",
+      "description": "Information about the benefits and harms of the model to an identified at risk group. The next tag number is 5.",
       "additionalProperties": false,
       "properties": {
         "groupAtRisk": {
