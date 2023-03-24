@@ -2187,9 +2187,27 @@ limitations under the License.
                     <xs:documentation>The tool(s) used to identify, confirm, or score the vulnerability.</xs:documentation>
                 </xs:annotation>
                 <xs:complexType>
-                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
-                        <xs:element name="tool" minOccurs="0" type="bom:toolType"/>
-                    </xs:sequence>
+                    <xs:choice>
+                        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                            <xs:element name="tool" minOccurs="0" type="bom:toolType">
+                                <xs:annotation>
+                                    <xs:documentation>DEPRECATED. Use tools\components or tools\services instead.</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:sequence>
+                        <xs:sequence minOccurs="0" maxOccurs="1">
+                            <xs:element name="components" type="bom:componentsType" minOccurs="0" maxOccurs="1">
+                                <xs:annotation>
+                                    <xs:documentation>A list of software and hardware components used as tools.</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element name="services" type="bom:servicesType" minOccurs="0" maxOccurs="1">
+                                <xs:annotation>
+                                    <xs:documentation>A list of services used as tools.</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:choice>
                 </xs:complexType>
             </xs:element>
             <xs:element name="analysis" minOccurs="0" maxOccurs="1">
