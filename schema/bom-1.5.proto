@@ -353,7 +353,7 @@ message Metadata {
   // The date and time (timestamp) when the document was created.
   optional google.protobuf.Timestamp timestamp = 1;
   // The tool(s) used in the creation of the BOM.
-  repeated Tool tools = 2;
+  optional Tool tools = 2;
   // The person(s) who created the BOM. Authors are common in BOMs created through manual processes. BOMs created through automated means may not have authors.
   repeated OrganizationalContact authors = 3;
   // The component that the BOM describes.
@@ -482,15 +482,20 @@ message Swid {
 
 // Specifies a tool (manual or automated).
 message Tool {
-  // The vendor of the tool used to create the BOM.
-  optional string vendor = 1;
-  // The name of the tool used to create the BOM.
-  optional string name = 2;
-  // The version of the tool used to create the BOM.
-  optional string version = 3;
-  repeated Hash hashes = 4;
-  // Provides the ability to document external references related to the tool.
-  repeated ExternalReference external_references = 5;
+  // DEPRECATED - DO NOT USE - The vendor of the tool used to create the BOM.
+  optional string vendor = 1 [deprecated = true];
+  // DEPRECATED - DO NOT USE - The name of the tool used to create the BOM.
+  optional string name = 2 [deprecated = true];
+  // DEPRECATED - DO NOT USE - The version of the tool used to create the BOM.
+  optional string version = 3 [deprecated = true];
+  // DEPRECATED - DO NOT USE
+  repeated Hash hashes = 4 [deprecated = true];
+  // DEPRECATED - DO NOT USE - Provides the ability to document external references related to the tool.
+  repeated ExternalReference external_references = 5 [deprecated = true];
+  // A list of software and hardware components used as tools
+  repeated Component components = 6;
+  // A list of services used as tools. This may include microservices, function-as-a-service, and other types of network or intra-process services.
+  repeated Service services = 7;
 }
 
 // Specifies a property
@@ -595,7 +600,7 @@ message Vulnerability {
   // Individuals or organizations credited with the discovery of the vulnerability.
   optional VulnerabilityCredits credits = 14;
   // The tool(s) used to identify, confirm, or score the vulnerability.
-  repeated Tool tools = 15;
+  optional Tool tools = 15;
   // An assessment of the impact and exploitability of the vulnerability.
   optional VulnerabilityAnalysis analysis = 16;
   // affects
