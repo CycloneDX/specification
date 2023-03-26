@@ -580,7 +580,7 @@ message Vulnerability {
   repeated int32 cwes = 6;
   // A description of the vulnerability as provided by the source.
   optional string description = 7;
-  // If available, an in-depth description of the vulnerability as provided by the source organization. Details often include examples, proof-of-concepts, and other information useful in understanding root cause.
+  // If available, an in-depth description of the vulnerability as provided by the source organization. Details often include information useful in understanding root cause.
   optional string detail = 8;
   // Recommendations of how the vulnerability can be remediated or mitigated.
   optional string recommendation = 9;
@@ -604,6 +604,17 @@ message Vulnerability {
   repeated Property properties = 18;
   // The date and time (timestamp) when the vulnerability record was rejected (if applicable).
   optional google.protobuf.Timestamp rejected = 19;
+  // Evidence used to reproduce the vulnerability.
+  optional ProofOfConcept proofOfConcept = 20;
+}
+
+message ProofOfConcept {
+  // Precise steps to reproduce the vulnerability.
+  optional string reproductionSteps = 1;
+  // A description of the environment in which reproduction was possible.
+  optional string environment = 2;
+  // Supporting material that helps in reproducing or understanding how reproduction is possible. This may include screenshots, payloads, and PoC exploit code.
+  repeated AttachedText supportingMaterial = 3;
 }
 
 message VulnerabilityReference {
