@@ -2018,7 +2018,6 @@
                 }
               }
             },
-
             "task": {
               "type": "string",
               "description": "Directly influences the input and/or output. Such as classification, regression, clustering, etc"
@@ -2031,43 +2030,23 @@
               "description": "The specific architecture of the model such as GPT-1, ResNet-50, YOLOv3, etc.",
               "type": "string"
             },
-
-
             "datasets": {
               "description": "The datasets used to train and evaluate the model.",
               "type": "array",
               "additionalItems": false,
               "items": { "$ref": "#/definitions/componentData" }
             },
-            "input": {
-              "description": "The input format of the model",
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "format": {
-                  "$comment": "https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/user_guide/model_configuration.html#datatypes",
-                  "description": "The data format for inputs to the model. Example formats include string, image, time-series",
-                  "type": "string",
-                  "enum": [
-                    ""
-                  ]
-                }
-              }
+            "inputs": {
+              "description": "The input format(s) of the model",
+              "type": "array",
+              "additionalItems": false,
+              "items": { "$ref": "#/definitions/inputOutputMLParameters" }
             },
-            "output": {
-              "description": "The output format of the model",
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "format": {
-                  "$comment": "https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/user_guide/model_configuration.html#datatypes",
-                  "description": "The data format for outputs from the model. Example formats include string, image, time-series",
-                  "type": "string",
-                  "enum": [
-                    ""
-                  ]
-                }
-              }
+            "outputs": {
+              "description": "The output format(s) from the model",
+              "type": "array",
+              "additionalItems": false,
+              "items": { "$ref": "#/definitions/inputOutputMLParameters" }
             }
           }
         },
@@ -2107,7 +2086,7 @@
                 "type": "string"
               }
             },
-            "limitations": {
+            "technicalLimitations": {
               "description": "What are the known technical limitations of the model? E.g. What kind(s) of data should the model be expected not to perform well on? What are the factors that might degrade model performance?",
               "type": "array",
               "additionalItems": false,
@@ -2115,7 +2094,7 @@
                 "type": "string"
               }
             },
-            "tradeoffs": {
+            "performanceTradeoffs": {
               "description": "What are the known tradeoffs in accuracy/performance of the model?",
               "type": "array",
               "additionalItems": false,
@@ -2145,6 +2124,17 @@
           "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
           "additionalItems": false,
           "items": {"$ref": "#/definitions/property"}
+        }
+      }
+    },
+    "inputOutputMLParameters": {
+      "type": "object",
+      "title": "Input and Output Parameters",
+      "additionalProperties": false,
+      "properties": {
+        "format": {
+          "description": "The data format for input/output to the model. Example formats include string, image, time-series",
+          "type": "string"
         }
       }
     },
