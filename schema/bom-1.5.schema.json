@@ -1978,8 +1978,9 @@
     },
     "modelCard": {
       "$comment": "Model card support in CycloneDX is derived from TensorFlow Model Card Toolkit released under the Apache 2.0 license and available from https://github.com/tensorflow/model-card-toolkit/blob/main/model_card_toolkit/schema/v0.0.2/model_card.schema.json. In addition, CycloneDX model card support includes portions of VerifyML, also released under the Apache 2.0 license and available from https://github.com/cylynx/verifyml/blob/main/verifyml/model_card_toolkit/schema/v0.0.4/model_card.schema.json.",
-      "description": "A model card describes the intended uses of a machine learning model and potential limitations, including biases and ethical considerations. Model cards typically contain the training parameters, which datasets were used to train the model, performance metrics, and other relevant data useful for ML transparency. This object SHOULD be specified for any component of type `machine-learning-model` and MUST NOT be specified for other component types.",
       "type": "object",
+      "title": "Model Card",
+      "description": "A model card describes the intended uses of a machine learning model and potential limitations, including biases and ethical considerations. Model cards typically contain the training parameters, which datasets were used to train the model, performance metrics, and other relevant data useful for ML transparency. This object SHOULD be specified for any component of type `machine-learning-model` and MUST NOT be specified for other component types.",
       "additionalProperties": false,
       "properties": {
         "bom-ref": {
@@ -1988,76 +1989,95 @@
           "description": "An optional identifier which can be used to reference the model card elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
         },
         "modelParameters": {
-          "description": "Hyper-parameters for construction of the model.",
           "type": "object",
+          "title": "Model Parameters",
+          "description": "Hyper-parameters for construction of the model.",
           "additionalProperties": false,
           "properties": {
             "approach": {
               "type": "object",
-              "title": "",
-              "description": "",
+              "title": "Approach",
+              "description": "The overall approach to learning used by the model for problem solving.",
               "additionalProperties": false,
               "properties": {
                 "type": {
-                  "description": "The learning type: TODO: https://machinelearningmastery.com/types-of-learning-in-machine-learning/",
                   "type": "string",
+                  "title": "Learning Type",
+                  "description": "Learning types describing the learning problem or hybrid learning problem.",
                   "enum": [
                     "supervised",
                     "unsupervised",
+                    "reinforcement-learning",
                     "semi-supervised",
-                    "reinforcement-learning"
+                    "self-supervised"
                   ]
-                },
-                "$comment": "TODO",
-                "externalReferences": {
-                  "type": "array",
-                  "additionalItems": false,
-                  "items": {"$ref": "#/definitions/externalReference"},
-                  "title": "External References",
-                  "description": "External references provide a way to document systems, sites, and information that may be relevant but which are not included with the BOM."
                 }
               }
             },
             "task": {
               "type": "string",
-              "description": "Directly influences the input and/or output. Such as classification, regression, clustering, etc"
+              "title": "Task",
+              "description": "Directly influences the input and/or output. Examples include classification, regression, clustering, etc."
             },
             "architectureFamily": {
-              "description": "The model architecture family such as transformer network, convolutional neural network, residual neural network, LSTM neural network, etc.",
-              "type": "string"
+              "type": "string",
+              "title": "Architecture Family",
+              "description": "The model architecture family such as transformer network, convolutional neural network, residual neural network, LSTM neural network, etc."
             },
             "modelArchitecture": {
-              "description": "The specific architecture of the model such as GPT-1, ResNet-50, YOLOv3, etc.",
-              "type": "string"
+              "type": "string",
+              "title": "Model Architecture",
+              "description": "The specific architecture of the model such as GPT-1, ResNet-50, YOLOv3, etc."
             },
             "datasets": {
-              "description": "The datasets used to train and evaluate the model.",
               "type": "array",
+              "title": "Datasets",
+              "description": "The datasets used to train and evaluate the model.",
               "additionalItems": false,
-              "items": { "$ref": "#/definitions/componentData" }
+              "items" : {
+                "oneOf" : [
+                  {
+                    "title": "Inline Component Dataset",
+                    "$ref": "#/definitions/componentData"
+                  },
+                  {
+                    "title": "Data Component Reference",
+                    "description": "References a data component by the components bom-ref attribute",
+                    "ref": {
+                      "type": "string",
+                      "title": "Reference",
+                      "description": "References a data component by the components bom-ref attribute"
+                    }
+                  }
+                ]
+              }
             },
             "inputs": {
-              "description": "The input format(s) of the model",
               "type": "array",
+              "title": "Inputs",
+              "description": "The input format(s) of the model",
               "additionalItems": false,
               "items": { "$ref": "#/definitions/inputOutputMLParameters" }
             },
             "outputs": {
-              "description": "The output format(s) from the model",
               "type": "array",
+              "title": "Outputs",
+              "description": "The output format(s) from the model",
               "additionalItems": false,
               "items": { "$ref": "#/definitions/inputOutputMLParameters" }
             }
           }
         },
         "quantitativeAnalysis": {
-          "description": "A quantitative analysis of the model",
           "type": "object",
+          "title": "Quantitative Analysis",
+          "description": "A quantitative analysis of the model",
           "additionalProperties": false,
           "properties": {
             "performanceMetrics": {
-              "description": "The model performance metrics being reported. Examples may include accuracy, F1 score, precision, top-3 error rates, MSC, etc",
               "type": "array",
+              "title": "Performance Metrics",
+              "description": "The model performance metrics being reported. Examples may include accuracy, F1 score, precision, top-3 error rates, MSC, etc.",
               "additionalItems": false,
               "items": { "$ref": "#/definitions/performanceMetric" }
             },
@@ -2065,56 +2085,62 @@
           }
         },
         "considerations": {
-          "description": "What considerations should be taken into account regarding the model's construction, training, and application?",
           "type": "object",
+          "title": "Considerations",
+          "description": "What considerations should be taken into account regarding the model's construction, training, and application?",
           "additionalProperties": false,
           "properties": {
             "users": {
               "type": "array",
+              "title": "Users",
+              "description": "Who are the intended users of the model?",
               "additionalItems": false,
               "items": {
                 "type": "string"
-              },
-              "title": "Users",
-              "description": "Who are the intended users of the model?"
+              }
             },
             "useCases": {
-              "description": "What are the intended use cases of the model?",
               "type": "array",
+              "title": "Use Cases",
+              "description": "What are the intended use cases of the model?",
               "additionalItems": false,
               "items": {
                 "type": "string"
               }
             },
             "technicalLimitations": {
-              "description": "What are the known technical limitations of the model? E.g. What kind(s) of data should the model be expected not to perform well on? What are the factors that might degrade model performance?",
               "type": "array",
+              "title": "Technical Limitations",
+              "description": "What are the known technical limitations of the model? E.g. What kind(s) of data should the model be expected not to perform well on? What are the factors that might degrade model performance?",
               "additionalItems": false,
               "items": {
                 "type": "string"
               }
             },
             "performanceTradeoffs": {
-              "description": "What are the known tradeoffs in accuracy/performance of the model?",
               "type": "array",
+              "title": "Performance Tradeoffs",
+              "description": "What are the known tradeoffs in accuracy/performance of the model?",
               "additionalItems": false,
               "items": {
                 "type": "string"
               }
             },
             "ethicalConsiderations": {
-              "description": "What are the ethical (or environmental) risks involved in the application of this model?",
               "type": "array",
+              "title": "Ethical Considerations",
+              "description": "What are the ethical (or environmental) risks involved in the application of this model?",
               "additionalItems": false,
               "items": { "$ref": "#/definitions/risk" }
             },
             "fairnessAssessment": {
+              "type": "array",
+              "title": "Fairness Assessment",
+              "description": "How does the model affect groups at risk of being systematically disadvantaged? What are the harms and benefits to the various affected groups?",
               "additionalItems": false,
               "items": {
                 "$ref": "#/definitions/fairnessAssessment"
-              },
-              "type": "array",
-              "description": "How does the model affect groups at risk of being systematically disadvantaged? What are the harms and benefits to the various affected groups?"
+              }
             }
           }
         },
@@ -2338,7 +2364,7 @@
     "fairnessAssessment": {
       "type": "object",
       "title": "Fairness Assessment",
-      "description": "Information about the benefits and harms of the model to an identified at risk group. The next tag number is 5.",
+      "description": "Information about the benefits and harms of the model to an identified at risk group.",
       "additionalProperties": false,
       "properties": {
         "groupAtRisk": {
