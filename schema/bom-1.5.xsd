@@ -397,6 +397,21 @@ limitations under the License.
                     <xs:documentation>Specifies optional release notes.</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="modelCard" type="bom:modelCardType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>A model card describes the intended uses of a machine learning model and potential
+                        limitations, including biases and ethical considerations. Model cards typically contain the
+                        training parameters, which datasets were used to train the model, performance metrics, and other
+                        relevant data useful for ML transparency. This object SHOULD be specified for any component of
+                        type `machine-learning-model` and MUST NOT be specified for other component types.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="data" type="bom:componentDataType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>This object SHOULD be specified for any component of type `data` and MUST NOT be
+                        specified for other component types.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                     <xs:documentation>
@@ -708,6 +723,12 @@ limitations under the License.
                         virtualization technology. Refer to https://en.wikipedia.org/wiki/OS-level_virtualization</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
+            <xs:enumeration value="platform">
+                <xs:annotation>
+                    <xs:documentation>A runtime environment which interprets or executes software. This may include
+                        runtimes such as those that execute bytecode or low-code/no-code application platforms.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
             <xs:enumeration value="operating-system">
                 <xs:annotation>
                     <xs:documentation>A software operating system without regard to deployment model
@@ -733,6 +754,17 @@ limitations under the License.
                 <xs:annotation>
                     <xs:documentation>A computer file. Refer to https://en.wikipedia.org/wiki/Computer_file
                         for information about files.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="machine-learning-model">
+                <xs:annotation>
+                    <xs:documentation>A model based on training data that can make predictions or decisions without
+                        being explicitly programmed to do so.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="data">
+                <xs:annotation>
+                    <xs:documentation>A collection of discrete values that convey information.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
         </xs:restriction>
@@ -1026,6 +1058,13 @@ limitations under the License.
             <xs:enumeration value="security-contact">
                 <xs:annotation>
                     <xs:documentation>Specifies a way to contact the maintainer, supplier, or provider in the event of a security incident. Common URIs include links to a disclosure procedure, a mailto (RFC-2368) that specifies an email address, a tel (RFC-3966) that specifies a phone number, or dns (RFC-4501]) that specifies the records containing DNS Security TXT.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="model-card">
+                <xs:annotation>
+                    <xs:documentation>A model card describes the intended uses of a machine learning model, potential
+                        limitations, biases, ethical considerations, training parameters, datasets used to train the
+                        model, performance metrics, and other relevant data useful for ML transparency.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
             <xs:enumeration value="other">
@@ -1938,6 +1977,644 @@ limitations under the License.
             </xs:annotation>
         </xs:anyAttribute>
     </xs:complexType>
+
+   <!--
+   Model card support in CycloneDX is derived from TensorFlow Model Card Toolkit released under the Apache 2.0 license and
+   available from https://github.com/tensorflow/model-card-toolkit/blob/main/model_card_toolkit/schema/v0.0.2/model_card.schema.json.
+   In addition, CycloneDX model card support includes portions of VerifyML, also released under the Apache 2.0 license and
+   available from https://github.com/cylynx/verifyml/blob/main/verifyml/model_card_toolkit/schema/v0.0.4/model_card.schema.json.
+   -->
+    <xs:complexType name="modelCardType">
+        <xs:annotation>
+            <xs:documentation>
+                A model card describes the intended uses of a machine learning model and potential limitations, including
+                biases and ethical considerations. Model cards typically contain the training parameters, which datasets
+                were used to train the model, performance metrics, and other relevant data useful for ML transparency.
+                This object SHOULD be specified for any component of type `machine-learning-model` and MUST NOT be specified
+                for other component types.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="modelParameters" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Hyper-parameters for construction of the model.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="approach" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The overall approach to learning used by the model for problem solving.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="type" type="bom:machineLearningApproachType" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Learning types describing the learning problem or hybrid learning problem.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="task" type="xs:string" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Directly influences the input and/or output. Examples include classification,
+                                    regression, clustering, etc.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="architectureFamily" type="xs:string" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The model architecture family such as transformer network, convolutional neural
+                                    network, residual neural network, LSTM neural network, etc.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="modelArchitecture" type="xs:string" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The specific architecture of the model such as GPT-1, ResNet-50, YOLOv3, etc.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="datasets" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The datasets used to train and evaluate the model.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element name="ref" type="bom:refType" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>References a data component by the components bom-ref attribute</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="dataset" type="bom:componentDataType" minOccurs="0" maxOccurs="1" />
+                                </xs:choice>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="inputs" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The input format(s) of the model
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="input" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="format" type="xs:string" minOccurs="1" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The data format for input to the model. Example formats include string, image, time-series
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="outputs" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The output format(s) from the model
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="output" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="format" type="xs:string" minOccurs="1" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The data format for output from the model. Example formats include string, image, time-series
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="quantitativeAnalysis" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        A quantitative analysis of the model
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="performanceMetrics" minOccurs="0" maxOccurs="1">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="performanceMetric" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="type" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The type of performance metric.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The value of the performance metric.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="slice" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The name of the slice this metric was computed on. By default, assume
+                                                            this metric is not sliced.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="confidenceInterval" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The confidence interval of the metric.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                    <xs:complexType>
+                                                        <xs:sequence>
+                                                            <xs:element name="lowerBound" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>
+                                                                        The lower bound of the confidence interval.
+                                                                    </xs:documentation>
+                                                                </xs:annotation>
+                                                            </xs:element>
+                                                            <xs:element name="upperBound" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>
+                                                                        The upper bound of the confidence interval.
+                                                                    </xs:documentation>
+                                                                </xs:annotation>
+                                                            </xs:element>
+                                                        </xs:sequence>
+                                                    </xs:complexType>
+                                                </xs:element>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="graphics" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    A collection of graphics that represent various measurements
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                A description of this collection of graphics.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="collection" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                A collection of graphics.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="graphic" minOccurs="0" maxOccurs="unbounded">
+                                                    <xs:complexType>
+                                                        <xs:sequence>
+                                                            <xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>
+                                                                        The name of the graphic.
+                                                                    </xs:documentation>
+                                                                </xs:annotation>
+                                                            </xs:element>
+                                                            <xs:element name="image" type="bom:attachedTextType" minOccurs="0" maxOccurs="1">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>
+                                                                        The graphic (vector or raster). Base64 encoding MUST be specified for binary images.
+                                                                    </xs:documentation>
+                                                                </xs:annotation>
+                                                            </xs:element>
+                                                        </xs:sequence>
+                                                    </xs:complexType>
+                                                </xs:element>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="considerations" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        What considerations should be taken into account regarding the model's construction, training,
+                        and application?
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="users" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Who are the intended users of the model?
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="user" type="xs:string" minOccurs="0" maxOccurs="1" />
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="useCases" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    What are the intended use cases of the model?
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="useCase" type="xs:string" minOccurs="0" maxOccurs="1" />
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="technicalLimitations" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    What are the known technical limitations of the model? E.g. What kind(s) of data
+                                    should the model be expected not to perform well on? What are the factors that might
+                                    degrade model performance?
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="technicalLimitation" type="xs:string" minOccurs="0" maxOccurs="1" />
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="performanceTradeoffs" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    What are the known tradeoffs in accuracy/performance of the model?
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="performanceTradeoff" type="xs:string" minOccurs="0" maxOccurs="1" />
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="ethicalConsiderations" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    What are the ethical (or environmental) risks involved in the application of this model?
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="ethicalConsideration" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The name of the risk
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="mitigationStrategy" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            Strategy used to address this risk
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="fairnessAssessments" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    How does the model affect groups at risk of being systematically disadvantaged?
+                                    What are the harms and benefits to the various affected groups?
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="fairnessAssessment" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="groupAtRisk" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The groups or individuals at risk of being systematically disadvantaged by the model.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="benefits" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            Expected benefits to the identified groups.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="harms" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            Expected harms to the identified groups.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="mitigationStrategy" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            With respect to the benefits and harms outlined, please
+                                                            describe any mitigation strategy implemented.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="bom-ref" type="bom:refType">
+            <xs:annotation>
+                <xs:documentation>
+                    An optional identifier which can be used to reference the model card elsewhere in the BOM.
+                    Every bom-ref MUST be unique within the BOM.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:simpleType name="machineLearningApproachType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="supervised">
+                <xs:annotation>
+                    <xs:documentation>TODO</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="unsupervised">
+                <xs:annotation>
+                    <xs:documentation>TODO</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="reinforcement-learning">
+                <xs:annotation>
+                    <xs:documentation>TODO</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="semi-supervised">
+                <xs:annotation>
+                    <xs:documentation>TODO</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="self-supervised">
+                <xs:annotation>
+                    <xs:documentation>TODO</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="componentDataType">
+        <xs:sequence>
+            <xs:element name="type" type="bom:componentDataTypeEnumeration" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The general theme or subject matter of the data being specified.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The name of the dataset.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="contents" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The contents or references to the contents of the data being described.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="attachment" type="bom:attachedTextType" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>An optional way to include textual or encoded data.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="url" type="xs:anyURI" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>The URL to where the data can be retrieved.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>Provides the ability to document name-value parameters used for configuration.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="classification" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Data classification tags data according to its type, sensitivity, and value if altered, stolen, or destroyed.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="sensitiveData" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        A description of any sensitive data in a dataset.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="graphics" type="bom:graphicsCollectionType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        A collection of graphics that represent various measurements.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        A description of the dataset. Can describe size of dataset, whether it's used for source code,
+                        training, testing, or validation, etc.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="governance" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="custodians" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Data custodians are responsible for the safe custody, transport, and storage of data.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="custodian" type="bom:organizationOrIndividualType" minOccurs="0" maxOccurs="unbounded"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="stewards" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Data stewards are responsible for data content, context, and associated business rules.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="steward" type="bom:organizationOrIndividualType" minOccurs="0" maxOccurs="unbounded"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="owners" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Data owners are concerned with risk and appropriate access to data.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="owner" type="bom:organizationOrIndividualType" minOccurs="0" maxOccurs="unbounded"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="bom-ref" type="bom:refType">
+            <xs:annotation>
+                <xs:documentation>
+                    An optional identifier which can be used to reference the dataset elsewhere in the BOM.
+                    Every bom-ref MUST be unique within the BOM.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="organizationOrIndividualType">
+        <xs:choice>
+            <xs:element name="organization" type="bom:organizationalEntity" minOccurs="0" maxOccurs="1" />
+            <xs:element name="individual" type="bom:organizationalContact" minOccurs="0" maxOccurs="1" />
+        </xs:choice>
+    </xs:complexType>
+
+    <xs:complexType name="graphicsCollectionType">
+        <xs:annotation>
+            <xs:documentation>
+                A collection of graphics that represent various measurements.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="description" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        A description of this collection of graphics.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="collection" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        A collection of graphics.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="graphic" minOccurs="0" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The name of the graphic.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="image" type="bom:attachedTextType" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The graphic (vector or raster). Base64 encoding MUST be specified for binary images.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="componentDataTypeEnumeration">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="source-code">
+                <xs:annotation>
+                    <xs:documentation>Any type of code, code snippet, or data-as-code.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="configuration">
+                <xs:annotation>
+                    <xs:documentation>Parameters or settings that may be used by other components.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="dataset">
+                <xs:annotation>
+                    <xs:documentation>A collection of data.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="other">
+                <xs:annotation>
+                    <xs:documentation>Any other type of data that does not fit into existing definitions.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
 
     <xs:complexType name="bomReferenceType">
         <xs:attribute name="ref" type="bom:refType" use="required">

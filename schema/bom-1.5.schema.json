@@ -2037,16 +2037,18 @@
               "items" : {
                 "oneOf" : [
                   {
-                    "title": "Inline Component Dataset",
+                    "title": "Inline Component Data",
                     "$ref": "#/definitions/componentData"
                   },
                   {
                     "title": "Data Component Reference",
-                    "description": "References a data component by the components bom-ref attribute",
-                    "ref": {
-                      "type": "string",
-                      "title": "Reference",
-                      "description": "References a data component by the components bom-ref attribute"
+                    "additionalProperties": false,
+                    "properties": {
+                      "ref": {
+                        "type": "string",
+                        "title": "Reference",
+                        "description": "References a data component by the components bom-ref attribute"
+                      }
                     }
                   }
                 ]
@@ -2133,9 +2135,9 @@
               "additionalItems": false,
               "items": { "$ref": "#/definitions/risk" }
             },
-            "fairnessAssessment": {
+            "fairnessAssessments": {
               "type": "array",
-              "title": "Fairness Assessment",
+              "title": "Fairness Assessments",
               "description": "How does the model affect groups at risk of being systematically disadvantaged? What are the harms and benefits to the various affected groups?",
               "additionalItems": false,
               "items": {
@@ -2242,19 +2244,23 @@
           "additionalProperties": false,
           "properties": {
             "custodians": {
+              "type": "array",
               "title": "Data Custodians",
               "description": "Data custodians are responsible for the safe custody, transport, and storage of data.",
-              "$ref": "#/definitions/dataGovernanceResponsibleParty"
+              "additionalItems": false,
+              "items": { "$ref": "#/definitions/dataGovernanceResponsibleParty" }
             },
             "stewards": {
+              "type": "array",
               "title": "Data Stewards",
               "description": "Data stewards are responsible for data content, context, and associated business rules.",
-              "$ref": "#/definitions/dataGovernanceResponsibleParty"
+              "items": { "$ref": "#/definitions/dataGovernanceResponsibleParty" }
             },
             "owners": {
+              "type": "array",
               "title": "Data Owners",
               "description": "Data owners are concerned with risk and appropriate access to data.",
-              "$ref": "#/definitions/dataGovernanceResponsibleParty"
+              "items": { "$ref": "#/definitions/dataGovernanceResponsibleParty" }
             }
           }
         }
