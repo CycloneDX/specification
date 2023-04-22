@@ -533,6 +533,29 @@ message Evidence {
   repeated EvidenceCopyright copyright = 2;
   repeated EvidenceIdentity identity = 3;
   repeated EvidenceOccurrences occurrences = 4;
+  optional Callstack callstack = 5;
+}
+
+// Evidence of the components use through the callstack.
+message Callstack {
+  repeated Frames frames = 1;
+
+  message Frames {
+    // A package organizes modules into namespaces, providing a unique namespace for each type it contains.
+    optional string package = 1;
+    // A module or class that encloses functions/methods and other code.
+    string module = 2;
+    // A block of code designed to perform a particular task.
+    optional string function = 3;
+    // Optional arguments that are passed to the module or function.
+    repeated string parameters = 4;
+    // The line number the code that is called resides on.
+    optional int32 line = 5;
+    // The column the code that is called resides.
+    optional int32 column = 6;
+    // The full path and filename of the module.
+    optional string fullFilename = 7;
+  }
 }
 
 message EvidenceIdentity {
