@@ -137,11 +137,39 @@
           "description": "The date and time (timestamp) when the BOM was created."
         },
         "tools": {
-          "type": "array",
-          "title": "Creation Tools",
-          "description": "The tool(s) used in the creation of the BOM.",
-          "additionalItems": false,
-          "items": {"$ref": "#/definitions/tool"}
+          "oneOf": [
+            {
+              "type": "object",
+              "title": "Creation Tools",
+              "description": "The tool(s) used in the creation of the BOM.",
+              "additionalProperties": false,
+              "properties": {
+                "components": {
+                  "type": "array",
+                  "additionalItems": false,
+                  "items": {"$ref": "#/definitions/component"},
+                  "uniqueItems": true,
+                  "title": "Components",
+                  "description": "A list of software and hardware components used as tools"
+                },
+                "services": {
+                  "type": "array",
+                  "additionalItems": false,
+                  "items": {"$ref": "#/definitions/service"},
+                  "uniqueItems": true,
+                  "title": "Services",
+                  "description": "A list of services used as tools. This may include microservices, function-as-a-service, and other types of network or intra-process services."
+                }
+              }
+            },
+            {
+              "type": "array",
+              "title": "Creation Tools (legacy)",
+              "description": "[Deprecated] The tool(s) used in the creation of the BOM.",
+              "additionalItems": false,
+              "items": {"$ref": "#/definitions/tool"}
+            }
+          ]
         },
         "authors" :{
           "type": "array",
@@ -183,7 +211,7 @@
     "tool": {
       "type": "object",
       "title": "Tool",
-      "description": "Information about the automated or manual tool used",
+      "description": "[Deprecated] - DO NOT USE. This will be removed in a future version. This will be removed in a future version. Use component or service instead. Information about the automated or manual tool used",
       "additionalProperties": false,
       "properties": {
         "vendor": {
@@ -1792,11 +1820,39 @@
           }
         },
         "tools": {
-          "type": "array",
-          "title": "Creation Tools",
-          "description": "The tool(s) used to identify, confirm, or score the vulnerability.",
-          "additionalItems": false,
-          "items": {"$ref": "#/definitions/tool"}
+          "oneOf": [
+            {
+              "type": "object",
+              "title": "Tools",
+              "description": "The tool(s) used to identify, confirm, or score the vulnerability.",
+              "additionalProperties": false,
+              "properties": {
+                "components": {
+                  "type": "array",
+                  "additionalItems": false,
+                  "items": {"$ref": "#/definitions/component"},
+                  "uniqueItems": true,
+                  "title": "Components",
+                  "description": "A list of software and hardware components used as tools"
+                },
+                "services": {
+                  "type": "array",
+                  "additionalItems": false,
+                  "items": {"$ref": "#/definitions/service"},
+                  "uniqueItems": true,
+                  "title": "Services",
+                  "description": "A list of services used as tools. This may include microservices, function-as-a-service, and other types of network or intra-process services."
+                }
+              }
+            },
+            {
+              "type": "array",
+              "title": "Tools (legacy)",
+              "description": "[Deprecated] The tool(s) used to identify, confirm, or score the vulnerability.",
+              "additionalItems": false,
+              "items": {"$ref": "#/definitions/tool"}
+            }
+          ]
         },
         "analysis": {
           "type": "object",
