@@ -1323,13 +1323,172 @@
         }
       }
     },
-
     "componentEvidence": {
       "type": "object",
       "title": "Evidence",
       "description": "Provides the ability to document evidence collected through various forms of extraction or analysis.",
       "additionalProperties": false,
       "properties": {
+        "identity": {
+          "type": "object",
+          "description": "Evidence that substantiates the identity of a component.",
+          "required": [ "field" ],
+          "additionalProperties": false,
+          "properties": {
+            "field": {
+              "type": "string",
+              "enum": [
+                "group", "name", "version", "purl", "cpe", "swid", "hash"
+              ],
+              "title": "Field",
+              "description": "The identity field of the component which the evidence describes."
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "title": "Confidence",
+              "description": "The overall confidence of the evidence from 0 - 1, where 1 is 100% confidence."
+            },
+            "methods": {
+              "type": "array",
+              "title": "Methods",
+              "description": "The methods used to extract and/or analyze the evidence.",
+              "additionalItems": false,
+              "items": {
+                "type": "object",
+                "required": [
+                  "technique" ,
+                  "confidence"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "technique": {
+                    "title": "Technique",
+                    "description": "The technique used in this method of analysis.",
+                    "type": "string",
+                    "enum": [
+                      "source-code-analysis",
+                      "binary-analysis",
+                      "manifest-analysis",
+                      "ast-fingerprint",
+                      "hash-comparison",
+                      "instrumentation",
+                      "dynamic-analysis",
+                      "filename",
+                      "attestation",
+                      "other"
+                    ]
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "title": "Confidence",
+                    "description": "The confidence of the evidence from 0 - 1, where 1 is 100% confidence. Confidence is specific to the technique used. Each technique of analysis can have independent confidence."
+                  },
+                  "value": {
+                    "type": "string",
+                    "title": "Value",
+                    "description": "The value or contents of the evidence."
+                  }
+                }
+              }
+            },
+            "tools": {
+              "type": "array",
+              "uniqueItems": true,
+              "additionalItems": false,
+              "items": {
+                "$ref": "#/definitions/refType"
+              },
+              "title": "BOM References",
+              "description": "The object in the BOM identified by its bom-ref. This is often a component or service, but may be any object type supporting bom-refs. Tools used for analysis should already be defined in the BOM, either in the metadata/tools, components, or formulation."
+            }
+          }
+        },
+        "occurrences": {
+          "type": "array",
+          "title": "Occurrences",
+          "description": "Evidence of individual instances of a component spread across multiple locations.",
+          "additionalItems": false,
+          "items": {
+            "required": [ "location" ],
+            "additionalProperties": false,
+            "properties": {
+              "bom-ref": {
+                "$ref": "#/definitions/refType",
+                "title": "BOM Reference",
+                "description": "An optional identifier which can be used to reference the occurrence elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+              },
+              "location": {
+                "type": "string",
+                "title": "Location",
+                "description": "The location or path to where the component was found."
+              }
+            }
+          }
+        },
+        "callstack": {
+          "type": "object",
+          "description": "Evidence of the components use through the callstack.",
+          "additionalProperties": false,
+          "properties": {
+            "frames": {
+              "type": "array",
+              "title": "Methods",
+              "additionalItems": false,
+              "items": {
+                "type": "object",
+                "required": [
+                  "module"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "package": {
+                    "title": "Package",
+                    "description": "A package organizes modules into namespaces, providing a unique namespace for each type it contains.",
+                    "type": "string"
+                  },
+                  "module": {
+                    "title": "Module",
+                    "description": "A module or class that encloses functions/methods and other code.",
+                    "type": "string"
+                  },
+                  "function": {
+                    "title": "Function",
+                    "description": "A block of code designed to perform a particular task.",
+                    "type": "string"
+                  },
+                  "parameters": {
+                    "title": "Parameters",
+                    "description": "Optional arguments that are passed to the module or function.",
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "line": {
+                    "title": "Line",
+                    "description": "The line number the code that is called resides on.",
+                    "type": "integer"
+                  },
+                  "column": {
+                    "title": "Column",
+                    "description": "The column the code that is called resides.",
+                    "type": "integer"
+                  },
+                  "fullFilename": {
+                    "title": "Full Filename",
+                    "description": "The full path and filename of the module.",
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
         "licenses": {
           "type": "array",
           "additionalItems": false,

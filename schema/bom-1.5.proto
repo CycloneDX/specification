@@ -576,6 +576,82 @@ message EvidenceCopyright {
 message Evidence {
   repeated LicenseChoice licenses = 1;
   repeated EvidenceCopyright copyright = 2;
+  repeated EvidenceIdentity identity = 3;
+  repeated EvidenceOccurrences occurrences = 4;
+  optional Callstack callstack = 5;
+}
+
+// Evidence of the components use through the callstack.
+message Callstack {
+  repeated Frames frames = 1;
+
+  message Frames {
+    // A package organizes modules into namespaces, providing a unique namespace for each type it contains.
+    optional string package = 1;
+    // A module or class that encloses functions/methods and other code.
+    string module = 2;
+    // A block of code designed to perform a particular task.
+    optional string function = 3;
+    // Optional arguments that are passed to the module or function.
+    repeated string parameters = 4;
+    // The line number the code that is called resides on.
+    optional int32 line = 5;
+    // The column the code that is called resides.
+    optional int32 column = 6;
+    // The full path and filename of the module.
+    optional string fullFilename = 7;
+  }
+}
+
+message EvidenceIdentity {
+  // The identity field of the component which the evidence describes.
+  EvidenceFieldType field = 1;
+  // The overall confidence of the evidence from 0 - 1, where 1 is 100% confidence.
+  optional float confidence = 2;
+  // The methods used to extract and/or analyze the evidence.
+  repeated EvidenceMethods methods = 3;
+  // The object in the BOM identified by its bom-ref. This is often a component or service, but may be any object type supporting bom-refs. Tools used for analysis should already be defined in the BOM, either in the metadata/tools, components, or formulation.
+  repeated string tools = 4;
+}
+
+message EvidenceMethods {
+  // The technique used in this method of analysis.
+  EvidenceTechnique technique = 1;
+  // The confidence of the evidence from 0 - 1, where 1 is 100% confidence. Confidence is specific to the technique used. Each technique of analysis can have independent confidence.
+  float confidence = 2;
+  // The value or contents of the evidence.
+  optional string value = 3;
+}
+
+message EvidenceOccurrences {
+  // An optional identifier which can be used to reference the occurrence elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.
+  optional string bom_ref = 1;
+  // The location or path to where the component was found.
+  string location = 2;
+}
+
+enum EvidenceFieldType {
+  EVIDENCE_FIELD_NULL = 0;
+  EVIDENCE_FIELD_GROUP = 1;
+  EVIDENCE_FIELD_NAME = 2;
+  EVIDENCE_FIELD_VERSION = 3;
+  EVIDENCE_FIELD_PURL = 4;
+  EVIDENCE_FIELD_CPE = 5;
+  EVIDENCE_FIELD_SWID = 6;
+  EVIDENCE_FIELD_HASH = 7;
+}
+
+enum EvidenceTechnique {
+  EVIDENCE_TECHNIQUE_SOURCE_CODE_ANALYSIS = 0;
+  EVIDENCE_TECHNIQUE_BINARY_ANALYSIS = 1;
+  EVIDENCE_TECHNIQUE_MANIFEST_ANALYSIS = 2;
+  EVIDENCE_TECHNIQUE_AST_FINGERPRINT = 3;
+  EVIDENCE_TECHNIQUE_HASH_COMPARISON = 4;
+  EVIDENCE_TECHNIQUE_INSTRUMENTATION = 5;
+  EVIDENCE_TECHNIQUE_DYNAMIC_ANALYSIS = 6;
+  EVIDENCE_TECHNIQUE_FILENAME = 7;
+  EVIDENCE_TECHNIQUE_ATTESTATION = 8;
+  EVIDENCE_TECHNIQUE_OTHER = 9;
 }
 
 message Note {
