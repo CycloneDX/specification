@@ -2142,13 +2142,21 @@ limitations under the License.
                 </xs:complexType>
             </xs:element>
         </xs:sequence>
+        <xs:attribute name="bom-ref" type="bom:refType">
+            <xs:annotation>
+                <xs:documentation>
+                    An optional identifier which can be used to reference the composition elsewhere in the BOM.
+                    Uniqueness is enforced within all elements and children of the root-level bom element.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
     </xs:complexType>
 
     <xs:simpleType name="aggregateType">
         <xs:restriction base="xs:string">
             <xs:enumeration value="complete">
                 <xs:annotation>
-                    <xs:documentation>The relationship is complete. No further relationships including constituent components, services, or dependencies exist.</xs:documentation>
+                    <xs:documentation>The relationship is complete. No further relationships including constituent components, services, or dependencies are known to exist.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
             <xs:enumeration value="incomplete">
@@ -2161,9 +2169,29 @@ limitations under the License.
                     <xs:documentation>The relationship is incomplete. Only relationships for first-party components, services, or their dependencies are represented.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
+            <xs:enumeration value="incomplete_first_party_proprietary_only">
+                <xs:annotation>
+                    <xs:documentation>The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented, limited specifically to those that are proprietary.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="incomplete_first_party_opensource_only">
+                <xs:annotation>
+                    <xs:documentation>The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented, limited specifically to those that are opensource.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
             <xs:enumeration value="incomplete_third_party_only">
                 <xs:annotation>
                     <xs:documentation>The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="incomplete_third_party_proprietary_only">
+                <xs:annotation>
+                    <xs:documentation>The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented, limited specifically to those that are proprietary.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="incomplete_third_party_opensource_only">
+                <xs:annotation>
+                    <xs:documentation>The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented, limited specifically to those that are opensource.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
             <xs:enumeration value="unknown">
