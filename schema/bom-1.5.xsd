@@ -2141,6 +2141,25 @@ limitations under the License.
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="vulnerabilities" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The bom-ref identifiers of the vulnerabilities being described.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="vulnerability" type="bom:bomReferenceType"/>
+                        <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Allows any undeclared elements as long as the elements are placed in a different namespace.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:any>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
         </xs:sequence>
         <xs:attribute name="bom-ref" type="bom:refType">
             <xs:annotation>
@@ -3213,7 +3232,7 @@ limitations under the License.
                 </xs:element>
                 <xs:element name="compositions" type="bom:compositionsType" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
-                        <xs:documentation>Compositions describe constituent parts (including components, services, and dependency relationships) and their completeness.</xs:documentation>
+                        <xs:documentation>Compositions describe constituent parts (including components, services, and dependency relationships) and their completeness. The completeness of vulnerabilities expressed in a BOM may also be described.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
                 <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
