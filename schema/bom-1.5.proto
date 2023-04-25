@@ -29,7 +29,7 @@ message Bom {
   repeated ExternalReference external_references = 7;
   // Provides the ability to document dependency relationships.
   repeated Dependency dependencies = 8;
-  // Provides the ability to document aggregate completeness
+  // Compositions describe constituent parts (including components, services, and dependency relationships) and their completeness. Other inventory types such as vulnerabilities may also be described for completeness.
   repeated Composition compositions = 9;
   // Vulnerabilities identified in components or services.
   repeated Vulnerability vulnerabilities = 10;
@@ -568,11 +568,11 @@ enum Aggregate {
 }
 
 message Composition {
-  // Indicates the aggregate completeness
+  // Specifies an aggregate type that describe how complete a relationship is.
   Aggregate aggregate = 1;
-  // The assemblies the aggregate completeness applies to
+  // The bom-ref identifiers of the components or services being described. Assemblies refer to nested relationships whereby a constituent part may include other constituent parts. References do not cascade to child parts. References are explicit for the specified constituent part only. Other inventory types such as vulnerabilities may also be described.
   repeated string assemblies = 2;
-  // The dependencies the aggregate completeness applies to
+  // The bom-ref identifiers of the components or services being described. Dependencies refer to a relationship whereby an independent constituent part requires another independent constituent part. References do not cascade to transitive dependencies. References are explicit for the specified dependency only.
   repeated string dependencies = 3;
   // An optional identifier which can be used to reference the composition elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.
   optional string bom_ref = 4;
