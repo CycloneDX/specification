@@ -136,6 +136,56 @@
           "title": "Timestamp",
           "description": "The date and time (timestamp) when the BOM was created."
         },
+        "lifecycles": {
+          "type": "array",
+          "title": "Lifecycles",
+          "description": "",
+          "additionalItems": false,
+          "items": {
+            "type": "object",
+            "title": "Lifecycle",
+            "description": "The product lifecycle(s) that this BOM represents.",
+            "additionalProperties": false,
+            "oneOf": [
+              {
+                "required": ["phase"],
+                "additionalProperties": false,
+                "properties": {
+                  "phase": {
+                    "type": "string",
+                    "title": "Phase",
+                    "description": "A pre-defined phase in the product lifecycle.\n\n* __design__ = BOM produced early in the development lifecycle containing inventory of components and services that are proposed or planned to be used. The inventory may need to be procured, retrieved, or resourced prior to use.\n* __pre-build__ = BOM consisting of information obtained prior to a build process and may contain source files and development artifacts and manifests. The inventory may need to be resolved and retrieved prior to use.\n* __build__ = BOM consisting of information obtained during a build process where component inventory is available for use. The precise versions of resolved components are usually available at this time as well as the provenance of where the components were retried from.\n* __post-build__ = BOM consisting of information obtained after a build process has completed and the resulting components(s) are available for further analysis. Built components may exist as the result of a CI/CD process, may have been installed or deployed to a system or device, and may need to be retrieved or extracted from the system or device.\n* __operations__ = BOM produced that represents inventory that is running and operational. This may include staging or production environments, and will generally encompass multiple SBOMs describing the applications and operating system, along with HBOMs describing the hardware that make up the system. Operations Bill of Materials (OBOM) can provide full-stack inventory of runtime environments, configurations, and additional dependencies.\n* __discovery__ = BOM consisting of information observed through network discovery providing point-in-time enumeration of embedded, on-premise, and cloud native services such as server applications, connected devices, microservices, and serverless functions.\n* __decommission__ = BOM containing inventory that will be, or has been retired from operations.",
+                    "enum": [
+                      "design",
+                      "pre-build",
+                      "build",
+                      "post-build",
+                      "operations",
+                      "discovery",
+                      "decommission"
+                    ]
+                  }
+                }
+              },
+              {
+                "required": ["name"],
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "title": "Name",
+                    "description": "The name of the lifecycle phase"
+                  },
+                  "description": {
+                    "type": "string",
+                    "title": "Description",
+                    "description": "The description of the lifecycle phase"
+                  }
+                }
+              }
+            ]
+          }
+      },
         "tools": {
           "oneOf": [
             {

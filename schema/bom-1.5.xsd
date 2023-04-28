@@ -49,6 +49,48 @@ limitations under the License.
                     <xs:documentation>The date and time (timestamp) when the BOM was created.</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="lifecycles" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The product lifecycle(s) that this BOM represents.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="lifecycle" minOccurs="0" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:choice>
+                                    <xs:sequence>
+                                        <xs:element name="phase" type="bom:lifecyclePhaseType" minOccurs="1" maxOccurs="1">
+                                            <xs:annotation>
+                                                <xs:documentation>
+                                                    A pre-defined phase in the product lifecycle.
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                    </xs:sequence>
+                                    <xs:sequence>
+                                        <xs:element name="name" type="xs:normalizedString" minOccurs="1" maxOccurs="1">
+                                            <xs:annotation>
+                                                <xs:documentation>
+                                                    The name of the lifecycle phase
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1">
+                                            <xs:annotation>
+                                                <xs:documentation>
+                                                    The description of the lifecycle phase
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:choice>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="tools" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>The tool(s) used in the creation of the BOM.</xs:documentation>
@@ -130,6 +172,75 @@ limitations under the License.
             </xs:annotation>
         </xs:anyAttribute>
     </xs:complexType>
+
+    <xs:simpleType name="lifecyclePhaseType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="design">
+                <xs:annotation>
+                    <xs:documentation>
+                        BOM produced early in the development lifecycle containing inventory of components and services
+                        that are proposed or planned to be used. The inventory may need to be procured, retrieved,
+                        or resourced prior to use.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="pre-build">
+                <xs:annotation>
+                    <xs:documentation>
+                        BOM consisting of information obtained prior to a build process and may contain source files
+                        and development artifacts and manifests. The inventory may need to be resolved and retrieved
+                        prior to use.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="build">
+                <xs:annotation>
+                    <xs:documentation>
+                        BOM consisting of information obtained during a build process where component inventory is
+                        available for use. The precise versions of resolved components are usually available at this
+                        time as well as the provenance of where the components were retried from.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="post-build">
+                <xs:annotation>
+                    <xs:documentation>
+                        BOM consisting of information obtained after a build process has completed and the resulting
+                        components(s) are available for further analysis. Built components may exist as the result of a
+                        CI/CD process, may have been installed or deployed to a system or device, and may need to be
+                        retrieved or extracted from the system or device.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="operations">
+                <xs:annotation>
+                    <xs:documentation>
+                        BOM produced that represents inventory that is running and operational. This may include staging
+                        or production environments, and will generally encompass multiple SBOMs describing the applications
+                        and operating system, along with HBOMs describing the hardware that make up the system. Operations
+                        Bill of Materials (OBOM) can provide full-stack inventory of runtime environments, configurations,
+                        and additional dependencies.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="discovery">
+                <xs:annotation>
+                    <xs:documentation>
+                        BOM consisting of information observed through network discovery providing point-in-time
+                        enumeration of embedded, on-premise, and cloud native services such as server applications,
+                        connected devices, microservices, and serverless functions.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="decommission">
+                <xs:annotation>
+                    <xs:documentation>
+                        BOM containing inventory that will be, or has been retired from operations.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
 
     <xs:complexType name="organizationalEntity">
         <xs:sequence minOccurs="0" maxOccurs="1">
@@ -1826,41 +1937,13 @@ limitations under the License.
 
     <xs:simpleType name="identityFieldType">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="group">
-                <xs:annotation>
-                    <xs:documentation>blah</xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="name">
-                <xs:annotation>
-                    <xs:documentation>blah</xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="version">
-                <xs:annotation>
-                    <xs:documentation>blah</xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="purl">
-                <xs:annotation>
-                    <xs:documentation>blah</xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="cpe">
-                <xs:annotation>
-                    <xs:documentation>blah</xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="swid">
-                <xs:annotation>
-                    <xs:documentation>blah</xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="hash">
-                <xs:annotation>
-                    <xs:documentation>blah</xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
+            <xs:enumeration value="group"/>
+            <xs:enumeration value="name"/>
+            <xs:enumeration value="version"/>
+            <xs:enumeration value="purl"/>
+            <xs:enumeration value="cpe"/>
+            <xs:enumeration value="swid"/>
+            <xs:enumeration value="hash"/>
         </xs:restriction>
     </xs:simpleType>
 
