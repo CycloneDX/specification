@@ -54,9 +54,27 @@ limitations under the License.
                     <xs:documentation>The tool(s) used in the creation of the BOM.</xs:documentation>
                 </xs:annotation>
                 <xs:complexType>
-                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
-                        <xs:element name="tool" minOccurs="0" type="bom:toolType"/>
-                    </xs:sequence>
+                    <xs:choice>
+                        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                            <xs:element name="tool" minOccurs="0" type="bom:toolType">
+                                <xs:annotation>
+                                    <xs:documentation>DEPRECATED. Use tools\components or tools\services instead.</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:sequence>
+                        <xs:sequence minOccurs="0" maxOccurs="1">
+                            <xs:element name="components" type="bom:componentsType" minOccurs="0" maxOccurs="1">
+                                <xs:annotation>
+                                    <xs:documentation>A list of software and hardware components used as tools.</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element name="services" type="bom:servicesType" minOccurs="0" maxOccurs="1">
+                                <xs:annotation>
+                                    <xs:documentation>A list of services used as tools.</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:choice>
                 </xs:complexType>
             </xs:element>
             <xs:element name="authors" minOccurs="0" maxOccurs="1">
@@ -744,6 +762,12 @@ limitations under the License.
                         information about the software running on the device.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
+            <xs:enumeration value="device-driver">
+                <xs:annotation>
+                    <xs:documentation>A special type of software that operates or controls a particular type of device.
+                        Refer to https://en.wikipedia.org/wiki/Device_driver</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
             <xs:enumeration value="firmware">
                 <xs:annotation>
                     <xs:documentation>A special type of software that provides low-level control over a devices
@@ -1034,6 +1058,11 @@ limitations under the License.
                     <xs:documentation>Direct or repository download location</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
+            <xs:enumeration value="distribution-intake">
+                <xs:annotation>
+                    <xs:documentation>The location where a component was published to. This is often the same as "distribution" but may also include specialized publishing processes that act as an intermediary</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
             <xs:enumeration value="license">
                 <xs:annotation>
                     <xs:documentation>The URL to the license file. If a license URL has been defined in the license
@@ -1065,6 +1094,70 @@ limitations under the License.
                     <xs:documentation>A model card describes the intended uses of a machine learning model, potential
                         limitations, biases, ethical considerations, training parameters, datasets used to train the
                         model, performance metrics, and other relevant data useful for ML transparency.</xs:documentation>
+            </xs:enumeration>
+            <xs:enumeration value="attestation">
+                <xs:annotation>
+                    <xs:documentation>Human or machine-readable statements containing facts, evidence, or testimony</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="threat-model">
+                <xs:annotation>
+                    <xs:documentation>An enumeration of identified weaknesses, threats, and countermeasures, dataflow diagram (DFD), attack tree, and other supporting documentation in human-readable or machine-readable format</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="vulnerability-assertion">
+                <xs:annotation>
+                    <xs:documentation>A Vulnerability Disclosure Report (VDR) which asserts the known and previously unknown vulnerabilities that affect a component, service, or product including the analysis and findings describing the impact (or lack of impact) that the reported vulnerability has on a component, service, or product.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="exploitability-statement">
+                <xs:annotation>
+                    <xs:documentation>A Vulnerability Exploitability eXchange (VEX) which asserts the known vulnerabilities that do not affect a product, product family, or organization, and optionally the ones that do. The VEX should include the analysis and findings describing the impact (or lack of impact) that the reported vulnerability has on the product, product family, or organization.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="pentest-report">
+                <xs:annotation>
+                    <xs:documentation>Results from an authorized simulated cyberattack on a component or service, otherwise known as a penetration test</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="static-analysis-report">
+                <xs:annotation>
+                    <xs:documentation>SARIF or proprietary machine or human-readable report for which static analysis has identified code quality, security, and other potential issues with the source code</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="dynamic-analysis-report">
+                <xs:annotation>
+                    <xs:documentation>Dynamic analysis report that has identified issues such as vulnerabilities and misconfigurations</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="runtime-analysis-report">
+                <xs:annotation>
+                    <xs:documentation>Report generated by analyzing the call stack of a running application</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="component-analysis-report">
+                <xs:annotation>
+                    <xs:documentation>Report generated by Software Composition Analysis (SCA), container analysis, or other forms of component analysis</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="maturity-report">
+                <xs:annotation>
+                    <xs:documentation>Report containing a formal assessment of an organization, business unit, or team against a maturity model</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="certification-report">
+                <xs:annotation>
+                    <xs:documentation>Industry, regulatory, or other certification from an accredited (if applicable) certification body</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="quality-metrics">
+                <xs:annotation>
+                    <xs:documentation>Report or system in which quality metrics can be obtained</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="codified-infrastructure">
+                <xs:annotation>
+                    <xs:documentation>Code or configuration that defines and provisions virtualized infrastructure, commonly referred to as Infrastructure as Code (IaC)</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
             <xs:enumeration value="other">
@@ -1583,15 +1676,76 @@ limitations under the License.
                         A value of false indicates that by using the service, a trust boundary is not crossed.</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="trustZone" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The name of the trust zone the service resides in.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:element name="data" minOccurs="0" maxOccurs="1">
                 <xs:complexType>
-                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
-                        <xs:element name="classification" type="bom:dataClassificationType">
+                    <xs:choice>
+                        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                            <xs:element name="classification" type="bom:dataClassificationType">
+                                <xs:annotation>
+                                    <xs:documentation>DEPRECATED: Specifies the data classification. THIS FIELD IS DEPRECATED AS OF v1.5. Use dataflow\classification instead</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:sequence>
+                        <xs:element name="dataflow" minOccurs="0" maxOccurs="unbounded">
                             <xs:annotation>
                                 <xs:documentation>Specifies the data classification.</xs:documentation>
                             </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="classification" type="bom:dataClassificationType" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>Specifies the data classification.</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="source" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>The URI, URL, or BOM-Link of the components or services the data came in from.</xs:documentation>
+                                        </xs:annotation>
+                                        <xs:complexType>
+                                            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                                                <xs:element name="url" type="xs:anyURI"/>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                    <xs:element name="destination" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>The URI, URL, or BOM-Link of the components or services the data is sent to.</xs:documentation>
+                                        </xs:annotation>
+                                        <xs:complexType>
+                                            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                                                <xs:element name="url" type="xs:anyURI"/>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                                <xs:attribute name="name" type="xs:string" use="optional">
+                                    <xs:annotation>
+                                        <xs:documentation>
+                                            Name for the defined data.
+                                        </xs:documentation>
+                                    </xs:annotation>
+                                </xs:attribute>
+                                <xs:attribute name="description" type="xs:string" use="optional">
+                                    <xs:annotation>
+                                        <xs:documentation>
+                                            Short description of the data content and usage.
+                                        </xs:documentation>
+                                    </xs:annotation>
+                                </xs:attribute>
+                                <xs:anyAttribute namespace="##any" processContents="lax">
+                                    <xs:annotation>
+                                        <xs:documentation>User-defined attributes may be used on this element as long as they
+                                            do not have the same name as an existing attribute used by the schema.</xs:documentation>
+                                    </xs:annotation>
+                                </xs:anyAttribute>
+                            </xs:complexType>
                         </xs:element>
-                    </xs:sequence>
+                    </xs:choice>
                 </xs:complexType>
             </xs:element>
             <xs:element name="licenses" type="bom:licenseChoiceType" minOccurs="0" maxOccurs="1"/>
@@ -1708,8 +1862,236 @@ limitations under the License.
         </xs:sequence>
     </xs:complexType>
 
+    <xs:simpleType name="identityFieldType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="group">
+                <xs:annotation>
+                    <xs:documentation>blah</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="name">
+                <xs:annotation>
+                    <xs:documentation>blah</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="version">
+                <xs:annotation>
+                    <xs:documentation>blah</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="purl">
+                <xs:annotation>
+                    <xs:documentation>blah</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="cpe">
+                <xs:annotation>
+                    <xs:documentation>blah</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="swid">
+                <xs:annotation>
+                    <xs:documentation>blah</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="hash">
+                <xs:annotation>
+                    <xs:documentation>blah</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="decimalPercentType">
+        <xs:restriction base="xs:decimal">
+            <xs:minInclusive value="0"/>
+            <xs:maxInclusive value="1"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="evidenceTechnique">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="source-code-analysis" />
+            <xs:enumeration value="binary-analysis" />
+            <xs:enumeration value="manifest-analysis" />
+            <xs:enumeration value="ast-fingerprint" />
+            <xs:enumeration value="hash-comparison" />
+            <xs:enumeration value="instrumentation" />
+            <xs:enumeration value="dynamic-analysis" />
+            <xs:enumeration value="filename" />
+            <xs:enumeration value="attestation" />
+            <xs:enumeration value="other" />
+        </xs:restriction>
+    </xs:simpleType>
+
     <xs:complexType name="componentEvidenceType">
         <xs:sequence>
+            <xs:element name="identity" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Evidence that substantiates the identity of a component.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="field" type="bom:identityFieldType" minOccurs="1" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>The identity field of the component which the evidence describes.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="confidence" type="bom:decimalPercentType" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>The overall confidence of the evidence from 0 - 1, where 1 is 100% confidence.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="methods" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>The methods used to extract and/or analyze the evidence.</xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="method" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="technique" type="bom:evidenceTechnique" minOccurs="1" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>The technique used in this method of analysis.</xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="confidence" type="bom:decimalPercentType" minOccurs="1" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>The confidence of the evidence from 0 - 1, where 1 is 100% confidence. Confidence is specific to the technique used. Each technique of analysis can have independent confidence.</xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>The value or contents of the evidence.</xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="tools" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The object in the BOM identified by its bom-ref. This is often a component or service,
+                                    but may be any object type supporting bom-refs. Tools used for analysis should already
+                                    be defined in the BOM, either in the metadata/tools, components, or formulation.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="tool" type="bom:bomReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="occurrences" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Evidence of individual instances of a component spread across multiple locations.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="occurrence" minOccurs="0" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="location" minOccurs="1" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>The location or path to where the component was found.</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                </xs:sequence>
+                                <xs:attribute name="bom-ref" type="bom:refType">
+                                    <xs:annotation>
+                                        <xs:documentation>
+                                            An optional identifier which can be used to reference the occurrence elsewhere
+                                            in the BOM. Every bom-ref MUST be unique within the BOM.
+                                        </xs:documentation>
+                                    </xs:annotation>
+                                </xs:attribute>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="callstack" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Evidence of the components use through the callstack.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="frames" minOccurs="0" maxOccurs="1">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="frame" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="package" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>A package organizes modules into namespaces, providing a unique namespace for each type it contains.</xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="module" type="xs:string" minOccurs="1" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>A module or class that encloses functions/methods and other code.</xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="function" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>A block of code designed to perform a particular task.</xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="parameters" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>Optional arguments that are passed to the module or function.</xs:documentation>
+                                                    </xs:annotation>
+                                                    <xs:complexType>
+                                                        <xs:sequence>
+                                                            <xs:element name="parameter" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                                                        </xs:sequence>
+                                                    </xs:complexType>
+                                                </xs:element>
+                                                <xs:element name="line" type="xs:integer" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>The line number the code that is called resides on.</xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="column" type="xs:integer" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>The column the code that is called resides.</xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="fullFilename" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>The full path and filename of the module.</xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="tools" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The object in the BOM identified by its bom-ref. This is often a component or service,
+                                    but may be any object type supporting bom-refs. Tools used for analysis should already
+                                    be defined in the BOM, either in the metadata/tools, components, or formulation.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="tool" type="bom:bomReferenceType" minOccurs="0" maxOccurs="unbounded"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="licenses" type="bom:licenseChoiceType" minOccurs="0" maxOccurs="1"/>
             <xs:element name="copyright" type="bom:copyrightsType" minOccurs="0" maxOccurs="1"/>
             <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
@@ -2771,14 +3153,49 @@ limitations under the License.
             <xs:element name="detail" type="xs:string" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>If available, an in-depth description of the vulnerability as provided by the
-                        source organization. Details often include examples, proof-of-concepts, and other information
-                        useful in understanding root cause.</xs:documentation>
+                        source organization. Details often include information useful in understanding root cause.</xs:documentation>
                 </xs:annotation>
             </xs:element>
             <xs:element name="recommendation" type="xs:string" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>Recommendations of how the vulnerability can be remediated or mitigated.</xs:documentation>
                 </xs:annotation>
+            </xs:element>
+            <xs:element name="workaround" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>A bypass, usually temporary, of the vulnerability that reduces its likelihood and/or impact. Workarounds often involve changes to configuration or deployments.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="proofOfConcept" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                            Evidence used to reproduce the vulnerability.
+                        </xs:documentation>
+                    </xs:annotation>
+                    <xs:sequence>
+                        <xs:element name="reproductionSteps" type="xs:string" minOccurs="0" maxOccurs="1">
+                                <xs:annotation>
+                                    <xs:documentation>Precise steps to reproduce the vulnerability.</xs:documentation>
+                                </xs:annotation>
+                        </xs:element>
+                        <xs:element name="environment" type="xs:string" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>A description of the environment in which reproduction was possible.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="supportingMaterial" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>Supporting material that helps in reproducing or understanding how reproduction is possible. This may include screenshots, payloads, and PoC exploit code.</xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="attachment" type="bom:attachedTextType" minOccurs="0" maxOccurs="unbounded" />
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
             </xs:element>
             <xs:element name="advisories" minOccurs="0" maxOccurs="1">
                 <xs:complexType>
@@ -2846,9 +3263,27 @@ limitations under the License.
                     <xs:documentation>The tool(s) used to identify, confirm, or score the vulnerability.</xs:documentation>
                 </xs:annotation>
                 <xs:complexType>
-                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
-                        <xs:element name="tool" minOccurs="0" type="bom:toolType"/>
-                    </xs:sequence>
+                    <xs:choice>
+                        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                            <xs:element name="tool" minOccurs="0" type="bom:toolType">
+                                <xs:annotation>
+                                    <xs:documentation>DEPRECATED. Use tools\components or tools\services instead.</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:sequence>
+                        <xs:sequence minOccurs="0" maxOccurs="1">
+                            <xs:element name="components" type="bom:componentsType" minOccurs="0" maxOccurs="1">
+                                <xs:annotation>
+                                    <xs:documentation>A list of software and hardware components used as tools.</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element name="services" type="bom:servicesType" minOccurs="0" maxOccurs="1">
+                                <xs:annotation>
+                                    <xs:documentation>A list of services used as tools.</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:choice>
                 </xs:complexType>
             </xs:element>
             <xs:element name="analysis" minOccurs="0" maxOccurs="1">
@@ -3333,6 +3768,14 @@ limitations under the License.
                     <xs:documentation xml:lang="en">
                         The rating is based on CVSS v3.1 standard
                         https://www.first.org/cvss/v3-1/
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="CVSSv4">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        The rating is based on CVSS v4.0 standard
+                        https://www.first.org/cvss/v4-0/
                     </xs:documentation>
                 </xs:annotation>
             </xs:enumeration>

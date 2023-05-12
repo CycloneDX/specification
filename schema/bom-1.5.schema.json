@@ -137,11 +137,39 @@
           "description": "The date and time (timestamp) when the BOM was created."
         },
         "tools": {
-          "type": "array",
-          "title": "Creation Tools",
-          "description": "The tool(s) used in the creation of the BOM.",
-          "additionalItems": false,
-          "items": {"$ref": "#/definitions/tool"}
+          "oneOf": [
+            {
+              "type": "object",
+              "title": "Creation Tools",
+              "description": "The tool(s) used in the creation of the BOM.",
+              "additionalProperties": false,
+              "properties": {
+                "components": {
+                  "type": "array",
+                  "additionalItems": false,
+                  "items": {"$ref": "#/definitions/component"},
+                  "uniqueItems": true,
+                  "title": "Components",
+                  "description": "A list of software and hardware components used as tools"
+                },
+                "services": {
+                  "type": "array",
+                  "additionalItems": false,
+                  "items": {"$ref": "#/definitions/service"},
+                  "uniqueItems": true,
+                  "title": "Services",
+                  "description": "A list of services used as tools. This may include microservices, function-as-a-service, and other types of network or intra-process services."
+                }
+              }
+            },
+            {
+              "type": "array",
+              "title": "Creation Tools (legacy)",
+              "description": "[Deprecated] The tool(s) used in the creation of the BOM.",
+              "additionalItems": false,
+              "items": {"$ref": "#/definitions/tool"}
+            }
+          ]
         },
         "authors" :{
           "type": "array",
@@ -183,7 +211,7 @@
     "tool": {
       "type": "object",
       "title": "Tool",
-      "description": "Information about the automated or manual tool used",
+      "description": "[Deprecated] - DO NOT USE. This will be removed in a future version. This will be removed in a future version. Use component or service instead. Information about the automated or manual tool used",
       "additionalProperties": false,
       "properties": {
         "vendor": {
@@ -296,13 +324,14 @@
             "platform",
             "operating-system",
             "device",
+            "device-driver",
             "firmware",
             "file",
             "machine-learning-model",
             "data"
           ],
           "title": "Component Type",
-          "description": "Specifies the type of component. For software components, classify as application if no more specific appropriate classification is available or cannot be determined for the component. Types include:\n\n* __application__ = A software application. Refer to [https://en.wikipedia.org/wiki/Application_software](https://en.wikipedia.org/wiki/Application_software) for information about applications.\n* __framework__ = A software framework. Refer to [https://en.wikipedia.org/wiki/Software_framework](https://en.wikipedia.org/wiki/Software_framework) for information on how frameworks vary slightly from libraries.\n* __library__ = A software library. Refer to [https://en.wikipedia.org/wiki/Library_(computing)](https://en.wikipedia.org/wiki/Library_(computing))\n for information about libraries. All third-party and open source reusable components will likely be a library. If the library also has key features of a framework, then it should be classified as a framework. If not, or is unknown, then specifying library is RECOMMENDED.\n* __container__ = A packaging and/or runtime format, not specific to any particular technology, which isolates software inside the container from software outside of a container through virtualization technology. Refer to [https://en.wikipedia.org/wiki/OS-level_virtualization](https://en.wikipedia.org/wiki/OS-level_virtualization)\n* __platform__ = A runtime environment which interprets or executes software. This may include runtimes such as those that execute bytecode or low-code/no-code application platforms.\n* __operating-system__ = A software operating system without regard to deployment model (i.e. installed on physical hardware, virtual machine, image, etc) Refer to [https://en.wikipedia.org/wiki/Operating_system](https://en.wikipedia.org/wiki/Operating_system)\n* __device__ = A hardware device such as a processor, or chip-set. A hardware device containing firmware SHOULD include a component for the physical hardware itself, and another component of type 'firmware' or 'operating-system' (whichever is relevant), describing information about the software running on the device.\n* __firmware__ = A special type of software that provides low-level control over a devices hardware. Refer to [https://en.wikipedia.org/wiki/Firmware](https://en.wikipedia.org/wiki/Firmware)\n* __file__ = A computer file. Refer to [https://en.wikipedia.org/wiki/Computer_file](https://en.wikipedia.org/wiki/Computer_file) for information about files.\n* __machine-learning-model__ = A model based on training data that can make predictions or decisions without being explicitly programmed to do so.\n* __data__ = A collection of discrete values that convey information.",
+          "description": "Specifies the type of component. For software components, classify as application if no more specific appropriate classification is available or cannot be determined for the component. Types include:\n\n* __application__ = A software application. Refer to [https://en.wikipedia.org/wiki/Application_software](https://en.wikipedia.org/wiki/Application_software) for information about applications.\n* __framework__ = A software framework. Refer to [https://en.wikipedia.org/wiki/Software_framework](https://en.wikipedia.org/wiki/Software_framework) for information on how frameworks vary slightly from libraries.\n* __library__ = A software library. Refer to [https://en.wikipedia.org/wiki/Library_(computing)](https://en.wikipedia.org/wiki/Library_(computing))\n for information about libraries. All third-party and open source reusable components will likely be a library. If the library also has key features of a framework, then it should be classified as a framework. If not, or is unknown, then specifying library is RECOMMENDED.\n* __container__ = A packaging and/or runtime format, not specific to any particular technology, which isolates software inside the container from software outside of a container through virtualization technology. Refer to [https://en.wikipedia.org/wiki/OS-level_virtualization](https://en.wikipedia.org/wiki/OS-level_virtualization)\n* __platform__ = A runtime environment which interprets or executes software. This may include runtimes such as those that execute bytecode or low-code/no-code application platforms.\n* __operating-system__ = A software operating system without regard to deployment model (i.e. installed on physical hardware, virtual machine, image, etc) Refer to [https://en.wikipedia.org/wiki/Operating_system](https://en.wikipedia.org/wiki/Operating_system)\n* __device__ = A hardware device such as a processor, or chip-set. A hardware device containing firmware SHOULD include a component for the physical hardware itself, and another component of type 'firmware' or 'operating-system' (whichever is relevant), describing information about the software running on the device.\n* __device-driver__ = A special type of software that operates or controls a particular type of device. Refer to [https://en.wikipedia.org/wiki/Device_driver](https://en.wikipedia.org/wiki/Device_driver)\n* __firmware__ = A special type of software that provides low-level control over a devices hardware. Refer to [https://en.wikipedia.org/wiki/Firmware](https://en.wikipedia.org/wiki/Firmware)\n* __file__ = A computer file. Refer to [https://en.wikipedia.org/wiki/Computer_file](https://en.wikipedia.org/wiki/Computer_file) for information about files.\n* __machine-learning-model__ = A model based on training data that can make predictions or decisions without being explicitly programmed to do so.\n* __data__ = A collection of discrete values that convey information.",
           "examples": ["library"]
         },
         "mime-type": {
@@ -1042,7 +1071,7 @@
         "type": {
           "type": "string",
           "title": "Type",
-          "description": "Specifies the type of external reference.\n\n* __vcs__ = Version Control System\n* __issue-tracker__ = Issue or defect tracking system, or an Application Lifecycle Management (ALM) system\n* __website__ = Website\n* __advisories__ = Security advisories\n* __bom__ = Bill of Materials (SBOM, OBOM, HBOM, SaaSBOM, etc)\n* __mailing-list__ = Mailing list or discussion group\n* __social__ = Social media account\n* __chat__ = Real-time chat platform\n* __documentation__ = Documentation, guides, or how-to instructions\n* __support__ = Community or commercial support\n* __distribution__ = Direct or repository download location\n* __license__ = The URL to the license file. If a license URL has been defined in the license node, it should also be defined as an external reference for completeness\n* __build-meta__ = Build-system specific meta file (i.e. pom.xml, package.json, .nuspec, etc)\n* __build-system__ = URL to an automated build system\n* __release-notes__ = URL to release notes\n* __security-contact__ = Specifies a way to contact the maintainer, supplier, or provider in the event of a security incident. Common URIs include links to a disclosure procedure, a mailto (RFC-2368) that specifies an email address, a tel (RFC-3966) that specifies a phone number, or dns (RFC-4501]) that specifies the records containing DNS Security TXT\n* __model-card__ = A model card describes the intended uses of a machine learning model, potential limitations, biases, ethical considerations, training parameters, datasets used to train the model, performance metrics, and other relevant data useful for ML transparency.\n* __other__ = Use this if no other types accurately describe the purpose of the external reference",
+          "description": "Specifies the type of external reference.\n\n* __vcs__ = Version Control System\n* __issue-tracker__ = Issue or defect tracking system, or an Application Lifecycle Management (ALM) system\n* __website__ = Website\n* __advisories__ = Security advisories\n* __bom__ = Bill of Materials (SBOM, OBOM, HBOM, SaaSBOM, etc)\n* __mailing-list__ = Mailing list or discussion group\n* __social__ = Social media account\n* __chat__ = Real-time chat platform\n* __documentation__ = Documentation, guides, or how-to instructions\n* __support__ = Community or commercial support\n* __distribution__ = Direct or repository download location\n* __distribution-intake__ = The location where a component was published to. This is often the same as \"distribution\" but may also include specialized publishing processes that act as an intermediary\n* __license__ = The URL to the license file. If a license URL has been defined in the license node, it should also be defined as an external reference for completeness\n* __build-meta__ = Build-system specific meta file (i.e. pom.xml, package.json, .nuspec, etc)\n* __build-system__ = URL to an automated build system\n* __release-notes__ = URL to release notes\n* __security-contact__ = Specifies a way to contact the maintainer, supplier, or provider in the event of a security incident. Common URIs include links to a disclosure procedure, a mailto (RFC-2368) that specifies an email address, a tel (RFC-3966) that specifies a phone number, or dns (RFC-4501]) that specifies the records containing DNS Security TXT\n* __model-card__ = A model card describes the intended uses of a machine learning model, potential limitations, biases, ethical considerations, training parameters, datasets used to train the model, performance metrics, and other relevant data useful for ML transparency.\n* __attestation__ = Human or machine-readable statements containing facts, evidence, or testimony\n* __threat-model__ = An enumeration of identified weaknesses, threats, and countermeasures, dataflow diagram (DFD), attack tree, and other supporting documentation in human-readable or machine-readable format\n* __vulnerability-assertion__ = A Vulnerability Disclosure Report (VDR) which asserts the known and previously unknown vulnerabilities that affect a component, service, or product including the analysis and findings describing the impact (or lack of impact) that the reported vulnerability has on a component, service, or product.\n* __exploitability-statement__ = A Vulnerability Exploitability eXchange (VEX) which asserts the known vulnerabilities that do not affect a product, product family, or organization, and optionally the ones that do. The VEX should include the analysis and findings describing the impact (or lack of impact) that the reported vulnerability has on the product, product family, or organization.\n* __pentest-report__ = Results from an authorized simulated cyberattack on a component or service, otherwise known as a penetration test\n* __static-analysis-report__ = SARIF or proprietary machine or human-readable report for which static analysis has identified code quality, security, and other potential issues with the source code\n* __dynamic-analysis-report__ = Dynamic analysis report that has identified issues such as vulnerabilities and misconfigurations\n* __runtime-analysis-report__ = Report generated by analyzing the call stack of a running application\n* __component-analysis-report__ = Report generated by Software Composition Analysis (SCA), container analysis, or other forms of component analysis\n* __maturity-report__ = Report containing a formal assessment of an organization, business unit, or team against a maturity model\n* __certification-report__ = Industry, regulatory, or other certification from an accredited (if applicable) certification body\n* __quality-metrics__ = Report or system in which quality metrics can be obtained\n* __codified-infrastructure__ = Code or configuration that defines and provisions virtualized infrastructure, commonly referred to as Infrastructure as Code (IaC)\n* __other__ = Use this if no other types accurately describe the purpose of the external reference",
           "enum": [
             "vcs",
             "issue-tracker",
@@ -1055,12 +1084,26 @@
             "documentation",
             "support",
             "distribution",
+            "distribution-intake",
             "license",
             "build-meta",
             "build-system",
             "release-notes",
             "security-contact",
             "model-card",
+            "attestation",
+            "threat-model",
+            "vulnerability-assertion",
+            "exploitability-statement",
+            "pentest-report",
+            "static-analysis-report",
+            "dynamic-analysis-report",
+            "runtime-analysis-report",
+            "component-analysis-report",
+            "maturity-report",
+            "certification-report",
+            "codified-infrastructure",
+            "quality-metrics",
             "other"
           ]
         },
@@ -1160,6 +1203,11 @@
           "title": "Crosses Trust Boundary",
           "description": "A boolean value indicating if use of the service crosses a trust zone or boundary. A value of true indicates that by using the service, a trust boundary is crossed. A value of false indicates that by using the service, a trust boundary is not crossed."
         },
+        "trustZone": {
+          "type": "string",
+          "title": "Trust Zone",
+          "description": "The name of the trust zone the service resides in."
+        },
         "data": {
           "type": "array",
           "additionalItems": false,
@@ -1217,16 +1265,52 @@
       "additionalProperties": false,
       "properties": {
         "flow": {
-          "$ref": "#/definitions/dataFlow",
+          "$ref": "#/definitions/dataFlowDirection",
           "title": "Directional Flow",
           "description": "Specifies the flow direction of the data. Direction is relative to the service. Inbound flow states that data enters the service. Outbound flow states that data leaves the service. Bi-directional states that data flows both ways, and unknown states that the direction is not known."
         },
         "classification": {
           "$ref": "#/definitions/dataClassification"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "Name for the defined data",
+          "examples": [
+            "Credit card reporting"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "Short description of the data content and usage",
+          "examples": [
+            "Credit card information being exchanged in between the web app and the database"
+          ]
+        },
+        "source": {
+          "type": "array",
+          "additionalItems": false,
+          "items": {
+            "type": "string",
+            "format": "iri-reference"
+          },
+          "title": "Source",
+          "description": "The URI, URL, or BOM-Link of the components or services the data came in from"
+        },
+        "destination": {
+          "type": "array",
+          "additionalItems": false,
+          "items": {
+            "type": "string",
+            "format": "iri-reference"
+          },
+          "title": "Destination",
+          "description": "The URI, URL, or BOM-Link of the components or services the data is sent to"
         }
       }
     },
-    "dataFlow": {
+    "dataFlowDirection": {
       "type": "string",
       "enum": [
         "inbound",
@@ -1252,13 +1336,172 @@
         }
       }
     },
-
     "componentEvidence": {
       "type": "object",
       "title": "Evidence",
       "description": "Provides the ability to document evidence collected through various forms of extraction or analysis.",
       "additionalProperties": false,
       "properties": {
+        "identity": {
+          "type": "object",
+          "description": "Evidence that substantiates the identity of a component.",
+          "required": [ "field" ],
+          "additionalProperties": false,
+          "properties": {
+            "field": {
+              "type": "string",
+              "enum": [
+                "group", "name", "version", "purl", "cpe", "swid", "hash"
+              ],
+              "title": "Field",
+              "description": "The identity field of the component which the evidence describes."
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "title": "Confidence",
+              "description": "The overall confidence of the evidence from 0 - 1, where 1 is 100% confidence."
+            },
+            "methods": {
+              "type": "array",
+              "title": "Methods",
+              "description": "The methods used to extract and/or analyze the evidence.",
+              "additionalItems": false,
+              "items": {
+                "type": "object",
+                "required": [
+                  "technique" ,
+                  "confidence"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "technique": {
+                    "title": "Technique",
+                    "description": "The technique used in this method of analysis.",
+                    "type": "string",
+                    "enum": [
+                      "source-code-analysis",
+                      "binary-analysis",
+                      "manifest-analysis",
+                      "ast-fingerprint",
+                      "hash-comparison",
+                      "instrumentation",
+                      "dynamic-analysis",
+                      "filename",
+                      "attestation",
+                      "other"
+                    ]
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "title": "Confidence",
+                    "description": "The confidence of the evidence from 0 - 1, where 1 is 100% confidence. Confidence is specific to the technique used. Each technique of analysis can have independent confidence."
+                  },
+                  "value": {
+                    "type": "string",
+                    "title": "Value",
+                    "description": "The value or contents of the evidence."
+                  }
+                }
+              }
+            },
+            "tools": {
+              "type": "array",
+              "uniqueItems": true,
+              "additionalItems": false,
+              "items": {
+                "$ref": "#/definitions/refType"
+              },
+              "title": "BOM References",
+              "description": "The object in the BOM identified by its bom-ref. This is often a component or service, but may be any object type supporting bom-refs. Tools used for analysis should already be defined in the BOM, either in the metadata/tools, components, or formulation."
+            }
+          }
+        },
+        "occurrences": {
+          "type": "array",
+          "title": "Occurrences",
+          "description": "Evidence of individual instances of a component spread across multiple locations.",
+          "additionalItems": false,
+          "items": {
+            "required": [ "location" ],
+            "additionalProperties": false,
+            "properties": {
+              "bom-ref": {
+                "$ref": "#/definitions/refType",
+                "title": "BOM Reference",
+                "description": "An optional identifier which can be used to reference the occurrence elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+              },
+              "location": {
+                "type": "string",
+                "title": "Location",
+                "description": "The location or path to where the component was found."
+              }
+            }
+          }
+        },
+        "callstack": {
+          "type": "object",
+          "description": "Evidence of the components use through the callstack.",
+          "additionalProperties": false,
+          "properties": {
+            "frames": {
+              "type": "array",
+              "title": "Methods",
+              "additionalItems": false,
+              "items": {
+                "type": "object",
+                "required": [
+                  "module"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "package": {
+                    "title": "Package",
+                    "description": "A package organizes modules into namespaces, providing a unique namespace for each type it contains.",
+                    "type": "string"
+                  },
+                  "module": {
+                    "title": "Module",
+                    "description": "A module or class that encloses functions/methods and other code.",
+                    "type": "string"
+                  },
+                  "function": {
+                    "title": "Function",
+                    "description": "A block of code designed to perform a particular task.",
+                    "type": "string"
+                  },
+                  "parameters": {
+                    "title": "Parameters",
+                    "description": "Optional arguments that are passed to the module or function.",
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "line": {
+                    "title": "Line",
+                    "description": "The line number the code that is called resides on.",
+                    "type": "integer"
+                  },
+                  "column": {
+                    "title": "Column",
+                    "description": "The column the code that is called resides.",
+                    "type": "integer"
+                  },
+                  "fullFilename": {
+                    "title": "Full Filename",
+                    "description": "The full path and filename of the module.",
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
         "licenses": {
           "type": "array",
           "additionalItems": false,
@@ -1500,11 +1743,12 @@
     "scoreMethod": {
       "type": "string",
       "title": "Method",
-      "description": "Specifies the severity or risk scoring methodology or standard used.\n\n* CVSSv2 - [Common Vulnerability Scoring System v2](https://www.first.org/cvss/v2/)\n* CVSSv3 - [Common Vulnerability Scoring System v3](https://www.first.org/cvss/v3-0/)\n* CVSSv31 - [Common Vulnerability Scoring System v3.1](https://www.first.org/cvss/v3-1/)\n* OWASP - [OWASP Risk Rating Methodology](https://owasp.org/www-community/OWASP_Risk_Rating_Methodology)",
+      "description": "Specifies the severity or risk scoring methodology or standard used.\n\n* CVSSv2 - [Common Vulnerability Scoring System v2](https://www.first.org/cvss/v2/)\n* CVSSv3 - [Common Vulnerability Scoring System v3](https://www.first.org/cvss/v3-0/)\n* CVSSv31 - [Common Vulnerability Scoring System v3.1](https://www.first.org/cvss/v3-1/)\n* CVSSv4 - [Common Vulnerability Scoring System v4](https://www.first.org/cvss/v4-0/)\n* OWASP - [OWASP Risk Rating Methodology](https://owasp.org/www-community/OWASP_Risk_Rating_Methodology)",
       "enum": [
         "CVSSv2",
         "CVSSv3",
         "CVSSv31",
+        "CVSSv4",
         "OWASP",
         "other"
       ]
@@ -1681,12 +1925,40 @@
         "detail": {
           "type": "string",
           "title": "Details",
-          "description": "If available, an in-depth description of the vulnerability as provided by the source organization. Details often include examples, proof-of-concepts, and other information useful in understanding root cause."
+          "description": "If available, an in-depth description of the vulnerability as provided by the source organization. Details often include information useful in understanding root cause."
         },
         "recommendation": {
           "type": "string",
-          "title": "Details",
+          "title": "Recommendation",
           "description": "Recommendations of how the vulnerability can be remediated or mitigated."
+        },
+        "workaround": {
+          "type": "string",
+          "title": "Workarounds",
+          "description": "A bypass, usually temporary, of the vulnerability that reduces its likelihood and/or impact. Workarounds often involve changes to configuration or deployments."
+        },
+        "proofOfConcept": {
+          "type": "object",
+          "title": "Proof of Concept",
+          "description": "Evidence used to reproduce the vulnerability.",
+          "properties": {
+            "reproductionSteps": {
+              "type": "string",
+              "title": "Steps to Reproduce",
+              "description": "Precise steps to reproduce the vulnerability."
+            },
+            "environment": {
+              "type": "string",
+              "title": "Environment",
+              "description": "A description of the environment in which reproduction was possible."
+            },
+            "supportingMaterial": {
+              "type": "array",
+              "title": "Supporting Material",
+              "description": "Supporting material that helps in reproducing or understanding how reproduction is possible. This may include screenshots, payloads, and PoC exploit code.",
+              "items": { "$ref": "#/definitions/attachment" }
+            }
+          }
         },
         "advisories": {
           "type": "array",
@@ -1748,11 +2020,39 @@
           }
         },
         "tools": {
-          "type": "array",
-          "title": "Creation Tools",
-          "description": "The tool(s) used to identify, confirm, or score the vulnerability.",
-          "additionalItems": false,
-          "items": {"$ref": "#/definitions/tool"}
+          "oneOf": [
+            {
+              "type": "object",
+              "title": "Tools",
+              "description": "The tool(s) used to identify, confirm, or score the vulnerability.",
+              "additionalProperties": false,
+              "properties": {
+                "components": {
+                  "type": "array",
+                  "additionalItems": false,
+                  "items": {"$ref": "#/definitions/component"},
+                  "uniqueItems": true,
+                  "title": "Components",
+                  "description": "A list of software and hardware components used as tools"
+                },
+                "services": {
+                  "type": "array",
+                  "additionalItems": false,
+                  "items": {"$ref": "#/definitions/service"},
+                  "uniqueItems": true,
+                  "title": "Services",
+                  "description": "A list of services used as tools. This may include microservices, function-as-a-service, and other types of network or intra-process services."
+                }
+              }
+            },
+            {
+              "type": "array",
+              "title": "Tools (legacy)",
+              "description": "[Deprecated] The tool(s) used to identify, confirm, or score the vulnerability.",
+              "additionalItems": false,
+              "items": {"$ref": "#/definitions/tool"}
+            }
+          ]
         },
         "analysis": {
           "type": "object",
@@ -1838,7 +2138,7 @@
                     },
                     "range": {
                       "description": "A version range specified in Package URL Version Range syntax (vers) which is defined at https://github.com/package-url/purl-spec/VERSION-RANGE-SPEC.rst",
-                      "$ref": "#/definitions/version"
+                      "$ref": "#/definitions/range"
                     },
                     "status": {
                       "description": "The vulnerability status for the version or range of versions.",
