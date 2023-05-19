@@ -1096,6 +1096,26 @@ limitations under the License.
                         model, performance metrics, and other relevant data useful for ML transparency.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
+            <xs:enumeration value="log">
+                <xs:annotation>
+                    <xs:documentation>TODO</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="configuration">
+                <xs:annotation>
+                    <xs:documentation>TODO</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="evidence">
+                <xs:annotation>
+                    <xs:documentation>TODO</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="formulation">
+                <xs:annotation>
+                    <xs:documentation>TODO</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
             <xs:enumeration value="attestation">
                 <xs:annotation>
                     <xs:documentation>Human or machine-readable statements containing facts, evidence, or testimony</xs:documentation>
@@ -1624,6 +1644,11 @@ limitations under the License.
 
     <xs:complexType name="service">
         <xs:sequence>
+            <xs:element name="provides" type="bom:providesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>TODO</xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:element name="provider" type="bom:organizationalEntity" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>The organization that provides the service.</xs:documentation>
@@ -1813,6 +1838,70 @@ limitations under the License.
             </xs:annotation>
         </xs:anyAttribute>
     </xs:complexType>
+
+    <xs:simpleType name="providesType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="application"/>
+            <xs:enumeration value="analytics"/>
+            <xs:enumeration value="bastion"/>
+            <xs:enumeration value="communication"/>
+            <xs:enumeration value="compute"/>
+            <xs:enumeration value="compute-function"/>
+            <xs:enumeration value="compute-physical"/>
+            <xs:enumeration value="compute-virtual"/>
+            <xs:enumeration value="discovery"/>
+            <xs:enumeration value="distributed-ledger"/>
+            <xs:enumeration value="distributed-ledger-centralized"/>
+            <xs:enumeration value="distributed-ledger-decentralized"/>
+            <xs:enumeration value="data-collection"/>
+            <xs:enumeration value="data-streaming"/>
+            <xs:enumeration value="data-processing"/>
+            <xs:enumeration value="data-warehousing"/>
+            <xs:enumeration value="domain-resolution"/>
+            <xs:enumeration value="firewall"/>
+            <xs:enumeration value="firewall-waf"/>
+            <xs:enumeration value="gateway"/>
+            <xs:enumeration value="gateway-api"/>
+            <xs:enumeration value="gateway-vpn"/>
+            <xs:enumeration value="identity-access-management"/>
+            <xs:enumeration value="in-memory-caching"/>
+            <xs:enumeration value="machine-learning"/>
+            <xs:enumeration value="media-content-delivery"/>
+            <xs:enumeration value="media-encoding"/>
+            <xs:enumeration value="media-live"/>
+            <xs:enumeration value="media-on-demand"/>
+            <xs:enumeration value="media-protection"/>
+            <xs:enumeration value="media-rendering"/>
+            <xs:enumeration value="messaging"/>
+            <xs:enumeration value="messaging-notification"/>
+            <xs:enumeration value="message-queue"/>
+            <xs:enumeration value="metrics"/>
+            <xs:enumeration value="monitoring"/>
+            <xs:enumeration value="orchestration"/>
+            <xs:enumeration value="pki-certificate-authority"/>
+            <xs:enumeration value="pki-certificate-management"/>
+            <xs:enumeration value="pki-certificate-revocation"/>
+            <xs:enumeration value="pki-key-management"/>
+            <xs:enumeration value="pki-secrets-management"/>
+            <xs:enumeration value="pki-signing"/>
+            <xs:enumeration value="pki-tsa"/>
+            <xs:enumeration value="scanning"/>
+            <xs:enumeration value="source-code-management"/>
+            <xs:enumeration value="storage"/>
+            <xs:enumeration value="storage-archival"/>
+            <xs:enumeration value="storage-repository"/>
+            <xs:enumeration value="storage-database"/>
+            <xs:enumeration value="storage-database-hierarchical"/>
+            <xs:enumeration value="storage-database-relational"/>
+            <xs:enumeration value="storage-database-non-relational"/>
+            <xs:enumeration value="storage-database-graph"/>
+            <xs:enumeration value="storage-database-object"/>
+            <xs:enumeration value="storage-database-vector"/>
+            <xs:enumeration value="storage-registry"/>
+            <xs:enumeration value="transparency-log"/>
+            <xs:enumeration value="website"/>
+        </xs:restriction>
+    </xs:simpleType>
 
     <xs:complexType name="dataClassificationType">
         <xs:annotation>
@@ -2991,6 +3080,11 @@ limitations under the License.
                     <xs:documentation>A collection of data.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
+            <xs:enumeration value="definition">
+                <xs:annotation>
+                    <xs:documentation>Data that can be used to create new instances of what the definition defines.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
             <xs:enumeration value="other">
                 <xs:annotation>
                     <xs:documentation>Any other type of data that does not fit into existing definitions.</xs:documentation>
@@ -3830,6 +3924,1267 @@ limitations under the License.
         </xs:restriction>
     </xs:simpleType>
 
+    <xs:complexType name="formulationType">
+        <xs:annotation>
+            <xs:documentation>
+                Describes how a component or service was manufactured or deployed. This is achieved through the use
+                of formulas, workflows, tasks, and steps, which declare the precise steps to reproduce along with the
+                observed formulas describing the steps which transpired in the manufacturing process.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="formula" type="bom:formulaType"/>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##any" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:complexType name="formulaType">
+        <xs:annotation>
+            <xs:documentation>
+                Describes workflows and resources that captures rules and other aspects of how the associated
+                BOM component or service was formed.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="components" type="bom:componentsType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Transient components that are used in tasks that constitute one or more of
+                        this formula's workflows</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="services" type="bom:servicesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Transient services that are used in tasks that constitute one or more of
+                        this formula's workflows</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="workflows" type="bom:workflowsType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>List of workflows that can be declared to accomplish specific orchestrated goals
+                        and independently triggered.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Provides the ability to document properties in a name/value store.
+                        This provides flexibility to include data not officially supported in the standard
+                        without having to use additional namespaces or create extensions. Property names
+                        of interest to the general public are encouraged to be registered in the
+                        CycloneDX Property Taxonomy - https://github.com/CycloneDX/cyclonedx-property-taxonomy.
+                        Formal registration is OPTIONAL.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="bom-ref" type="bom:refType">
+            <xs:annotation>
+                <xs:documentation>
+                    An optional identifier which can be used to reference the formula elsewhere in the BOM.
+                    Uniqueness is enforced within all elements and children of the root-level bom element.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:anyAttribute namespace="##any" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:complexType name="workflowsType">
+        <xs:sequence>
+            <xs:element name="workflow" type="bom:workflowType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##any" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:complexType name="workflowType">
+        <xs:sequence>
+            <xs:element name="uid" type="xs:string" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The unique identifier for the resource instance within its deployment context.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The name of the resource instance.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The description of the resource instance.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="resourceReferences" type="bom:resourceReferencesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>References to component or service resources that are used to realize
+                        the resource instance.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="tasks" type="bom:tasksType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The tasks that comprise the workflow.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="taskDependencies" type="bom:dependenciesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The graph of dependencies between tasks within the workflow.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="taskTypes" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Indicates the types of activities performed by the set of workflow tasks.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="taskType" type="bom:taskTypeEnum" minOccurs="0" maxOccurs="unbounded" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="trigger" type="bom:triggerType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The trigger that initiated the task.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="steps" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The sequence of steps for the task.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="step" type="bom:stepType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="inputs" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Represents resources and data brought into a task at runtime by executor
+                        or task commands</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="input" type="bom:inputType" minOccurs="0" maxOccurs="unbounded" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="outputs" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Represents resources and data output from a task at runtime by executor
+                        or task commands</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="output" type="bom:outputType" minOccurs="0" maxOccurs="unbounded" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="timeStart" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The date and time (timestamp) when the task started.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="timeEnd" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The date and time (timestamp) when the task ended.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="workspaces" type="bom:workspacesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>A set of named filesystem or data resource shareable by workflow tasks.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="runtimeTopology" type="bom:dependenciesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>A graph of the component runtime topology for workflow's instance.
+                        A description of the runtime component and service topology.  This can describe a partial or
+                        complete topology used to host and execute the task (e.g., hardware, operating systems,
+                        configurations, etc.)</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Provides the ability to document properties in a name/value store.
+                        This provides flexibility to include data not officially supported in the standard
+                        without having to use additional namespaces or create extensions. Property names
+                        of interest to the general public are encouraged to be registered in the
+                        CycloneDX Property Taxonomy - https://github.com/CycloneDX/cyclonedx-property-taxonomy.
+                        Formal registration is OPTIONAL.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:attribute name="bom-ref" type="bom:refType" use="required">
+            <xs:annotation>
+                <xs:documentation>
+                    An optional identifier which can be used to reference the workflow elsewhere in the BOM.
+                    Uniqueness is enforced within all elements and children of the root-level bom element.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:anyAttribute namespace="##any" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:complexType name="resourceReferencesType">
+        <xs:sequence>
+            <xs:element name="resourceReference" type="bom:resourceReferenceType" minOccurs="0" maxOccurs="unbounded" />
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##any" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:complexType name="resourceReferenceType">
+        <xs:sequence>
+            <xs:choice>
+                <xs:element name="ref" type="bom:refType" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>
+                            References an object by its bom-ref attribute
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="externalReference" type="bom:externalReference" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Reference to an externally accessible resource.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:choice>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##any" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:complexType name="tasksType">
+        <xs:sequence>
+            <xs:element name="task" type="bom:taskType" minOccurs="0" maxOccurs="unbounded" />
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##any" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:complexType name="taskType">
+        <xs:sequence>
+            <xs:element name="uid" type="xs:string" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The unique identifier for the resource instance within its deployment context.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The name of the resource instance.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The description of the resource instance.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="resourceReferences" type="bom:resourceReferencesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        References to component or service resources that are used to realize the resource instance.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="taskTypes" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Indicates the types of activities performed by the set of workflow tasks.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="taskType" type="bom:taskTypeEnum" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="trigger" type="bom:triggerType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The trigger that initiated the task.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="steps" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The sequence of steps for the task.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="step" type="bom:stepType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="inputs" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Represents resources and data brought into a task at runtime by executor or task commands.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="input" type="bom:inputType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="outputs" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Represents resources and data output from a task at runtime by executor or task commands
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="output" type="bom:outputType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="timeStart" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The date and time (timestamp) when the task started.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="timeEnd" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The date and time (timestamp) when the task ended.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="workspaces" type="bom:workspacesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        A set of named filesystem or data resource shareable by workflow tasks.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="runtimeTopology" type="bom:dependenciesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        A graph of the component runtime topology for task's instance.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Provides the ability to document properties in a name/value store.
+                        This provides flexibility to include data not officially supported in the standard
+                        without having to use additional namespaces or create extensions. Property names
+                        of interest to the general public are encouraged to be registered in the
+                        CycloneDX Property Taxonomy - https://github.com/CycloneDX/cyclonedx-property-taxonomy.
+                        Formal registration is OPTIONAL.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:attribute name="bom-ref" type="bom:refType" use="required">
+            <xs:annotation>
+                <xs:documentation>
+                    An optional identifier which can be used to reference the task elsewhere in the BOM.
+                    Uniqueness is enforced within all elements and children of the root-level bom element.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:anyAttribute namespace="##any" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:simpleType name="taskTypeEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="copy"/>
+            <xs:enumeration value="clone"/>
+            <xs:enumeration value="lint"/>
+            <xs:enumeration value="scan"/>
+            <xs:enumeration value="merge"/>
+            <xs:enumeration value="build"/>
+            <xs:enumeration value="test"/>
+            <xs:enumeration value="deliver"/>
+            <xs:enumeration value="deploy"/>
+            <xs:enumeration value="release"/>
+            <xs:enumeration value="clean"/>
+            <xs:enumeration value="other"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="workspacesType">
+        <xs:sequence>
+            <xs:element name="workspace" type="bom:workspaceType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##any" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:complexType name="workspaceType">
+        <xs:annotation>
+            <xs:documentation>
+                A named filesystem or data resource shareable by workflow tasks.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="uid" type="xs:string" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The unique identifier for the resource instance within its deployment context.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The name of the resource instance.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="aliases" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The names for the workspace as referenced by other workflow tasks. Effectively, a name mapping
+                        so other tasks can use their own local name in their steps.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="alias" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The description of the resource instance.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="resourceReferences" type="bom:resourceReferencesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        References to component or service resources that are used to realize the resource instance.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="accessMode" type="bom:accessModeEnum" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Describes the read-write access control for the workspace relative to the owning resource instance.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="mountPath" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        A path to a location on disk where the workspace will be available to the associated task's steps.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="managedDataType" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The name of a domain-specific data type the workspace represents. This property is for CI/CD
+                        frameworks that are able to provide access to structured, managed data at a more granular level
+                        than a filesystem.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="volumeRequest" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Identifies the reference to the request for a specific volume type and parameters.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="volume" type="bom:volumeType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Information about the actual volume instance allocated to the workspace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Provides the ability to document properties in a name/value store.
+                        This provides flexibility to include data not officially supported in the standard
+                        without having to use additional namespaces or create extensions. Property names
+                        of interest to the general public are encouraged to be registered in the
+                        CycloneDX Property Taxonomy - https://github.com/CycloneDX/cyclonedx-property-taxonomy.
+                        Formal registration is OPTIONAL.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:attribute name="bom-ref" type="bom:refType" use="required">
+            <xs:annotation>
+                <xs:documentation>
+                    An optional identifier which can be used to reference the workflow elsewhere in the BOM.
+                    Uniqueness is enforced within all elements and children of the root-level bom element.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:anyAttribute namespace="##any" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:simpleType name="accessModeEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="read-only"/>
+            <xs:enumeration value="read-write"/>
+            <xs:enumeration value="read-write-once"/>
+            <xs:enumeration value="write-once"/>
+            <xs:enumeration value="write-only"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="volumeType">
+        <xs:annotation>
+            <xs:documentation>
+                An identifiable, logical unit of data storage tied to a physical device.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="uid" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The unique identifier for the volume instance within its deployment context.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The name of the volume instance
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="mode" type="bom:volumeModeEnum" minOccurs="0" maxOccurs="1" default="filesystem">
+                <xs:annotation>
+                    <xs:documentation>
+                        The mode for the volume instance.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="path" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The underlying path created from the actual volume.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="sizeAllocated" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The allocated size of the volume accessible to the associated workspace. This should include
+                        the scalar size as well as IEC standard unit in either decimal or binary form.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="persistent" type="xs:boolean" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Indicates if the volume persists beyond the life of the resource it is associated with.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="remote" type="xs:boolean" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Indicates if the volume is remotely (i.e., network) attached.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Provides the ability to document properties in a name/value store.
+                        This provides flexibility to include data not officially supported in the standard
+                        without having to use additional namespaces or create extensions. Property names
+                        of interest to the general public are encouraged to be registered in the
+                        CycloneDX Property Taxonomy - https://github.com/CycloneDX/cyclonedx-property-taxonomy.
+                        Formal registration is OPTIONAL.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="volumeModeEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="filesystem"/>
+            <xs:enumeration value="block"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="stepType">
+        <xs:annotation>
+            <xs:documentation>
+                Executes specific commands or tools in order to accomplish its owning task as part of a sequence.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        A name for the step.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        A description of the step.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="commands" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Ordered list of commands or directives for the step
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="command" minOccurs="0" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="executed" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                A text representation of the executed command.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>Provides the ability to document properties in a name/value store.
+                                                This provides flexibility to include data not officially supported in the standard
+                                                without having to use additional namespaces or create extensions. Property names
+                                                of interest to the general public are encouraged to be registered in the
+                                                CycloneDX Property Taxonomy - https://github.com/CycloneDX/cyclonedx-property-taxonomy.
+                                                Formal registration is OPTIONAL.</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Provides the ability to document properties in a name/value store.
+                        This provides flexibility to include data not officially supported in the standard
+                        without having to use additional namespaces or create extensions. Property names
+                        of interest to the general public are encouraged to be registered in the
+                        CycloneDX Property Taxonomy - https://github.com/CycloneDX/cyclonedx-property-taxonomy.
+                        Formal registration is OPTIONAL.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##any" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:complexType name="triggerType">
+        <xs:sequence>
+            <xs:element name="uid" type="xs:string" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The unique identifier for the resource instance within its deployment context.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The name of the resource instance.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The description of the resource instance.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="resourceReferences" type="bom:resourceReferencesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        References to component or service resources that are used to realize the resource instance.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="type" type="bom:triggerTypeType" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The source type of event which caused the trigger to fire.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="event" type="bom:eventType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The event data that caused the associated trigger to activate.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="conditions" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="condition" minOccurs="0" maxOccurs="unbounded">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    A condition that was used to determine a trigger should be activated.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Describes the set of conditions which cause the trigger to activate.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="expression" type="xs:string" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The logical expression that was evaluated that determined the trigger should be fired.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>Provides the ability to document properties in a name/value store.
+                                                This provides flexibility to include data not officially supported in the standard
+                                                without having to use additional namespaces or create extensions. Property names
+                                                of interest to the general public are encouraged to be registered in the
+                                                CycloneDX Property Taxonomy - https://github.com/CycloneDX/cyclonedx-property-taxonomy.
+                                                Formal registration is OPTIONAL.</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="timeActivated" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The date and time (timestamp) when the trigger was activated.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="inputs" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Represents resources and data brought into a task at runtime by executor or task commands
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="input" type="bom:inputType" minOccurs="0" maxOccurs="unbounded" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="outputs" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Represents resources and data output from a task at runtime by executor or task commands
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="output" type="bom:outputType" minOccurs="0" maxOccurs="unbounded" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Provides the ability to document properties in a name/value store.
+                        This provides flexibility to include data not officially supported in the standard
+                        without having to use additional namespaces or create extensions. Property names
+                        of interest to the general public are encouraged to be registered in the
+                        CycloneDX Property Taxonomy - https://github.com/CycloneDX/cyclonedx-property-taxonomy.
+                        Formal registration is OPTIONAL.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:attribute name="bom-ref" type="bom:refType" use="required">
+            <xs:annotation>
+                <xs:documentation>
+                    An optional identifier which can be used to reference the trigger elsewhere in the BOM.
+                    Uniqueness is enforced within all elements and children of the root-level bom element.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:anyAttribute namespace="##any" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:simpleType name="triggerTypeType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="manual"/>
+            <xs:enumeration value="api"/>
+            <xs:enumeration value="webhook"/>
+            <xs:enumeration value="scheduled"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="eventType">
+        <xs:sequence>
+            <xs:element name="uid" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The unique identifier of the event.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        A description of the event.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="timeReceived" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The date and time (timestamp) when the event was received.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="data" type="bom:attachedTextType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Encoding of the raw event data.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="source" type="bom:resourceReferenceType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        References the component or service that was the source of the event
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="target" type="bom:resourceReferenceType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        References the component or service that was the target of the event
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Provides the ability to document properties in a name/value store.
+                        This provides flexibility to include data not officially supported in the standard
+                        without having to use additional namespaces or create extensions. Property names
+                        of interest to the general public are encouraged to be registered in the
+                        CycloneDX Property Taxonomy - https://github.com/CycloneDX/cyclonedx-property-taxonomy.
+                        Formal registration is OPTIONAL.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##any" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:complexType name="inputType">
+        <xs:annotation>
+            <xs:documentation>
+                Type that represents various input data types and formats.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:choice>
+                <xs:element name="resource" type="bom:resourceReferenceType" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>
+                            A reference to an independent resource provided as an input to a task by the workflow runtime.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="parameters" type="bom:parametersType" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Inputs that have the form of parameters with names and values.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="environmentVars" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Inputs that have the form of parameters with names and values.
+                        </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                            <!-- maxOccurs="unbounded" NEEDS to be set on the sequence, not the individual elements -->
+                            <xs:choice>
+                                <xs:element name="environmentVar" type="bom:propertyType" minOccurs="0" maxOccurs="1"/>
+                                <xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                            </xs:choice>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="data" type="bom:attachedTextType" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Inputs that have the form of data.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:choice>
+            <xs:element name="source" type="bom:resourceReferenceType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        A references to the component or service that provided the input to the task
+                        (e.g., reference to a service with data flow value of inbound)
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="target" type="bom:resourceReferenceType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        A reference to the component or service that received or stored the input if not the task
+                        itself (e.g., a local, named storage workspace)
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Provides the ability to document properties in a name/value store.
+                        This provides flexibility to include data not officially supported in the standard
+                        without having to use additional namespaces or create extensions. Property names
+                        of interest to the general public are encouraged to be registered in the
+                        CycloneDX Property Taxonomy - https://github.com/CycloneDX/cyclonedx-property-taxonomy.
+                        Formal registration is OPTIONAL.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:attribute name="bom-ref" type="bom:refType">
+            <xs:annotation>
+                <xs:documentation>
+                    An optional identifier which can be used to reference the trigger elsewhere in the BOM.
+                    Uniqueness is enforced within all elements and children of the root-level bom element.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:anyAttribute namespace="##any" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:complexType name="outputType">
+        <xs:annotation>
+            <xs:documentation>
+                Represents resources and data output from a task at runtime by executor or task commands
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:choice>
+                <xs:element name="resource" type="bom:resourceReferenceType" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>
+                            A reference to an independent resource generated as output by the task.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="environmentVars" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Outputs that have the form of environment variables.
+                        </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                            <!-- maxOccurs="unbounded" NEEDS to be set on the sequence, not the individual elements -->
+                            <xs:choice>
+                                <xs:element name="environmentVar" type="bom:propertyType" minOccurs="0" maxOccurs="1"/>
+                                <xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                            </xs:choice>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="data" type="bom:attachedTextType" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Outputs that have the form of data.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:choice>
+            <xs:element name="type" type="bom:outputTypeEnum" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Describes the type of data output.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="source" type="bom:resourceReferenceType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Component or service that generated or provided the output from the task (e.g., a build tool)
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="target" type="bom:resourceReferenceType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Component or service that received the output from the task
+                        (e.g., reference to an artifactory service with data flow value of outbound)
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Provides the ability to document properties in a name/value store.
+                        This provides flexibility to include data not officially supported in the standard
+                        without having to use additional namespaces or create extensions. Property names
+                        of interest to the general public are encouraged to be registered in the
+                        CycloneDX Property Taxonomy - https://github.com/CycloneDX/cyclonedx-property-taxonomy.
+                        Formal registration is OPTIONAL.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##any" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:simpleType name="outputTypeEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="artifact"/>
+            <xs:enumeration value="attestation"/>
+            <xs:enumeration value="log"/>
+            <xs:enumeration value="evidence"/>
+            <xs:enumeration value="metrics"/>
+            <xs:enumeration value="other"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="parametersType">
+        <xs:sequence>
+            <xs:element name="parameter" type="bom:parameterType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="parameterType">
+        <xs:annotation>
+            <xs:documentation>
+                A representation of a functional parameter.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The name of the parameter.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The value of the parameter.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="dataType" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The data type of the parameter.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##any" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
 
     <xs:element name="bom">
         <xs:complexType>
@@ -3887,6 +5242,14 @@ limitations under the License.
                             inventory information, annotations may contain opinion or commentary from various
                             stakeholders. Annotations may be inline (with inventory) or externalized via BOM-Link,
                             and may optionally be signed.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="formulation" type="bom:formulationType" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>Describes how a component or service was manufactured or deployed. This is
+                            achieved through the use of formulas, workflows, tasks, and steps, which declare the precise
+                            steps to reproduce along with the observed formulas describing the steps which transpired
+                            in the manufacturing process.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
                 <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
