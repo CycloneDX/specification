@@ -29,7 +29,7 @@ message Bom {
   repeated ExternalReference external_references = 7;
   // Provides the ability to document dependency relationships.
   repeated Dependency dependencies = 8;
-  // Provides the ability to document aggregate completeness
+  // Compositions describe constituent parts (including components, services, and dependency relationships) and their completeness. The completeness of vulnerabilities expressed in a BOM may also be described.
   repeated Composition compositions = 9;
   // Vulnerabilities identified in components or services.
   repeated Vulnerability vulnerabilities = 10;
@@ -557,18 +557,26 @@ message Property {
 }
 
 enum Aggregate {
-  // Default, no statement about the aggregate completeness is being made
+  // The relationship completeness is not specified.
   AGGREGATE_NOT_SPECIFIED = 0;
-  // The aggregate composition is complete
+  // The relationship is complete. No further relationships including constituent components, services, or dependencies are known to exist.
   AGGREGATE_COMPLETE = 1;
-  // The aggregate composition is incomplete
+  // The relationship is incomplete. Additional relationships exist and may include constituent components, services, or dependencies.
   AGGREGATE_INCOMPLETE = 2;
-  // The aggregate composition is incomplete for first party components, complete for third party components
+  // The relationship is incomplete. Only relationships for first-party components, services, or their dependencies are represented.
   AGGREGATE_INCOMPLETE_FIRST_PARTY_ONLY = 3;
-  // The aggregate composition is incomplete for third party components, complete for first party components
+  // The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented.
   AGGREGATE_INCOMPLETE_THIRD_PARTY_ONLY = 4;
-  // The aggregate composition completeness is unknown
+  // The relationship may be complete or incomplete. This usually signifies a 'best-effort' to obtain constituent components, services, or dependencies but the completeness is inconclusive.
   AGGREGATE_UNKNOWN = 5;
+  // The relationship is incomplete. Only relationships for first-party components, services, or their dependencies are represented, limited specifically to those that are proprietary.
+  AGGREGATE_INCOMPLETE_FIRST_PARTY_PROPRIETARY_ONLY = 6;
+  // The relationship is incomplete. Only relationships for first-party components, services, or their dependencies are represented, limited specifically to those that are opensource.
+  AGGREGATE_INCOMPLETE_FIRST_PARTY_OPENSOURCE_ONLY = 7;
+  // The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented, limited specifically to those that are proprietary.
+  AGGREGATE_INCOMPLETE_THIRD_PARTY_PROPRIETARY_ONLY = 8;
+  // The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented, limited specifically to those that are opensource.
+  AGGREGATE_INCOMPLETE_THIRD_PARTY_OPENSOURCE_ONLY = 9;
 }
 
 message Composition {
@@ -578,6 +586,10 @@ message Composition {
   repeated string assemblies = 2;
   // The dependencies the aggregate completeness applies to
   repeated string dependencies = 3;
+  // The bom-ref identifiers of the vulnerabilities being described.
+  repeated string vulnerabilities = 4;
+  // An optional identifier which can be used to reference the composition elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.
+  optional string bom_ref = 5;
 }
 
 message EvidenceCopyright {

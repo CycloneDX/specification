@@ -87,7 +87,7 @@
       "items": {"$ref": "#/definitions/compositions"},
       "uniqueItems": true,
       "title": "Compositions",
-      "description": "Compositions describe constituent parts (including components, services, and dependency relationships) and their completeness."
+      "description": "Compositions describe constituent parts (including components, services, and dependency relationships) and their completeness. The completeness of vulnerabilities expressed in a BOM may also be described."
     },
     "vulnerabilities": {
       "type": "array",
@@ -1524,10 +1524,15 @@
       ],
       "additionalProperties": false,
       "properties": {
+        "bom-ref": {
+          "$ref": "#/definitions/refType",
+          "title": "BOM Reference",
+          "description": "An optional identifier which can be used to reference the composition elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+        },
         "aggregate": {
           "$ref": "#/definitions/aggregateType",
           "title": "Aggregate",
-          "description": "Specifies an aggregate type that describe how complete a relationship is."
+          "description": "Specifies an aggregate type that describe how complete a relationship is.\n\n* __complete__ = The relationship is complete. No further relationships including constituent components, services, or dependencies are known to exist.\n* __incomplete__ = The relationship is incomplete. Additional relationships exist and may include constituent components, services, or dependencies.\n* __incomplete&#95;first&#95;party&#95;only__ = The relationship is incomplete. Only relationships for first-party components, services, or their dependencies are represented.\n* __incomplete&#95;first&#95;party&#95;proprietary&#95;only__ = The relationship is incomplete. Only relationships for first-party components, services, or their dependencies are represented, limited specifically to those that are proprietary.\n* __incomplete&#95;first&#95;party&#95;opensource&#95;only__ = The relationship is incomplete. Only relationships for first-party components, services, or their dependencies are represented, limited specifically to those that are opensource.\n* __incomplete&#95;third&#95;party&#95;only__ = The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented.\n* __incomplete&#95;third&#95;party&#95;proprietary&#95;only__ = The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented, limited specifically to those that are proprietary.\n* __incomplete&#95;third&#95;party&#95;opensource&#95;only__ = The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented, limited specifically to those that are opensource.\n* __unknown__ = The relationship may be complete or incomplete. This usually signifies a 'best-effort' to obtain constituent components, services, or dependencies but the completeness is inconclusive.\n* __not&#95;specified__ = The relationship completeness is not specified.\n"
         },
         "assemblies": {
           "type": "array",
@@ -1547,6 +1552,15 @@
           "title": "BOM references",
           "description": "The bom-ref identifiers of the components or services being described. Dependencies refer to a relationship whereby an independent constituent part requires another independent constituent part. References do not cascade to transitive dependencies. References are explicit for the specified dependency only."
         },
+        "vulnerabilities": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "title": "BOM references",
+          "description": "The bom-ref identifiers of the vulnerabilities being described."
+        },
         "signature": {
           "$ref": "#/definitions/signature",
           "title": "Signature",
@@ -1561,7 +1575,11 @@
         "complete",
         "incomplete",
         "incomplete_first_party_only",
+        "incomplete_first_party_proprietary_only",
+        "incomplete_first_party_opensource_only",
         "incomplete_third_party_only",
+        "incomplete_third_party_proprietary_only",
+        "incomplete_third_party_opensource_only",
         "unknown",
         "not_specified"
       ]
