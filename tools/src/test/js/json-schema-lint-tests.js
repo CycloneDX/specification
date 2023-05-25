@@ -26,7 +26,10 @@ function getAjv() {
     const ajv = new Ajv({
         // no defaults => no data alteration
         useDefaults: false,
+        // main idea is to be as strict as possible
         strict: true,
+        // this parser has issues with the oneOf-required in `{oneOf:[{reqiored:['a']},{required:['b']}], properties:{a:{},b:{}}}`
+        strictRequired: false,
         strictSchema: true,
         addUsedSchema: false,
         schemas: {
