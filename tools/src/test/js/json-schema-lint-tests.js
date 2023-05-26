@@ -72,10 +72,19 @@ for (const bomSchemaFile of bomSchemas) {
         console.log('> Skipped.')
         continue
     }
-    const strict = [Number(v[1]), Number(v[2])] >= [1, 5]
+
+    const cdxVersion = [Number(v[1]), Number(v[2])]
+    const strict = cdxVersion >= [1, 5]
         ? true
         : 'log'
     console.debug('> strict:', strict)
+    const ajv = getAjv(strict)
+
+    if (cdxVersion[0] === 1 &&  cdxVersion[1] === 2) {
+        // CycloneDX 1.2 had a wrong undefined format `string`.
+        // Let's ignore this format only for this special version.
+        ajv.addFormat('string', true)
+    }
 
     let bomSchema
     try {
@@ -87,7 +96,7 @@ for (const bomSchemaFile of bomSchemas) {
     }
 
     try {
-        getAjv(strict).compile(bomSchema)
+        ajv.compile(bomSchema)
     } catch (err) {
         ++errCnt
         console.error(`!!! SCHEMA ERROR: ${err}`)
