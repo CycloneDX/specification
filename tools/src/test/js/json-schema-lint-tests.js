@@ -77,7 +77,7 @@ for (const bomSchemaFile of bomSchemas) {
     const strict = cdxVersion >= [1, 5]
         ? true
         : 'log'
-    console.debug('> strict:', strict)
+    console.debug('> strict: ', strict)
     const ajv = getAjv(strict)
 
     if (cdxVersion[0] === 1 &&  cdxVersion[1] === 2) {
@@ -95,15 +95,17 @@ for (const bomSchemaFile of bomSchemas) {
         continue
     }
 
+    console.group(`> compile schema, log warnings ...`)
     try {
         ajv.compile(bomSchema)
     } catch (err) {
         ++errCnt
+        console.groupEnd()
         console.error(`!!! SCHEMA ERROR: ${err}`)
         continue
     }
-
-    console.log('> OK.')
+    console.groupEnd()
+    console.log('> SCHEMA OK.')
 }
 
 // Exit statuses should be in the range 0 to 254.
