@@ -25,19 +25,23 @@ const [spdxSchema, jsfSchema, bomSchemas] = await Promise.all([
 assert.notStrictEqual(bomSchemas.length, 0)
 
 /**
+ * @param {boolean|"log"} strict
  * @return {Ajv}
  */
-function getAjv() {
+function getAjv(strict) {
+    // see https://ajv.js.org/options.html
     const ajv = new Ajv({
-        // no defaults => no data alteration
-        useDefaults: false,
-        // main idea is to be as strict as possible
-        strict: true,
+        strict: strict,
+        strictSchema: strict,
+        strictNumbers: strict,
+        strictTypes: strict,
+        strictTuples: strict,
         // this parser has issues with the oneOf-required in
         // `{ type: 'object', oneOf:[{required:['a']},{required:['b']}], properties:{a:{...},b:{...}} }`
         // so lets simply log them, do not throw errors on them.
-        strictRequired: 'log',
-        strictSchema: true,
+        strictRequired: false,
+        validateFormats: true,
+        allowMatchingProperties: true,
         addUsedSchema: false,
         schemas: {
             'http://cyclonedx.org/schema/spdx.schema.json': spdxSchema,
@@ -55,37 +59,36 @@ function getAjv() {
 let errCnt = 0
 
 for (const bomSchemaFile of bomSchemas) {
-    console.log('\nSchemaFile: ', bomSchemaFile);
+    console.log('\n> SchemaFile: ', bomSchemaFile);
     const v = /^bom-(\d)\.(\d)/.exec(basename(bomSchemaFile)) ?? []
     if (!v[0]) {
         // test match failed
-        console.log('Skipped.')
+        console.log('> Skipped.')
         continue
     }
-    if (([Number(v[1]), Number(v[2])] < [1, 5])) {
-        // versions < 1.5 are not expected to pass these tests
-        console.log('Skipped.')
-        continue
-    }
+    const strict = [Number(v[1]), Number(v[2])] >= [1, 5]
+        ? true
+        : 'log'
+    console.debug('> strict:', strict)
 
     let bomSchema
     try {
         bomSchema = await readFile(bomSchemaFile, 'utf-8').then(JSON.parse)
     } catch (err) {
         ++errCnt
-        console.error('JSON DECODE ERROR:', err)
+        console.error('!!! JSON DECODE ERROR:', err)
         continue
     }
 
     try {
-        getAjv().compile(bomSchema)
+        getAjv(strict).compile(bomSchema)
     } catch (err) {
         ++errCnt
-        console.error(`SCHEMA ERROR: ${err}`)
+        console.error(`!!! SCHEMA ERROR: ${err}`)
         continue
     }
 
-    console.log('OK.')
+    console.log('> OK.')
 }
 
 // Exit statuses should be in the range 0 to 254.
