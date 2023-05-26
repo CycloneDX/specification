@@ -36,9 +36,15 @@ function getAjv(strict) {
         strictNumbers: strict,
         strictTypes: strict,
         strictTuples: strict,
-        // this parser has issues with the oneOf-required in
-        // `{ type: 'object', oneOf:[{required:['a']},{required:['b']}], properties:{a:{...},b:{...}} }`
-        // so lets simply log them, do not throw errors on them.
+        /* This parser has issues with the oneOf-required in
+         * `{ type: 'object', oneOf:[{required:['a']},{required:['b']}], properties:{a:{...},b:{...}} }`
+         * So  `strictRequired` must be `false` tor our schema files.
+         *
+         * This is a known and expected behaviour.
+         * see https://ajv.js.org/strict-mode.html#defined-required-properties
+         * > Property defined in parent schema
+         * > There are cases when property defined in the parent schema will not be taken into account.
+         */
         strictRequired: false,
         validateFormats: true,
         allowMatchingProperties: true,
