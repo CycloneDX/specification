@@ -231,9 +231,8 @@
           "$ref": "#/definitions/organizationalEntity"
         },
         "licenses": {
-          "type": "array",
           "title": "BOM License(s)",
-          "items": {"$ref": "#/definitions/licenseChoice"}
+          "$ref": "#/definitions/licenseChoice"
         },
         "properties": {
           "type": "array",
@@ -435,8 +434,7 @@
           "items": {"$ref": "#/definitions/hash"}
         },
         "licenses": {
-          "type": "array",
-          "items": {"$ref": "#/definitions/licenseChoice"},
+          "$ref": "#/definitions/licenseChoice",
           "title": "Component License(s)"
         },
         "copyright": {
@@ -866,28 +864,41 @@
       }
     },
     "licenseChoice": {
-      "type": "object",
-      "title": "License(s)",
-      "additionalProperties": false,
-      "properties": {
-        "license": {
-          "$ref": "#/definitions/license"
-        },
-        "expression": {
-          "type": "string",
-          "title": "SPDX License Expression",
-          "examples": [
-            "Apache-2.0 AND (MIT OR GPL-2.0-only)",
-            "GPL-3.0-only WITH Classpath-exception-2.0"
-          ]
-        }
-      },
-      "oneOf":[
+      "type": "array",
+      "title": "License Choice",
+      "description": "EITHER (a list of SPDX and/or named licenses) OR (a list of one SPDX License Expression)",
+      "oneOf": [
         {
-          "required": ["license"]
+          "description": "a list of SPDX and/or named licenses",
+          "items": {
+            "type": "object",
+            "required": ["license"],
+            "additionalProperties": false,
+            "properties": {
+              "license": {"$ref": "#/definitions/license"}
+            }
+          }
         },
         {
-          "required": ["expression"]
+          "description": "a list of one SPDX License Expression",
+          "additionalItems": false,
+          "minItems": 1,
+          "maxItems": 1,
+          "items": [{
+            "type": "object",
+            "required": ["expression"],
+            "additionalProperties": false,
+            "properties": {
+              "expression": {
+                "type": "string",
+                "title": "SPDX License Expression",
+                "examples": [
+                  "Apache-2.0 AND (MIT OR GPL-2.0-only)",
+                  "GPL-3.0-only WITH Classpath-exception-2.0"
+                ]
+              }
+            }
+          }]
         }
       ]
     },
@@ -1235,8 +1246,7 @@
           "description": "Specifies information about the data including the directional flow of data and the data classification."
         },
         "licenses": {
-          "type": "array",
-          "items": {"$ref": "#/definitions/licenseChoice"},
+          "$ref": "#/definitions/licenseChoice",
           "title": "Component License(s)"
         },
         "externalReferences": {
@@ -1512,8 +1522,7 @@
           }
         },
         "licenses": {
-          "type": "array",
-          "items": {"$ref": "#/definitions/licenseChoice"},
+          "$ref": "#/definitions/licenseChoice",
           "title": "Component License(s)"
         },
         "copyright": {
