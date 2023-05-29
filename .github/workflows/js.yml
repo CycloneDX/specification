@@ -1,0 +1,32 @@
+# docs: https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions
+
+name: JS CI
+
+on: [push, pull_request, workflow_dispatch]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+
+defaults:
+  run:
+    working-directory: tools/src/test/js
+
+jobs:
+  test:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        # see https://github.com/actions/checkout
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        # see https://github.com/actions/setup-node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+      - name: Install Depenencies
+        run: npm install
+      - name: Run test 
+        run: npm test
