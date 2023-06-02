@@ -147,6 +147,8 @@ message DataFlow {
   repeated string source = 5;
   // The URI, URL, or BOM-Link of the components or services the data is sent to
   repeated string destination = 6;
+  // Data Governance
+  optional DataGovernance governance = 7;
 }
 
 // Specifies the flow direction of the data. Valid values are: inbound, outbound, bi-directional, and unknown. Direction is relative to the service. Inbound flow states that data enters the service. Outbound flow states that data leaves the service. Bi-directional states that data flows both ways, and unknown states that the direction is not known.
@@ -1109,20 +1111,20 @@ message ComponentData {
     // Provides the ability to document name-value parameters used for configuration.
     repeated Property properties = 3;
   }
+}
 
-  message DataGovernance {
-    // Data custodians are responsible for the safe custody, transport, and storage of data.
-    repeated DataGovernanceResponsibleParty custodians = 1;
-    // Data stewards are responsible for data content, context, and associated business rules.
-    repeated DataGovernanceResponsibleParty stewards = 2;
-    // Data owners are concerned with risk and appropriate access to data.
-    repeated DataGovernanceResponsibleParty owners = 3;
+message DataGovernance {
+  // Data custodians are responsible for the safe custody, transport, and storage of data.
+  repeated DataGovernanceResponsibleParty custodians = 1;
+  // Data stewards are responsible for data content, context, and associated business rules.
+  repeated DataGovernanceResponsibleParty stewards = 2;
+  // Data owners are concerned with risk and appropriate access to data.
+  repeated DataGovernanceResponsibleParty owners = 3;
 
-    message DataGovernanceResponsibleParty {
-      oneof choice {
-        OrganizationalEntity organization = 1;
-        OrganizationalContact contact = 2;
-      }
+  message DataGovernanceResponsibleParty {
+    oneof choice {
+      OrganizationalEntity organization = 1;
+      OrganizationalContact contact = 2;
     }
   }
 }
