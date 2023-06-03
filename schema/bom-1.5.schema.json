@@ -117,6 +117,26 @@
       "$comment": "Identifier-DataType for interlinked elements.",
       "type": "string"
     },
+    "bomLinkDocumentType": {
+      "title": "BOM-Link document",
+      "description": "Descriptor for another BOM document. See https://cyclonedx.org/capabilities/bomlink/",
+      "type": "string",
+      "pattern": "^urn:cdx:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/[1-9][0-9]*$",
+      "$comment": "part of the pattern is based on `bom.serialNumber`'s pattern"
+    },
+    "bomLinkElementType": {
+      "title": "BOM-Link element",
+      "description": "Descriptor for an element in another BOM document. See https://cyclonedx.org/capabilities/bomlink/",
+      "type": "string",
+      "pattern": "^urn:cdx:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/[1-9][0-9]*#.+$",
+      "$comment": "part of the pattern is based on `bom.serialNumber`'s pattern"
+    },
+    "bomLink": {
+      "anyOf": [
+        {"$ref": "#/definitions/bomLinkDocumentType"},
+        {"$ref": "#/definitions/bomLinkElementType"}
+      ]
+    },
     "metadata": {
       "type": "object",
       "title": "BOM Metadata Object",
