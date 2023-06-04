@@ -42,6 +42,34 @@ limitations under the License.
         <xs:restriction base="xs:string" />
     </xs:simpleType>
 
+    <xs:simpleType name="bomLinkDocumentType">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+                Descriptor for another BOM document.
+                See https://cyclonedx.org/capabilities/bomlink/
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <!-- part of the pattern is based on `bom.serialNumber`'s pattern -->
+            <xs:pattern value="urn:cdx:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})|(\{[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\})/[1-9][0-9]*"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="bomLinkElementType">
+        <xs:annotation>
+            <xs:documentation  xml:lang="en">
+                Descriptor for an element in another BOM document.
+                See https://cyclonedx.org/capabilities/bomlink/
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <!-- part of the pattern is based on `bom.serialNumber`'s pattern -->
+            <xs:pattern value="urn:cdx:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})|(\{[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\})/[1-9][0-9]*#.+"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="bomLinkType">
+        <xs:union memberTypes="bom:bomLinkDocumentType bom:bomLinkElementType"/>
+    </xs:simpleType>
+
     <xs:complexType name="metadata">
         <xs:sequence minOccurs="0" maxOccurs="1">
             <xs:element name="timestamp" type="xs:dateTime" minOccurs="0">
