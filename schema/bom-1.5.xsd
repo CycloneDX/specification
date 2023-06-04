@@ -37,9 +37,21 @@ limitations under the License.
 
     <xs:simpleType name="refType">
         <xs:annotation>
-            <xs:documentation>Identifier-DataType for interlinked elements.</xs:documentation>
+            <xs:documentation>Identifier-DataType for interlink-able elements.</xs:documentation>
         </xs:annotation>
-        <xs:restriction base="xs:string" />
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <!-- value SHOULD not start with the BOM-Link intro "urn:cdx:" -->
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="refLinkType">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+                Descriptor for an element identified by the attribute "bom-ref" in the same BOM document.
+                In contrast to `bomLinkElementType`.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="bom:refType"/>
     </xs:simpleType>
 
     <xs:simpleType name="bomLinkDocumentType">
@@ -1339,7 +1351,7 @@ limitations under the License.
 
     <xs:complexType name="externalReference">
         <xs:sequence>
-            <xs:element name="url" type="xs:anyURI" minOccurs="1" maxOccurs="1">
+            <xs:element name="url" minOccurs="1" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">The URI (URL or URN) to the external reference. External references
                         are URIs and therefore can accept any URL scheme including https, mailto, tel, and dns.
@@ -1348,6 +1360,9 @@ limitations under the License.
                         references into relationships that can be expressed in a BOM or across BOMs. Refer to:
                         https://cyclonedx.org/capabilities/bomlink/</xs:documentation>
                 </xs:annotation>
+                <xs:simpleType>
+                    <xs:union memberTypes="xs:anyURI bom:bomLinkType"/>
+                </xs:simpleType>
             </xs:element>
             <xs:element name="comment" type="xs:string" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
@@ -1728,7 +1743,7 @@ limitations under the License.
         <xs:sequence minOccurs="0" maxOccurs="unbounded">
             <xs:element name="dependency" type="bom:dependencyType"/>
         </xs:sequence>
-        <xs:attribute name="ref" type="bom:refType" use="required">
+        <xs:attribute name="ref" type="bom:refLinkType" use="required">
             <xs:annotation>
                 <xs:documentation>References a component or service by the its bom-ref attribute</xs:documentation>
             </xs:annotation>
@@ -1861,7 +1876,11 @@ limitations under the License.
                                         </xs:annotation>
                                         <xs:complexType>
                                             <xs:sequence minOccurs="0" maxOccurs="unbounded">
-                                                <xs:element name="url" type="xs:anyURI"/>
+                                                <xs:element name="url">
+                                                    <xs:simpleType>
+                                                        <xs:union memberTypes="xs:anyURI bom:bomLinkElementType"/>
+                                                    </xs:simpleType>
+                                                </xs:element>
                                             </xs:sequence>
                                         </xs:complexType>
                                     </xs:element>
@@ -1871,7 +1890,11 @@ limitations under the License.
                                         </xs:annotation>
                                         <xs:complexType>
                                             <xs:sequence minOccurs="0" maxOccurs="unbounded">
-                                                <xs:element name="url" type="xs:anyURI"/>
+                                                <xs:element name="url">
+                                                    <xs:simpleType>
+                                                        <xs:union memberTypes="xs:anyURI bom:bomLinkElementType"/>
+                                                    </xs:simpleType>
+                                                </xs:element>
                                             </xs:sequence>
                                         </xs:complexType>
                                     </xs:element>
@@ -2606,10 +2629,13 @@ limitations under the License.
                             </xs:annotation>
                             <xs:complexType>
                                 <xs:choice minOccurs="0" maxOccurs="unbounded">
-                                    <xs:element name="ref" type="bom:refType" minOccurs="0" maxOccurs="1">
+                                    <xs:element name="ref" minOccurs="0" maxOccurs="1">
                                         <xs:annotation>
                                             <xs:documentation>References a data component by the components bom-ref attribute</xs:documentation>
                                         </xs:annotation>
+                                        <xs:simpleType>
+                                            <xs:union memberTypes="bom:refLinkType bom:bomLinkElementType"/>
+                                        </xs:simpleType>
                                     </xs:element>
                                     <xs:element name="dataset" type="bom:componentDataType" minOccurs="0" maxOccurs="1" />
                                 </xs:choice>
@@ -3171,10 +3197,13 @@ limitations under the License.
     </xs:simpleType>
 
     <xs:complexType name="bomReferenceType">
-        <xs:attribute name="ref" type="bom:refType" use="required">
+        <xs:attribute name="ref" use="required">
             <xs:annotation>
                 <xs:documentation>References a component or service by the its bom-ref attribute</xs:documentation>
             </xs:annotation>
+            <xs:simpleType>
+                <xs:union memberTypes="bom:refLinkType bom:bomLinkType"/>
+            </xs:simpleType>
         </xs:attribute>
         <xs:anyAttribute namespace="##other" processContents="lax">
             <xs:annotation>
@@ -3528,10 +3557,13 @@ limitations under the License.
                         <xs:element name="target">
                             <xs:complexType>
                                 <xs:sequence minOccurs="0" maxOccurs="1">
-                                    <xs:element name="ref" type="bom:refType" minOccurs="1" maxOccurs="1">
+                                    <xs:element name="ref" minOccurs="1" maxOccurs="1">
                                         <xs:annotation>
                                             <xs:documentation>References a component or service by the objects bom-ref.</xs:documentation>
                                         </xs:annotation>
+                                        <xs:simpleType>
+                                            <xs:union memberTypes="bom:refLinkType bom:bomLinkElementType"/>
+                                        </xs:simpleType>
                                     </xs:element>
                                     <xs:element name="versions" minOccurs="0" maxOccurs="1">
                                         <xs:annotation>
