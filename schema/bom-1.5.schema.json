@@ -1117,10 +1117,17 @@
       "additionalProperties": false,
       "properties": {
         "url": {
-          "type": "string",
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "iri-reference"
+            },
+            {
+              "$ref": "#/definitions/bomLink"
+            }
+          ],
           "title": "URL",
-          "description": "The URI (URL or URN) to the external reference. External references are URIs and therefore can accept any URL scheme including https ([RFC-7230](https://www.ietf.org/rfc/rfc7230.txt)), mailto ([RFC-2368](https://www.ietf.org/rfc/rfc2368.txt)), tel ([RFC-3966](https://www.ietf.org/rfc/rfc3966.txt)), and dns ([RFC-4501](https://www.ietf.org/rfc/rfc4501.txt)). External references may also include formally registered URNs such as [CycloneDX BOM-Link](https://cyclonedx.org/capabilities/bomlink/) to reference CycloneDX BOMs or any object within a BOM. BOM-Link transforms applicable external references into relationships that can be expressed in a BOM or across BOMs.",
-          "format": "iri-reference"
+          "description": "The URI (URL or URN) to the external reference. External references are URIs and therefore can accept any URL scheme including https ([RFC-7230](https://www.ietf.org/rfc/rfc7230.txt)), mailto ([RFC-2368](https://www.ietf.org/rfc/rfc2368.txt)), tel ([RFC-3966](https://www.ietf.org/rfc/rfc3966.txt)), and dns ([RFC-4501](https://www.ietf.org/rfc/rfc4501.txt)). External references may also include formally registered URNs such as [CycloneDX BOM-Link](https://cyclonedx.org/capabilities/bomlink/) to reference CycloneDX BOMs or any object within a BOM. BOM-Link transforms applicable external references into relationships that can be expressed in a BOM or across BOMs."
         },
         "comment": {
           "type": "string",
@@ -1186,7 +1193,7 @@
       "additionalProperties": false,
       "properties": {
         "ref": {
-          "$ref": "#/definitions/refType",
+          "$ref": "#/definitions/refLinkType",
           "title": "Reference",
           "description": "References a component by the components bom-ref attribute"
         },
@@ -1194,7 +1201,7 @@
           "type": "array",
           "uniqueItems": true,
           "items": {
-            "$ref": "#/definitions/refType"
+            "$ref": "#/definitions/refLinkType"
           },
           "title": "Depends On",
           "description": "The bom-ref identifiers of the components that are dependencies of this dependency object."
@@ -1349,8 +1356,15 @@
         "source": {
           "type": "array",
           "items": {
-            "type": "string",
-            "format": "iri-reference"
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "iri-reference"
+              },
+              {
+                "$ref": "#/definitions/bomLinkElementType"
+              }
+            ]
           },
           "title": "Source",
           "description": "The URI, URL, or BOM-Link of the components or services the data came in from"
@@ -1358,8 +1372,15 @@
         "destination": {
           "type": "array",
           "items": {
-            "type": "string",
-            "format": "iri-reference"
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "iri-reference"
+              },
+              {
+                "$ref": "#/definitions/bomLinkElementType"
+              }
+            ]
           },
           "title": "Destination",
           "description": "The URI, URL, or BOM-Link of the components or services the data is sent to"
@@ -1467,7 +1488,10 @@
               "type": "array",
               "uniqueItems": true,
               "items": {
-                "$ref": "#/definitions/refType"
+                "anyOf": [
+                  {"$ref": "#/definitions/refLinkType"},
+                  {"$ref": "#/definitions/bomLinkElementType"}
+                ]
               },
               "title": "BOM References",
               "description": "The object in the BOM identified by its bom-ref. This is often a component or service, but may be any object type supporting bom-refs. Tools used for analysis should already be defined in the BOM, either in the metadata/tools, components, or formulation."
@@ -1587,7 +1611,10 @@
           "type": "array",
           "uniqueItems": true,
           "items": {
-            "$ref": "#/definitions/refType"
+            "anyOf": [
+              {"$ref": "#/definitions/refLinkType"},
+              {"$ref": "#/definitions/bomLinkElementType"}
+            ]
           },
           "title": "BOM references",
           "description": "The bom-ref identifiers of the components or services being described. Assemblies refer to nested relationships whereby a constituent part may include other constituent parts. References do not cascade to child parts. References are explicit for the specified constituent part only."
@@ -2167,7 +2194,10 @@
             "additionalProperties": false,
             "properties": {
               "ref": {
-                "$ref": "#/definitions/refType",
+                "anyOf": [
+                  {"$ref": "#/definitions/refLinkType"},
+                  {"$ref": "#/definitions/bomLinkElementType"}
+                ],
                 "title": "Reference",
                 "description": "References a component or service by the objects bom-ref"
               },
@@ -2260,7 +2290,10 @@
           "type": "array",
           "uniqueItems": true,
           "items": {
-            "$ref": "#/definitions/refType"
+            "anyOf": [
+              {"$ref": "#/definitions/refLinkType"},
+              {"$ref": "#/definitions/bomLinkElementType"}
+            ]
           },
           "title": "BOM References",
           "description": "The object in the BOM identified by its bom-ref. This is often a component or service, but may be any object type supporting bom-refs."
@@ -2398,7 +2431,10 @@
                     "additionalProperties": false,
                     "properties": {
                       "ref": {
-                        "$ref": "#/definitions/refType",
+                        "anyOf": [
+                          {"$ref": "#/definitions/refLinkType"},
+                          {"$ref": "#/definitions/bomLinkElementType"}
+                        ],
                         "title": "Reference",
                         "description": "References a data component by the components bom-ref attribute"
                       }
