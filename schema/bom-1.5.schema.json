@@ -114,13 +114,20 @@
   },
   "definitions": {
     "refType": {
-      "$comment": "Identifier-DataType for interlinked elements.",
-      "type": "string"
+      "description": "Identifier for referable and therefore interlink-able elements.",
+      "type": "string",
+      "minLength": 1,
+      "$comment": "value SHOULD not start with the BOM-Link intro 'urn:cdx:'"
+    },
+    "refLinkType": {
+      "description": "Descriptor for an element identified by the attribute 'bom-ref' in the same BOM document.\nIn contrast to `bomLinkElementType`.",
+      "allOf": [{"$ref": "#/definitions/refType"}]
     },
     "bomLinkDocumentType": {
       "title": "BOM-Link document",
       "description": "Descriptor for another BOM document. See https://cyclonedx.org/capabilities/bomlink/",
       "type": "string",
+      "format": "iri-reference",
       "pattern": "^urn:cdx:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/[1-9][0-9]*$",
       "$comment": "part of the pattern is based on `bom.serialNumber`'s pattern"
     },
@@ -128,6 +135,7 @@
       "title": "BOM-Link element",
       "description": "Descriptor for an element in another BOM document. See https://cyclonedx.org/capabilities/bomlink/",
       "type": "string",
+      "format": "iri-reference",
       "pattern": "^urn:cdx:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/[1-9][0-9]*#.+$",
       "$comment": "part of the pattern is based on `bom.serialNumber`'s pattern"
     },
