@@ -42,12 +42,82 @@ limitations under the License.
         <xs:restriction base="xs:string" />
     </xs:simpleType>
 
+    <xs:simpleType name="bomLinkDocumentType">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+                Descriptor for another BOM document.
+                See https://cyclonedx.org/capabilities/bomlink/
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <!-- part of the pattern is based on `bom.serialNumber`'s pattern -->
+            <xs:pattern value="urn:cdx:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})|(\{[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\})/[1-9][0-9]*"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="bomLinkElementType">
+        <xs:annotation>
+            <xs:documentation  xml:lang="en">
+                Descriptor for an element in another BOM document.
+                See https://cyclonedx.org/capabilities/bomlink/
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <!-- part of the pattern is based on `bom.serialNumber`'s pattern -->
+            <xs:pattern value="urn:cdx:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})|(\{[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\})/[1-9][0-9]*#.+"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="bomLinkType">
+        <xs:union memberTypes="bom:bomLinkDocumentType bom:bomLinkElementType"/>
+    </xs:simpleType>
+
     <xs:complexType name="metadata">
         <xs:sequence minOccurs="0" maxOccurs="1">
             <xs:element name="timestamp" type="xs:dateTime" minOccurs="0">
                 <xs:annotation>
                     <xs:documentation>The date and time (timestamp) when the BOM was created.</xs:documentation>
                 </xs:annotation>
+            </xs:element>
+            <xs:element name="lifecycles" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The product lifecycle(s) that this BOM represents.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="lifecycle" minOccurs="0" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:choice>
+                                    <xs:sequence>
+                                        <xs:element name="phase" type="bom:lifecyclePhaseType" minOccurs="1" maxOccurs="1">
+                                            <xs:annotation>
+                                                <xs:documentation>
+                                                    A pre-defined phase in the product lifecycle.
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                    </xs:sequence>
+                                    <xs:sequence>
+                                        <xs:element name="name" type="xs:normalizedString" minOccurs="1" maxOccurs="1">
+                                            <xs:annotation>
+                                                <xs:documentation>
+                                                    The name of the lifecycle phase
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1">
+                                            <xs:annotation>
+                                                <xs:documentation>
+                                                    The description of the lifecycle phase
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:choice>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
             </xs:element>
             <xs:element name="tools" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
@@ -130,6 +200,75 @@ limitations under the License.
             </xs:annotation>
         </xs:anyAttribute>
     </xs:complexType>
+
+    <xs:simpleType name="lifecyclePhaseType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="design">
+                <xs:annotation>
+                    <xs:documentation>
+                        BOM produced early in the development lifecycle containing inventory of components and services
+                        that are proposed or planned to be used. The inventory may need to be procured, retrieved,
+                        or resourced prior to use.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="pre-build">
+                <xs:annotation>
+                    <xs:documentation>
+                        BOM consisting of information obtained prior to a build process and may contain source files
+                        and development artifacts and manifests. The inventory may need to be resolved and retrieved
+                        prior to use.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="build">
+                <xs:annotation>
+                    <xs:documentation>
+                        BOM consisting of information obtained during a build process where component inventory is
+                        available for use. The precise versions of resolved components are usually available at this
+                        time as well as the provenance of where the components were retrieved from.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="post-build">
+                <xs:annotation>
+                    <xs:documentation>
+                        BOM consisting of information obtained after a build process has completed and the resulting
+                        components(s) are available for further analysis. Built components may exist as the result of a
+                        CI/CD process, may have been installed or deployed to a system or device, and may need to be
+                        retrieved or extracted from the system or device.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="operations">
+                <xs:annotation>
+                    <xs:documentation>
+                        BOM produced that represents inventory that is running and operational. This may include staging
+                        or production environments and will generally encompass multiple SBOMs describing the applications
+                        and operating system, along with HBOMs describing the hardware that makes up the system. Operations
+                        Bill of Materials (OBOM) can provide full-stack inventory of runtime environments, configurations,
+                        and additional dependencies.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="discovery">
+                <xs:annotation>
+                    <xs:documentation>
+                        BOM consisting of information observed through network discovery providing point-in-time
+                        enumeration of embedded, on-premise, and cloud-native services such as server applications,
+                        connected devices, microservices, and serverless functions.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="decommission">
+                <xs:annotation>
+                    <xs:documentation>
+                        BOM containing inventory that will be, or has been retired from operations.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
 
     <xs:complexType name="organizationalEntity">
         <xs:sequence minOccurs="0" maxOccurs="1">
@@ -854,13 +993,13 @@ limitations under the License.
             </xs:enumeration>
             <xs:enumeration value="device">
                 <xs:annotation>
-                    <xs:documentation>A license which covers a defined number of installations on
+                    <xs:documentation>A license that covers a defined number of installations on
                         computers and other types of devices.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
             <xs:enumeration value="evaluation">
                 <xs:annotation>
-                    <xs:documentation>A license which grants permission to install and use software
+                    <xs:documentation>A license that grants permission to install and use software
                         for trial purposes.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
@@ -1106,6 +1245,16 @@ limitations under the License.
             <xs:enumeration value="threat-model">
                 <xs:annotation>
                     <xs:documentation>An enumeration of identified weaknesses, threats, and countermeasures, dataflow diagram (DFD), attack tree, and other supporting documentation in human-readable or machine-readable format</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="adversary-model">
+                <xs:annotation>
+                    <xs:documentation>The defined assumptions, goals, and capabilities of an adversary.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="risk-assessment">
+                <xs:annotation>
+                    <xs:documentation>Identifies and analyzes the potential of future events that may negatively impact individuals, assets, and/or the environment. Risk assessments may also include judgments on the tolerability of each risk.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
             <xs:enumeration value="vulnerability-assertion">
@@ -1710,6 +1859,7 @@ limitations under the License.
                                             <xs:documentation>Specifies the data classification.</xs:documentation>
                                         </xs:annotation>
                                     </xs:element>
+                                    <xs:element name="governance" type="bom:dataGovernance" minOccurs="0" maxOccurs="1" />
                                     <xs:element name="source" minOccurs="0" maxOccurs="1">
                                         <xs:annotation>
                                             <xs:documentation>The URI, URL, or BOM-Link of the components or services the data came in from.</xs:documentation>
@@ -1872,41 +2022,13 @@ limitations under the License.
 
     <xs:simpleType name="identityFieldType">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="group">
-                <xs:annotation>
-                    <xs:documentation>blah</xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="name">
-                <xs:annotation>
-                    <xs:documentation>blah</xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="version">
-                <xs:annotation>
-                    <xs:documentation>blah</xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="purl">
-                <xs:annotation>
-                    <xs:documentation>blah</xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="cpe">
-                <xs:annotation>
-                    <xs:documentation>blah</xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="swid">
-                <xs:annotation>
-                    <xs:documentation>blah</xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="hash">
-                <xs:annotation>
-                    <xs:documentation>blah</xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
+            <xs:enumeration value="group"/>
+            <xs:enumeration value="name"/>
+            <xs:enumeration value="version"/>
+            <xs:enumeration value="purl"/>
+            <xs:enumeration value="cpe"/>
+            <xs:enumeration value="swid"/>
+            <xs:enumeration value="hash"/>
         </xs:restriction>
     </xs:simpleType>
 
@@ -2920,48 +3042,7 @@ limitations under the License.
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="governance" minOccurs="0" maxOccurs="1">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element name="custodians" minOccurs="0" maxOccurs="1">
-                            <xs:annotation>
-                                <xs:documentation>
-                                    Data custodians are responsible for the safe custody, transport, and storage of data.
-                                </xs:documentation>
-                            </xs:annotation>
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element name="custodian" type="bom:organizationOrIndividualType" minOccurs="0" maxOccurs="unbounded"/>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element name="stewards" minOccurs="0" maxOccurs="1">
-                            <xs:annotation>
-                                <xs:documentation>
-                                    Data stewards are responsible for data content, context, and associated business rules.
-                                </xs:documentation>
-                            </xs:annotation>
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element name="steward" type="bom:organizationOrIndividualType" minOccurs="0" maxOccurs="unbounded"/>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element name="owners" minOccurs="0" maxOccurs="1">
-                            <xs:annotation>
-                                <xs:documentation>
-                                    Data owners are concerned with risk and appropriate access to data.
-                                </xs:documentation>
-                            </xs:annotation>
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element name="owner" type="bom:organizationOrIndividualType" minOccurs="0" maxOccurs="unbounded"/>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
+            <xs:element name="governance" type="bom:dataGovernance" minOccurs="0" maxOccurs="1" />
         </xs:sequence>
         <xs:attribute name="bom-ref" type="bom:refType">
             <xs:annotation>
@@ -2971,6 +3052,47 @@ limitations under the License.
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="dataGovernance">
+        <xs:sequence>
+            <xs:element name="custodians" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Data custodians are responsible for the safe custody, transport, and storage of data.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="custodian" type="bom:organizationOrIndividualType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="stewards" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Data stewards are responsible for data content, context, and associated business rules.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="steward" type="bom:organizationOrIndividualType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="owners" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Data owners are concerned with risk and appropriate access to data.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="owner" type="bom:organizationOrIndividualType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
     </xs:complexType>
 
     <xs:complexType name="organizationOrIndividualType">
@@ -3411,7 +3533,7 @@ limitations under the License.
                         <xs:element name="target">
                             <xs:complexType>
                                 <xs:sequence minOccurs="0" maxOccurs="1">
-                                    <xs:element name="ref" minOccurs="1" maxOccurs="1">
+                                    <xs:element name="ref" type="bom:refType" minOccurs="1" maxOccurs="1">
                                         <xs:annotation>
                                             <xs:documentation>References a component or service by the objects bom-ref.</xs:documentation>
                                         </xs:annotation>
