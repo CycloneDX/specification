@@ -1,9 +1,9 @@
 "use strict";
 
-import assert from 'assert'
-import {readFile} from 'fs/promises'
-import {dirname, basename, join} from 'path'
-import {fileURLToPath} from 'url'
+import assert from 'node:assert'
+import {readFile} from 'node:fs/promises'
+import {dirname, basename, join} from 'node:path'
+import {fileURLToPath} from 'node:url'
 
 import Ajv from 'ajv'
 import addFormats from 'ajv-formats'
