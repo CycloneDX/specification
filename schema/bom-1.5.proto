@@ -29,7 +29,7 @@ message Bom {
   repeated ExternalReference external_references = 7;
   // Provides the ability to document dependency relationships.
   repeated Dependency dependencies = 8;
-  // Provides the ability to document aggregate completeness
+  // Compositions describe constituent parts (including components, services, and dependency relationships) and their completeness. The completeness of vulnerabilities expressed in a BOM may also be described.
   repeated Composition compositions = 9;
   // Vulnerabilities identified in components or services.
   repeated Vulnerability vulnerabilities = 10;
@@ -49,7 +49,7 @@ enum Classification {
   CLASSIFICATION_LIBRARY = 3;
   // A software operating system without regard to deployment model (i.e. installed on physical hardware, virtual machine, image, etc) Refer to https://en.wikipedia.org/wiki/Operating_system
   CLASSIFICATION_OPERATING_SYSTEM = 4;
-  // A hardware device such as a processor, or chip-set. A hardware device containing firmware should include a component for the physical hardware itself, and another component of type 'firmware' or 'operating-system' (whichever is relevant), describing information about the software running on the device.
+  // A hardware device such as a processor, or chip-set. A hardware device containing firmware should include a component for the physical hardware itself, and another component of type 'firmware' or 'operating-system' (whichever is relevant), describing information about the software running on the device. See also the list of known device properties: https://github.com/CycloneDX/cyclonedx-property-taxonomy/blob/main/cdx/device.md
   CLASSIFICATION_DEVICE = 5;
   // A computer file. Refer to https://en.wikipedia.org/wiki/Computer_file for information about files.
   CLASSIFICATION_FILE = 6;
@@ -59,6 +59,12 @@ enum Classification {
   CLASSIFICATION_FIRMWARE = 8;
   // A special type of software that operates or controls a particular type of device. Refer to https://en.wikipedia.org/wiki/Device_driver
   CLASSIFICATION_DEVICE_DRIVER = 9;
+  // A runtime environment which interprets or executes software. This may include runtimes such as those that execute bytecode or low-code/no-code application platforms.
+  CLASSIFICATION_PLATFORM = 10;
+  // A model based on training data that can make predictions or decisions without being explicitly programmed to do so.
+  CLASSIFICATION_MACHINE_LEARNING_MODEL = 11;
+  // A collection of discrete values that convey information.
+  CLASSIFICATION_DATA = 12;
 }
 
 message Commit {
@@ -121,6 +127,10 @@ message Component {
   repeated Evidence evidence = 23;
   // Specifies optional release notes.
   optional ReleaseNotes releaseNotes = 24;
+  // A model card describes the intended uses of a machine learning model, potential limitations, biases, ethical considerations, training parameters, datasets used to train the model, performance metrics, and other relevant data useful for ML transparency.
+  optional ModelCard modelCard = 25;
+  // This object SHOULD be specified for any component of type `data` and MUST NOT be specified for other component types.
+  optional ComponentData data = 26;
 }
 
 // Specifies the data flow.
@@ -137,6 +147,8 @@ message DataFlow {
   repeated string source = 5;
   // The URI, URL, or BOM-Link of the components or services the data is sent to
   repeated string destination = 6;
+  // Data Governance
+  optional DataGovernance governance = 7;
 }
 
 // Specifies the flow direction of the data. Valid values are: inbound, outbound, bi-directional, and unknown. Direction is relative to the service. Inbound flow states that data enters the service. Outbound flow states that data leaves the service. Bi-directional states that data flows both ways, and unknown states that the direction is not known.
@@ -209,30 +221,38 @@ enum ExternalReferenceType {
   EXTERNAL_REFERENCE_TYPE_ATTESTATION = 16;
   // An enumeration of identified weaknesses, threats, and countermeasures, dataflow diagram (DFD), attack tree, and other supporting documentation in human-readable or machine-readable format
   EXTERNAL_REFERENCE_TYPE_THREAT_MODEL = 17;
+  // The defined assumptions, goals, and capabilities of an adversary.
+  EXTERNAL_REFERENCE_TYPE_ADVERSARY_MODEL = 18;
+  // Identifies and analyzes the potential of future events that may negatively impact individuals, assets, and/or the environment. Risk assessments may also include judgments on the tolerability of each risk.
+  EXTERNAL_REFERENCE_TYPE_RISK_ASSESSMENT = 19;
   // The location where a component was published to. This is often the same as "distribution" but may also include specialized publishing processes that act as an intermediary
-  EXTERNAL_REFERENCE_TYPE_DISTRIBUTION_INTAKE = 18;
+  EXTERNAL_REFERENCE_TYPE_DISTRIBUTION_INTAKE = 20;
   // A Vulnerability Disclosure Report (VDR) which asserts the known and previously unknown vulnerabilities that affect a component, service, or product including the analysis and findings describing the impact (or lack of impact) that the reported vulnerability has on a component, service, or product
-  EXTERNAL_REFERENCE_TYPE_VULNERABILITY_ASSERTION = 19;
+  EXTERNAL_REFERENCE_TYPE_VULNERABILITY_ASSERTION = 21;
   // A Vulnerability Exploitability eXchange (VEX) which asserts the known vulnerabilities that do not affect a product, product family, or organization, and optionally the ones that do. The VEX should include the analysis and findings describing the impact (or lack of impact) that the reported vulnerability has on the product, product family, or organization
-  EXTERNAL_REFERENCE_TYPE_EXPLOITABILITY_STATEMENT = 20;
+  EXTERNAL_REFERENCE_TYPE_EXPLOITABILITY_STATEMENT = 22;
   // Results from an authorized simulated cyberattack on a component or service, otherwise known as a penetration test
-  EXTERNAL_REFERENCE_TYPE_PENTEST_REPORT = 21;
+  EXTERNAL_REFERENCE_TYPE_PENTEST_REPORT = 23;
   // SARIF or proprietary machine or human-readable report for which static analysis has identified code quality, security, and other potential issues with the source code
-  EXTERNAL_REFERENCE_TYPE_STATIC_ANALYSIS_REPORT = 22;
+  EXTERNAL_REFERENCE_TYPE_STATIC_ANALYSIS_REPORT = 24;
   // Dynamic analysis report that has identified issues such as vulnerabilities and misconfigurations
-  EXTERNAL_REFERENCE_TYPE_DYNAMIC_ANALYSIS_REPORT = 23;
+  EXTERNAL_REFERENCE_TYPE_DYNAMIC_ANALYSIS_REPORT = 25;
   // Report generated by analyzing the call stack of a running application
-  EXTERNAL_REFERENCE_TYPE_RUNTIME_ANALYSIS_REPORT = 24;
+  EXTERNAL_REFERENCE_TYPE_RUNTIME_ANALYSIS_REPORT = 26;
   // Report generated by Software Composition Analysis (SCA), container analysis, or other forms of component analysis
-  EXTERNAL_REFERENCE_TYPE_COMPONENT_ANALYSIS_REPORT = 25;
+  EXTERNAL_REFERENCE_TYPE_COMPONENT_ANALYSIS_REPORT = 27;
   // Report containing a formal assessment of an organization, business unit, or team against a maturity model
-  EXTERNAL_REFERENCE_TYPE_MATURITY_REPORT = 26;
+  EXTERNAL_REFERENCE_TYPE_MATURITY_REPORT = 28;
   // Industry, regulatory, or other certification from an accredited (if applicable) certification body
-  EXTERNAL_REFERENCE_TYPE_CERTIFICATION_REPORT = 27;
+  EXTERNAL_REFERENCE_TYPE_CERTIFICATION_REPORT = 29;
   // Report or system in which quality metrics can be obtained
-  EXTERNAL_REFERENCE_TYPE_QUALITY_METRICS = 28;
+  EXTERNAL_REFERENCE_TYPE_QUALITY_METRICS = 30;
   // Code or configuration that defines and provisions virtualized infrastructure, commonly referred to as Infrastructure as Code (IaC)
-  EXTERNAL_REFERENCE_TYPE_CODIFIED_INFRASTRUCTURE = 29;
+  EXTERNAL_REFERENCE_TYPE_CODIFIED_INFRASTRUCTURE = 31;
+  // A model card describes the intended uses of a machine learning model, potential limitations, biases, ethical considerations, training parameters, datasets used to train the model, performance metrics, and other relevant data useful for ML transparency.
+  EXTERNAL_REFERENCE_TYPE_MODEL_CARD = 32;
+    // Plans of Action and Milestones (POAM) compliment an "attestation" external reference. POAM is defined by NIST as a "document that identifies tasks needing to be accomplished. It details resources required to accomplish the elements of the plan, any milestones in meeting the tasks and scheduled completion dates for the milestones".
+  EXTERNAL_REFERENCE_TYPE_POAM = 33;
 }
 
 enum HashAlg {
@@ -365,9 +385,9 @@ enum LicensingTypeEnum {
   LICENSING_TYPE_CORE_POINTS = 5;
   // A license for which consumption is measured by non-standard metrics.
   LICENSING_TYPE_CUSTOM_METRIC = 6;
-  // A license which covers a defined number of installations on computers and other types of devices.
+  // A license that covers a defined number of installations on computers and other types of devices.
   LICENSING_TYPE_DEVICE = 7;
-  // A license which grants permission to install and use software for trial purposes.
+  // A license that grants permission to install and use software for trial purposes.
   LICENSING_TYPE_EVALUATION = 8;
   // A license that grants access to the software to one or more pre-defined users.
   LICENSING_TYPE_NAMED_USER = 9;
@@ -404,6 +424,36 @@ message Metadata {
   optional LicenseChoice licenses = 7;
   // Specifies optional, custom, properties
   repeated Property properties = 8;
+  // The product lifecycle(s) that this BOM represents.
+  repeated Lifecycles lifecycles = 9;
+}
+
+message Lifecycles {
+   oneof choice {
+     // A pre-defined phase in the product lifecycle.
+     LifecyclePhase phase = 1;
+     // The name of the lifecycle phase
+     string name = 2;
+   }
+   // The description of the lifecycle phase
+  optional string description = 2;
+}
+
+enum LifecyclePhase {
+  // BOM produced early in the development lifecycle containing inventory of components and services that are proposed or planned to be used. The inventory may need to be procured, retrieved, or resourced prior to use.
+  LIFECYCLE_PHASE_DESIGN = 0;
+  // BOM consisting of information obtained prior to a build process and may contain source files and development artifacts and manifests. The inventory may need to be resolved and retrieved prior to use.
+  LIFECYCLE_PHASE_PRE_BUILD = 1;
+  // BOM consisting of information obtained during a build process where component inventory is available for use. The precise versions of resolved components are usually available at this time as well as the provenance of where the components were retrieved from.
+  LIFECYCLE_PHASE_BUILD = 2;
+  // BOM consisting of information obtained after a build process has completed and the resulting components(s) are available for further analysis. Built components may exist as the result of a CI/CD process, may have been installed or deployed to a system or device, and may need to be retrieved or extracted from the system or device.
+  LIFECYCLE_PHASE_POST_BUILD = 3;
+  // BOM produced that represents inventory that is running and operational. This may include staging or production environments and will generally encompass multiple SBOMs describing the applications and operating system, along with HBOMs describing the hardware that makes up the system. Operations Bill of Materials (OBOM) can provide full-stack inventory of runtime environments, configurations, and additional dependencies.
+  LIFECYCLE_PHASE_OPERATIONS = 4;
+  // BOM consisting of information observed through network discovery providing point-in-time enumeration of embedded, on-premise, and cloud-native services such as server applications, connected devices, microservices, and serverless functions.
+  LIFECYCLE_PHASE_DISCOVERY = 5;
+  // BOM containing inventory that will be, or has been retired from operations.
+  LIFECYCLE_PHASE_DECOMMISSION = 6;
 }
 
 message OrganizationalContact {
@@ -413,6 +463,8 @@ message OrganizationalContact {
   optional string email = 2;
   // The phone number of the contact.
   optional string phone = 3;
+  // An optional identifier which can be used to reference the object elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
+  optional string bom_ref = 4;
 }
 
 message OrganizationalEntity {
@@ -422,6 +474,8 @@ message OrganizationalEntity {
   repeated string url = 2;
   // A contact person at the organization. Multiple contacts are allowed.
   repeated OrganizationalContact contact = 3;
+  // An optional identifier which can be used to reference the object elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
+  optional string bom_ref = 4;
 }
 
 enum PatchClassification {
@@ -545,18 +599,26 @@ message Property {
 }
 
 enum Aggregate {
-  // Default, no statement about the aggregate completeness is being made
+  // The relationship completeness is not specified.
   AGGREGATE_NOT_SPECIFIED = 0;
-  // The aggregate composition is complete
+  // The relationship is complete. No further relationships including constituent components, services, or dependencies are known to exist.
   AGGREGATE_COMPLETE = 1;
-  // The aggregate composition is incomplete
+  // The relationship is incomplete. Additional relationships exist and may include constituent components, services, or dependencies.
   AGGREGATE_INCOMPLETE = 2;
-  // The aggregate composition is incomplete for first party components, complete for third party components
+  // The relationship is incomplete. Only relationships for first-party components, services, or their dependencies are represented.
   AGGREGATE_INCOMPLETE_FIRST_PARTY_ONLY = 3;
-  // The aggregate composition is incomplete for third party components, complete for first party components
+  // The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented.
   AGGREGATE_INCOMPLETE_THIRD_PARTY_ONLY = 4;
-  // The aggregate composition completeness is unknown
+  // The relationship may be complete or incomplete. This usually signifies a 'best-effort' to obtain constituent components, services, or dependencies but the completeness is inconclusive.
   AGGREGATE_UNKNOWN = 5;
+  // The relationship is incomplete. Only relationships for first-party components, services, or their dependencies are represented, limited specifically to those that are proprietary.
+  AGGREGATE_INCOMPLETE_FIRST_PARTY_PROPRIETARY_ONLY = 6;
+  // The relationship is incomplete. Only relationships for first-party components, services, or their dependencies are represented, limited specifically to those that are opensource.
+  AGGREGATE_INCOMPLETE_FIRST_PARTY_OPENSOURCE_ONLY = 7;
+  // The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented, limited specifically to those that are proprietary.
+  AGGREGATE_INCOMPLETE_THIRD_PARTY_PROPRIETARY_ONLY = 8;
+  // The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented, limited specifically to those that are opensource.
+  AGGREGATE_INCOMPLETE_THIRD_PARTY_OPENSOURCE_ONLY = 9;
 }
 
 message Composition {
@@ -566,6 +628,10 @@ message Composition {
   repeated string assemblies = 2;
   // The dependencies the aggregate completeness applies to
   repeated string dependencies = 3;
+  // The bom-ref identifiers of the vulnerabilities being described.
+  repeated string vulnerabilities = 4;
+  // An optional identifier which can be used to reference the composition elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.
+  optional string bom_ref = 5;
 }
 
 message EvidenceCopyright {
@@ -916,4 +982,181 @@ message Annotation {
   google.protobuf.Timestamp timestamp = 4;
   // The textual content of the annotation.
   string text = 5;
+}
+
+message ModelCard {
+  // An optional identifier which can be used to reference the model card elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.
+  optional string bom_ref = 1;
+  // Hyper-parameters for construction of the model.
+  optional ModelParameters modelParameters = 2;
+  // A quantitative analysis of the model
+  optional QuantitativeAnalysis quantitativeAnalysis = 3;
+  // What considerations should be taken into account regarding the model's construction, training, and application?
+  optional ModelCardConsiderations considerations = 4;
+
+  message ModelParameters {
+    // The overall approach to learning used by the model for problem solving.
+    optional Approach approach = 1;
+    // Directly influences the input and/or output. Examples include classification, regression, clustering, etc.
+    optional string task = 2;
+    // The model architecture family such as transformer network, convolutional neural network, residual neural network, LSTM neural network, etc.
+    optional string architectureFamily = 3;
+    //The specific architecture of the model such as GPT-1, ResNet-50, YOLOv3, etc.
+    optional string modelArchitecture = 4;
+    // The datasets used to train and evaluate the model.
+    repeated Datasets datasets = 5;
+    // The input format(s) of the model
+    repeated MachineLearningInputOutputParameters inputs = 6;
+    // The output format(s) from the model
+    repeated MachineLearningInputOutputParameters outputs = 7;
+
+    message Approach {
+      optional ModelParameterApproachType type = 1;
+    }
+    message Datasets {
+      oneof choice {
+        ComponentData dataset = 1;
+        // References a data component by the components bom-ref attribute
+        string ref = 2;
+      }
+    }
+    message MachineLearningInputOutputParameters {
+      // The data format for input/output to the model. Example formats include string, image, time-series
+      optional string format = 1;
+    }
+  }
+  message QuantitativeAnalysis {
+    // The model performance metrics being reported. Examples may include accuracy, F1 score, precision, top-3 error rates, MSC, etc.
+    repeated PerformanceMetrics performanceMetrics = 1;
+    optional GraphicsCollection graphics = 2;
+
+    message PerformanceMetrics {
+      // The type of performance metric.
+      optional string type = 1;
+      // The value of the performance metric.
+      optional string value = 2;
+      // The name of the slice this metric was computed on. By default, assume this metric is not sliced.
+      optional string slice = 3;
+      // The confidence interval of the metric.
+      optional ConfidenceInterval confidenceInterval = 4;
+
+      message ConfidenceInterval {
+        // The lower bound of the confidence interval.
+        optional string lowerBound = 1;
+        // The upper bound of the confidence interval.
+        optional string upperBound = 2;
+      }
+    }
+  }
+  message ModelCardConsiderations {
+    // Who are the intended users of the model?
+    repeated string users = 1;
+    // What are the intended use cases of the model?
+    repeated string useCases = 2;
+    // What are the known technical limitations of the model? E.g. What kind(s) of data should the model be expected not to perform well on? What are the factors that might degrade model performance?
+    repeated string technicalLimitations = 3;
+    // What are the known tradeoffs in accuracy/performance of the model?
+    repeated string performanceTradeoffs = 4;
+    // What are the ethical (or environmental) risks involved in the application of this model?
+    repeated EthicalConsiderations ethicalConsiderations = 5;
+    // How does the model affect groups at risk of being systematically disadvantaged? What are the harms and benefits to the various affected groups?
+    repeated FairnessAssessments fairnessAssessments = 6;
+
+    message EthicalConsiderations {
+      // The name of the risk.
+      optional string name = 1;
+      // Strategy used to address this risk.
+      optional string mitigationStrategy = 2;
+    }
+    message FairnessAssessments {
+      // The groups or individuals at risk of being systematically disadvantaged by the model.
+      optional string groupAtRisk = 1;
+      // Expected benefits to the identified groups.
+      optional string benefits = 2;
+      // Expected harms to the identified groups.
+      optional string harms = 3;
+      // With respect to the benefits and harms outlined, please describe any mitigation strategy implemented.
+      optional string mitigationStrategy = 4;
+    }
+  }
+}
+
+enum ModelParameterApproachType {
+  MODEL_PARAMETER_APPROACH_TYPE_SUPERVISED = 0;
+  MODEL_PARAMETER_APPROACH_TYPE_UNSUPERVISED = 1;
+  MODEL_PARAMETER_APPROACH_TYPE_REINFORCED_LEARNING = 2;
+  MODEL_PARAMETER_APPROACH_TYPE_SEMI_SUPERVISED = 3;
+  MODEL_PARAMETER_APPROACH_TYPE_SELF_SUPERVISED = 4;
+}
+
+message ComponentData {
+  // An optional identifier which can be used to reference the dataset elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.
+  optional string bom_ref = 1;
+  // The general theme or subject matter of the data being specified.
+  ComponentDataType type = 2;
+  // The name of the dataset.
+  optional string name = 3;
+  // The contents or references to the contents of the data being described.
+  optional ComponentDataContents contents = 4;
+  // Data classification tags data according to its type, sensitivity, and value if altered, stolen, or destroyed.
+  optional string classification = 5;
+  // A description of any sensitive data in a dataset.
+  repeated string sensitiveData = 6;
+  // A collection of graphics that represent various measurements.
+  optional GraphicsCollection graphics = 7;
+  // A description of the dataset. Can describe size of dataset, whether it's used for source code, training, testing, or validation, etc.
+  optional string description = 8;
+  // Data Governance
+  optional DataGovernance governance = 9;
+
+  message ComponentDataContents {
+    // An optional way to include textual or encoded data.
+    optional AttachedText attachment = 1;
+    // The URL to where the data can be retrieved.
+    optional string url = 2;
+    // Provides the ability to document name-value parameters used for configuration.
+    repeated Property properties = 3;
+  }
+}
+
+message DataGovernance {
+  // Data custodians are responsible for the safe custody, transport, and storage of data.
+  repeated DataGovernanceResponsibleParty custodians = 1;
+  // Data stewards are responsible for data content, context, and associated business rules.
+  repeated DataGovernanceResponsibleParty stewards = 2;
+  // Data owners are concerned with risk and appropriate access to data.
+  repeated DataGovernanceResponsibleParty owners = 3;
+
+  message DataGovernanceResponsibleParty {
+    oneof choice {
+      OrganizationalEntity organization = 1;
+      OrganizationalContact contact = 2;
+    }
+  }
+}
+
+enum ComponentDataType {
+  // Any type of code, code snippet, or data-as-code
+  COMPONENT_DATA_TYPE_SOURCE_CODE = 0;
+  // Parameters or settings that may be used by other components.
+  COMPONENT_DATA_TYPE_CONFIGURATION = 1;
+  // A collection of data.
+  COMPONENT_DATA_TYPE_DATASET = 2;
+  // Any other type of data that does not fit into existing definitions.
+  COMPONENT_DATA_TYPE_OTHER = 3;
+}
+
+message GraphicsCollection {
+  // A description of this collection of graphics.
+  optional string description = 1;
+  // A collection of graphics.
+  repeated Graphic graphic = 2;
+
+  message Graphic {
+    // The name of the graphic.
+    optional string name = 1;
+    // The graphic (vector or raster). Base64 encoding MUST be specified for binary images.
+    optional AttachedText image = 2;
+  }
+
 }
