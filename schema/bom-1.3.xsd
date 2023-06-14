@@ -35,6 +35,13 @@ limitations under the License.
         </xs:documentation>
     </xs:annotation>
 
+    <xs:simpleType name="refType">
+        <xs:annotation>
+            <xs:documentation>Identifier-DataType for interlinked elements.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string" />
+    </xs:simpleType>
+
     <xs:complexType name="metadata">
         <xs:sequence minOccurs="0" maxOccurs="1">
             <xs:element name="timestamp" type="xs:dateTime" minOccurs="0">
@@ -400,7 +407,7 @@ limitations under the License.
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
-        <xs:attribute name="bom-ref" type="xs:string">
+        <xs:attribute name="bom-ref" type="bom:refType">
             <xs:annotation>
                 <xs:documentation>
                     An optional identifier which can be used to reference the component elsewhere in the BOM.
@@ -555,7 +562,9 @@ limitations under the License.
                     <xs:documentation>A hardware device such as a processor, or chip-set. A hardware device
                         containing firmware should include a component for the physical hardware itself, and another
                         component of type 'firmware' or 'operating-system' (whichever is relevant), describing
-                        information about the software running on the device.</xs:documentation>
+                        information about the software running on the device.
+                        See also the list of known device properties: https://github.com/CycloneDX/cyclonedx-property-taxonomy/blob/main/cdx/device.md
+                    </xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
             <xs:enumeration value="firmware">
@@ -1156,7 +1165,7 @@ limitations under the License.
         <xs:sequence minOccurs="0" maxOccurs="unbounded">
             <xs:element name="dependency" type="bom:dependencyType"/>
         </xs:sequence>
-        <xs:attribute name="ref" type="xs:string" use="required">
+        <xs:attribute name="ref" type="bom:refType" use="required">
             <xs:annotation>
                 <xs:documentation>References a component or service by the its bom-ref attribute</xs:documentation>
             </xs:annotation>
@@ -1309,7 +1318,7 @@ limitations under the License.
                 </xs:annotation>
             </xs:any>
         </xs:sequence>
-        <xs:attribute name="bom-ref" type="xs:string">
+        <xs:attribute name="bom-ref" type="bom:refType">
             <xs:annotation>
                 <xs:documentation>
                     An optional identifier which can be used to reference the service elsewhere in the BOM.
@@ -1502,7 +1511,7 @@ limitations under the License.
     </xs:simpleType>
 
     <xs:complexType name="bomReferenceType">
-        <xs:attribute name="ref" type="xs:string" use="required">
+        <xs:attribute name="ref" type="bom:refType" use="required">
             <xs:annotation>
                 <xs:documentation>References a component or service by the its bom-ref attribute</xs:documentation>
             </xs:annotation>
