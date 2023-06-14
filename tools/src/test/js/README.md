@@ -5,7 +5,7 @@ for validation of a schema.
 
 ## requirements
 
-* node >=16
+* node >=18.3
 
 ## setup
 
