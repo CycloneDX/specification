@@ -52,7 +52,6 @@
     },
     "components": {
       "type": "array",
-      "additionalItems": false,
       "items": {"$ref": "#/definitions/component"},
       "uniqueItems": true,
       "title": "Components",
@@ -60,7 +59,6 @@
     },
     "services": {
       "type": "array",
-      "additionalItems": false,
       "items": {"$ref": "#/definitions/service"},
       "uniqueItems": true,
       "title": "Services",
@@ -68,14 +66,12 @@
     },
     "externalReferences": {
       "type": "array",
-      "additionalItems": false,
       "items": {"$ref": "#/definitions/externalReference"},
       "title": "External References",
       "description": "External references provide a way to document systems, sites, and information that may be relevant, but are not included with the BOM. They may also establish specific relationships within or external to the BOM."
     },
     "dependencies": {
       "type": "array",
-      "additionalItems": false,
       "items": {"$ref": "#/definitions/dependency"},
       "uniqueItems": true,
       "title": "Dependencies",
@@ -83,15 +79,13 @@
     },
     "compositions": {
       "type": "array",
-      "additionalItems": false,
       "items": {"$ref": "#/definitions/compositions"},
       "uniqueItems": true,
       "title": "Compositions",
-      "description": "Compositions describe constituent parts (including components, services, and dependency relationships) and their completeness."
+      "description": "Compositions describe constituent parts (including components, services, and dependency relationships) and their completeness. The completeness of vulnerabilities expressed in a BOM may also be described."
     },
     "vulnerabilities": {
       "type": "array",
-      "additionalItems": false,
       "items": {"$ref": "#/definitions/vulnerability"},
       "uniqueItems": true,
       "title": "Vulnerabilities",
@@ -99,7 +93,6 @@
     },
     "annotations": {
       "type": "array",
-      "additionalItems": false,
       "items": {"$ref": "#/definitions/annotations"},
       "uniqueItems": true,
       "title": "Annotations",
@@ -109,7 +102,6 @@
       "type": "array",
       "title": "Properties",
       "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
-      "additionalItems": false,
       "items": {
         "$ref": "#/definitions/property"
       }
@@ -125,6 +117,26 @@
       "$comment": "Identifier-DataType for interlinked elements.",
       "type": "string"
     },
+    "bomLinkDocumentType": {
+      "title": "BOM-Link document",
+      "description": "Descriptor for another BOM document. See https://cyclonedx.org/capabilities/bomlink/",
+      "type": "string",
+      "pattern": "^urn:cdx:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/[1-9][0-9]*$",
+      "$comment": "part of the pattern is based on `bom.serialNumber`'s pattern"
+    },
+    "bomLinkElementType": {
+      "title": "BOM-Link element",
+      "description": "Descriptor for an element in another BOM document. See https://cyclonedx.org/capabilities/bomlink/",
+      "type": "string",
+      "pattern": "^urn:cdx:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/[1-9][0-9]*#.+$",
+      "$comment": "part of the pattern is based on `bom.serialNumber`'s pattern"
+    },
+    "bomLink": {
+      "anyOf": [
+        {"$ref": "#/definitions/bomLinkDocumentType"},
+        {"$ref": "#/definitions/bomLinkElementType"}
+      ]
+    },
     "metadata": {
       "type": "object",
       "title": "BOM Metadata Object",
@@ -136,6 +148,54 @@
           "title": "Timestamp",
           "description": "The date and time (timestamp) when the BOM was created."
         },
+        "lifecycles": {
+          "type": "array",
+          "title": "Lifecycles",
+          "description": "",
+          "items": {
+            "type": "object",
+            "title": "Lifecycle",
+            "description": "The product lifecycle(s) that this BOM represents.",
+            "oneOf": [
+              {
+                "required": ["phase"],
+                "additionalProperties": false,
+                "properties": {
+                  "phase": {
+                    "type": "string",
+                    "title": "Phase",
+                    "description": "A pre-defined phase in the product lifecycle.\n\n* __design__ = BOM produced early in the development lifecycle containing inventory of components and services that are proposed or planned to be used. The inventory may need to be procured, retrieved, or resourced prior to use.\n* __pre-build__ = BOM consisting of information obtained prior to a build process and may contain source files and development artifacts and manifests. The inventory may need to be resolved and retrieved prior to use.\n* __build__ = BOM consisting of information obtained during a build process where component inventory is available for use. The precise versions of resolved components are usually available at this time as well as the provenance of where the components were retrieved from.\n* __post-build__ = BOM consisting of information obtained after a build process has completed and the resulting components(s) are available for further analysis. Built components may exist as the result of a CI/CD process, may have been installed or deployed to a system or device, and may need to be retrieved or extracted from the system or device.\n* __operations__ = BOM produced that represents inventory that is running and operational. This may include staging or production environments and will generally encompass multiple SBOMs describing the applications and operating system, along with HBOMs describing the hardware that makes up the system. Operations Bill of Materials (OBOM) can provide full-stack inventory of runtime environments, configurations, and additional dependencies.\n* __discovery__ = BOM consisting of information observed through network discovery providing point-in-time enumeration of embedded, on-premise, and cloud-native services such as server applications, connected devices, microservices, and serverless functions.\n* __decommission__ = BOM containing inventory that will be, or has been retired from operations.",
+                    "enum": [
+                      "design",
+                      "pre-build",
+                      "build",
+                      "post-build",
+                      "operations",
+                      "discovery",
+                      "decommission"
+                    ]
+                  }
+                }
+              },
+              {
+                "required": ["name"],
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "title": "Name",
+                    "description": "The name of the lifecycle phase"
+                  },
+                  "description": {
+                    "type": "string",
+                    "title": "Description",
+                    "description": "The description of the lifecycle phase"
+                  }
+                }
+              }
+            ]
+          }
+      },
         "tools": {
           "oneOf": [
             {
@@ -146,7 +206,6 @@
               "properties": {
                 "components": {
                   "type": "array",
-                  "additionalItems": false,
                   "items": {"$ref": "#/definitions/component"},
                   "uniqueItems": true,
                   "title": "Components",
@@ -154,7 +213,6 @@
                 },
                 "services": {
                   "type": "array",
-                  "additionalItems": false,
                   "items": {"$ref": "#/definitions/service"},
                   "uniqueItems": true,
                   "title": "Services",
@@ -166,7 +224,6 @@
               "type": "array",
               "title": "Creation Tools (legacy)",
               "description": "[Deprecated] The tool(s) used in the creation of the BOM.",
-              "additionalItems": false,
               "items": {"$ref": "#/definitions/tool"}
             }
           ]
@@ -175,7 +232,6 @@
           "type": "array",
           "title": "Authors",
           "description": "The person(s) who created the BOM. Authors are common in BOMs created through manual processes. BOMs created through automated means may not have authors.",
-          "additionalItems": false,
           "items": {"$ref": "#/definitions/organizationalContact"}
         },
         "component": {
@@ -194,16 +250,13 @@
           "$ref": "#/definitions/organizationalEntity"
         },
         "licenses": {
-          "type": "array",
           "title": "BOM License(s)",
-          "additionalItems": false,
-          "items": {"$ref": "#/definitions/licenseChoice"}
+          "$ref": "#/definitions/licenseChoice"
         },
         "properties": {
           "type": "array",
           "title": "Properties",
           "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
-          "additionalItems": false,
           "items": {"$ref": "#/definitions/property"}
         }
       }
@@ -231,14 +284,12 @@
         },
         "hashes": {
           "type": "array",
-          "additionalItems": false,
           "items": {"$ref": "#/definitions/hash"},
           "title": "Hashes",
           "description": "The hashes of the tool (if applicable)."
         },
         "externalReferences": {
           "type": "array",
-          "additionalItems": false,
           "items": {"$ref": "#/definitions/externalReference"},
           "title": "External References",
           "description": "External references provide a way to document systems, sites, and information that may be relevant, but are not included with the BOM. They may also establish specific relationships within or external to the BOM."
@@ -251,6 +302,11 @@
       "description": "",
       "additionalProperties": false,
       "properties": {
+        "bom-ref": {
+          "$ref": "#/definitions/refType",
+          "title": "BOM Reference",
+          "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+        },
         "name": {
           "type": "string",
           "title": "Name",
@@ -273,7 +329,6 @@
           "type": "array",
           "title": "Contact",
           "description": "A contact at the organization. Multiple contacts are allowed.",
-          "additionalItems": false,
           "items": {"$ref": "#/definitions/organizationalContact"}
         }
       }
@@ -284,6 +339,11 @@
       "description": "",
       "additionalProperties": false,
       "properties": {
+        "bom-ref": {
+          "$ref": "#/definitions/refType",
+          "title": "BOM Reference",
+          "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+        },
         "name": {
           "type": "string",
           "title": "Name",
@@ -400,13 +460,10 @@
         "hashes": {
           "type": "array",
           "title": "Component Hashes",
-          "additionalItems": false,
           "items": {"$ref": "#/definitions/hash"}
         },
         "licenses": {
-          "type": "array",
-          "additionalItems": false,
-          "items": {"$ref": "#/definitions/licenseChoice"},
+          "$ref": "#/definitions/licenseChoice",
           "title": "Component License(s)"
         },
         "copyright": {
@@ -447,35 +504,30 @@
               "type": "array",
               "title": "Ancestors",
               "description": "Describes zero or more components in which a component is derived from. This is commonly used to describe forks from existing projects where the forked version contains a ancestor node containing the original component it was forked from. For example, Component A is the original component. Component B is the component being used and documented in the BOM. However, Component B contains a pedigree node with a single ancestor documenting Component A - the original component from which Component B is derived from.",
-              "additionalItems": false,
               "items": {"$ref": "#/definitions/component"}
             },
             "descendants": {
               "type": "array",
               "title": "Descendants",
               "description": "Descendants are the exact opposite of ancestors. This provides a way to document all forks (and their forks) of an original or root component.",
-              "additionalItems": false,
               "items": {"$ref": "#/definitions/component"}
             },
             "variants": {
               "type": "array",
               "title": "Variants",
               "description": "Variants describe relations where the relationship between the components are not known. For example, if Component A contains nearly identical code to Component B. They are both related, but it is unclear if one is derived from the other, or if they share a common ancestor.",
-              "additionalItems": false,
               "items": {"$ref": "#/definitions/component"}
             },
             "commits": {
               "type": "array",
               "title": "Commits",
               "description": "A list of zero or more commits which provide a trail describing how the component deviates from an ancestor, descendant, or variant.",
-              "additionalItems": false,
               "items": {"$ref": "#/definitions/commit"}
             },
             "patches": {
               "type": "array",
               "title": "Patches",
               "description": ">A list of zero or more patches describing how the component deviates from an ancestor, descendant, or variant. Patches may be complimentary to commits or may be used in place of commits.",
-              "additionalItems": false,
               "items": {"$ref": "#/definitions/patch"}
             },
             "notes": {
@@ -487,14 +539,12 @@
         },
         "externalReferences": {
           "type": "array",
-          "additionalItems": false,
           "items": {"$ref": "#/definitions/externalReference"},
           "title": "External References",
           "description": "External references provide a way to document systems, sites, and information that may be relevant, but are not included with the BOM. They may also establish specific relationships within or external to the BOM."
         },
         "components": {
           "type": "array",
-          "additionalItems": false,
           "items": {"$ref": "#/definitions/component"},
           "uniqueItems": true,
           "title": "Components",
@@ -516,7 +566,6 @@
         },
         "data": {
           "type": "array",
-          "additionalItems": false,
           "items": {"$ref": "#/definitions/componentData"},
           "title": "Data",
           "description": "This object SHOULD be specified for any component of type `data` and MUST NOT be specified for other component types."
@@ -525,7 +574,6 @@
           "type": "array",
           "title": "Properties",
           "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
-          "additionalItems": false,
           "items": {"$ref": "#/definitions/property"}
         },
         "signature": {
@@ -709,7 +757,6 @@
               "type": "array",
               "title": "Alternate License Identifiers",
               "description": "License identifiers that may be used to manage licenses and their lifecycle",
-              "additionalItems": false,
               "items": {
                 "type": "string"
               }
@@ -717,6 +764,7 @@
             "licensor": {
               "title": "Licensor",
               "description": "The individual or organization that grants a license to another individual or organization",
+              "type": "object",
               "additionalProperties": false,
               "properties": {
                 "organization": {
@@ -742,6 +790,7 @@
             "licensee": {
               "title": "Licensee",
               "description": "The individual or organization for which a license was granted to",
+              "type": "object",
               "additionalProperties": false,
               "properties": {
                 "organization": {
@@ -767,6 +816,7 @@
             "purchaser": {
               "title": "Purchaser",
               "description": "The individual or organization that purchased the license",
+              "type": "object",
               "additionalProperties": false,
               "properties": {
                 "organization": {
@@ -797,8 +847,7 @@
             "licenseTypes": {
               "type": "array",
               "title": "License Type",
-              "description": "The type of license(s) that was granted to the licensee\n\n* __academic__ = A license that grants use of software solely for the purpose of education or research.\n* __appliance__ = A license covering use of software embedded in a specific piece of hardware.\n* __client-access__ = A Client Access License (CAL) allows client computers to access services provided by server software.\n* __concurrent-user__ = A Concurrent User license (aka floating license) limits the number of licenses for a software application and licenses are shared among a larger number of users.\n* __core-points__ = A license where the core of a computer's processor is assigned a specific number of points.\n* __custom-metric__ = A license for which consumption is measured by non-standard metrics.\n* __device__ = A license which covers a defined number of installations on computers and other types of devices.\n* __evaluation__ = A license which grants permission to install and use software for trial purposes.\n* __named-user__ = A license that grants access to the software to one or more pre-defined users.\n* __node-locked__ = A license that grants access to the software on one or more pre-defined computers or devices.\n* __oem__ = An Original Equipment Manufacturer license that is delivered with hardware, cannot be transferred to other hardware, and is valid for the life of the hardware.\n* __perpetual__ = A license where the software is sold on a one-time basis and the licensee can use a copy of the software indefinitely.\n* __processor-points__ = A license where each installation consumes points per processor.\n* __subscription__ = A license where the licensee pays a fee to use the software or service.\n* __user__ = A license that grants access to the software or service by a specified number of users.\n* __other__ = Another license type.\n",
-              "additionalItems": false,
+              "description": "The type of license(s) that was granted to the licensee\n\n* __academic__ = A license that grants use of software solely for the purpose of education or research.\n* __appliance__ = A license covering use of software embedded in a specific piece of hardware.\n* __client-access__ = A Client Access License (CAL) allows client computers to access services provided by server software.\n* __concurrent-user__ = A Concurrent User license (aka floating license) limits the number of licenses for a software application and licenses are shared among a larger number of users.\n* __core-points__ = A license where the core of a computer's processor is assigned a specific number of points.\n* __custom-metric__ = A license for which consumption is measured by non-standard metrics.\n* __device__ = A license that covers a defined number of installations on computers and other types of devices.\n* __evaluation__ = A license that grants permission to install and use software for trial purposes.\n* __named-user__ = A license that grants access to the software to one or more pre-defined users.\n* __node-locked__ = A license that grants access to the software on one or more pre-defined computers or devices.\n* __oem__ = An Original Equipment Manufacturer license that is delivered with hardware, cannot be transferred to other hardware, and is valid for the life of the hardware.\n* __perpetual__ = A license where the software is sold on a one-time basis and the licensee can use a copy of the software indefinitely.\n* __processor-points__ = A license where each installation consumes points per processor.\n* __subscription__ = A license where the licensee pays a fee to use the software or service.\n* __user__ = A license that grants access to the software or service by a specified number of users.\n* __other__ = Another license type.\n",
               "items": {
                 "type": "string",
                 "enum": [
@@ -839,34 +888,46 @@
           "type": "array",
           "title": "Properties",
           "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
-          "additionalItems": false,
           "items": {"$ref": "#/definitions/property"}
         }
       }
     },
     "licenseChoice": {
-      "type": "object",
-      "title": "License(s)",
-      "additionalProperties": false,
-      "properties": {
-        "license": {
-          "$ref": "#/definitions/license"
-        },
-        "expression": {
-          "type": "string",
-          "title": "SPDX License Expression",
-          "examples": [
-            "Apache-2.0 AND (MIT OR GPL-2.0-only)",
-            "GPL-3.0-only WITH Classpath-exception-2.0"
-          ]
-        }
-      },
-      "oneOf":[
+      "type": "array",
+      "title": "License Choice",
+      "description": "EITHER (a list of SPDX and/or named licenses) OR (a list of one SPDX License Expression)",
+      "oneOf": [
         {
-          "required": ["license"]
+          "description": "a list of SPDX and/or named licenses",
+          "items": {
+            "type": "object",
+            "required": ["license"],
+            "additionalProperties": false,
+            "properties": {
+              "license": {"$ref": "#/definitions/license"}
+            }
+          }
         },
         {
-          "required": ["expression"]
+          "description": "a list of one SPDX License Expression",
+          "additionalItems": false,
+          "minItems": 1,
+          "maxItems": 1,
+          "items": [{
+            "type": "object",
+            "required": ["expression"],
+            "additionalProperties": false,
+            "properties": {
+              "expression": {
+                "type": "string",
+                "title": "SPDX License Expression",
+                "examples": [
+                  "Apache-2.0 AND (MIT OR GPL-2.0-only)",
+                  "GPL-3.0-only WITH Classpath-exception-2.0"
+                ]
+              }
+            }
+          }]
         }
       ]
     },
@@ -931,7 +992,6 @@
         },
         "resolves": {
           "type": "array",
-          "additionalItems": false,
           "items": {"$ref": "#/definitions/issue"},
           "title": "Resolves",
           "description": "A collection of issues the patch resolves"
@@ -1071,7 +1131,7 @@
         "type": {
           "type": "string",
           "title": "Type",
-          "description": "Specifies the type of external reference.\n\n* __vcs__ = Version Control System\n* __issue-tracker__ = Issue or defect tracking system, or an Application Lifecycle Management (ALM) system\n* __website__ = Website\n* __advisories__ = Security advisories\n* __bom__ = Bill of Materials (SBOM, OBOM, HBOM, SaaSBOM, etc)\n* __mailing-list__ = Mailing list or discussion group\n* __social__ = Social media account\n* __chat__ = Real-time chat platform\n* __documentation__ = Documentation, guides, or how-to instructions\n* __support__ = Community or commercial support\n* __distribution__ = Direct or repository download location\n* __distribution-intake__ = The location where a component was published to. This is often the same as \"distribution\" but may also include specialized publishing processes that act as an intermediary\n* __license__ = The URL to the license file. If a license URL has been defined in the license node, it should also be defined as an external reference for completeness\n* __build-meta__ = Build-system specific meta file (i.e. pom.xml, package.json, .nuspec, etc)\n* __build-system__ = URL to an automated build system\n* __release-notes__ = URL to release notes\n* __security-contact__ = Specifies a way to contact the maintainer, supplier, or provider in the event of a security incident. Common URIs include links to a disclosure procedure, a mailto (RFC-2368) that specifies an email address, a tel (RFC-3966) that specifies a phone number, or dns (RFC-4501]) that specifies the records containing DNS Security TXT\n* __model-card__ = A model card describes the intended uses of a machine learning model, potential limitations, biases, ethical considerations, training parameters, datasets used to train the model, performance metrics, and other relevant data useful for ML transparency.\n* __attestation__ = Human or machine-readable statements containing facts, evidence, or testimony\n* __threat-model__ = An enumeration of identified weaknesses, threats, and countermeasures, dataflow diagram (DFD), attack tree, and other supporting documentation in human-readable or machine-readable format\n* __vulnerability-assertion__ = A Vulnerability Disclosure Report (VDR) which asserts the known and previously unknown vulnerabilities that affect a component, service, or product including the analysis and findings describing the impact (or lack of impact) that the reported vulnerability has on a component, service, or product.\n* __exploitability-statement__ = A Vulnerability Exploitability eXchange (VEX) which asserts the known vulnerabilities that do not affect a product, product family, or organization, and optionally the ones that do. The VEX should include the analysis and findings describing the impact (or lack of impact) that the reported vulnerability has on the product, product family, or organization.\n* __pentest-report__ = Results from an authorized simulated cyberattack on a component or service, otherwise known as a penetration test\n* __static-analysis-report__ = SARIF or proprietary machine or human-readable report for which static analysis has identified code quality, security, and other potential issues with the source code\n* __dynamic-analysis-report__ = Dynamic analysis report that has identified issues such as vulnerabilities and misconfigurations\n* __runtime-analysis-report__ = Report generated by analyzing the call stack of a running application\n* __component-analysis-report__ = Report generated by Software Composition Analysis (SCA), container analysis, or other forms of component analysis\n* __maturity-report__ = Report containing a formal assessment of an organization, business unit, or team against a maturity model\n* __certification-report__ = Industry, regulatory, or other certification from an accredited (if applicable) certification body\n* __quality-metrics__ = Report or system in which quality metrics can be obtained\n* __codified-infrastructure__ = Code or configuration that defines and provisions virtualized infrastructure, commonly referred to as Infrastructure as Code (IaC)\n* __other__ = Use this if no other types accurately describe the purpose of the external reference",
+          "description": "Specifies the type of external reference.\n\n* __vcs__ = Version Control System\n* __issue-tracker__ = Issue or defect tracking system, or an Application Lifecycle Management (ALM) system\n* __website__ = Website\n* __advisories__ = Security advisories\n* __bom__ = Bill of Materials (SBOM, OBOM, HBOM, SaaSBOM, etc)\n* __mailing-list__ = Mailing list or discussion group\n* __social__ = Social media account\n* __chat__ = Real-time chat platform\n* __documentation__ = Documentation, guides, or how-to instructions\n* __support__ = Community or commercial support\n* __distribution__ = Direct or repository download location\n* __distribution-intake__ = The location where a component was published to. This is often the same as \"distribution\" but may also include specialized publishing processes that act as an intermediary\n* __license__ = The URL to the license file. If a license URL has been defined in the license node, it should also be defined as an external reference for completeness\n* __build-meta__ = Build-system specific meta file (i.e. pom.xml, package.json, .nuspec, etc)\n* __build-system__ = URL to an automated build system\n* __release-notes__ = URL to release notes\n* __security-contact__ = Specifies a way to contact the maintainer, supplier, or provider in the event of a security incident. Common URIs include links to a disclosure procedure, a mailto (RFC-2368) that specifies an email address, a tel (RFC-3966) that specifies a phone number, or dns (RFC-4501]) that specifies the records containing DNS Security TXT\n* __model-card__ = A model card describes the intended uses of a machine learning model, potential limitations, biases, ethical considerations, training parameters, datasets \n* __attestation__ = Human or machine-readable statements containing facts, evidence, or testimony\n* __threat-model__ = An enumeration of identified weaknesses, threats, and countermeasures, dataflow diagram (DFD), attack tree, and other supporting documentation in human-readable or machine-readable format\n* __adversary-model__ = The defined assumptions, goals, and capabilities of an adversary.\n* __risk-assessment__ = Identifies and analyzes the potential of future events that may negatively impact individuals, assets, and/or the environment. Risk assessments may also include judgments on the tolerability of each risk.\n* __vulnerability-assertion__ = A Vulnerability Disclosure Report (VDR) which asserts the known and previously unknown vulnerabilities that affect a component, service, or product including the analysis and findings describing the impact (or lack of impact) that the reported vulnerability has on a component, service, or product.\n* __exploitability-statement__ = A Vulnerability Exploitability eXchange (VEX) which asserts the known vulnerabilities that do not affect a product, product family, or organization, and optionally the ones that do. The VEX should include the analysis and findings describing the impact (or lack of impact) that the reported vulnerability has on the product, product family, or organization.\n* __pentest-report__ = Results from an authorized simulated cyberattack on a component or service, otherwise known as a penetration test\n* __static-analysis-report__ = SARIF or proprietary machine or human-readable report for which static analysis has identified code quality, security, and other potential issues with the source code\n* __dynamic-analysis-report__ = Dynamic analysis report that has identified issues such as vulnerabilities and misconfigurations\n* __runtime-analysis-report__ = Report generated by analyzing the call stack of a running application\n* __component-analysis-report__ = Report generated by Software Composition Analysis (SCA), container analysis, or other forms of component analysis\n* __maturity-report__ = Report containing a formal assessment of an organization, business unit, or team against a maturity model\n* __certification-report__ = Industry, regulatory, or other certification from an accredited (if applicable) certification body\n* __quality-metrics__ = Report or system in which quality metrics can be obtained\n* __codified-infrastructure__ = Code or configuration that defines and provisions virtualized infrastructure, commonly referred to as Infrastructure as Code (IaC)\n* __poam__ = Plans of Action and Milestones (POAM) compliment an \"attestation\" external reference. POAM is defined by NIST as a \"document that identifies tasks needing to be accomplished. It details resources required to accomplish the elements of the plan, any milestones in meeting the tasks and scheduled completion dates for the milestones\".\n* __other__ = Use this if no other types accurately describe the purpose of the external reference",
           "enum": [
             "vcs",
             "issue-tracker",
@@ -1093,6 +1153,8 @@
             "model-card",
             "attestation",
             "threat-model",
+            "adversary-model",
+            "risk-assessment",
             "vulnerability-assertion",
             "exploitability-statement",
             "pentest-report",
@@ -1104,12 +1166,12 @@
             "certification-report",
             "codified-infrastructure",
             "quality-metrics",
+            "poam",
             "other"
           ]
         },
         "hashes": {
           "type": "array",
-          "additionalItems": false,
           "items": {"$ref": "#/definitions/hash"},
           "title": "Hashes",
           "description": "The hashes of the external reference (if applicable)."
@@ -1133,7 +1195,6 @@
         "dependsOn": {
           "type": "array",
           "uniqueItems": true,
-          "additionalItems": false,
           "items": {
             "$ref": "#/definitions/refType"
           },
@@ -1210,27 +1271,22 @@
         },
         "data": {
           "type": "array",
-          "additionalItems": false,
           "items": {"$ref": "#/definitions/serviceData"},
           "title": "Data",
           "description": "Specifies information about the data including the directional flow of data and the data classification."
         },
         "licenses": {
-          "type": "array",
-          "additionalItems": false,
-          "items": {"$ref": "#/definitions/licenseChoice"},
+          "$ref": "#/definitions/licenseChoice",
           "title": "Component License(s)"
         },
         "externalReferences": {
           "type": "array",
-          "additionalItems": false,
           "items": {"$ref": "#/definitions/externalReference"},
           "title": "External References",
           "description": "External references provide a way to document systems, sites, and information that may be relevant, but are not included with the BOM. They may also establish specific relationships within or external to the BOM."
         },
         "services": {
           "type": "array",
-          "additionalItems": false,
           "items": {"$ref": "#/definitions/service"},
           "uniqueItems": true,
           "title": "Services",
@@ -1245,7 +1301,6 @@
           "type": "array",
           "title": "Properties",
           "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
-          "additionalItems": false,
           "items": {"$ref": "#/definitions/property"}
         },
         "signature": {
@@ -1288,9 +1343,13 @@
             "Credit card information being exchanged in between the web app and the database"
           ]
         },
+        "governance": {
+          "type": "object",
+          "title": "Data Governance",
+          "$ref": "#/definitions/dataGovernance"
+        },
         "source": {
           "type": "array",
-          "additionalItems": false,
           "items": {
             "type": "string",
             "format": "iri-reference"
@@ -1300,7 +1359,6 @@
         },
         "destination": {
           "type": "array",
-          "additionalItems": false,
           "items": {
             "type": "string",
             "format": "iri-reference"
@@ -1367,7 +1425,6 @@
               "type": "array",
               "title": "Methods",
               "description": "The methods used to extract and/or analyze the evidence.",
-              "additionalItems": false,
               "items": {
                 "type": "object",
                 "required": [
@@ -1411,7 +1468,6 @@
             "tools": {
               "type": "array",
               "uniqueItems": true,
-              "additionalItems": false,
               "items": {
                 "$ref": "#/definitions/refType"
               },
@@ -1424,8 +1480,8 @@
           "type": "array",
           "title": "Occurrences",
           "description": "Evidence of individual instances of a component spread across multiple locations.",
-          "additionalItems": false,
           "items": {
+            "type": "object",
             "required": [ "location" ],
             "additionalProperties": false,
             "properties": {
@@ -1450,7 +1506,6 @@
             "frames": {
               "type": "array",
               "title": "Methods",
-              "additionalItems": false,
               "items": {
                 "type": "object",
                 "required": [
@@ -1477,7 +1532,6 @@
                     "title": "Parameters",
                     "description": "Optional arguments that are passed to the module or function.",
                     "type": "array",
-                    "additionalItems": false,
                     "items": {
                       "type": "string"
                     }
@@ -1503,14 +1557,11 @@
           }
         },
         "licenses": {
-          "type": "array",
-          "additionalItems": false,
-          "items": {"$ref": "#/definitions/licenseChoice"},
+          "$ref": "#/definitions/licenseChoice",
           "title": "Component License(s)"
         },
         "copyright": {
           "type": "array",
-          "additionalItems": false,
           "items": {"$ref": "#/definitions/copyright"},
           "title": "Copyright"
         }
@@ -1524,16 +1575,21 @@
       ],
       "additionalProperties": false,
       "properties": {
+        "bom-ref": {
+          "$ref": "#/definitions/refType",
+          "title": "BOM Reference",
+          "description": "An optional identifier which can be used to reference the composition elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+        },
         "aggregate": {
           "$ref": "#/definitions/aggregateType",
           "title": "Aggregate",
-          "description": "Specifies an aggregate type that describe how complete a relationship is."
+          "description": "Specifies an aggregate type that describe how complete a relationship is.\n\n* __complete__ = The relationship is complete. No further relationships including constituent components, services, or dependencies are known to exist.\n* __incomplete__ = The relationship is incomplete. Additional relationships exist and may include constituent components, services, or dependencies.\n* __incomplete&#95;first&#95;party&#95;only__ = The relationship is incomplete. Only relationships for first-party components, services, or their dependencies are represented.\n* __incomplete&#95;first&#95;party&#95;proprietary&#95;only__ = The relationship is incomplete. Only relationships for first-party components, services, or their dependencies are represented, limited specifically to those that are proprietary.\n* __incomplete&#95;first&#95;party&#95;opensource&#95;only__ = The relationship is incomplete. Only relationships for first-party components, services, or their dependencies are represented, limited specifically to those that are opensource.\n* __incomplete&#95;third&#95;party&#95;only__ = The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented.\n* __incomplete&#95;third&#95;party&#95;proprietary&#95;only__ = The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented, limited specifically to those that are proprietary.\n* __incomplete&#95;third&#95;party&#95;opensource&#95;only__ = The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented, limited specifically to those that are opensource.\n* __unknown__ = The relationship may be complete or incomplete. This usually signifies a 'best-effort' to obtain constituent components, services, or dependencies but the completeness is inconclusive.\n* __not&#95;specified__ = The relationship completeness is not specified.\n"
         },
         "assemblies": {
           "type": "array",
           "uniqueItems": true,
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/refType"
           },
           "title": "BOM references",
           "description": "The bom-ref identifiers of the components or services being described. Assemblies refer to nested relationships whereby a constituent part may include other constituent parts. References do not cascade to child parts. References are explicit for the specified constituent part only."
@@ -1546,6 +1602,15 @@
           },
           "title": "BOM references",
           "description": "The bom-ref identifiers of the components or services being described. Dependencies refer to a relationship whereby an independent constituent part requires another independent constituent part. References do not cascade to transitive dependencies. References are explicit for the specified dependency only."
+        },
+        "vulnerabilities": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "title": "BOM references",
+          "description": "The bom-ref identifiers of the vulnerabilities being described."
         },
         "signature": {
           "$ref": "#/definitions/signature",
@@ -1561,7 +1626,11 @@
         "complete",
         "incomplete",
         "incomplete_first_party_only",
+        "incomplete_first_party_proprietary_only",
+        "incomplete_first_party_opensource_only",
         "incomplete_third_party_only",
+        "incomplete_third_party_proprietary_only",
+        "incomplete_third_party_opensource_only",
         "unknown",
         "not_specified"
       ]
@@ -1679,14 +1748,12 @@
         },
         "resolves": {
           "type": "array",
-          "additionalItems": false,
           "items": {"$ref": "#/definitions/issue"},
           "title": "Resolves",
           "description": "A collection of issues that have been resolved."
         },
         "notes": {
           "type": "array",
-          "additionalItems": false,
           "items": {"$ref": "#/definitions/note"},
           "title": "Notes",
           "description": "Zero or more release notes containing the locale and content. Multiple note objects may be specified to support release notes in a wide variety of languages."
@@ -1695,7 +1762,6 @@
           "type": "array",
           "title": "Properties",
           "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
-          "additionalItems": false,
           "items": {"$ref": "#/definitions/property"}
         }
       }
@@ -1874,8 +1940,8 @@
           "type": "array",
           "title": "References",
           "description": "Zero or more pointers to vulnerabilities that are the equivalent of the vulnerability specified. Often times, the same vulnerability may exist in multiple sources of vulnerability intelligence, but have different identifiers. References provide a way to correlate vulnerabilities across multiple sources of vulnerability intelligence.",
-          "additionalItems": false,
           "items": {
+            "type": "object",
             "required": [
               "id",
               "source"
@@ -1903,7 +1969,6 @@
           "type": "array",
           "title": "Ratings",
           "description": "List of vulnerability ratings",
-          "additionalItems": false,
           "items": {
             "$ref": "#/definitions/rating"
           }
@@ -1913,7 +1978,6 @@
           "title": "CWEs",
           "description": "List of Common Weaknesses Enumerations (CWEs) codes that describes this vulnerability. For example 399 (of https://cwe.mitre.org/data/definitions/399.html)",
           "examples": [399],
-          "additionalItems": false,
           "items": {
             "$ref": "#/definitions/cwe"
           }
@@ -1965,7 +2029,6 @@
           "type": "array",
           "title": "Advisories",
           "description": "Published advisories of the vulnerability if provided.",
-          "additionalItems": false,
           "items": {
             "$ref": "#/definitions/advisory"
           }
@@ -2004,7 +2067,6 @@
               "type": "array",
               "title": "Organizations",
               "description": "The organizations credited with vulnerability discovery.",
-              "additionalItems": false,
               "items": {
                 "$ref": "#/definitions/organizationalEntity"
               }
@@ -2013,7 +2075,6 @@
               "type": "array",
               "title": "Individuals",
               "description": "The individuals, not associated with organizations, that are credited with vulnerability discovery.",
-              "additionalItems": false,
               "items": {
                 "$ref": "#/definitions/organizationalContact"
               }
@@ -2030,7 +2091,6 @@
               "properties": {
                 "components": {
                   "type": "array",
-                  "additionalItems": false,
                   "items": {"$ref": "#/definitions/component"},
                   "uniqueItems": true,
                   "title": "Components",
@@ -2038,7 +2098,6 @@
                 },
                 "services": {
                   "type": "array",
-                  "additionalItems": false,
                   "items": {"$ref": "#/definitions/service"},
                   "uniqueItems": true,
                   "title": "Services",
@@ -2050,7 +2109,6 @@
               "type": "array",
               "title": "Tools (legacy)",
               "description": "[Deprecated] The tool(s) used to identify, confirm, or score the vulnerability.",
-              "additionalItems": false,
               "items": {"$ref": "#/definitions/tool"}
             }
           ]
@@ -2071,7 +2129,6 @@
               "type": "array",
               "title": "Response",
               "description": "A response to the vulnerability by the manufacturer, supplier, or project responsible for the affected component or service. More than one response is allowed. Responses are strongly encouraged for vulnerabilities where the analysis state is exploitable.",
-              "additionalItems": false,
               "items": {
                 "type": "string",
                 "enum": [
@@ -2105,8 +2162,8 @@
         "affects": {
           "type": "array",
           "uniqueItems": true,
-          "additionalItems": false,
           "items": {
+            "type": "object",
             "required": [
               "ref"
             ],
@@ -2121,8 +2178,8 @@
                 "type": "array",
                 "title": "Versions",
                 "description": "Zero or more individual versions or range of versions.",
-                "additionalItems": false,
                 "items": {
+                  "type": "object",
                   "oneOf": [
                     {
                       "required": ["version"]
@@ -2158,7 +2215,6 @@
           "type": "array",
           "title": "Properties",
           "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
-          "additionalItems": false,
           "items": {
             "$ref": "#/definitions/property"
           }
@@ -2206,7 +2262,6 @@
         "subjects": {
           "type": "array",
           "uniqueItems": true,
-          "additionalItems": false,
           "items": {
             "$ref": "#/definitions/refType"
           },
@@ -2334,7 +2389,6 @@
               "type": "array",
               "title": "Datasets",
               "description": "The datasets used to train and evaluate the model.",
-              "additionalItems": false,
               "items" : {
                 "oneOf" : [
                   {
@@ -2342,11 +2396,12 @@
                     "$ref": "#/definitions/componentData"
                   },
                   {
+                    "type": "object",
                     "title": "Data Component Reference",
                     "additionalProperties": false,
                     "properties": {
                       "ref": {
-                        "type": "string",
+                        "$ref": "#/definitions/refType",
                         "title": "Reference",
                         "description": "References a data component by the components bom-ref attribute"
                       }
@@ -2359,14 +2414,12 @@
               "type": "array",
               "title": "Inputs",
               "description": "The input format(s) of the model",
-              "additionalItems": false,
               "items": { "$ref": "#/definitions/inputOutputMLParameters" }
             },
             "outputs": {
               "type": "array",
               "title": "Outputs",
               "description": "The output format(s) from the model",
-              "additionalItems": false,
               "items": { "$ref": "#/definitions/inputOutputMLParameters" }
             }
           }
@@ -2381,7 +2434,6 @@
               "type": "array",
               "title": "Performance Metrics",
               "description": "The model performance metrics being reported. Examples may include accuracy, F1 score, precision, top-3 error rates, MSC, etc.",
-              "additionalItems": false,
               "items": { "$ref": "#/definitions/performanceMetric" }
             },
             "graphics": { "$ref": "#/definitions/graphicsCollection" }
@@ -2397,7 +2449,6 @@
               "type": "array",
               "title": "Users",
               "description": "Who are the intended users of the model?",
-              "additionalItems": false,
               "items": {
                 "type": "string"
               }
@@ -2406,7 +2457,6 @@
               "type": "array",
               "title": "Use Cases",
               "description": "What are the intended use cases of the model?",
-              "additionalItems": false,
               "items": {
                 "type": "string"
               }
@@ -2415,7 +2465,6 @@
               "type": "array",
               "title": "Technical Limitations",
               "description": "What are the known technical limitations of the model? E.g. What kind(s) of data should the model be expected not to perform well on? What are the factors that might degrade model performance?",
-              "additionalItems": false,
               "items": {
                 "type": "string"
               }
@@ -2424,7 +2473,6 @@
               "type": "array",
               "title": "Performance Tradeoffs",
               "description": "What are the known tradeoffs in accuracy/performance of the model?",
-              "additionalItems": false,
               "items": {
                 "type": "string"
               }
@@ -2433,14 +2481,12 @@
               "type": "array",
               "title": "Ethical Considerations",
               "description": "What are the ethical (or environmental) risks involved in the application of this model?",
-              "additionalItems": false,
               "items": { "$ref": "#/definitions/risk" }
             },
             "fairnessAssessments": {
               "type": "array",
               "title": "Fairness Assessments",
               "description": "How does the model affect groups at risk of being systematically disadvantaged? What are the harms and benefits to the various affected groups?",
-              "additionalItems": false,
               "items": {
                 "$ref": "#/definitions/fairnessAssessment"
               }
@@ -2451,7 +2497,6 @@
           "type": "array",
           "title": "Properties",
           "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
-          "additionalItems": false,
           "items": {"$ref": "#/definitions/property"}
         }
       }
@@ -2515,7 +2560,6 @@
               "type": "array",
               "title": "Configuration Properties",
               "description": "Provides the ability to document name-value parameters used for configuration.",
-              "additionalItems": false,
               "items": {
                 "$ref": "#/definitions/property"
               }
@@ -2528,7 +2572,6 @@
         "sensitiveData": {
           "type": "array",
           "description": "A description of any sensitive data in a dataset.",
-          "additionalItems": false,
           "items": {
             "type": "string"
           }
@@ -2541,33 +2584,37 @@
         "governance": {
           "type": "object",
           "title": "Data Governance",
-          "description": "",
-          "additionalProperties": false,
-          "properties": {
-            "custodians": {
-              "type": "array",
-              "title": "Data Custodians",
-              "description": "Data custodians are responsible for the safe custody, transport, and storage of data.",
-              "additionalItems": false,
-              "items": { "$ref": "#/definitions/dataGovernanceResponsibleParty" }
-            },
-            "stewards": {
-              "type": "array",
-              "title": "Data Stewards",
-              "description": "Data stewards are responsible for data content, context, and associated business rules.",
-              "items": { "$ref": "#/definitions/dataGovernanceResponsibleParty" }
-            },
-            "owners": {
-              "type": "array",
-              "title": "Data Owners",
-              "description": "Data owners are concerned with risk and appropriate access to data.",
-              "items": { "$ref": "#/definitions/dataGovernanceResponsibleParty" }
-            }
-          }
+          "$ref": "#/definitions/dataGovernance"
+        }
+      }
+    },
+    "dataGovernance": {
+      "type": "object",
+      "title": "Data Governance",
+      "additionalProperties": false,
+      "properties": {
+        "custodians": {
+          "type": "array",
+          "title": "Data Custodians",
+          "description": "Data custodians are responsible for the safe custody, transport, and storage of data.",
+          "items": { "$ref": "#/definitions/dataGovernanceResponsibleParty" }
+        },
+        "stewards": {
+          "type": "array",
+          "title": "Data Stewards",
+          "description": "Data stewards are responsible for data content, context, and associated business rules.",
+          "items": { "$ref": "#/definitions/dataGovernanceResponsibleParty" }
+        },
+        "owners": {
+          "type": "array",
+          "title": "Data Owners",
+          "description": "Data owners are concerned with risk and appropriate access to data.",
+          "items": { "$ref": "#/definitions/dataGovernanceResponsibleParty" }
         }
       }
     },
     "dataGovernanceResponsibleParty": {
+      "type": "object",
       "additionalProperties": false,
       "properties": {
         "organization": {
@@ -2601,7 +2648,6 @@
         "collection": {
           "description": "A collection of graphics.",
           "type": "array",
-          "additionalItems": false,
           "items": { "$ref": "#/definitions/graphic" }
         }
       }
