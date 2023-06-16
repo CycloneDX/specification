@@ -87,6 +87,10 @@
     }
   },
   "definitions": {
+    "refType": {
+      "$comment": "Identifier-DataType for interlinked elements.",
+      "type": "string"
+    },
     "metadata": {
       "type": "object",
       "title": "BOM Metadata Object",
@@ -261,7 +265,7 @@
           "pattern": "^[-+a-z0-9.]+/[-+a-z0-9.]+$"
         },
         "bom-ref": {
-          "type": "string",
+          "$ref": "#/definitions/refType",
           "title": "BOM Reference",
           "description": "An optional identifier which can be used to reference the component elsewhere in the BOM. Every bom-ref should be unique.",
           "default": "",
@@ -859,8 +863,7 @@
       "additionalProperties": false,
       "properties": {
         "ref": {
-          "type": "string",
-          "format": "string",
+          "$ref": "#/definitions/refType",
           "title": "Reference",
           "description": "References a component by the components bom-ref attribute"
         },
@@ -868,7 +871,7 @@
           "type": "array",
           "uniqueItems": true,
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/refType"
           },
           "title": "Depends On",
           "description": "The bom-ref identifiers of the components that are dependencies of this dependency object."
@@ -884,7 +887,7 @@
       "additionalProperties": false,
       "properties": {
         "bom-ref": {
-          "type": "string",
+          "$ref": "#/definitions/refType",
           "title": "BOM Reference",
           "description": "An optional identifier which can be used to reference the service elsewhere in the BOM. Every bom-ref should be unique.",
           "default": "",
