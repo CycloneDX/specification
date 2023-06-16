@@ -37,6 +37,8 @@ message Bom {
   repeated Annotation annotations = 11;
   // Specifies optional, custom, properties
   repeated Property properties = 12;
+  // Describes how a component or service was manufactured or deployed. This is achieved through the use of formulas, workflows, tasks, and steps, which declare the precise steps to reproduce along with the observed formulas describing the steps which transpired in the manufacturing process.
+  repeated Formula formulation = 13;
 }
 
 enum Classification {
@@ -253,6 +255,14 @@ enum ExternalReferenceType {
   EXTERNAL_REFERENCE_TYPE_MODEL_CARD = 32;
     // Plans of Action and Milestones (POAM) compliment an "attestation" external reference. POAM is defined by NIST as a "document that identifies tasks needing to be accomplished. It details resources required to accomplish the elements of the plan, any milestones in meeting the tasks and scheduled completion dates for the milestones".
   EXTERNAL_REFERENCE_TYPE_POAM = 33;
+  // A record of events that occurred in a computer system or application, such as problems, errors, or information on current operations.
+  EXTERNAL_REFERENCE_TYPE_LOG = 34;
+  // Parameters or settings that may be used by other components or services.
+  EXTERNAL_REFERENCE_TYPE_CONFIGURATION = 35;
+  // Information used to substantiate a claim.
+  EXTERNAL_REFERENCE_TYPE_EVIDENCE = 36;
+  // Describes how a component or service was manufactured or deployed.
+  EXTERNAL_REFERENCE_TYPE_FORMULATION = 37;
 }
 
 enum HashAlg {
@@ -1144,8 +1154,10 @@ enum ComponentDataType {
   COMPONENT_DATA_TYPE_CONFIGURATION = 1;
   // A collection of data.
   COMPONENT_DATA_TYPE_DATASET = 2;
+  // Data that can be used to create new instances of what the definition defines.
+  COMPONENT_DATA_TYPE_DEFINITION = 3;
   // Any other type of data that does not fit into existing definitions.
-  COMPONENT_DATA_TYPE_OTHER = 3;
+  COMPONENT_DATA_TYPE_OTHER = 4;
 }
 
 message GraphicsCollection {
@@ -1160,5 +1172,316 @@ message GraphicsCollection {
     // The graphic (vector or raster). Base64 encoding MUST be specified for binary images.
     optional AttachedText image = 2;
   }
+}
 
+// Describes workflows and resources that captures rules and other aspects of how the associated BOM component or service was formed.
+message Formula {
+  // BOM unique reference to the resource.
+  optional string bom_ref = 1;
+  // Transient components that are used in tasks that constitute one or more of this formula's workflows
+  repeated Component components = 2;
+  // Transient services that are used in tasks that constitute one or more of this formula's workflows
+  repeated Service services = 3;
+  // List of workflows that can be declared to accomplish specific orchestrated goals and independently triggered.
+  repeated Workflow workflows = 4;
+  // Domain-specific formula properties.
+  repeated Property properties = 5;
+}
+
+// A specialized orchestration task.
+message Workflow {
+  // BOM unique reference to the resource.
+  string bom_ref = 1;
+  // The unique identifier for the resource instance within its deployment context.
+  string uid = 2;
+  // The name of the resource instance.
+  optional string name = 3;
+  // A description of the resource instance.
+  optional string description = 4;
+  // Domain-specific resource instance properties.
+  repeated Property properties = 5;
+  // References to component or service resources that are used to realize the resource instance.
+  repeated ResourceReferenceChoice resourceReferences = 6;
+  // The tasks that comprise the workflow.
+  repeated Task tasks = 7;
+  // The graph of dependencies between tasks within the workflow.
+  repeated Dependency taskDependencies = 8;
+  // Indicates the types of activities performed by the set of workflow tasks.
+  repeated TaskType taskTypes = 9;
+  // The trigger that initiated the task.
+  optional Trigger trigger = 10;
+  // The sequence of steps for the task.
+  repeated Step steps = 11;
+  // Represents resources and data brought into a task at runtime by executor or task commands
+  repeated InputType inputs = 12;
+  // Represents resources and data output from a task at runtime by executor or task commands
+  repeated OutputType outputs = 13;
+  // The date and time (timestamp) when the task started.
+  optional google.protobuf.Timestamp timeStart = 14;
+  // The date and time (timestamp) when the task ended.
+  optional google.protobuf.Timestamp timeEnd = 15;
+  // A set of named filesystem or data resource shareable by workflow tasks.
+  repeated Workspace workspaces = 16;
+  // A graph of the component runtime topology for workflow's instance.
+  repeated Dependency runtimeTopology = 17;
+}
+
+// Describes the inputs, sequence of steps and resources used to accomplish a task and its output.
+message Task {
+  // BOM unique reference to the resource.
+  string bom_ref = 1;
+  // The unique identifier for the resource instance within its deployment context.
+  string uid = 2;
+  // The name of the resource instance.
+  optional string name = 3;
+  // A description of the resource instance.
+  optional string description = 4;
+  // Domain-specific task instance properties.
+  repeated Property properties = 5;
+  // References to component or service resources that are used to realize the resource instance.
+  repeated ResourceReferenceChoice resourceReferences = 6;
+  // Indicates the types of activities performed by the set of workflow tasks.
+  repeated TaskType taskTypes = 7;
+  // The trigger that initiated the task.
+  optional Trigger trigger = 8;
+  // "The sequence of steps for the task.
+  repeated Step steps = 9;
+  // Represents resources and data brought into a task at runtime by executor or task commands
+  repeated InputType inputs = 10;
+  // Represents resources and data output from a task at runtime by executor or task commands
+  repeated OutputType outputs = 11;
+  // The date and time (timestamp) when the task started.
+  optional google.protobuf.Timestamp timeStart = 14;
+  // The date and time (timestamp) when the task ended.
+  optional google.protobuf.Timestamp timeEnd = 15;
+  // A set of named filesystem or data resource shareable by workflow tasks.
+  repeated Workspace workspaces = 16;
+  // A graph of the component runtime topology for task's instance.
+  repeated Dependency runtimeTopology = 17;
+}
+
+// Executes specific commands or tools in order to accomplish its owning task as part of a sequence.
+message Step {
+  // A name for the step.
+  optional string name = 1;
+  // A description of the step.
+  optional string description = 2;
+  // Ordered list of commands or directives for the step
+  repeated Command commands = 3;
+  // Domain-specific step properties.
+  repeated Property properties = 4;
+}
+
+message Command {
+  // A text representation of the executed command.
+  optional string executed = 1;
+  // Domain-specific command properties.
+  repeated Property properties = 2;
+}
+
+// A named filesystem or data resource shareable by workflow tasks.
+message Workspace {
+  // BOM unique reference to the resource.
+  string bom_ref = 1;
+  // The unique identifier for the resource instance within its deployment context.
+  string uid = 2;
+  // The name of the resource instance.
+  optional string name = 3;
+  // The names for the workspace as referenced by other workflow tasks. Effectively, a name mapping so other tasks can use their own local name in their steps.
+  repeated string aliases = 4;
+  // A description of the resource instance.
+  optional string description = 5;
+  // Domain-specific workspace instance properties.
+  repeated Property properties = 6;
+  // References to component or service resources that are used to realize the resource instance.
+  repeated ResourceReferenceChoice resourceReferences = 7;
+  // Describes the read-write access control for the workspace relative to the owning resource instance.
+  optional AccessMode accessMode = 8;
+  // A path to a location on disk where the workspace will be available to the associated task's steps.
+  optional string mountPath = 9;
+  // The name of a domain-specific data type the workspace represents.
+  optional string managedDataType = 10;
+  // Identifies the reference to the request for a specific volume type and parameters.
+  optional string volumeRequest = 11;
+  // Information about the actual volume instance allocated to the workspace.
+  optional Volume volume = 12;
+
+  enum AccessMode {
+    ACCESS_MODE_READ_ONLY = 0;
+    ACCESS_MODE_READ_WRITE = 1;
+    ACCESS_MODE_READ_WRITE_ONCE = 2;
+    ACCESS_MODE_WRITE_ONCE = 3;
+    ACCESS_MODE_WRITE_ONLY = 4;
+  }
+}
+
+// An identifiable, logical unit of data storage tied to a physical device.
+message Volume {
+  // The unique identifier for the volume instance within its deployment context.
+  optional string uid = 1;
+  // The name of the volume instance
+  optional string name = 2;
+  // The volume mode for the volume instance.
+  optional VolumeMode mode = 3;
+  // The underlying path created from the actual volume.
+  optional string path = 4;
+  // The allocated size of the volume accessible to the associated workspace. This should include the scalar size as well as IEC standard unit in either decimal or binary form.
+  optional string sizeAllocated = 5;
+  // Indicates if the volume persists beyond the life of the resource it is associated with.
+  optional bool persistent = 6;
+  // Indicates if the volume is remotely (i.e., network) attached.
+  optional bool remote = 7;
+  // Domain-specific volume instance properties.
+  repeated Property properties = 8;
+
+  enum VolumeMode {
+    VOLUME_MODE_FILESYSTEM = 0;
+    VOLUME_MODE_BLOCK = 1;
+  }
+}
+
+// Represents a resource that can conditionally activate (or fire) tasks based upon associated events and their data.
+message Trigger {
+  // BOM unique reference to the resource.
+  string bom_ref = 1;
+  // The unique identifier for the resource instance within its deployment context.
+  string uid = 2;
+  // The name of the resource instance.
+  optional string name = 3;
+  // A description of the resource instance.
+  optional string description = 4;
+  // Additional properties of the trigger.
+  repeated Property properties = 5;
+  // References to component or service resources that are used to realize the resource instance.
+  repeated ResourceReferenceChoice resourceReferences = 6;
+  // The source type of event which caused the trigger to fire.
+  TriggerType type = 7;
+  // The event data that caused the associated trigger to activate.
+  optional Event event = 8;
+  // Conditions
+  repeated Condition conditions = 9;
+  // The date and time (timestamp) when the trigger was activated.
+  optional google.protobuf.Timestamp timeActivated = 10;
+  // Represents resources and data brought into a task at runtime by executor or task commands
+  repeated InputType inputs = 11;
+  // Represents resources and data output from a task at runtime by executor or task commands
+  repeated OutputType outputs = 12;
+
+  enum TriggerType {
+    TRIGGER_TYPE_MANUAL = 0;
+    TRIGGER_TYPE_API = 1;
+    TRIGGER_TYPE_WEBHOOK = 2;
+    TRIGGER_TYPE_SCHEDULED = 3;
+  }
+}
+
+// Represents something that happened that may trigger a response.
+message Event {
+  // The unique identifier of the event.
+  optional string uid = 1;
+  // A description of the event.
+  optional string description = 2;
+  // The date and time (timestamp) when the event was received.
+  optional google.protobuf.Timestamp timeReceived = 3;
+  // Encoding of the raw event data.
+  optional AttachedText data = 4;
+  // References the component or service that was the source of the event
+  optional ResourceReferenceChoice source = 5;
+  // References the component or service that was the target of the event
+  optional ResourceReferenceChoice target = 6;
+  // Additional properties of the event.
+  repeated Property properties = 7;
+}
+
+// Type that represents various input data types and formats.
+message InputType {
+  // A references to the component or service that provided the input to the task (e.g., reference to a service with data flow value of `inbound`)
+  optional ResourceReferenceChoice source = 1;
+  // A reference to the component or service that received or stored the input if not the task itself (e.g., a local, named storage workspace)
+  optional ResourceReferenceChoice target = 2;
+  // A reference to an independent resource provided as an input to a task by the workflow runtime.
+  optional ResourceReferenceChoice resource = 3;
+  // Inputs that have the form of parameters with names and values.
+  repeated Parameter parameters = 4;
+  // Inputs that have the form of parameters with names and values.
+  repeated EnvironmentVars environmentVars = 5;
+  // Inputs that have the form of data.
+  optional AttachedText data = 6;
+  // Additional properties of the input data.
+  repeated Property properties = 7;
+}
+
+message OutputType {
+  // Describes the type of data output.
+  optional OutputTypeType type = 1;
+  // Component or service that generated or provided the output from the task (e.g., a build tool)
+  optional ResourceReferenceChoice source = 2;
+  // Component or service that received the output from the task (e.g., reference to an artifactory service with data flow value of `outbound`)
+  optional ResourceReferenceChoice target = 3;
+  // A reference to an independent resource generated as output by the task.
+  optional ResourceReferenceChoice resource = 4;
+  // Outputs that have the form of data.
+  optional AttachedText data = 5;
+  // Outputs that have the form of environment variables.
+  repeated EnvironmentVars environmentVars = 6;
+  // Additional properties of the output data.
+  repeated Property properties = 7;
+
+  enum OutputTypeType {
+    OUTPUT_TYPE_ARTIFACT = 0;
+    OUTPUT_TYPE_ATTESTATION = 1;
+    OUTPUT_TYPE_LOG = 2;
+    OUTPUT_TYPE_EVIDENCE = 3;
+    OUTPUT_TYPE_METRICS = 4;
+    OUTPUT_TYPE_OTHER = 5;
+  }
+}
+
+message ResourceReferenceChoice {
+  oneof choice {
+    string ref = 1;
+    ExternalReference externalReference = 2;
+  }
+}
+
+// A condition that was used to determine a trigger should be activated.
+message Condition {
+  // Describes the set of conditions which cause the trigger to activate.
+  optional string description = 1;
+  // The logical expression that was evaluated that determined the trigger should be fired.
+  optional string expression = 2;
+  // Domain-specific condition instance properties.
+  repeated Property properties = 3;
+}
+
+enum TaskType {
+  TASK_TYPE_COPY = 0;
+  TASK_TYPE_CLONE = 1;
+  TASK_TYPE_LINT = 2;
+  TASK_TYPE_SCAN = 3;
+  TASK_TYPE_MERGE = 4;
+  TASK_TYPE_BUILD = 5;
+  TASK_TYPE_TEST = 6;
+  TASK_TYPE_DELIVER = 7;
+  TASK_TYPE_DEPLOY = 8;
+  TASK_TYPE_RELEASE = 9;
+  TASK_TYPE_CLEAN = 10;
+  TASK_TYPE_OTHER = 11;
+}
+
+// A representation of a functional parameter.
+message Parameter {
+  // The name of the parameter.
+  optional string name = 1;
+  // The value of the parameter.
+  optional string value = 2;
+  // The data type of the parameter.
+  optional string dataType = 3;
+}
+
+message EnvironmentVars {
+  oneof choice {
+    Property property = 1;
+    string value = 2;
+  }
 }
