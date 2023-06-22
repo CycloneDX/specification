@@ -132,7 +132,7 @@
       "allOf": [{"$ref": "#/definitions/refType"}]
     },
     "bomLinkDocumentType": {
-      "title": "BOM-Link document",
+      "title": "BOM-Link Document",
       "description": "Descriptor for another BOM document. See https://cyclonedx.org/capabilities/bomlink/",
       "type": "string",
       "format": "iri-reference",
@@ -140,8 +140,8 @@
       "$comment": "part of the pattern is based on `bom.serialNumber`'s pattern"
     },
     "bomLinkElementType": {
-      "title": "BOM-Link element",
-      "description": "Descriptor for an element in another BOM document. See https://cyclonedx.org/capabilities/bomlink/",
+      "title": "BOM-Link Element",
+      "description": "Descriptor for an element in a BOM document. See https://cyclonedx.org/capabilities/bomlink/",
       "type": "string",
       "format": "iri-reference",
       "pattern": "^urn:cdx:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/[1-9][0-9]*#.+$",
@@ -149,8 +149,14 @@
     },
     "bomLink": {
       "anyOf": [
-        {"$ref": "#/definitions/bomLinkDocumentType"},
-        {"$ref": "#/definitions/bomLinkElementType"}
+        {
+          "title": "BOM-Link Document",
+          "$ref": "#/definitions/bomLinkDocumentType"
+        },
+        {
+          "title": "BOM-Link Element",
+          "$ref": "#/definitions/bomLinkElementType"
+        }
       ]
     },
     "metadata": {
@@ -1136,10 +1142,12 @@
         "url": {
           "anyOf": [
             {
+              "title": "URL",
               "type": "string",
               "format": "iri-reference"
             },
             {
+              "title": "BOM-Link",
               "$ref": "#/definitions/bomLink"
             }
           ],
@@ -1380,10 +1388,12 @@
           "items": {
             "anyOf": [
               {
+                "title": "URL",
                 "type": "string",
                 "format": "iri-reference"
               },
               {
+                "title": "BOM-Link Element",
                 "$ref": "#/definitions/bomLinkElementType"
               }
             ]
@@ -1396,10 +1406,12 @@
           "items": {
             "anyOf": [
               {
+                "title": "URL",
                 "type": "string",
                 "format": "iri-reference"
               },
               {
+                "title": "BOM-Link Element",
                 "$ref": "#/definitions/bomLinkElementType"
               }
             ]
@@ -1511,8 +1523,14 @@
               "uniqueItems": true,
               "items": {
                 "anyOf": [
-                  {"$ref": "#/definitions/refLinkType"},
-                  {"$ref": "#/definitions/bomLinkElementType"}
+                  {
+                    "title": "Ref",
+                    "$ref": "#/definitions/refLinkType"
+                  },
+                  {
+                    "title": "BOM-Link Element",
+                    "$ref": "#/definitions/bomLinkElementType"
+                  }
                 ]
               },
               "title": "BOM References",
@@ -1634,8 +1652,14 @@
           "uniqueItems": true,
           "items": {
             "anyOf": [
-              {"$ref": "#/definitions/refLinkType"},
-              {"$ref": "#/definitions/bomLinkElementType"}
+              {
+                "title": "Ref",
+                "$ref": "#/definitions/refLinkType"
+              },
+              {
+                "title": "BOM-Link Element",
+                "$ref": "#/definitions/bomLinkElementType"
+              }
             ]
           },
           "title": "BOM references",
@@ -2219,8 +2243,14 @@
             "properties": {
               "ref": {
                 "anyOf": [
-                  {"$ref": "#/definitions/refLinkType"},
-                  {"$ref": "#/definitions/bomLinkElementType"}
+                  {
+                    "title": "Ref",
+                    "$ref": "#/definitions/refLinkType"
+                  },
+                  {
+                    "title": "BOM-Link Element",
+                    "$ref": "#/definitions/bomLinkElementType"
+                  }
                 ],
                 "title": "Reference",
                 "description": "References a component or service by the objects bom-ref"
@@ -2315,8 +2345,14 @@
           "uniqueItems": true,
           "items": {
             "anyOf": [
-              {"$ref": "#/definitions/refLinkType"},
-              {"$ref": "#/definitions/bomLinkElementType"}
+              {
+                "title": "Ref",
+                "$ref": "#/definitions/refLinkType"
+              },
+              {
+                "title": "BOM-Link Element",
+                "$ref": "#/definitions/bomLinkElementType"
+              }
             ]
           },
           "title": "BOM References",
@@ -2456,8 +2492,14 @@
                     "properties": {
                       "ref": {
                         "anyOf": [
-                          {"$ref": "#/definitions/refLinkType"},
-                          {"$ref": "#/definitions/bomLinkElementType"}
+                          {
+                            "title": "Ref",
+                            "$ref": "#/definitions/refLinkType"
+                          },
+                          {
+                            "title": "BOM-Link Element",
+                            "$ref": "#/definitions/bomLinkElementType"
+                          }
                         ],
                         "title": "Reference",
                         "description": "References a data component by the components bom-ref attribute"
@@ -3646,8 +3688,14 @@
           "title": "BOM Reference",
           "description": "References an object by its bom-ref attribute",
           "anyOf": [
-            {"$ref": "#/definitions/refLinkType"},
-            {"$ref": "#/definitions/bomLinkElementType"}
+            {
+              "title": "Ref",
+              "$ref": "#/definitions/refLinkType"
+            },
+            {
+              "title": "BOM-Link Element",
+              "$ref": "#/definitions/bomLinkElementType"
+            }
           ]
         },
         "externalReference": {
