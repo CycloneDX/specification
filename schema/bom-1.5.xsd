@@ -2066,11 +2066,25 @@ limitations under the License.
     <xs:complexType name="licenseChoiceType">
         <xs:choice>
             <xs:element name="license" type="bom:licenseType" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="expression" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
+            <xs:element name="expression" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>A valid SPDX license expression.
                         Refer to https://spdx.org/specifications for syntax requirements</xs:documentation>
                 </xs:annotation>
+                <xs:complexType>
+                    <xs:simpleContent>
+                        <xs:extension base="xs:normalizedString">
+                            <xs:attribute name="bom-ref" type="bom:refType">
+                                <xs:annotation>
+                                    <xs:documentation>
+                                        An optional identifier which can be used to reference the license elsewhere in the BOM.
+                                        Uniqueness is enforced within all elements and children of the root-level bom element.
+                                    </xs:documentation>
+                                </xs:annotation>
+                            </xs:attribute>
+                        </xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
             </xs:element>
         </xs:choice>
     </xs:complexType>
