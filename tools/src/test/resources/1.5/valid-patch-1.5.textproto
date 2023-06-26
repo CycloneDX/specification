@@ -1,0 +1,71 @@
+spec_version: "1.5"
+version: 1
+serial_number: "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79"
+components {
+  type: CLASSIFICATION_LIBRARY
+  group: "com.acme"
+  name: "sample-library"
+  version: "1.0.0"
+  pedigree {
+    ancestors {
+      type: CLASSIFICATION_LIBRARY
+      group: "org.example"
+      name: "sample-library"
+      version: "1.0.0"
+    }
+    patches {
+      type: PATCH_CLASSIFICATION_UNOFFICIAL
+      diff {
+        text {
+          content_type: "text/plain"
+          encoding: "base64"
+          value: "blah"
+        }
+        url: "uri/to/changes.diff"
+      }
+      resolves {
+        type: ISSUE_CLASSIFICATION_ENHANCEMENT
+        id: "JIRA-17240"
+        description: "Great new feature that does something"
+        source {
+          name: "Acme Org"
+          url: "https://issues.acme.org/17240"
+        }
+      }
+    }
+    patches {
+      type: PATCH_CLASSIFICATION_BACKPORT
+      diff {
+        text {
+          content_type: "text/plain"
+          encoding: "base64"
+          value: "blah"
+        }
+        url: "uri/to/changes.diff"
+      }
+      resolves {
+        type: ISSUE_CLASSIFICATION_SECURITY
+        id: "CVE-2019-9997"
+        name: "CVE-2019-9997"
+        description: "blah blah"
+        source {
+          name: "NVD"
+          url: "https://nvd.nist.gov/vuln/detail/CVE-2019-9997"
+        }
+        references: "http://some/other/site-1"
+        references: "http://some/other/site-2"
+      }
+      resolves {
+        type: ISSUE_CLASSIFICATION_DEFECT
+        id: "JIRA-874319"
+        description: "Enable to do something"
+        source {
+          name: "Example Org"
+          url: "https://issues.example.org/874319"
+        }
+        references: "http://some/other/site-1"
+        references: "http://some/other/site-2"
+      }
+    }
+  }
+}
