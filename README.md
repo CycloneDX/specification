@@ -55,7 +55,8 @@ The officially supported media type for Protocol Buffer format is `application/x
 ## Release History
 
 | Version | Release Date |
-| ------- | --------- |
+| ------- | ------------ |
+| CycloneDX 1.5 | 26 June 2023 |
 | CycloneDX 1.4 | 12 January 2022 |
 | CycloneDX 1.3 | 04 May 2021 |
 | CycloneDX 1.2 | 26 May 2020 |
