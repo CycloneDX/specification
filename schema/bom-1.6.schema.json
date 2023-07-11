@@ -105,6 +105,452 @@
       "title": "Formulation",
       "description": "Describes how a component or service was manufactured or deployed. This is achieved through the use of formulas, workflows, tasks, and steps, which declare the precise steps to reproduce along with the observed formulas describing the steps which transpired in the manufacturing process."
     },
+    "declarations": {
+      "type": "object",
+      "title": "Declarations",
+      "description": "",
+      "additionalProperties": false,
+      "properties": {
+        "standards": {
+          "type": "array",
+          "title": "Standards",
+          "description": "",
+          "items": {
+            "type": "object",
+            "title": "Standard",
+            "description": "",
+            "additionalProperties": false,
+            "properties": {
+              "bom-ref": {
+                "$ref": "#/definitions/refType",
+                "title": "BOM Reference",
+                "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+              },
+              "name": {
+                "type": "string",
+                "title": "Name",
+                "description": "The name of the standard"
+              },
+              "description": {
+                "type": "string",
+                "title": "Description",
+                "description": "A description of the standard"
+              },
+              "version": {
+                "type": "string",
+                "title": "Version",
+                "description": "A version of the standard"
+              },
+              "owner": {
+                "type": "string",
+                "title": "Owner",
+                "description": "The owner of the standard"
+              },
+              "requirements": {
+                "type": "array",
+                "title": "Requirements",
+                "description": "The requirements that make up the standard",
+                "items": {
+                  "type": "object",
+                  "title": "Requirement",
+                  "description": "",
+                  "additionalProperties": false,
+                  "properties": {
+                    "bom-ref": {
+                      "$ref": "#/definitions/refType",
+                      "title": "BOM Reference",
+                      "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+                    },
+                    "identifier": {
+                      "type": "string",
+                      "title": "Identifier",
+                      "description": "The identifier used in the standard to identify a specific requirement"
+                    },
+                    "title": {
+                      "type": "string",
+                      "title": "Title",
+                      "description": "The title of the requirement"
+                    },
+                    "text": {
+                      "type": "string",
+                      "title": "Text",
+                      "description": "The textual content of the requirement"
+                    },
+                    "opencre": {
+                      "type": "string",
+                      "format": "iri-reference",
+                      "title": "OWASP OpenCRE",
+                      "description": "URL to the Common Requirements Enumeration"
+                    },
+                    "parent": {
+                      "$ref": "#/definitions/refLinkType",
+                      "title": "Parent BOM Reference",
+                      "description": "The optional `bom-ref` to a parent requirement. This establishes a hierarchy of requirements."
+                    },
+                    "externalReferences": {
+                      "type": "array",
+                      "items": {"$ref": "#/definitions/externalReference"},
+                      "title": "External References",
+                      "description": "External references provide a way to document systems, sites, and information that may be relevant, but are not included with the BOM. They may also establish specific relationships within or external to the BOM."
+                    }
+                  }
+                }
+              },
+              "levels": {
+                "type": "array",
+                "title": "Levels",
+                "description": "",
+                "items": {
+                  "type": "object",
+                  "title": "Level",
+                  "description": "",
+                  "additionalProperties": false,
+                  "properties": {
+                    "bom-ref": {
+                      "$ref": "#/definitions/refType",
+                      "title": "BOM Reference",
+                      "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+                    },
+                    "identifier": {
+                      "type": "string",
+                      "title": "Identifier",
+                      "description": "The identifier used in the standard to identify a specific level"
+                    },
+                    "title": {
+                      "type": "string",
+                      "title": "Title",
+                      "description": "The title of the level"
+                    },
+                    "description": {
+                      "type": "string",
+                      "title": "Description",
+                      "description": "The description of the level"
+                    },
+                    "requirements": {
+                      "type": "array",
+                      "title": "Requirements",
+                      "description": "",
+                      "items": { "$ref": "#/definitions/refLinkType" }
+                    }
+                  }
+                }
+              },
+              "externalReferences": {
+                "type": "array",
+                "items": {"$ref": "#/definitions/externalReference"},
+                "title": "External References",
+                "description": "External references provide a way to document systems, sites, and information that may be relevant, but are not included with the BOM. They may also establish specific relationships within or external to the BOM."
+              },
+              "signature": {
+                "$ref": "#/definitions/signature",
+                "title": "Signature",
+                "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
+              }
+            }
+          }
+        },
+        "assessors": {
+          "type": "array",
+          "title": "Assessors",
+          "description": "",
+          "items": {
+            "type": "object",
+            "title": "Assessor",
+            "description": "",
+            "additionalProperties": false,
+            "properties": {
+              "bom-ref": {
+                "$ref": "#/definitions/refType",
+                "title": "BOM Reference",
+                "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "self",
+                  "purchaser",
+                  "independent"
+                ],
+                "title": "Type",
+                "description": ""
+              },
+              "organization": {
+                "$ref": "#/definitions/organizationalEntity",
+                "title": "Organization",
+                "description": ""
+              }
+            }
+          }
+        },
+        "attestations": {
+          "type": "array",
+          "title": "Attestations",
+          "description": "",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "targets": {
+                "type": "array",
+                "title": "Targets",
+                "description": "",
+                "items": { "$ref": "#/definitions/refLinkType" }
+              },
+              "assessor": {
+                "$ref": "#/definitions/refLinkType",
+                "title": "Assessor",
+                "description": ""
+              },
+              "map": {
+                "type": "array",
+                "title": "Map",
+                "description": "",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "requirement": {
+                      "$ref": "#/definitions/refLinkType",
+                      "title": "Requirement",
+                      "description": ""
+                    },
+                    "claims": {
+                      "type": "array",
+                      "title": "Claims",
+                      "description": "",
+                      "items": { "$ref": "#/definitions/refLinkType" }
+                    },
+                    "counterClaims": {
+                      "type": "array",
+                      "title": "Claims",
+                      "description": "",
+                      "items": { "$ref": "#/definitions/refLinkType" }
+                    },
+                    "conformance": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "title": "Conformance",
+                      "description": "The conformance to a requirement from 0 - 1, where 1 is 100% conformance."
+                    },
+                    "mitigationStrategy": {
+                      "type": "array",
+                      "title": "Mitigation Strategy",
+                      "description": "",
+                      "items": { "$ref": "#/definitions/refLinkType" }
+                    },
+                    "confidence": {
+                      "type": "object",
+                      "title": "Confidence",
+                      "description": "",
+                      "additionalProperties": false,
+                      "properties": {
+                        "score": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "title": "Score",
+                          "description": "The confidence of the attestation from 0 - 1, where 1 is 100% confidence."
+                        },
+                        "rationale": {
+                          "type": "string",
+                          "title": "Rationale",
+                          "description": ""
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "signature": {
+                "$ref": "#/definitions/signature",
+                "title": "Signature",
+                "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
+              }
+            }
+          }
+        },
+        "claims": {
+          "type": "array",
+          "title": "Claims",
+          "description": "",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "bom-ref": {
+                "$ref": "#/definitions/refType",
+                "title": "BOM Reference",
+                "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+              },
+              "target": {
+                "$ref": "#/definitions/refLinkType",
+                "title": "Target",
+                "description": ""
+              },
+              "predicate": {
+                "type": "string",
+                "title": "Predicate",
+                "description": ""
+              },
+              "mitigationStrategy": {
+                "type": "array",
+                "title": "Mitigation Strategy",
+                "description": "",
+                "items": { "$ref": "#/definitions/refLinkType" }
+              },
+              "reasoning": {
+                "type": "string",
+                "title": "Reasoning",
+                "description": ""
+              },
+              "evidence": {
+                "type": "array",
+                "title": "Evidence",
+                "description": "",
+                "items": { "$ref": "#/definitions/refLinkType" }
+              },
+              "counterEvidence": {
+                "type": "array",
+                "title": "Counter Evidence",
+                "description": "",
+                "items": { "$ref": "#/definitions/refLinkType" }
+              },
+              "externalReferences": {
+                "type": "array",
+                "items": {"$ref": "#/definitions/externalReference"},
+                "title": "External References",
+                "description": "External references provide a way to document systems, sites, and information that may be relevant, but are not included with the BOM. They may also establish specific relationships within or external to the BOM."
+              },
+              "signature": {
+                "$ref": "#/definitions/signature",
+                "title": "Signature",
+                "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
+              }
+            }
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "title": "Evidence",
+          "description": "",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "bom-ref": {
+                "$ref": "#/definitions/refType",
+                "title": "BOM Reference",
+                "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+              },
+              "type": {
+                "type": "string",
+                "title": "Type",
+                "description": "TODO - make this extensible - see valid-attestations-1.6.json for notes"
+              },
+              "description": {
+                "type": "string",
+                "title": "Description",
+                "description": ""
+              },
+              "data": {
+                "type": "string",
+                "title": "Description",
+                "description": "",
+                "additionalProperties": false,
+                "properties": {
+                  "contents": {
+                    "type": "object",
+                    "title": "Data Contents",
+                    "description": "The contents or references to the contents of the data being described.",
+                    "additionalProperties": false,
+                    "properties": {
+                      "attachment": {
+                        "title": "Data Attachment",
+                        "description": "An optional way to include textual or encoded data.",
+                        "$ref": "#/definitions/attachment"
+                      },
+                      "url": {
+                        "type": "string",
+                        "title": "Data URL",
+                        "description": "The URL to where the data can be retrieved.",
+                        "format": "iri-reference"
+                      }
+                    }
+                  }
+                }
+              },
+              "created": {
+                "type": "string",
+                "format": "date-time",
+                "title": "Created",
+                "description": ""
+              },
+              "expires": {
+                "type": "string",
+                "format": "date-time",
+                "title": "Expires",
+                "description": ""
+              },
+              "author": {
+                "$ref": "#/definitions/organizationalContact",
+                "title": "Author",
+                "description": ""
+              },
+              "reviewer": {
+                "$ref": "#/definitions/organizationalContact",
+                "title": "Reviewer",
+                "description": ""
+              },
+              "signature": {
+                "$ref": "#/definitions/signature",
+                "title": "Signature",
+                "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
+              }
+            }
+          }
+        },
+        "targets": {
+          "type": "object",
+          "title": "Targets",
+          "description": "",
+          "additionalProperties": false,
+          "properties": {
+            "organizations": {
+              "type": "array",
+              "title": "Organizations",
+              "description": "",
+              "items": {"$ref": "#/definitions/organizationalEntity"}
+            },
+            "contacts": {
+              "type": "array",
+              "title": "Contacts",
+              "description": "",
+              "items": {"$ref": "#/definitions/organizationalContact"}
+            },
+            "components": {
+              "type": "array",
+              "title": "Components",
+              "description": "",
+              "items": {"$ref": "#/definitions/component"}
+            },
+            "services": {
+              "type": "array",
+              "title": "Services",
+              "description": "",
+              "items": {"$ref": "#/definitions/service"}
+            }
+          }
+        },
+        "affirmation": {
+          "type": "object",
+          "title": "Affirmation",
+          "additionalProperties": false,
+          "properties": {
+            "text": {
+
+            }
+          }
+        }
+      }
+    },
     "properties": {
       "type": "array",
       "title": "Properties",
