@@ -111,144 +111,6 @@
       "description": "",
       "additionalProperties": false,
       "properties": {
-        "standards": {
-          "type": "array",
-          "title": "Standards",
-          "description": "",
-          "items": {
-            "type": "object",
-            "title": "Standard",
-            "description": "",
-            "additionalProperties": false,
-            "properties": {
-              "bom-ref": {
-                "$ref": "#/definitions/refType",
-                "title": "BOM Reference",
-                "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
-              },
-              "name": {
-                "type": "string",
-                "title": "Name",
-                "description": "The name of the standard"
-              },
-              "description": {
-                "type": "string",
-                "title": "Description",
-                "description": "A description of the standard"
-              },
-              "version": {
-                "type": "string",
-                "title": "Version",
-                "description": "A version of the standard"
-              },
-              "owner": {
-                "type": "string",
-                "title": "Owner",
-                "description": "The owner of the standard"
-              },
-              "requirements": {
-                "type": "array",
-                "title": "Requirements",
-                "description": "The requirements that make up the standard",
-                "items": {
-                  "type": "object",
-                  "title": "Requirement",
-                  "description": "",
-                  "additionalProperties": false,
-                  "properties": {
-                    "bom-ref": {
-                      "$ref": "#/definitions/refType",
-                      "title": "BOM Reference",
-                      "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
-                    },
-                    "identifier": {
-                      "type": "string",
-                      "title": "Identifier",
-                      "description": "The identifier used in the standard to identify a specific requirement"
-                    },
-                    "title": {
-                      "type": "string",
-                      "title": "Title",
-                      "description": "The title of the requirement"
-                    },
-                    "text": {
-                      "type": "string",
-                      "title": "Text",
-                      "description": "The textual content of the requirement"
-                    },
-                    "opencre": {
-                      "type": "string",
-                      "format": "iri-reference",
-                      "title": "OWASP OpenCRE",
-                      "description": "URL to the Common Requirements Enumeration"
-                    },
-                    "parent": {
-                      "$ref": "#/definitions/refLinkType",
-                      "title": "Parent BOM Reference",
-                      "description": "The optional `bom-ref` to a parent requirement. This establishes a hierarchy of requirements."
-                    },
-                    "externalReferences": {
-                      "type": "array",
-                      "items": {"$ref": "#/definitions/externalReference"},
-                      "title": "External References",
-                      "description": "External references provide a way to document systems, sites, and information that may be relevant, but are not included with the BOM. They may also establish specific relationships within or external to the BOM."
-                    }
-                  }
-                }
-              },
-              "levels": {
-                "type": "array",
-                "title": "Levels",
-                "description": "",
-                "items": {
-                  "type": "object",
-                  "title": "Level",
-                  "description": "",
-                  "additionalProperties": false,
-                  "properties": {
-                    "bom-ref": {
-                      "$ref": "#/definitions/refType",
-                      "title": "BOM Reference",
-                      "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
-                    },
-                    "identifier": {
-                      "type": "string",
-                      "title": "Identifier",
-                      "description": "The identifier used in the standard to identify a specific level"
-                    },
-                    "title": {
-                      "type": "string",
-                      "title": "Title",
-                      "description": "The title of the level"
-                    },
-                    "description": {
-                      "type": "string",
-                      "title": "Description",
-                      "description": "The description of the level"
-                    },
-                    "requirements": {
-                      "type": "array",
-                      "title": "Requirements",
-                      "description": "",
-                      "items": { "$ref": "#/definitions/refLinkType" }
-                    }
-                  }
-                }
-              },
-              "externalReferences": {
-                "type": "array",
-                "items": {"$ref": "#/definitions/externalReference"},
-                "title": "External References",
-                "description": "External references provide a way to document systems, sites, and information that may be relevant, but are not included with the BOM. They may also establish specific relationships within or external to the BOM."
-              },
-              "signature": {
-                "$ref": "#/definitions/signature",
-                "title": "Signature",
-                "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
-              }
-            }
-          }
-        },
         "assessors": {
           "type": "array",
           "title": "Assessors",
@@ -547,6 +409,22 @@
             "text": {
 
             }
+          }
+        }
+      }
+    },
+    "definitions": {
+      "type": "object",
+      "title": "Definitions",
+      "description": "",
+      "additionalProperties": false,
+      "properties": {
+        "standards": {
+          "type": "array",
+          "title": "Standards",
+          "description": "Defines standards which may consist of regulations, industry or organizational-specific standards, maturity models, and best practices which can be evaluated against or attested to.",
+          "items": {
+            "$ref": "#/definitions/standard"
           }
         }
       }
@@ -4233,6 +4111,139 @@
           "title": "Data type",
           "description": "The data type of the parameter.",
           "type": "string"
+        }
+      }
+    },
+    "standard": {
+      "type": "object",
+      "title": "Standard",
+      "description": "",
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "#/definitions/refType",
+          "title": "BOM Reference",
+          "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name of the standard"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the standard"
+        },
+        "version": {
+          "type": "string",
+          "title": "Version",
+          "description": "A version of the standard"
+        },
+        "owner": {
+          "type": "string",
+          "title": "Owner",
+          "description": "The owner of the standard"
+        },
+        "requirements": {
+          "type": "array",
+          "title": "Requirements",
+          "description": "The requirements that make up the standard",
+          "items": {
+            "type": "object",
+            "title": "Requirement",
+            "description": "",
+            "additionalProperties": false,
+            "properties": {
+              "bom-ref": {
+                "$ref": "#/definitions/refType",
+                "title": "BOM Reference",
+                "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+              },
+              "identifier": {
+                "type": "string",
+                "title": "Identifier",
+                "description": "The identifier used in the standard to identify a specific requirement"
+              },
+              "title": {
+                "type": "string",
+                "title": "Title",
+                "description": "The title of the requirement"
+              },
+              "text": {
+                "type": "string",
+                "title": "Text",
+                "description": "The textual content of the requirement"
+              },
+              "opencre": {
+                "type": "string",
+                "format": "iri-reference",
+                "title": "OWASP OpenCRE",
+                "description": "URL to the Common Requirements Enumeration"
+              },
+              "parent": {
+                "$ref": "#/definitions/refLinkType",
+                "title": "Parent BOM Reference",
+                "description": "The optional `bom-ref` to a parent requirement. This establishes a hierarchy of requirements."
+              },
+              "externalReferences": {
+                "type": "array",
+                "items": {"$ref": "#/definitions/externalReference"},
+                "title": "External References",
+                "description": "External references provide a way to document systems, sites, and information that may be relevant, but are not included with the BOM. They may also establish specific relationships within or external to the BOM."
+              }
+            }
+          }
+        },
+        "levels": {
+          "type": "array",
+          "title": "Levels",
+          "description": "",
+          "items": {
+            "type": "object",
+            "title": "Level",
+            "description": "",
+            "additionalProperties": false,
+            "properties": {
+              "bom-ref": {
+                "$ref": "#/definitions/refType",
+                "title": "BOM Reference",
+                "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+              },
+              "identifier": {
+                "type": "string",
+                "title": "Identifier",
+                "description": "The identifier used in the standard to identify a specific level"
+              },
+              "title": {
+                "type": "string",
+                "title": "Title",
+                "description": "The title of the level"
+              },
+              "description": {
+                "type": "string",
+                "title": "Description",
+                "description": "The description of the level"
+              },
+              "requirements": {
+                "type": "array",
+                "title": "Requirements",
+                "description": "",
+                "items": { "$ref": "#/definitions/refLinkType" }
+              }
+            }
+          }
+        },
+        "externalReferences": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/externalReference"},
+          "title": "External References",
+          "description": "External references provide a way to document systems, sites, and information that may be relevant, but are not included with the BOM. They may also establish specific relationships within or external to the BOM."
+        },
+        "signature": {
+          "$ref": "#/definitions/signature",
+          "title": "Signature",
+          "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
         }
       }
     },
