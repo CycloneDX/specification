@@ -108,13 +108,13 @@
     "declarations": {
       "type": "object",
       "title": "Declarations",
-      "description": "",
+      "description": "The list of declarations which describe the conformance to standards. Each declaration may include attestations, claims, and evidence.",
       "additionalProperties": false,
       "properties": {
         "assessors": {
           "type": "array",
           "title": "Assessors",
-          "description": "",
+          "description": "The list of assessors evaluating claims and determining conformance to requirements and confidence in that assessment.",
           "items": {
             "type": "object",
             "title": "Assessor",
@@ -126,20 +126,15 @@
                 "title": "BOM Reference",
                 "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
               },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "self",
-                  "purchaser",
-                  "independent"
-                ],
-                "title": "Type",
-                "description": ""
+              "thirdParty": {
+                "type": "boolean",
+                "title": "Third Party",
+                "description": "The boolean indicating if the assessor is outside the organization generating claims. A value of false indicates a self assessor."
               },
               "organization": {
                 "$ref": "#/definitions/organizationalEntity",
                 "title": "Organization",
-                "description": ""
+                "description": "The entity issuing the assessment."
               }
             }
           }
@@ -147,7 +142,7 @@
         "attestations": {
           "type": "array",
           "title": "Attestations",
-          "description": "",
+          "description": "The list of attestations asserted by an assessor that maps requirements to claims.",
           "items": {
             "type": "object",
             "additionalProperties": false,
@@ -160,12 +155,12 @@
               "assessor": {
                 "$ref": "#/definitions/refLinkType",
                 "title": "Assessor",
-                "description": ""
+                "description": "The `bom-ref` to the assessor asserting the attestation."
               },
               "map": {
                 "type": "array",
                 "title": "Map",
-                "description": "",
+                "description": "The grouping of requirements to claims and the attestors declaired conformance and confidence thereof.",
                 "items": {
                   "type": "object",
                   "additionalProperties": false,
@@ -173,24 +168,24 @@
                     "requirement": {
                       "$ref": "#/definitions/refLinkType",
                       "title": "Requirement",
-                      "description": ""
+                      "description": "The `bom-ref` to the requirement being attested to."
                     },
                     "claims": {
                       "type": "array",
                       "title": "Claims",
-                      "description": "",
+                      "description": "The list of `bom-ref` to the claims being attested to.",
                       "items": { "$ref": "#/definitions/refLinkType" }
                     },
                     "counterClaims": {
                       "type": "array",
                       "title": "Claims",
-                      "description": "",
+                      "description": "The list of  `bom-ref` to the counter claims being attested to.",
                       "items": { "$ref": "#/definitions/refLinkType" }
                     },
                     "conformance": {
                       "type": "object",
                       "title": "Conformance",
-                      "description": "",
+                      "description": "The conformance of the claim meeting a requirement.",
                       "additionalProperties": false,
                       "properties": {
                         "score": {
@@ -198,17 +193,17 @@
                           "minimum": 0,
                           "maximum": 1,
                           "title": "Score",
-                          "description": "The conformance to a requirement from 0 - 1, where 1 is 100% conformance."
+                          "description": "The conformance of the claim within [0,1], where 1 is 100% confidence."
                         },
                         "rationale": {
                           "type": "string",
                           "title": "Rationale",
-                          "description": ""
+                          "description": "The rationale for the score of conformance."
                         },
                         "mitigationStrategy": {
                           "type": "array",
                           "title": "Mitigation Strategy",
-                          "description": "",
+                          "description": "The description of the mitigation strategy if conformance is not `1`.",
                           "items": { "$ref": "#/definitions/refLinkType" }
                         }
                       }
@@ -216,7 +211,7 @@
                     "confidence": {
                       "type": "object",
                       "title": "Confidence",
-                      "description": "",
+                      "description": "The confidence of the claim meeting the requirement.",
                       "additionalProperties": false,
                       "properties": {
                         "score": {
@@ -224,12 +219,12 @@
                           "minimum": 0,
                           "maximum": 1,
                           "title": "Score",
-                          "description": "The confidence of the attestation from 0 - 1, where 1 is 100% confidence."
+                          "description": "The confidence of the claim within [0,1], where 1 is 100% confidence."
                         },
                         "rationale": {
                           "type": "string",
                           "title": "Rationale",
-                          "description": ""
+                          "description": "The rationale for the confidence score."
                         }
                       }
                     }
@@ -247,7 +242,7 @@
         "claims": {
           "type": "array",
           "title": "Claims",
-          "description": "",
+          "description": "The list of claims.",
           "items": {
             "type": "object",
             "additionalProperties": false,
@@ -260,34 +255,34 @@
               "target": {
                 "$ref": "#/definitions/refLinkType",
                 "title": "Target",
-                "description": ""
+                "description": "The `bom-ref` to a target representing a specific system, application, API, module, team, person, process, business unit, company, etc...  that this claim is being applied to."
               },
               "predicate": {
                 "type": "string",
                 "title": "Predicate",
-                "description": ""
+                "description": "The specific statement or assertion about the target."
               },
               "mitigationStrategy": {
                 "type": "array",
                 "title": "Mitigation Strategy",
-                "description": "",
+                "description": "The written explanation of how any weaknesses in the evidence will be mitigated.",
                 "items": { "$ref": "#/definitions/refLinkType" }
               },
               "reasoning": {
                 "type": "string",
                 "title": "Reasoning",
-                "description": ""
+                "description": "The written explanation of why the evidence provided substantiates the claim."
               },
               "evidence": {
                 "type": "array",
                 "title": "Evidence",
-                "description": "",
+                "description": "The array of references to evidence that supports this claim.",
                 "items": { "$ref": "#/definitions/refLinkType" }
               },
               "counterEvidence": {
                 "type": "array",
                 "title": "Counter Evidence",
-                "description": "",
+                "description": "The array of references to counterEvidence that undermines this claim.",
                 "items": { "$ref": "#/definitions/refLinkType" }
               },
               "externalReferences": {
@@ -307,7 +302,7 @@
         "evidence": {
           "type": "array",
           "title": "Evidence",
-          "description": "",
+          "description": "The list of evidence.",
           "items": {
             "type": "object",
             "additionalProperties": false,
@@ -325,12 +320,12 @@
               "description": {
                 "type": "string",
                 "title": "Description",
-                "description": ""
+                "description": "The written description of what this evidence is and how it was created."
               },
               "data": {
                 "type": "object",
                 "title": "Description",
-                "description": "",
+                "description": "The output or analysis that supports claims.",
                 "additionalProperties": false,
                 "properties": {
                   "contents": {
@@ -341,13 +336,13 @@
                     "properties": {
                       "attachment": {
                         "title": "Data Attachment",
-                        "description": "An optional way to include textual or encoded data.",
+                        "description": "The optional way to include textual or encoded data.",
                         "$ref": "#/definitions/attachment"
                       },
                       "url": {
                         "type": "string",
                         "title": "Data URL",
-                        "description": "The URL to where the data can be retrieved.",
+                        "description": "The URL where the data can be retrieved.",
                         "format": "iri-reference"
                       }
                     }
@@ -358,23 +353,23 @@
                 "type": "string",
                 "format": "date-time",
                 "title": "Created",
-                "description": ""
+                "description": "The date and time (timestamp) when the evidence was created."
               },
               "expires": {
                 "type": "string",
                 "format": "date-time",
                 "title": "Expires",
-                "description": ""
+                "description": "The optional date and time (timestamp) when the evidence is no longer valid."
               },
               "author": {
                 "$ref": "#/definitions/organizationalContact",
                 "title": "Author",
-                "description": ""
+                "description": "The author of the evidence."
               },
               "reviewer": {
                 "$ref": "#/definitions/organizationalContact",
                 "title": "Reviewer",
-                "description": ""
+                "description": "The reviewer of the evidence."
               },
               "signature": {
                 "$ref": "#/definitions/signature",
@@ -387,31 +382,31 @@
         "targets": {
           "type": "object",
           "title": "Targets",
-          "description": "",
+          "description": "The list of targets which claims are made against.",
           "additionalProperties": false,
           "properties": {
             "organizations": {
               "type": "array",
               "title": "Organizations",
-              "description": "",
+              "description": "The list of organizations which claims are made against.",
               "items": {"$ref": "#/definitions/organizationalEntity"}
             },
-            "contacts": {
+            "people": {
               "type": "array",
-              "title": "Contacts",
-              "description": "",
+              "title": "People",
+              "description": "The list of individuals which claims are made against.",
               "items": {"$ref": "#/definitions/organizationalContact"}
             },
             "components": {
               "type": "array",
               "title": "Components",
-              "description": "",
+              "description": "The list of components which claims are made against.",
               "items": {"$ref": "#/definitions/component"}
             },
             "services": {
               "type": "array",
               "title": "Services",
-              "description": "",
+              "description": "The list of services which claims are made against.",
               "items": {"$ref": "#/definitions/service"}
             }
           }
@@ -421,8 +416,55 @@
           "title": "Affirmation",
           "additionalProperties": false,
           "properties": {
-            "text": {
-
+            "statement": {
+              "type": "string",
+              "title": "Text",
+              "description": "The brief statement affirmed by an individual regarding all declarations.\n*- Notes This could be an affirmation of acceptance by a third-party auditor or receiving individual of a file.",
+              "examples": [ "I certify, to the best of my knowledge, that all information is correct." ]
+            },
+            "signatories": {
+              "type": "array",
+              "title": "Signatories",
+              "description": "The list of signatories authorized on behalf of an organization to assert validity of this document.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "oneOf": [
+                  {
+                    "required": ["signature"]
+                  },
+                  {
+                    "required": ["externalReference", "organization"]
+                  }
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "title": "Name",
+                    "description": "The signatory's name."
+                  },
+                  "role": {
+                    "type": "string",
+                    "title": "Role",
+                    "description": "The signatory's role within an organization."
+                  },
+                  "signature": {
+                    "$ref": "#/definitions/signature",
+                    "title": "Signature",
+                    "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
+                  },
+                  "organization": {
+                    "$ref": "#/definitions/organizationalEntity",
+                    "title": "Organization",
+                    "description": "The signatory's organization."
+                  },
+                  "externalReference": {
+                    "$ref": "#/definitions/externalReference",
+                    "title": "External Reference",
+                    "description": "An External reference provide a way to document systems, sites, and information that may be relevant, but are not included with the BOM. They may also establish specific relationships within or external to the BOM."
+                  }
+                }
+              }
             }
           }
         }
@@ -437,7 +479,7 @@
         "standards": {
           "type": "array",
           "title": "Standards",
-          "description": "Defines standards which may consist of regulations, industry or organizational-specific standards, maturity models, and best practices which can be evaluated against or attested to.",
+          "description": "The list of standards which may consist of regulations, industry or organizational-specific standards, maturity models, best practices, or any other requirements which can be evaluated against or attested to.",
           "items": {
             "$ref": "#/definitions/standard"
           }
@@ -4130,7 +4172,7 @@
     "standard": {
       "type": "object",
       "title": "Standard",
-      "description": "",
+      "description": "A standard may consist of regulations, industry or organizational-specific standards, maturity models, best practices, or any other requirements which can be evaluated against or attested to.",
       "additionalProperties": false,
       "properties": {
         "bom-ref": {
@@ -4141,31 +4183,30 @@
         "name": {
           "type": "string",
           "title": "Name",
-          "description": "The name of the standard"
+          "description": "The name of the standard. This will often be a shortened, single name of the standard."
         },
         "description": {
           "type": "string",
           "title": "Description",
-          "description": "A description of the standard"
+          "description": "The description of the standard."
         },
         "version": {
           "type": "string",
           "title": "Version",
-          "description": "A version of the standard"
+          "description": "The version of the standard."
         },
         "owner": {
           "type": "string",
           "title": "Owner",
-          "description": "The owner of the standard"
+          "description": "The owner of the standard, often the entity responsible for its release."
         },
         "requirements": {
           "type": "array",
           "title": "Requirements",
-          "description": "The requirements that make up the standard",
+          "description": "The list of requirements comprising the standard.",
           "items": {
             "type": "object",
             "title": "Requirement",
-            "description": "",
             "additionalProperties": false,
             "properties": {
               "bom-ref": {
@@ -4176,28 +4217,28 @@
               "identifier": {
                 "type": "string",
                 "title": "Identifier",
-                "description": "The identifier used in the standard to identify a specific requirement"
+                "description": "The unique identifier used in the standard to identify a specific requirement. This should match what is in the standard and should not be the requirements bom-ref."
               },
               "title": {
                 "type": "string",
                 "title": "Title",
-                "description": "The title of the requirement"
+                "description": "The title of the requirement."
               },
               "text": {
                 "type": "string",
                 "title": "Text",
-                "description": "The textual content of the requirement"
+                "description": "The textual content of the requirement."
               },
               "opencre": {
                 "type": "string",
                 "format": "iri-reference",
                 "title": "OWASP OpenCRE",
-                "description": "URL to the Common Requirements Enumeration"
+                "description": "The URL to the corresponding Common Requirements Enumeration (CRE) common requirement identifier."
               },
               "parent": {
                 "$ref": "#/definitions/refLinkType",
                 "title": "Parent BOM Reference",
-                "description": "The optional `bom-ref` to a parent requirement. This establishes a hierarchy of requirements."
+                "description": "The optional `bom-ref` to a parent requirement. This establishes a hierarchy of requirements. Top-level requirements must not define a parent. Only child requirements should define parents."
               },
               "externalReferences": {
                 "type": "array",
@@ -4211,11 +4252,10 @@
         "levels": {
           "type": "array",
           "title": "Levels",
-          "description": "",
+          "description": "The list of levels associated with the standard. Some standards have different levels of compliance.",
           "items": {
             "type": "object",
             "title": "Level",
-            "description": "",
             "additionalProperties": false,
             "properties": {
               "bom-ref": {
@@ -4226,22 +4266,22 @@
               "identifier": {
                 "type": "string",
                 "title": "Identifier",
-                "description": "The identifier used in the standard to identify a specific level"
+                "description": "The identifier used in the standard to identify a specific level."
               },
               "title": {
                 "type": "string",
                 "title": "Title",
-                "description": "The title of the level"
+                "description": "The title of the level."
               },
               "description": {
                 "type": "string",
                 "title": "Description",
-                "description": "The description of the level"
+                "description": "The description of the level."
               },
               "requirements": {
                 "type": "array",
                 "title": "Requirements",
-                "description": "",
+                "description": "The list of requirement `bom-ref`s that comprise the level.",
                 "items": { "$ref": "#/definitions/refLinkType" }
               }
             }
