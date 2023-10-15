@@ -1,15 +1,17 @@
 name: CI Build
 
-on: [push, pull_request]
+on:
+  push:
+    branches: ['master', 'main']
+  pull_request:
+  workflow_dispatch:
 
 env:
-  PYTHON_VERISON_DEFAULT: "3.10"
+  PYTHON_VERSION_DEFAULT: "3.10"
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout
       # see https://github.com/actions/checkout
@@ -22,24 +24,20 @@ jobs:
         distribution: 'zulu'
         java-package: jdk
     - name: Build with Maven
-      run: |
-        cd tools
-        mvn -B package --file pom.xml
-        cd ..
+      run: mvn -B package --file pom.xml
+      working-directory: tools
     - name: Setup Python Environment
       # see https://github.com/actions/setup-python
       uses: actions/setup-python@v4
       with:
-        python-version: ${{ env.PYTHON_VERISON_DEFAULT }}
+        python-version: ${{ env.PYTHON_VERSION_DEFAULT }}
         architecture: 'x64'
     - name: Generate JSON Schema documentation
-      run: |
-        cd docgen/json
-        ./gen.sh
+      run: ./gen.sh
+      working-directory: docgen/json
     - name: Generate XML Schema documentation
-      run: |
-        cd docgen/xml
-        ./gen.sh
+      run: ./gen.sh
+      working-directory: docgen/xml
     - name: Archive JSON Schema documentation
       # https://github.com/actions/upload-artifact
       uses: actions/upload-artifact@v3
