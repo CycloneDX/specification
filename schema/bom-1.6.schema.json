@@ -299,7 +299,7 @@
           "description": "The name of the tool"
         },
         "version": {
-          "type": "string",
+          "$ref": "#/definitions/version",
           "title": "Tool Version",
           "description": "The version of the tool"
         },
@@ -457,10 +457,9 @@
           "examples": ["tomcat-catalina"]
         },
         "version": {
-          "type": "string",
+          "$ref": "#/definitions/version",
           "title": "Component Version",
-          "description": "The component version. The version should ideally comply with semantic versioning but is not enforced.",
-          "examples": ["9.0.14"]
+          "description": "The component version. The version should ideally comply with semantic versioning but is not enforced."
         },
         "description": {
           "type": "string",
@@ -1277,10 +1276,9 @@
           "examples": ["ticker-service"]
         },
         "version": {
-          "type": "string",
+          "$ref": "#/definitions/version",
           "title": "Service Version",
-          "description": "The service version.",
-          "examples": ["1.0.0"]
+          "description": "The service version."
         },
         "description": {
           "type": "string",
@@ -2285,7 +2283,7 @@
                     },
                     "range": {
                       "description": "A version range specified in Package URL Version Range syntax (vers) which is defined at https://github.com/package-url/purl-spec/VERSION-RANGE-SPEC.rst",
-                      "$ref": "#/definitions/range"
+                      "$ref": "#/definitions/versionRange"
                     },
                     "status": {
                       "description": "The vulnerability status for the version or range of versions.",
@@ -2320,16 +2318,36 @@
       ]
     },
     "version": {
-      "description": "A single version of a component or service.",
+      "description": "A single disjunctive version identifier, for a component or service.",
       "type": "string",
       "minLength": 1,
-      "maxLength": 1024
+      "maxLength": 1024,
+      "examples": [
+        "9.0.14",
+        "v1.33.7",
+        "7.0.0-M1",
+        "2.0pre1",
+        "1.0.0-beta1",
+        "0.8.15"
+      ]
     },
-    "range": {
+    "versionRange": {
       "description": "A version range specified in Package URL Version Range syntax (vers) which is defined at https://github.com/package-url/purl-spec/VERSION-RANGE-SPEC.rst",
       "type": "string",
       "minLength": 1,
-      "maxLength": 1024
+      "maxLength": 1024,
+      "examples": [
+        "9.0.14",
+        "1.2.3|>=2.0.0|<5.0.0",
+        "0.0.0|0.0.1|0.0.2|0.0.3|1.0|2.0pre1",
+        ">=1.0.0-beta1|<=1.7.5|>=7.0.0-M1|<=7.0.7|>=7.1.0|<=7.1.2|>=8.0.0-M1|<=8.0.1",
+        ">=2.2.0|!= 2.2.1|<2.3.0"
+      ]
+    },
+    "range": {
+      "deprecated": true,
+      "description": "Deprecated definition. use definition `versionRange` instead.",
+      "allOf": [{"$ref": "#/definitions/versionRange"}]
     },
     "annotations": {
       "type": "object",
