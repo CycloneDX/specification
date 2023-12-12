@@ -44,6 +44,8 @@ public class XmlSchemaVerificationTest extends BaseSchemaVerificationTest {
                     schemaVersion = CycloneDxSchema.Version.VERSION_13;
                 } else if (file.endsWith("-1.4.xml")) {
                     schemaVersion = CycloneDxSchema.Version.VERSION_14;
+                } else if (file.endsWith("-1.5.xml")) {
+                    schemaVersion = CycloneDxSchema.Version.VERSION_15;
                 } else {
                     schemaVersion = null;
                 }
