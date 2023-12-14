@@ -3848,11 +3848,13 @@
     },
     "dependencyType": {
       "type": "string",
+      "title": "Dependency Type",
       "enum": [
         "implements",
-        "uses"
+        "uses",
+        "protectedBy"
       ],
-      "title": "Type to characterize a dependency"
+      "description": "An optional field that describes the type of dependency.\n\n* implement: refers to crypto assets implemented, or statically available in a component. Examples are the algorithms provided by crypto libraries. A crypto asset 'implemented' by a component does not imply that it is in use.\n* uses: refers to crypto assets in use, or being referenced by other components. The referencing can be done by explicit function calls or by configuration at run time. Usage may change over time, so CBOMs always represent a snapshot at a given point in time."
     },
     "cryptoProperties": {
       "type": "object",
@@ -4049,19 +4051,19 @@
         },
         "certificateProperties": {
           "type": "object",
-          "title": "certificate properties",
-          "description": "Properties for crypto assets of asset type 'certificate'",
+          "title": "Certificate Properties",
+          "description": "Properties for cryptographic assets of asset type 'certificate'",
           "additionalProperties": false,
           "properties": {
             "subjectName": {
               "type": "string",
               "title": "Subject Name",
-              "description": "The subject name for the crypto certificate"
+              "description": "The subject name for the certificate"
             },
             "issuerName": {
               "type": "string",
               "title": "Issuer Name",
-              "description": "The issuer name for the crypto certificate"
+              "description": "The issuer name for the certificate"
             },
             "notValidBefore": {
               "type": "string",
@@ -4075,7 +4077,7 @@
             },
             "signatureAlgorithm": {
               "$ref": "#/definitions/cryptoRef",
-              "title": "Algorithm reference",
+              "title": "Algorithm Reference",
               "description": "Bom-ref to signature algorithm used by the certificate"
             },
             "subjectPublicKey": {
@@ -4085,7 +4087,7 @@
             },
             "certificateFormat": {
               "type": "string",
-              "title": "Certificate format",
+              "title": "Certificate Format",
               "description": "The format of the certificate",
               "examples": [
                 "X.509",
@@ -4096,8 +4098,8 @@
             },
             "certificateExtension": {
               "type": "string",
-              "title": "Certificate extensions",
-              "description": "The certificate extensions of the crypto certificate",
+              "title": "Certificate File Extension",
+              "description": "The file extension of the certificate",
               "examples": [
                 "crt",
                 "pem",
@@ -4110,14 +4112,14 @@
         },
         "relatedCryptoMaterialProperties": {
           "type": "object",
-          "title": "related crypto material properties",
-          "description": "Properties for crypto assets of asset type 'relatedCryptoMaterial'",
+          "title": "Related Cryptographic Material Properties",
+          "description": "Properties for cryptographic assets of asset type 'relatedCryptoMaterial'",
           "additionalProperties": false,
           "properties": {
             "type": {
                 "type": "string",
                 "title": "relatedCryptoMaterialType",
-                "description": "The type for the related crypto material",
+                "description": "The type for the related cryptographic material",
                 "enum": [
                     "privateKey",
                     "publicKey",
@@ -4142,13 +4144,13 @@
             },
             "id": {
                 "type": "string",
-                "title": "id",
-                "description": "The identifier for the relatedCryptoMaterial"
+                "title": "ID",
+                "description": "The optional unique identifier for the related cryptographic material"
             },
             "state": {
                 "type": "string",
-                "title": "state",
-                "description": "The key state according to NIST SP 800-57",
+                "title": "State",
+                "description": "The key state as defined by NIST SP 800-57",
                 "enum": [
                     "preActivation",
                     "active",
@@ -4160,62 +4162,64 @@
             },
             "algorithmRef": {
                 "$ref": "#/definitions/cryptoRef",
-                "title": "Algorithm reference",
-                "description": "Bom-ref to algorithm used to generate the relatedCryptoMaterial"
+                "title": "Algorithm Reference",
+                "description": "Bom-ref to the algorithm used to generate the related cryptographic material"
             },
             "creationDate": {
                 "type": "string",
                 "format": "date-time",
-                "title": "creation date",
-                "description": "The date and time (timestamp) when the relatedCryptoMaterial was created."
+                "title": "Creation Date",
+                "description": "The date and time (timestamp) when the related cryptographic material was created."
             },
             "activationDate": {
                 "type": "string",
                 "format": "date-time",
-                "title": "activation date",
-                "description": "The date and time (timestamp) when the relatedCryptoMaterial was activated."
+                "title": "Activation Date",
+                "description": "The date and time (timestamp) when the related cryptographic material was activated."
             },
             "updateDate": {
                 "type": "string",
                 "format": "date-time",
-                "title": "update date",
-                "description": "The date and time (timestamp) when the relatedCryptoMaterial was updated."
+                "title": "Update Date",
+                "description": "The date and time (timestamp) when the related cryptographic material was updated."
             },
             "expirationDate": {
                 "type": "string",
                 "format": "date-time",
-                "title": "expiration date",
-                "description": "The date and time (timestamp) when the relatedCryptoMaterial expired."
+                "title": "Expiration Date",
+                "description": "The date and time (timestamp) when the related cryptographic material expires."
             },
             "value": {
                 "type": "string",
-                "title": "Value assosiated to the crypto material",
-                "description": "The assosiated value of the crypto material"
+                "title": "Value",
+                "description": "The associated value of the cryptographic material"
             },
             "size": {
                 "type": "integer",
-                "title": "Crypto asset size (in bits)"
+                "title":"Size",
+                "description": "Cryptographic asset size (in bits)"
             },
             "format": {
                 "type": "string",
-                "title": "format",
-                "description": "format of the related crypto material (e.g. P8, PEM, DER)"
+                "title": "Format",
+                "description": "Format of the related cryptographic material (e.g. P8, PEM, DER)"
             },
             "securedBy": {
                 "$ref": "#/definitions/securedBy",
-                "title": "Crypto asset is secured by"
+                "title": "Secured By",
+                "description": "The mechanism by which the cryptographic asset is secured by."
             }
           }
         },
         "protocolProperties": {
           "type": "object",
-          "title": "protocol properties",
-          "description": "Properties for crypto assets of asset type 'protocol'",
+          "title": "Protocol Properties",
+          "description": "Properties for cryptographic assets of asset type 'protocol'",
           "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
-              "title": "type",
+              "title": "Type",
               "description": "The concrete protocol type",
               "enum": [
                 "tls",
@@ -4230,7 +4234,7 @@
             },
             "version": {
               "type": "string",
-              "title": "protocol version",
+              "title": "Protocol Version",
               "description": "The version of the protocol",
               "examples": [
                 "1.0",
@@ -4240,17 +4244,17 @@
             },
             "cipherSuites": {
               "type": "array",
-              "title": "Cipher suites related to the protocol",
+              "title": "Cipher Suites",
               "description": "A list of cipher suites related to the protocol",
               "items": {
                 "$ref": "#/definitions/cipherSuite",
-                "title": "Cipher suite"
+                "title": "Cipher Suite"
               }
             },
             "ikev2TransformTypes": {
               "type": "object",
-              "title": "IKEv2 transform types supported",
-              "description": "the IKEv2 transform types supported (types 1-4), according to RFC7296 section 3.3.2, and additional properties",
+              "title": "IKEv2 Transform Types",
+              "description": "The IKEv2 transform types supported (types 1-4), defined in RFC7296 section 3.3.2, and additional properties",
               "properties": {
                 "encr": {
                   "$ref": "#/definitions/cryptoRefArray",
@@ -4280,31 +4284,32 @@
             },
             "cryptoRefArray": {
               "$ref": "#/definitions/cryptoRefArray",
-              "title": "A list of protocol-related cryptographic assets"
+              "title": "Cryptographic References",
+              "description": "A list of protocol-related cryptographic assets"
             }
           }
         },
         "oid": {
           "type": "string",
           "title": "OID",
-          "description": "OID of crypto asset"
+          "description": "Object identifier of cryptographic asset"
         }
       }
     },
     "cryptoRef": {
       "type": "string",
-      "title": "Reference to a crypto asset",
-      "description": "Reference (bom-ref) to the crypto asset used in this context"
+      "title": "Reference to a Cryptographic Asset",
+      "description": "Reference (bom-ref) to the cryptographic asset used in this context"
     },
     "cipherSuite": {
       "type": "object",
-      "title": "Cipher suite",
+      "title": "Cipher Suite",
       "description": "Object representing a cipher suite",
       "additionalProperties": false,
       "properties": {
         "name": {
           "type": "string",
-          "title": "Common name",
+          "title": "Common Name",
           "description": "A common name for the cipher suite",
           "examples": [
             "TLS_DHE_RSA_WITH_AES_128_CCM"
@@ -4312,17 +4317,17 @@
         },
         "algorithms": {
           "type": "array",
-          "title": "Related algorithms",
+          "title": "Related Algorithms",
           "description": "List of algorithms related to the cipher suite",
           "items": {
             "$ref": "#/definitions/cryptoRef",
             "title": "Algorithm reference",
-            "description": "Bom-ref to algorithm crypto asset"
+            "description": "Bom-ref to algorithm cryptographic asset"
           }
         },
         "identifiers": {
           "type": "array",
-          "title": "Cipher suite identifiers",
+          "title": "Cipher Suite Identifiers",
           "description": "A list of common identifiers for the cipher suite",
           "items": {
             "type": "string",
@@ -4344,13 +4349,13 @@
     },
     "securedBy": {
       "type": "object",
-      "title": "Crypto asset is secured by",
+      "title": "Secured By",
       "description": "Specifies the mechanism by which the crypto asset is secured by",
       "additionalProperties": false,
       "properties": {
         "mechanism": {
           "type": "string",
-          "title": "mechanism by which the crypto asset is secured by",
+          "title": "Mechanism",
           "description": "Specifies the mechanism by which the crypto asset is secured by",
           "examples": [
             "HSM",
