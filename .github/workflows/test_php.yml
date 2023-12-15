@@ -1,12 +1,16 @@
 # docs: https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions
 
-name: PHP CI
+name: CT PHP
 
 on:
   push:
     branches: ['master', 'main']
   pull_request:
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 defaults:
   run:
