@@ -118,7 +118,7 @@
           "items": {
             "type": "object",
             "title": "Assessor",
-            "description": "",
+            "description": "The assessor who evaluates claims and determines conformance to requirements and confidence in that assessment.",
             "additionalProperties": false,
             "properties": {
               "bom-ref": {
@@ -160,7 +160,7 @@
               "map": {
                 "type": "array",
                 "title": "Map",
-                "description": "The grouping of requirements to claims and the attestors declaired conformance and confidence thereof.",
+                "description": "The grouping of requirements to claims and the attestors declared conformance and confidence thereof.",
                 "items": {
                   "type": "object",
                   "additionalProperties": false,
@@ -193,17 +193,17 @@
                           "minimum": 0,
                           "maximum": 1,
                           "title": "Score",
-                          "description": "The conformance of the claim between and inclusive of 0 and 1, where 1 is 100% confidence."
+                          "description": "The conformance of the claim between and inclusive of 0 and 1, where 1 is 100% conformance."
                         },
                         "rationale": {
                           "type": "string",
                           "title": "Rationale",
-                          "description": "The rationale for the score of conformance."
+                          "description": "The rationale for the conformance score."
                         },
-                        "mitigationStrategy": {
+                        "mitigationStrategies": {
                           "type": "array",
-                          "title": "Mitigation Strategy",
-                          "description": "The description of the mitigation strategy if conformance is not `1`.",
+                          "title": "Mitigation Strategies",
+                          "description": "The list of  `bom-ref` to the evidence provided describing the mitigation strategies.",
                           "items": { "$ref": "#/definitions/refLinkType" }
                         }
                       }
@@ -262,10 +262,10 @@
                 "title": "Predicate",
                 "description": "The specific statement or assertion about the target."
               },
-              "mitigationStrategy": {
+              "mitigationStrategies": {
                 "type": "array",
-                "title": "Mitigation Strategy",
-                "description": "The written explanation of how any weaknesses in the evidence will be mitigated.",
+                "title": "Mitigation Strategies",
+                "description": "The list of  `bom-ref` to the evidence provided describing the mitigation strategies. Each mitigation strategy should include an explanation of how any weaknesses in the evidence will be mitigated.",
                 "items": { "$ref": "#/definitions/refLinkType" }
               },
               "reasoning": {
@@ -276,13 +276,13 @@
               "evidence": {
                 "type": "array",
                 "title": "Evidence",
-                "description": "The array of references to evidence that supports this claim.",
+                "description": "The list of `bom-ref` to evidence that supports this claim.",
                 "items": { "$ref": "#/definitions/refLinkType" }
               },
               "counterEvidence": {
                 "type": "array",
                 "title": "Counter Evidence",
-                "description": "The array of references to counterEvidence that undermines this claim.",
+                "description": "The list of `bom-ref` to counterEvidence that supports this claim.",
                 "items": { "$ref": "#/definitions/refLinkType" }
               },
               "externalReferences": {
@@ -302,7 +302,7 @@
         "evidence": {
           "type": "array",
           "title": "Evidence",
-          "description": "The list of evidence.",
+          "description": "The list of evidence",
           "items": {
             "type": "object",
             "additionalProperties": false,
@@ -315,7 +315,7 @@
               "propertyName": {
                 "type": "string",
                 "title": "Type",
-                "description": "The reference to the property name as defined in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy/). "
+                "description": "The reference to the property name as defined in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy/)."
               },
               "description": {
                 "type": "string",
@@ -323,28 +323,49 @@
                 "description": "The written description of what this evidence is and how it was created."
               },
               "data": {
-                "type": "object",
-                "title": "Description",
+                "type": "array",
+                "title": "Data",
                 "description": "The output or analysis that supports claims.",
-                "additionalProperties": false,
-                "properties": {
-                  "contents": {
-                    "type": "object",
-                    "title": "Data Contents",
-                    "description": "The contents or references to the contents of the data being described.",
-                    "additionalProperties": false,
-                    "properties": {
-                      "attachment": {
-                        "title": "Data Attachment",
-                        "description": "The optional way to include textual or encoded data.",
-                        "$ref": "#/definitions/attachment"
-                      },
-                      "url": {
-                        "type": "string",
-                        "title": "Data URL",
-                        "description": "The URL where the data can be retrieved.",
-                        "format": "iri-reference"
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "description": "The name of the data.",
+                      "type": "string"
+                    },
+                    "contents": {
+                      "type": "object",
+                      "title": "Data Contents",
+                      "description": "The contents or references to the contents of the data being described.",
+                      "additionalProperties": false,
+                      "properties": {
+                        "attachment": {
+                          "title": "Data Attachment",
+                          "description": "An optional way to include textual or encoded data.",
+                          "$ref": "#/definitions/attachment"
+                        },
+                        "url": {
+                          "type": "string",
+                          "title": "Data URL",
+                          "description": "The URL to where the data can be retrieved.",
+                          "format": "iri-reference"
+                        }
                       }
+                    },
+                    "classification": {
+                      "$ref": "#/definitions/dataClassification"
+                    },
+                    "sensitiveData": {
+                      "type": "array",
+                      "description": "A description of any sensitive data included.",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "governance": {
+                      "title": "Data Governance",
+                      "$ref": "#/definitions/dataGovernance"
                     }
                   }
                 }
@@ -390,12 +411,6 @@
               "title": "Organizations",
               "description": "The list of organizations which claims are made against.",
               "items": {"$ref": "#/definitions/organizationalEntity"}
-            },
-            "people": {
-              "type": "array",
-              "title": "People",
-              "description": "The list of individuals which claims are made against.",
-              "items": {"$ref": "#/definitions/organizationalContact"}
             },
             "components": {
               "type": "array",
@@ -465,15 +480,25 @@
                   }
                 }
               }
+            },
+            "signature": {
+              "$ref": "#/definitions/signature",
+              "title": "Signature",
+              "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
             }
           }
+        },
+        "signature": {
+          "$ref": "#/definitions/signature",
+          "title": "Signature",
+          "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
         }
       }
     },
     "definitions": {
       "type": "object",
       "title": "Definitions",
-      "description": "",
+      "description": "A collection of reusable objects that are defined and may be used elsewhere in the BOM.",
       "additionalProperties": false,
       "properties": {
         "standards": {
@@ -1551,7 +1576,7 @@
         "type": {
           "type": "string",
           "title": "Type",
-          "description": "Specifies the type of external reference.\n\n* __vcs__ = Version Control System\n* __issue-tracker__ = Issue or defect tracking system, or an Application Lifecycle Management (ALM) system\n* __website__ = Website\n* __advisories__ = Security advisories\n* __bom__ = Bill of Materials (SBOM, OBOM, HBOM, SaaSBOM, etc)\n* __mailing-list__ = Mailing list or discussion group\n* __social__ = Social media account\n* __chat__ = Real-time chat platform\n* __documentation__ = Documentation, guides, or how-to instructions\n* __support__ = Community or commercial support\n* __distribution__ = Direct or repository download location\n* __distribution-intake__ = The location where a component was published to. This is often the same as \"distribution\" but may also include specialized publishing processes that act as an intermediary\n* __license__ = The URL to the license file. If a license URL has been defined in the license node, it should also be defined as an external reference for completeness\n* __build-meta__ = Build-system specific meta file (i.e. pom.xml, package.json, .nuspec, etc)\n* __build-system__ = URL to an automated build system\n* __release-notes__ = URL to release notes\n* __security-contact__ = Specifies a way to contact the maintainer, supplier, or provider in the event of a security incident. Common URIs include links to a disclosure procedure, a mailto (RFC-2368) that specifies an email address, a tel (RFC-3966) that specifies a phone number, or dns (RFC-4501) that specifies the records containing DNS Security TXT\n* __model-card__ = A model card describes the intended uses of a machine learning model, potential limitations, biases, ethical considerations, training parameters, datasets used to train the model, performance metrics, and other relevant data useful for ML transparency\n* __log__ = A record of events that occurred in a computer system or application, such as problems, errors, or information on current operations\n* __configuration__ = Parameters or settings that may be used by other components or services\n* __evidence__ = Information used to substantiate a claim\n* __formulation__ = Describes how a component or service was manufactured or deployed\n* __attestation__ = Human or machine-readable statements containing facts, evidence, or testimony\n* __threat-model__ = An enumeration of identified weaknesses, threats, and countermeasures, dataflow diagram (DFD), attack tree, and other supporting documentation in human-readable or machine-readable format\n* __adversary-model__ = The defined assumptions, goals, and capabilities of an adversary.\n* __risk-assessment__ = Identifies and analyzes the potential of future events that may negatively impact individuals, assets, and/or the environment. Risk assessments may also include judgments on the tolerability of each risk.\n* __vulnerability-assertion__ = A Vulnerability Disclosure Report (VDR) which asserts the known and previously unknown vulnerabilities that affect a component, service, or product including the analysis and findings describing the impact (or lack of impact) that the reported vulnerability has on a component, service, or product.\n* __exploitability-statement__ = A Vulnerability Exploitability eXchange (VEX) which asserts the known vulnerabilities that do not affect a product, product family, or organization, and optionally the ones that do. The VEX should include the analysis and findings describing the impact (or lack of impact) that the reported vulnerability has on the product, product family, or organization.\n* __pentest-report__ = Results from an authorized simulated cyberattack on a component or service, otherwise known as a penetration test\n* __static-analysis-report__ = SARIF or proprietary machine or human-readable report for which static analysis has identified code quality, security, and other potential issues with the source code\n* __dynamic-analysis-report__ = Dynamic analysis report that has identified issues such as vulnerabilities and misconfigurations\n* __runtime-analysis-report__ = Report generated by analyzing the call stack of a running application\n* __component-analysis-report__ = Report generated by Software Composition Analysis (SCA), container analysis, or other forms of component analysis\n* __maturity-report__ = Report containing a formal assessment of an organization, business unit, or team against a maturity model\n* __certification-report__ = Industry, regulatory, or other certification from an accredited (if applicable) certification body\n* __quality-metrics__ = Report or system in which quality metrics can be obtained\n* __codified-infrastructure__ = Code or configuration that defines and provisions virtualized infrastructure, commonly referred to as Infrastructure as Code (IaC)\n* __poam__ = Plans of Action and Milestones (POAM) compliment an \"attestation\" external reference. POAM is defined by NIST as a \"document that identifies tasks needing to be accomplished. It details resources required to accomplish the elements of the plan, any milestones in meeting the tasks and scheduled completion dates for the milestones\".\n* __other__ = Use this if no other types accurately describe the purpose of the external reference",
+          "description": "Specifies the type of external reference.\n\n* __vcs__ = Version Control System\n* __issue-tracker__ = Issue or defect tracking system, or an Application Lifecycle Management (ALM) system\n* __website__ = Website\n* __advisories__ = Security advisories\n* __bom__ = Bill of Materials (SBOM, OBOM, HBOM, SaaSBOM, etc)\n* __mailing-list__ = Mailing list or discussion group\n* __social__ = Social media account\n* __chat__ = Real-time chat platform\n* __documentation__ = Documentation, guides, or how-to instructions\n* __support__ = Community or commercial support\n* __distribution__ = Direct or repository download location\n* __distribution-intake__ = The location where a component was published to. This is often the same as \"distribution\" but may also include specialized publishing processes that act as an intermediary\n* __license__ = The URL to the license file. If a license URL has been defined in the license node, it should also be defined as an external reference for completeness\n* __build-meta__ = Build-system specific meta file (i.e. pom.xml, package.json, .nuspec, etc)\n* __build-system__ = URL to an automated build system\n* __release-notes__ = URL to release notes\n* __security-contact__ = Specifies a way to contact the maintainer, supplier, or provider in the event of a security incident. Common URIs include links to a disclosure procedure, a mailto (RFC-2368) that specifies an email address, a tel (RFC-3966) that specifies a phone number, or dns (RFC-4501) that specifies the records containing DNS Security TXT\n* __model-card__ = A model card describes the intended uses of a machine learning model, potential limitations, biases, ethical considerations, training parameters, datasets used to train the model, performance metrics, and other relevant data useful for ML transparency\n* __log__ = A record of events that occurred in a computer system or application, such as problems, errors, or information on current operations\n* __configuration__ = Parameters or settings that may be used by other components or services\n* __evidence__ = Information used to substantiate a claim\n* __formulation__ = Describes how a component or service was manufactured or deployed\n* __attestation__ = Human or machine-readable statements containing facts, evidence, or testimony\n* __threat-model__ = An enumeration of identified weaknesses, threats, and countermeasures, dataflow diagram (DFD), attack tree, and other supporting documentation in human-readable or machine-readable format\n* __adversary-model__ = The defined assumptions, goals, and capabilities of an adversary.\n* __risk-assessment__ = Identifies and analyzes the potential of future events that may negatively impact individuals, assets, and/or the environment. Risk assessments may also include judgments on the tolerability of each risk.\n* __vulnerability-assertion__ = A Vulnerability Disclosure Report (VDR) which asserts the known and previously unknown vulnerabilities that affect a component, service, or product including the analysis and findings describing the impact (or lack of impact) that the reported vulnerability has on a component, service, or product.\n* __exploitability-statement__ = A Vulnerability Exploitability eXchange (VEX) which asserts the known vulnerabilities that do not affect a product, product family, or organization, and optionally the ones that do. The VEX should include the analysis and findings describing the impact (or lack of impact) that the reported vulnerability has on the product, product family, or organization.\n* __pentest-report__ = Results from an authorized simulated cyberattack on a component or service, otherwise known as a penetration test\n* __static-analysis-report__ = SARIF or proprietary machine or human-readable report for which static analysis has identified code quality, security, and other potential issues with the source code\n* __dynamic-analysis-report__ = Dynamic analysis report that has identified issues such as vulnerabilities and misconfigurations\n* __runtime-analysis-report__ = Report generated by analyzing the call stack of a running application\n* __component-analysis-report__ = Report generated by Software Composition Analysis (SCA), container analysis, or other forms of component analysis\n* __maturity-report__ = Report containing a formal assessment of an organization, business unit, or team against a maturity model\n* __certification-report__ = Industry, regulatory, or other certification from an accredited (if applicable) certification body\n* __quality-metrics__ = Report or system in which quality metrics can be obtained\n* __codified-infrastructure__ = Code or configuration that defines and provisions virtualized infrastructure, commonly referred to as Infrastructure as Code (IaC)\n* __poam__ = Plans of Action and Milestones (POAM) compliment an \"attestation\" external reference. POAM is defined by NIST as a \"document that identifies tasks needing to be accomplished. It details resources required to accomplish the elements of the plan, any milestones in meeting the tasks and scheduled completion dates for the milestones\".\n* __electronic-signature__ An e-signature is commonly a scanned representation of a written signature or a stylized script of the persons name.\n* __digital-signature__ = A signature that leverages cryptography, typically public/private key pairs, which provides strong authenticity verification.\n* __other__ = Use this if no other types accurately describe the purpose of the external reference",
           "enum": [
             "vcs",
             "issue-tracker",
@@ -1591,6 +1616,8 @@
             "codified-infrastructure",
             "quality-metrics",
             "poam",
+            "electronic-signature",
+            "digital-signature",
             "other"
           ]
         },
