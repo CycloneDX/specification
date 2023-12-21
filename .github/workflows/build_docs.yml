@@ -1,0 +1,60 @@
+name: Build Docs
+
+on:
+  push:
+    branches: ['master', 'main']
+  pull_request:
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION_DEFAULT: "3.10"
+
+jobs:
+  docs_xml:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: docgen/xml
+    steps:
+    - name: Checkout
+      # see https://github.com/actions/checkout
+      uses: actions/checkout@v4
+    - name: Setup Python Environment
+      # see https://github.com/actions/setup-python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION_DEFAULT }}
+        architecture: 'x64'
+    - name: Generate Schema documentation
+      run: ./gen.sh
+    - name: Archive Schema documentation
+      # https://github.com/actions/upload-artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: XML-Schema-documentation
+        path: docgen/xml/docs
+        if-no-files-found: error
+  docs_json:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: docgen/json
+    steps:
+    - name: Checkout
+      # see https://github.com/actions/checkout
+      uses: actions/checkout@v4
+    - name: Setup Python Environment
+      # see https://github.com/actions/setup-python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION_DEFAULT }}
+        architecture: 'x64'
+    - name: Generate Schema documentation
+      run: ./gen.sh
+    - name: Archive Schema documentation
+      # https://github.com/actions/upload-artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: JSON-Schema-documentation
+        path: docgen/json/docs
+        if-no-files-found: error
