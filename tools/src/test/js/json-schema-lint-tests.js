@@ -49,6 +49,7 @@ function getAjv(strict) {
         validateFormats: true,
         allowMatchingProperties: true,
         addUsedSchema: false,
+        allowUnionTypes: true,
         schemas: {
             'http://cyclonedx.org/schema/spdx.schema.json': spdxSchema,
             'http://cyclonedx.org/schema/jsf-0.82.schema.json': jsfSchema
