@@ -67,6 +67,8 @@ enum Classification {
   CLASSIFICATION_MACHINE_LEARNING_MODEL = 11;
   // A collection of discrete values that convey information.
   CLASSIFICATION_DATA = 12;
+  // Cryptographic asset including algorithms, protocols, certificates, keys, tokens, and secrets.
+  CLASSIFICATION_CRYPTOGRAPHIC_ASSET = 13;
 }
 
 message Commit {
@@ -133,6 +135,8 @@ message Component {
   optional ModelCard modelCard = 25;
   // This object SHOULD be specified for any component of type `data` and MUST NOT be specified for other component types.
   optional ComponentData data = 26;
+  // Cryptographic assets have properties that uniquely define them and that make them actionable for further reasoning. As an example, it makes a difference if one knows the algorithm family (e.g. AES) or the specific variant or instantiation (e.g. AES-128-GCM). This is because the security level and the algorithm primitive (authenticated encryption) is only defined by the definition of the algorithm variant. The presence of a weak cryptographic algorithm like SHA1 vs. HMAC-SHA1 also makes a difference.
+  optional CryptoProperties cryptoProperties = 27;
 }
 
 // Specifies the data flow.
@@ -163,9 +167,17 @@ enum DataFlowDirection {
 }
 
 message Dependency {
+  enum DependencyType {
+    DEPENDENCY_TYPE_IMPLEMENTS = 0;
+    DEPENDENCY_TYPE_USES = 1;
+    DEPENDENCY_TYPE_PROTECTED_BY = 2;
+  }
   // References a component or service by the its bom-ref attribute
   string ref = 1;
+  // The bom-ref identifiers of the components or services that are dependencies of this dependency object.
   repeated Dependency dependencies = 2;
+  // Defines and characterizes the type of dependency
+  optional DependencyType type = 3;
 }
 
 message Diff {
@@ -1485,4 +1497,246 @@ message EnvironmentVars {
     Property property = 1;
     string value = 2;
   }
+}
+
+message CryptoProperties {
+  enum CryptoAssetType {
+    CRYPTO_ASSET_TYPE_ALGORITHM = 0;
+    CRYPTO_ASSET_TYPE_CERTIFICATE = 1;
+    CRYPTO_ASSET_TYPE_PROTOCOL = 2;
+    CRYPTO_ASSET_TYPE_RELATED_CRYPTO_MATERIAL = 3;
+  }
+  message AlgorithmProperties {
+    enum CryptoPrimitive {
+      CRYPTO_PRIMITIVE_DRBG = 0;
+      CRYPTO_PRIMITIVE_MAC = 1;
+      CRYPTO_PRIMITIVE_BLOCK_CIPHER = 2;
+      CRYPTO_PRIMITIVE_STREAM_CIPHER = 3;
+      CRYPTO_PRIMITIVE_SIGNATURE = 4;
+      CRYPTO_PRIMITIVE_HASH = 5;
+      CRYPTO_PRIMITIVE_PKE = 6;
+      CRYPTO_PRIMITIVE_XOF = 7;
+      CRYPTO_PRIMITIVE_KDF = 8;
+      CRYPTO_PRIMITIVE_KEY_AGREE = 9;
+      CRYPTO_PRIMITIVE_KEM = 10;
+      CRYPTO_PRIMITIVE_AE = 11;
+      CRYPTO_PRIMITIVE_COMBINER = 12;
+      CRYPTO_PRIMITIVE_OTHER = 13;
+      CRYPTO_PRIMITIVE_UNKNOWN = 14;
+    }
+    enum CryptoExecutionEnvironment {
+      CRYPTO_EXECUTION_ENVIRONMENT_SOFTWARE_PLAIN_RAM = 0;
+      CRYPTO_EXECUTION_ENVIRONMENT_SOFTWARE_ENCRYPTED_RAM = 1;
+      CRYPTO_EXECUTION_ENVIRONMENT_SOFTWARE_TEE = 2;
+      CRYPTO_EXECUTION_ENVIRONMENT_HARDWARE = 3;
+      CRYPTO_EXECUTION_ENVIRONMENT_OTHER = 4;
+      CRYPTO_EXECUTION_ENVIRONMENT_UNKNOWN = 5;
+    }
+    enum CryptoImplementationPlatform {
+      CRYPTO_IMPLEMENTATION_PLATFORM_GENERIC = 0;
+      CRYPTO_IMPLEMENTATION_PLATFORM_X86_32 = 1;
+      CRYPTO_IMPLEMENTATION_PLATFORM_X86_64 = 2;
+      CRYPTO_IMPLEMENTATION_PLATFORM_ARMV7A = 3;
+      CRYPTO_IMPLEMENTATION_PLATFORM_ARMV7M = 4;
+      CRYPTO_IMPLEMENTATION_PLATFORM_ARMV8A = 5;
+      CRYPTO_IMPLEMENTATION_PLATFORM_ARMV8M = 6;
+      CRYPTO_IMPLEMENTATION_PLATFORM_ARMV9A = 7;
+      CRYPTO_IMPLEMENTATION_PLATFORM_ARMV9M = 8;
+      CRYPTO_IMPLEMENTATION_PLATFORM_X390X = 9;
+      CRYPTO_IMPLEMENTATION_PLATFORM_PPC64 = 10;
+      CRYPTO_IMPLEMENTATION_PLATFORM_PPC64LE = 11;
+      CRYPTO_IMPLEMENTATION_PLATFORM_OTHER = 12;
+      CRYPTO_IMPLEMENTATION_PLATFORM_UNKNOWN = 13;
+    }
+    enum CryptoAlgorithmMode {
+      CRYPTO_ALGORITHM_MODE_CBC = 0;
+      CRYPTO_ALGORITHM_MODE_ECB = 1;
+      CRYPTO_ALGORITHM_MODE_CCM = 2;
+      CRYPTO_ALGORITHM_MODE_GCM = 3;
+      CRYPTO_ALGORITHM_MODE_CFB = 4;
+      CRYPTO_ALGORITHM_MODE_OFB = 5;
+      CRYPTO_ALGORITHM_MODE_CTR = 6;
+      CRYPTO_ALGORITHM_MODE_OTHER = 7;
+      CRYPTO_ALGORITHM_MODE_UNKNOWN = 8;
+    }
+    enum CryptoAlgorithmPadding {
+      CRYPTO_ALGORITHM_PADDING_PKCS5 = 0;
+      CRYPTO_ALGORITHM_PADDING_PKCS7 = 1;
+      CRYPTO_ALGORITHM_PADDING_PKCS1V15 = 2;
+      CRYPTO_ALGORITHM_PADDING_OAEP = 3;
+      CRYPTO_ALGORITHM_PADDING_RAW = 4;
+      CRYPTO_ALGORITHM_PADDING_OTHER = 5;
+      CRYPTO_ALGORITHM_PADDING_UNKNOWN = 6;
+    }
+    enum CryptoAlgorithmFunction {
+      CRYPTO_ALGORITHM_FUNCTION_GENERATE = 0;
+      CRYPTO_ALGORITHM_FUNCTION_KEYGEN = 1;
+      CRYPTO_ALGORITHM_FUNCTION_ENCRYPT = 2;
+      CRYPTO_ALGORITHM_FUNCTION_DECRYPT = 3;
+      CRYPTO_ALGORITHM_FUNCTION_DIGEST = 4;
+      CRYPTO_ALGORITHM_FUNCTION_TAG = 5;
+      CRYPTO_ALGORITHM_FUNCTION_KEYDERIVE = 6;
+      CRYPTO_ALGORITHM_FUNCTION_SIGN = 7;
+      CRYPTO_ALGORITHM_FUNCTION_VERIFY = 8;
+      CRYPTO_ALGORITHM_FUNCTION_ENCAPSULATE = 9;
+      CRYPTO_ALGORITHM_FUNCTION_DECAPSULATE = 10;
+      CRYPTO_ALGORITHM_FUNCTION_OTHER = 11;
+      CRYPTO_ALGORITHM_FUNCTION_UNKNOWN = 12;
+    }
+    // Cryptographic building blocks used in higher-level cryptographic systems and protocols. Primitives represent different cryptographic routines: deterministic random bit generators (drbg, e.g. CTR_DRBG from NIST SP800-90A-r1), message authentication codes (mac, e.g. HMAC-SHA-256), blockciphers (e.g. AES), streamciphers (e.g. Salsa20), signatures (e.g. ECDSA), hash functions (e.g. SHA-256), public-key encryption schemes (pke, e.g. RSA), extended output functions (xof, e.g. SHAKE256), key derivation functions (e.g. pbkdf2), key agreement algorithms (e.g. ECDH), key encapsulation mechanisms (e.g. ML-KEM), authenticated encryption (ae, e.g. AES-GCM) and the combination of multiple algorithms (combiner, e.g. SP800-56Cr2).
+    optional CryptoPrimitive primitive = 1;
+    // An identifier for the parameter set of the cryptographic algorithm. Examples: in AES128, '128' identifies the key length in bits, in SHA256, '256' identifies the digest length, '128' in SHAKE128 identifies its maximum security level in bits, and 'SHA2-128s' identifies a parameter set used in SLH-DSA (FIPS205).
+    optional string parameterSetIdentifier = 2;
+    // The specific underlying Elliptic Curve (EC) definition employed which is an indicator of the level of security strength, performance and complexity. Absent an authoritative source of curve names, CycloneDX recommends use of curve names as defined at [https://neuromancer.sk/std/](https://neuromancer.sk/std/), the source from which can be found at [https://github.com/J08nY/std-curves](https://github.com/J08nY/std-curves).
+    optional string curve = 3;
+    // The target and execution environment in which the algorithm is implemented in.
+    optional CryptoExecutionEnvironment executionEnvironment = 4;
+    // The target platform for which the algorithm is implemented. The implementation can be 'generic', running on any platform or for a specific platform.
+    optional CryptoImplementationPlatform implementationPlatform = 5;
+    // The certification that the implementation of the cryptographic algorithm has received, if any. Certifications include revisions and levels of FIPS 140 or Common Criteria of different Extended Assurance Levels (CC-EAL).
+    optional string certificationLevel = 6;
+    // The mode of operation in which the cryptographic algorithm (block cipher) is used.
+    optional CryptoAlgorithmMode mode = 7;
+    // The padding scheme that is used for the cryptographic algorithm.
+    optional CryptoAlgorithmPadding padding = 8;
+    // The cryptographic functions implemented by the cryptographic algorithm.
+    repeated CryptoAlgorithmFunction cryptoFunctions = 9;
+    // The classical security level that a cryptographic algorithm provides (in bits).
+    optional int32 classicalSecurityLevel = 10;
+    // The NIST security strength category as defined in https://csrc.nist.gov/projects/post-quantum-cryptography/post-quantum-cryptography-standardization/evaluation-criteria/security-(evaluation-criteria). A value of 0 indicates that none of the categories are met.
+    optional int32 nistQuantumSecurityLevel = 11;
+  } // end of AlgorithmProperties
+  message CertificateProperties {
+    // The subject name for the certificate
+    optional string subjectName = 1;
+    // The issuer name for the certificate
+    optional string issuerName = 2;
+    // The date and time according to ISO-8601 standard from which the certificate is valid
+    optional google.protobuf.Timestamp notValidBefore = 3;
+    // The date and time according to ISO-8601 standard from which the certificate is not valid anymore
+    optional google.protobuf.Timestamp notValidAfter = 4;
+    // The bom-ref to signature algorithm used by the certificate
+    optional string signatureAlgorithm = 5;
+    // The bom-ref to the public key of the subject
+    optional string subjectPublicKey = 6;
+    // The format of the certificate. Examples include X.509, PEM, DER, and CVC.
+    optional string certificateFormat = 7;
+    // The file extension of the certificate. Examples include crt, pem, cer, der, and p12.
+    optional string certificateExtension = 8;
+  } // end of CertificateProperties
+  message RelatedCryptoMaterialProperties {
+    enum CryptoRelatedType {
+      CRYPTO_RELATED_TYPE_PRIVATE_KEY = 0;
+      CRYPTO_RELATED_TYPE_PUBLIC_KEY = 1;
+      CRYPTO_RELATED_TYPE_SECRET_KEY = 2;
+      CRYPTO_RELATED_TYPE_KEY = 3;
+      CRYPTO_RELATED_TYPE_CIPHERTEXT = 4;
+      CRYPTO_RELATED_TYPE_SIGNATURE = 5;
+      CRYPTO_RELATED_TYPE_DIGEST = 6;
+      CRYPTO_RELATED_TYPE_INITIALIZATION_VECTOR = 7;
+      CRYPTO_RELATED_TYPE_NONCE = 8;
+      CRYPTO_RELATED_TYPE_SEED = 9;
+      CRYPTO_RELATED_TYPE_SALT = 10;
+      CRYPTO_RELATED_TYPE_SHARED_SECRET = 11;
+      CRYPTO_RELATED_TYPE_TAG = 12;
+      CRYPTO_RELATED_TYPE_ADDITIONAL_DATA = 13;
+      CRYPTO_RELATED_TYPE_PASSWORD = 14;
+      CRYPTO_RELATED_TYPE_CREDENTIAL = 15;
+      CRYPTO_RELATED_TYPE_TOKEN = 16;
+      CRYPTO_RELATED_TYPE_OTHER = 17;
+      CRYPTO_RELATED_TYPE_UNKNOWN = 18;
+    }
+    enum CryptoRelatedState {
+      CRYPTO_RELATED_STATE_PRE_ACTIVATION = 0;
+      CRYPTO_RELATED_STATE_ACTIVE = 1;
+      CRYPTO_RELATED_STATE_SUSPENDED = 2;
+      CRYPTO_RELATED_STATE_DEACTIVATED = 3;
+      CRYPTO_RELATED_STATE_COMPROMISED = 4;
+      CRYPTO_RELATED_STATE_DESTROYED = 5;
+    }
+    message CryptoRelatedSecuredBy {
+      // Specifies the mechanism by which the cryptographic asset is secured by. Examples include HSM, TPM, SGX, Software, and None
+      optional string mechanism = 1;
+      // The bom-ref to the algorithm.
+      optional string algorithmRef = 2;
+    }
+    // The type for the related cryptographic material
+    optional CryptoRelatedType type = 1;
+    // The optional unique identifier for the related cryptographic material.
+    optional string id = 2;
+    // The key state as defined by NIST SP 800-57.
+    optional CryptoRelatedState state = 3;
+    // The bom-ref to the algorithm used to generate the related cryptographic material.
+    optional string algorithmRef = 4;
+    // The date and time (timestamp) when the related cryptographic material was created.
+    optional google.protobuf.Timestamp creationDate = 5;
+    // The date and time (timestamp) when the related cryptographic material was activated.
+    optional google.protobuf.Timestamp activationDate = 6;
+    // The date and time (timestamp) when the related cryptographic material was updated.
+    optional google.protobuf.Timestamp updateDate = 7;
+    // The date and time (timestamp) when the related cryptographic material expires.
+    optional google.protobuf.Timestamp expirationDate = 8;
+    // The associated value of the cryptographic material.
+    optional string value = 9;
+    // The size of the cryptographic asset (in bits).
+    optional int64 size = 10;
+    // The format of the related cryptographic material (e.g. P8, PEM, DER).
+    optional string format = 11;
+    // The mechanism by which the cryptographic asset is secured by.
+    optional CryptoRelatedSecuredBy securedBy = 12;
+  } // end of RelatedCryptoMaterialProperties
+  message ProtocolProperties {
+    enum CryptoProtocolType {
+      CRYPTO_PROTOCOL_TYPE_TLS = 0;
+      CRYPTO_PROTOCOL_TYPE_SSH = 1;
+      CRYPTO_PROTOCOL_TYPE_IPSEC = 2;
+      CRYPTO_PROTOCOL_TYPE_IKE = 3;
+      CRYPTO_PROTOCOL_TYPE_SSTP = 4;
+      CRYPTO_PROTOCOL_TYPE_WPA = 5;
+      CRYPTO_PROTOCOL_TYPE_OTHER = 6;
+      CRYPTO_PROTOCOL_TYPE_UNKNOWN = 7;
+    }
+    message CryptoProtocolCipherSuite {
+      // A common name for the cipher suite. For example: TLS_DHE_RSA_WITH_AES_128_CCM
+      optional string name = 1;
+      // A list of algorithms related to the cipher suite. Use the bom-ref to the algorithm cryptographic asset.
+      repeated string algorithms = 2;
+      // A list of common identifiers for the cipher suite. For example: 0xC0 and 0x9E
+      repeated string identifiers = 3;
+    }
+    message Ikev2TransformTypes {
+      // Transform Type 1: encryption algorithms
+      repeated string encr = 1;
+      // Transform Type 2: pseudorandom functions
+      repeated string prf = 2;
+      // Transform Type 3: integrity algorithms
+      repeated string integ = 3;
+      // Transform Type 4: Key Exchange Method (KE) per RFC9370, formerly called Diffie-Hellman Group (D-H)
+      repeated string ke = 4;
+      // Specifies if an Extended Sequence Number (ESN) is used.
+      optional bool esn = 5;
+      // IKEv2 Authentication method
+      repeated string auth = 6;
+    }
+    // The concrete protocol type.
+    optional CryptoProtocolType type = 1;
+    // The version of the protocol. Examples include 1.0, 1.2, and 1.99.
+    optional string version = 2;
+    // A list of cipher suites related to the protocol.
+    repeated CryptoProtocolCipherSuite cipherSuites = 3;
+    // The IKEv2 transform types supported (types 1-4), defined in RFC7296 section 3.3.2, and additional properties.
+    optional Ikev2TransformTypes ikev2TransformTypes = 4;
+  } // end of ProtocolProperties
+  // Cryptographic assets occur in several forms. Algorithms and protocols are most commonly implemented in specialized cryptographic libraries. They may however also be 'hardcoded' in software components. Certificates and related cryptographic material like keys, tokens, secrets or passwords are other cryptographic assets to be modelled.
+  optional CryptoAssetType assetType = 1;
+  // Additional properties specific to a cryptographic algorithm.
+  optional AlgorithmProperties algorithmProperties = 2;
+  // Properties for cryptographic assets of asset type 'certificate'
+  optional CertificateProperties certificateProperties = 3;
+  // Properties for cryptographic assets of asset type: `related-crypto-material`
+  optional RelatedCryptoMaterialProperties relatedCryptoMaterialProperties = 4;
+  // Properties specific to cryptographic assets of type: `protocol`.
+  optional ProtocolProperties protocolProperties = 5;
+  // The object identifier (OID) of the cryptographic asset.
+  optional string oid = 6;
 }

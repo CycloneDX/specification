@@ -410,10 +410,10 @@
             "file",
             "machine-learning-model",
             "data",
-            "crypto-asset"
+            "cryptographic-asset"
           ],
           "title": "Component Type",
-          "description": "Specifies the type of component. For software components, classify as application if no more specific appropriate classification is available or cannot be determined for the component. Types include:\n\n* __application__ = A software application. Refer to [https://en.wikipedia.org/wiki/Application_software](https://en.wikipedia.org/wiki/Application_software) for information about applications.\n* __framework__ = A software framework. Refer to [https://en.wikipedia.org/wiki/Software_framework](https://en.wikipedia.org/wiki/Software_framework) for information on how frameworks vary slightly from libraries.\n* __library__ = A software library. Refer to [https://en.wikipedia.org/wiki/Library_(computing)](https://en.wikipedia.org/wiki/Library_(computing))\n for information about libraries. All third-party and open source reusable components will likely be a library. If the library also has key features of a framework, then it should be classified as a framework. If not, or is unknown, then specifying library is RECOMMENDED.\n* __container__ = A packaging and/or runtime format, not specific to any particular technology, which isolates software inside the container from software outside of a container through virtualization technology. Refer to [https://en.wikipedia.org/wiki/OS-level_virtualization](https://en.wikipedia.org/wiki/OS-level_virtualization)\n* __platform__ = A runtime environment which interprets or executes software. This may include runtimes such as those that execute bytecode or low-code/no-code application platforms.\n* __operating-system__ = A software operating system without regard to deployment model (i.e. installed on physical hardware, virtual machine, image, etc) Refer to [https://en.wikipedia.org/wiki/Operating_system](https://en.wikipedia.org/wiki/Operating_system)\n* __device__ = A hardware device such as a processor, or chip-set. A hardware device containing firmware SHOULD include a component for the physical hardware itself, and another component of type 'firmware' or 'operating-system' (whichever is relevant), describing information about the software running on the device.\n  See also the list of [known device properties](https://github.com/CycloneDX/cyclonedx-property-taxonomy/blob/main/cdx/device.md).\n* __device-driver__ = A special type of software that operates or controls a particular type of device. Refer to [https://en.wikipedia.org/wiki/Device_driver](https://en.wikipedia.org/wiki/Device_driver)\n* __firmware__ = A special type of software that provides low-level control over a devices hardware. Refer to [https://en.wikipedia.org/wiki/Firmware](https://en.wikipedia.org/wiki/Firmware)\n* __file__ = A computer file. Refer to [https://en.wikipedia.org/wiki/Computer_file](https://en.wikipedia.org/wiki/Computer_file) for information about files.\n* __machine-learning-model__ = A model based on training data that can make predictions or decisions without being explicitly programmed to do so.\n* __data__ = A collection of discrete values that convey information.\n* __crypto-asset__ = Cryptographic asset including algorithms, protocols, certificates, keys, tokens, and secrets.",
+          "description": "Specifies the type of component. For software components, classify as application if no more specific appropriate classification is available or cannot be determined for the component. Types include:\n\n* __application__ = A software application. Refer to [https://en.wikipedia.org/wiki/Application_software](https://en.wikipedia.org/wiki/Application_software) for information about applications.\n* __framework__ = A software framework. Refer to [https://en.wikipedia.org/wiki/Software_framework](https://en.wikipedia.org/wiki/Software_framework) for information on how frameworks vary slightly from libraries.\n* __library__ = A software library. Refer to [https://en.wikipedia.org/wiki/Library_(computing)](https://en.wikipedia.org/wiki/Library_(computing))\n for information about libraries. All third-party and open source reusable components will likely be a library. If the library also has key features of a framework, then it should be classified as a framework. If not, or is unknown, then specifying library is RECOMMENDED.\n* __container__ = A packaging and/or runtime format, not specific to any particular technology, which isolates software inside the container from software outside of a container through virtualization technology. Refer to [https://en.wikipedia.org/wiki/OS-level_virtualization](https://en.wikipedia.org/wiki/OS-level_virtualization)\n* __platform__ = A runtime environment which interprets or executes software. This may include runtimes such as those that execute bytecode or low-code/no-code application platforms.\n* __operating-system__ = A software operating system without regard to deployment model (i.e. installed on physical hardware, virtual machine, image, etc) Refer to [https://en.wikipedia.org/wiki/Operating_system](https://en.wikipedia.org/wiki/Operating_system)\n* __device__ = A hardware device such as a processor, or chip-set. A hardware device containing firmware SHOULD include a component for the physical hardware itself, and another component of type 'firmware' or 'operating-system' (whichever is relevant), describing information about the software running on the device.\n  See also the list of [known device properties](https://github.com/CycloneDX/cyclonedx-property-taxonomy/blob/main/cdx/device.md).\n* __device-driver__ = A special type of software that operates or controls a particular type of device. Refer to [https://en.wikipedia.org/wiki/Device_driver](https://en.wikipedia.org/wiki/Device_driver)\n* __firmware__ = A special type of software that provides low-level control over a devices hardware. Refer to [https://en.wikipedia.org/wiki/Firmware](https://en.wikipedia.org/wiki/Firmware)\n* __file__ = A computer file. Refer to [https://en.wikipedia.org/wiki/Computer_file](https://en.wikipedia.org/wiki/Computer_file) for information about files.\n* __machine-learning-model__ = A model based on training data that can make predictions or decisions without being explicitly programmed to do so.\n* __data__ = A collection of discrete values that convey information.\n* __cryptographic-asset__ = Cryptographic asset including algorithms, protocols, certificates, keys, tokens, and secrets.",
           "examples": ["library"]
         },
         "mime-type": {
@@ -593,8 +593,7 @@
         },
         "cryptoProperties": {
           "$ref": "#/definitions/cryptoProperties",
-          "title": "Crypto Properties",
-          "description": "Properties for Crypto Assets"
+          "title": "Cryptographic Properties"
         },
         "properties": {
           "type": "array",
@@ -1250,9 +1249,9 @@
           "title": "Depends On",
           "description": "The bom-ref identifiers of the components or services that are dependencies of this dependency object."
         },
-        "dependencyType": {
+        "type": {
           "type": "string",
-          "title": "Type of dependency",
+          "title": "Dependency Type",
           "description": "Defines and characterizes the type of dependency",
           "$ref": "#/definitions/dependencyType"
         }
@@ -3852,9 +3851,15 @@
       "enum": [
         "implements",
         "uses",
-        "protectedBy"
+        "protected-by"
       ],
-      "description": "An optional field that describes the type of dependency.\n\n* implement: refers to crypto assets implemented, or statically available in a component. Examples are the algorithms provided by crypto libraries. A crypto asset 'implemented' by a component does not imply that it is in use.\n* uses: refers to crypto assets in use, or being referenced by other components. The referencing can be done by explicit function calls or by configuration at run time. Usage may change over time, so CBOMs always represent a snapshot at a given point in time."
+      "meta:enum": {
+        "implements": "Refers to a component or service that fulfills the requirements of a given specification or standard. For example, a cryptographic library which implements a cryptographic algorithm. A component which implements another component does not imply that the implementation is in use.",
+        "uses": "Refers to a component or service that relies on another component or service, either explicitly via function calls or via configuration at run time.",
+        "protected-by": "Refers to a component or service that safeguards another component or service. For example, a cryptographic component that protects a data component. A component or service which is protected by another component or service does not imply that either are in use."
+      },
+      "default": "uses",
+      "description": "An optional field that describes the type of dependency."
     },
     "cryptoProperties": {
       "type": "object",
@@ -3864,14 +3869,20 @@
       "properties": {
         "assetType": {
           "type": "string",
-          "title": "assetType",
-          "description": "Cryptographic assets occur in several forms. Algorithms and protocols are most commonly implemented in specialized cryptographic libraries. They may however also be 'hardcoded' in software components. Certificates and related cryptographic material like keys, tokens, secrets or passwords are other cryptographic assets to be modelled.\n\n* __algorithm__ = Mathematical functions that encrypt text. They are used for data encryption, authentication, and digital signatures.\n* __certificate__ = An electronic document that is used to provide the identity or validate a public key.\n* __protocol__ = A set of rules and guidelines that govern the behavior and communication with each other.\n* __relatedCryptoMaterial__ = Other cryptographic assets that are related to algorithms, certificate, and protocols such as keys and tokens.",
+          "title": "Asset Type",
+          "description": "Cryptographic assets occur in several forms. Algorithms and protocols are most commonly implemented in specialized cryptographic libraries. They may however also be 'hardcoded' in software components. Certificates and related cryptographic material like keys, tokens, secrets or passwords are other cryptographic assets to be modelled.",
           "enum": [
             "algorithm",
             "certificate",
             "protocol",
-            "relatedCryptoMaterial"
-          ]
+            "related-crypto-material"
+          ],
+          "meta:enum": {
+            "algorithm": "Mathematical function commonly used for data encryption, authentication, and digital signatures.",
+            "certificate": "An electronic document that is used to provide the identity or validate a public key.",
+            "protocol": "A set of rules and guidelines that govern the behavior and communication with each other.",
+            "related-crypto-material": "Other cryptographic assets that are related to algorithms, certificate, and protocols such as keys and tokens."
+          }
         },
         "algorithmProperties": {
           "type": "object",
@@ -3882,24 +3893,41 @@
             "primitive": {
               "type": "string",
               "title": "primitive",
-              "description": "Cryptographic building blocks used in higher-level cryptographic systems and protocols. Primitives represent different cryptographic routines: deterministic random bit generators (drbg, e.g. CTR_DRBG from NIST SP800-90A-r1), message authentication codes (mac, e.g. HMAC-SHA-256), blockciphers (e.g. AES), streamciphers (e.g. Salsa20), signatures (e.g. ECDSA), hash functions (e.g. SHA-256), public-key encryption schemes (pke, e.g. RSA), extended output functions (xof, e.g. SHAKE256), key derivation functions (e.g. pbkdf2), key agreement algoorithms (e.g. ECDH), key encapsulation mechanisms (e.g. ML-KEM), authenticated encryption (ae, e.g. AES-GCM) and the combination of multiple algorithms (combiner, e.g. SP800-56Cr2).",
+              "description": "Cryptographic building blocks used in higher-level cryptographic systems and protocols. Primitives represent different cryptographic routines: deterministic random bit generators (drbg, e.g. CTR_DRBG from NIST SP800-90A-r1), message authentication codes (mac, e.g. HMAC-SHA-256), blockciphers (e.g. AES), streamciphers (e.g. Salsa20), signatures (e.g. ECDSA), hash functions (e.g. SHA-256), public-key encryption schemes (pke, e.g. RSA), extended output functions (xof, e.g. SHAKE256), key derivation functions (e.g. pbkdf2), key agreement algorithms (e.g. ECDH), key encapsulation mechanisms (e.g. ML-KEM), authenticated encryption (ae, e.g. AES-GCM) and the combination of multiple algorithms (combiner, e.g. SP800-56Cr2).",
               "enum": [
                 "drbg",
                 "mac",
-                "blockcipher",
-                "streamcipher",
+                "block-cipher",
+                "stream-cipher",
                 "signature",
                 "hash",
                 "pke",
                 "xof",
                 "kdf",
-                "keyagree",
+                "key-agree",
                 "kem",
                 "ae",
                 "combiner",
                 "other",
                 "unknown"
-              ]
+              ],
+              "meta:enum": {
+                "drbg": "Deterministic Random Bit Generator (DRBG) is a type of pseudorandom number generator designed to produce a sequence of bits from an initial seed value. DRBGs are commonly used in cryptographic applications where reproducibility of random values is important.",
+                "mac": "In cryptography, a Message Authentication Code (MAC) is information used for authenticating and integrity-checking a message.",
+                "block-cipher": "A block cipher is a symmetric key algorithm that operates on fixed-size blocks of data. It encrypts or decrypts the data in block units, providing confidentiality. Block ciphers are widely used in various cryptographic modes and protocols for secure data transmission.",
+                "stream-cipher": "A stream cipher is a symmetric key cipher where plaintext digits are combined with a pseudorandom cipher digit stream (keystream).",
+                "signature": "In cryptography, a signature is a digital representation of a message or data that proves its origin, identity, and integrity. Digital signatures are generated using cryptographic algorithms and are widely used for authentication and verification in secure communication.",
+                "hash": "A hash function is a mathematical algorithm that takes an input (or 'message') and produces a fixed-size string of characters, which is typically a hash value. Hash functions are commonly used in various cryptographic applications, including data integrity verification and password hashing.",
+                "pke": "Public Key Encryption (PKE) is a type of encryption that uses a pair of public and private keys for secure communication. The public key is used for encryption, while the private key is used for decryption. PKE is a fundamental component of public-key cryptography.",
+                "xof": "An XOF is an extendable output function that can take arbitrary input and creates a stream of output, up to a limit determined by the size of the internal state of the hash function that underlies the XOF.",
+                "kdf": "A Key Derivation Function (KDF) derives key material from another source of entropy while preserving the entropy of the input.",
+                "key-agree": "In cryptography, a key-agreement is a protocol whereby two or more parties agree on a cryptographic key in such a way that both influence the outcome.",
+                "kem": "A Key Encapsulation Mechanism (KEM) algorithm is a mechanism for transporting random keying material to a recipient using the recipient's public key.",
+                "ae": "Authenticated Encryption (AE) is a cryptographic process that provides both confidentiality and data integrity. It ensures that the encrypted data has not been tampered with and comes from a legitimate source. AE is commonly used in secure communication protocols.",
+                "combiner": "A combiner aggregates many candidates for a cryptographic primitive and generates a new candidate for the same primitive.",
+                "other": "Another primitive type.",
+                "unknown": "The primitive is not known."
+              }
             },
             "parameterSetIdentifier": {
               "type": "string",
@@ -3914,20 +3942,28 @@
             "executionEnvironment": {
               "type": "string",
               "title": "Execution Environment",
-              "description": "The target and execution environment in which the algorithm is implemented in. The execution environment can be a software implementation running in plain unencrypted RAM ('softwarePlainRAM'), a software implementation running in encrypted RAM ('softwareEncryptedRAM'), a software implementation running in a trusted execution environment ('softwareTEE'), or an implementation in 'hardware'.",
+              "description": "The target and execution environment in which the algorithm is implemented in.",
               "enum": [
-                "softwarePlainRAM",
-                "softwareEncryptedRAM",
-                "softwareTEE",
+                "software-plain-ram",
+                "software-encrypted-ram",
+                "software-tee",
                 "hardware",
                 "other",
                 "unknown"
-              ]
+              ],
+              "meta:enum": {
+                "software-plain-ram": "A software implementation running in plain unencrypted RAM.",
+                "software-encrypted-ram": "A software implementation running in encrypted RAM.",
+                "software-tee": "A software implementation running in a trusted execution environment.",
+                "hardware": "A hardware implementation.",
+                "other": "Another implementation environment.",
+                "unknown": "The execution environment is not known."
+              }
             },
             "implementationPlatform": {
               "type": "string",
               "title": "implementation platform",
-              "description": "The target platform for which the algorithm is implemented. The implementation can be 'generic', running on any platform or for a specific platform such as 'x86_32', 'x86_64, 'armv7-a', 'armv7-m', 'armv8-a', 'armv8-m', 's390x', 'ppc64' or 'ppc64le'.",
+              "description": "The target platform for which the algorithm is implemented. The implementation can be 'generic', running on any platform or for a specific platform.",
               "enum": [
                 "generic",
                 "x86_32",
@@ -3979,7 +4015,38 @@
                 "cc-eal7+",
                 "other",
                 "unknown"
-              ]
+              ],
+              "meta:enum": {
+                "none": "No certification obtained",
+                "fips140-1-l1": "FIPS 140-1 Level 1",
+                "fips140-1-l2": "FIPS 140-1 Level 2",
+                "fips140-1-l3": "FIPS 140-1 Level 3",
+                "fips140-1-l4": "FIPS 140-1 Level 4",
+                "fips140-2-l1": "FIPS 140-2 Level 1",
+                "fips140-2-l2": "FIPS 140-2 Level 2",
+                "fips140-2-l3": "FIPS 140-2 Level 3",
+                "fips140-2-l4": "FIPS 140-2 Level 4",
+                "fips140-3-l1": "FIPS 140-3 Level 1",
+                "fips140-3-l2": "FIPS 140-3 Level 2",
+                "fips140-3-l3": "FIPS 140-3 Level 3",
+                "fips140-3-l4": "FIPS 140-3 Level 4",
+                "cc-eal1": "Common Criteria - Evaluation Assurance Level 1",
+                "cc-eal1+": "Common Criteria - Evaluation Assurance Level 1 (Augmented)",
+                "cc-eal2": "Common Criteria - Evaluation Assurance Level 2",
+                "cc-eal2+": "Common Criteria - Evaluation Assurance Level 2 (Augmented)",
+                "cc-eal3": "Common Criteria - Evaluation Assurance Level 3",
+                "cc-eal3+": "Common Criteria - Evaluation Assurance Level 3 (Augmented)",
+                "cc-eal4": "Common Criteria - Evaluation Assurance Level 4",
+                "cc-eal4+": "Common Criteria - Evaluation Assurance Level 4 (Augmented)",
+                "cc-eal5": "Common Criteria - Evaluation Assurance Level 5",
+                "cc-eal5+": "Common Criteria - Evaluation Assurance Level 5 (Augmented)",
+                "cc-eal6": "Common Criteria - Evaluation Assurance Level 6",
+                "cc-eal6+": "Common Criteria - Evaluation Assurance Level 6 (Augmented)",
+                "cc-eal7": "Common Criteria - Evaluation Assurance Level 7",
+                "cc-eal7+": "Common Criteria - Evaluation Assurance Level 7 (Augmented)",
+                "other": "Another certification",
+                "unknown": "The certification level is not known"
+              }
             },
             "mode": {
               "type": "string",
@@ -3995,7 +4062,18 @@
                 "ctr",
                 "other",
                 "unknown"
-              ]
+              ],
+              "meta:enum": {
+                "cbc": "Cipher block chaining",
+                "ecb": "Electronic codebook",
+                "ccm": "Counter with cipher block chaining message authentication code",
+                "gcm": "Galois/counter",
+                "cfb": "Cipher feedback",
+                "ofb": "Output feedback",
+                "ctr": "Counter",
+                "other": "Another mode of operation",
+                "unknown": "The mode of operation is not known"
+              }
             },
             "padding": {
               "type": "string",
@@ -4009,12 +4087,21 @@
                 "raw",
                 "other",
                 "unknown"
-              ]
+              ],
+              "meta:enum": {
+                "pkcs5": "Public Key Cryptography Standard: Password-Based Cryptography",
+                "pkcs7": "Public Key Cryptography Standard: Cryptographic Message Syntax",
+                "pkcs1v15": "Public Key Cryptography Standard: RSA Cryptography v1.5",
+                "oaep": "Optimal asymmetric encryption padding",
+                "raw": "Raw",
+                "other": "Another padding scheme",
+                "unknown": "The padding scheme is not known"
+              }
             },
             "cryptoFunctions": {
               "type": "array",
-              "title": "Crypto function",
-              "description": "The cryptographic functions implemented by the cryptographic algorithm",
+              "title": "Cryptographic functions",
+              "description": "The cryptographic functions implemented by the cryptographic algorithm.",
               "items": {
                 "type": "string",
                 "enum": [
@@ -4067,23 +4154,25 @@
             },
             "notValidBefore": {
               "type": "string",
+              "format": "date-time",
               "title": "Not Valid Before",
               "description": "The date and time according to ISO-8601 standard from which the certificate is valid"
             },
             "notValidAfter": {
               "type": "string",
+              "format": "date-time",
               "title": "Not Valid After",
               "description": "The date and time according to ISO-8601 standard from which the certificate is not valid anymore"
             },
             "signatureAlgorithm": {
-              "$ref": "#/definitions/cryptoRef",
+              "$ref": "#/definitions/refType",
               "title": "Algorithm Reference",
-              "description": "Bom-ref to signature algorithm used by the certificate"
+              "description": "The bom-ref to signature algorithm used by the certificate"
             },
             "subjectPublicKey": {
-              "$ref": "#/definitions/cryptoRef",
+              "$ref": "#/definitions/refType",
               "title": "Key reference",
-              "description": "Bom-ref to the public key of the subject"
+              "description": "The bom-ref to the public key of the subject"
             },
             "certificateFormat": {
               "type": "string",
@@ -4113,46 +4202,46 @@
         "relatedCryptoMaterialProperties": {
           "type": "object",
           "title": "Related Cryptographic Material Properties",
-          "description": "Properties for cryptographic assets of asset type 'relatedCryptoMaterial'",
+          "description": "Properties for cryptographic assets of asset type: `related-crypto-material`",
           "additionalProperties": false,
           "properties": {
             "type": {
-                "type": "string",
-                "title": "relatedCryptoMaterialType",
-                "description": "The type for the related cryptographic material",
-                "enum": [
-                    "privateKey",
-                    "publicKey",
-                    "secretKey",
-                    "key",
-                    "ciphertext",
-                    "signature",
-                    "digest",
-                    "initializationVector",
-                    "nonce",
-                    "seed",
-                    "salt",
-                    "sharedSecret",
-                    "tag",
-                    "additionalData",
-                    "password",
-                    "credential",
-                    "token",
-                    "other",
-                    "unknown"
-                ]
+              "type": "string",
+              "title": "relatedCryptoMaterialType",
+              "description": "The type for the related cryptographic material",
+              "enum": [
+                "private-key",
+                "public-key",
+                "secret-key",
+                "key",
+                "ciphertext",
+                "signature",
+                "digest",
+                "initialization-vector",
+                "nonce",
+                "seed",
+                "salt",
+                "shared-secret",
+                "tag",
+                "additional-data",
+                "password",
+                "credential",
+                "token",
+                "other",
+                "unknown"
+              ]
             },
             "id": {
                 "type": "string",
                 "title": "ID",
-                "description": "The optional unique identifier for the related cryptographic material"
+                "description": "The optional unique identifier for the related cryptographic material."
             },
             "state": {
                 "type": "string",
                 "title": "State",
-                "description": "The key state as defined by NIST SP 800-57",
+                "description": "The key state as defined by NIST SP 800-57.",
                 "enum": [
-                    "preActivation",
+                    "pre-activation",
                     "active",
                     "suspended",
                     "deactivated",
@@ -4161,9 +4250,9 @@
                 ]
             },
             "algorithmRef": {
-                "$ref": "#/definitions/cryptoRef",
+                "$ref": "#/definitions/refType",
                 "title": "Algorithm Reference",
-                "description": "Bom-ref to the algorithm used to generate the related cryptographic material"
+                "description": "The bom-ref to the algorithm used to generate the related cryptographic material."
             },
             "creationDate": {
                 "type": "string",
@@ -4192,17 +4281,17 @@
             "value": {
                 "type": "string",
                 "title": "Value",
-                "description": "The associated value of the cryptographic material"
+                "description": "The associated value of the cryptographic material."
             },
             "size": {
                 "type": "integer",
                 "title":"Size",
-                "description": "Cryptographic asset size (in bits)"
+                "description": "The size of the cryptographic asset (in bits)."
             },
             "format": {
                 "type": "string",
                 "title": "Format",
-                "description": "Format of the related cryptographic material (e.g. P8, PEM, DER)"
+                "description": "The format of the related cryptographic material (e.g. P8, PEM, DER)."
             },
             "securedBy": {
                 "$ref": "#/definitions/securedBy",
@@ -4214,13 +4303,13 @@
         "protocolProperties": {
           "type": "object",
           "title": "Protocol Properties",
-          "description": "Properties for cryptographic assets of asset type 'protocol'",
+          "description": "Properties specific to cryptographic assets of type: `protocol`.",
           "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
               "title": "Type",
-              "description": "The concrete protocol type",
+              "description": "The concrete protocol type.",
               "enum": [
                 "tls",
                 "ssh",
@@ -4230,12 +4319,22 @@
                 "wpa",
                 "other",
                 "unknown"
-              ]
+              ],
+              "meta:enum": {
+                "tls": "Transport Layer Security",
+                "ssh": "Secure Shell",
+                "ipsec": "Internet Protocol Security",
+                "ike": "Internet Key Exchange",
+                "sstp": "Secure Socket Tunneling Protocol",
+                "wpa": "Wi-Fi Protected Access",
+                "other": "Another protocol type",
+                "unknown": "The protocol type is not known"
+              }
             },
             "version": {
               "type": "string",
               "title": "Protocol Version",
-              "description": "The version of the protocol",
+              "description": "The version of the protocol.",
               "examples": [
                 "1.0",
                 "1.2",
@@ -4245,7 +4344,7 @@
             "cipherSuites": {
               "type": "array",
               "title": "Cipher Suites",
-              "description": "A list of cipher suites related to the protocol",
+              "description": "A list of cipher suites related to the protocol.",
               "items": {
                 "$ref": "#/definitions/cipherSuite",
                 "title": "Cipher Suite"
@@ -4254,31 +4353,32 @@
             "ikev2TransformTypes": {
               "type": "object",
               "title": "IKEv2 Transform Types",
-              "description": "The IKEv2 transform types supported (types 1-4), defined in RFC7296 section 3.3.2, and additional properties",
+              "description": "The IKEv2 transform types supported (types 1-4), defined in RFC7296 section 3.3.2, and additional properties.",
+              "additionalProperties": false,
               "properties": {
                 "encr": {
                   "$ref": "#/definitions/cryptoRefArray",
-                  "title": "Transform Type 1: encryption algorithms"
+                  "description": "Transform Type 1: encryption algorithms"
                 },
                 "prf": {
                   "$ref": "#/definitions/cryptoRefArray",
-                  "title": "Transform Type 2: pseudorandom functions"
+                  "description": "Transform Type 2: pseudorandom functions"
                 },
                 "integ": {
                   "$ref": "#/definitions/cryptoRefArray",
-                  "title": "Transform Type 3: integrity algorithms"
+                  "description": "Transform Type 3: integrity algorithms"
                 },
                 "ke": {
                   "$ref": "#/definitions/cryptoRefArray",
-                  "title": "Key Exchange Method (KE) by RFC9370, formerly called dh"
+                  "description": "Transform Type 4: Key Exchange Method (KE) per RFC9370, formerly called Diffie-Hellman Group (D-H)"
                 },
                 "esn": {
                   "type": "boolean",
-                  "title": "Extended Sequence Number is used"
+                  "description": "Specifies if an Extended Sequence Number (ESN) is used."
                 },
                 "auth": {
                   "$ref": "#/definitions/cryptoRefArray",
-                  "title": "IKEv2 Authentication method"
+                  "description": "IKEv2 Authentication method"
                 }
               }
             },
@@ -4292,14 +4392,9 @@
         "oid": {
           "type": "string",
           "title": "OID",
-          "description": "Object identifier of cryptographic asset"
+          "description": "The object identifier (OID) of the cryptographic asset."
         }
       }
-    },
-    "cryptoRef": {
-      "type": "string",
-      "title": "Reference to a Cryptographic Asset",
-      "description": "Reference (bom-ref) to the cryptographic asset used in this context"
     },
     "cipherSuite": {
       "type": "object",
@@ -4310,7 +4405,7 @@
         "name": {
           "type": "string",
           "title": "Common Name",
-          "description": "A common name for the cipher suite",
+          "description": "A common name for the cipher suite.",
           "examples": [
             "TLS_DHE_RSA_WITH_AES_128_CCM"
           ]
@@ -4318,17 +4413,17 @@
         "algorithms": {
           "type": "array",
           "title": "Related Algorithms",
-          "description": "List of algorithms related to the cipher suite",
+          "description": "A list of algorithms related to the cipher suite.",
           "items": {
-            "$ref": "#/definitions/cryptoRef",
+            "$ref": "#/definitions/refType",
             "title": "Algorithm reference",
-            "description": "Bom-ref to algorithm cryptographic asset"
+            "description": "The bom-ref to algorithm cryptographic asset."
           }
         },
         "identifiers": {
           "type": "array",
           "title": "Cipher Suite Identifiers",
-          "description": "A list of common identifiers for the cipher suite",
+          "description": "A list of common identifiers for the cipher suite.",
           "items": {
             "type": "string",
             "title": "identifier",
@@ -4344,19 +4439,19 @@
     "cryptoRefArray" : {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/cryptoRef"
+        "$ref": "#/definitions/refType"
       }
     },
     "securedBy": {
       "type": "object",
       "title": "Secured By",
-      "description": "Specifies the mechanism by which the crypto asset is secured by",
+      "description": "Specifies the mechanism by which the cryptographic asset is secured by",
       "additionalProperties": false,
       "properties": {
         "mechanism": {
           "type": "string",
           "title": "Mechanism",
-          "description": "Specifies the mechanism by which the crypto asset is secured by",
+          "description": "Specifies the mechanism by which the cryptographic asset is secured by.",
           "examples": [
             "HSM",
             "TPM",
@@ -4366,8 +4461,9 @@
           ]
         },
         "algorithmRef": {
-          "$ref": "#/definitions/cryptoRef",
-          "title": "Algorithm reference"
+          "$ref": "#/definitions/refType",
+          "title": "Algorithm Reference",
+          "description": "The bom-ref to the algorithm."
         }
       }
     }
