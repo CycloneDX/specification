@@ -105,6 +105,412 @@
       "title": "Formulation",
       "description": "Describes how a component or service was manufactured or deployed. This is achieved through the use of formulas, workflows, tasks, and steps, which declare the precise steps to reproduce along with the observed formulas describing the steps which transpired in the manufacturing process."
     },
+    "declarations": {
+      "type": "object",
+      "title": "Declarations",
+      "description": "The list of declarations which describe the conformance to standards. Each declaration may include attestations, claims, and evidence.",
+      "additionalProperties": false,
+      "properties": {
+        "assessors": {
+          "type": "array",
+          "title": "Assessors",
+          "description": "The list of assessors evaluating claims and determining conformance to requirements and confidence in that assessment.",
+          "items": {
+            "type": "object",
+            "title": "Assessor",
+            "description": "The assessor who evaluates claims and determines conformance to requirements and confidence in that assessment.",
+            "additionalProperties": false,
+            "properties": {
+              "bom-ref": {
+                "$ref": "#/definitions/refType",
+                "title": "BOM Reference",
+                "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+              },
+              "thirdParty": {
+                "type": "boolean",
+                "title": "Third Party",
+                "description": "The boolean indicating if the assessor is outside the organization generating claims. A value of false indicates a self assessor."
+              },
+              "organization": {
+                "$ref": "#/definitions/organizationalEntity",
+                "title": "Organization",
+                "description": "The entity issuing the assessment."
+              }
+            }
+          }
+        },
+        "attestations": {
+          "type": "array",
+          "title": "Attestations",
+          "description": "The list of attestations asserted by an assessor that maps requirements to claims.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "summary":  {
+                "type": "string",
+                "title": "Summary",
+                "description": "The short description explaining the main points of the attestation."
+              },
+              "assessor": {
+                "$ref": "#/definitions/refLinkType",
+                "title": "Assessor",
+                "description": "The `bom-ref` to the assessor asserting the attestation."
+              },
+              "map": {
+                "type": "array",
+                "title": "Map",
+                "description": "The grouping of requirements to claims and the attestors declared conformance and confidence thereof.",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "requirement": {
+                      "$ref": "#/definitions/refLinkType",
+                      "title": "Requirement",
+                      "description": "The `bom-ref` to the requirement being attested to."
+                    },
+                    "claims": {
+                      "type": "array",
+                      "title": "Claims",
+                      "description": "The list of `bom-ref` to the claims being attested to.",
+                      "items": { "$ref": "#/definitions/refLinkType" }
+                    },
+                    "counterClaims": {
+                      "type": "array",
+                      "title": "Claims",
+                      "description": "The list of  `bom-ref` to the counter claims being attested to.",
+                      "items": { "$ref": "#/definitions/refLinkType" }
+                    },
+                    "conformance": {
+                      "type": "object",
+                      "title": "Conformance",
+                      "description": "The conformance of the claim meeting a requirement.",
+                      "additionalProperties": false,
+                      "properties": {
+                        "score": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "title": "Score",
+                          "description": "The conformance of the claim between and inclusive of 0 and 1, where 1 is 100% conformance."
+                        },
+                        "rationale": {
+                          "type": "string",
+                          "title": "Rationale",
+                          "description": "The rationale for the conformance score."
+                        },
+                        "mitigationStrategies": {
+                          "type": "array",
+                          "title": "Mitigation Strategies",
+                          "description": "The list of  `bom-ref` to the evidence provided describing the mitigation strategies.",
+                          "items": { "$ref": "#/definitions/refLinkType" }
+                        }
+                      }
+                    },
+                    "confidence": {
+                      "type": "object",
+                      "title": "Confidence",
+                      "description": "The confidence of the claim meeting the requirement.",
+                      "additionalProperties": false,
+                      "properties": {
+                        "score": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "title": "Score",
+                          "description": "The confidence of the claim between and inclusive of 0 and 1, where 1 is 100% confidence."
+                        },
+                        "rationale": {
+                          "type": "string",
+                          "title": "Rationale",
+                          "description": "The rationale for the confidence score."
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "signature": {
+                "$ref": "#/definitions/signature",
+                "title": "Signature",
+                "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
+              }
+            }
+          }
+        },
+        "claims": {
+          "type": "array",
+          "title": "Claims",
+          "description": "The list of claims.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "bom-ref": {
+                "$ref": "#/definitions/refType",
+                "title": "BOM Reference",
+                "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+              },
+              "target": {
+                "$ref": "#/definitions/refLinkType",
+                "title": "Target",
+                "description": "The `bom-ref` to a target representing a specific system, application, API, module, team, person, process, business unit, company, etc...  that this claim is being applied to."
+              },
+              "predicate": {
+                "type": "string",
+                "title": "Predicate",
+                "description": "The specific statement or assertion about the target."
+              },
+              "mitigationStrategies": {
+                "type": "array",
+                "title": "Mitigation Strategies",
+                "description": "The list of  `bom-ref` to the evidence provided describing the mitigation strategies. Each mitigation strategy should include an explanation of how any weaknesses in the evidence will be mitigated.",
+                "items": { "$ref": "#/definitions/refLinkType" }
+              },
+              "reasoning": {
+                "type": "string",
+                "title": "Reasoning",
+                "description": "The written explanation of why the evidence provided substantiates the claim."
+              },
+              "evidence": {
+                "type": "array",
+                "title": "Evidence",
+                "description": "The list of `bom-ref` to evidence that supports this claim.",
+                "items": { "$ref": "#/definitions/refLinkType" }
+              },
+              "counterEvidence": {
+                "type": "array",
+                "title": "Counter Evidence",
+                "description": "The list of `bom-ref` to counterEvidence that supports this claim.",
+                "items": { "$ref": "#/definitions/refLinkType" }
+              },
+              "externalReferences": {
+                "type": "array",
+                "items": {"$ref": "#/definitions/externalReference"},
+                "title": "External References",
+                "description": "External references provide a way to document systems, sites, and information that may be relevant, but are not included with the BOM. They may also establish specific relationships within or external to the BOM."
+              },
+              "signature": {
+                "$ref": "#/definitions/signature",
+                "title": "Signature",
+                "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
+              }
+            }
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "title": "Evidence",
+          "description": "The list of evidence",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "bom-ref": {
+                "$ref": "#/definitions/refType",
+                "title": "BOM Reference",
+                "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+              },
+              "propertyName": {
+                "type": "string",
+                "title": "Type",
+                "description": "The reference to the property name as defined in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy/)."
+              },
+              "description": {
+                "type": "string",
+                "title": "Description",
+                "description": "The written description of what this evidence is and how it was created."
+              },
+              "data": {
+                "type": "array",
+                "title": "Data",
+                "description": "The output or analysis that supports claims.",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "description": "The name of the data.",
+                      "type": "string"
+                    },
+                    "contents": {
+                      "type": "object",
+                      "title": "Data Contents",
+                      "description": "The contents or references to the contents of the data being described.",
+                      "additionalProperties": false,
+                      "properties": {
+                        "attachment": {
+                          "title": "Data Attachment",
+                          "description": "An optional way to include textual or encoded data.",
+                          "$ref": "#/definitions/attachment"
+                        },
+                        "url": {
+                          "type": "string",
+                          "title": "Data URL",
+                          "description": "The URL to where the data can be retrieved.",
+                          "format": "iri-reference"
+                        }
+                      }
+                    },
+                    "classification": {
+                      "$ref": "#/definitions/dataClassification"
+                    },
+                    "sensitiveData": {
+                      "type": "array",
+                      "description": "A description of any sensitive data included.",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "governance": {
+                      "title": "Data Governance",
+                      "$ref": "#/definitions/dataGovernance"
+                    }
+                  }
+                }
+              },
+              "created": {
+                "type": "string",
+                "format": "date-time",
+                "title": "Created",
+                "description": "The date and time (timestamp) when the evidence was created."
+              },
+              "expires": {
+                "type": "string",
+                "format": "date-time",
+                "title": "Expires",
+                "description": "The optional date and time (timestamp) when the evidence is no longer valid."
+              },
+              "author": {
+                "$ref": "#/definitions/organizationalContact",
+                "title": "Author",
+                "description": "The author of the evidence."
+              },
+              "reviewer": {
+                "$ref": "#/definitions/organizationalContact",
+                "title": "Reviewer",
+                "description": "The reviewer of the evidence."
+              },
+              "signature": {
+                "$ref": "#/definitions/signature",
+                "title": "Signature",
+                "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
+              }
+            }
+          }
+        },
+        "targets": {
+          "type": "object",
+          "title": "Targets",
+          "description": "The list of targets which claims are made against.",
+          "additionalProperties": false,
+          "properties": {
+            "organizations": {
+              "type": "array",
+              "title": "Organizations",
+              "description": "The list of organizations which claims are made against.",
+              "items": {"$ref": "#/definitions/organizationalEntity"}
+            },
+            "components": {
+              "type": "array",
+              "title": "Components",
+              "description": "The list of components which claims are made against.",
+              "items": {"$ref": "#/definitions/component"}
+            },
+            "services": {
+              "type": "array",
+              "title": "Services",
+              "description": "The list of services which claims are made against.",
+              "items": {"$ref": "#/definitions/service"}
+            }
+          }
+        },
+        "affirmation": {
+          "type": "object",
+          "title": "Affirmation",
+          "additionalProperties": false,
+          "properties": {
+            "statement": {
+              "type": "string",
+              "title": "Text",
+              "description": "The brief statement affirmed by an individual regarding all declarations.\n*- Notes This could be an affirmation of acceptance by a third-party auditor or receiving individual of a file.",
+              "examples": [ "I certify, to the best of my knowledge, that all information is correct." ]
+            },
+            "signatories": {
+              "type": "array",
+              "title": "Signatories",
+              "description": "The list of signatories authorized on behalf of an organization to assert validity of this document.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "oneOf": [
+                  {
+                    "required": ["signature"]
+                  },
+                  {
+                    "required": ["externalReference", "organization"]
+                  }
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "title": "Name",
+                    "description": "The signatory's name."
+                  },
+                  "role": {
+                    "type": "string",
+                    "title": "Role",
+                    "description": "The signatory's role within an organization."
+                  },
+                  "signature": {
+                    "$ref": "#/definitions/signature",
+                    "title": "Signature",
+                    "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
+                  },
+                  "organization": {
+                    "$ref": "#/definitions/organizationalEntity",
+                    "title": "Organization",
+                    "description": "The signatory's organization."
+                  },
+                  "externalReference": {
+                    "$ref": "#/definitions/externalReference",
+                    "title": "External Reference",
+                    "description": "An External reference provide a way to document systems, sites, and information that may be relevant, but are not included with the BOM. They may also establish specific relationships within or external to the BOM."
+                  }
+                }
+              }
+            },
+            "signature": {
+              "$ref": "#/definitions/signature",
+              "title": "Signature",
+              "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
+            }
+          }
+        },
+        "signature": {
+          "$ref": "#/definitions/signature",
+          "title": "Signature",
+          "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
+        }
+      }
+    },
+    "definitions": {
+      "type": "object",
+      "title": "Definitions",
+      "description": "A collection of reusable objects that are defined and may be used elsewhere in the BOM.",
+      "additionalProperties": false,
+      "properties": {
+        "standards": {
+          "type": "array",
+          "title": "Standards",
+          "description": "The list of standards which may consist of regulations, industry or organizational-specific standards, maturity models, best practices, or any other requirements which can be evaluated against or attested to.",
+          "items": {
+            "$ref": "#/definitions/standard"
+          }
+        }
+      }
+    },
     "properties": {
       "type": "array",
       "title": "Properties",
@@ -1273,6 +1679,8 @@
             "codified-infrastructure",
             "quality-metrics",
             "poam",
+            "electronic-signature",
+            "digital-signature",
             "other"
           ],
           "meta:enum": {
@@ -1315,6 +1723,8 @@
             "codified-infrastructure": "Code or configuration that defines and provisions virtualized infrastructure, commonly referred to as Infrastructure as Code (IaC).",
             "quality-metrics": "Report or system in which quality metrics can be obtained.",
             "poam": "Plans of Action and Milestones (POAM) compliment an \"attestation\" external reference. POAM is defined by NIST as a \"document that identifies tasks needing to be accomplished. It details resources required to accomplish the elements of the plan, any milestones in meeting the tasks and scheduled completion dates for the milestones\".",
+            "electronic-signature": "An e-signature is commonly a scanned representation of a written signature or a stylized script of the persons name.",
+            "digital-signature": "A signature that leverages cryptography, typically public/private key pairs, which provides strong authenticity verification.",
             "other": "Use this if no other types accurately describe the purpose of the external reference."
           }
 
@@ -3996,6 +4406,155 @@
           "title": "Data type",
           "description": "The data type of the parameter.",
           "type": "string"
+        }
+      }
+    },
+    "standard": {
+      "type": "object",
+      "title": "Standard",
+      "description": "A standard may consist of regulations, industry or organizational-specific standards, maturity models, best practices, or any other requirements which can be evaluated against or attested to.",
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "#/definitions/refType",
+          "title": "BOM Reference",
+          "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name of the standard. This will often be a shortened, single name of the standard."
+        },
+        "version": {
+          "type": "string",
+          "title": "Version",
+          "description": "The version of the standard."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "The description of the standard."
+        },
+        "owner": {
+          "type": "string",
+          "title": "Owner",
+          "description": "The owner of the standard, often the entity responsible for its release."
+        },
+        "requirements": {
+          "type": "array",
+          "title": "Requirements",
+          "description": "The list of requirements comprising the standard.",
+          "items": {
+            "type": "object",
+            "title": "Requirement",
+            "additionalProperties": false,
+            "properties": {
+              "bom-ref": {
+                "$ref": "#/definitions/refType",
+                "title": "BOM Reference",
+                "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+              },
+              "identifier": {
+                "type": "string",
+                "title": "Identifier",
+                "description": "The unique identifier used in the standard to identify a specific requirement. This should match what is in the standard and should not be the requirements bom-ref."
+              },
+              "title": {
+                "type": "string",
+                "title": "Title",
+                "description": "The title of the requirement."
+              },
+              "text": {
+                "type": "string",
+                "title": "Text",
+                "description": "The textual content of the requirement."
+              },
+              "descriptions": {
+                "type": "array",
+                "title": "Descriptions",
+                "description": "The supplemental text that provides additional guidance or context to the requirement, but is not directly part of the requirement.",
+                "items": { "type":  "string" }
+              },
+              "openCre": {
+                "type": "array",
+                "title": "OWASP OpenCRE Identifier(s)",
+                "description": "The Common Requirements Enumeration (CRE) identifier(s). CRE is a structured and standardized framework for uniting security standards and guidelines. CRE links each section of a resource to a shared topic identifier (a Common Requirement). Through this shared topic link, all resources map to each other. Use of CRE promotes clear and unambiguous communication among stakeholders.",
+                "items": {
+                  "type":  "string",
+                  "pattern": "^CRE:[0-9]+-[0-9]+$",
+                  "examples": [ "CRE:764-507" ]
+                }
+              },
+              "parent": {
+                "$ref": "#/definitions/refLinkType",
+                "title": "Parent BOM Reference",
+                "description": "The optional `bom-ref` to a parent requirement. This establishes a hierarchy of requirements. Top-level requirements must not define a parent. Only child requirements should define parents."
+              },
+              "properties": {
+                "type": "array",
+                "title": "Properties",
+                "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
+                "items": {
+                  "$ref": "#/definitions/property"
+                }
+              },
+              "externalReferences": {
+                "type": "array",
+                "items": {"$ref": "#/definitions/externalReference"},
+                "title": "External References",
+                "description": "External references provide a way to document systems, sites, and information that may be relevant, but are not included with the BOM. They may also establish specific relationships within or external to the BOM."
+              }
+            }
+          }
+        },
+        "levels": {
+          "type": "array",
+          "title": "Levels",
+          "description": "The list of levels associated with the standard. Some standards have different levels of compliance.",
+          "items": {
+            "type": "object",
+            "title": "Level",
+            "additionalProperties": false,
+            "properties": {
+              "bom-ref": {
+                "$ref": "#/definitions/refType",
+                "title": "BOM Reference",
+                "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref MUST be unique within the BOM."
+              },
+              "identifier": {
+                "type": "string",
+                "title": "Identifier",
+                "description": "The identifier used in the standard to identify a specific level."
+              },
+              "title": {
+                "type": "string",
+                "title": "Title",
+                "description": "The title of the level."
+              },
+              "description": {
+                "type": "string",
+                "title": "Description",
+                "description": "The description of the level."
+              },
+              "requirements": {
+                "type": "array",
+                "title": "Requirements",
+                "description": "The list of requirement `bom-ref`s that comprise the level.",
+                "items": { "$ref": "#/definitions/refLinkType" }
+              }
+            }
+          }
+        },
+        "externalReferences": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/externalReference"},
+          "title": "External References",
+          "description": "External references provide a way to document systems, sites, and information that may be relevant, but are not included with the BOM. They may also establish specific relationships within or external to the BOM."
+        },
+        "signature": {
+          "$ref": "#/definitions/signature",
+          "title": "Signature",
+          "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
         }
       }
     },
