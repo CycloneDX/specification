@@ -50,6 +50,7 @@ function getAjv(strict) {
         allowMatchingProperties: true,
         addUsedSchema: false,
         allowUnionTypes: false,
+        keywords: ["meta:enum"],
         schemas: {
             'http://cyclonedx.org/schema/spdx.schema.json': spdxSchema,
             'http://cyclonedx.org/schema/jsf-0.82.schema.json': jsfSchema
