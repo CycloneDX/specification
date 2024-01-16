@@ -564,7 +564,11 @@ limitations under the License.
                 <xs:element name="versionRange" type="bom:versionRangeType" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>The component version range that may be provided to fulfill this capability.
-                            MAY only occur if `isExtraneous` is `true`.</xs:documentation>
+                            MAY only occur if attribute `isExtraneous` is set to `true`.</xs:documentation>
+                        <!-- Attention:
+                        Since XSD 1.1 `asserts` are mostly not implemented, there is currently no rule in this XSD,
+                        that is taking cate of the plausibility between `version`/`versionRange` and `isExtraneous`=='true'
+                        -->
                     </xs:annotation>
                 </xs:element>
             </xs:choice>
@@ -775,12 +779,11 @@ limitations under the License.
                     do not have the same name as an existing attribute used by the schema.</xs:documentation>
             </xs:annotation>
         </xs:anyAttribute>
-        <!--
-        this would be formal, if the support for XSD1.1's `assert` was properly implemented
-        in validators and tools digesting XML.
+        <!-- Attention:
+        This would be formal, if the support for XSD1.1's `assert` was properly implemented in validators and tools digesting XML.
         <xs:assert id="versionRange_requires_isExtraneous_eq_true"
                    test="if (versionRange) then (@isExtraneous eq 'true') else true()">
-            child `versionRange` MAY only be present, if attribute `isExtraneous` is `true`
+            Child `versionRange` MAY only be present, if attribute `isExtraneous` is 'true'.
         </xs:assert>
         -->
     </xs:complexType>
