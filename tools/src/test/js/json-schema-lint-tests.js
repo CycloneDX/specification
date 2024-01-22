@@ -49,6 +49,7 @@ function getAjv(strict) {
         validateFormats: true,
         allowMatchingProperties: true,
         addUsedSchema: false,
+        allowUnionTypes: false,
         keywords: ["meta:enum"],
         schemas: {
             'http://cyclonedx.org/schema/spdx.schema.json': spdxSchema,

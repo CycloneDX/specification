@@ -1276,6 +1276,11 @@ limitations under the License.
                     <xs:documentation>Community or commercial support</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
+            <xs:enumeration value="source-distribution">
+                <xs:annotation>
+                    <xs:documentation>URL to a source archive</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
             <xs:enumeration value="distribution">
                 <xs:annotation>
                     <xs:documentation>Direct or repository download location</xs:documentation>
@@ -1417,6 +1422,16 @@ limitations under the License.
             <xs:enumeration value="poam">
                 <xs:annotation>
                     <xs:documentation>Plans of Action and Milestones (POAM) compliment an "attestation" external reference. POAM is defined by NIST as a "document that identifies tasks needing to be accomplished. It details resources required to accomplish the elements of the plan, any milestones in meeting the tasks and scheduled completion dates for the milestones".</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="electronic-signature">
+                <xs:annotation>
+                    <xs:documentation>An e-signature is commonly a scanned representation of a written signature or a stylized script of the persons name.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="digital-signature">
+                <xs:annotation>
+                    <xs:documentation>A signature that leverages cryptography, typically public/private key pairs, which provides strong authenticity verification.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
             <xs:enumeration value="other">
@@ -2202,24 +2217,87 @@ limitations under the License.
 
     <xs:simpleType name="evidenceTechnique">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="source-code-analysis" />
-            <xs:enumeration value="binary-analysis" />
-            <xs:enumeration value="manifest-analysis" />
-            <xs:enumeration value="ast-fingerprint" />
-            <xs:enumeration value="hash-comparison" />
-            <xs:enumeration value="instrumentation" />
-            <xs:enumeration value="dynamic-analysis" />
-            <xs:enumeration value="filename" />
-            <xs:enumeration value="attestation" />
-            <xs:enumeration value="other" />
+            <xs:enumeration value="source-code-analysis">
+                <xs:annotation>
+                    <xs:documentation>
+                        Examines the source code without executing it.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="binary-analysis">
+                <xs:annotation>
+                    <xs:documentation>
+                        Examines a compiled binary through reverse engineering, typically via disassembly or bytecode reversal.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="manifest-analysis">
+                <xs:annotation>
+                    <xs:documentation>
+                        Examines a package management system such as those used for building software or installing software.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="ast-fingerprint">
+                <xs:annotation>
+                    <xs:documentation>
+                        Examines the Abstract Syntax Tree (AST) of source code or a compiled binary.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="hash-comparison">
+                <xs:annotation>
+                    <xs:documentation>
+                        Evaluates the cryptographic hash of a component against a set of pre-computed hashes of identified software.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="instrumentation">
+                <xs:annotation>
+                    <xs:documentation>
+                        Examines the call stack of running applications by intercepting and monitoring application logic without the need to modify the application.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="dynamic-analysis">
+                <xs:annotation>
+                    <xs:documentation>
+                        Evaluates a running application.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="filename">
+                <xs:annotation>
+                    <xs:documentation>
+                        Evaluates file name of a component against a set of known file names of identified software.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="attestation">
+                <xs:annotation>
+                    <xs:documentation>
+                        A testimony to the accuracy of the identify of a component made by an individual or entity.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="other">
+                <xs:annotation>
+                    <xs:documentation>
+                        Any other technique.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
         </xs:restriction>
     </xs:simpleType>
 
     <xs:complexType name="componentEvidenceType">
         <xs:sequence>
-            <xs:element name="identity" minOccurs="0" maxOccurs="1">
+            <xs:element name="identity" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
-                    <xs:documentation>Evidence that substantiates the identity of a component.</xs:documentation>
+                    <xs:documentation>Evidence that substantiates the identity of a component. The identify may be an
+                        object or an array of identity objects. Support for specifying identify as a single object was
+                        introduced in CycloneDX v1.5. "unbounded" was introduced in v1.6. It is RECOMMENDED that all
+                        implementations are aware of "unbounded".</xs:documentation>
                 </xs:annotation>
                 <xs:complexType>
                     <xs:sequence>
@@ -4102,55 +4180,49 @@ limitations under the License.
             <xs:enumeration value="CVSSv2">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">
-                        The rating is based on CVSS v2 standard
-                        https://www.first.org/cvss/v2/
+                        Common Vulnerability Scoring System v2.0 standard as defined at https://www.first.org/cvss/v2/
                     </xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
             <xs:enumeration value="CVSSv3">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">
-                        The rating is based on CVSS v3.0 standard
-                        https://www.first.org/cvss/v3-0/
+                        Common Vulnerability Scoring System v3.0 standard as defined at https://www.first.org/cvss/v3-0/
                     </xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
             <xs:enumeration value="CVSSv31">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">
-                        The rating is based on CVSS v3.1 standard
-                        https://www.first.org/cvss/v3-1/
+                        Common Vulnerability Scoring System v3.1 standard as defined at https://www.first.org/cvss/v3-1/
                     </xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
             <xs:enumeration value="CVSSv4">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">
-                        The rating is based on CVSS v4.0 standard
-                        https://www.first.org/cvss/v4-0/
+                        Common Vulnerability Scoring System v4.0 standard as defined at https://www.first.org/cvss/v4-0/
                     </xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
             <xs:enumeration value="OWASP">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">
-                        The rating is based on OWASP Risk Rating
-                        https://owasp.org/www-community/OWASP_Risk_Rating_Methodology
+                        OWASP Risk Rating as defined at https://owasp.org/www-community/OWASP_Risk_Rating_Methodology
                     </xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
             <xs:enumeration value="SSVC">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">
-                        The rating is based on Stakeholder Specific Vulnerability Categorization (all versions)
-                        https://github.com/CERTCC/SSVC
+                        Stakeholder Specific Vulnerability Categorization as defined at https://github.com/CERTCC/SSVC
                     </xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
             <xs:enumeration value="other">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">
-                        Use this if the risk scoring methodology is not based on any of the options above
+                        Another severity or risk scoring methodology
                     </xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
@@ -6592,6 +6664,850 @@ limitations under the License.
         </xs:sequence>
     </xs:complexType>
 
+    <xs:complexType name="declarationsType">
+        <xs:sequence>
+            <xs:element name="assessors" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The list of assessors evaluating claims and determining conformance to requirements and confidence in that assessment.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="assessor" minOccurs="0" maxOccurs="unbounded">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The assessor who evaluates claims and determines conformance to requirements and confidence in that assessment.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="thirdParty" type="xs:boolean" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The boolean indicating if the assessor is outside the organization generating claims. A value of false indicates a self assessor.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="organization" type="bom:organizationalEntity" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The entity issuing the assessment.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                </xs:sequence>
+                                <xs:attribute name="bom-ref" type="bom:refType">
+                                    <xs:annotation>
+                                        <xs:documentation>
+                                            An optional identifier which can be used to reference the object elsewhere in the BOM.
+                                            Every bom-ref MUST be unique within the BOM.
+                                        </xs:documentation>
+                                    </xs:annotation>
+                                </xs:attribute>
+                                <xs:anyAttribute namespace="##other" processContents="lax">
+                                    <xs:annotation>
+                                        <xs:documentation>User-defined attributes may be used on this element as long as they
+                                            do not have the same name as an existing attribute used by the schema.</xs:documentation>
+                                    </xs:annotation>
+                                </xs:anyAttribute>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="attestations" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The list of attestations asserted by an assessor that maps requirements to claims.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="attestation" minOccurs="0" maxOccurs="unbounded">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    An attestation asserted by an assessor that maps requirements to claims.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="summary" type="xs:string" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The short description explaining the main points of the attestation.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="assessor" type="bom:refLinkType" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The `bom-ref` to the assessor asserting the attestation.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="map" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The grouping of requirements to claims and the attestors declared conformance and confidence thereof.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="requirement" type="bom:refLinkType" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The `bom-ref` to the requirement being attested to.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="claims" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The list of `bom-ref` to the claims being attested to.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                    <xs:complexType>
+                                                        <xs:sequence>
+                                                            <xs:element name="claim" type="bom:refLinkType" minOccurs="0" maxOccurs="unbounded">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>
+                                                                        The `bom-ref` to the claim being attested to.
+                                                                    </xs:documentation>
+                                                                </xs:annotation>
+                                                            </xs:element>
+                                                        </xs:sequence>
+                                                    </xs:complexType>
+                                                </xs:element>
+                                                <xs:element name="counterClaims" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The list of `bom-ref` to the counter claims being attested to.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                    <xs:complexType>
+                                                        <xs:sequence>
+                                                            <xs:element name="counterClaim" type="bom:refLinkType" minOccurs="0" maxOccurs="unbounded">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>
+                                                                        The `bom-ref` to the counter claim being attested to.
+                                                                    </xs:documentation>
+                                                                </xs:annotation>
+                                                            </xs:element>
+                                                        </xs:sequence>
+                                                    </xs:complexType>
+                                                </xs:element>
+                                                <xs:element name="conformance" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The conformance of the claim meeting a requirement.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                    <xs:complexType>
+                                                        <xs:sequence>
+                                                            <xs:element name="score">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>
+                                                                        The conformance of the claim between and inclusive of 0 and 1, where 1 is 100% conformance.
+                                                                    </xs:documentation>
+                                                                </xs:annotation>
+                                                                <xs:simpleType>
+                                                                    <xs:restriction base="xs:decimal">
+                                                                        <xs:minInclusive value="0"/>
+                                                                        <xs:maxInclusive value="1"/>
+                                                                    </xs:restriction>
+                                                                </xs:simpleType>
+                                                            </xs:element>
+                                                            <xs:element name="rationale" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>
+                                                                        The rationale for the score of conformance.
+                                                                    </xs:documentation>
+                                                                </xs:annotation>
+                                                            </xs:element>
+                                                            <xs:element name="mitigationStrategies" minOccurs="0" maxOccurs="1">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>
+                                                                        The list of  `bom-ref` to the evidence provided describing the
+                                                                        mitigation strategies. Each mitigation strategy should include an
+                                                                        explanation of how any weaknesses in the evidence will be mitigated.
+                                                                    </xs:documentation>
+                                                                </xs:annotation>
+                                                                <xs:complexType>
+                                                                    <xs:sequence>
+                                                                        <xs:element name="mitigationStrategy" type="bom:refLinkType" minOccurs="0" maxOccurs="unbounded"/>
+                                                                    </xs:sequence>
+                                                                </xs:complexType>
+                                                            </xs:element>
+                                                        </xs:sequence>
+                                                    </xs:complexType>
+                                                </xs:element>
+                                                <xs:element name="confidence" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The confidence of the claim meeting the requirement.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                    <xs:complexType>
+                                                        <xs:sequence>
+                                                            <xs:element name="score">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>
+                                                                        The confidence of the claim between and inclusive of 0 and 1, where 1 is 100% confidence.
+                                                                    </xs:documentation>
+                                                                </xs:annotation>
+                                                                <xs:simpleType>
+                                                                    <xs:restriction base="xs:decimal">
+                                                                        <xs:minInclusive value="0"/>
+                                                                        <xs:maxInclusive value="1"/>
+                                                                    </xs:restriction>
+                                                                </xs:simpleType>
+                                                            </xs:element>
+                                                            <xs:element name="rationale" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>
+                                                                        The rationale for the confidence score.
+                                                                    </xs:documentation>
+                                                                </xs:annotation>
+                                                            </xs:element>
+                                                        </xs:sequence>
+                                                    </xs:complexType>
+                                                </xs:element>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                    <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Allows any undeclared elements as long as the elements are placed in a different namespace.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:any>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="claims" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The list of claims.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="claim" minOccurs="0" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="target" type="bom:refLinkType" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The `bom-ref` to a target representing a specific system, application,
+                                                API, module, team, person, process, business unit, company, etc...
+                                                that this claim is being applied to.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="predicate" type="xs:string" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The specific statement or assertion about the target.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="mitigationStrategies" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The list of  `bom-ref` to the evidence provided describing the
+                                                mitigation strategies. Each mitigation strategy should include an
+                                                explanation of how any weaknesses in the evidence will be mitigated.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="mitigationStrategy" type="bom:refLinkType" minOccurs="0" maxOccurs="unbounded"/>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                    <xs:element name="reasoning" type="xs:string" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The written explanation of why the evidence provided substantiates the claim.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="evidence" type="bom:refLinkType" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The list of `bom-ref` to evidence that supports this claim.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="counterEvidence" type="bom:refLinkType" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The list of `bom-ref` to counterEvidence that supports this claim.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="externalReferences" type="bom:externalReferences" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>Provides the ability to document external references related to the claim the BOM describes.</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Allows any undeclared elements as long as the elements are placed in a different namespace.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:any>
+                                </xs:sequence>
+                                <xs:attribute name="bom-ref" type="bom:refType">
+                                    <xs:annotation>
+                                        <xs:documentation>
+                                            An optional identifier which can be used to reference the object elsewhere
+                                            in the BOM. Every bom-ref MUST be unique within the BOM.
+                                        </xs:documentation>
+                                    </xs:annotation>
+                                </xs:attribute>
+                                <xs:anyAttribute namespace="##other" processContents="lax">
+                                    <xs:annotation>
+                                        <xs:documentation>User-defined attributes may be used on this element as long as they
+                                            do not have the same name as an existing attribute used by the schema.</xs:documentation>
+                                    </xs:annotation>
+                                </xs:anyAttribute>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="evidence" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The list of evidence
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="evidence" minOccurs="0" maxOccurs="unbounded">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The list of evidence
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="propertyName" type="xs:string" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The reference to the property name as defined in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy/).
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The written description of what this evidence is and how it was created.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="data" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The output or analysis that supports claims.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The name of the data.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="contents" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The contents or references to the contents of the data being described.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                    <xs:complexType>
+                                                        <xs:sequence>
+                                                            <xs:element name="attachment" type="bom:attachedTextType" minOccurs="0" maxOccurs="1">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>An optional way to include textual or encoded data.</xs:documentation>
+                                                                </xs:annotation>
+                                                            </xs:element>
+                                                            <xs:element name="url" type="xs:anyURI" minOccurs="0" maxOccurs="1">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>The URL to where the data can be retrieved.</xs:documentation>
+                                                                </xs:annotation>
+                                                            </xs:element>
+                                                        </xs:sequence>
+                                                    </xs:complexType>
+                                                </xs:element>
+                                                <xs:element name="classification" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            Data classification tags data according to its type, sensitivity, and value if altered, stolen, or destroyed.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="sensitiveData" minOccurs="0" maxOccurs="unbounded">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            A description of any sensitive data.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="governance" type="bom:dataGovernance" minOccurs="0" maxOccurs="1" />
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                    <xs:element name="created" type="xs:dateTime" minOccurs="0">
+                                        <xs:annotation>
+                                            <xs:documentation>The date and time (timestamp) when the evidence was created.</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="expires" type="xs:dateTime" minOccurs="0">
+                                        <xs:annotation>
+                                            <xs:documentation>The optional date and time (timestamp) when the evidence is no longer valid.</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="author" type="bom:organizationalContact" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>The author of the evidence.</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="reviewer" type="bom:organizationalContact" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>The reviewer of the evidence.</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Allows any undeclared elements as long as the elements are placed in a different namespace.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:any>
+                                </xs:sequence>
+                                <xs:attribute name="bom-ref" type="bom:refType">
+                                    <xs:annotation>
+                                        <xs:documentation>
+                                            An optional identifier which can be used to reference the object elsewhere
+                                            in the BOM. Every bom-ref MUST be unique within the BOM.
+                                        </xs:documentation>
+                                    </xs:annotation>
+                                </xs:attribute>
+                                <xs:anyAttribute namespace="##other" processContents="lax">
+                                    <xs:annotation>
+                                        <xs:documentation>User-defined attributes may be used on this element as long as they
+                                            do not have the same name as an existing attribute used by the schema.</xs:documentation>
+                                    </xs:annotation>
+                                </xs:anyAttribute>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="targets" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The list of targets which claims are made against.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="organizations" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The list of organizations which claims are made against.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="organization" type="bom:organizationalEntity" minOccurs="0" maxOccurs="unbounded" />
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="components" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The list of components which claims are made against.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="component" type="bom:component" minOccurs="0" maxOccurs="unbounded" />
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="services" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The list of services which claims are made against.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="service" type="bom:service" minOccurs="0" maxOccurs="unbounded" />
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="affirmation" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="statement" type="xs:string" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The brief statement affirmed by an individual regarding all declarations.
+                                    This could be an affirmation of acceptance by a third-party auditor or receiving
+                                    individual of a file. For example: "I certify, to the best of my knowledge, that all information is correct."
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="signatories" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The list of signatories authorized on behalf of an organization to assert validity of this document.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="signatory" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The signatory's name.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="role" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The signatory's role within an organization.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="organization" type="bom:organizationalEntity" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The signatory's organization.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="externalReference" type="bom:externalReference" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            An External reference provide a way to document systems, sites, and information that may be relevant, but are not included with the BOM. They may also establish specific relationships within or external to the BOM.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            Allows any undeclared elements as long as the elements are placed in a different namespace.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:any>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Allows any undeclared elements as long as the elements are placed in a different namespace.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:any>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="definitionsType">
+        <xs:annotation>
+            <xs:documentation>
+                A collection of reusable objects that are defined and may be used elsewhere in the BOM.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="standards" type="bom:standardsType" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="standardsType">
+        <xs:annotation>
+            <xs:documentation>
+                The list of standards which may consist of regulations, industry or organizational-specific standards, maturity models, best practices, or any other requirements which can be evaluated against or attested to.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="standard" type="bom:standard"/>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##any" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:complexType name="standard">
+        <xs:annotation>
+            <xs:documentation>
+                A standard may consist of regulations, industry or organizational-specific standards, maturity models, best practices, or any other requirements which can be evaluated against or attested to.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="name" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>
+                        The name of the standard. This will often be a shortened, single name of the standard.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="version" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>
+                        The version of the standard.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="description" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>
+                        The description of the standard.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="owner" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>
+                        The owner of the standard, often the entity responsible for its release.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="requirements" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The list of requirements comprising the standard.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="requirement" minOccurs="0" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="identifier" type="xs:string" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The unique identifier used in the standard to identify a specific requirement. This should match what is in the standard and should not be the requirements bom-ref.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="title" type="xs:string" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The title of the requirement.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="text" type="xs:string" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The textual content of the requirement.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="descriptions" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The supplemental text that provides additional guidance or context to the requirement, but is not directly part of the requirement.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                    <xs:element name="openCre" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The Common Requirements Enumeration (CRE) identifier(s). CRE is a structured and standardized framework for uniting security standards and guidelines. CRE links each section of a resource to a shared topic identifier (a Common Requirement). Through this shared topic link, all resources map to each other. Use of CRE promotes clear and unambiguous communication among stakeholders.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                        <xs:simpleType>
+                                            <xs:restriction base="xs:string">
+                                                <xs:pattern value="CRE:[0-9]+-[0-9]+"/>
+                                            </xs:restriction>
+                                        </xs:simpleType>
+                                    </xs:element>
+                                    <xs:element name="parent" type="bom:refLinkType" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The optional `bom-ref` to a parent requirement. This establishes a hierarchy of requirements. Top-level requirements must not define a parent. Only child requirements should define parents.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>Provides the ability to document properties in a name/value store.
+                                                This provides flexibility to include data not officially supported in the standard
+                                                without having to use additional namespaces or create extensions. Property names
+                                                of interest to the general public are encouraged to be registered in the
+                                                CycloneDX Property Taxonomy - https://github.com/CycloneDX/cyclonedx-property-taxonomy.
+                                                Formal registration is OPTIONAL.</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="externalReferences" type="bom:externalReferences" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>Provides the ability to document external references related to the BOM or
+                                                to the project the BOM describes.</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                </xs:sequence>
+                                <xs:attribute name="bom-ref" type="bom:refType">
+                                    <xs:annotation>
+                                        <xs:documentation>
+                                            An optional identifier which can be used to reference the object elsewhere
+                                            in the BOM. Every bom-ref MUST be unique within the BOM.
+                                        </xs:documentation>
+                                    </xs:annotation>
+                                </xs:attribute>
+                                <xs:anyAttribute namespace="##other" processContents="lax">
+                                    <xs:annotation>
+                                        <xs:documentation>User-defined attributes may be used on this element as long as they
+                                            do not have the same name as an existing attribute used by the schema.</xs:documentation>
+                                    </xs:annotation>
+                                </xs:anyAttribute>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="levels" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The list of levels associated with the standard. Some standards have different levels of compliance.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="level" minOccurs="0" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="identifier" type="xs:string" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The identifier used in the standard to identify a specific level.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="title" type="xs:string" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The title of the level.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The description of the level.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="requirements" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The list of requirement `bom-ref`s that comprise the level.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="requirement" type="bom:refLinkType" minOccurs="0" maxOccurs="unbounded"/>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                                <xs:attribute name="bom-ref" type="bom:refType">
+                                    <xs:annotation>
+                                        <xs:documentation>
+                                            An optional identifier which can be used to reference the object elsewhere
+                                            in the BOM. Every bom-ref MUST be unique within the BOM.
+                                        </xs:documentation>
+                                    </xs:annotation>
+                                </xs:attribute>
+                                <xs:anyAttribute namespace="##other" processContents="lax">
+                                    <xs:annotation>
+                                        <xs:documentation>User-defined attributes may be used on this element as long as they
+                                            do not have the same name as an existing attribute used by the schema.</xs:documentation>
+                                    </xs:annotation>
+                                </xs:anyAttribute>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="externalReferences" type="bom:externalReferences" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Provides the ability to document external references related to the BOM or
+                        to the project the BOM describes.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:attribute name="bom-ref" type="bom:refType">
+            <xs:annotation>
+                <xs:documentation>
+                    An optional identifier which can be used to reference the object elsewhere
+                    in the BOM. Every bom-ref MUST be unique within the BOM.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:anyAttribute namespace="##other" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
     <xs:element name="bom">
         <xs:complexType>
             <xs:sequence>
@@ -6656,6 +7572,21 @@ limitations under the License.
                             achieved through the use of formulas, workflows, tasks, and steps, which declare the precise
                             steps to reproduce along with the observed formulas describing the steps which transpired
                             in the manufacturing process.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="declarations" type="bom:declarationsType" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>
+                            The list of declarations which describe the conformance to standards. Each declaration may
+                            include attestations, claims, and evidence.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="definitions" type="bom:definitionsType" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>
+                            A collection of reusable objects that are defined and may be used elsewhere in the BOM.
+                        </xs:documentation>
                     </xs:annotation>
                 </xs:element>
                 <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
