@@ -634,6 +634,18 @@ limitations under the License.
                         specified for other component types.</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="cryptoProperties" type="bom:cryptoPropertiesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Cryptographic assets have properties that uniquely define them and that make them actionable
+                        for further reasoning. As an example, it makes a difference if one knows the algorithm family
+                        (e.g. AES) or the specific variant or instantiation (e.g. AES-128-GCM). This is because the
+                        security level and the algorithm primitive (authenticated encryption) is only defined by the
+                        definition of the algorithm variant. The presence of a weak cryptographic algorithm like SHA1
+                        vs. HMAC-SHA1 also makes a difference.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                     <xs:documentation>
@@ -995,6 +1007,11 @@ limitations under the License.
             <xs:enumeration value="data">
                 <xs:annotation>
                     <xs:documentation>A collection of discrete values that convey information.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="cryptographic-asset">
+                <xs:annotation>
+                    <xs:documentation>Cryptographic asset including algorithms, protocols, certificates, keys, tokens, and secrets.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
         </xs:restriction>
@@ -1834,7 +1851,26 @@ limitations under the License.
 
     <xs:complexType name="dependencyType">
         <xs:sequence minOccurs="0" maxOccurs="unbounded">
-            <xs:element name="dependency" type="bom:dependencyType"/>
+            <xs:element name="dependency" type="bom:dependencyType" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>The component or service that is a dependency of this dependency object.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="provides" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>
+                        The component or service that define a given specification or standard, which is provided or implemented by this dependency object.
+                        For example, a cryptographic library which implements a cryptographic algorithm. A component which implements another component does not imply that the implementation is in use.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:attribute name="ref" type="bom:refLinkType" use="required">
+                        <xs:annotation>
+                            <xs:documentation>References a component or service by its bom-ref attribute</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:complexType>
+            </xs:element>
         </xs:sequence>
         <xs:attribute name="ref" type="bom:refLinkType" use="required">
             <xs:annotation>
@@ -2323,11 +2359,32 @@ limitations under the License.
                         <xs:element name="occurrence" minOccurs="0" maxOccurs="unbounded">
                             <xs:complexType>
                                 <xs:sequence>
-                                    <xs:element name="location" minOccurs="1" maxOccurs="1">
+                                    <xs:element name="location" type="xs:string" minOccurs="1" maxOccurs="1">
                                         <xs:annotation>
                                             <xs:documentation>The location or path to where the component was found.</xs:documentation>
                                         </xs:annotation>
                                     </xs:element>
+                                    <xs:element name="line" type="xs:nonNegativeInteger" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>The line number where the component was found.</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="offset" type="xs:nonNegativeInteger" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>The offset where the component was found.</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="symbol" type="xs:string" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>The symbol name that was found associated with the component.</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="additionalContext" type="xs:string" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>Any additional context of the detected component (e.g. a code snippet).</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+
                                 </xs:sequence>
                                 <xs:attribute name="bom-ref" type="bom:refType">
                                     <xs:annotation>
@@ -5472,6 +5529,1152 @@ limitations under the License.
                     do not have the same name as an existing attribute used by the schema.</xs:documentation>
             </xs:annotation>
         </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:complexType name="cryptoPropertiesType">
+        <xs:annotation>
+            <xs:documentation>
+                Cryptographic assets have properties that uniquely define them and that make them actionable for
+                further reasoning. As an example, it makes a difference if one knows the algorithm family (e.g. AES)
+                or the specific variant or instantiation (e.g. AES-128-GCM). This is because the security level and the
+                algorithm primitive (authenticated encryption) is only defined by the definition of the algorithm variant.
+                The presence of a weak cryptographic algorithm like SHA1 vs. HMAC-SHA1 also makes a difference.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="assetType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Cryptographic assets occur in several forms. Algorithms and protocols are most commonly
+                        implemented in specialized cryptographic libraries. They may however also be 'hardcoded'
+                        in software components. Certificates and related cryptographic material like keys, tokens,
+                        secrets or passwords are other cryptographic assets to be modelled.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="algorithm">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Mathematical function commonly used for data encryption, authentication, and
+                                    digital signatures.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="certificate">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    An electronic document that is used to provide the identity or validate a public key.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="protocol">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    A set of rules and guidelines that govern the behavior and communication with each other.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="related-crypto-material">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Other cryptographic assets that are related to algorithms, certificate, and protocols
+                                    such as keys and tokens.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="algorithmProperties" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Additional properties specific to a cryptographic algorithm.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="primitive" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Cryptographic building blocks used in higher-level cryptographic systems and
+                                    protocols. Primitives represent different cryptographic routines: deterministic
+                                    random bit generators (drbg, e.g. CTR_DRBG from NIST SP800-90A-r1), message
+                                    authentication codes (mac, e.g. HMAC-SHA-256), blockciphers (e.g. AES),
+                                    streamciphers (e.g. Salsa20), signatures (e.g. ECDSA), hash functions (e.g. SHA-256),
+                                    public-key encryption schemes (pke, e.g. RSA), extended output functions
+                                    (xof, e.g. SHAKE256), key derivation functions (e.g. pbkdf2), key agreement
+                                    algorithms (e.g. ECDH), key encapsulation mechanisms (e.g. ML-KEM), authenticated
+                                    encryption (ae, e.g. AES-GCM) and the combination of multiple algorithms
+                                    (combiner, e.g. SP800-56Cr2).
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:enumeration value="drbg">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Deterministic Random Bit Generator (DRBG) is a type of pseudorandom
+                                                number generator designed to produce a sequence of bits from an initial
+                                                seed value. DRBGs are commonly used in cryptographic applications where
+                                                reproducibility of random values is important.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="mac">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                In cryptography, a Message Authentication Code (MAC) is information
+                                                used for authenticating and integrity-checking a message.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="block-cipher">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                A block cipher is a symmetric key algorithm that operates on fixed-size
+                                                blocks of data. It encrypts or decrypts the data in block units,
+                                                providing confidentiality. Block ciphers are widely used in various
+                                                cryptographic modes and protocols for secure data transmission.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="stream-cipher">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                A stream cipher is a symmetric key cipher where plaintext digits are
+                                                combined with a pseudorandom cipher digit stream (keystream).
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="signature">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                In cryptography, a signature is a digital representation of a message
+                                                or data that proves its origin, identity, and integrity. Digital
+                                                signatures are generated using cryptographic algorithms and are widely
+                                                used for authentication and verification in secure communication.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="hash">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                A hash function is a mathematical algorithm that takes an input
+                                                (or 'message') and produces a fixed-size string of characters, which is
+                                                typically a hash value. Hash functions are commonly used in various
+                                                cryptographic applications, including data integrity verification and
+                                                password hashing.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="pke">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Public Key Encryption (PKE) is a type of encryption that uses a pair of
+                                                public and private keys for secure communication. The public key is used
+                                                for encryption, while the private key is used for decryption. PKE is a
+                                                fundamental component of public-key cryptography.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="xof">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                An XOF is an extendable output function that can take arbitrary input
+                                                and creates a stream of output, up to a limit determined by the size of
+                                                the internal state of the hash function that underlies the XOF.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="kdf">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                A Key Derivation Function (KDF) derives key material from another source
+                                                of entropy while preserving the entropy of the input.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="key-agree">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                In cryptography, a key-agreement is a protocol whereby two or more
+                                                parties agree on a cryptographic key in such a way that both influence
+                                                the outcome.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="kem">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                A Key Encapsulation Mechanism (KEM) algorithm is a mechanism for
+                                                transporting random keying material to a recipient using the recipient's
+                                                public key.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="ae">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Authenticated Encryption (AE) is a cryptographic process that provides
+                                                both confidentiality and data integrity. It ensures that the encrypted
+                                                data has not been tampered with and comes from a legitimate source.
+                                                AE is commonly used in secure communication protocols.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="combiner">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                A combiner aggregates many candidates for a cryptographic primitive and
+                                                generates a new candidate for the same primitive.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="other">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Another primitive type.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="unknown">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The primitive is not known.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="parameterSetIdentifier" type="xs:string" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    An identifier for the parameter set of the cryptographic algorithm. Examples: in
+                                    AES128, '128' identifies the key length in bits, in SHA256, '256' identifies the
+                                    digest length, '128' in SHAKE128 identifies its maximum security level in bits, and
+                                    'SHA2-128s' identifies a parameter set used in SLH-DSA (FIPS205).
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="curve" type="xs:string" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The specific underlying Elliptic Curve (EC) definition employed which is an indicator
+                                    of the level of security strength, performance and complexity. Absent an
+                                    authoritative source of curve names, CycloneDX recommends use of curve names as
+                                    defined at https://neuromancer.sk/std/, the source from which can be found at
+                                    https://github.com/J08nY/std-curves.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="executionEnvironment" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The target and execution environment in which the algorithm is implemented in.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:enumeration value="software-plain-ram">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                A software implementation running in plain unencrypted RAM.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="software-encrypted-ram">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                A software implementation running in encrypted RAM.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration><xs:enumeration value="software-tee">
+                                    <xs:annotation>
+                                        <xs:documentation>
+                                            A software implementation running in a trusted execution environment.
+                                        </xs:documentation>
+                                    </xs:annotation>
+                                </xs:enumeration><xs:enumeration value="hardware">
+                                    <xs:annotation>
+                                        <xs:documentation>
+                                            A hardware implementation.
+                                        </xs:documentation>
+                                    </xs:annotation>
+                                </xs:enumeration><xs:enumeration value="other">
+                                    <xs:annotation>
+                                        <xs:documentation>
+                                            Another implementation environment.
+                                        </xs:documentation>
+                                    </xs:annotation>
+                                </xs:enumeration><xs:enumeration value="unknown">
+                                    <xs:annotation>
+                                        <xs:documentation>
+                                            The execution environment is not known.
+                                        </xs:documentation>
+                                    </xs:annotation>
+                                </xs:enumeration>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="implementationPlatform" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The target platform for which the algorithm is implemented. The implementation can
+                                    be 'generic', running on any platform or for a specific platform.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:enumeration value="generic"/>
+                                    <xs:enumeration value="x86_32"/>
+                                    <xs:enumeration value="x86_64"/>
+                                    <xs:enumeration value="armv7-a"/>
+                                    <xs:enumeration value="armv7-m"/>
+                                    <xs:enumeration value="armv8-a"/>
+                                    <xs:enumeration value="armv8-m"/>
+                                    <xs:enumeration value="armv9-a"/>
+                                    <xs:enumeration value="armv9-m"/>
+                                    <xs:enumeration value="s390x"/>
+                                    <xs:enumeration value="ppc64"/>
+                                    <xs:enumeration value="ppc64le"/>
+                                    <xs:enumeration value="other"/>
+                                    <xs:enumeration value="unknown"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="certificationLevel" minOccurs="0" maxOccurs="unbounded">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The certification that the implementation of the cryptographic algorithm has
+                                    received, if any. Certifications include revisions and levels of FIPS 140 or
+                                    Common Criteria of different Extended Assurance Levels (CC-EAL).
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:enumeration value="none">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                No certification obtained
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="fips140-1-l1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                FIPS 140-1 Level 1
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="fips140-1-l2">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                FIPS 140-1 Level 2
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="fips140-1-l3">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                FIPS 140-1 Level 3
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="fips140-1-l4">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                FIPS 140-1 Level 4
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="fips140-2-l1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                FIPS 140-2 Level 1
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="fips140-2-l2">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                FIPS 140-2 Level 2
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="fips140-2-l3">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                FIPS 140-2 Level 3
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="fips140-2-l4">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                FIPS 140-2 Level 4
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="fips140-3-l1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                FIPS 140-3 Level 1
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="fips140-3-l2">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                FIPS 140-3 Level 2
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="fips140-3-l3">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                FIPS 140-3 Level 3
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="fips140-3-l4">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                FIPS 140-3 Level 4
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="cc-eal1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Common Criteria - Evaluation Assurance Level 1
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="cc-eal1+">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Common Criteria - Evaluation Assurance Level 1 (Augmented)
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="cc-eal2">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Common Criteria - Evaluation Assurance Level 2
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="cc-eal2+">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Common Criteria - Evaluation Assurance Level 2 (Augmented)
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="cc-eal3">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Common Criteria - Evaluation Assurance Level 3
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="cc-eal3+">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Common Criteria - Evaluation Assurance Level 3 (Augmented)
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="cc-eal4">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Common Criteria - Evaluation Assurance Level 4
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="cc-eal4+">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Common Criteria - Evaluation Assurance Level 4 (Augmented)
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="cc-eal5">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Common Criteria - Evaluation Assurance Level 5
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="cc-eal5+">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Common Criteria - Evaluation Assurance Level 5 (Augmented)
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="cc-eal6">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Common Criteria - Evaluation Assurance Level 6
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="cc-eal6+">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Common Criteria - Evaluation Assurance Level 6 (Augmented)
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="cc-eal7">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Common Criteria - Evaluation Assurance Level 7
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="cc-eal7+">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Common Criteria - Evaluation Assurance Level 7 (Augmented)
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="other">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Another certification
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="unknown">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The certification level is not known
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="mode" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The mode of operation in which the cryptographic algorithm (block cipher) is used.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:enumeration value="cbc">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Cipher block chaining
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="ecb">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Electronic codebook
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="ccm">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Counter with cipher block chaining message authentication code
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="gcm">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Galois/counter
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="cfb">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Cipher feedback
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="ofb">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Output feedback
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="ctr">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Counter
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="other">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Another mode of operation
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="unknown">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The mode of operation is not known
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="padding" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The padding scheme that is used for the cryptographic algorithm.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:enumeration value="pkcs5">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Password-Based Cryptography Specification #5
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="pkcs7">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Public Key Cryptography Standard: Cryptographic Message Syntax
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="pkcs1v15">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Public Key Cryptography Standard: RSA Cryptography v1.5
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="oaep">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Optimal asymmetric encryption padding
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="raw">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Raw
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="other">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Another padding scheme
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="unknown">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The padding scheme is not known
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="cryptoFunctions" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The cryptographic functions implemented by the cryptographic algorithm.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="cryptoFunction" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:simpleType>
+                                            <xs:restriction base="xs:string">
+                                                <xs:enumeration value="generate"/>
+                                                <xs:enumeration value="keygen"/>
+                                                <xs:enumeration value="encrypt"/>
+                                                <xs:enumeration value="decrypt"/>
+                                                <xs:enumeration value="digest"/>
+                                                <xs:enumeration value="tag"/>
+                                                <xs:enumeration value="keyderive"/>
+                                                <xs:enumeration value="sign"/>
+                                                <xs:enumeration value="verify"/>
+                                                <xs:enumeration value="encapsulate"/>
+                                                <xs:enumeration value="decapsulate"/>
+                                                <xs:enumeration value="other"/>
+                                                <xs:enumeration value="unknown"/>
+                                            </xs:restriction>
+                                        </xs:simpleType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="classicalSecurityLevel" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The classical security level that a cryptographic algorithm provides (in bits).
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:simpleType>
+                                <xs:restriction base="xs:integer">
+                                    <xs:minInclusive value="0"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="nistQuantumSecurityLevel" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The NIST security strength category as defined in
+                                    https://csrc.nist.gov/projects/post-quantum-cryptography/post-quantum-cryptography-standardization/evaluation-criteria/security-(evaluation-criteria).
+                                    A value of 0 indicates that none of the categories are met.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:simpleType>
+                                <xs:restriction base="xs:integer">
+                                    <xs:minInclusive value="0"/>
+                                    <xs:maxInclusive value="6"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="certificateProperties" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Properties for cryptographic assets of asset type 'certificate'
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="subjectName" type="xs:string" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The subject name for the certificate
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="issuerName" type="xs:string" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The issuer name for the certificate
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="notValidBefore" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The date and time according to ISO-8601 standard from which the certificate is valid
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="notValidAfter" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The date and time according to ISO-8601 standard from which the certificate is not valid anymore
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="signatureAlgorithmRef" type="bom:refType" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The bom-ref to signature algorithm used by the certificate
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="subjectPublicKeyRef" type="bom:refType" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The bom-ref to the public key of the subject
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="certificateFormat" type="xs:string" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The format of the certificate. Examples include X.509, PEM, DER, and CVC
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="certificateExtension" type="xs:string" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The file extension of the certificate. Examples include crt, pem, cer, der, and p12.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="relatedCryptoMaterialProperties" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Properties for cryptographic assets of asset type 'relatedCryptoMaterial'
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="type" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The type for the related cryptographic material
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:enumeration value="private-key"/>
+                                    <xs:enumeration value="public-key"/>
+                                    <xs:enumeration value="secret-key"/>
+                                    <xs:enumeration value="key"/>
+                                    <xs:enumeration value="ciphertext"/>
+                                    <xs:enumeration value="signature"/>
+                                    <xs:enumeration value="digest"/>
+                                    <xs:enumeration value="initialization-vector"/>
+                                    <xs:enumeration value="nonce"/>
+                                    <xs:enumeration value="seed"/>
+                                    <xs:enumeration value="salt"/>
+                                    <xs:enumeration value="shared-secret"/>
+                                    <xs:enumeration value="tag"/>
+                                    <xs:enumeration value="additional-data"/>
+                                    <xs:enumeration value="password"/>
+                                    <xs:enumeration value="credential"/>
+                                    <xs:enumeration value="token"/>
+                                    <xs:enumeration value="other"/>
+                                    <xs:enumeration value="unknown"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="id" type="xs:string" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The optional unique identifier for the related cryptographic material.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="state" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The key state as defined by NIST SP 800-57.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:enumeration value="pre-activation"/>
+                                    <xs:enumeration value="active"/>
+                                    <xs:enumeration value="suspended"/>
+                                    <xs:enumeration value="deactivated"/>
+                                    <xs:enumeration value="compromised"/>
+                                    <xs:enumeration value="destroyed"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="algorithmRef" type="bom:refType" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The bom-ref to the algorithm used to generate the related cryptographic material.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="creationDate" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The date and time (timestamp) when the related cryptographic material was created.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="activationDate" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The date and time (timestamp) when the related cryptographic material was activated.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="updateDate" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The date and time (timestamp) when the related cryptographic material was updated.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="expirationDate" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The date and time (timestamp) when the related cryptographic material expires.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The associated value of the cryptographic material.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="size" type="xs:integer" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The size of the cryptographic asset (in bits).
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="format" type="xs:string" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The format of the related cryptographic material (e.g. P8, PEM, DER).
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="securedBy" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The mechanism by which the cryptographic asset is secured by.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="mechanism" type="xs:string" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Specifies the mechanism by which the cryptographic asset is secured by.
+                                                Examples include HSM, TPM, XGX, Software, and None.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="algorithmRef" type="bom:refType" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The bom-ref to the algorithm.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="protocolProperties" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Properties specific to cryptographic assets of type: 'protocol'.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="type" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The concrete protocol type.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:enumeration value="tls">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Transport Layer Security
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="ssh">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Secure Shell
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="ipsec">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Internet Protocol Security
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="ike">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Internet Key Exchange
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="sstp">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Secure Socket Tunneling Protocol
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="wpa">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Wi-Fi Protected Access
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="other">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Another protocol type
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="unknown">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                The protocol type is not known
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="version" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The version of the protocol. Examples include 1.0, 1.2, and 1.99.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="cipherSuites" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    A list of cipher suites related to the protocol.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="cipherSuite" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            A common name for the cipher suite. For example: TLS_DHE_RSA_WITH_AES_128_CCM
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="algorithms" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            A list of algorithms related to the cipher suite.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                    <xs:complexType>
+                                                        <xs:sequence>
+                                                            <xs:element name="algorithm" type="bom:refType" minOccurs="0" maxOccurs="unbounded">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>
+                                                                        The bom-ref to algorithm cryptographic asset.
+                                                                    </xs:documentation>
+                                                                </xs:annotation>
+                                                            </xs:element>
+                                                        </xs:sequence>
+                                                    </xs:complexType>
+                                                </xs:element>
+                                                <xs:element name="identifiers" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            A list of common identifiers for the cipher suite.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                    <xs:complexType>
+                                                        <xs:sequence>
+                                                            <xs:element name="identifier" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>
+                                                                        Cipher suite identifier. Examples include 0xC0 and 0x9E.
+                                                                    </xs:documentation>
+                                                                </xs:annotation>
+                                                            </xs:element>
+                                                        </xs:sequence>
+                                                    </xs:complexType>
+                                                </xs:element>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="ikev2TransformTypes" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The IKEv2 transform types supported (types 1-4), defined in RFC7296 section 3.3.2,
+                                    and additional properties.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="encr" type="bom:refType" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Transform Type 1: encryption algorithms
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="prf" type="bom:refType" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Transform Type 2: pseudorandom functions
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="integ" type="bom:refType" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Transform Type 3: integrity algorithms
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="ke" type="bom:refType" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Transform Type 4: Key Exchange Method (KE) per RFC9370, formerly called Diffie-Hellman Group (D-H)
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="esn" type="xs:boolean" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Specifies if an Extended Sequence Number (ESN) is used.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="auth" type="bom:refType" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                IKEv2 Authentication method
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="oid" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The object identifier (OID) of the cryptographic asset.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
     </xs:complexType>
 
     <xs:complexType name="declarationsType">
