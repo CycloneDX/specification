@@ -1766,11 +1766,14 @@
           "title": "Depends On",
           "description": "The bom-ref identifiers of the components or services that are dependencies of this dependency object."
         },
-        "type": {
-          "type": "string",
-          "title": "Dependency Type",
-          "description": "Defines and characterizes the type of dependency",
-          "$ref": "#/definitions/dependencyType"
+        "provides": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/refLinkType"
+          },
+          "title": "Provides",
+          "description": "The bom-ref identifiers of the components or services that define a given specification or standard, which are provided or implemented by this dependency object.\nFor example, a cryptographic library which implements a cryptographic algorithm. A component which implements another component does not imply that the implementation is in use."
         }
       }
     },
@@ -4600,20 +4603,6 @@
       "$ref": "jsf-0.82.schema.json#/definitions/signature",
       "title": "Signature",
       "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
-    },
-    "dependencyType": {
-      "type": "string",
-      "title": "Dependency Type",
-      "enum": [
-        "implements",
-        "uses"
-      ],
-      "meta:enum": {
-        "implements": "Refers to a component or service that fulfills the requirements of a given specification or standard. For example, a cryptographic library which implements a cryptographic algorithm. A component which implements another component does not imply that the implementation is in use.",
-        "uses": "Refers to a component or service that relies on another component or service, either explicitly via function calls or via configuration at run time."
-      },
-      "default": "uses",
-      "description": "An optional field that describes the type of dependency."
     },
     "cryptoProperties": {
       "type": "object",
