@@ -1,3 +1,6 @@
+# proto-file: schema/bom-1.6.proto
+# proto-message: 
+
 spec_version: "1.6"
 version: 1
 serial_number: "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79"
@@ -40,21 +43,26 @@ components: [
     bom_ref: "crypto-library"
     name: "Crypto library"
     version: "1.0.0"
+  },
+  {
+    type: CLASSIFICATION_LIBRARY
+    bom_ref: "some-library"
+    name: "Some library"
+    version: "1.0.0"
   }
 ],
 dependencies: [
   {
     ref: "acme-application"
-    type: DEPENDENCY_TYPE_USES
     dependencies {
       ref: "crypto-library"
     }
   },
   {
     ref: "crypto-library"
-    type: DEPENDENCY_TYPE_IMPLEMENTS
+    provides: [ "aes128gcm" ]
     dependencies {
-      ref: "aes128gcm"
+      ref: "some-library"
     }
   }
 ]

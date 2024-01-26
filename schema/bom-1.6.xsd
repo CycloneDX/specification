@@ -1851,16 +1851,30 @@ limitations under the License.
 
     <xs:complexType name="dependencyType">
         <xs:sequence minOccurs="0" maxOccurs="unbounded">
-            <xs:element name="dependency" type="bom:dependencyType"/>
+            <xs:element name="dependency" type="bom:dependencyType" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>The component or service that is a dependency of this dependency object.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="provides" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>
+                        The component or service that define a given specification or standard, which is provided or implemented by this dependency object.
+                        For example, a cryptographic library which implements a cryptographic algorithm. A component which implements another component does not imply that the implementation is in use.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:attribute name="ref" type="bom:refLinkType" use="required">
+                        <xs:annotation>
+                            <xs:documentation>References a component or service by its bom-ref attribute</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:complexType>
+            </xs:element>
         </xs:sequence>
         <xs:attribute name="ref" type="bom:refLinkType" use="required">
             <xs:annotation>
                 <xs:documentation>References a component or service by its bom-ref attribute</xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
-        <xs:attribute name="type" type="bom:dependencyUsageType" default="uses" use="optional">
-            <xs:annotation>
-                <xs:documentation>An optional field that describes the type of dependency.</xs:documentation>
             </xs:annotation>
         </xs:attribute>
         <xs:anyAttribute namespace="##other" processContents="lax">
@@ -1870,28 +1884,6 @@ limitations under the License.
             </xs:annotation>
         </xs:anyAttribute>
     </xs:complexType>
-
-    <xs:simpleType name="dependencyUsageType">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="implements">
-                <xs:annotation>
-                    <xs:documentation>
-                        Refers to a component or service that fulfills the requirements of a given specification or
-                        standard. For example, a cryptographic library which implements a cryptographic algorithm.
-                        A component which implements another component does not imply that the implementation is in use.
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="uses">
-                <xs:annotation>
-                    <xs:documentation>
-                        Refers to a component or service that relies on another component or service, either explicitly
-                        via function calls or via configuration at run time.
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
-        </xs:restriction>
-    </xs:simpleType>
 
     <xs:complexType name="dependenciesType">
         <xs:sequence minOccurs="0" maxOccurs="unbounded">
