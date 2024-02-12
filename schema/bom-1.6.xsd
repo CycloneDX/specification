@@ -690,12 +690,12 @@ limitations under the License.
     <xs:complexType name="licenseType">
         <xs:sequence>
             <xs:choice>
-                <xs:element name="id" type="spdx:licenseId" minOccurs="0" maxOccurs="1">
+                <xs:element name="id" type="spdx:licenseId" minOccurs="1" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>A valid SPDX license ID</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element name="name" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
+                <xs:element name="name" type="xs:normalizedString" minOccurs="1" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>If SPDX does not define the license used, this field may be used to provide the license name</xs:documentation>
                     </xs:annotation>
@@ -845,8 +845,8 @@ limitations under the License.
                         of interest to the general public are encouraged to be registered in the
                         CycloneDX Property Taxonomy - https://github.com/CycloneDX/cyclonedx-property-taxonomy.
                         Formal registration is OPTIONAL.</xs:documentation>
-                </xs:annotation>  
-            </xs:element>    
+                </xs:annotation>
+            </xs:element>
             <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                     <xs:documentation>
@@ -1421,7 +1421,7 @@ limitations under the License.
             </xs:enumeration>
             <xs:enumeration value="poam">
                 <xs:annotation>
-                    <xs:documentation>Plans of Action and Milestones (POAM) compliment an "attestation" external reference. POAM is defined by NIST as a "document that identifies tasks needing to be accomplished. It details resources required to accomplish the elements of the plan, any milestones in meeting the tasks and scheduled completion dates for the milestones".</xs:documentation>
+                    <xs:documentation>Plans of Action and Milestones (POAM) complement an "attestation" external reference. POAM is defined by NIST as a "document that identifies tasks needing to be accomplished. It details resources required to accomplish the elements of the plan, any milestones in meeting the tasks and scheduled completion dates for the milestones".</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
             <xs:enumeration value="electronic-signature">
@@ -1828,7 +1828,7 @@ limitations under the License.
             <xs:element name="patches" type="bom:patchesType" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">A list of zero or more patches describing how the component
-                        deviates from an ancestor, descendant, or variant. Patches may be complimentary to commits
+                        deviates from an ancestor, descendant, or variant. Patches may be complementary to commits
                         or may be used in place of commits.</xs:documentation>
                 </xs:annotation>
             </xs:element>
@@ -2158,7 +2158,7 @@ limitations under the License.
                 <xs:annotation>
                     <xs:documentation>A valid SPDX license expression.
                         Refer to https://spdx.org/specifications for syntax requirements
-                    
+
                         Example values:
                         - Apache-2.0 AND (MIT OR GPL-2.0-only)
                         - GPL-3.0-only WITH Classpath-exception-2.0
@@ -3976,7 +3976,7 @@ limitations under the License.
             </xs:element>
         </xs:choice>
     </xs:complexType>
-    
+
     <xs:complexType name="annotationType">
         <xs:sequence>
             <xs:element name="subjects" minOccurs="0" maxOccurs="1">
@@ -4745,18 +4745,66 @@ limitations under the License.
 
     <xs:simpleType name="taskTypeEnum">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="copy"/>
-            <xs:enumeration value="clone"/>
-            <xs:enumeration value="lint"/>
-            <xs:enumeration value="scan"/>
-            <xs:enumeration value="merge"/>
-            <xs:enumeration value="build"/>
-            <xs:enumeration value="test"/>
-            <xs:enumeration value="deliver"/>
-            <xs:enumeration value="deploy"/>
-            <xs:enumeration value="release"/>
-            <xs:enumeration value="clean"/>
-            <xs:enumeration value="other"/>
+            <xs:enumeration value="copy">
+                <xs:annotation>
+                    <xs:documentation>A task that copies software or data used to accomplish other tasks in the workflow.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="clone">
+                <xs:annotation>
+                    <xs:documentation>A task that clones a software repository into the workflow in order to retrieve its source code or data for use in a build step.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="lint">
+                <xs:annotation>
+                    <xs:documentation>A task that checks source code for programmatic and stylistic errors.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="scan">
+                <xs:annotation>
+                    <xs:documentation>A task that performs a scan against source code, or built or deployed components and services. Scans are typically run to gather or test for security vulnerabilities or policy compliance.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="merge">
+                <xs:annotation>
+                    <xs:documentation>A task that merges changes or fixes into source code prior to a build step in the workflow.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="build">
+                <xs:annotation>
+                    <xs:documentation>A task that builds the source code, dependencies and/or data into an artifact that can be deployed to and executed on target systems.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="test">
+                <xs:annotation>
+                    <xs:documentation>A task that verifies the functionality of a component or service.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="deliver">
+                <xs:annotation>
+                    <xs:documentation>A task that delivers a built artifact to one or more target repositories or storage systems.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="deploy">
+                <xs:annotation>
+                    <xs:documentation>A task that deploys a built artifact for execution on one or more target systems.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="release">
+                <xs:annotation>
+                    <xs:documentation>A task that releases a built, versioned artifact to a target repository or distribution system.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="clean">
+                <xs:annotation>
+                    <xs:documentation>A task that cleans unnecessary tools, build artifacts and/or data from workflow storage.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="other">
+                <xs:annotation>
+                    <xs:documentation>A workflow task that does not match current task type definitions.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
         </xs:restriction>
     </xs:simpleType>
 

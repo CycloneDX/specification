@@ -178,7 +178,7 @@
                     },
                     "counterClaims": {
                       "type": "array",
-                      "title": "Claims",
+                      "title": "Counter Claims",
                       "description": "The list of  `bom-ref` to the counter claims being attested to.",
                       "items": { "$ref": "#/definitions/refLinkType" }
                     },
@@ -985,7 +985,7 @@
             "patches": {
               "type": "array",
               "title": "Patches",
-              "description": ">A list of zero or more patches describing how the component deviates from an ancestor, descendant, or variant. Patches may be complimentary to commits or may be used in place of commits.",
+              "description": ">A list of zero or more patches describing how the component deviates from an ancestor, descendant, or variant. Patches may be complementary to commits or may be used in place of commits.",
               "items": {"$ref": "#/definitions/patch"}
             },
             "notes": {
@@ -1728,7 +1728,7 @@
             "certification-report": "Industry, regulatory, or other certification from an accredited (if applicable) certification body.",
             "codified-infrastructure": "Code or configuration that defines and provisions virtualized infrastructure, commonly referred to as Infrastructure as Code (IaC).",
             "quality-metrics": "Report or system in which quality metrics can be obtained.",
-            "poam": "Plans of Action and Milestones (POAM) compliment an \"attestation\" external reference. POAM is defined by NIST as a \"document that identifies tasks needing to be accomplished. It details resources required to accomplish the elements of the plan, any milestones in meeting the tasks and scheduled completion dates for the milestones\".",
+            "poam": "Plans of Action and Milestones (POAM) complement an \"attestation\" external reference. POAM is defined by NIST as a \"document that identifies tasks needing to be accomplished. It details resources required to accomplish the elements of the plan, any milestones in meeting the tasks and scheduled completion dates for the milestones\".",
             "electronic-signature": "An e-signature is commonly a scanned representation of a written signature or a stylized script of the persons name.",
             "digital-signature": "A signature that leverages cryptography, typically public/private key pairs, which provides strong authenticity verification.",
             "other": "Use this if no other types accurately describe the purpose of the external reference."
@@ -2218,6 +2218,9 @@
       "type": "object",
       "title": "Lightweight name-value pair",
       "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is OPTIONAL.",
+      "required": [
+        "name"
+      ],
       "properties": {
         "name": {
           "type": "string",
@@ -2229,7 +2232,8 @@
           "title": "Value",
           "description": "The value of the property."
         }
-      }
+      },
+      "additionalProperties": false
     },
     "localeType": {
       "type": "string",
@@ -4340,7 +4344,21 @@
         "release",
         "clean",
         "other"
-      ]
+      ],
+      "meta:enum": {
+        "copy": "A task that copies software or data used to accomplish other tasks in the workflow.",
+        "clone": "A task that clones a software repository into the workflow in order to retrieve its source code or data for use in a build step.",
+        "lint": "A task that checks source code for programmatic and stylistic errors.",
+        "scan": "A task that performs a scan against source code, or built or deployed components and services. Scans are typically run to gather or test for security vulnerabilities or policy compliance.",
+        "merge": "A task that merges changes or fixes into source code prior to a build step in the workflow.",
+        "build": "A task that builds the source code, dependencies and/or data into an artifact that can be deployed to and executed on target systems.",
+        "test": "A task that verifies the functionality of a component or service.",
+        "deliver": "A task that delivers a built artifact to one or more target repositories or storage systems.",
+        "deploy": "A task that deploys a built artifact for execution on one or more target systems.",
+        "release": "A task that releases a built, versioned artifact to a target repository or distribution system.",
+        "clean": "A task that cleans unnecessary tools, build artifacts and/or data from workflow storage.",
+        "other": "A workflow task that does not match current task type definitions."
+      }
     },
     "parameter": {
       "title": "Parameter",
