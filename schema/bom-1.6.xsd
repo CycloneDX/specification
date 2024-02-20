@@ -198,8 +198,10 @@ limitations under the License.
             </xs:element>
             <xs:element name="authors" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation>The person(s) who created the BOM. Authors are common in BOMs created through
-                        manual processes. BOMs created through automated means may not have authors.</xs:documentation>
+                    <xs:documentation>
+                        The person(s) who created the BOM.
+                        Authors are common in BOMs created through manual processes. BOMs created through automated means may have './manufacturer' instead.
+                    </xs:documentation>
                 </xs:annotation>
                 <xs:complexType>
                     <xs:sequence minOccurs="0" maxOccurs="unbounded">
@@ -212,9 +214,20 @@ limitations under the License.
                     <xs:documentation>The component that the BOM describes.</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="manufacturer" type="bom:organizationalEntity" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The organization that created the BOM.
+                        Manufacturer is common in BOMs created through automated processes. BOMs created through manual means may have './authors' instead.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:element name="manufacture" type="bom:organizationalEntity" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation>The organization that manufactured the component that the BOM describes.</xs:documentation>
+                    <xs:documentation>
+                        DEPRECATED - DO NOT USE. This will be removed in a future version. Use the `./component/manufacturer` instead.
+                        The organization that manufactured the component that the BOM describes.
+                    </xs:documentation>
                 </xs:annotation>
             </xs:element>
             <xs:element name="supplier" type="bom:organizationalEntity" minOccurs="0" maxOccurs="1">
@@ -483,9 +496,33 @@ limitations under the License.
                         be the manufacturer, but may also be a distributor or repackager.</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="manufacturer" type="bom:organizationalEntity" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The organization that created the component.
+                        Manufacturer is common in components created through automated processes. Components created through manual means may have './authors' instead.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="authors" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The person(s) who created the component.
+                        Authors are common in components created through manual processes. Components created through automated means may have `./manufacturer` instead.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="author" type="bom:organizationalContact"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="author" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation>The person(s) or organization(s) that authored the component</xs:documentation>
+                    <xs:documentation>
+                        DEPRECATED - DO NOT USE. This will be removed in a future version. Use `./authors` or `./manufacturer` instead.
+                        The person(s) or organization(s) that authored the component.
+                    </xs:documentation>
                 </xs:annotation>
             </xs:element>
             <xs:element name="publisher" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
