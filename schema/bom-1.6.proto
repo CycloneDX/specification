@@ -97,8 +97,8 @@ message Component {
   optional string bom_ref = 3;
   // The organization that supplied the component. The supplier may often be the manufacture, but may also be a distributor or repackager.
   optional OrganizationalEntity supplier = 4;
-  // The person(s) or organization(s) that authored the component
-  optional string author = 5;
+  // DEPRECATED - DO NOT USE - This will be removed in a future version - Use `.authors` or `.manufacturer` instead. The person(s) or organization(s) that authored the component
+  optional string author = 5 [deprecated = true];
   // The person(s) or organization(s) that published the component
   optional string publisher = 6;
   // The grouping name or identifier. This will often be a shortened, single name of the company or project that produced the component, or the source package or domain name. Whitespace and special characters should be avoided. Examples include: apache, org.apache.commons, and apache.org.
@@ -141,8 +141,12 @@ message Component {
   optional ComponentData data = 26;
   // Cryptographic assets have properties that uniquely define them and that make them actionable for further reasoning. As an example, it makes a difference if one knows the algorithm family (e.g. AES) or the specific variant or instantiation (e.g. AES-128-GCM). This is because the security level and the algorithm primitive (authenticated encryption) is only defined by the definition of the algorithm variant. The presence of a weak cryptographic algorithm like SHA1 vs. HMAC-SHA1 also makes a difference.
   optional CryptoProperties cryptoProperties = 27;
+  // The organization that created the component. Manufacturer is common in components created through automated processes. Components created through manual means may have `.authors` instead.
+  optional OrganizationalEntity manufacturer = 28;
+  // The person(s) who created the component. Authors are common in components created through manual processes. Components created through automated means may have `.manufacturer` instead.
+  repeated OrganizationalContact authors = 29;
   // Textual strings that aid in discovery, search, and retrieval of the associated object. Tags often serve as a way to group or categorize similar or related objects by various attributes. Examples include "json-parser", "object-persistence", "text-to-image", "translation", and "object-detection".
-  repeated string tags = 28;
+  repeated string tags = 30;
 }
 
 // Specifies the data flow.
@@ -442,12 +446,12 @@ message Metadata {
   optional google.protobuf.Timestamp timestamp = 1;
   // The tool(s) used in the creation of the BOM.
   optional Tool tools = 2;
-  // The person(s) who created the BOM. Authors are common in BOMs created through manual processes. BOMs created through automated means may not have authors.
+  // The person(s) who created the BOM. Authors are common in BOMs created through manual processes. BOMs created through automated means may have '.manufacturer' instead.
   repeated OrganizationalContact authors = 3;
   // The component that the BOM describes.
   optional Component component = 4;
-  // The organization that manufactured the component that the BOM describes.
-  optional OrganizationalEntity manufacture = 5;
+  // DEPRECATED - DO NOT USE - This will be removed in a future version - Use the `.component.manufacturer` instead. The organization that manufactured the component that the BOM describes.
+  optional OrganizationalEntity manufacture = 5 [deprecated = true];
   // The organization that supplied the component that the BOM describes. The supplier may often be the manufacture, but may also be a distributor or repackager.
   optional OrganizationalEntity supplier = 6;
   // The license information for the BOM document. This may be different from the license(s) of the component that the BOM describes.
@@ -456,6 +460,8 @@ message Metadata {
   repeated Property properties = 8;
   // The product lifecycle(s) that this BOM represents.
   repeated Lifecycles lifecycles = 9;
+  // The organization that created the BOM. Manufacturer is common in BOMs created through automated processes. BOMs created through manual means may have '.authors' instead.
+  optional OrganizationalEntity manufacturer = 10;
 }
 
 message Lifecycles {

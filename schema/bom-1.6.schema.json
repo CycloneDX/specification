@@ -668,10 +668,15 @@
             }
           ]
         },
-        "authors" :{
+        "manufacturer": {
+          "title": "BOM Manufacturer",
+          "description": "The organization that created the BOM.\nManufacturer is common in BOMs created through automated processes. BOMs created through manual means may have '@.authors' instead.",
+          "$ref": "#/definitions/organizationalEntity"
+        },
+        "authors": {
           "type": "array",
-          "title": "Authors",
-          "description": "The person(s) who created the BOM. Authors are common in BOMs created through manual processes. BOMs created through automated means may not have authors.",
+          "title": "BOM Authors",
+          "description": "The person(s) who created the BOM.\nAuthors are common in BOMs created through manual processes. BOMs created through automated means may have '@.manufacturer' instead.",
           "items": {"$ref": "#/definitions/organizationalContact"}
         },
         "component": {
@@ -680,8 +685,9 @@
           "$ref": "#/definitions/component"
         },
         "manufacture": {
-          "title": "Manufacture",
-          "description": "The organization that manufactured the component that the BOM describes.",
+          "deprecated": true,
+          "title": "Component Manufacture (legacy)",
+          "description": "[Deprecated] - DO NOT USE. This will be removed in a future version. Use the `@.component.manufacturer` instead.\nThe organization that manufactured the component that the BOM describes.",
           "$ref": "#/definitions/organizationalEntity"
         },
         "supplier": {
@@ -868,10 +874,22 @@
           "description": " The organization that supplied the component. The supplier may often be the manufacturer, but may also be a distributor or repackager.",
           "$ref": "#/definitions/organizationalEntity"
         },
+        "manufacturer": {
+          "title": "Component Manufacturer",
+          "description": "The organization that created the component.\nManufacturer is common in components created through automated processes. Components created through manual means may have `@.authors` instead.",
+          "$ref": "#/definitions/organizationalEntity"
+        },
+        "authors" :{
+          "type": "array",
+          "title": "Component Authors",
+          "description": "The person(s) who created the component.\nAuthors are common in components created through manual processes. Components created through automated means may have `@.manufacturer` instead.",
+          "items": {"$ref": "#/definitions/organizationalContact"}
+        },
         "author": {
+          "deprecated": true,
           "type": "string",
-          "title": "Component Author",
-          "description": "The person(s) or organization(s) that authored the component",
+          "title": "Component Author (legacy)",
+          "description": "[Deprecated] - DO NOT USE. This will be removed in a future version. Use `@.authors` or `@.manufacturer` instead.\nThe person(s) or organization(s) that authored the component",
           "examples": ["Acme Inc"]
         },
         "publisher": {
