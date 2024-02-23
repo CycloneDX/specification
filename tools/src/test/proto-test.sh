@@ -13,7 +13,7 @@ docker run \
   --volume "$(pwd):/workspace" \
   --workdir /workspace \
   bufbuild/buf:1.29.0 \
-  lint --error-format "$LOG_FORMAT" --debug
+  lint --error-format "$LOG_FORMAT"  --verbose --debug
 
 # check protobuf schema files for breaking changes
 # docker run \
