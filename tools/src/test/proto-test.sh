@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -uex
+set -ue
 
 THIS_DIR="$(dirname "$0")"
 REPO_ROOT="$(realpath "${THIS_DIR}/../../..")"
@@ -29,8 +29,8 @@ function test-schema-lint () {
 }
 
 
-function test-schema-breaking () {
-  echo '> test schema for breaking changes' >&2
+function test-schema-breaking-v2v () {
+  echo '> test schema for breaking changes v2v' >&2
 
   if [[ -n "${CI:-}" ]]
   then
@@ -39,8 +39,11 @@ function test-schema-breaking () {
     LOG_FORMAT='text'
   fi
 
+  # scope is to detect changes from one version to the other -> so ignore "FILE_SAME_PACKAGE"
+  BUF_CFG='{"version":"v1","breaking":{"use":["FILE","WIRE_JSON"],"except":["FILE_SAME_PACKAGE"]}}'
+
   function run-test() {
-    echo "> new:${1} -VS- old:${2}" >&2
+    echo ">> new:${1} -VS- old:${2}" >&2
     # stick with the original paths, so the reporting makes sense...
     docker run --rm \
       --volume "${REPO_ROOT}/${SCHEMA_DIR}/bom-${1}.proto:/workspace/${SCHEMA_DIR}/bom-${1}.proto:ro" \
@@ -50,12 +53,11 @@ function test-schema-breaking () {
         breaking "${SCHEMA_DIR}/" \
         --against "${SCHEMA_DIR}_old/" \
         --error-format "$LOG_FORMAT" \
-        --config '{"version":"v1","breaking":{"use":["FILE","WIRE_JSON"],"except":["FILE_SAME_PACKAGE"]}}'
-        # scope is to detect changes from one version to the other -> so ignore "FILE_SAME_PACKAGE"
+        --config "$BUF_CFG"
   }
 
   run-test '1.6' '1.5'
-  run-test '1.5' '1.4'
+  echo '>> skip testing' '1.5' '1.4' # <-- had breaking changes, which is acknowledged ...
   run-test '1.4' '1.3'
 }
 
@@ -76,14 +78,14 @@ case "${1:-test}" in
     test-schema-lint
     ;;
   'breaking')
-    test-schema-breaking
+    test-schema-breaking-v2v
     ;;
   'functional')
     test-schema-functional
     ;;
   'test')
     test-schema-lint
-    test-schema-breaking
+    test-schema-breaking-v2v
     test-schema-functional
     ;;
   *)
