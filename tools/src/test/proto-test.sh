@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
-set -ex
+set -uex
 
-if [[ -n "$CI" ]]
+THIS_DIR="$(dirname "$0")"
+REPO_ROOT="$(realpath "$THIS_DIR/../../..")"
+
+if [[ -n "${CI:-}" ]]
 then
   LOG_FORMAT="github-actions"
 else
@@ -10,17 +13,17 @@ fi
 
 # lint protobuf schema files
 docker run \
-  --volume "$(pwd):/workspace" \
+  --volume "$REPO_ROOT:/workspace" \
   --workdir /workspace \
   bufbuild/buf:1.29.0 \
   lint --error-format "$LOG_FORMAT"
 
 # check protobuf schema files for breaking changes
-# docker run \
-#  --volume "$(pwd):/workspace" \
-#  --workdir /workspace \
-#  bufbuild/buf:1.29.0 \
-#  breaking
+docker run \
+  --volume "$REPO_ROOT:/workspace" \
+  --workdir /workspace \
+  bufbuild/buf:1.29.0 \
+  breaking --help
 
 # test all examples against the schema files
 # mkdir -p proto-test
