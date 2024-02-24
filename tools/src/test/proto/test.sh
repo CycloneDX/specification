@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -ue
 
-THIS_DIR="$(realpath "$(dirname "$0")")"
-REPO_ROOT="$(realpath "${THIS_DIR}/../../../..")"
+THIS_PATH="$(realpath "$(dirname "$0")")"
+ROOT_PATH="$(realpath "${THIS_PATH}/../../../..")"
 
-# paths relative to $REPO_ROOT
+# paths relative to $ROOT_PATH
 SCHEMA_DIR='schema'
 
 REMOTE="https://github.com/${GITHUB_REPOSITORY:-CycloneDX/specification}.git"
@@ -20,8 +20,8 @@ function schema-lint () {
   fi
 
   docker run --rm \
-    --volume "${REPO_ROOT}/${SCHEMA_DIR}:/workspace/${SCHEMA_DIR}:ro" \
-    --volume "${THIS_DIR}/buf_lint.yaml:/workspace/buf.yaml:ro" \
+    --volume "${ROOT_PATH}/${SCHEMA_DIR}:/workspace/${SCHEMA_DIR}:ro" \
+    --volume "${THIS_PATH}/buf_lint.yaml:/workspace/buf.yaml:ro" \
     --workdir '/workspace' \
     bufbuild/buf:1.29.0 \
       lint --path "$SCHEMA_DIR" \
@@ -44,9 +44,9 @@ function schema-breaking-version () {
     echo ">> compare new:${1} -VS- old:${2}" >&2
     # stick with the original paths, so the reporting makes sense...
     docker run --rm \
-      --volume "${REPO_ROOT}/${SCHEMA_DIR}/bom-${1}.proto:/workspace/${SCHEMA_DIR}/bom-${1}.proto:ro" \
-      --volume "${REPO_ROOT}/${SCHEMA_DIR}/bom-${2}.proto:/workspace/${SCHEMA_DIR}_old/bom-${1}.proto:ro" \
-      --volume "${THIS_DIR}/buf_breaking-version.yaml:/workspace/buf.yaml:ro" \
+      --volume "${ROOT_PATH}/${SCHEMA_DIR}/bom-${1}.proto:/workspace/${SCHEMA_DIR}/bom-${1}.proto:ro" \
+      --volume "${ROOT_PATH}/${SCHEMA_DIR}/bom-${2}.proto:/workspace/${SCHEMA_DIR}_old/bom-${1}.proto:ro" \
+      --volume "${THIS_PATH}/buf_breaking-version.yaml:/workspace/buf.yaml:ro" \
       --workdir '/workspace' \
       bufbuild/buf:1.29.0 \
         breaking "$SCHEMA_DIR" --against "${SCHEMA_DIR}_old" \
@@ -70,8 +70,8 @@ function schema-breaking-remote () {
   fi
 
   docker run --rm \
-    --volume "${REPO_ROOT}/${SCHEMA_DIR}:/workspace/${SCHEMA_DIR}:ro" \
-    --volume "${THIS_DIR}/buf_breaking-remote.yaml:/workspace/buf.yaml:ro" \
+    --volume "${ROOT_PATH}/${SCHEMA_DIR}:/workspace/${SCHEMA_DIR}:ro" \
+    --volume "${THIS_PATH}/buf_breaking-remote.yaml:/workspace/buf.yaml:ro" \
     --workdir '/workspace' \
     bufbuild/buf:1.29.0 \
       breaking "$SCHEMA_DIR" --against "${REMOTE}#subdir=${SCHEMA_DIR}" \
