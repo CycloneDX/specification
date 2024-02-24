@@ -82,6 +82,7 @@ function schema-breaking-remote () {
 function schema-functional () {
   echo '> test all examples against the schema files' >&2
 
+  echo 'TODO' # @TODO
   return 0 # WIP
 
   mkdir -p proto-test
