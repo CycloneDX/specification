@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-set -uex
+set -ue
 
-THIS_DIR="$(dirname "$0")"
+THIS_DIR="$(realpath "$(dirname "$0")")"
 REPO_ROOT="$(realpath "${THIS_DIR}/../../../..")"
 
 # paths relative to $REPO_ROOT
