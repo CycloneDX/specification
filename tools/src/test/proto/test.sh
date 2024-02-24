@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -ue
+set -uex
 
 THIS_DIR="$(dirname "$0")"
 REPO_ROOT="$(realpath "${THIS_DIR}/../../../..")"
@@ -7,7 +7,7 @@ REPO_ROOT="$(realpath "${THIS_DIR}/../../../..")"
 # paths relative to $REPO_ROOT
 SCHEMA_DIR='schema'
 
-REMOTE='https://github.com/CycloneDX/specification.git'
+REMOTE="https://github.com/${GITHUB_REPOSITORY:-CycloneDX/specification}.git"
 
 function schema-lint () {
   echo '> lint schema files' >&2
@@ -33,7 +33,7 @@ function schema-lint () {
 function schema-breaking-version () {
   echo '> test schema for breaking changes against previous version' >&2
 
-  if [[ -n "${CI:-}" ]]
+  if [[ -n "${GITHUB_WORKFLOW:-}" ]]
   then
     LOG_FORMAT='github-actions'
   else
@@ -62,7 +62,7 @@ function schema-breaking-version () {
 function schema-breaking-remote () {
   echo '> test schema for breaking changes against remote' >&2
 
-  if [[ -n "${CI:-}" ]]
+  if [[ -n "${GITHUB_WORKFLOW:-}" ]]
   then
     LOG_FORMAT='github-actions'
   else
