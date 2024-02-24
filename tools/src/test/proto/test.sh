@@ -55,7 +55,7 @@ function schema-breaking-version () {
   }
 
   compare '1.6' '1.5'
-  echo '>> skip compare' '1.5' '1.4' # <-- had breaking changes, which is acknowledged ...
+  echo '>> skip compare' '1.5' '1.4' >&2 # <-- had breaking changes, which is acknowledged ...
   compare '1.4' '1.3'
 }
 
