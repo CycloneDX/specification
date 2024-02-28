@@ -48,19 +48,20 @@ function schema-breaking-version () {
   fi
 
   function compare() {
-    NEW="${1}"
-    OLD="${2}"
+    NEW="bom-${1}.proto"
+    OLD="bom-${2}.proto"
+    SCHEMA_DIR_OLD="${SCHEMA_DIR}_old"
 
     echo ">> compare new:${NEW} -VS- old:${OLD}" >&2
-    # stick with the original paths, so the reporting makes sense...
+    # stick with the original path of "$NEW", so the reporting makes sense...
     docker run --rm \
-      --volume "${ROOT_PATH}/${SCHEMA_DIR}/bom-${NEW}.proto:/workspace/${SCHEMA_DIR}/bom-${NEW}.proto:ro" \
-      --volume "${ROOT_PATH}/${SCHEMA_DIR}/bom-${OLD}.proto:/workspace/${SCHEMA_DIR}_old/bom-${NEW}.proto:ro" \
+      --volume "${ROOT_PATH}/${SCHEMA_DIR}/${NEW}:/workspace/${SCHEMA_DIR}/${NEW}:ro" \
+      --volume "${ROOT_PATH}/${SCHEMA_DIR}/${OLD}:/workspace/${SCHEMA_DIR_OLD}/${NEW}:ro" \
       --volume "${THIS_PATH}/buf_breaking-version.yaml:/workspace/buf.yaml:ro" \
       --workdir '/workspace' \
       bufbuild/buf:1.29.0 \
         breaking "$SCHEMA_DIR" \
-        --against "${SCHEMA_DIR}_old" \
+        --against "$SCHEMA_DIR_OLD" \
         --config 'buf.yaml' \
         --error-format "$LOG_FORMAT"
   }
@@ -104,7 +105,7 @@ function schema-functional () {
     SCHEMA_FILE="bom-${SCHEMA_VERS}.proto"
     MESSAGE="cyclonedx.v${SCHEMA_VERS/./_}.Bom"
 
-    echo ">> validate ${FILE} as ${MESSAGE} of ${SCHEMA_FILE}" >&2
+    echo ">> validate $(realpath --relative-to="$PWD" "$FILE") as ${MESSAGE} of ${SCHEMA_FILE}" >&2
 
     docker run --rm \
       --volume "${ROOT_PATH}/${SCHEMA_DIR}:/workspace/${SCHEMA_DIR}:ro" \
