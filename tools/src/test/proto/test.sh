@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -uex
+set -ue
 
 THIS_PATH="$(realpath "$(dirname "$0")")"
 ROOT_PATH="$(realpath "${THIS_PATH}/../../../..")"
