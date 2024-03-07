@@ -3518,6 +3518,170 @@
         }
       }
     },
+    "environmentalConsiderations": {
+      "type": "object",
+      "title": "Environmental Considerations",
+      "description": "Describes various environmental impact metrics the corresponding model has exhibited across its lifecycle.",
+      "properties": {
+        "energyConsumptions": {
+          "title": "Energy Consumptions",
+          "description": "Describes energy consumption information incurred for specified model lifecycle activities.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/energyConsumption"
+          }
+        }
+      }
+    },
+    "energyConsumption": {
+      "title": "Energy consumption",
+      "description": "Describes energy consumption information incurred for the specified model lifecycle activity.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "activity": {
+            "type": "string",
+            "title": "Activity",
+            "description": "An activity that is part of a machine learning model development or operational lifecycle.",
+            "enum": [ "design", "data-collection", "data-preparation", "training", "fine-tuning", "deployment", "inference" ]
+          },
+          "energySources": {
+            "title": "Energy Sources",
+            "description": "The provider(s) of the energy consumed by the associated model development lifecycle activity.",
+            "type": "array",
+            "items": { "$ref": "#/definitions/energyProvider" }
+           },
+           "energyCost": {
+             "title": "Energy consumed",
+             "description": "The total energy cost associated with the model lifecycle activity.",
+             "$ref": "#/definitions/energyMeasure"
+           },
+           "CO2CostEquivalent": {
+             "title": "CO2 Equivalent Cost",
+             "description": "The CO2 cost (debit) equivalent to the total energy cost.",
+             "$ref": "#/definitions/CO2Measure"
+           },
+           "CO2CostOffset": {
+             "title": "CO2 Cost Offset",
+             "description": "The CO2 offset (credit) for the CO2 equivalent cost.",
+             "$ref": "#/definitions/CO2Measure"
+           }
+        }
+      }
+    },
+    "energyMeasure": {
+      "type": "object",
+      "title": "Energy Measure",
+      "description": "A measure of energy.",
+      "properties": {
+        "value": {
+          "type": "string",
+          "title": "Value",
+          "description": "Quantity of energy."
+        },
+        "unit": {
+          "type": "string",
+          "enum": [ "kWh" ],
+          "title": "Unit",
+          "description": "Unit of energy.",
+          "meta:enum": {
+            "kWh": "kilowatt-hour (kWh) is the energy delivered by one kilowatt (kW) of power for one hour (h)."
+          }
+        }
+      }
+    },
+    "co2Measure": {
+      "type": "object",
+      "title": "CO2 Measure",
+      "description": "A measure of carbon dioxide (CO2).",
+      "properties": {
+        "value": {
+          "type": "number",
+          "title": "Value",
+          "description": "Quantity of carbon dioxide (CO2)."
+        },
+        "unit": {
+          "type": "string",
+          "enum": [ "tCO2eq" ],
+          "title": "Unit",
+          "description": "Unit of carbon dioxide (CO2).",
+          "meta:enum": {
+            "tCO2eq": "Tonnes (t) of carbon dioxide (CO2) equivalent (eq)."
+          }
+        }
+      }
+    },
+    "energyProvider": {
+      "type": "object",
+      "title": "Energy Provider",
+      "description": "Describes the physical provider of energy used for model development or operations.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name of the energy provider."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the energy provider."
+        },
+        "address": {
+          "$ref": "#/definitions/postalAddress",
+          "title": "Address",
+          "description": "The physical address (location) of the energy provider."
+        },
+        "energySource": {
+          "type": "string",
+          "enum": [ "coal", "oil", "natural-gas", "propane", "nuclear", "wind", "solar", "geothermal", "hydropower", "other" ],
+          "title": "Energy Source",
+          "description": "The energy source for the energy provider."
+        },
+        "energyProvided": {
+          "type": "number",
+          "title": "Energy Provided",
+          "description": "The energy provided by the energy source for the activity."
+        }
+      }
+    },
+    "postalAddress": {
+      "type": "object",
+      "title": "Postal address",
+      "description": "An address used to identify a contactable location.",
+      "properties": {
+        "country": {
+          "type": "string",
+          "title": "Country",
+          "description": "The country name or the two-letter ISO 3166-1 alpha-2 country code."
+        },
+        "region": {
+          "type": "string",
+          "title": "Region",
+          "description": "The region or state in the country. For example, Texas."
+        },
+        "locality": {
+          "type": "string",
+          "title": "Locality",
+          "description": "The locality or city within the country. For example, Austin."
+        },
+        "postOfficeBoxNumber ": {
+          "type": "string",
+          "title": "Post Office Box Number",
+          "description": "The post office box number. For example, 901."
+        },
+        "postalCode": {
+          "type": "string",
+          "title": "Postal Code",
+          "description": "The postal code. For example, 78758."
+        },
+        "streetAddress": {
+          "type": "string",
+          "title": "Street Address",
+          "description": "The street address. For example, 100 Main Street."
+        }
+      }
+    },
     "workflow": {
       "title": "Workflow",
       "description": "A specialized orchestration task.",
