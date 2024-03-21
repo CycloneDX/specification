@@ -3176,6 +3176,13 @@ limitations under the License.
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
+                        <xs:element name="environmentalConsiderations" type="bom:environmentalConsiderationsType" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Describes various environmental impact metrics the corresponding model has exhibited across its lifecycle.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
                         <xs:element name="fairnessAssessments" minOccurs="0" maxOccurs="1">
                             <xs:annotation>
                                 <xs:documentation>
@@ -3237,6 +3244,72 @@ limitations under the License.
         </xs:attribute>
     </xs:complexType>
 
+    <!-- ML Env. Defns. -->
+    <xs:complexType name="environmentalConsiderationsType">
+        <xs:annotation>
+            <xs:documentation>
+                Describes various environmental impact metrics the corresponding model has exhibited across its lifecycle.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="energyConsumptions" type="bom:energyConsumptionType" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Describes energy consumption information incurred for specified model lifecycle activities.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="energyConsumptionType">
+        <xs:annotation>
+            <xs:documentation>
+                Describes energy consumption information incurred for the specified model lifecycle activity.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        TBD
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="energyMeasureType">
+        <xs:annotation>
+            <xs:documentation>
+                A measure of energy.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="value" type="xs:decimal" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Quantity of energy.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="unit" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        "Unit of energy.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="kWh"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- ML Defns. -->
     <xs:simpleType name="machineLearningApproachType">
         <xs:restriction base="xs:string">
             <xs:enumeration value="supervised">
