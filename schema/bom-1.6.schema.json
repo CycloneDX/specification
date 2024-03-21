@@ -3496,6 +3496,11 @@
       "type": "array",
       "items": {
         "type": "object",
+        "required": [
+          "activity",
+          "energySources"
+        ],
+        "additionalProperties": false,
         "properties": {
           "activity": {
             "type": "string",
@@ -3512,7 +3517,6 @@
               "deployment": "explicit model deployment to a target hosting infrastructure.",
               "inference": "generating an output response from a hosted model from a set of inputs."
             }
-
           },
           "energySources": {
             "title": "Energy Sources",
@@ -3542,6 +3546,11 @@
       "type": "object",
       "title": "Energy Measure",
       "description": "A measure of energy.",
+      "required": [
+        "value",
+        "unit"
+      ],
+      "additionalProperties": false,
       "properties": {
         "value": {
           "type": "string",
@@ -3563,6 +3572,11 @@
       "type": "object",
       "title": "CO2 Measure",
       "description": "A measure of carbon dioxide (CO2).",
+      "required": [
+        "value",
+        "unit"
+      ],
+      "additionalProperties": false,
       "properties": {
         "value": {
           "type": "number",
@@ -3584,6 +3598,12 @@
       "type": "object",
       "title": "Energy Provider",
       "description": "Describes the physical provider of energy used for model development or operations.",
+      "required": [
+        "name",
+        "energySource",
+        "energyProvided"
+      ],
+      "additionalProperties": false,
       "properties": {
         "name": {
           "type": "string",
@@ -3602,14 +3622,14 @@
         },
         "energySource": {
           "type": "string",
-          "enum": [ "coal", "oil", "natural-gas", "propane", "nuclear", "wind", "solar", "geothermal", "hydropower", "other" ],
+          "enum": [ "coal", "oil", "natural-gas", "propane", "nuclear", "wind", "solar", "geothermal", "hydropower", "unknown", "other" ],
           "title": "Energy Source",
           "description": "The energy source for the energy provider."
         },
         "energyProvided": {
           "$ref": "#/definitions/energyMeasure",
           "title": "Energy Provided",
-          "description": "The energy provided by the energy source for the activity."
+          "description": "The energy provided by the energy source for an associated activity."
         }
       }
     },
@@ -3621,7 +3641,7 @@
         "country": {
           "type": "string",
           "title": "Country",
-          "description": "The country name or the two-letter ISO 3166-1 alpha-2 country code."
+          "description": "The country name or the two-letter ISO 3166-1 country code."
         },
         "region": {
           "type": "string",
