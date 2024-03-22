@@ -1129,10 +1129,12 @@ message ModelCard {
     repeated string technicalLimitations = 3;
     // What are the known tradeoffs in accuracy/performance of the model?
     repeated string performanceTradeoffs = 4;
-    // What are the ethical (or environmental) risks involved in the application of this model?
+    // What are the ethical risks involved in the application of this model?
     repeated EthicalConsiderations ethicalConsiderations = 5;
     // How does the model affect groups at risk of being systematically disadvantaged? What are the harms and benefits to the various affected groups?
     repeated FairnessAssessments fairnessAssessments = 6;
+    // What are the various environmental impacts the corresponding machine learning model has exhibited across its lifecycle?
+    optional EnvironmentalConsiderations environmentalConsiderations = 7;
 
     message EthicalConsiderations {
       // The name of the risk.
@@ -1150,7 +1152,35 @@ message ModelCard {
       // With respect to the benefits and harms outlined, please describe any mitigation strategy implemented.
       optional string mitigationStrategy = 4;
     }
+    message EnvironmentalConsiderations {
+      // Describes energy consumption information incurred for one or more component lifecycle activities.
+      repeated EnergyConsumption energyConsumptions = 1;
+    }
+    message EnergyConsumption {
+      // Describes energy consumption information incurred for the specified lifecycle activity.
+      ActivityType activity = 1
+    }
   }
+}
+
+enum ActivityType {
+  // An activity that is part of a machine learning model development or operational lifecycle.
+  // model design including problem framing, goal definition and algorithm selection.
+  ACTIVITY_TYPE_DESIGN = 0;
+  // model data acquisition including search, selection and transfer.
+  ACTIVITY_TYPE_DATA_COLLECTION = 1;
+  // model data preparation including data cleaning, labeling and conversion.
+  ACTIVITY_TYPE_DATA_PREPARATION = 2;
+  // model building, training and generalized tuning.
+  ACTIVITY_TYPE_TRAINING = 3;
+  // refining a trained model to produce desired outputs for a given problem space.
+  ACTIVITY_TYPE_FINE_TUNING = 4;
+  // model validation including model output evaluation and testing.
+  ACTIVITY_TYPE_VALIDATION = 5;
+  // explicit model deployment to a target hosting infrastructure.
+  ACTIVITY_TYPE_DEPLOYMENT = 6;
+  // generating an output response from a hosted model from a set of inputs.
+  ACTIVITY_TYPE_INFERENCE = 7;
 }
 
 enum ModelParameterApproachType {
