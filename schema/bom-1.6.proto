@@ -1158,29 +1158,123 @@ message ModelCard {
     }
     message EnergyConsumption {
       // Describes energy consumption information incurred for the specified lifecycle activity.
-      ActivityType activity = 1
+      ActivityType activity = 1;
+      // The providers of the energy consumed by the associated model development lifecycle activity.
+      repeated EnergyProviderType energySources = 2;
+      // The total energy cost associated with the model lifecycle activity.
+      EnergyMeasureType energyCost = 3;
+      // The CO2 cost or debit equivalent to the total energy cost.
+      optional CO2MeasureType co2CostEquivalent = 4;
+      // The CO2 offset or credit for the CO2 equivalent cost.
+      optional CO2MeasureType co2CostOffset = 5;
     }
   }
 }
 
+// An activity that is part of a machine learning model development or operational lifecycle.
 enum ActivityType {
-  // An activity that is part of a machine learning model development or operational lifecycle.
+  // a lifecycle activity type whose description does not match currently defined values.
+  ACTIVITY_TYPE_OTHER = 0;
   // model design including problem framing, goal definition and algorithm selection.
-  ACTIVITY_TYPE_DESIGN = 0;
+  ACTIVITY_TYPE_DESIGN = 1;
   // model data acquisition including search, selection and transfer.
-  ACTIVITY_TYPE_DATA_COLLECTION = 1;
+  ACTIVITY_TYPE_DATA_COLLECTION = 2;
   // model data preparation including data cleaning, labeling and conversion.
-  ACTIVITY_TYPE_DATA_PREPARATION = 2;
+  ACTIVITY_TYPE_DATA_PREPARATION = 3;
   // model building, training and generalized tuning.
-  ACTIVITY_TYPE_TRAINING = 3;
+  ACTIVITY_TYPE_TRAINING = 4;
   // refining a trained model to produce desired outputs for a given problem space.
-  ACTIVITY_TYPE_FINE_TUNING = 4;
+  ACTIVITY_TYPE_FINE_TUNING = 5;
   // model validation including model output evaluation and testing.
-  ACTIVITY_TYPE_VALIDATION = 5;
+  ACTIVITY_TYPE_VALIDATION = 6;
   // explicit model deployment to a target hosting infrastructure.
-  ACTIVITY_TYPE_DEPLOYMENT = 6;
+  ACTIVITY_TYPE_DEPLOYMENT = 7;
   // generating an output response from a hosted model from a set of inputs.
-  ACTIVITY_TYPE_INFERENCE = 7;
+  ACTIVITY_TYPE_INFERENCE = 8;
+}
+
+// Describes the physical provider of energy used for model development or operations.
+message EnergyProviderType {
+  // BOM unique reference to the energy provider.
+  optional string bom_ref = 1;
+  // The name of the energy provider.
+  string name 1;
+  // A description of the energy provider.
+  optional string description = 2;
+  // TThe physical address (location) of the energy provider.BD
+  optional PostalAddressType address = 3;
+  // The energy source for the energy provider.
+  EnerySourceType energySource = 4;
+  // The energy provided by the energy source for an associated activity.
+  EnergyMeasureType energyProvided = 5;
+}
+
+enum EnerySourceType {
+  // energy source: unknown
+  ENERGY_SOURCE_TYPE_UNKNOWN = 0;
+  // energy source: coal
+  ENERGY_SOURCE_TYPE_COAL = 1;
+  // energy source: oil
+  ENERGY_SOURCE_TYPE_OIL = 2;
+  // energy source: natural gas
+  ENERGY_SOURCE_TYPE_NATURAL_GAS = 3;
+  // energy source: propane
+  ENERGY_SOURCE_TYPE_PROPANE = 4;
+  // energy source: nuclear
+  ENERGY_SOURCE_TYPE_NUCLEAR = 5;
+  // energy source: wind
+  ENERGY_SOURCE_TYPE_WIND = 6;
+  // energy source: solar
+  ENERGY_SOURCE_TYPE_SOLAR = 7;
+  // energy source: geothermal
+  ENERGY_SOURCE_TYPE_GEOTHERMAL = 8;
+  // energy source: hydropower
+  ENERGY_SOURCE_TYPE_HYDROPOWER = 9;
+  // energy source: other; not yet defined
+  ENERGY_SOURCE_TYPE_OTHER = 10;
+}
+
+
+// A measure of energy.
+message EnergyMeasureType {
+  // Quantity of energy.
+  float value = 1;
+  // Unit of energy.
+  EnergyMeasureUnitType unit = 2;
+}
+
+enum EnergyMeasureUnitType {
+  // kilowatt-hour (kWh) is the energy delivered by one kilowatt (kW) of power for one hour (h).
+  ENERGY_MEASURE_UNIT_TYPE_KILOWATT_HOURS = 0;
+}
+
+// A measure of carbon dioxide (CO2).
+message CO2MeasureType {
+  // Quantity of carbon dioxide (CO2).
+  float value = 1;
+  // Unit of carbon dioxide (CO2).
+  CO2MeasureUnitType unit = 2;
+}
+
+enum CO2MeasureUnitType {
+  // Tonnes (t) of carbon dioxide (CO2) equivalent (eq).
+  C02_MEASURE_UNIT_TYPE_TONNES_CO2_EQUIVALENT = 0;
+}
+
+// A measure of carbon dioxide (CO2).
+message PostalAddressType {
+  // TBD.
+  optional string value = 1;
+  // TBD
+  optional string value  = 2;
+  // TBD
+  optional string value  = 3;
+  // TBD
+  optional string value  = 4;
+  // TBD
+  optional string value  = 5;
+  // TBD
+  optional string value  = 6;
 }
 
 enum ModelParameterApproachType {
