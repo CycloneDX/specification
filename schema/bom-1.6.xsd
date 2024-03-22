@@ -3244,7 +3244,6 @@ limitations under the License.
         </xs:attribute>
     </xs:complexType>
 
-    <!-- ML Env. Defns. -->
     <xs:complexType name="environmentalConsiderationsType">
         <xs:annotation>
             <xs:documentation>
@@ -3259,7 +3258,6 @@ limitations under the License.
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
-
         </xs:sequence>
     </xs:complexType>
 
@@ -3270,10 +3268,98 @@ limitations under the License.
             </xs:documentation>
         </xs:annotation>
         <xs:sequence>
-            <xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1">
+            <xs:element name="activity" minOccurs="1" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>
-                        TBD
+                        An activity that is part of a machine learning model development or operational lifecycle.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="design">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    model design including problem framing, goal definition and algorithm selection.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="data-collection">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    model data acquisition including search, selection and transfer.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="data-preparation">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    model data preparation including data cleaning, labeling and conversion.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="training">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    model building, training and generalized tuning.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="fine-tuning">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    refining a trained model to produce desired outputs for a given problem space.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="validation">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    model validation including model output evaluation and testing.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="deployment">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    explicit model deployment to a target hosting infrastructure.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="inference">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    generating an output response from a hosted model from a set of inputs.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="energySources" type="bom:energyProviderType" minOccurs="1" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        The provider(s) of the energy consumed by the associated model development lifecycle activity.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="energyCost" type="bom:energyMeasureType" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Quantity of carbon dioxide (CO2).
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="co2CostEquivalent" type="bom:co2MeasureType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The CO2 cost (debit) equivalent to the total energy cost.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="co2CostOffset" type="bom:co2MeasureType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The CO2 offset (credit) for the CO2 equivalent cost.
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
@@ -3462,7 +3548,6 @@ limitations under the License.
         </xs:sequence>
     </xs:complexType>
 
-    <!-- ML Defns. -->
     <xs:simpleType name="machineLearningApproachType">
         <xs:restriction base="xs:string">
             <xs:enumeration value="supervised">
