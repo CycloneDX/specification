@@ -3494,54 +3494,51 @@
     "energyConsumption": {
       "title": "Energy consumption",
       "description": "Describes energy consumption information incurred for the specified lifecycle activity.",
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": [
-          "activity",
-          "energySources",
-          "energyCost"
-        ],
-        "additionalProperties": false,
-        "properties": {
-          "activity": {
-            "type": "string",
-            "title": "Activity",
-            "description": "An activity that is part of a machine learning model development or operational lifecycle.",
-            "enum": [ "design", "data-collection", "data-preparation", "training", "fine-tuning", "validation", "deployment", "inference" ],
-            "meta:enum": {
-              "design": "model design including problem framing, goal definition and algorithm selection.",
-              "data-collection": "model data acquisition including search, selection and transfer.",
-              "data-preparation": "model data preparation including data cleaning, labeling and conversion.",
-              "training": "model building, training and generalized tuning.",
-              "fine-tuning": "refining a trained model to produce desired outputs for a given problem space.",
-              "validation": "model validation including model output evaluation and testing.",
-              "deployment": "explicit model deployment to a target hosting infrastructure.",
-              "inference": "generating an output response from a hosted model from a set of inputs.",
-              "other": "a lifecycle activity type whose description does not match currently defined values."
-            }
-          },
-          "energySources": {
-            "title": "Energy Sources",
-            "description": "The provider(s) of the energy consumed by the associated model development lifecycle activity.",
-            "type": "array",
-            "items": { "$ref": "#/definitions/energyProvider" }
-          },
-          "energyCost": {
-            "title": "Energy Cost",
-            "description": "The total energy cost associated with the model lifecycle activity.",
-            "$ref": "#/definitions/energyMeasure"
-          },
-          "co2CostEquivalent": {
-            "title": "CO2 Equivalent Cost",
-            "description": "The CO2 cost (debit) equivalent to the total energy cost.",
-            "$ref": "#/definitions/co2Measure"
-          },
-          "co2CostOffset": {
-            "title": "CO2 Cost Offset",
-            "description": "The CO2 offset (credit) for the CO2 equivalent cost.",
-            "$ref": "#/definitions/co2Measure"
+      "type": "object",
+      "required": [
+        "activity",
+        "energyProviders",
+        "activityEnergyCost"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "activity": {
+          "type": "string",
+          "title": "Activity",
+          "description": "The type of activity that is part of a machine learning model development or operational lifecycle.",
+          "enum": [ "design", "data-collection", "data-preparation", "training", "fine-tuning", "validation", "deployment", "inference" ],
+          "meta:enum": {
+            "design": "model design including problem framing, goal definition and algorithm selection.",
+            "data-collection": "model data acquisition including search, selection and transfer.",
+            "data-preparation": "model data preparation including data cleaning, labeling and conversion.",
+            "training": "model building, training and generalized tuning.",
+            "fine-tuning": "refining a trained model to produce desired outputs for a given problem space.",
+            "validation": "model validation including model output evaluation and testing.",
+            "deployment": "explicit model deployment to a target hosting infrastructure.",
+            "inference": "generating an output response from a hosted model from a set of inputs.",
+            "other": "a lifecycle activity type whose description does not match currently defined values."
           }
+        },
+        "energyProviders": {
+          "title": "Energy Providers",
+          "description": "The provider(s) of the energy consumed by the associated model development lifecycle activity.",
+          "type": "array",
+          "items": { "$ref": "#/definitions/energyProvider" }
+        },
+        "activityEnergyCost": {
+          "title": "Activity Energy Cost",
+          "description": "The total energy cost associated with the model lifecycle activity.",
+          "$ref": "#/definitions/energyMeasure"
+        },
+        "co2CostEquivalent": {
+          "title": "CO2 Equivalent Cost",
+          "description": "The CO2 cost (debit) equivalent to the total energy cost.",
+          "$ref": "#/definitions/co2Measure"
+        },
+        "co2CostOffset": {
+          "title": "CO2 Cost Offset",
+          "description": "The CO2 offset (credit) for the CO2 equivalent cost.",
+          "$ref": "#/definitions/co2Measure"
         }
       }
     },
