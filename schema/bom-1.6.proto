@@ -1160,6 +1160,29 @@ message ModelCard {
     }
     // Describes energy consumption information incurred for the specified lifecycle activity.
     message EnergyConsumption {
+      // An activity that is part of a machine learning model development or operational lifecycle.
+      enum ActivityType {
+        ACTIVITY_TYPE_UNSPECIFIED = 0;
+        // a lifecycle activity type whose description does not match currently defined values (the default type).
+        ACTIVITY_TYPE_OTHER = 1;
+        // model design including problem framing, goal definition and algorithm selection.
+        ACTIVITY_TYPE_DESIGN = 2;
+        // model data acquisition including search, selection and transfer.
+        ACTIVITY_TYPE_DATA_COLLECTION = 3;
+        // model data preparation including data cleaning, labeling and conversion.
+        ACTIVITY_TYPE_DATA_PREPARATION = 4;
+        // model building, training and generalized tuning.
+        ACTIVITY_TYPE_TRAINING = 5;
+        // refining a trained model to produce desired outputs for a given problem space.
+        ACTIVITY_TYPE_FINE_TUNING = 6;
+        // model validation including model output evaluation and testing.
+        ACTIVITY_TYPE_VALIDATION = 7;
+        // explicit model deployment to a target hosting infrastructure.
+        ACTIVITY_TYPE_DEPLOYMENT = 8;
+        // generating an output response from a hosted model from a set of inputs.
+        ACTIVITY_TYPE_INFERENCE = 9;
+      }
+
       // The type of activity that is part of a machine learning model development or operational lifecycle.
       ActivityType activity = 1;
       // The providers of the energy consumed by the associated model development lifecycle activity.
@@ -1176,100 +1199,76 @@ message ModelCard {
   }
 }
 
-// An activity that is part of a machine learning model development or operational lifecycle.
-enum ActivityType {
-  ACTIVITY_TYPE_UNSPECIFIED = 0;
-  // a lifecycle activity type whose description does not match currently defined values (the default type).
-  ACTIVITY_TYPE_OTHER = 1;
-  // model design including problem framing, goal definition and algorithm selection.
-  ACTIVITY_TYPE_DESIGN = 2;
-  // model data acquisition including search, selection and transfer.
-  ACTIVITY_TYPE_DATA_COLLECTION = 3;
-  // model data preparation including data cleaning, labeling and conversion.
-  ACTIVITY_TYPE_DATA_PREPARATION = 4;
-  // model building, training and generalized tuning.
-  ACTIVITY_TYPE_TRAINING = 5;
-  // refining a trained model to produce desired outputs for a given problem space.
-  ACTIVITY_TYPE_FINE_TUNING = 6;
-  // model validation including model output evaluation and testing.
-  ACTIVITY_TYPE_VALIDATION = 7;
-  // explicit model deployment to a target hosting infrastructure.
-  ACTIVITY_TYPE_DEPLOYMENT = 8;
-  // generating an output response from a hosted model from a set of inputs.
-  ACTIVITY_TYPE_INFERENCE = 9;
-}
 
 // Describes the physical provider of energy used for model development or operations.
 message EnergyProviderType {
+  enum EnergySourceType {
+    ENERGY_SOURCE_TYPE_UNSPECIFIED = 0;
+    // energy source: unknown. The energy source is unknown.
+    ENERGY_SOURCE_TYPE_UNKNOWN = 1;
+    // energy source: other. An energy source that is not listed.
+    ENERGY_SOURCE_TYPE_OTHER = 2;
+    // energy source: coal. Energy produced by types of coal.
+    ENERGY_SOURCE_TYPE_COAL = 3;
+    // energy source: oil. Petroleum products (primarily crude oil and its derivative fuel oils).
+    ENERGY_SOURCE_TYPE_OIL = 4;
+    // energy source: natural-gas. Hydrocarbon gas liquids (HGL) that occur as gases at atmospheric pressure and as liquids under higher pressures including Natural gas (C5H12 and heavier), Ethane (C2H6), Propane (C3H8), etc.
+    ENERGY_SOURCE_TYPE_NATURAL_GAS = 5;
+    // energy source: nuclear. Energy produced from the cores of atoms (i.e., through nuclear fission or fusion).
+    ENERGY_SOURCE_TYPE_NUCLEAR = 6;
+    // energy source: wind. Energy produced from moving air.
+    ENERGY_SOURCE_TYPE_WIND = 7;
+    // energy source: solar. Energy produced from the sun (i.e., solar radiation).
+    ENERGY_SOURCE_TYPE_SOLAR = 8;
+    // energy source: geothermal. Energy produced from heat within the earth.
+    ENERGY_SOURCE_TYPE_GEOTHERMAL = 9;
+    // energy source: hydropower. Energy produced from flowing water.
+    ENERGY_SOURCE_TYPE_HYDROPOWER = 10;
+    // energy source: biofuel. Liquid fuels produced from biomass feedstocks (i.e., organic materials such as plants or animals).
+    ENERGY_SOURCE_TYPE_BIOFUEL = 11;
+  }
+
   // BOM unique reference to the energy provider.
   optional string bom_ref = 1;
-  // The name of the energy provider.
-  string name = 2;
-  // A description of the energy provider.
-  optional string description = 3;
-  // TThe physical address (location) of the energy provider.BD
-  optional PostalAddressType address = 4;
+  // The organization of the energy provider.
+  OrganizationalEntity organization = 2;
   // The energy source for the energy provider.
-  EnergySourceType energySource = 5;
+  EnergySourceType energySource = 3;
   // The energy provided by the energy source for an associated activity.
-  EnergyMeasureType energyProvided = 6;
+  EnergyMeasureType energyProvided = 4;
   // Provides the ability to document external references related to the BOM or to the project the BOM describes.
-  repeated ExternalReference external_references = 7;
-}
-
-enum EnergySourceType {
-  ENERGY_SOURCE_TYPE_UNSPECIFIED = 0;
-  // energy source: unknown. The energy source is unknown.
-  ENERGY_SOURCE_TYPE_UNKNOWN = 1;
-  // energy source: other. An energy source that is not listed.
-  ENERGY_SOURCE_TYPE_OTHER = 2;
-  // energy source: coal. Energy produced by types of coal.
-  ENERGY_SOURCE_TYPE_COAL = 3;
-  // energy source: oil. Petroleum products (primarily crude oil and its derivative fuel oils).
-  ENERGY_SOURCE_TYPE_OIL = 4;
-  // energy source: natural-gas. Hydrocarbon gas liquids (HGL) that occur as gases at atmospheric pressure and as liquids under higher pressures including Natural gas (C5H12 and heavier), Ethane (C2H6), Propane (C3H8), etc.
-  ENERGY_SOURCE_TYPE_NATURAL_GAS = 5;
-  // energy source: nuclear. Energy produced from the cores of atoms (i.e., through nuclear fission or fusion).
-  ENERGY_SOURCE_TYPE_NUCLEAR = 6;
-  // energy source: wind. Energy produced from moving air.
-  ENERGY_SOURCE_TYPE_WIND = 7;
-  // energy source: solar. Energy produced from the sun (i.e., solar radiation).
-  ENERGY_SOURCE_TYPE_SOLAR = 8;
-  // energy source: geothermal. Energy produced from heat within the earth.
-  ENERGY_SOURCE_TYPE_GEOTHERMAL = 9;
-  // energy source: hydropower. Energy produced from flowing water.
-  ENERGY_SOURCE_TYPE_HYDROPOWER = 10;
-  // energy source: biofuel. Liquid fuels produced from biomass feedstocks (i.e., organic materials such as plants or animals).
-  ENERGY_SOURCE_TYPE_BIOFUEL = 11;
+  repeated ExternalReference external_references = 5;
 }
 
 // A measure of energy.
 message EnergyMeasureType {
+  enum EnergyMeasureUnitType {
+    ENERGY_MEASURE_UNIT_TYPE_UNSPECIFIED = 0;
+    // kilowatt-hour (kWh) is the energy delivered by one kilowatt (kW) of power for one hour (h) (the default unit).
+    ENERGY_MEASURE_UNIT_TYPE_KILOWATT_HOURS = 1;
+  }
+
   // Quantity of energy.
   float value = 1;
   // Unit of energy.
   EnergyMeasureUnitType unit = 2;
 }
 
-enum EnergyMeasureUnitType {
-  ENERGY_MEASURE_UNIT_TYPE_UNSPECIFIED = 0;
-  // kilowatt-hour (kWh) is the energy delivered by one kilowatt (kW) of power for one hour (h) (the default unit).
-  ENERGY_MEASURE_UNIT_TYPE_KILOWATT_HOURS = 1;
-}
 
 // A measure of carbon dioxide (CO2).
 message CO2MeasureType {
+  enum CO2MeasureUnitType {
+    CO2_MEASURE_UNIT_TYPE_UNSPECIFIED = 0;
+    // Tonnes (t) of carbon dioxide (CO2) equivalent (eq) (the default unit).
+    CO2_MEASURE_UNIT_TYPE_TONNES_CO2_EQUIVALENT = 1;
+  }
+
   // Quantity of carbon dioxide (CO2).
   float value = 1;
   // Unit of carbon dioxide (CO2).
   CO2MeasureUnitType unit = 2;
 }
 
-enum CO2MeasureUnitType {
-  CO2_MEASURE_UNIT_TYPE_UNSPECIFIED = 0;
-  // Tonnes (t) of carbon dioxide (CO2) equivalent (eq) (the default unit).
-  CO2_MEASURE_UNIT_TYPE_TONNES_CO2_EQUIVALENT = 1;
-}
 
 // An address used to identify a contactable location.
 message PostalAddressType {
