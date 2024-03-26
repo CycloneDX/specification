@@ -1155,10 +1155,12 @@ message ModelCard {
     message EnvironmentalConsiderations {
       // Describes energy consumption information incurred for one or more component lifecycle activities.
       repeated EnergyConsumption energyConsumptions = 1;
+      // Specifies optional, custom properties for environment considerations
+      repeated Property properties = 2;
     }
     // Describes energy consumption information incurred for the specified lifecycle activity.
     message EnergyConsumption {
-      // An activity that is part of a machine learning model development or operational lifecycle.
+      // The type of activity that is part of a machine learning model development or operational lifecycle.
       ActivityType activity = 1;
       // The providers of the energy consumed by the associated model development lifecycle activity.
       repeated EnergyProviderType energyProviders = 2;
@@ -1168,6 +1170,8 @@ message ModelCard {
       optional CO2MeasureType co2CostEquivalent = 4;
       // The CO2 offset or credit for the CO2 equivalent cost.
       optional CO2MeasureType co2CostOffset = 5;
+      // Specifies optional, custom properties for environment considerations
+      repeated Property properties = 6;
     }
   }
 }
@@ -1209,6 +1213,8 @@ message EnergyProviderType {
   EnergySourceType energySource = 5;
   // The energy provided by the energy source for an associated activity.
   EnergyMeasureType energyProvided = 6;
+  // Provides the ability to document external references related to the BOM or to the project the BOM describes.
+  repeated ExternalReference external_references = 7;
 }
 
 enum EnergySourceType {
