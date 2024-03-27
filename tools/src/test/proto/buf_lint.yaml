@@ -1,0 +1,22 @@
+# This is the config for "Buf" - a ProtocolBuffer linter/checker/more
+# see https://buf.build/docs/configuration/v1/buf-yaml
+version: v1
+lint:  # https://buf.build/docs/configuration/v1/buf-yaml#lint
+  use:  # see https://buf.build/docs/lint/rules
+    - DEFAULT  # https://buf.build/docs/lint/rules#default
+  except:
+    # directory/file layout does not match the recommendation/framework of the tool
+    - DIRECTORY_SAME_PACKAGE   # https://buf.build/docs/lint/rules#directory_same_package
+    - PACKAGE_DIRECTORY_MATCH  # https://buf.build/docs/lint/rules#package_lower_snake_case
+    - FILE_LOWER_SNAKE_CASE    # https://buf.build/docs/lint/rules#file_lower_snake_case
+    # we do not stick to the following best-practices and recommendations:
+    # (shall be fixed with v2.0 of this very schema)
+    - PACKAGE_VERSION_SUFFIX   # https://buf.build/docs/lint/rules#package_version_suffix
+    - FIELD_LOWER_SNAKE_CASE   # https://buf.build/docs/lint/rules#field_lower_snake_case
+  ignore_only:
+    DEFAULT:  # https://buf.build/docs/lint/rules#default
+      # legacy schema files may NOT stick to the rules -- this is acknowledged.
+      - "schema/bom-1.5.proto"
+      - "schema/bom-1.4.proto"
+      - "schema/bom-1.3.proto"
+  allow_comment_ignores: true  # the so-called "baseline" is done by annotating exceptions

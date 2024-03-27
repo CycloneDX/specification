@@ -1,0 +1,207 @@
+# proto-file: schema/bom-1.6.proto
+# proto-message: Bom
+
+spec_version: "1.6"
+version: 1
+serial_number: "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79"
+metadata {
+  timestamp {
+    seconds: 3173618478
+    nanos: 3
+  }
+  component {
+    type: CLASSIFICATION_APPLICATION
+    bom_ref: "acme-stock-application"
+    name: "Acme SaaSBOM Example"
+    version: "2022-1"
+  }
+}
+services {
+  bom_ref: "stock-ticker-service"
+  provider {
+    name: "Acme Inc"
+    url: "https://example.com"
+  }
+  group: "com.example"
+  name: "Stock Ticker Service"
+  version:"2022-1"
+  endpoints: "https://example.com/"
+  endpoints: "https://example.com/app"
+  authenticated: true
+  trustZone:  "Acme Public Zone"
+  data {
+    flow: DATA_FLOW_BI_DIRECTIONAL
+    value: "Customer"
+    name: "Consumer to Stock Service",
+    description: "Traffic to/from consumer to service"
+    governance: {
+      owners: [
+        {
+          organization: {
+            name: "Customer Name"
+          }
+        }
+      ]
+    },
+    source: "https://0.0.0.0"
+    destination: "https://0.0.0.0"
+  }
+  data {
+    flow: DATA_FLOW_BI_DIRECTIONAL
+    value: "PII"
+    name: "Stock Service to MS-1"
+    description: "Traffic to/from stock service to microservice-1"
+    source: "urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#ms-1.example.com"
+    destination: "urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#ms-1.example.com"
+  }
+  data {
+    flow: DATA_FLOW_BI_DIRECTIONAL
+    value: "PIFI"
+    name: "Stock Service to MS-2"
+    description: "Traffic to/from stock service to microservice-2"
+    source: "urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#ms-2.example.com"
+    destination: "urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#ms-2.example.com"
+  }
+  data {
+    flow: DATA_FLOW_BI_DIRECTIONAL
+    value: "Public"
+    name: "Stock Service to MS-3"
+    description: "Traffic to/from stock service to microservice-3"
+    source: "urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#ms-3.example.com"
+    destination: "urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#ms-3.example.com"
+  }
+  external_references {
+    type: EXTERNAL_REFERENCE_TYPE_DOCUMENTATION
+    url: "https://example.com/app/swagger"
+  }
+  services {
+    bom_ref: "ms-1.example.com"
+    provider {
+      name: "Acme Inc"
+      url: "https://example.com"
+    }
+    group: "com.example"
+    name: "Microservice 1"
+    version:"2022-1"
+    endpoints: "https://ms-1.example.com"
+    authenticated: true
+    trustZone:  "Acme Private Zone"
+    data {
+      flow: DATA_FLOW_BI_DIRECTIONAL
+      value: "PII"
+      name: "Stock Service to MS-1"
+      description: "Traffic to/from stock service to microservice-1"
+      source: "urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#stock-ticker-service"
+      destination: "urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#stock-ticker-service"
+    }
+    data {
+      flow: DATA_FLOW_BI_DIRECTIONAL
+      value: "PII"
+      name: "MS-1 to Database"
+      description: "Traffic to/from microservice-1 to database"
+      source: "urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#ms-1-pgsql.example.com"
+      destination: "urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#ms-1-pgsql.example.com"
+    }
+    external_references {
+      type: EXTERNAL_REFERENCE_TYPE_DOCUMENTATION
+      url: "https://ms-1.example.com/swagger"
+    }
+  }
+  services {
+    bom_ref: "ms-2.example.com"
+    provider {
+      name: "Acme Inc"
+      url: "https://example.com"
+    }
+    group: "com.example"
+    name: "Microservice 2"
+    version:"2022-1"
+    endpoints: "https://ms-2.example.com"
+    authenticated: true
+    trustZone:  "Acme Private Zone"
+    data {
+      flow: DATA_FLOW_BI_DIRECTIONAL
+      value: "PIFI"
+      name: "Stock Service to MS-2"
+      description: "Traffic to/from stock service to microservice-2"
+      source: "urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#stock-ticker-service"
+      destination: "urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#stock-ticker-service"
+    }
+    external_references {
+      type: EXTERNAL_REFERENCE_TYPE_DOCUMENTATION
+      url: "https://ms-2.example.com/swagger"
+    }
+  }
+  services {
+    bom_ref: "ms-3.example.com"
+    provider {
+      name: "Acme Inc"
+      url: "https://example.com"
+    }
+    group: "com.example"
+    name: "Microservice 3"
+    version:"2022-1"
+    endpoints: "https://ms-3.example.com"
+    authenticated: true
+    trustZone:  "Acme Private Zone"
+    data {
+      flow: DATA_FLOW_BI_DIRECTIONAL
+      value: "Public"
+      name: "Stock Service to MS-3"
+      description: "Traffic to/from stock service to microservice-3"
+      source: "urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#stock-ticker-service"
+      destination: "urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#stock-ticker-service"
+    }
+    data {
+      flow: DATA_FLOW_OUTBOUND
+      value: "Public"
+      name: "MS-3 to S3"
+      description: "Data pushed from microservice-3 to S3 bucket"
+      destination: "urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#s3-example.amazon.com"
+    }
+    external_references {
+      type: EXTERNAL_REFERENCE_TYPE_DOCUMENTATION
+      url: "https://ms-3.example.com/swagger"
+    }
+  }
+  services {
+    bom_ref: "ms-1-pgsql.example.com"
+    group: "org.postgresql"
+    name: "Postgres"
+    version:"14.1"
+    description: "Postgres database for Microservice #1"
+    endpoints: "https://ms-1-pgsql.example.com:5432"
+    authenticated: true
+    trustZone:  "Acme Private Zone"
+    data {
+      flow: DATA_FLOW_BI_DIRECTIONAL
+      value: "PII"
+      name: "MS-1 to Database"
+      description: "Traffic to/from microservice-1 to database"
+      source: "urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#ms-1.example.com"
+      destination: "urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#ms-1.example.com"
+    }
+  }
+  services {
+    bom_ref: "s3-example.amazon.com"
+    group: "com.amazon"
+    name: "S3"
+    description: "S3 bucket"
+    endpoints:  "https://s3-example.amazon.com"
+    authenticated: true
+    trustZone:  "Public Internet"
+    data {
+      flow: DATA_FLOW_INBOUND
+      value: "PII"
+      name: "MS-3 to S3"
+      description: "Data pushed from microservice-3 to S3 bucket"
+      source: "urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#ms-3.example.com"
+    }
+  }
+}
+dependencies {
+  ref: "pkg:maven/com.acme/stock-java-client@1.0.12"
+  dependencies {
+    ref: "b2a46a4b-8367-4bae-9820-95557cfe03a8"
+  }
+}

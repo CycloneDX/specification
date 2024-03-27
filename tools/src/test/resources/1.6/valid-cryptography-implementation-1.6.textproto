@@ -1,0 +1,71 @@
+# proto-file: schema/bom-1.6.proto
+# proto-message: Bom
+
+# proto-file: schema/bom-1.6.proto
+# proto-message: 
+
+spec_version: "1.6"
+version: 1
+serial_number: "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79"
+metadata: {
+  component: {
+    type: CLASSIFICATION_APPLICATION
+    bom_ref: "acme-application"
+    name: "Acme Application"
+    version: "1.0"
+  }
+}
+components: [
+  {
+    type: CLASSIFICATION_CRYPTOGRAPHIC_ASSET
+    bom_ref: "aes128gcm"
+    name: "AES"
+    cryptoProperties: {
+      assetType: CRYPTO_ASSET_TYPE_ALGORITHM
+      algorithmProperties: {
+        primitive: CRYPTO_PRIMITIVE_AE
+        parameterSetIdentifier: "128"
+        executionEnvironment: CRYPTO_EXECUTION_ENVIRONMENT_SOFTWARE_PLAIN_RAM
+        implementationPlatform: CRYPTO_IMPLEMENTATION_PLATFORM_X86_64
+        certificationLevel: [ "none" ],
+        mode: CRYPTO_ALGORITHM_MODE_GCM
+        cryptoFunctions: [
+          CRYPTO_ALGORITHM_FUNCTION_KEYGEN,
+          CRYPTO_ALGORITHM_FUNCTION_ENCRYPT,
+          CRYPTO_ALGORITHM_FUNCTION_DECRYPT,
+          CRYPTO_ALGORITHM_FUNCTION_TAG
+        ]
+        classicalSecurityLevel: 128
+        nistQuantumSecurityLevel: 1
+      },
+      oid: "oid:2.16.840.1.101.3.4.1.6"
+    }
+  },
+  {
+    type: CLASSIFICATION_LIBRARY
+    bom_ref: "crypto-library"
+    name: "Crypto library"
+    version: "1.0.0"
+  },
+  {
+    type: CLASSIFICATION_LIBRARY
+    bom_ref: "some-library"
+    name: "Some library"
+    version: "1.0.0"
+  }
+],
+dependencies: [
+  {
+    ref: "acme-application"
+    dependencies {
+      ref: "crypto-library"
+    }
+  },
+  {
+    ref: "crypto-library"
+    provides: [ "aes128gcm" ]
+    dependencies {
+      ref: "some-library"
+    }
+  }
+]

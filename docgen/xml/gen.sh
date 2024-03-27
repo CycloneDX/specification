@@ -17,3 +17,4 @@ generate 1.2
 generate 1.3
 generate 1.4
 generate 1.5
+generate 1.6

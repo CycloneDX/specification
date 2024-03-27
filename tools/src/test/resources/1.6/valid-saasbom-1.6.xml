@@ -1,0 +1,239 @@
+<?xml version="1.0"?>
+<bom serialNumber="urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79" version="1" xmlns="http://cyclonedx.org/schema/bom/1.6">
+    <metadata>
+        <timestamp>2021-01-10T12:00:00Z</timestamp>
+        <component type="application" bom-ref="acme-stock-application">
+            <name>Acme SaaSBOM Example</name>
+            <version>2022-1</version>
+        </component>
+    </metadata>
+    <services>
+        <service bom-ref="stock-ticker-service">
+            <provider>
+                <name>Acme Inc</name>
+                <url>https://example.com</url>
+            </provider>
+            <group>com.example</group>
+            <name>Stock ticker Service</name>
+            <endpoints>
+                <endpoint>https://example.com/</endpoint>
+                <endpoint>https://example.com/app</endpoint>
+            </endpoints>
+            <authenticated>true</authenticated>
+            <trustZone>Acme Public Zone</trustZone>
+            <data>
+                <dataflow name="Consumer to Stock Service" description="Traffic to/from consumer to service">
+                    <classification flow="bi-directional">Customer</classification>
+                    <governance>
+                        <owners>
+                            <owner>
+                                <organization>
+                                    <name>Customer Name</name>
+                                </organization>
+                            </owner>
+                        </owners>
+                    </governance>
+                    <source>
+                        <url>https://0.0.0.0</url>
+                    </source>
+                    <destination>
+                        <url>https://0.0.0.0</url>
+                    </destination>
+                </dataflow>
+                <dataflow name="Stock Service to MS-1" description="Traffic to/from stock service to microservice-1">
+                    <classification flow="bi-directional">PII</classification>
+                    <source>
+                        <url>urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#ms-1.example.com</url>
+                    </source>
+                    <destination>
+                        <url>urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#ms-1.example.com</url>
+                    </destination>
+                </dataflow>
+                <dataflow name="Stock Service to MS-2" description="Traffic to/from stock service to microservice-2">
+                    <classification flow="bi-directional">PIFI</classification>
+                    <source>
+                        <url>urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#ms-2.example.com</url>
+                    </source>
+                    <destination>
+                        <url>urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#ms-2.example.com</url>
+                    </destination>
+                </dataflow>
+                <dataflow name="Stock Service to MS-3" description="Traffic to/from stock service to microservice-3">
+                    <classification flow="bi-directional">Public</classification>
+                    <source>
+                        <url>urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#ms-3.example.com</url>
+                    </source>
+                    <destination>
+                        <url>urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#ms-3.example.com</url>
+                    </destination>
+                </dataflow>
+            </data>
+            <externalReferences>
+                <reference type="documentation">
+                    <url>https://example.com/app/swagger</url>
+                </reference>
+            </externalReferences>
+            <services>
+                <service bom-ref="ms-1.example.com">
+                    <provider>
+                        <name>Acme Inc</name>
+                        <url>https://example.com</url>
+                    </provider>
+                    <group>com.example</group>
+                    <name>Microservice 1</name>
+                    <endpoints>
+                        <endpoint>https://ms-1.example.com</endpoint>
+                    </endpoints>
+                    <authenticated>true</authenticated>
+                    <trustZone>Acme Private Zone</trustZone>
+                    <data>
+                        <dataflow name="Stock Service to MS-1" description="Traffic to/from stock service to microservice-1">
+                            <classification flow="bi-directional">PII</classification>
+                            <source>
+                                <url>urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#stock-ticker-service</url>
+                            </source>
+                            <destination>
+                                <url>urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#stock-ticker-service</url>
+                            </destination>
+                        </dataflow>
+                        <dataflow name="MS-1 to Database" description="Traffic to/from microservice-1 to database">
+                            <classification flow="bi-directional">PII</classification>
+                            <source>
+                                <url>urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#ms-1-pgsql.example.com</url>
+                            </source>
+                            <destination>
+                                <url>urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#ms-1-pgsql.example.com</url>
+                            </destination>
+                        </dataflow>
+                    </data>
+                    <externalReferences>
+                        <reference type="documentation">
+                            <url>https://ms-1.example.com/swagger</url>
+                        </reference>
+                    </externalReferences>
+                </service>
+                <service bom-ref="ms-2.example.com">
+                    <provider>
+                        <name>Acme Inc</name>
+                        <url>https://example.com</url>
+                    </provider>
+                    <group>com.example</group>
+                    <name>Microservice 2</name>
+                    <endpoints>
+                        <endpoint>https://ms-2.example.com</endpoint>
+                    </endpoints>
+                    <authenticated>true</authenticated>
+                    <trustZone>Acme Private Zone</trustZone>
+                    <data>
+                        <dataflow name="Stock Service to MS-2" description="Traffic to/from stock service to microservice-2">
+                            <classification flow="bi-directional">PII</classification>
+                            <source>
+                                <url>urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#stock-ticker-service</url>
+                            </source>
+                            <destination>
+                                <url>urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#stock-ticker-service</url>
+                            </destination>
+                        </dataflow>
+                    </data>
+                    <externalReferences>
+                        <reference type="documentation">
+                            <url>https://ms-2.example.com/swagger</url>
+                        </reference>
+                    </externalReferences>
+                </service>
+                <service bom-ref="ms-3.example.com">
+                    <provider>
+                        <name>Acme Inc</name>
+                        <url>https://example.com</url>
+                    </provider>
+                    <group>com.example</group>
+                    <name>Microservice 3</name>
+                    <endpoints>
+                        <endpoint>https://ms-3.example.com</endpoint>
+                    </endpoints>
+                    <authenticated>true</authenticated>
+                    <trustZone>Acme Private Zone</trustZone>
+                    <data>
+                        <dataflow name="Stock Service to MS-3" description="Traffic to/from stock service to microservice-3">
+                            <classification flow="bi-directional">PII</classification>
+                            <source>
+                                <url>urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#stock-ticker-service</url>
+                            </source>
+                            <destination>
+                                <url>urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#stock-ticker-service</url>
+                            </destination>
+                        </dataflow>
+                        <dataflow name="MS-3 to S3" description="Data pushed from microservice-3 to S3 bucket">
+                            <classification flow="outbound">Public</classification>
+                            <destination>
+                                <url>urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#s3-example.amazon.com</url>
+                            </destination>
+                        </dataflow>
+                    </data>
+                    <externalReferences>
+                        <reference type="documentation">
+                            <url>https://ms-3.example.com/swagger</url>
+                        </reference>
+                    </externalReferences>
+                </service>
+                <service bom-ref="ms-1-pgsql.example.com">
+                    <group>org.postgresql</group>
+                    <name>Postgres</name>
+                    <version>14.1</version>
+                    <description>Postgres database for Microservice #1</description>
+                    <endpoints>
+                        <endpoint>https://ms-1-pgsql.example.com:5432</endpoint>
+                    </endpoints>
+                    <authenticated>true</authenticated>
+                    <trustZone>Acme Private Zone</trustZone>
+                    <data>
+                        <dataflow name="MS-1 to Database" description="Traffic to/from microservice-1 to database">
+                            <classification flow="bi-directional">PII</classification>
+                            <source>
+                                <url>urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#ms-1.example.com</url>
+                            </source>
+                            <destination>
+                                <url>urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#ms-1.example.com</url>
+                            </destination>
+                        </dataflow>
+                    </data>
+                </service>
+                <service bom-ref="s3-example.amazon.com">
+                    <group>com.amazon</group>
+                    <name>S3</name>
+                    <description>S3 bucket</description>
+                    <endpoints>
+                        <endpoint>https://s3-example.amazon.com</endpoint>
+                    </endpoints>
+                    <authenticated>true</authenticated>
+                    <trustZone>Public Internet</trustZone>
+                    <data>
+                        <dataflow name="MS-3 to S3" description="Data pushed from microservice-3 to S3 bucket">
+                            <classification flow="inbound">Public</classification>
+                            <source>
+                                <url>urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#ms-3.example.com</url>
+                            </source>
+                        </dataflow>
+                    </data>
+                </service>
+            </services>
+        </service>
+    </services>
+    <dependencies>
+        <dependency ref="acme-stock-application">
+            <dependency ref="stock-ticker-service"/>
+        </dependency>
+        <dependency ref="stock-ticker-service">
+            <dependency ref="ms-1.example.com"/>
+            <dependency ref="ms-2.example.com"/>
+            <dependency ref="ms-3.example.com"/>
+        </dependency>
+        <dependency ref="ms-1.example.com">
+            <dependency ref="ms-1-pgsql.example.com"/>
+        </dependency>
+        <dependency ref="ms-2.example.com" />
+        <dependency ref="ms-3.example.com">
+            <dependency ref="s3-example.amazon.com"/>
+        </dependency>
+    </dependencies>
+</bom>
