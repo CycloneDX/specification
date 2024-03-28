@@ -1231,6 +1231,9 @@
           "description": "If SPDX does not define the license used, this field may be used to provide the license name",
           "examples": ["Acme Software License"]
         },
+        "acknowledgement": {
+          "$ref": "#/definitions/licenseAcknowledgementEnumeration"
+        },
         "text": {
           "title": "License text",
           "description": "An optional way to include the textual content of a license.",
@@ -1406,6 +1409,19 @@
         }
       }
     },
+    "licenseAcknowledgementEnumeration": {
+      "title": "License Acknowledgement",
+      "description": "Declared licenses and concluded licenses represent two different stages in the licensing process within software development. Declared licenses refer to the initial intention of the software authors regarding the licensing terms under which their code is released. On the other hand, concluded licenses are the result of a comprehensive analysis of the project's codebase to identify and confirm the actual licenses of the components used, which may differ from the initially declared licenses. While declared licenses provide an upfront indication of the licensing intentions, concluded licenses offer a more thorough understanding of the actual licensing within a project, facilitating proper compliance and risk management. Observed licenses are defined in `@.evidence.licenses`. Observed licenses form the evidence necessary to substantiate a concluded license.",
+      "type": "string",
+      "enum": [
+        "declared",
+        "concluded"
+      ],
+      "meta:enum": {
+        "declared": "Declared licenses represent the initial intentions of authors regarding the licensing terms of their code.",
+        "concluded": "Concluded licenses are verified and confirmed."
+      }
+    },
     "licenseChoice": {
       "title": "License Choice",
       "description": "EITHER (list of SPDX licenses and/or named licenses) OR (tuple of one SPDX License Expression)",
@@ -1445,6 +1461,9 @@
                   "Apache-2.0 AND (MIT OR GPL-2.0-only)",
                   "GPL-3.0-only WITH Classpath-exception-2.0"
                 ]
+              },
+              "acknowledgement": {
+                "$ref": "#/definitions/licenseAcknowledgementEnumeration"
               },
               "bom-ref": {
                 "$ref": "#/definitions/refType",
