@@ -348,6 +348,11 @@ limitations under the License.
                     <xs:documentation>The name of the organization</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="address" type="bom:postalAddressType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The physical address (location) of the organization.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:element name="url" type="xs:anyURI" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                     <xs:documentation>The URL of the organization. Multiple URLs are allowed.</xs:documentation>
@@ -3209,7 +3214,7 @@ limitations under the License.
                         <xs:element name="ethicalConsiderations" minOccurs="0" maxOccurs="1">
                             <xs:annotation>
                                 <xs:documentation>
-                                    What are the ethical (or environmental) risks involved in the application of this model?
+                                    What are the ethical risks involved in the application of this model?
                                 </xs:documentation>
                             </xs:annotation>
                             <xs:complexType>
@@ -3236,6 +3241,13 @@ limitations under the License.
                                     </xs:element>
                                 </xs:sequence>
                             </xs:complexType>
+                        </xs:element>
+                        <xs:element name="environmentalConsiderations" type="bom:environmentalConsiderationsType" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    What are the various environmental impacts the corresponding machine learning model has exhibited across its lifecycle?
+                                </xs:documentation>
+                            </xs:annotation>
                         </xs:element>
                         <xs:element name="fairnessAssessments" minOccurs="0" maxOccurs="1">
                             <xs:annotation>
@@ -3293,6 +3305,438 @@ limitations under the License.
                 <xs:documentation>
                     An optional identifier which can be used to reference the model card elsewhere in the BOM.
                     Every bom-ref MUST be unique within the BOM.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="environmentalConsiderationsType">
+        <xs:annotation>
+            <xs:documentation>
+                Describes various environmental impact metrics.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="energyConsumptions" type="bom:energyConsumptionsType" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Describes energy consumption information incurred for one or more component lifecycle activities.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Provides the ability to document properties in a name/value store.
+                        This provides flexibility to include data not officially supported in the standard
+                        without having to use additional namespaces or create extensions. Property names
+                        of interest to the general public are encouraged to be registered in the
+                        CycloneDX Property Taxonomy - https://github.com/CycloneDX/cyclonedx-property-taxonomy.
+                        Formal registration is OPTIONAL.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="energyConsumptionsType">
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="energyConsumption" type="bom:energyConsumptionType"/>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##any" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:complexType name="energyConsumptionType">
+        <xs:annotation>
+            <xs:documentation>
+                Describes energy consumption information incurred for the specified lifecycle activity.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="activity" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The type of activity that is part of a machine learning model development or operational lifecycle.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="design">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    model design including problem framing, goal definition and algorithm selection.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="data-collection">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    model data acquisition including search, selection and transfer.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="data-preparation">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    model data preparation including data cleaning, labeling and conversion.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="training">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    model building, training and generalized tuning.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="fine-tuning">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    refining a trained model to produce desired outputs for a given problem space.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="validation">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    model validation including model output evaluation and testing.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="deployment">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    explicit model deployment to a target hosting infrastructure.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="inference">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    generating an output response from a hosted model from a set of inputs.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="other">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    a lifecycle activity type whose description does not match currently defined values.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="energyProviders" type="bom:energyProviderType" minOccurs="1" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        The provider(s) of the energy consumed by the associated model development lifecycle activity.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="activityEnergyCost" type="bom:energyMeasureType" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The total energy cost associated with the model lifecycle activity.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="co2CostEquivalent" type="bom:co2MeasureType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The CO2 cost (debit) equivalent to the total energy cost.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="co2CostOffset" type="bom:co2MeasureType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The CO2 offset (credit) for the CO2 equivalent cost.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Provides the ability to document properties in a name/value store.
+                        This provides flexibility to include data not officially supported in the standard
+                        without having to use additional namespaces or create extensions. Property names
+                        of interest to the general public are encouraged to be registered in the
+                        CycloneDX Property Taxonomy - https://github.com/CycloneDX/cyclonedx-property-taxonomy.
+                        Formal registration is OPTIONAL.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="energyMeasureType">
+        <xs:annotation>
+            <xs:documentation>
+                A measure of energy.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="value" type="xs:decimal" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Quantity of energy.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="unit" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Unit of energy.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="kWh">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    kilowatt-hour (kWh) is the energy delivered by one kilowatt (kW) of power for one hour (h).
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="co2MeasureType">
+        <xs:annotation>
+            <xs:documentation>
+                A measure of carbon dioxide (CO2).
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="value" type="xs:decimal" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Quantity of carbon dioxide (CO2).
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="unit" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Unit of carbon dioxide (CO2).
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="tCO2eq">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Tonnes (t) of carbon dioxide (CO2) equivalent (eq).
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="energyProviderType">
+        <xs:annotation>
+            <xs:documentation>
+                Describes the physical provider of energy used for model development or operations.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        A description of the energy provider.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="organization" type="bom:organizationalEntity" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The organization of the energy provider.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="energySource" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The energy source for the energy provider.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="coal">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Energy produced by types of coal.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="oil">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Petroleum products (primarily crude oil and its derivative fuel oils).
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="natural-gas">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Hydrocarbon gas liquids (HGL) that occur as gases at atmospheric pressure and as liquids under higher pressures including Natural gas (C5H12 and heavier), Ethane (C2H6), Propane (C3H8), etc.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="nuclear">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Energy produced from the cores of atoms (i.e., through nuclear fission or fusion).
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="wind">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Energy produced from moving air.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="solar">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Energy produced from the sun (i.e., solar radiation).
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="geothermal">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Energy produced from heat within the earth.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="hydropower">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Energy produced from flowing water.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="biofuel">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Liquid fuels produced from biomass feedstocks (i.e., organic materials such as plants or animals).
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="unknown">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The energy source is unknown.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="other">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    An energy source that is not listed.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:enumeration>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="energyProvided" type="bom:energyMeasureType" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The energy provided by the energy source for an associated activity.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="externalReferences" type="bom:externalReferences" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>External references provide a way to document systems, sites, and information that may be relevant but are not included with the BOM. They may also establish specific relationships within or external to the BOM.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="bom-ref" type="bom:refType">
+            <xs:annotation>
+                <xs:documentation>
+                    An optional identifier which can be used to reference the energy provider elsewhere in the BOM.
+                    Uniqueness is enforced within all elements and children of the root-level bom element.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="postalAddressType">
+        <xs:annotation>
+            <xs:documentation>
+                An address used to identify a contactable location.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="country" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The country name or the two-letter ISO 3166-1 country code.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="region" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The region or state in the country. For example, Texas.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="locality" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The locality or city within the country. For example, Austin.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="postOfficeBoxNumber" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The post office box number. For example, 901.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="postalCode" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The postal code. For example, 78758.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="streetAddress" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The street address. For example, 100 Main Street.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="bom-ref" type="bom:refType">
+            <xs:annotation>
+                <xs:documentation>
+                    An optional identifier which can be used to reference the address elsewhere in the BOM.
+                    Uniqueness is enforced within all elements and children of the root-level bom element.
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>

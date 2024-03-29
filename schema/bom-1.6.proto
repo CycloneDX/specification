@@ -537,6 +537,8 @@ message OrganizationalEntity {
   repeated OrganizationalContact contact = 3;
   // An optional identifier which can be used to reference the object elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
   optional string bom_ref = 4;
+  // The physical address (location) of the organization
+  optional PostalAddressType address = 5;
 }
 
 enum PatchClassification {
@@ -1145,10 +1147,12 @@ message ModelCard {
     repeated string technicalLimitations = 3;
     // What are the known tradeoffs in accuracy/performance of the model?
     repeated string performanceTradeoffs = 4;
-    // What are the ethical (or environmental) risks involved in the application of this model?
+    // What are the ethical risks involved in the application of this model?
     repeated EthicalConsiderations ethicalConsiderations = 5;
     // How does the model affect groups at risk of being systematically disadvantaged? What are the harms and benefits to the various affected groups?
     repeated FairnessAssessments fairnessAssessments = 6;
+    // What are the various environmental impacts the corresponding machine learning model has exhibited across its lifecycle?
+    optional EnvironmentalConsiderations environmentalConsiderations = 7;
 
     message EthicalConsiderations {
       // The name of the risk.
@@ -1166,7 +1170,142 @@ message ModelCard {
       // With respect to the benefits and harms outlined, please describe any mitigation strategy implemented.
       optional string mitigationStrategy = 4;
     }
+    message EnvironmentalConsiderations {
+      // Describes energy consumption information incurred for one or more component lifecycle activities.
+      repeated EnergyConsumption energyConsumptions = 1;
+      // Specifies optional, custom properties for environment considerations
+      repeated Property properties = 2;
+    }
+    // Describes energy consumption information incurred for the specified lifecycle activity.
+    message EnergyConsumption {
+      // An activity that is part of a machine learning model development or operational lifecycle.
+      enum ActivityType {
+        ACTIVITY_TYPE_UNSPECIFIED = 0;
+        // a lifecycle activity type whose description does not match currently defined values (the default type).
+        ACTIVITY_TYPE_OTHER = 1;
+        // model design including problem framing, goal definition and algorithm selection.
+        ACTIVITY_TYPE_DESIGN = 2;
+        // model data acquisition including search, selection and transfer.
+        ACTIVITY_TYPE_DATA_COLLECTION = 3;
+        // model data preparation including data cleaning, labeling and conversion.
+        ACTIVITY_TYPE_DATA_PREPARATION = 4;
+        // model building, training and generalized tuning.
+        ACTIVITY_TYPE_TRAINING = 5;
+        // refining a trained model to produce desired outputs for a given problem space.
+        ACTIVITY_TYPE_FINE_TUNING = 6;
+        // model validation including model output evaluation and testing.
+        ACTIVITY_TYPE_VALIDATION = 7;
+        // explicit model deployment to a target hosting infrastructure.
+        ACTIVITY_TYPE_DEPLOYMENT = 8;
+        // generating an output response from a hosted model from a set of inputs.
+        ACTIVITY_TYPE_INFERENCE = 9;
+      }
+
+      // The type of activity that is part of a machine learning model development or operational lifecycle.
+      ActivityType activity = 1;
+      // The providers of the energy consumed by the associated model development lifecycle activity.
+      repeated EnergyProviderType energyProviders = 2;
+      // The total energy cost associated with the model lifecycle activity.
+      EnergyMeasureType activityEnergyCost = 3;
+      // The CO2 cost or debit equivalent to the total energy cost.
+      optional CO2MeasureType co2CostEquivalent = 4;
+      // The CO2 offset or credit for the CO2 equivalent cost.
+      optional CO2MeasureType co2CostOffset = 5;
+      // Specifies optional, custom properties for environment considerations
+      repeated Property properties = 6;
+    }
   }
+}
+
+
+// Describes the physical provider of energy used for model development or operations.
+message EnergyProviderType {
+  enum EnergySourceType {
+    ENERGY_SOURCE_TYPE_UNSPECIFIED = 0;
+    // energy source: unknown. The energy source is unknown.
+    ENERGY_SOURCE_TYPE_UNKNOWN = 1;
+    // energy source: other. An energy source that is not listed.
+    ENERGY_SOURCE_TYPE_OTHER = 2;
+    // energy source: coal. Energy produced by types of coal.
+    ENERGY_SOURCE_TYPE_COAL = 3;
+    // energy source: oil. Petroleum products (primarily crude oil and its derivative fuel oils).
+    ENERGY_SOURCE_TYPE_OIL = 4;
+    // energy source: natural-gas. Hydrocarbon gas liquids (HGL) that occur as gases at atmospheric pressure and as liquids under higher pressures including Natural gas (C5H12 and heavier), Ethane (C2H6), Propane (C3H8), etc.
+    ENERGY_SOURCE_TYPE_NATURAL_GAS = 5;
+    // energy source: nuclear. Energy produced from the cores of atoms (i.e., through nuclear fission or fusion).
+    ENERGY_SOURCE_TYPE_NUCLEAR = 6;
+    // energy source: wind. Energy produced from moving air.
+    ENERGY_SOURCE_TYPE_WIND = 7;
+    // energy source: solar. Energy produced from the sun (i.e., solar radiation).
+    ENERGY_SOURCE_TYPE_SOLAR = 8;
+    // energy source: geothermal. Energy produced from heat within the earth.
+    ENERGY_SOURCE_TYPE_GEOTHERMAL = 9;
+    // energy source: hydropower. Energy produced from flowing water.
+    ENERGY_SOURCE_TYPE_HYDROPOWER = 10;
+    // energy source: biofuel. Liquid fuels produced from biomass feedstocks (i.e., organic materials such as plants or animals).
+    ENERGY_SOURCE_TYPE_BIOFUEL = 11;
+  }
+
+  // BOM unique reference to the energy provider.
+  optional string bom_ref = 1;
+  // A description of the energy provider.
+  string description = 2;
+  // The organization of the energy provider.
+  OrganizationalEntity organization = 3;
+  // The energy source for the energy provider.
+  EnergySourceType energySource = 4;
+  // The energy provided by the energy source for an associated activity.
+  EnergyMeasureType energyProvided = 5;
+  // Provides the ability to document external references related to the BOM or to the project the BOM describes.
+  repeated ExternalReference external_references = 6;
+}
+
+// A measure of energy.
+message EnergyMeasureType {
+  enum EnergyMeasureUnitType {
+    ENERGY_MEASURE_UNIT_TYPE_UNSPECIFIED = 0;
+    // kilowatt-hour (kWh) is the energy delivered by one kilowatt (kW) of power for one hour (h) (the default unit).
+    ENERGY_MEASURE_UNIT_TYPE_KILOWATT_HOURS = 1;
+  }
+
+  // Quantity of energy.
+  float value = 1;
+  // Unit of energy.
+  EnergyMeasureUnitType unit = 2;
+}
+
+
+// A measure of carbon dioxide (CO2).
+message CO2MeasureType {
+  enum CO2MeasureUnitType {
+    CO2_MEASURE_UNIT_TYPE_UNSPECIFIED = 0;
+    // Tonnes (t) of carbon dioxide (CO2) equivalent (eq) (the default unit).
+    CO2_MEASURE_UNIT_TYPE_TONNES_CO2_EQUIVALENT = 1;
+  }
+
+  // Quantity of carbon dioxide (CO2).
+  float value = 1;
+  // Unit of carbon dioxide (CO2).
+  CO2MeasureUnitType unit = 2;
+}
+
+
+// An address used to identify a contactable location.
+message PostalAddressType {
+  // An optional identifier which can be used to reference the address elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.
+  optional string bom_ref = 1;
+  // The country name or the two-letter ISO 3166-1 country code.
+  optional string country = 2;
+  // The region or state in the country. For example, Texas.
+  optional string region = 3;
+  // The locality or city within the country. For example, Austin.
+  optional string locality = 4;
+  // The post office box number. For example, 901.
+  optional string postOfficeBoxNumber = 5;
+  // The postal code. For example, 78758.
+  optional string postalCodeue = 6;
+  // The street address. For example, 100 Main Street.
+  optional string streetAddress = 7;
 }
 
 enum ModelParameterApproachType {
@@ -1497,6 +1636,7 @@ message InputType {
   repeated Property properties = 7;
 }
 
+// Type that represents various output data types and formats.
 message OutputType {
   // Describes the type of data output.
   optional OutputTypeType type = 1;
@@ -1525,6 +1665,7 @@ message OutputType {
   }
 }
 
+// Type that permits a choice to reference a resource using an iternal bom-ref identifier or an external reference.
 message ResourceReferenceChoice {
   oneof choice {
     string ref = 1;
