@@ -159,7 +159,7 @@
    <xsl:param name="externalCSSURL"></xsl:param>
 
    <!-- Link to JQuery. -->
-   <xsl:param name="jQueryURL">https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js</xsl:param>
+   <xsl:param name="jQueryURL">https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js</xsl:param>
 
    <!-- Link base to Bootstrap CSS and JS. The files
         <bootstrapURL>/css/bootstrap.min.css and
@@ -339,11 +339,13 @@
                         <li class="dropdown">
                            <a href="#" class="dropdown-toggle version-selector" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">v<xsl:value-of select="$cycloneDxVersion"/> (XML)<span class="caret"></span></a>
                            <ul class="dropdown-menu">
+                              <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.6/json/">v1.6 (JSON)</a></li>
                               <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.5/json/">v1.5 (JSON)</a></li>
                               <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.4/json/">v1.4 (JSON)</a></li>
                               <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.3/json/">v1.3 (JSON)</a></li>
                               <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.2/json/">v1.2 (JSON)</a></li>
                               <li style="padding:0"><hr class="dropdown-divider"/></li>
+                              <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.6/xml/">v1.6 (XML)</a></li>
                               <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.5/xml/">v1.5 (XML)</a></li>
                               <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.4/xml/">v1.4 (XML)</a></li>
                               <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.3/xml/">v1.3 (XML)</a></li>
