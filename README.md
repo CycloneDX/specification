@@ -11,10 +11,12 @@ OWASP CycloneDX is a full-stack Bill of Materials (BOM) standard that provides a
 * Software-as-a-Service Bill of Materials (SaaSBOM)
 * Hardware Bill of Materials (HBOM)
 * Machine Learning Bill of Materials (ML-BOM)
+* Cryptography Bill of Materials (CBOM)
 * Manufacturing Bill of Materials (MBOM)
 * Operations Bill of Materials (OBOM)
 * Vulnerability Disclosure Reports (VDR)
-* Vulnerability Exploitability eXchange (VEX).
+* Vulnerability Exploitability eXchange (VEX)
+* CycloneDX Attestations (CDXA)
 
 
 ## Introduction
@@ -47,30 +49,24 @@ The following media types are officially registered with IANA:
 | application/vnd.cyclonedx+xml | XML | [IANA](https://www.iana.org/assignments/media-types/application/vnd.cyclonedx+xml) |
 | application/vnd.cyclonedx+json | JSON | [IANA](https://www.iana.org/assignments/media-types/application/vnd.cyclonedx+json) |
 
-Specific versions of CycloneDX can be specified by using the version parameter. For example: `application/vnd.cyclonedx+xml; version=1.3`.
+Specific versions of CycloneDX can be specified by using the version parameter. For example: `application/vnd.cyclonedx+xml; version=1.6`.
 
 The officially supported media type for Protocol Buffer format is `application/x.vnd.cyclonedx+protobuf`.
 
 
 ## Release History
 
-| Version | Release Date |
-| ------- | ------------ |
-| CycloneDX 1.5 | 26 June 2023 |
-| CycloneDX 1.4 | 12 January 2022 |
-| CycloneDX 1.3 | 04 May 2021 |
-| CycloneDX 1.2 | 26 May 2020 |
-| CycloneDX 1.1 | 03 March 2019 |
-| CycloneDX 1.0 | 26 March 2018 |
-| Initial Prototype | 01 May 2017 |
+| Version           | Release Date    |
+|-------------------|-----------------|
+| CycloneDX 1.6     | 09 April 2024   |
+| CycloneDX 1.5     | 26 June 2023    |
+| CycloneDX 1.4     | 12 January 2022 |
+| CycloneDX 1.3     | 04 May 2021     |
+| CycloneDX 1.2     | 26 May 2020     |
+| CycloneDX 1.1     | 03 March 2019   |
+| CycloneDX 1.0     | 26 March 2018   |
+| Initial Prototype | 01 May 2017     |
 
-
-## Related Work
-[SPDX (Software Package Data Exchange)][spdx-url] is a specification that provides low-level details of components, including all files, hashes, authors, and copyrights. SPDX also defines over 300 open source license IDs. CycloneDX builds on top of the work SPDX has accomplished with license IDs, but varies greatly in its approach towards building a software bill of material specification.
-
-[SWID (ISO/IEC 19770-2:2015)][swid-url] is used primarily to identify installed software and is the preferred format of the NVD. SWID tags are used in the National Vulnerability Database to describe vulnerable components. The CycloneDX specification complements this work as CycloneDX documents can incorporate SWID tags and other high-level SWID metadata and optionally include entire SWID documents. Use of SWID tag ID's are useful in determining if a specific component has known vulnerabilities.
-
-[CPE (Common Platform Enumeration)][cpe-url] is a specification that describes the vendor, name, and version for an application, operating system, or hardware device. CPE identifiers are used in the National Vulnerability Database to describe vulnerable components. The CycloneDX specification complements this work as CycloneDX documents can easily be used to construct exact CPE identifiers that are useful in determining if a specific component has known vulnerabilities.
 
 ## Copyright & License
 
@@ -80,6 +76,3 @@ Permission to modify and redistribute is granted under the terms of the [Apache 
 
 [license-image]: https://img.shields.io/badge/license-apache%20v2-brightgreen.svg
 [license-url]: https://github.com/CycloneDX/specification/blob/master/LICENSE
-[spdx-url]: https://spdx.org
-[swid-url]: https://www.iso.org/standard/65666.html
-[cpe-url]: https://nvd.nist.gov/products/cpe
