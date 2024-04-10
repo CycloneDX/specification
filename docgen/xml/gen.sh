@@ -2,14 +2,14 @@
 set -eu
 
 THIS_PATH="$(realpath "$(dirname "$0")")"
-SCHEMA_DIR="$(realpath "$THIS_DIR/../../schema")"
-DOCS_DIR="$THIS_DIR/docs"
+SCHEMA_PATH="$(realpath "$THIS_PATH/../../schema")"
+DOCS_PATH="$THIS_PATH/docs"
 
 SAXON_JAR='Saxon-HE-9.9.1-8.jar'
 
 rm -f -R docs
-if [ ! -f "$THIS_DIR/$SAXON_JAR" ]; then
-  curl --output-dir "$THIS_DIR" -O \
+if [ ! -f "$THIS_PATH/$SAXON_JAR" ]; then
+  curl --output-dir "$THIS_PATH" -O \
     "https://repo1.maven.org/maven2/net/sf/saxon/Saxon-HE/9.9.1-8/$SAXON_JAR"
 fi
 
@@ -18,10 +18,10 @@ generate () {
   title="CycloneDX v$version XML Reference"
   echo "Generating: $title"
 
-  java -jar "$THIS_DIR/$SAXON_JAR" \
-    -s:"$SCHEMA_DIR/bom-${version}.xsd" \
-    -xsl:"$THIS_DIR/xs3p.xsl" \
-    -o:"$DOCS_DIR/$version/index.html" \
+  java -jar "$THIS_PATH/$SAXON_JAR" \
+    -s:"$SCHEMA_PATH/bom-${version}.xsd" \
+    -xsl:"$THIS_PATH/xs3p.xsl" \
+    -o:"$DOCS_PATH/$version/index.html" \
     cycloneDxVersion="$version" \
     title="$title"
 }
