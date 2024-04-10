@@ -10,7 +10,7 @@ TEST_RES_DIR='tools/src/test/resources'
 
 REMOTE="https://github.com/${GITHUB_REPOSITORY:-CycloneDX/specification}.git"
 
-BUF_IMAGE_VERSION='1.30.0'
+BUF_IMAGE_VERSION='1.30.1'
 
 
 ## ----
