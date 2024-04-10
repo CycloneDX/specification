@@ -25,8 +25,8 @@ generate () {
   if [ -f "$STRICT_SCHEMA_FILE" ]; then
       SCHEMA_FILE="$STRICT_SCHEMA_FILE"
   fi
-
   echo "$SCHEMA_FILE"
+
   generate-schema-doc \
     --config no_link_to_reused_ref \
     --config no_show_breadcrumbs \
@@ -34,8 +34,9 @@ generate () {
     --deprecated-from-description \
     --config title="$title" \
     --config custom_template_path="$TEMPLATES_DIR/cyclonedx/base.html" \
-    --minify "$SCHEMA_FILE" \
-     "$DOCS_DIR/$version/index.html"
+    --minify \
+    "$SCHEMA_FILE" \
+    "$DOCS_DIR/$version/index.html"
 
   sed -i -e "s/\${quotedTitle}/\"$title\"/g" "$DOCS_DIR/$version/index.html"
   sed -i -e "s/\${title}/$title/g" "$DOCS_DIR/$version/index.html"
