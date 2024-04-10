@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-THIS_DIR="$(dirname "$0")"
+THIS_PATH="$(realpath "$(dirname "$0")")"
 SCHEMA_DIR="$(realpath "$THIS_DIR/../../schema")"
 DOCS_DIR="$THIS_DIR/docs"
 TEMPLATES_DIR="$THIS_DIR/templates"
