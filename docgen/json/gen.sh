@@ -12,6 +12,7 @@ mkdir -p "$DOCS_PATH/"{1.2,1.3,1.4,1.5,1.6}
 # Check to see if generate-schema-doc is executable and is in the path. If not, install JSON Schema for Humans.
 if ! [ -x "$(command -v generate-schema-doc)" ]
 then
+  # dependencies managed externally, so dependebot/renovate can pick it up
   pip3 install -r "$THIS_PATH/requirements.txt"
 fi
 
