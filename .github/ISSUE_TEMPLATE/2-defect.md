@@ -10,7 +10,7 @@ labels: defect
 THank you for taking the time to file a report.  
 -->
 
-## Describe the bug
+## Describe the defect
 
 A clear and concise description of what the defect appears to be.
 
