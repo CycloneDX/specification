@@ -10,6 +10,8 @@ TEST_RES_DIR='tools/src/test/resources'
 
 REMOTE="https://github.com/${GITHUB_REPOSITORY:-CycloneDX/specification}.git"
 
+BUF_IMAGE_VERSION='1.30.1'
+
 
 ## ----
 
@@ -28,7 +30,7 @@ function schema-lint () {
     --volume "${ROOT_PATH}/${SCHEMA_DIR}:/workspace/${SCHEMA_DIR}:ro" \
     --volume "${THIS_PATH}/buf_lint.yaml:/workspace/buf.yaml:ro" \
     --workdir '/workspace' \
-    bufbuild/buf:1.30.0 \
+    bufbuild/buf:"$BUF_IMAGE_VERSION" \
       lint --path "$SCHEMA_DIR" \
       --config 'buf.yaml' \
       --error-format "$LOG_FORMAT"
@@ -59,7 +61,7 @@ function schema-breaking-version () {
       --volume "${ROOT_PATH}/${SCHEMA_DIR}/${OLD}:/workspace/${SCHEMA_DIR_OLD}/${NEW}:ro" \
       --volume "${THIS_PATH}/buf_breaking-version.yaml:/workspace/buf.yaml:ro" \
       --workdir '/workspace' \
-      bufbuild/buf:1.30.0 \
+      bufbuild/buf:"$BUF_IMAGE_VERSION" \
         breaking "$SCHEMA_DIR" \
         --against "$SCHEMA_DIR_OLD" \
         --config 'buf.yaml' \
@@ -87,7 +89,7 @@ function schema-breaking-remote () {
     --volume "${ROOT_PATH}/${SCHEMA_DIR}:/workspace/${SCHEMA_DIR}:ro" \
     --volume "${THIS_PATH}/buf_breaking-remote.yaml:/workspace/buf.yaml:ro" \
     --workdir '/workspace' \
-    bufbuild/buf:1.30.0 \
+    bufbuild/buf:"$BUF_IMAGE_VERSION" \
       breaking "$SCHEMA_DIR" \
       --against "${REMOTE}#subdir=${SCHEMA_DIR}" \
       --config 'buf.yaml' \
@@ -113,7 +115,7 @@ function schema-functional () {
       --volume "${ROOT_PATH}/${SCHEMA_DIR}:/workspace/${SCHEMA_DIR}:ro" \
       --volume "${FILE}:/workspace/test_res:ro" \
       --workdir '/workspace' \
-      bufbuild/buf:1.30.0 \
+      bufbuild/buf:"$BUF_IMAGE_VERSION" \
         convert "${SCHEMA_DIR}/${SCHEMA_FILE}" \
         --type "$MESSAGE" \
         --from 'test_res#format=txtpb' \
