@@ -1,7 +1,7 @@
 name: Defect Report
-description: File a defect report.
+about: File a defect report.
 title: "[Defect]: <your title here>"
-labels: ["defect"]
+labels: defect
 ----
 
 <!-- 
