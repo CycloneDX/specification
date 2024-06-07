@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: request or propose a core enhancement or feature 
+about: Request or propose a core enhancement or feature 
 title: "[FEATURE]: <your title here>"
 labels: proposed core enhancement
 
