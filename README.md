@@ -4,6 +4,20 @@
 [![Slack Invite](https://img.shields.io/badge/Slack-Join-blue?logo=slack&labelColor=393939)](https://cyclonedx.org/slack/invite)
 [![Group Discussion](https://img.shields.io/badge/discussion-groups.io-blue.svg)](https://groups.io/g/CycloneDX)
 [![Twitter](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&label=Follow)](https://twitter.com/CycloneDX_Spec)
+[![ECMA TC54](https://img.shields.io/badge/ECMA-TC54-FC7C00?labelColor=404040)](https://tc54.org)
+
+
+# NOTICE: Opt-out review period
+> Opt-out review period: 25 April 2024 to 25 June 2024
+> Review Material: [TC54/2024/011](https://members.ecma-international.org:5001/sharing/a5WruJ6ga)
+> 
+> Dear TC54 members,
+> 
+> This is to announce the beginning of the Opt-out review period for new ECMA-4xx draft standard from 25 April 2024 to 25 June 2024. See the Ecma RF policy extension and consult your company's legal department for more details on this process. Please > feel free to reach out to me if you have any questions.
+>
+>All possible opt-out requests should be submitted to the Ecma Secretariat directly. The Opt-out form is available on the [Ecma website](https://ecma-international.org/policies/by-ipr/).
+
+
 
 # CycloneDX Specification
 OWASP CycloneDX is a full-stack Bill of Materials (BOM) standard that provides advanced supply chain capabilities for cyber risk reduction. The specification supports:
