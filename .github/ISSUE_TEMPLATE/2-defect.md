@@ -2,7 +2,7 @@
 name: Defect Report
 about: File a defect report.
 title: "[Defect]: <your title here>"
-labels: defect\
+labels: defect
 
 ---
 
