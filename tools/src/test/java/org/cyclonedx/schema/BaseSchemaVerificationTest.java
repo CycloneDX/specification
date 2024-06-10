@@ -29,6 +29,7 @@ public abstract class BaseSchemaVerificationTest {
         files.addAll(getResources("1.3/"));
         files.addAll(getResources("1.4/"));
         files.addAll(getResources("1.5/"));
+        files.addAll(getResources("1.6/"));
         return files;
     }
 
