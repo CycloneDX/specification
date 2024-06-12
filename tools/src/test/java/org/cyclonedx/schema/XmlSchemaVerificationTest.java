@@ -53,8 +53,6 @@ public class XmlSchemaVerificationTest extends BaseSchemaVerificationTest {
                     schemaVersion = Version.VERSION_14;
                 } else if (file.endsWith("-1.5.xml")) {
                     schemaVersion = Version.VERSION_15;
-                } else if (file.endsWith("-1.6.xml")) {
-                    schemaVersion = Version.VERSION_16;
                 } else {
                     schemaVersion = null;
                 }
