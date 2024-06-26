@@ -7,15 +7,13 @@
 [![ECMA TC54](https://img.shields.io/badge/ECMA-TC54-FC7C00?labelColor=404040)](https://tc54.org)
 
 
-# NOTICE: Opt-out review period
-> Opt-out review period: 25 April 2024 to 25 June 2024
-> Review Material: [TC54/2024/011](https://members.ecma-international.org:5001/sharing/a5WruJ6ga)
+# NOTICE: End of opt-out review period
 > 
 > Dear TC54 members,
 > 
-> This is to announce the beginning of the Opt-out review period for new ECMA-4xx draft standard from 25 April 2024 to 25 June 2024. See the Ecma RF policy extension and consult your company's legal department for more details on this process. Please > feel free to reach out to me if you have any questions.
+> This is to inform you that for the CycloneDX Bill of materials specification, draft standard, by the end of the opt-out review period 25 June 2024, no opt-out requests have been submitted to the Ecma Secretariat.
 >
->All possible opt-out requests should be submitted to the Ecma Secretariat directly. The Opt-out form is available on the [Ecma website](https://ecma-international.org/policies/by-ipr/).
+> Please note that, from an editorial point of view, the final version that will be up for GA approval on 26 June 2024, may include some differences from the “frozen specification” of the standard. From the substance point of view no changes are permitted.
 
 
 
