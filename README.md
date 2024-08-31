@@ -11,8 +11,8 @@
 OWASP CycloneDX is a full-stack Bill of Materials (BOM) standard that provides advanced supply chain capabilities for 
 cyber risk reduction. CycloneDX is an [Ecma International](https://ecma-international.org/) standard published as 
 [ECMA-424](https://ecma-international.org/publications-and-standards/standards/ecma-424/). 
-The [OWASP Foundation](https://owasp.org/) and Ecma International Technical Committee for Software & System Transparency 
-([TC54](https://tc54.org/)) drive the continued advancement of the specification.
+The [OWASP Foundation](https://owasp.org/) and Ecma International [Technical Committee for Software & System Transparency (TC54)](https://tc54.org/) 
+drive the continued advancement of the specification.
 
 The specification supports:
 * Software Bill of Materials (SBOM)
