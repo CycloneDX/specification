@@ -26,6 +26,12 @@ The specification supports:
 * Vulnerability Exploitability eXchange (VEX)
 * CycloneDX Attestations (CDXA)
 
+## A Note on the Standard and Schemas
+CycloneDX is an Ecma International standard published as ECMA-424 under a [royalty-free patent policy](https://ecma-international.org/policies/by-ipr/royalty-free-patent-policy-extension-option/). 
+The CycloneDX schemas in this repository are the official interpretations of the standard and are available under the
+[Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0.txt). The JSON Schema is the reference implementation 
+for the standard.
+
 ## Use Cases
 The CycloneDX project maintains a [list of achievable use cases](https://cyclonedx.org/use-cases/). Examples for each
 use case are provided in both XML and JSON.
