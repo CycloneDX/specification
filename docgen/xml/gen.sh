@@ -5,19 +5,27 @@ THIS_PATH="$(realpath "$(dirname "$0")")"
 SCHEMA_PATH="$(realpath "$THIS_PATH/../../schema")"
 DOCS_PATH="$THIS_PATH/docs"
 
-SAXON_JAR='Saxon-HE-9.9.1-8.jar'
+SAXON_VERSION='10.9'
 
-rm -f -R docs
+# --
+
+
+rm -rf "$DOCS_PATH"
+
+
+SAXON_JAR="Saxon-HE-${SAXON_VERSION}.jar"
 if [ ! -f "$THIS_PATH/$SAXON_JAR" ]; then
   curl --output-dir "$THIS_PATH" -O \
-    "https://repo1.maven.org/maven2/net/sf/saxon/Saxon-HE/9.9.1-8/$SAXON_JAR"
+    "https://repo1.maven.org/maven2/net/sf/saxon/Saxon-HE/$SAXON_VERSION/$SAXON_JAR"
 fi
+
 
 generate () {
   version="$1"
   title="CycloneDX v$version XML Reference"
   echo "Generating: $title"
 
+  ## docs: https://www.saxonica.com/documentation10/index.html#!using-xsl/commandline
   java -jar "$THIS_PATH/$SAXON_JAR" \
     -s:"$SCHEMA_PATH/bom-${version}.xsd" \
     -xsl:"$THIS_PATH/xs3p.xsl" \
