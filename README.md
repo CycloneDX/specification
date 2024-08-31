@@ -7,18 +7,13 @@
 [![ECMA TC54](https://img.shields.io/badge/ECMA-TC54-FC7C00?labelColor=404040)](https://tc54.org)
 
 
-# NOTICE: End of opt-out review period
-> 
-> Dear TC54 members,
-> 
-> This is to inform you that for the CycloneDX Bill of materials specification, draft standard, by the end of the opt-out review period 25 June 2024, no opt-out requests have been submitted to the Ecma Secretariat.
->
-> Please note that, from an editorial point of view, the final version that will be up for GA approval on 26 June 2024, may include some differences from the “frozen specification” of the standard. From the substance point of view no changes are permitted.
+# CycloneDX Bill of Materials Specification (ECMA-424)
+OWASP CycloneDX is a full-stack Bill of Materials (BOM) standard that provides advanced supply chain capabilities for 
+cyber risk reduction. CycloneDX is an Ecma International standard published as [ECMA-424](https://ecma-international.org/publications-and-standards/standards/ecma-424/).
+The OWASP Foundation and Ecma International Technical Committee for Software & System Transparency ([TC54](https://tc54.org/)) 
+drive the continued advancement of the specification.
 
-
-
-# CycloneDX Specification
-OWASP CycloneDX is a full-stack Bill of Materials (BOM) standard that provides advanced supply chain capabilities for cyber risk reduction. The specification supports:
+The specification supports:
 * Software Bill of Materials (SBOM)
 * Software-as-a-Service Bill of Materials (SaaSBOM)
 * Hardware Bill of Materials (HBOM)
@@ -29,18 +24,6 @@ OWASP CycloneDX is a full-stack Bill of Materials (BOM) standard that provides a
 * Vulnerability Disclosure Reports (VDR)
 * Vulnerability Exploitability eXchange (VEX)
 * CycloneDX Attestations (CDXA)
-
-
-## Introduction
-Modern software is assembled using third-party and open source components, glued together in complex and unique ways,
-and integrated with original code to achieve the desired functionality. An accurate inventory of all components enables
-organizations to identify risk, allows for greater transparency, and enables rapid impact analysis.
-
-CycloneDX was created for this purpose.
-
-Strategic direction and maintenance of the specification is managed by the CycloneDX Core Working Group, is backed by the 
-[OWASP Foundation](https://owasp.org), and is supported by the global information security community.
-
 
 ## Use Cases
 The CycloneDX project maintains a [list of achievable use cases](https://cyclonedx.org/use-cases/). Examples for each
