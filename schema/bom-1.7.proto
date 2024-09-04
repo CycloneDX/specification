@@ -106,7 +106,7 @@ message Component {
   optional string group = 7;
   // The name of the component. This will often be a shortened, single name of the component. Examples: commons-lang3 and jquery
   string name = 8;
-  // The component version. The version should ideally comply with semantic versioning but is not enforced. Version was made optional in v1.4 of the spec. For backward compatibility, it is RECOMMENDED to use an empty string to represent components without version information.
+  // The component version. The version should ideally comply with semantic versioning but is not enforced. Version was made optional in v1.4 of the spec. For backward compatibility, it is recommended to use an empty string to represent components without version information.
   string version = 9;
   // Specifies a description for the component
   optional string description = 10;
@@ -134,12 +134,12 @@ message Component {
   // Specifies optional, custom, properties
   repeated Property properties = 22;
   // Specifies optional license and copyright evidence
-  optional Evidence evidence = 23;
+  repeated Evidence evidence = 23;
   // Specifies optional release notes.
   optional ReleaseNotes releaseNotes = 24;
   // A model card describes the intended uses of a machine learning model, potential limitations, biases, ethical considerations, training parameters, datasets used to train the model, performance metrics, and other relevant data useful for ML transparency.
   optional ModelCard modelCard = 25;
-  // This object SHOULD be specified for any component of type `data` and MUST NOT be specified for other component types.
+  // This object SHOULD be specified for any component of type `data` and must not be specified for other component types.
   optional ComponentData data = 26;
   // Cryptographic assets have properties that uniquely define them and that make them actionable for further reasoning. As an example, it makes a difference if one knows the algorithm family (e.g. AES) or the specific variant or instantiation (e.g. AES-128-GCM). This is because the security level and the algorithm primitive (authenticated encryption) is only defined by the definition of the algorithm variant. The presence of a weak cryptographic algorithm like SHA1 vs. HMAC-SHA1 also makes a difference.
   optional CryptoProperties cryptoProperties = 27;
@@ -149,9 +149,9 @@ message Component {
   repeated OrganizationalContact authors = 29;
   // Textual strings that aid in discovery, search, and retrieval of the associated object. Tags often serve as a way to group or categorize similar or related objects by various attributes. Examples include "json-parser", "object-persistence", "text-to-image", "translation", and "object-detection".
   repeated string tags = 30;
-  // Specifies the OmniBOR Artifact ID. The OmniBOR, if specified, MUST be valid and conform to the specification defined at: https://www.iana.org/assignments/uri-schemes/prov/gitoid
+  // Specifies the OmniBOR Artifact ID. The OmniBOR, if specified, must be valid and conform to the specification defined at: https://www.iana.org/assignments/uri-schemes/prov/gitoid
   repeated string omniborId = 31;
-  // Specifies the Software Heritage persistent identifier (SWHID). The SWHID, if specified, MUST be valid and conform to the specification defined at: https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html
+  // Specifies the Software Heritage persistent identifier (SWHID). The SWHID, if specified, must be valid and conform to the specification defined at: https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html
   repeated string swhid = 32;
 }
 
@@ -279,7 +279,7 @@ enum ExternalReferenceType {
   EXTERNAL_REFERENCE_TYPE_CODIFIED_INFRASTRUCTURE = 31;
   // A model card describes the intended uses of a machine learning model, potential limitations, biases, ethical considerations, training parameters, datasets used to train the model, performance metrics, and other relevant data useful for ML transparency.
   EXTERNAL_REFERENCE_TYPE_MODEL_CARD = 32;
-    // Plans of Action and Milestones (POAM) complement an "attestation" external reference. POAM is defined by NIST as a "document that identifies tasks needing to be accomplished. It details resources required to accomplish the elements of the plan, any milestones in meeting the tasks and scheduled completion dates for the milestones".
+  // Plans of Action and Milestones (POA&M) complement an "attestation" external reference. POA&M is defined by NIST as a "document that identifies tasks needing to be accomplished. It details resources required to accomplish the elements of the plan, any milestones in meeting the tasks and scheduled completion dates for the milestones".
   EXTERNAL_REFERENCE_TYPE_POAM = 33;
   // A record of events that occurred in a computer system or application, such as problems, errors, or information on current operations.
   EXTERNAL_REFERENCE_TYPE_LOG = 34;
@@ -375,11 +375,12 @@ message LicenseChoice {
   optional LicenseAcknowledgementEnumeration acknowledgement = 3;
 }
 
+// Specifies the details and attributes related to a software license. It can either include a valid SPDX license identifier or a named license, along with additional properties such as license acknowledgment, comprehensive commercial licensing information, and the full text of the license.
 message License {
   oneof license {
-    // A valid SPDX license ID
+    // A valid SPDX license identifier. If specified, this value must be one of the enumeration of valid SPDX license identifiers defined in the spdx.schema.json (or spdx.xml) subschema which is synchronized with the official SPDX license list.
     string id = 1;
-    // If SPDX does not define the license used, this field may be used to provide the license name
+    // The name of the license. This may include the name of a commercial or proprietary license or an open source license that may not be defined by SPDX.
     string name = 2;
   }
   // Specifies the optional full text of the attachment
@@ -704,7 +705,7 @@ message Composition {
   repeated string dependencies = 3;
   // The bom-ref identifiers of the vulnerabilities being described.
   repeated string vulnerabilities = 4;
-  // An optional identifier which can be used to reference the composition elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.
+  // An optional identifier which can be used to reference the composition elsewhere in the BOM. Every bom-ref must be unique within the BOM.
   optional string bom_ref = 5;
 }
 
@@ -767,7 +768,7 @@ message EvidenceMethods {
 }
 
 message EvidenceOccurrences {
-  // An optional identifier which can be used to reference the occurrence elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.
+  // An optional identifier which can be used to reference the occurrence elsewhere in the BOM. Every bom-ref must be unique within the BOM.
   optional string bom_ref = 1;
   // The location or path to where the component was found.
   string location = 2;
@@ -818,7 +819,7 @@ message Note {
 }
 
 message ReleaseNotes {
-  // The software versioning type. It is RECOMMENDED that the release type use one of 'major', 'minor', 'patch', 'pre-release', or 'internal'. Representing all possible software release types is not practical, so standardizing on the recommended values, whenever possible, is strongly encouraged.
+  // The software versioning type. It is recommended that the release type use one of 'major', 'minor', 'patch', 'pre-release', or 'internal'. Representing all possible software release types is not practical, so standardizing on the recommended values, whenever possible, is strongly encouraged.
   string type = 1;
   // The title of the release.
   optional string title = 2;
@@ -1072,7 +1073,7 @@ message AnnotatorChoice {
 }
 
 message Annotation {
-  // An optional identifier which can be used to reference the annotation elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.
+  // An optional identifier which can be used to reference the annotation elsewhere in the BOM. Every bom-ref must be unique within the BOM.
   optional string bom_ref = 1;
   // The object in the BOM identified by its bom-ref. This is often a component or service but may be any object type supporting bom-refs.
   repeated string subjects = 2;
@@ -1085,7 +1086,7 @@ message Annotation {
 }
 
 message ModelCard {
-  // An optional identifier which can be used to reference the model card elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.
+  // An optional identifier which can be used to reference the model card elsewhere in the BOM. Every bom-ref must be unique within the BOM.
   optional string bom_ref = 1;
   // Hyper-parameters for construction of the model.
   optional ModelParameters modelParameters = 2;
@@ -1302,7 +1303,7 @@ message CO2MeasureType {
 
 // An address used to identify a contactable location.
 message PostalAddressType {
-  // An optional identifier which can be used to reference the address elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.
+  // An optional identifier which can be used to reference the address elsewhere in the BOM. Every bom-ref must be unique within the BOM.
   optional string bom_ref = 1;
   // The country name or the two-letter ISO 3166-1 country code.
   optional string country = 2;
@@ -1333,7 +1334,7 @@ enum ModelParameterApproachType {
 }
 
 message ComponentData {
-  // An optional identifier which can be used to reference the dataset elsewhere in the BOM. Every bom-ref MUST be unique within the BOM.
+  // An optional identifier which can be used to reference the dataset elsewhere in the BOM. Every bom-ref must be unique within the BOM.
   optional string bom_ref = 1;
   // The general theme or subject matter of the data being specified.
   ComponentDataType type = 2;
@@ -1401,7 +1402,7 @@ message GraphicsCollection {
   message Graphic {
     // The name of the graphic.
     optional string name = 1;
-    // The graphic (vector or raster). Base64 encoding MUST be specified for binary images.
+    // The graphic (vector or raster). Base64 encoding must be specified for binary images.
     optional AttachedText image = 2;
   }
 }
@@ -1592,7 +1593,7 @@ message Trigger {
   TriggerType type = 7;
   // The event data that caused the associated trigger to activate.
   optional Event event = 8;
-  // Conditions
+  // A list of conditions used to determine if a trigger should be activated.
   repeated Condition conditions = 9;
   // The date and time (timestamp) when the trigger was activated.
   optional google.protobuf.Timestamp timeActivated = 10;
