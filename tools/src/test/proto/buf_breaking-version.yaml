@@ -1,9 +1,15 @@
 # This is the config for "Buf" - a ProtocolBuffer linter/checker/more
-# see https://buf.build/docs/configuration/v1/buf-yaml
-version: v1
-breaking:  # https://buf.build/docs/configuration/v1/buf-yaml#breaking
+# see https://buf.build/docs/configuration/v2/buf-yaml
+version: v2
+lint:  # https://buf.build/docs/configuration/v2/buf-yaml#lint
+  except:
+    - FIELD_NOT_REQUIRED
+    - PACKAGE_NO_IMPORT_CYCLE
+  disallow_comment_ignores: true
+breaking:  # https://buf.build/docs/configuration/v2/buf-yaml#breaking
   use:  # see https://buf.build/docs/breaking/overview#rules-and-categories
     - WIRE
   except:
-    # scope is to detect changes from one version to the other -> so ignore "FILE_SAME_PACKAGE"
+    - EXTENSION_NO_DELETE
+    - FIELD_SAME_DEFAULT
     - FILE_SAME_PACKAGE
