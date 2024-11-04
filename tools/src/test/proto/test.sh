@@ -69,7 +69,7 @@ function schema-breaking-version () {
   }
 
   compare '1.6' '1.5'
-  echo '>> skip compare' '1.5' '1.4' >&2  # <-- had breaking changes, which is acknowledged
+  compare '1.5' '1.4'
   compare '1.4' '1.3'
 
   echo '>> OK.' >&2
