@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -ue
+set -uex
 
 THIS_PATH="$(realpath "$(dirname "$0")")"
 ROOT_PATH="$(realpath "${THIS_PATH}/../../../..")"
@@ -10,7 +10,7 @@ TEST_RES_DIR='tools/src/test/resources'
 
 REMOTE="https://github.com/${GITHUB_REPOSITORY:-CycloneDX/specification}.git"
 
-BUF_IMAGE_VERSION='1.30.1'
+BUF_IMAGE_VERSION='1.46.0'
 
 
 ## ----
@@ -32,7 +32,6 @@ function schema-lint () {
     --workdir '/workspace' \
     bufbuild/buf:"$BUF_IMAGE_VERSION" \
       lint --path "$SCHEMA_DIR" \
-      --config 'buf.yaml' \
       --error-format "$LOG_FORMAT"
 
   echo '>> OK.' >&2
@@ -57,19 +56,18 @@ function schema-breaking-version () {
     echo ">> compare new:${NEW} -VS- old:${OLD}" >&2
     # stick with the original path of "$NEW", so the reporting makes sense...
     docker run --rm \
-      --volume "${ROOT_PATH}/${SCHEMA_DIR}/${NEW}:/workspace/${SCHEMA_DIR}/${NEW}:ro" \
-      --volume "${ROOT_PATH}/${SCHEMA_DIR}/${OLD}:/workspace/${SCHEMA_DIR_OLD}/${NEW}:ro" \
-      --volume "${THIS_PATH}/buf_breaking-version.yaml:/workspace/buf.yaml:ro" \
-      --workdir '/workspace' \
+      --volume "${ROOT_PATH}/${SCHEMA_DIR}/${OLD}:/workspaces/old/${NEW}:ro" \
+      --volume "${ROOT_PATH}/${SCHEMA_DIR}/${NEW}:/workspaces/new/${NEW}:ro" \
+      --volume "${THIS_PATH}/buf_breaking-version.yaml:/workspaces/new/buf.yaml:ro" \
+      --workdir '/workspaces' \
       bufbuild/buf:"$BUF_IMAGE_VERSION" \
-        breaking "$SCHEMA_DIR" \
-        --against "$SCHEMA_DIR_OLD" \
-        --config 'buf.yaml' \
+        breaking new \
+        --against old \
         --error-format "$LOG_FORMAT"
   }
 
   compare '1.6' '1.5'
-  echo '>> skip compare' '1.5' '1.4' >&2  # <-- had breaking changes, which is acknowledged
+  compare '1.5' '1.4'
   compare '1.4' '1.3'
 
   echo '>> OK.' >&2
@@ -90,9 +88,8 @@ function schema-breaking-remote () {
     --volume "${THIS_PATH}/buf_breaking-remote.yaml:/workspace/buf.yaml:ro" \
     --workdir '/workspace' \
     bufbuild/buf:"$BUF_IMAGE_VERSION" \
-      breaking "$SCHEMA_DIR" \
-      --against "${REMOTE}#subdir=${SCHEMA_DIR}" \
-      --config 'buf.yaml' \
+      breaking --path "$SCHEMA_DIR" \
+      --against "${REMOTE}" \
       --error-format "$LOG_FORMAT"
 
   echo '>> OK.' >&2
