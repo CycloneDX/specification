@@ -177,11 +177,16 @@ message DataFlow {
 // Specifies the flow direction of the data. Valid values are: inbound, outbound, bi-directional, and unknown. Direction is relative to the service. Inbound flow states that data enters the service. Outbound flow states that data leaves the service. Bi-directional states that data flows both ways, and unknown states that the direction is not known.
 // buf:lint:ignore ENUM_VALUE_PREFIX -- Enum value names should be prefixed with "DATA_FLOW_DIRECTION_"
 enum DataFlowDirection {
+  // Default
   // buf:lint:ignore ENUM_ZERO_VALUE_SUFFIX -- `null` is our fallback, doubling `unspecified`
   DATA_FLOW_NULL = 0;
+  // Data that enters a service.
   DATA_FLOW_INBOUND = 1;
+  // Data that exits a service.
   DATA_FLOW_OUTBOUND = 2;
+  // Data flows in and out of the service.
   DATA_FLOW_BI_DIRECTIONAL = 3;
+  // The directional flow of data is not known.
   DATA_FLOW_UNKNOWN = 4;
 }
 
@@ -338,6 +343,7 @@ message IdentifiableAction {
 }
 
 enum IssueClassification {
+  // Default
   // buf:lint:ignore ENUM_ZERO_VALUE_SUFFIX -- `null` is our fallback, doubling `unspecified`
   ISSUE_CLASSIFICATION_NULL = 0;
   // A fault, flaw, or bug in software
@@ -560,6 +566,7 @@ message OrganizationalEntity {
 }
 
 enum PatchClassification {
+  // Default
   // buf:lint:ignore ENUM_ZERO_VALUE_SUFFIX -- `null` is our fallback, doubling `unspecified`
   PATCH_CLASSIFICATION_NULL = 0;
   // A patch which is not developed by the creators or maintainers of the software being patched. Refer to https://en.wikipedia.org/wiki/Unofficial_patch
@@ -944,14 +951,22 @@ message VulnerabilityRating {
   optional string justification = 6;
 }
 
+// Textual representation of the severity of the vulnerability adopted by the analysis method. If the analysis method uses values other than what is provided, the user is expected to translate appropriately.
 enum Severity {
+  // The severity is not known
   // buf:lint:ignore ENUM_ZERO_VALUE_SUFFIX -- `unknown` is our fallback, doubling `unspecified`
   SEVERITY_UNKNOWN = 0;
+  // Critical severity
   SEVERITY_CRITICAL = 1;
+  // High severity
   SEVERITY_HIGH = 2;
+  // Medium severity
   SEVERITY_MEDIUM = 3;
+  // Low severity
   SEVERITY_LOW = 4;
+  // Informational warning.
   SEVERITY_INFO = 5;
+  // None
   SEVERITY_NONE = 6;
 }
 
@@ -1051,10 +1066,15 @@ enum VulnerabilityResponse {
   // unspecified value
   // buf:lint:ignore ENUM_ZERO_VALUE_SUFFIX -- `null` is our fallback, doubling `unspecified`
   VULNERABILITY_RESPONSE_NULL = 0;
+  // Can not fix
   VULNERABILITY_RESPONSE_CAN_NOT_FIX = 1;
+  // Will not fix
   VULNERABILITY_RESPONSE_WILL_NOT_FIX = 2;
+  // Update to a different revision or release
   VULNERABILITY_RESPONSE_UPDATE = 3;
+  // Revert to a previous revision or release
   VULNERABILITY_RESPONSE_ROLLBACK = 4;
+  // There is a workaround available
   VULNERABILITY_RESPONSE_WORKAROUND_AVAILABLE = 5;
 }
 
@@ -1081,7 +1101,9 @@ enum VulnerabilityAffectedStatus {
   // It is unknown (or unspecified) whether the given version is affected.
   // buf:lint:ignore ENUM_ZERO_VALUE_SUFFIX -- `unknown` is our fallback, doubling `unspecified`
   VULNERABILITY_AFFECTED_STATUS_UNKNOWN = 0;
+  // The version is affected by the vulnerability.
   VULNERABILITY_AFFECTED_STATUS_AFFECTED = 1;
+  // The version is not affected by the vulnerability.
   VULNERABILITY_AFFECTED_STATUS_NOT_AFFECTED = 2;
 }
 
@@ -1228,6 +1250,7 @@ message ModelCard {
     message EnergyConsumption {
       // An activity that is part of a machine learning model development or operational lifecycle.
       enum ActivityType {
+        // Default
         ACTIVITY_TYPE_UNSPECIFIED = 0;
         // a lifecycle activity type whose description does not match currently defined values (the default type).
         ACTIVITY_TYPE_OTHER = 1;
@@ -1269,6 +1292,7 @@ message ModelCard {
 // Describes the physical provider of energy used for model development or operations.
 message EnergyProviderType {
   enum EnergySourceType {
+    // Default
     ENERGY_SOURCE_TYPE_UNSPECIFIED = 0;
     // energy source: unknown. The energy source is unknown.
     ENERGY_SOURCE_TYPE_UNKNOWN = 1;
@@ -1311,6 +1335,7 @@ message EnergyProviderType {
 // A measure of energy.
 message EnergyMeasureType {
   enum EnergyMeasureUnitType {
+    //Default
     ENERGY_MEASURE_UNIT_TYPE_UNSPECIFIED = 0;
     // kilowatt-hour (kWh) is the energy delivered by one kilowatt (kW) of power for one hour (h) (the default unit).
     ENERGY_MEASURE_UNIT_TYPE_KILOWATT_HOURS = 1;
@@ -1326,6 +1351,7 @@ message EnergyMeasureType {
 // A measure of carbon dioxide (CO2).
 message CO2MeasureType {
   enum CO2MeasureUnitType {
+    // Default
     CO2_MEASURE_UNIT_TYPE_UNSPECIFIED = 0;
     // Tonnes (t) of carbon dioxide (CO2) equivalent (eq) (the default unit).
     CO2_MEASURE_UNIT_TYPE_TONNES_CO2_EQUIVALENT = 1;
@@ -2002,9 +2028,13 @@ message CryptoProperties {
   enum CryptoAssetType {
     // ProtoBuff's default value
     CRYPTO_ASSET_TYPE_UNSPECIFIED = 0;
+    // Mathematical function commonly used for data encryption, authentication, and digital signatures.
     CRYPTO_ASSET_TYPE_ALGORITHM = 1;
+    // An electronic document that is used to provide the identity or validate a public key.
     CRYPTO_ASSET_TYPE_CERTIFICATE = 2;
+    // A set of rules and guidelines that govern the behavior and communication with each other.
     CRYPTO_ASSET_TYPE_PROTOCOL = 3;
+    // Other cryptographic assets related to algorithms, certificates, and protocols such as keys and tokens.
     CRYPTO_ASSET_TYPE_RELATED_CRYPTO_MATERIAL = 4;
   }
 
@@ -2018,18 +2048,31 @@ message CryptoProperties {
       CRYPTO_PRIMITIVE_UNKNOWN = 1;
       // Another primitive type - none of the following
       CRYPTO_PRIMITIVE_OTHER = 2;
+      // Deterministic Random Bit Generator (DRBG) is a type of pseudorandom number generator designed to produce a sequence of bits from an initial seed value. DRBGs are commonly used in cryptographic applications where reproducibility of random values is important.
       CRYPTO_PRIMITIVE_DRBG = 3;
+      // In cryptography, a Message Authentication Code (MAC) is information used for authenticating and integrity-checking a message.
       CRYPTO_PRIMITIVE_MAC = 4;
+      // A block cipher is a symmetric key algorithm that operates on fixed-size blocks of data. It encrypts or decrypts the data in block units, providing confidentiality. Block ciphers are widely used in various cryptographic modes and protocols for secure data transmission.
       CRYPTO_PRIMITIVE_BLOCK_CIPHER = 5;
+      // A stream cipher is a symmetric key cipher where plaintext digits are combined with a pseudorandom cipher digit stream (keystream).
       CRYPTO_PRIMITIVE_STREAM_CIPHER = 6;
+      // In cryptography, a signature is a digital representation of a message or data that proves its origin, identity, and integrity. Digital signatures are generated using cryptographic algorithms and are widely used for authentication and verification in secure communication.
       CRYPTO_PRIMITIVE_SIGNATURE = 7;
+      // A hash function is a mathematical algorithm that takes an input (or 'message') and produces a fixed-size string of characters, which is typically a hash value. Hash functions are commonly used in various cryptographic applications, including data integrity verification and password hashing.
       CRYPTO_PRIMITIVE_HASH = 8;
+      // Public Key Encryption (PKE) is a type of encryption that uses a pair of public and private keys for secure communication. The public key is used for encryption, while the private key is used for decryption. PKE is a fundamental component of public-key cryptography.
       CRYPTO_PRIMITIVE_PKE = 9;
+      // An XOF is an extendable output function that can take arbitrary input and creates a stream of output, up to a limit determined by the size of the internal state of the hash function that underlies the XOF.
       CRYPTO_PRIMITIVE_XOF = 10;
+      // A Key Derivation Function (KDF) derives key material from another source of entropy while preserving the entropy of the input.
       CRYPTO_PRIMITIVE_KDF = 11;
+      // In cryptography, a key-agreement is a protocol whereby two or more parties agree on a cryptographic key in such a way that both influence the outcome.
       CRYPTO_PRIMITIVE_KEY_AGREE = 12;
+      // A Key Encapsulation Mechanism (KEM) algorithm is a mechanism for transporting random keying material to a recipient using the recipient's public key.
       CRYPTO_PRIMITIVE_KEM = 13;
+      // Authenticated Encryption (AE) is a cryptographic process that provides both confidentiality and data integrity. It ensures that the encrypted data has not been tampered with and comes from a legitimate source. AE is commonly used in secure communication protocols.
       CRYPTO_PRIMITIVE_AE = 14;
+      // A combiner aggregates many candidates for a cryptographic primitive and generates a new candidate for the same primitive.
       CRYPTO_PRIMITIVE_COMBINER = 15;
     }
 
@@ -2041,9 +2084,13 @@ message CryptoProperties {
       CRYPTO_EXECUTION_ENVIRONMENT_UNKNOWN = 1;
       // Another implementation environment - none of the following
       CRYPTO_EXECUTION_ENVIRONMENT_OTHER = 2;
+      // A software implementation running in plain unencrypted RAM.
       CRYPTO_EXECUTION_ENVIRONMENT_SOFTWARE_PLAIN_RAM = 3;
+      // A software implementation running in encrypted RAM.
       CRYPTO_EXECUTION_ENVIRONMENT_SOFTWARE_ENCRYPTED_RAM = 4;
+      // A software implementation running in a trusted execution environment.
       CRYPTO_EXECUTION_ENVIRONMENT_SOFTWARE_TEE = 5;
+      // A hardware implementation.
       CRYPTO_EXECUTION_ENVIRONMENT_HARDWARE = 6;
     }
 
@@ -2077,12 +2124,19 @@ message CryptoProperties {
       CRYPTO_ALGORITHM_MODE_UNKNOWN = 1;
       // Another mode of operation - none of the following
       CRYPTO_ALGORITHM_MODE_OTHER = 2;
+      // Cipher block chaining
       CRYPTO_ALGORITHM_MODE_CBC = 3;
+      // Electronic codebook
       CRYPTO_ALGORITHM_MODE_ECB = 4;
+      // Counter with cipher block chaining message authentication code
       CRYPTO_ALGORITHM_MODE_CCM = 5;
+      // Galois/counter
       CRYPTO_ALGORITHM_MODE_GCM = 6;
+      // Cipher feedback
       CRYPTO_ALGORITHM_MODE_CFB = 7;
+      // Output feedback
       CRYPTO_ALGORITHM_MODE_OFB = 8;
+      // Counter
       CRYPTO_ALGORITHM_MODE_CTR = 9;
     }
 
@@ -2094,10 +2148,15 @@ message CryptoProperties {
       CRYPTO_ALGORITHM_PADDING_UNKNOWN = 1;
       // Another padding scheme - none of the following
       CRYPTO_ALGORITHM_PADDING_OTHER = 2;
+      // Public Key Cryptography Standard: Password-Based Cryptography
       CRYPTO_ALGORITHM_PADDING_PKCS5 = 3;
+      // Public Key Cryptography Standard: Cryptographic Message Syntax
       CRYPTO_ALGORITHM_PADDING_PKCS7 = 4;
+      // Public Key Cryptography Standard: RSA Cryptography v1.5
       CRYPTO_ALGORITHM_PADDING_PKCS1V15 = 5;
+      // Optimal asymmetric encryption padding
       CRYPTO_ALGORITHM_PADDING_OAEP = 6;
+      // Raw
       CRYPTO_ALGORITHM_PADDING_RAW = 7;
     }
 
@@ -2251,11 +2310,17 @@ message CryptoProperties {
       CRYPTO_PROTOCOL_TYPE_UNKNOWN = 1;
       // Another protocol type - none of the following
       CRYPTO_PROTOCOL_TYPE_OTHER = 2;
+      // Transport Layer Security
       CRYPTO_PROTOCOL_TYPE_TLS = 3;
+      // Secure Shell
       CRYPTO_PROTOCOL_TYPE_SSH = 4;
+      // Internet Protocol Security
       CRYPTO_PROTOCOL_TYPE_IPSEC = 5;
+      // Internet Key Exchange
       CRYPTO_PROTOCOL_TYPE_IKE = 6;
+      // Secure Socket Tunneling Protocol
       CRYPTO_PROTOCOL_TYPE_SSTP = 7;
+      // Wi-Fi Protected Access
       CRYPTO_PROTOCOL_TYPE_WPA = 8;
     }
 
