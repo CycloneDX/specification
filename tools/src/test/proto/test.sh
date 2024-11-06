@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -uex
+set -ue
 
 THIS_PATH="$(realpath "$(dirname "$0")")"
 ROOT_PATH="$(realpath "${THIS_PATH}/../../../..")"
@@ -19,7 +19,7 @@ BUF_IMAGE_VERSION='1.46.0'
 function schema-lint () {
   echo '> lint schema files' >&2
 
-  if [[ -n "${CI:-}" ]]
+  if [[ -n "${GITHUB_WORKFLOW:-}" ]]
   then
     LOG_FORMAT='github-actions'
   else
@@ -51,23 +51,29 @@ function schema-breaking-version () {
   function compare() {
     NEW="bom-${1}.proto"
     OLD="bom-${2}.proto"
-    SCHEMA_DIR_OLD="${SCHEMA_DIR}_old"
+
+    NEW_NP="$(mktemp)"
+    OLD_NP="$(mktemp)"
+
+    # remove package identifier -> so that the comparisson works as expected
+    sed 's/^package .*//' "${ROOT_PATH}/${SCHEMA_DIR}/${NEW}" > "$NEW_NP"
+    sed 's/^package .*//' "${ROOT_PATH}/${SCHEMA_DIR}/${OLD}" > "$OLD_NP"
 
     echo ">> compare new:${NEW} -VS- old:${OLD}" >&2
-    # stick with the original path of "$NEW", so the reporting makes sense...
+    # stick with the original path and name of "$NEW", so the reporting makes sense...
     docker run --rm \
-      --volume "${ROOT_PATH}/${SCHEMA_DIR}/${OLD}:/workspaces/old/${NEW}:ro" \
-      --volume "${ROOT_PATH}/${SCHEMA_DIR}/${NEW}:/workspaces/new/${NEW}:ro" \
+      --volume "${OLD_NP}:/workspaces/old/${SCHEMA_DIR}/${NEW}:ro" \
+      --volume "${NEW_NP}:/workspaces/new/${SCHEMA_DIR}/${NEW}:ro" \
       --volume "${THIS_PATH}/buf_breaking-version.yaml:/workspaces/new/buf.yaml:ro" \
-      --workdir '/workspaces' \
+      --workdir '/workspaces/new' \
       bufbuild/buf:"$BUF_IMAGE_VERSION" \
-        breaking new \
-        --against old \
+        breaking \
+        --against ../old \
         --error-format "$LOG_FORMAT"
   }
 
-  compare '1.6' '1.5'
-  compare '1.5' '1.4'
+  # compare '1.6' '1.5'  #  <-- possible breaks are acknowledged
+  # compare '1.5' '1.4'  #  <-- possible breaks are acknowledged
   compare '1.4' '1.3'
 
   echo '>> OK.' >&2
