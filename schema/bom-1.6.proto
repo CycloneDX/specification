@@ -112,6 +112,7 @@ message Component {
   optional string description = 10;
   // Specifies the scope of the component. If a scope is not specified, SCOPE_REQUIRED scope should be assumed by the consumer of the BOM
   optional Scope scope = 11;
+  // The hashes of the component.
   repeated Hash hashes = 12;
   // EITHER (list of SPDX licenses and/or named licenses) OR (tuple of one SPDX License Expression)
   repeated LicenseChoice licenses = 13;
@@ -184,6 +185,7 @@ enum DataFlowDirection {
   DATA_FLOW_UNKNOWN = 4;
 }
 
+// Defines the direct dependencies of a component, service, or the components provided/implemented by a given component. Components or services that do not have their own dependencies must be declared as empty elements within the graph. Components or services that are not represented in the dependency graph may have unknown dependencies. It is recommended that implementations assume this to be opaque and not an indicator of an object being dependency-free. It is recommended to leverage compositions to indicate unknown dependency graphs.
 message Dependency {
   // References a component or service by its bom-ref attribute
   string ref = 1;
@@ -193,6 +195,7 @@ message Dependency {
   repeated string provides = 3;
 }
 
+// The patch file (or diff) that shows changes. Refer to https://en.wikipedia.org/wiki/Diff
 message Diff {
   // Specifies the optional text of the diff
   optional AttachedText text = 1;
@@ -200,6 +203,7 @@ message Diff {
   optional string url = 2;
 }
 
+// External references provide a way to document systems, sites, and information that may be relevant but are not included with the BOM. They may also establish specific relationships within or external to the BOM.
 message ExternalReference {
   // Specifies the type of external reference. There are built-in types to describe common references. If a type does not exist for the reference being referred to, use the "other" type.
   ExternalReferenceType type = 1;
@@ -344,6 +348,7 @@ enum IssueClassification {
   ISSUE_CLASSIFICATION_SECURITY = 3;
 }
 
+// An individual issue that has been resolved.
 message Issue {
   // Specifies the type of issue
   IssueClassification type = 1;
@@ -353,7 +358,9 @@ message Issue {
   optional string name = 3;
   // A description of the issue
   optional string description = 4;
+  // The source of the issue where it is documented
   optional Source source = 5;
+  // A collection of URL's for reference. Multiple URLs are allowed. Example: "https://example.com"
   repeated string references = 6;
 }
 
@@ -367,6 +374,7 @@ message Source {
 
 message LicenseChoice {
   oneof choice {
+    // A license
     License license = 1;
     // A valid SPDX license expression. Refer to https://spdx.org/specifications for syntax requirements
     string expression = 2;
@@ -426,9 +434,12 @@ message Licensing {
   optional google.protobuf.Timestamp expiration = 8;
 }
 
+// EITHER an organization OR an individual
 message OrganizationalEntityOrContact {
   oneof choice {
+    // Organization
     OrganizationalEntity organization = 1;
+    // Individual
     OrganizationalContact individual = 2;
   }
 }
@@ -561,11 +572,13 @@ enum PatchClassification {
   PATCH_CLASSIFICATION_CHERRY_PICK = 4;
 }
 
+// Specifies an individual patch
 message Patch {
   // Specifies the purpose for the patch, including the resolution of defects, security issues, or new behavior or functionality
   PatchClassification type = 1;
   // The patch file (or diff) that show changes. Refer to https://en.wikipedia.org/wiki/Diff
   optional Diff diff = 2;
+  // A collection of issues the patch resolves
   repeated Issue resolves = 3;
 }
 
@@ -609,11 +622,13 @@ message Service {
   optional string version = 5;
   // Specifies a description for the service.
   optional string description = 6;
+  // The endpoint URIs of the service. Multiple endpoints are allowed. Example: "https://example.com/api/v1/ticker"
   repeated string endpoints = 7;
   // A boolean value indicating if the service requires authentication. A value of true indicates the service requires authentication prior to use. A value of false indicates the service does not require authentication.
   optional bool authenticated = 8;
   // A boolean value indicating if the use of the service crosses a trust zone or boundary. A value of true indicates that by using the service, a trust boundary is crossed. A value of false indicates that by using the service, a trust boundary is not crossed.
   optional bool x_trust_boundary = 9;
+  // Specifies information about the data including the directional flow of data and the data classification.
   repeated DataFlow data = 10;
   // EITHER (list of SPDX licenses and/or named licenses) OR (tuple of one SPDX License Expression)
   repeated LicenseChoice licenses = 11;
@@ -631,6 +646,7 @@ message Service {
   repeated string tags = 17;
 }
 
+// Specifies metadata and content for ISO-IEC 19770-2 Software Identification (SWID) Tags.
 message Swid {
   // Maps to the tagId of a SoftwareIdentity.
   string tag_id = 1;
@@ -668,7 +684,9 @@ message Tool {
 
 // Specifies a property
 message Property {
+  // Name (or key)
   string name = 1;
+  // Value
   optional string value = 2;
 }
 
@@ -714,17 +732,22 @@ message EvidenceCopyright {
   string text = 1;
 }
 
+// Provides the ability to document evidence collected through various forms of extraction or analysis.
 message Evidence {
   // EITHER (list of SPDX licenses and/or named licenses) OR (tuple of one SPDX License Expression)
   repeated LicenseChoice licenses = 1;
+  // Copyright evidence captures intellectual property assertions, providing evidence of possible ownership and legal protection.
   repeated EvidenceCopyright copyright = 2;
+  // Evidence that substantiates the identity of a component. The identity may be an object or an array of identity objects. Support for specifying identity as a single object was introduced in CycloneDX v1.5. Arrays were introduced in v1.6. It is recommended that all implementations use arrays, even if only one identity object is specified.
   repeated EvidenceIdentity identity = 3;
+  // Evidence of individual instances of a component spread across multiple locations.
   repeated EvidenceOccurrences occurrences = 4;
+  // Evidence of the components use through the callstack.
   optional Callstack callstack = 5;
 }
 
-// Evidence of the components use through the callstack.
 message Callstack {
+  // Within a call stack, a frame is a discrete unit that encapsulates an execution context, including local variables, parameters, and the return address. As function calls are made, frames are pushed onto the stack, forming an array-like structure that orchestrates the flow of program execution and manages the sequence of function invocations.
   repeated Frames frames = 1;
 
   message Frames {
@@ -811,6 +834,7 @@ enum EvidenceTechnique {
   EVIDENCE_TECHNIQUE_OTHER = 9;
 }
 
+// A note containing the locale and content.
 message Note {
   // The ISO-639 (or higher) language code and optional ISO-3166 (or higher) country code. Examples include: "en", "en-US", "fr" and "fr-CA".
   optional string locale = 1;
@@ -843,6 +867,7 @@ message ReleaseNotes {
   repeated Property properties = 11;
 }
 
+// Defines a weakness in a component or service that could be exploited or triggered by a threat source.
 message Vulnerability {
   // An optional identifier which can be used to reference the vulnerability elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
   optional string bom_ref = 1;
@@ -950,6 +975,7 @@ enum ScoreMethod {
   SCORE_METHOD_SSVC = 7;
 }
 
+// Title and location where advisory information can be obtained. An advisory is a notification of a threat to a component, service, or system.
 message Advisory {
   // An optional name of the advisory.
   optional string title = 1;
@@ -1085,6 +1111,12 @@ message Annotation {
   string text = 5;
 }
 
+/**
+ * A model card describes the intended uses of a machine learning model and potential limitations, including biases and ethical considerations. Model cards typically contain the training parameters, which datasets were used to train the model, performance metrics, and other relevant data useful for ML transparency. This object SHOULD be specified for any component of type `machine-learning-model` and must not be specified for other component types.
+ *
+ * Comment:
+ * Model card support in CycloneDX is derived from TensorFlow Model Card Toolkit released under the Apache 2.0 license and available from https://github.com/tensorflow/model-card-toolkit/blob/main/model_card_toolkit/schema/v0.0.2/model_card.schema.json. In addition, CycloneDX model card support includes portions of VerifyML, also released under the Apache 2.0 license and available from https://github.com/cylynx/verifyml/blob/main/verifyml/model_card_toolkit/schema/v0.0.4/model_card.schema.json.
+ */
 message ModelCard {
   // An optional identifier which can be used to reference the model card elsewhere in the BOM. Every bom-ref must be unique within the BOM.
   optional string bom_ref = 1;
@@ -1112,15 +1144,19 @@ message ModelCard {
     repeated MachineLearningInputOutputParameters outputs = 7;
 
     message Approach {
+      // Learning types describing the learning problem or hybrid learning problem.
       optional ModelParameterApproachType type = 1;
     }
+
     message Datasets {
       oneof choice {
+        // Inline Data Information
         ComponentData dataset = 1;
         // References a data component by the components bom-ref attribute
         string ref = 2;
       }
     }
+
     message MachineLearningInputOutputParameters {
       // The data format for input/output to the model. Example formats include string, image, time-series
       optional string format = 1;
@@ -1129,6 +1165,7 @@ message ModelCard {
   message QuantitativeAnalysis {
     // The model performance metrics being reported. Examples may include accuracy, F1 score, precision, top-3 error rates, MSC, etc.
     repeated PerformanceMetrics performanceMetrics = 1;
+    // A collection of graphics that represent various measurements.
     optional GraphicsCollection graphics = 2;
 
     message PerformanceMetrics {
@@ -1363,6 +1400,7 @@ message ComponentData {
   }
 }
 
+// Data governance captures information regarding data ownership, stewardship, and custodianship, providing insights into the individuals or entities responsible for managing, overseeing, and safeguarding the data throughout its lifecycle.
 message DataGovernance {
   // Data custodians are responsible for the safe custody, transport, and storage of data.
   repeated DataGovernanceResponsibleParty custodians = 1;
@@ -1373,7 +1411,9 @@ message DataGovernance {
 
   message DataGovernanceResponsibleParty {
     oneof choice {
+      // The organization that is responsible for specific data governance role(s).
       OrganizationalEntity organization = 1;
+      // The individual that is responsible for specific data governance role(s).
       OrganizationalContact contact = 2;
     }
   }
@@ -1393,6 +1433,7 @@ enum ComponentDataType {
   COMPONENT_DATA_TYPE_OTHER = 4;
 }
 
+// A collection of graphics that represent various measurements.
 message GraphicsCollection {
   // A description of this collection of graphics.
   optional string description = 1;
@@ -1679,7 +1720,9 @@ message OutputType {
 // Type that permits a choice to reference a resource using an iternal bom-ref identifier or an external reference.
 message ResourceReferenceChoice {
   oneof choice {
+    // References an object by its bom-ref attribute
     string ref = 1;
+    // Reference to an externally accessible resource
     ExternalReference externalReference = 2;
   }
 }
@@ -1734,11 +1777,14 @@ message Parameter {
 
 message EnvironmentVars {
   oneof choice {
+    // Name-value pair
     Property property = 1;
+    // Value
     string value = 2;
   }
 }
 
+// The list of declarations which describe the conformance to standards. Each declaration may include attestations, claims, and evidence.
 message Declarations {
   message Assessor {
     // An optional identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
@@ -1748,8 +1794,13 @@ message Declarations {
     // The entity issuing the assessment.
     optional OrganizationalEntity organization = 3;
   }
+
+  // Attestation
   message Attestation {
+    // Map
     message AttestationMap {
+
+      // Conformance
       message AttestationConformance {
         // The conformance of the claim between and inclusive of 0 and 1, where 1 is 100% conformance.
         optional double score = 1;
@@ -1758,12 +1809,15 @@ message Declarations {
         // The list of  `bom-ref` to the evidence provided describing the mitigation strategies.
         repeated string mitigationStrategies = 3;
       }
+
+      // Confidence
       message AttestationConfidence {
         // The confidence of the claim between and inclusive of 0 and 1, where 1 is 100% confidence.
         optional double score = 1;
         // The rationale for the confidence score.
         optional string rationale = 2;
       }
+
       // The `bom-ref` to the requirement being attested to.
       optional string requirement = 1;
       // The list of `bom-ref` to the claims being attested to.
@@ -1775,6 +1829,7 @@ message Declarations {
       // The confidence of the claim meeting the requirement.
       optional AttestationConfidence confidence = 5;
     }
+
     // The short description explaining the main points of the attestation.
     optional string summary = 1;
     // The `bom-ref` to the assessor asserting the attestation.
@@ -1782,6 +1837,7 @@ message Declarations {
     // The grouping of requirements to claims and the attestors' declared conformance and confidence thereof.
     repeated AttestationMap map = 3;
   }
+
   message Claim {
     // An optional identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
     optional string bom_ref = 1;
@@ -1800,6 +1856,7 @@ message Declarations {
     // External references provide a way to document systems, sites, and information that may be relevant but are not included with the BOM. They may also establish specific relationships within or external to the BOM.
     repeated ExternalReference externalReferences = 8;
   }
+
   message Evidence {
     message Data {
       message Contents {
@@ -1808,6 +1865,7 @@ message Declarations {
         // The URL to where the data can be retrieved.
         optional string url = 2;
       }
+
       // The name of the data.
       optional string name = 1;
       // The contents or references to the contents of the data being described.
@@ -1819,6 +1877,7 @@ message Declarations {
       // Data Governance
       optional DataGovernance governance = 5;
     }
+
     // An optional identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
     optional string bom_ref = 1;
     // The reference to the property name as defined in the CycloneDX Property Taxonomy: https://github.com/CycloneDX/cyclonedx-property-taxonomy/.
@@ -1836,6 +1895,7 @@ message Declarations {
     // The reviewer of the evidence.
     optional OrganizationalContact reviewer = 8;
   }
+
   message Targets {
     // The list of organizations which claims are made against.
     repeated OrganizationalEntity organizations = 1;
@@ -1844,6 +1904,7 @@ message Declarations {
     // The list of services which claims are made against.
     repeated Service services = 3;
   }
+
   message Affirmation {
     message Signatory {
       // The signatory's name.
@@ -1855,11 +1916,13 @@ message Declarations {
       // An External reference provides a way to document systems, sites, and information that may be relevant but are not included with the BOM. They may also establish specific relationships within or external to the BOM.
       optional ExternalReference externalReference = 4;
     }
-    // The brief statement affirmed by an individual regarding all declarations. Notes: This could be an affirmation of acceptance by a third-party auditor or receiving individual of a file.
+
+    // The brief statement affirmed by an individual regarding all declarations. Notes: This could be an affirmation of acceptance by a third-party auditor or receiving individual of a file.  Example: "I certify, to the best of my knowledge, that all information is correct."
     optional string statement = 1;
     // The list of signatories authorized on behalf of an organization to assert validity of this document.
     repeated Signatory signatories = 2;
   }
+
   // The list of assessors evaluating claims and determining conformance to requirements and confidence in that assessment.
   repeated Assessor assessors = 1;
   // The list of attestations asserted by an assessor that maps requirements to claims.
@@ -1870,11 +1933,12 @@ message Declarations {
   repeated Evidence evidence = 4;
   // The list of targets which claims are made against.
   optional Targets targets = 5;
-  // affirmation
+  // A concise statement affirmed by an individual regarding all declarations, often used for third-party auditor acceptance or recipient acknowledgment. It includes a list of authorized signatories who assert the validity of the document on behalf of the organization.
   optional Affirmation affirmation = 6;
 }
 
 message Definition {
+  // A standard may consist of regulations, industry or organizational-specific standards, maturity models, best practices, or any other requirements which can be evaluated against or attested to.
   message Standard {
     message Requirement {
       // An optional identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
@@ -1896,6 +1960,7 @@ message Definition {
       // External references provide a way to document systems, sites, and information that may be relevant but are not included with the BOM. They may also establish specific relationships within or external to the BOM.
       repeated ExternalReference externalReferences = 9;
     }
+
     message Level {
       // An optional identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
       optional string bom_ref = 1;
@@ -1908,6 +1973,7 @@ message Definition {
       // The list of requirement `bom-ref`s that comprise the level.
       repeated string requirements = 5;
     }
+
     // An optional identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
     optional string bom_ref = 1;
     // The name of the standard. This will often be a shortened, single name of the standard.
@@ -1925,10 +1991,14 @@ message Definition {
     // External references provide a way to document systems, sites, and information that may be relevant but are not included with the BOM. They may also establish specific relationships within or external to the BOM.
     repeated ExternalReference externalReferences = 8;
   }
+
+  // The list of standards which may consist of regulations, industry or organizational-specific standards, maturity models, best practices, or any other requirements which can be evaluated against or attested to.
   repeated Standard standards = 1;
 }
 
+// "Cryptographic Properties
 message CryptoProperties {
+  // Asset Type
   enum CryptoAssetType {
     // ProtoBuff's default value
     CRYPTO_ASSET_TYPE_UNSPECIFIED = 0;
@@ -1937,7 +2007,10 @@ message CryptoProperties {
     CRYPTO_ASSET_TYPE_PROTOCOL = 3;
     CRYPTO_ASSET_TYPE_RELATED_CRYPTO_MATERIAL = 4;
   }
+
+  // Algorithm Propertie
   message AlgorithmProperties {
+    // Primitive
     enum CryptoPrimitive {
       // ProtoBuff's default value -- it differs from "unknown"
       CRYPTO_PRIMITIVE_UNSPECIFIED = 0;
@@ -1959,6 +2032,8 @@ message CryptoProperties {
       CRYPTO_PRIMITIVE_AE = 14;
       CRYPTO_PRIMITIVE_COMBINER = 15;
     }
+
+    // Execution Environment
     enum CryptoExecutionEnvironment {
       // ProtoBuff's default value -- it differs from "unknown"
       CRYPTO_EXECUTION_ENVIRONMENT_UNSPECIFIED = 0;
@@ -1971,6 +2046,8 @@ message CryptoProperties {
       CRYPTO_EXECUTION_ENVIRONMENT_SOFTWARE_TEE = 5;
       CRYPTO_EXECUTION_ENVIRONMENT_HARDWARE = 6;
     }
+
+    // Implementation platform
     enum CryptoImplementationPlatform {
       // ProtoBuff's default value -- it differs from "unknown"
       CRYPTO_IMPLEMENTATION_PLATFORM_UNSPECIFIED = 0;
@@ -1991,6 +2068,8 @@ message CryptoProperties {
       CRYPTO_IMPLEMENTATION_PLATFORM_PPC64 = 13;
       CRYPTO_IMPLEMENTATION_PLATFORM_PPC64LE = 14;
     }
+
+    // Mode
     enum CryptoAlgorithmMode {
       // ProtoBuff's default value -- it differs from "unknown"
       CRYPTO_ALGORITHM_MODE_UNSPECIFIED = 0;
@@ -2006,6 +2085,8 @@ message CryptoProperties {
       CRYPTO_ALGORITHM_MODE_OFB = 8;
       CRYPTO_ALGORITHM_MODE_CTR = 9;
     }
+
+    // Padding
     enum CryptoAlgorithmPadding {
       // ProtoBuff's default value -- it differs from "unknown"
       CRYPTO_ALGORITHM_PADDING_UNSPECIFIED = 0;
@@ -2019,6 +2100,8 @@ message CryptoProperties {
       CRYPTO_ALGORITHM_PADDING_OAEP = 6;
       CRYPTO_ALGORITHM_PADDING_RAW = 7;
     }
+
+    // Cryptographic functions
     enum CryptoAlgorithmFunction {
       // ProtoBuff's default value -- it differs from "unknown"
       CRYPTO_ALGORITHM_FUNCTION_UNSPECIFIED = 0;
@@ -2038,6 +2121,7 @@ message CryptoProperties {
       CRYPTO_ALGORITHM_FUNCTION_ENCAPSULATE = 12;
       CRYPTO_ALGORITHM_FUNCTION_DECAPSULATE = 13;
     }
+
     // Cryptographic building blocks used in higher-level cryptographic systems and protocols. Primitives represent different cryptographic routines: deterministic random bit generators (drbg, e.g. CTR_DRBG from NIST SP800-90A-r1), message authentication codes (mac, e.g. HMAC-SHA-256), blockciphers (e.g. AES), streamciphers (e.g. Salsa20), signatures (e.g. ECDSA), hash functions (e.g. SHA-256), public-key encryption schemes (pke, e.g. RSA), extended output functions (xof, e.g. SHAKE256), key derivation functions (e.g. pbkdf2), key agreement algorithms (e.g. ECDH), key encapsulation mechanisms (e.g. ML-KEM), authenticated encryption (ae, e.g. AES-GCM) and the combination of multiple algorithms (combiner, e.g. SP800-56Cr2).
     optional CryptoPrimitive primitive = 1;
     // An identifier for the parameter set of the cryptographic algorithm. Examples: in AES128, '128' identifies the key length in bits, in SHA256, '256' identifies the digest length, '128' in SHAKE128 identifies its maximum security level in bits, and 'SHA2-128s' identifies a parameter set used in SLH-DSA (FIPS205).
@@ -2061,6 +2145,8 @@ message CryptoProperties {
     // The NIST security strength category as defined in https://csrc.nist.gov/projects/post-quantum-cryptography/post-quantum-cryptography-standardization/evaluation-criteria/security-(evaluation-criteria). A value of 0 indicates that none of the categories are met.
     optional int32 nistQuantumSecurityLevel = 11;
   } // end of AlgorithmProperties
+
+  // Certificate Properties
   message CertificateProperties {
     // The subject name for the certificate
     optional string subjectName = 1;
@@ -2079,7 +2165,11 @@ message CryptoProperties {
     // The file extension of the certificate. Examples include crt, pem, cer, der, and p12.
     optional string certificateExtension = 8;
   } // end of CertificateProperties
+
+  // Related Cryptographic Material Properties
   message RelatedCryptoMaterialProperties {
+
+    // relatedCryptoMaterialType
     enum CryptoRelatedType {
       // ProtoBuff's default value -- it differs from "unknown"
       CRYPTO_RELATED_TYPE_UNSPECIFIED = 0;
@@ -2105,6 +2195,8 @@ message CryptoProperties {
       CRYPTO_RELATED_TYPE_CREDENTIAL = 18;
       CRYPTO_RELATED_TYPE_TOKEN = 19;
     }
+
+    // State
     enum CryptoRelatedState {
       // Default
       CRYPTO_RELATED_STATE_UNSPECIFIED = 0;
@@ -2115,12 +2207,15 @@ message CryptoProperties {
       CRYPTO_RELATED_STATE_COMPROMISED = 5;
       CRYPTO_RELATED_STATE_DESTROYED = 6;
     }
+
+    // Secured By
     message CryptoRelatedSecuredBy {
       // Specifies the mechanism by which the cryptographic asset is secured. Examples include HSM, TPM, SGX, Software, and None
       optional string mechanism = 1;
       // The bom-ref to the algorithm.
       optional string algorithmRef = 2;
     }
+
     // The type for the related cryptographic material
     optional CryptoRelatedType type = 1;
     // The optional unique identifier for the related cryptographic material.
@@ -2146,6 +2241,8 @@ message CryptoProperties {
     // The mechanism by which the cryptographic asset is secured.
     optional CryptoRelatedSecuredBy securedBy = 12;
   } // end of RelatedCryptoMaterialProperties
+
+  // Protocol Properties
   message ProtocolProperties {
     enum CryptoProtocolType {
       // ProtoBuff's default value -- it differs from "unknown"
@@ -2161,6 +2258,8 @@ message CryptoProperties {
       CRYPTO_PROTOCOL_TYPE_SSTP = 7;
       CRYPTO_PROTOCOL_TYPE_WPA = 8;
     }
+
+    // Object representing a cipher suite
     message CryptoProtocolCipherSuite {
       // A common name for the cipher suite. For example: TLS_DHE_RSA_WITH_AES_128_CCM
       optional string name = 1;
@@ -2169,6 +2268,8 @@ message CryptoProperties {
       // A list of common identifiers for the cipher suite. For example: 0xC0 and 0x9E
       repeated string identifiers = 3;
     }
+
+    // IKEv2 Transform Types
     message Ikev2TransformTypes {
       // Transform Type 1: encryption algorithms
       repeated string encr = 1;
@@ -2183,6 +2284,7 @@ message CryptoProperties {
       // IKEv2 Authentication method
       repeated string auth = 6;
     }
+
     // The concrete protocol type.
     optional CryptoProtocolType type = 1;
     // The version of the protocol. Examples include 1.0, 1.2, and 1.99.
@@ -2194,6 +2296,7 @@ message CryptoProperties {
     // The bom-ref(s) to protocol-related cryptographic assets
     repeated string cryptoRef = 5;
   } // end of ProtocolProperties
+
   // Cryptographic assets occur in several forms. Algorithms and protocols are most commonly implemented in specialized cryptographic libraries. They may, however, also be 'hardcoded' in software components. Certificates and related cryptographic material like keys, tokens, secrets or passwords are other cryptographic assets to be modelled.
   CryptoAssetType assetType = 1;
   // Additional properties specific to a cryptographic algorithm.
