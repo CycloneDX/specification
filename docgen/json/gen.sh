@@ -7,7 +7,7 @@ DOCS_PATH="$THIS_PATH/docs"
 TEMPLATES_PATH="$THIS_PATH/templates"
 
 rm -f -R "$DOCS_PATH"
-mkdir -p "$DOCS_PATH/"{1.2,1.3,1.4,1.5,1.6}
+mkdir -p "$DOCS_PATH/"{1.2,1.3,1.4,1.5,1.6,1.7}
 
 # Check to see if generate-schema-doc is executable and is in the path. If not, install JSON Schema for Humans.
 if ! [ -x "$(command -v generate-schema-doc)" ]
@@ -50,3 +50,4 @@ generate 1.3
 generate 1.4
 generate 1.5
 generate 1.6
+generate 1.7
