@@ -5315,7 +5315,7 @@
             },
             "nistQuantumSecurityLevel": {
               "type": "integer",
-              "title": "NIST security strength category",
+              "title": "NIST security strength category.",
               "description": "The NIST security strength category as defined in https://csrc.nist.gov/projects/post-quantum-cryptography/post-quantum-cryptography-standardization/evaluation-criteria/security-(evaluation-criteria). A value of 0 indicates that none of the categories are met.",
               "minimum": 0,
               "maximum": 6
@@ -5325,45 +5325,50 @@
         "certificateProperties": {
           "type": "object",
           "title": "Certificate Properties",
-          "description": "Properties for cryptographic assets of asset type 'certificate'",
+          "description": "Properties for cryptographic assets of asset type 'certificate'.",
           "additionalProperties": false,
           "properties": {
+            "serialNumber": {
+              "type": "string",
+              "title": "Serial Number",
+              "description": "The serial number is a unique identifier for the certificate issued by a CA." // TODO: add pattern to validate serial number input
+            },
             "subjectName": {
               "type": "string",
               "title": "Subject Name",
-              "description": "The subject name for the certificate"
+              "description": "The subject name for the certificate."
             },
             "issuerName": {
               "type": "string",
               "title": "Issuer Name",
-              "description": "The issuer name for the certificate"
+              "description": "The issuer name for the certificate."
             },
             "notValidBefore": {
               "type": "string",
               "format": "date-time",
               "title": "Not Valid Before",
-              "description": "The date and time according to ISO-8601 standard from which the certificate is valid"
+              "description": "The date and time according to ISO-8601 standard from which the certificate is valid."
             },
             "notValidAfter": {
               "type": "string",
               "format": "date-time",
               "title": "Not Valid After",
-              "description": "The date and time according to ISO-8601 standard from which the certificate is not valid anymore"
+              "description": "The date and time according to ISO-8601 standard from which the certificate is not valid anymore."
             },
             "signatureAlgorithmRef": {
               "$ref": "#/definitions/refType",
               "title": "Algorithm Reference",
-              "description": "The bom-ref to signature algorithm used by the certificate"
+              "description": "The bom-ref to signature algorithm used by the certificate."
             },
             "subjectPublicKeyRef": {
               "$ref": "#/definitions/refType",
               "title": "Key reference",
-              "description": "The bom-ref to the public key of the subject"
+              "description": "The bom-ref to the public key of the subject."
             },
             "certificateFormat": {
               "type": "string",
               "title": "Certificate Format",
-              "description": "The format of the certificate",
+              "description": "The format of the certificate.",
               "examples": [
                 "X.509",
                 "PEM",
@@ -5374,7 +5379,7 @@
             "certificateExtension": {
               "type": "string",
               "title": "Certificate File Extension",
-              "description": "The file extension of the certificate",
+              "description": "The file extension of the certificate.",
               "examples": [
                 "crt",
                 "pem",
@@ -5382,6 +5387,12 @@
                 "der",
                 "p12"
               ]
+            },
+            "fingerprint": {
+              "type": "object",
+              "$ref": "#/definitions/hash",
+              "title": "Certificate Fingerprint",
+              "description": "The fingerprint is a cryptographic hash of the certificate excluding it's signature."
             }
           }
         },
@@ -5504,6 +5515,12 @@
               "$ref": "#/definitions/securedBy",
               "title": "Secured By",
               "description": "The mechanism by which the cryptographic asset is secured by."
+            },
+            "fingerprint": {
+              "type": "object",
+              "$ref": "#/definitions/hash",
+              "title": "Fingerprint",
+              "description": "The fingerprint is a cryptographic hash of the asset."
             }
           }
         },
