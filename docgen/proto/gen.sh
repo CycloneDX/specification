@@ -24,7 +24,7 @@ generate () {
     -v "${SCHEMA_PATH}:/protos:ro" \
     -v "${TEMPLATES_PATH}:/templates:ro" \
     "pseudomuto/protoc-gen-doc:${PROTOC_GEN_DOC_VERSION}" \
-      --doc_opt=html,index.html \
+      --doc_opt=/templates/html.tmpl,index.html \
       "bom-${version}.proto"
 
   # fix file permissions
