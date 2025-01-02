@@ -15,6 +15,8 @@ mkdir -p "$DOCS_PATH/"{1.3,1.4,1.5,1.6}
 
 generate () {
   version="$1"
+  title="CycloneDX v$version Proto Reference"
+  echo "Generating: $title"
 
   ## docs: https://github.com/pseudomuto/protoc-gen-doc
   docker run --rm \
