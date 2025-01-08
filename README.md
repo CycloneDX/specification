@@ -47,7 +47,7 @@ free, open source, and proprietary tools and solutions that support the CycloneD
 The following media types are officially registered with IANA:
 
 | Media Type | Format | Assignment |
-| ---------- |:------:| ---------- |
+|------------|--------|------------|
 | `application/vnd.cyclonedx+xml` | XML | [IANA](https://www.iana.org/assignments/media-types/application/vnd.cyclonedx+xml) |
 | `application/vnd.cyclonedx+json` | JSON | [IANA](https://www.iana.org/assignments/media-types/application/vnd.cyclonedx+json) |
 | `application/x.vnd.cyclonedx+protobuf` | Protocol Buffer | |
