@@ -47,14 +47,24 @@ free, open source, and proprietary tools and solutions that support the CycloneD
 The following media types are officially registered with IANA:
 
 | Media Type | Format | Assignment |
-| ------- | --------- | --------- |
-| application/vnd.cyclonedx+xml | XML | [IANA](https://www.iana.org/assignments/media-types/application/vnd.cyclonedx+xml) |
-| application/vnd.cyclonedx+json | JSON | [IANA](https://www.iana.org/assignments/media-types/application/vnd.cyclonedx+json) |
+|------------|--------|------------|
+| `application/vnd.cyclonedx+xml` | XML | [IANA](https://www.iana.org/assignments/media-types/application/vnd.cyclonedx+xml) |
+| `application/vnd.cyclonedx+json` | JSON | [IANA](https://www.iana.org/assignments/media-types/application/vnd.cyclonedx+json) |
+| `application/x.vnd.cyclonedx+protobuf` | Protocol Buffer | |
 
 Specific versions of CycloneDX can be specified by using the version parameter. For example: `application/vnd.cyclonedx+xml; version=1.6`.
 
-The officially supported media type for Protocol Buffer format is `application/x.vnd.cyclonedx+protobuf`.
 
+## Recognized file patterns
+
+The following file names are conventionally used for storing CycloneDX BOM files:
+* `bom.json` for JSON encoded CycloneDX BOM files.
+* `bom.xml` for XML encoded CycloneDX BOM files.
+
+Alternatively, files that match the glob pattern below are also recognized:
+* `*.cdx.json` for JSON encoded CycloneDX BOM files.
+* `*.cdx.xml` for XML encoded CycloneDX BOM files.
+    
 
 ## Release History
 

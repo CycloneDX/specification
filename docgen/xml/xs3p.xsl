@@ -280,16 +280,16 @@
             <meta name="twitter:card" content="summary_large_image"/>
             <meta name="twitter:site" content="@CycloneDX_Spec"/>
             <meta name="twitter:title"><xsl:attribute name="content"><xsl:value-of select="$actualTitle"/></xsl:attribute></meta>
-            <meta name="twitter:image" content="https://cyclonedx.org/theme/assets/images/CycloneDX-Twitter-Card.png"/>
+            <meta name="twitter:image" content="https://cyclonedx.org/images/CycloneDX-Social-Card.png"/>
             <meta name="twitter:description"><xsl:attribute name="content"><xsl:value-of select="$actualTitle"/></xsl:attribute></meta>
             <meta name="description"><xsl:attribute name="content"><xsl:value-of select="$actualTitle"/></xsl:attribute></meta>
             <meta property="og:description"><xsl:attribute name="content"><xsl:value-of select="$actualTitle"/></xsl:attribute></meta>
             <meta property="og:title"><xsl:attribute name="content"><xsl:value-of select="$actualTitle"/></xsl:attribute></meta>
             <meta property="og:locale" content="en_US"/>
             <meta property="og:type" content="website" />
-            <meta property="og:image" content="https://cyclonedx.org/theme/assets/images/CycloneDX-Twitter-Card.png" />
+            <meta property="og:image" content="https://cyclonedx.org/images/CycloneDX-Social-Card.png" />
 
-            <link rel="icon" href="https://cyclonedx.org/cyclonedx-icon.png" type="image/png"/>
+            <link href="/favicon.ico" rel="shortcut icon" type="image/ico" />
 
             <!-- Set base URL to use in working out relative paths -->
             <xsl:if test="$baseURL != ''">
@@ -319,7 +319,7 @@
 
             <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/8.3.2/markdown-it.min.js" type="text/javascript" charset="UTF-8"></script>
          </head>
-         <body data-spy="scroll" data-target=".xs3p-sidebar" data-offset="65">
+         <body data-spy="scroll" data-target=".xs3p-sidebar" data-offset="110">
 
             <div class="navbar navbar-fixed-top navbar-inverse" role="navigation">
                <div class="container">
@@ -332,31 +332,33 @@
                          <span class="icon-bar"><xsl:text> </xsl:text></span>
                       </button>
                       -->
-                     <a href="https://cyclonedx.org" class="navbar-brand site-header__logo"><img src="https://cyclonedx.org/theme/assets/images/layout/logo-white.svg" width="150" /></a>
+                     <a href="/" class="navbar-brand site-header__logo"><img src="https://cyclonedx.org/images/logo-all-white.svg" height="48" width="276" /></a>
 
                      <!-- Version selection dropdown -->
+                     <div style="display:flex; align-items:center; height:100%;">
                      <ul class="nav navbar-nav navbar-right">
                         <li class="dropdown">
                            <a href="#" class="dropdown-toggle version-selector" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">v<xsl:value-of select="$cycloneDxVersion"/> (XML)<span class="caret"></span></a>
                            <ul class="dropdown-menu">
-                              <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.7/json/">v1.7 (JSON)</a></li>
-                              <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.6/json/">v1.6 (JSON)</a></li>
-                              <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.5/json/">v1.5 (JSON)</a></li>
-                              <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.4/json/">v1.4 (JSON)</a></li>
-                              <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.3/json/">v1.3 (JSON)</a></li>
-                              <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.2/json/">v1.2 (JSON)</a></li>
+                              <li><a class="dropdown-item" href="/docs/1.7/json/">v1.7 (JSON)</a></li>
+                              <li><a class="dropdown-item" href="/docs/1.6/json/">v1.6 (JSON)</a></li>
+                              <li><a class="dropdown-item" href="/docs/1.5/json/">v1.5 (JSON)</a></li>
+                              <li><a class="dropdown-item" href="/docs/1.4/json/">v1.4 (JSON)</a></li>
+                              <li><a class="dropdown-item" href="/docs/1.3/json/">v1.3 (JSON)</a></li>
+                              <li><a class="dropdown-item" href="/docs/1.2/json/">v1.2 (JSON)</a></li>
                               <li style="padding:0"><hr class="dropdown-divider"/></li>
-                              <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.7/xml/">v1.7 (XML)</a></li>
-                              <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.6/xml/">v1.6 (XML)</a></li>
-                              <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.5/xml/">v1.5 (XML)</a></li>
-                              <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.4/xml/">v1.4 (XML)</a></li>
-                              <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.3/xml/">v1.3 (XML)</a></li>
-                              <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.2/xml/">v1.2 (XML)</a></li>
-                              <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.1/xml/">v1.1 (XML)</a></li>
-                              <li><a class="dropdown-item" href="https://cyclonedx.org/docs/1.0/xml/">v1.0 (XML)</a></li>
+                              <li><a class="dropdown-item" href="/docs/1.7/xml/">v1.7 (XML)</a></li>
+                              <li><a class="dropdown-item" href="/docs/1.6/xml/">v1.6 (XML)</a></li>
+                              <li><a class="dropdown-item" href="/docs/1.5/xml/">v1.5 (XML)</a></li>
+                              <li><a class="dropdown-item" href="/docs/1.4/xml/">v1.4 (XML)</a></li>
+                              <li><a class="dropdown-item" href="/docs/1.3/xml/">v1.3 (XML)</a></li>
+                              <li><a class="dropdown-item" href="/docs/1.2/xml/">v1.2 (XML)</a></li>
+                              <li><a class="dropdown-item" href="/docs/1.1/xml/">v1.1 (XML)</a></li>
+                              <li><a class="dropdown-item" href="/docs/1.0/xml/">v1.0 (XML)</a></li>
                            </ul>
                         </li>
                      </ul>
+                     </div>
 
                   </div>
                </div>
@@ -473,12 +475,12 @@
                   if ($(".xs3p-sidebar").css("position") == "fixed" &amp;&amp; $(window).height() &lt; $(".xs3p-sidebar").height()) {
                      var perc = $(window).scrollTop() / $("#xs3p-content").height();
                      var overflow = $(".xs3p-sidebar").height() + 105 - $(window).height();
-                     $(".xs3p-sidebar").css("top", (65 - Math.round(overflow * perc)) + "px");
+                     $(".xs3p-sidebar").css("top", (110 - Math.round(overflow * perc)) + "px");
                   }
                });
                $(window).resize(function() {
                   if ($(".xs3p-sidebar").css("position") == "fixed") {
-                     $(".xs3p-sidebar").css("top", "65px");
+                     $(".xs3p-sidebar").css("top", "110px");
                   }
                });
                </xsl:text>
@@ -755,13 +757,17 @@ body {
 }
 
 .navbar {
-    padding: 0.5rem 1rem;
+  padding: 0;
+  height: 90px;
 }
 .navbar-inverse .navbar-nav>.open>a,
 .navbar-inverse .navbar-nav>.open>a:focus,
-.navbar-inverse .navbar-nav>.open>a:hover,
+.navbar-inverse .navbar-nav>.open>a:hover {
+         background-image: none;
+         background-color: transparent;
+}
 .navbar-inverse {
-    background-color: #071525;
+    background-image: linear-gradient(269.12deg, rgba(232, 52, 82, 1) 0%, rgba(136, 38, 125, 1) 51.26%, rgba(52, 57, 175, 1) 100%);
 }
 .navbar-brand {
     display: inline-block;
@@ -769,19 +775,25 @@ body {
     font-size: 1.25rem;
     line-height: inherit;
     white-space: nowrap;
-    padding: 0 15px 0 15px;
+    padding: 0 30px 0 30px;
+}
+.navbar-header {
+    height: 100%;
 }
 .navbar-fixed-top {
-    padding: 8px 15px 8px 15px;
+
 }
 .navbar-inverse .navbar-nav>li>a {
     color: #ffffff;
 }
 .site-header__logo img {
-    height: 50px;
+    height: 90px;
 }
 .version-selector {
     font-size: 1.6rem
+}
+.table .thead-dark th {
+    background-color: #323550;
 }
 .version-selector .caret {
     border-left: 8px solid transparent;
@@ -796,18 +808,24 @@ body {
     padding: 6px 20px;
     line-height: 1.42857143;
 }
-
+h1, h2, h3, h4, h5, h6 {
+    color: rgb(52 57 175) !important;
+}
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+    color: rgb(52 57 175) !important;
+}
 code {
     color: #333;
 }
 
 .container {
+    height: 100%;
     margin-left: 0;
     margin-right: 0;
 }
 
 .container-fluid {
-    padding: 15px 15px;
+    padding: 30px 30px;
 }
 
 .nav-sub-item &gt; a {
@@ -815,10 +833,10 @@ code {
 }
 
 a {
-    color: #1e4877;
+    color: #2157c4;
 }
 a.name {
-    padding-top: 65px;
+    padding-top: 110px;
 }
 
 h3.xs3p-subsection-heading {
@@ -826,8 +844,8 @@ h3.xs3p-subsection-heading {
 }
 
 section, #top {
-    margin-top: -65px;
-    padding-top: 65px;
+    margin-top: -110px;
+    padding-top: 110px;
 }
 
 pre {
@@ -909,7 +927,7 @@ pre {
 @media (min-width: 992px) {
     .xs3p-sidebar {
         position: fixed;
-        top: 65px;
+        top: 110px;
         width: 22%;
     }
 }

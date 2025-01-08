@@ -60,17 +60,37 @@
         {%- endif -%}
 
         {# Enum and const #}
-        {%- if schema.kw_enum -%}
+        {%- if schema.kw_enum and schema.kw_meta_enum -%}
+            <div class="enum-value" id="{{ schema.kw_enum.html_id }}">
+                <h4>Must be one of:</h4>
+                <table class="table table-striped table-bordered">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th class="text-nowrap" scope="col">Name</th>
+                            <th scope="col">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {%- for enum_choice in schema.kw_enum.array_items -%}
+                        <tr>
+                            <td class="text-nowrap">
+                                <strong>{{ enum_choice.literal | python_to_json }}</strong>
+                            </td>
+                            <td>
+                                {{ (schema.enum_description(enum_choice.literal) | get_description_literal) }}
+                            </td>
+                        </tr>
+                    {%- endfor -%}
+                    </tbody>
+                </table>
+            </div>
+        {%- elif schema.kw_enum -%}
             <div class="enum-value" id="{{ schema.kw_enum.html_id }}">
             <h4>Must be one of:</h4>
             <ul class="list-group">
             {%- for enum_choice in schema.kw_enum.array_items -%}
                 <li class="list-group-item enum-item">
-                    {%- if schema.kw_meta_enum -%}<strong>{%- endif -%}
                     {{ enum_choice.literal | python_to_json }}
-                    {%- if schema.kw_meta_enum -%}</strong>
-                        : {{ (schema.enum_description(enum_choice.literal) | get_description_literal) }}
-                    {%- endif -%}
                 </li>
             {%- endfor -%}
             </ul>
