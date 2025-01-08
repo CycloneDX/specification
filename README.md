@@ -54,6 +54,18 @@ The following media types are officially registered with IANA:
 
 Specific versions of CycloneDX can be specified by using the version parameter. For example: `application/vnd.cyclonedx+xml; version=1.6`.
 
+
+## Recognized file patterns
+
+The following file names are conventionally used for storing CycloneDX BOM files:
+* `bom.json` for JSON encoded CycloneDX BOM files.
+* `bom.xml` for XML encoded CycloneDX BOM files.
+
+Alternatively, files that match the glob pattern below are also recognized:
+* `*.cdx.json` for JSON encoded CycloneDX BOM files.
+* `*.cdx.xml` for XML encoded CycloneDX BOM files.
+    
+
 ## Release History
 
 | Version           | Release Date    |
