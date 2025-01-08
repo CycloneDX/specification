@@ -280,16 +280,16 @@
             <meta name="twitter:card" content="summary_large_image"/>
             <meta name="twitter:site" content="@CycloneDX_Spec"/>
             <meta name="twitter:title"><xsl:attribute name="content"><xsl:value-of select="$actualTitle"/></xsl:attribute></meta>
-            <meta name="twitter:image" content="https://cyclonedx.org/theme/assets/images/CycloneDX-Twitter-Card.png"/>
+            <meta name="twitter:image" content="https://cyclonedx.org/images/CycloneDX-Social-Card.png"/>
             <meta name="twitter:description"><xsl:attribute name="content"><xsl:value-of select="$actualTitle"/></xsl:attribute></meta>
             <meta name="description"><xsl:attribute name="content"><xsl:value-of select="$actualTitle"/></xsl:attribute></meta>
             <meta property="og:description"><xsl:attribute name="content"><xsl:value-of select="$actualTitle"/></xsl:attribute></meta>
             <meta property="og:title"><xsl:attribute name="content"><xsl:value-of select="$actualTitle"/></xsl:attribute></meta>
             <meta property="og:locale" content="en_US"/>
             <meta property="og:type" content="website" />
-            <meta property="og:image" content="https://cyclonedx.org/theme/assets/images/CycloneDX-Twitter-Card.png" />
+            <meta property="og:image" content="https://cyclonedx.org/images/CycloneDX-Social-Card.png" />
 
-            <link rel="icon" href="https://cyclonedx.org/cyclonedx-icon.png" type="image/png"/>
+            <link href="/favicon.ico" rel="shortcut icon" type="image/ico" />
 
             <!-- Set base URL to use in working out relative paths -->
             <xsl:if test="$baseURL != ''">
@@ -332,7 +332,7 @@
                          <span class="icon-bar"><xsl:text> </xsl:text></span>
                       </button>
                       -->
-                     <a href="/" class="navbar-brand site-header__logo"><img src="https://cdx-staging.pages.dev/images/logo-all-white.svg" height="48" width="276" /></a>
+                     <a href="/" class="navbar-brand site-header__logo"><img src="https://cyclonedx.org/images/logo-all-white.svg" height="48" width="276" /></a>
 
                      <!-- Version selection dropdown -->
                      <div style="display:flex; align-items:center; height:100%;">
