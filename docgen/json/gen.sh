@@ -7,7 +7,6 @@ DOCS_PATH="$THIS_PATH/docs"
 TEMPLATES_PATH="$THIS_PATH/templates"
 
 rm -f -R "$DOCS_PATH"
-mkdir -p "$DOCS_PATH/"{1.2,1.3,1.4,1.5,1.6}
 
 # Check to see if generate-schema-doc is executable and is in the path. If not, install JSON Schema for Humans.
 if ! [ -x "$(command -v generate-schema-doc)" ]
@@ -27,7 +26,10 @@ generate () {
   then
       SCHEMA_FILE="$STRICT_SCHEMA_FILE"
   fi
-  echo "$SCHEMA_FILE"
+  echo "SCHEMA_FILE: $SCHEMA_FILE"
+
+  OUT_FILE="$DOCS_PATH/$version/json/index.html"
+  mkdir -p "$(dirname "$OUT_FILE")"
 
   generate-schema-doc \
     --config no_link_to_reused_ref \
@@ -38,11 +40,11 @@ generate () {
     --config custom_template_path="$TEMPLATES_PATH/cyclonedx/base.html" \
     --minify \
     "$SCHEMA_FILE" \
-    "$DOCS_PATH/$version/index.html"
+    "$OUT_FILE"
 
-  sed -i -e "s/\${quotedTitle}/\"$title\"/g" "$DOCS_PATH/$version/index.html"
-  sed -i -e "s/\${title}/$title/g" "$DOCS_PATH/$version/index.html"
-  sed -i -e "s/\${version}/$version/g" "$DOCS_PATH/$version/index.html"
+  sed -i -e "s/\${quotedTitle}/\"$title\"/g" "$OUT_FILE"
+  sed -i -e "s/\${title}/$title/g" "$OUT_FILE"
+  sed -i -e "s/\${version}/$version/g" "$OUT_FILE"
 }
 
 generate 1.2
