@@ -353,6 +353,11 @@
                               <li><a class="dropdown-item" href="/docs/1.2/xml/">v1.2 (XML)</a></li>
                               <li><a class="dropdown-item" href="/docs/1.1/xml/">v1.1 (XML)</a></li>
                               <li><a class="dropdown-item" href="/docs/1.0/xml/">v1.0 (XML)</a></li>
+                              <li style="padding:0"><hr class="dropdown-divider"/></li>
+                              <li><a class="dropdown-item" href="/docs/1.6/proto/">v1.6 (Protobuf)</a></li>
+                              <li><a class="dropdown-item" href="/docs/1.5/proto/">v1.5 (Protobuf)</a></li>
+                              <li><a class="dropdown-item" href="/docs/1.4/proto/">v1.4 (Protobuf)</a></li>
+                              <li><a class="dropdown-item" href="/docs/1.3/proto/">v1.3 (Protobuf)</a></li>
                            </ul>
                         </li>
                      </ul>
