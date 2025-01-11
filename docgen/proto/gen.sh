@@ -34,7 +34,7 @@ generate () {
     -v "${OUT_DIR}:/out" \
     --entrypoint chown \
     "pseudomuto/protoc-gen-doc:${PROTOC_GEN_DOC_VERSION}" \
-    "$(id -g):$(id -u)" -R /out
+    "$(id -u):$(id -g)" -R /out
 }
 
 generate 1.3
