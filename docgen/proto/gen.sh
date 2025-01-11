@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eu
+set -eux
 
 THIS_PATH="$(realpath "$(dirname "$0")")"
 SCHEMA_PATH="$(realpath "$THIS_PATH/../../schema")"
