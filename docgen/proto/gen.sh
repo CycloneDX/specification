@@ -11,16 +11,18 @@ PROTOC_GEN_DOC_VERSION='1.5.1'
 # --
 
 rm -f -R "$DOCS_PATH"
-mkdir -p "$DOCS_PATH/"{1.3,1.4,1.5,1.6}
 
 generate () {
   version="$1"
   title="CycloneDX v$version Proto Reference"
   echo "Generating: $title"
 
+  OUT_DIR="$DOCS_PATH/$version/proto/"
+  mkdir -p "$OUT_DIR"
+
   ## docs: https://github.com/pseudomuto/protoc-gen-doc
   docker run --rm \
-    -v "${DOCS_PATH}/${version}:/out" \
+    -v "${OUT_DIR}:/out" \
     -v "${SCHEMA_PATH}:/protos:ro" \
     -v "${TEMPLATES_PATH}:/templates:ro" \
     "pseudomuto/protoc-gen-doc:${PROTOC_GEN_DOC_VERSION}" \
@@ -29,7 +31,7 @@ generate () {
 
   # fix file permissions
   docker run --rm \
-    -v "${DOCS_PATH}/${version}:/out" \
+    -v "${OUT_DIR}:/out" \
     --entrypoint chown \
     "pseudomuto/protoc-gen-doc:${PROTOC_GEN_DOC_VERSION}" \
     "$(id -g):$(id -u)" -R /out
