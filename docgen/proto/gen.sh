@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eux
+set -eu
 
 THIS_PATH="$(realpath "$(dirname "$0")")"
 SCHEMA_PATH="$(realpath "$THIS_PATH/../../schema")"
@@ -17,7 +17,7 @@ generate () {
   title="CycloneDX v$version Protobuf Reference"
   echo "Generating: $title"
 
-  OUT_DIR="$DOCS_PATH/$version/proto/"
+  OUT_DIR="$DOCS_PATH/$version/proto"
   OUT_FILE="index.html"
   mkdir -p "$OUT_DIR"
 
