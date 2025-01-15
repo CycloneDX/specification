@@ -1196,6 +1196,7 @@
       ],
       "additionalProperties": false,
       "properties": {
+        "label": "string",
         "alg": {
           "$ref": "#/definitions/hash-alg"
         },
@@ -5322,7 +5323,7 @@
             }
           }
         },
-        "certificateProperties": {
+        "certificateProperties": { // TODO: what properties are mandatory depending on the certificate types
           "type": "object",
           "title": "Certificate Properties",
           "description": "Properties for cryptographic assets of asset type 'certificate'.",
@@ -5331,7 +5332,7 @@
             "serialNumber": {
               "type": "string",
               "title": "Serial Number",
-              "description": "The serial number is a unique identifier for the certificate issued by a CA." // TODO: add pattern to validate serial number input
+              "description": "The serial number is a unique identifier for the certificate issued by a CA." // TODO: add pattern to validate serial number input - is that the same pattern for the all certificate types?
             },
             "subjectName": {
               "type": "string",
@@ -5393,7 +5394,99 @@
               "$ref": "#/definitions/hash",
               "title": "Certificate Fingerprint",
               "description": "The fingerprint is a cryptographic hash of the certificate excluding it's signature."
-            }
+            },
+            "certificateState": {
+              "type": "array",
+              "title": "Certificate Lifecycle State",
+              "description": "The certificate lifecycle is a comprehensive process that manages digital certificates from their initial creation to eventual expiration or revocation. It typically involves several stages",
+              "items": {
+                "type": "object",
+                "title": "State",
+                "description": "The state of the certificate.",
+                "oneOf": [
+                  {
+                    "title": "Pre-Defined State",
+                    "required": ["state"],
+                    "additionalProperties": false,
+                    "properties": {
+                      "state": {
+                        "type": "string",
+                        "title": "State",
+                        "description": "A pre-defined state in the certificate lifecycle.",
+                        "enum": [
+                          "pre-activation",
+                          "active",
+                          "suspended",
+                          "deactivated",
+                          "revoked",
+                          "destroyed"
+                        ],
+                        "meta:enum": {
+                          "pre-activation": "The certificate has been issued by the issuing certificate authority (CA) but has not been authorized for use.",
+                          "active": "The certificate may be used to cryptographically protect information, cryptographically process previously protected information, or both.",
+                          "deactivated": "Certificates in the deactivated state shall not be used to apply cryptographic protection but, in some cases, may be used to process cryptographically protected information.",
+                          "suspended": "The use of a certifacte may be suspended for several possible reasons.",
+                          "revoked": "A revoked certificate is a digital certificate that has been invalidated by the issuing certificate authority (CA) before its scheduled expiration date.",
+                          "destroyed": "The certificate has been destroyed."
+                        },
+                      }
+                    }
+                  },
+                  {
+                    "title": "Custom State",
+                    "required": ["name"],
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "title": "Name",
+                        "description": "The name of the certificate lifecycle state"
+                      },
+                      "description": {
+                        "type": "string",
+                        "title": "Description",
+                        "description": "The description of the certificate lifecycle state"
+                      }
+                    }
+                  }
+                ],
+              }
+            },
+            "creationDate": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Creation Date",
+              "description": "The date and time (timestamp) when the certificate was created."
+            },
+            "activationDate": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Activation Date",
+              "description": "The date and time (timestamp) when the certificate was activated."
+            },
+            "deactivationDate": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Deactivation Date",
+              "description": "The date and time (timestamp) when the related certificate was deactiviated."
+            },
+            "revokationDate": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Revokation Date",
+              "description": "The date and time (timestamp) when the certificate was revoked."
+            },
+            "destructionDate": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Destruction Date",
+              "description": "The date and time (timestamp) when the certificate was destroyed."
+            },
+            "relatedCryptographicAssets": {
+              "$ref": "#/definitions/relatedCryptographicAssets",
+              "title": "Related Cryptographic Assets",
+              "description": "A list of bom-refs to cryptographic assets related to this protocol.",
+            },
           }
         },
         "relatedCryptoMaterialProperties": {
@@ -5454,6 +5547,7 @@
               "title": "ID",
               "description": "The optional unique identifier for the related cryptographic material."
             },
+            // TODO: add custom state and state for certificates. Look at https://cyclonedx.org/docs/1.6/json/#tab-pane_metadata_lifecycles_items_oneOf_i0
             "state": {
               "type": "string",
               "title": "State",
@@ -5468,9 +5562,10 @@
               ]
             },
             "algorithmRef": {
+              "deprecated": true,
               "$ref": "#/definitions/refType",
               "title": "Algorithm Reference",
-              "description": "The bom-ref to the algorithm used to generate the related cryptographic material."
+              "description": "[Deprecated] The bom-ref to the algorithm used to generate the related cryptographic material. Use relatedCryptographicAssets instead."
             },
             "creationDate": {
               "type": "string",
@@ -5521,7 +5616,12 @@
               "$ref": "#/definitions/hash",
               "title": "Fingerprint",
               "description": "The fingerprint is a cryptographic hash of the asset."
-            }
+            },
+            "relatedCryptographicAssets": {
+              "$ref": "#/definitions/relatedCryptographicAssets",
+              "title": "Related Cryptographic Assets",
+              "description": "A list of bom-refs to cryptographic assets related to this protocol.",
+            },
           }
         },
         "protocolProperties": {
@@ -5613,10 +5713,16 @@
               }
             },
             "cryptoRefArray": {
+              "deprecated": true,
               "$ref": "#/definitions/cryptoRefArray",
               "title": "Cryptographic References",
-              "description": "A list of protocol-related cryptographic assets"
-            }
+              "description": "[Deprecated] A list of protocol-related cryptographic assets. Use relatedCryptographicAssets instead."
+            },
+            "relatedCryptographicAssets": {
+              "$ref": "#/definitions/relatedCryptographicAssets",
+              "title": "Related Cryptographic Assets",
+              "description": "A list of bom-refs to cryptographic assets related to this protocol.",
+            },
           }
         },
         "oid": {
@@ -5667,9 +5773,33 @@
       }
     },
     "cryptoRefArray" : {
+      "deprecated": true,
       "type": "array",
       "items": {
         "$ref": "#/definitions/refType"
+      }
+    },
+    "relatedCryptographicAssets": {
+      "type": "object",
+      "title": "Related Cryptographic Assets",
+      "description": "A list of bom-refs to cryptographic assets related to this protocol.",
+      "additionalProperties": false,
+      "properties": {
+        "mechanism": {
+          "type": "string",
+          "title": "Type",
+          "description": "Specifies the mechanism by which the cryptographic asset is secured by.",
+          "examples": [
+            "publicKey",
+            "privateKey",
+            "algorithm"
+          ]
+        },
+        "ref": {
+          "$ref": "#/definitions/refType",
+          "title": "Algorithm Reference",
+          "description": "The bom-ref to the algorithm."
+        }
       }
     },
     "securedBy": {
