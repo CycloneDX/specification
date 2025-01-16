@@ -5357,14 +5357,16 @@
               "description": "The date and time according to ISO-8601 standard from which the certificate is not valid anymore."
             },
             "signatureAlgorithmRef": {
+              "deprecated": true,
               "$ref": "#/definitions/refType",
               "title": "Algorithm Reference",
-              "description": "The bom-ref to signature algorithm used by the certificate."
+              "description": "[Deprecated] The bom-ref to signature algorithm used by the certificate."
             },
             "subjectPublicKeyRef": {
+              "deprecated": true,
               "$ref": "#/definitions/refType",
               "title": "Key reference",
-              "description": "The bom-ref to the public key of the subject."
+              "description": "[Deprecated] The bom-ref to the public key of the subject."
             },
             "certificateFormat": {
               "type": "string",
@@ -5372,15 +5374,14 @@
               "description": "The format of the certificate.",
               "examples": [
                 "X.509",
-                "PEM",
-                "DER",
                 "CVC"
               ]
             },
             "certificateExtension": {
+              "deprecated": true,
               "type": "string",
               "title": "Certificate File Extension",
-              "description": "The file extension of the certificate.",
+              "description": "[Deprecated] The file extension of the certificate.",
               "examples": [
                 "crt",
                 "pem",
@@ -5456,7 +5457,7 @@
               "type": "string",
               "format": "date-time",
               "title": "Creation Date",
-              "description": "The date and time (timestamp) when the certificate was created."
+              "description": "The date and time (timestamp) when the certificate was created or pre-activated."
             },
             "activationDate": {
               "type": "string",
@@ -5481,6 +5482,53 @@
               "format": "date-time",
               "title": "Destruction Date",
               "description": "The date and time (timestamp) when the certificate was destroyed."
+            },
+            "certificateExtensions": {
+              "type": "array",
+              "title": "Certificate Extensions",
+              "description": "",
+              "items": {
+                "type": "object",
+                "title": "Extension",
+                "description": "",
+                "oneOf": [
+                  {
+                    "title": "Common Extensions",
+                    "required": ["extension"],
+                    "additionalProperties": false,
+                    "properties": {
+                      "extension": {
+                        "type": "string",
+                        "title": "Extension",
+                        "description": "",
+                        "enum": [
+                          "",
+                        ],
+                        "meta:enum": {
+                          "": "",
+                        },
+                      }
+                    }
+                  },
+                  {
+                    "title": "Custom Extensions",
+                    "required": ["name"],
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "title": "Name",
+                        "description": ""
+                      },
+                      "value": {
+                        "type": "string",
+                        "title": "Value",
+                        "description": ""
+                      }
+                    }
+                  }
+                ],
+              }
             },
             "relatedCryptographicAssets": {
               "$ref": "#/definitions/relatedCryptographicAssets",
@@ -5785,7 +5833,7 @@
       "description": "A list of bom-refs to cryptographic assets related to this protocol.",
       "additionalProperties": false,
       "properties": {
-        "mechanism": {
+        "type": {
           "type": "string",
           "title": "Type",
           "description": "Specifies the mechanism by which the cryptographic asset is secured by.",
