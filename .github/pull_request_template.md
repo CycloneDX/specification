@@ -17,8 +17,8 @@ Example:
 >
 > fixes #485 
 
-Or, in case this is a spelling/grammar improvement, please write a brief description.  
+In case this is for a spelling or grammar improvement, please provide a brief description.
 Example:
-> Fixe typo: color (AE) -> colour (BE)
+> Fixe typo: color(AE) -> colour(BE)
 
 -->
