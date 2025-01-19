@@ -1,7 +1,7 @@
 <!-- 
-Thank you for taking the time to develop and contribute a feature or core enhancement!
+Thank you for taking the time to develop and contribute a core enhancement or fix for a defect!
 
-We kindly request that you create pull requests only for issues that have been discussed in a ticket first.
+We kindly request that you create pull requests only for things that have been discussed in a ticket first; exceptions may be made for spelling or grammar fixe.
 Please have the related ticket/issue ID ready. 
 If there is none, feel free to create a new ticket: https://github.com/CycloneDX/specification/issues/new/choose
 -->
