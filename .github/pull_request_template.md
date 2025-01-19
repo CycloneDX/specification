@@ -19,6 +19,6 @@ Example:
 
 Or, in case this is a spelling/grammar improvement, please write a brief description.  
 Example:
-> Fixe typo: license (noun; AE) -> licence (noun; BE)
+> Fixe typo: color (AE) -> colour (BE)
 
 -->
