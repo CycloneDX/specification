@@ -17,7 +17,7 @@ Example:
 >
 > fixes #485 
 
-Or, in case this is a spellinggrammar improvement, please write a brief description.  
+Or, in case this is a spelling/grammar improvement, please write a brief description.  
 Example:
 > Fixe typo: license (noun; AE) -> licence (noun; BE)
 
