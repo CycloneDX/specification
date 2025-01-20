@@ -1454,14 +1454,11 @@
     },
     "licenseChoice": {
       "title": "License Choice",
-      "description": "EITHER (list of SPDX licenses and/or named licenses) OR (tuple of one SPDX License Expression)",
+      "description": "A list of SPDX licenses and/or named licenses and/or SPDX License Expression.",
       "type": "array",
-      "oneOf": [
-        {
-          "title": "Multiple licenses",
-          "description": "A list of SPDX licenses and/or named licenses.",
-          "type": "array",
-          "items": {
+      "items": {
+        "oneOf": [
+          {
             "type": "object",
             "title": "License",
             "required": ["license"],
@@ -1469,17 +1466,10 @@
             "properties": {
               "license": {"$ref": "#/definitions/license"}
             }
-          }
-        },
-        {
-          "title": "SPDX License Expression",
-          "description": "A tuple of exactly one SPDX License Expression.",
-          "type": "array",
-          "additionalItems": false,
-          "minItems": 1,
-          "maxItems": 1,
-          "items": [{
+          },
+          {
             "type": "object",
+            "title": "SPDX License Expression",
             "additionalProperties": false,
             "required": ["expression"],
             "properties": {
@@ -1501,9 +1491,9 @@
                 "description": "An optional identifier which can be used to reference the license elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
               }
             }
-          }]
-        }
-      ]
+          }
+        ]
+      }
     },
     "commit": {
       "type": "object",
