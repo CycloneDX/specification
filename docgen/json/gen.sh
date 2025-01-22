@@ -45,9 +45,9 @@ generate () {
   sed -i -e "s/\${version}/$version/g" "$DOCS_PATH/$version/index.html"
 }
 
-generate 1.2
-generate 1.3
-generate 1.4
-generate 1.5
-generate 1.6
 generate 1.7
+generate 1.6
+generate 1.5
+generate 1.4
+generate 1.3
+generate 1.2
