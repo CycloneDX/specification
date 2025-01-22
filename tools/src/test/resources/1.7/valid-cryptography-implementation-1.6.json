@@ -1,0 +1,60 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "type": "application",
+      "bom-ref": "acme-application",
+      "name": "Acme Application",
+      "version": "1.0"
+    }
+  },
+  "components": [
+    {
+      "type": "cryptographic-asset",
+      "bom-ref": "aes128gcm",
+      "name": "AES",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "ae",
+          "parameterSetIdentifier": "128",
+          "executionEnvironment": "software-plain-ram",
+          "implementationPlatform": "x86_64",
+          "certificationLevel": [ "none" ],
+          "mode": "gcm",
+          "cryptoFunctions": ["keygen", "encrypt", "decrypt", "tag"],
+          "classicalSecurityLevel": 128,
+          "nistQuantumSecurityLevel": 1
+        },
+        "oid": "oid:2.16.840.1.101.3.4.1.6"
+      }
+    },
+    {
+      "type": "library",
+      "bom-ref": "crypto-library",
+      "name": "Crypto library",
+      "version": "1.0.0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "some-library",
+      "name": "Some library",
+      "version": "1.0.0"
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "acme-application",
+      "dependsOn": ["crypto-library"]
+    },
+    {
+      "ref": "crypto-library",
+      "provides": ["aes128gcm"],
+      "dependsOn": ["some-library"]
+    }
+  ]
+}

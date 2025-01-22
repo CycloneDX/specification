@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<bom serialNumber="urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79" version="1" xmlns="http://cyclonedx.org/schema/bom/1.6">
+    <metadata>
+        <component type="application" bom-ref="acme-application">
+            <name>Acme Application</name>
+            <version>1.0</version>
+        </component>
+    </metadata>
+    <components>
+        <component type="cryptographic-asset" bom-ref="aes128gcm">
+            <name>AES</name>
+            <cryptoProperties>
+                <assetType>algorithm</assetType>
+                <algorithmProperties>
+                    <primitive>ae</primitive>
+                    <parameterSetIdentifier>128</parameterSetIdentifier>
+                    <executionEnvironment>software-plain-ram</executionEnvironment>
+                    <implementationPlatform>x86_64</implementationPlatform>
+                    <certificationLevel>none</certificationLevel>
+                    <mode>gcm</mode>
+                    <cryptoFunctions>
+                        <cryptoFunction>keygen</cryptoFunction>
+                        <cryptoFunction>encrypt</cryptoFunction>
+                        <cryptoFunction>decrypt</cryptoFunction>
+                        <cryptoFunction>tag</cryptoFunction>
+                    </cryptoFunctions>
+                    <classicalSecurityLevel>128</classicalSecurityLevel>
+                    <nistQuantumSecurityLevel>1</nistQuantumSecurityLevel>
+                </algorithmProperties>
+                <oid>oid:2.16.840.1.101.3.4.1.6</oid>
+            </cryptoProperties>
+        </component>
+        <component type="library" bom-ref="crypto-library">
+            <name>Crypto library</name>
+            <version>1.0.0</version>
+        </component>
+        <component type="library" bom-ref="some-library">
+            <name>Some library</name>
+            <version>1.0.0</version>
+        </component>
+    </components>
+    <dependencies>
+        <dependency ref="acme-application">
+            <dependency ref="crypto-library"/>
+        </dependency>
+        <dependency ref="crypto-library">
+            <provides ref="aes128gcm"/>
+            <dependency ref="some-library"/>
+        </dependency>
+    </dependencies>
+</bom>
