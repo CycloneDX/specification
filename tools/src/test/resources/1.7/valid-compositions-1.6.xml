@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<bom serialNumber="urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79" version="1" xmlns="http://cyclonedx.org/schema/bom/1.6">
+    <metadata>
+        <component type="application" bom-ref="acme-application-1.0">
+            <name>Acme Application</name>
+            <version>1.0</version>
+        </component>
+    </metadata>
+    <components>
+        <component type="library" bom-ref="pkg:maven/partner/shaded-library@1.0">
+            <name>Partner Shaded Library</name>
+            <version>1.0</version>
+            <purl>pkg:maven/partner/shaded-library@1.0</purl>
+            <components>
+                <component type="library" bom-ref="pkg:maven/ossproject/library@2.0">
+                    <name>Some Opensource Library</name>
+                    <version>2.0</version>
+                    <purl>pkg:maven/ossproject/library@2.0</purl>
+                </component>
+            </components>
+        </component>
+        <component type="library" bom-ref="pkg:maven/acme/library@3.0">
+            <name>Acme Library</name>
+            <version>3.0</version>
+            <purl>pkg:maven/acme/library@3.0</purl>
+        </component>
+    </components>
+    <dependencies>
+        <dependency ref="acme-application-1.0">
+            <dependency ref="pkg:maven/partner/shaded-library@1.0"/>
+            <dependency ref="pkg:maven/acme/library@3.0"/>
+        </dependency>
+    </dependencies>
+    <compositions>
+        <composition bom-ref="composition-1">
+            <aggregate>complete</aggregate>
+            <assemblies>
+                <assembly ref="pkg:maven/partner/shaded-library@1.0"/>
+            </assemblies>
+            <dependencies>
+                <dependency ref="acme-application-1.0"/>
+            </dependencies>
+        </composition>
+        <composition>
+            <aggregate>unknown</aggregate>
+            <assemblies>
+                <assembly ref="pkg:maven/acme/library@3.0"/>
+            </assemblies>
+        </composition>
+        <composition>
+            <aggregate>incomplete_first_party_only</aggregate>
+            <vulnerabilities>
+                <vulnerability ref="vulnerability-1"/>
+            </vulnerabilities>
+        </composition>
+    </compositions>
+    <vulnerabilities>
+        <vulnerability bom-ref="vulnerability-1">
+            <id>ACME-12345</id>
+            <source>
+                <name>Acme Inc</name>
+            </source>
+        </vulnerability>
+    </vulnerabilities>
+</bom>

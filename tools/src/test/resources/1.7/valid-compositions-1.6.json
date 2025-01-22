@@ -1,0 +1,82 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "bom-ref": "acme-application-1.0",
+      "type": "application",
+      "name": "Acme Application",
+      "version": "1.0"
+    }
+  },
+  "components": [
+    {
+      "bom-ref": "pkg:maven/partner/shaded-library@1.0",
+      "type": "library",
+      "name": "Partner Shaded Library",
+      "version": "1.0",
+      "purl": "pkg:maven/partner/shaded-library@1.0",
+      "components": [
+        {
+          "bom-ref": "pkg:maven/ossproject/library@2.0",
+          "type": "library",
+          "name": "Some Opensource Library",
+          "version": "2.0",
+          "purl": "pkg:maven/ossproject/library@2.0"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:maven/acme/library@3.0",
+      "type": "library",
+      "name": "Acme Library",
+      "version": "3.0",
+      "purl": "pkg:maven/acme/library@3.0"
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "acme-application-1.0",
+      "dependsOn": [
+        "pkg:maven/partner/shaded-library@1.0",
+        "pkg:maven/acme/library@3.0"
+      ]
+    }
+  ],
+  "vulnerabilities": [
+    {
+      "bom-ref": "vulnerability-1",
+      "id": "ACME-12345",
+      "source": {
+        "name": "Acme Inc"
+      }
+    }
+  ],
+  "compositions": [
+    {
+      "bom-ref": "composition-1",
+      "aggregate": "complete",
+      "assemblies": [
+        "pkg:maven/partner/shaded-library@1.0"
+      ],
+      "dependencies": [
+        "acme-application-1.0"
+      ]
+    },
+    {
+      "aggregate": "unknown",
+      "assemblies": [
+        "pkg:maven/acme/library@3.0"
+      ]
+    },
+    {
+      "aggregate": "incomplete_first_party_only",
+      "vulnerabilities": [
+        "vulnerability-1"
+      ]
+    }
+  ]
+}
