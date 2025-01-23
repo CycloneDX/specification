@@ -59,3 +59,21 @@ jobs:
         name: JSON-Schema-documentation
         path: docgen/json/docs
         if-no-files-found: error
+  docs_proto:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: docgen/proto
+    steps:
+    - name: Checkout
+      # see https://github.com/actions/checkout
+      uses: actions/checkout@v4
+    - name: Generate Schema documentation
+      run: ./gen.sh
+    - name: Archive Schema documentation
+      # https://github.com/actions/upload-artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: PROTO-Schema-documentation
+        path: docgen/proto/docs
+        if-no-files-found: error
