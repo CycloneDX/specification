@@ -1,7 +1,7 @@
 <!-- 
 Thank you for taking the time to develop and contribute a core enhancement or fix for a defect!
 
-We kindly request that you create pull requests only for things that have been discussed in a ticket first; exceptions may be made for spelling or grammar fixe.
+We kindly request that you create pull requests only for things that have been discussed in a ticket first; exceptions may be made for spelling or grammar fixes.
 Read more about the process here: https://cyclonedx.org/participate/standardization-process/#working-model
 
 Please have the related ticket/issue ID ready. 
