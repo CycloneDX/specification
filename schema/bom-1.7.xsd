@@ -211,10 +211,17 @@ limitations under the License.
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="component" type="bom:component" minOccurs="0">
+            <xs:element name="component" minOccurs="0">
                 <xs:annotation>
                     <xs:documentation>The component that the BOM describes.</xs:documentation>
                 </xs:annotation>
+                <xs:complexType>
+                    <xs:complexContent>
+                        <xs:extension base="bom:component">
+                            <xs:attribute name="isExtraneous" type="xs:boolean" fixed="false"/>
+                        </xs:extension>
+                    </xs:complexContent>
+                </xs:complexType>
             </xs:element>
             <xs:element name="manufacturer" type="bom:organizationalEntity" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
@@ -554,22 +561,23 @@ limitations under the License.
                         of the component. Examples: commons-lang3 and jquery</xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:choice>
-                <xs:element name="version" type="bom:versionType" minOccurs="0" maxOccurs="1">
+            <xs:choice minOccurs="0" maxOccurs="1">
+                <xs:element name="version" type="bom:versionType">
                     <xs:annotation>
                         <xs:documentation>The component version. The version should ideally comply with semantic versioning
                             but is not enforced.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element name="versionRange" type="bom:versionRangeType" minOccurs="0" maxOccurs="1">
+                <xs:element name="versionRange" type="bom:versionRangeType">
                     <xs:annotation>
-                        <xs:documentation>The component version range that may be provided to fulfill this capability.
-                            MAY only occur if attribute `isExtraneous` is set to `true`.</xs:documentation>
-                        <!-- Attention:
-                        Since XSD 1.1 `asserts` are mostly not implemented, there is currently no rule in this XSD
-                        that is taking cate of the plausibility between `version`/`versionRange` and `isExtraneous`=='true'
-                        -->
-                    </xs:annotation>
+                        <xs:documentation><![CDATA[
+                            A version range to fulfill this capability, specified in Package URL Version Range syntax (vers) which is defined at
+                            <https://github.com/package-url/purl-spec/blob/master/VERSION-RANGE-SPEC.rst>.
+                            The component version range that may be provided to fulfill this capability.
+                            MAY only occur if attribute `.@isExtraneous` is set to `true`.
+                            MUST NOT be used for `/metadata/component`.
+                        ]]></xs:documentation>
+                        </xs:annotation>
                 </xs:element>
             </xs:choice>
             <xs:element name="description" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
@@ -757,19 +765,20 @@ limitations under the License.
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
+        <xs:attribute name="isExtraneous" type="xs:boolean" default="false">
+            <xs:annotation>
+                <xs:documentation>
+                    Whether this component is extraneous.
+                    An extraneous component is not part of an assembly, but is (expected to be) provided by the environment, regardless of the component's `.scope`.
+                    MUST NOT be of value `false` for `/metadata/component`.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
         <xs:attribute name="bom-ref" type="bom:refType">
             <xs:annotation>
                 <xs:documentation>
                     An optional identifier which can be used to reference the component elsewhere in the BOM.
                     Uniqueness is enforced within all elements and children of the root-level bom element.
-                </xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
-        <xs:attribute name="isExtraneous" type="xs:boolean" default="false">
-            <xs:annotation>
-                <xs:documentation>
-                    Whether this component is extraneous.
-                    An extraneous component is not part of an assembly, but are (expected to be) provided by the environment, regardless of the component's `scope`.
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
