@@ -1,12 +1,26 @@
 #!/bin/bash
 set -eu
 
+
+
+CYCLONEDX_VERSIONS=('1.6' '1.5' '1.4' '1.3' '1.2')
+
+# region help
+
+USAGE_HELP="
+Generate HTML JSON Schema navigator for CycloneDX
+Usage: $0 <version> : runs only for a certain version (${CYCLONEDX_VERSIONS[@]})
+       $0           : loops over all valid and draft CycloneDX versions
+       $0 --help    : give this help list
+"
+
+# endregion help
+
 THIS_PATH="$(realpath "$(dirname "$0")")"
 SCHEMA_PATH="$(realpath "$THIS_PATH/../../schema")"
 DOCS_PATH="$THIS_PATH/docs"
 TEMPLATES_PATH="$THIS_PATH/templates"
 
-rm -f -R "$DOCS_PATH"
 
 # Check to see if generate-schema-doc is executable and is in the path. If not, install JSON Schema for Humans.
 if ! [ -x "$(command -v generate-schema-doc)" ]
@@ -19,6 +33,9 @@ generate () {
   version="$1"
   title="CycloneDX v${version} JSON Reference"
   echo "Generating: $title"
+
+  rm -f -R "$DOCS_PATH/$version"
+  mkdir -p
 
   SCHEMA_FILE="$SCHEMA_PATH/bom-${version}.schema.json"
   STRICT_SCHEMA_FILE="$SCHEMA_PATH/bom-${version}-strict.schema.json"
@@ -47,8 +64,29 @@ generate () {
   sed -i -e "s/\${version}/$version/g" "$OUT_FILE"
 }
 
-generate 1.2
-generate 1.3
-generate 1.4
-generate 1.5
-generate 1.6
+
+# Main logic to handle the argument using a switch case
+case "$#" in
+  0)
+    # No arguments provided: Loop over all VALID_CYCLONEDX_VERSIONS and DRAFT_CYCLONEDX_VERSIONS
+    for version in "${CYCLONEDX_VERSIONS[@]}"; do
+      generate "$version"
+    done
+    ;;
+  1)
+    case "$1" in
+      '-h'|'--help')
+        echo "Usage: $USAGE_HELP"
+        ;;
+      *)
+        # One argument provided: Call generate with the specific version
+        generate "$1"
+        ;;
+    esac
+    ;;
+  *)
+    # More than one argument provided: Show usage help
+    echo "Usage: $USAGE_HELP"
+    exit 1
+    ;;
+esac
