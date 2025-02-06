@@ -50,8 +50,9 @@ function schema-breaking-version () {
     local NEW="bom-${1}.proto"
     local OLD="bom-${2}.proto"
 
-    local NEW_NP="$(mktemp)"
-    local OLD_NP="$(mktemp)"
+    local NEW_NP OLD_NP
+    NEW_NP="$(mktemp)"
+    OLD_NP="$(mktemp)"
 
     # remove package identifier -> so that the comparisson works as expected
     sed 's/^package .*//' "${ROOT_PATH}/${SCHEMA_DIR}/${NEW}" > "$NEW_NP"
@@ -116,10 +117,11 @@ function schema-functional () {
         --to /dev/null
   }
 
+  local SCHEMA_VERS
   shopt -s globstar
   for test_res in "$ROOT_PATH"/"$TEST_RES_DIR"/*/valid-*.textproto
   do
-    local SCHEMA_VERS="$(basename "$(dirname "$test_res")")"
+    SCHEMA_VERS="$(basename "$(dirname "$test_res")")"
     validate "$test_res" "$SCHEMA_VERS"
   done
 
