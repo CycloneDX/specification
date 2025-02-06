@@ -77,8 +77,8 @@ function schema-breaking-version () {
         --error-format "$LOG_FORMAT"
   }
 
-  # compare '1.6' '1.5'  #  <-- possible breaks are acknowledged
-  # compare '1.5' '1.4'  #  <-- possible breaks are acknowledged
+  compare '1.6' '1.5' || echo "possible breaks are acknowledged for this specific version only"
+  compare '1.5' '1.4' || echo "possible breaks are acknowledged for this specific version only"
   compare '1.4' '1.3'
 
   echo '>> OK.' >&2
