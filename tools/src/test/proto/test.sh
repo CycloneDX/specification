@@ -13,6 +13,13 @@ REMOTE="https://github.com/${GITHUB_REPOSITORY:-CycloneDX/specification}.git"
 BUF_IMAGE_VERSION='1.50.0'
 BUF_IMAGE="bufbuild/buf:$BUF_IMAGE_VERSION"
 
+LOG_FORMAT='text'  # set to 'json' to see details
+if [[ -n "${GITHUB_WORKFLOW:-}" ]]
+then
+  LOG_FORMAT='github-actions'
+fi
+
+
 ## ----
 
 
@@ -24,20 +31,13 @@ function prepare () {
 function schema-lint () {
   echo '> lint schema files' >&2
 
-  if [[ -n "${GITHUB_WORKFLOW:-}" ]]
-  then
-    LOG_FORMAT='github-actions'
-  else
-    LOG_FORMAT='text'
-  fi
-
   docker run --rm \
     --volume "${ROOT_PATH}/${SCHEMA_DIR}:/workspace/${SCHEMA_DIR}:ro" \
     --volume "${THIS_PATH}/buf_lint.yaml:/workspace/buf.yaml:ro" \
     --workdir '/workspace' \
     "$BUF_IMAGE" \
       lint --path "$SCHEMA_DIR" \
-      --error-format "$LOG_FORMAT"
+      --error-format "${LOG_FORMAT:-$LOG_FORMAT_DEFAULT}"
 
   echo '>> OK.' >&2
 }
@@ -46,19 +46,12 @@ function schema-lint () {
 function schema-breaking-version () {
   echo '> test schema for breaking changes against previous version' >&2
 
-  if [[ -n "${GITHUB_WORKFLOW:-}" ]]
-  then
-    LOG_FORMAT='github-actions'
-  else
-    LOG_FORMAT='json'
-  fi
-
   function compare() {
-    NEW="bom-${1}.proto"
-    OLD="bom-${2}.proto"
+    local NEW="bom-${1}.proto"
+    local OLD="bom-${2}.proto"
 
-    NEW_NP="$(mktemp)"
-    OLD_NP="$(mktemp)"
+    local NEW_NP="$(mktemp)"
+    local OLD_NP="$(mktemp)"
 
     # remove package identifier -> so that the comparisson works as expected
     sed 's/^package .*//' "${ROOT_PATH}/${SCHEMA_DIR}/${NEW}" > "$NEW_NP"
@@ -87,13 +80,6 @@ function schema-breaking-version () {
 function schema-breaking-remote () {
   echo '> test schema for breaking changes against remote' >&2
 
-  if [[ -n "${GITHUB_WORKFLOW:-}" ]]
-  then
-    LOG_FORMAT='github-actions'
-  else
-    LOG_FORMAT='text'
-  fi
-
   docker run --rm \
     --volume "${ROOT_PATH}/${SCHEMA_DIR}:/workspace/${SCHEMA_DIR}:ro" \
     --volume "${THIS_PATH}/buf_breaking-remote.yaml:/workspace/buf.yaml:ro" \
@@ -110,10 +96,10 @@ function schema-functional () {
   echo '> test all examples against the respective schema' >&2
 
   function validate() {
-    FILE="$1"
-    SCHEMA_VERS="$2"
-    SCHEMA_FILE="bom-${SCHEMA_VERS}.proto"
-    MESSAGE="cyclonedx.v${SCHEMA_VERS/./_}.Bom"
+    local FILE="$1"
+    local SCHEMA_VERS="$2"
+    local SCHEMA_FILE="bom-${SCHEMA_VERS}.proto"
+    local MESSAGE="cyclonedx.v${SCHEMA_VERS/./_}.Bom"
 
     echo ">> validate $(realpath --relative-to="$PWD" "$FILE") as ${MESSAGE} of ${SCHEMA_FILE}" >&2
 
@@ -133,7 +119,7 @@ function schema-functional () {
   shopt -s globstar
   for test_res in "$ROOT_PATH"/"$TEST_RES_DIR"/*/valid-*.textproto
   do
-    SCHEMA_VERS="$(basename "$(dirname "$test_res")")"
+    local SCHEMA_VERS="$(basename "$(dirname "$test_res")")"
     validate "$test_res" "$SCHEMA_VERS"
   done
 
