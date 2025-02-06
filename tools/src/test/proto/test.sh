@@ -13,6 +13,13 @@ REMOTE="https://github.com/${GITHUB_REPOSITORY:-CycloneDX/specification}.git"
 BUF_IMAGE_VERSION='1.50.0'
 BUF_IMAGE="bufbuild/buf:$BUF_IMAGE_VERSION"
 
+LOG_FORMAT='text'  # set to 'json' to see details
+if [[ -n "${GITHUB_WORKFLOW:-}" ]]
+then
+  LOG_FORMAT='github-actions'
+fi
+
+
 ## ----
 
 
@@ -23,13 +30,6 @@ function prepare () {
 
 function schema-lint () {
   echo '> lint schema files' >&2
-
-  if [[ -n "${GITHUB_WORKFLOW:-}" ]]
-  then
-    LOG_FORMAT='github-actions'
-  else
-    LOG_FORMAT='text'
-  fi
 
   docker run --rm \
     --volume "${ROOT_PATH}/${SCHEMA_DIR}:/workspace/${SCHEMA_DIR}:ro" \
@@ -46,17 +46,11 @@ function schema-lint () {
 function schema-breaking-version () {
   echo '> test schema for breaking changes against previous version' >&2
 
-  if [[ -n "${GITHUB_WORKFLOW:-}" ]]
-  then
-    LOG_FORMAT='github-actions'
-  else
-    LOG_FORMAT='text'
-  fi
-
   function compare() {
-    NEW="bom-${1}.proto"
-    OLD="bom-${2}.proto"
+    local NEW="bom-${1}.proto"
+    local OLD="bom-${2}.proto"
 
+    local NEW_NP OLD_NP
     NEW_NP="$(mktemp)"
     OLD_NP="$(mktemp)"
 
@@ -77,8 +71,8 @@ function schema-breaking-version () {
         --error-format "$LOG_FORMAT"
   }
 
-  # compare '1.6' '1.5'  #  <-- possible breaks are acknowledged
-  # compare '1.5' '1.4'  #  <-- possible breaks are acknowledged
+  compare '1.6' '1.5' || echo "possible breaks are acknowledged for this specific version only"
+  compare '1.5' '1.4' || echo "possible breaks are acknowledged for this specific version only"
   compare '1.4' '1.3'
 
   echo '>> OK.' >&2
@@ -86,13 +80,6 @@ function schema-breaking-version () {
 
 function schema-breaking-remote () {
   echo '> test schema for breaking changes against remote' >&2
-
-  if [[ -n "${GITHUB_WORKFLOW:-}" ]]
-  then
-    LOG_FORMAT='github-actions'
-  else
-    LOG_FORMAT='text'
-  fi
 
   docker run --rm \
     --volume "${ROOT_PATH}/${SCHEMA_DIR}:/workspace/${SCHEMA_DIR}:ro" \
@@ -110,10 +97,10 @@ function schema-functional () {
   echo '> test all examples against the respective schema' >&2
 
   function validate() {
-    FILE="$1"
-    SCHEMA_VERS="$2"
-    SCHEMA_FILE="bom-${SCHEMA_VERS}.proto"
-    MESSAGE="cyclonedx.v${SCHEMA_VERS/./_}.Bom"
+    local FILE="$1"
+    local SCHEMA_VERS="$2"
+    local SCHEMA_FILE="bom-${SCHEMA_VERS}.proto"
+    local MESSAGE="cyclonedx.v${SCHEMA_VERS/./_}.Bom"
 
     echo ">> validate $(realpath --relative-to="$PWD" "$FILE") as ${MESSAGE} of ${SCHEMA_FILE}" >&2
 
@@ -130,6 +117,7 @@ function schema-functional () {
         --to /dev/null
   }
 
+  local SCHEMA_VERS
   shopt -s globstar
   for test_res in "$ROOT_PATH"/"$TEST_RES_DIR"/*/valid-*.textproto
   do
