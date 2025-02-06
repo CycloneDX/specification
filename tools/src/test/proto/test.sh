@@ -10,10 +10,15 @@ TEST_RES_DIR='tools/src/test/resources'
 
 REMOTE="https://github.com/${GITHUB_REPOSITORY:-CycloneDX/specification}.git"
 
-BUF_IMAGE_VERSION='1.46.0'
-
+BUF_IMAGE_VERSION='1.50.0'
+BUF_IMAGE="bufbuild/buf:$BUF_IMAGE_VERSION"
 
 ## ----
+
+
+function prepare () {
+  docker pull "$BUF_IMAGE"
+}
 
 
 function schema-lint () {
@@ -30,7 +35,7 @@ function schema-lint () {
     --volume "${ROOT_PATH}/${SCHEMA_DIR}:/workspace/${SCHEMA_DIR}:ro" \
     --volume "${THIS_PATH}/buf_lint.yaml:/workspace/buf.yaml:ro" \
     --workdir '/workspace' \
-    bufbuild/buf:"$BUF_IMAGE_VERSION" \
+    "$BUF_IMAGE" \
       lint --path "$SCHEMA_DIR" \
       --error-format "$LOG_FORMAT"
 
@@ -66,7 +71,7 @@ function schema-breaking-version () {
       --volume "${NEW_NP}:/workspaces/new/${SCHEMA_DIR}/${NEW}:ro" \
       --volume "${THIS_PATH}/buf_breaking-version.yaml:/workspaces/new/buf.yaml:ro" \
       --workdir '/workspaces/new' \
-      bufbuild/buf:"$BUF_IMAGE_VERSION" \
+      "$BUF_IMAGE" \
         breaking \
         --against ../old \
         --error-format "$LOG_FORMAT"
@@ -93,7 +98,7 @@ function schema-breaking-remote () {
     --volume "${ROOT_PATH}/${SCHEMA_DIR}:/workspace/${SCHEMA_DIR}:ro" \
     --volume "${THIS_PATH}/buf_breaking-remote.yaml:/workspace/buf.yaml:ro" \
     --workdir '/workspace' \
-    bufbuild/buf:"$BUF_IMAGE_VERSION" \
+    "$BUF_IMAGE" \
       breaking --path "$SCHEMA_DIR" \
       --against "${REMOTE}" \
       --error-format "$LOG_FORMAT"
@@ -118,7 +123,7 @@ function schema-functional () {
       --volume "${ROOT_PATH}/${SCHEMA_DIR}:/workspace/${SCHEMA_DIR}:ro" \
       --volume "${FILE}:/workspace/test_res:ro" \
       --workdir '/workspace' \
-      bufbuild/buf:"$BUF_IMAGE_VERSION" \
+      "$BUF_IMAGE" \
         convert "${SCHEMA_DIR}/${SCHEMA_FILE}" \
         --type "$MESSAGE" \
         --from 'test_res#format=txtpb' \
@@ -141,23 +146,29 @@ function schema-functional () {
 
 case "${1:-all}" in
   'schema-lint')
+    prepare
     schema-lint
     ;;
   'schema-breaking-version')
+    prepare
     schema-breaking-version
     ;;
   'schema-breaking-remote')
+    prepare
     schema-breaking-remote
     ;;
   'schema-breaking')
+    prepare
     schema-breaking-version
     schema-breaking-remote
     ;;
   'schema-functional')
+    prepare
     schema-functional
     ;;
   'all')
     # all the above
+    prepare
     schema-lint
     schema-breaking-version
     schema-breaking-remote
