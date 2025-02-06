@@ -50,7 +50,7 @@ function schema-breaking-version () {
   then
     LOG_FORMAT='github-actions'
   else
-    LOG_FORMAT='text'
+    LOG_FORMAT='json'
   fi
 
   function compare() {

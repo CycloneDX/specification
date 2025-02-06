@@ -4,11 +4,10 @@ version: v2
 breaking:  # https://buf.build/docs/configuration/v2/buf-yaml#breaking
   use:  # see https://buf.build/docs/breaking/overview#rules-and-categories
     - WIRE
-  exceptions:
-    - path: schema/bom-1.5.proto
-      except:
-        - RULE_ID
-      severity: WARN
-      # - 'schema/bom-1.5.proto' # possible breaks are acknowledged for this specific version only
-      #- 'schema/bom-1.6.proto' # possible breaks are acknowledged for this specific version only
-      # DO NOT ADD NEW VERSIONS HERE WITHOUT CONSULTING THE CDX CORE-WORKING-GROUP
+  ignore_only:
+    # DO NOT ADD NEW VERSIONS HERE WITHOUT CONSULTING THE CDX CORE-WORKING-GROUP
+    FIELD_WIRE_COMPATIBLE_CARDINALITY:
+      - 'schema/bom-1.6.proto'
+      - 'schema/bom-1.5.proto'
+    FIELD_WIRE_COMPATIBLE_TYPE:
+      - 'schema/bom-1.5.proto'
