@@ -37,7 +37,7 @@ function schema-lint () {
     --workdir '/workspace' \
     "$BUF_IMAGE" \
       lint --path "$SCHEMA_DIR" \
-      --error-format "${LOG_FORMAT:-$LOG_FORMAT_DEFAULT}"
+      --error-format "$LOG_FORMAT"
 
   echo '>> OK.' >&2
 }
