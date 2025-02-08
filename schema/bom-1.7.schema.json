@@ -1110,13 +1110,19 @@
       },
       "allOf": [
         {
-          "$comment": "properties `.version` and `.versionRange` Mustnot exist at the same time.",
-          "not": { "required": ["version", "versionRange"] }
+          "description": "Requirement: ensure that `version` and `versionRange` are not present simultaneously.",
+          "not": {
+            "required": ["version", "versionRange"]
+          }
         },
         {
-          "$comment": "`.versionRange` Must only be present if `.isExternal` is `true`",
-          "if": { "properties": { "isExternal": { "const": false } } },
-          "then": { "not": { "required": ["versionRange"] } },
+          "description": "Requirement: 'versionRange' must not be present when 'isExternal' is `false`.",
+          "if": {
+            "properties": { "isExternal": { "const": false } }
+          },
+          "then": {
+            "not": { "required": ["versionRange"] }
+          },
           "else": true
         }
       ]
