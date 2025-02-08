@@ -111,9 +111,9 @@ message Component {
     // Version was made optional in v1.4 of the spec.
     // For backward compatibility, it is recommended to use an empty string to represent components without version information.
     string version = 9;
-    // For an extraneous component, this is the accepted version range.
-    // Value must follow Package URL Version Range syntax (vers)which is defined at <https://github.com/package-url/purl-spec/blob/master/VERSION-RANGE-SPEC.rst>.
-    // May only occur if property `isExtraneous` is set to 'true'.
+    // For an external component, this specifies the accepted version range.
+    // The value must adhere to the Package URL Version Range syntax (vers), as defined at https://github.com/package-url/purl-spec/blob/master/VERSION-RANGE-SPEC.rst.
+    // May only be used if `isExternal` is set to `true`.
     string versionRange = 33;
   }
   // Specifies a description for the component
@@ -162,10 +162,10 @@ message Component {
   repeated string omniborId = 31;
   // Specifies the Software Heritage persistent identifier (SWHID). The SWHID, if specified, must be valid and conform to the specification defined at: https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html
   repeated string swhid = 32;
-  // Whether this component is extraneous.
-  // An extraneous component is not part of an assembly, but is (expected to be) provided by the environment, regardless of the component's `scope`.
-  // May be set to `true` for runtime components only. Must be of value `false` for `Bom.metadata.component`.
-  optional bool isExtraneous = 34; // implicit defaults to `false`
+  // Determine whether this component is external.
+  // An external component is one that is not part of an assembly, but is expected to be provided by the environment, regardless of the component's `scope`. This setting can be useful for distinguishing which components are bundled with the product and which can be relied upon to be present in the deployment environment.
+  // This may be set to `true` for runtime components only. For `Bom.metadata.component`, it must be set to `false`.
+  optional bool isExternal = 34; // implicit defaults to `false`
 }
 
 // Specifies the data flow.

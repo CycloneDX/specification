@@ -564,12 +564,11 @@ limitations under the License.
                 <xs:element name="versionRange" type="bom:versionRangeType">
                     <xs:annotation>
                         <xs:documentation><![CDATA[
-                            For an extraneous component, this is the accepted version range.
-                            Value must follow Package URL Version Range syntax (vers)which is defined at <https://github.com/package-url/purl-spec/blob/master/VERSION-RANGE-SPEC.rst>.
-                            The component version range that may be provided to fulfill this capability.
-                            May only occur if attribute `@isExtraneous` is set to `true`.
+                        For an external component, this specifies the accepted version range.
+                        The value must adhere to the Package URL Version Range syntax (vers), as defined at https://github.com/package-url/purl-spec/blob/master/VERSION-RANGE-SPEC.rst.
+                        May only be used if `@isExternal` is set to `true`.
                         ]]></xs:documentation>
-                        </xs:annotation>
+                    </xs:annotation>
                 </xs:element>
             </xs:choice>
             <xs:element name="description" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
@@ -757,12 +756,12 @@ limitations under the License.
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
-        <xs:attribute name="isExtraneous" type="xs:boolean" use="optional" default="false">
+        <xs:attribute name="isExternal" type="xs:boolean" use="optional" default="false">
             <xs:annotation>
                 <xs:documentation>
-                    Whether this component is extraneous.
-                    An extraneous component is not part of an assembly, but is (expected to be) provided by the environment, regardless of the component's `.scope`.
-                    May be set to `true` for runtime components only. Must be of value `false` for `/metadata/component`.
+                    Determine whether this component is external.
+                    An external component is one that is not part of an assembly, but is expected to be provided by the environment, regardless of the component's `@scope`. This setting can be useful for distinguishing which components are bundled with the product and which can be relied upon to be present in the deployment environment.
+                    This may be set to `true` for runtime components only. For `/metadata/component`, it must be set to `false`.
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
@@ -782,9 +781,9 @@ limitations under the License.
         </xs:anyAttribute>
         <!-- Attention:
         This would be formal, if the support for XSD1.1's `assert` was properly implemented in validators and tools digesting XML.
-        <xs:assert id="versionRange_requires_isExtraneous_eq_true"
-                   test="if (versionRange) then (@isExtraneous eq 'true') else true()">
-            Child `versionRange` May only be present, if attribute `isExtraneous`=='true'.
+        <xs:assert id="versionRange_requires_isExternal_eq_true"
+                   test="if (versionRange) then (@isExternal eq 'true') else true()">
+            Child `versionRange` May only be present, if attribute `isExternal`=='true'.
         </xs:assert>
         -->
     </xs:complexType>
