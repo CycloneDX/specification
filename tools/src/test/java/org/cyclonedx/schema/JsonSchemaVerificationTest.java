@@ -13,68 +13,130 @@
  */
 package org.cyclonedx.schema;
 
-import java.io.File;
+import static java.util.Objects.requireNonNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.networknt.schema.DefaultJsonMetaSchemaFactory;
+import com.networknt.schema.DisallowUnknownKeywordFactory;
+import com.networknt.schema.JsonMetaSchema;
+import com.networknt.schema.JsonMetaSchemaFactory;
+import com.networknt.schema.JsonSchema;
+import com.networknt.schema.JsonSchemaFactory;
+import com.networknt.schema.NonValidationKeyword;
+import com.networknt.schema.SchemaId;
+import com.networknt.schema.SchemaValidatorsConfig;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import org.cyclonedx.parsers.JsonParser;
-import org.cyclonedx.Version;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+class JsonSchemaVerificationTest extends BaseSchemaVerificationTest {
 
-public class JsonSchemaVerificationTest extends BaseSchemaVerificationTest {
+    private static final ObjectMapper MAPPER = new JsonMapper();
+
+    private static final JsonSchema VERSION_12;
+    private static final JsonSchema VERSION_13;
+    private static final JsonSchema VERSION_14;
+    private static final JsonSchema VERSION_15;
+    private static final JsonSchema VERSION_16;
+
+    static {
+        JsonMetaSchemaFactory metaSchemaFactory = new DefaultJsonMetaSchemaFactory() {
+            @Override
+            public JsonMetaSchema getMetaSchema(
+                    String iri, JsonSchemaFactory schemaFactory, SchemaValidatorsConfig config) {
+                return addCustomKeywords(super.getMetaSchema(iri, schemaFactory, config));
+            }
+        };
+        JsonSchemaFactory factory = JsonSchemaFactory.builder()
+                .defaultMetaSchemaIri(SchemaId.V7)
+                .metaSchema(addCustomKeywords(JsonMetaSchema.getV7()))
+                .metaSchemaFactory(metaSchemaFactory)
+                .build();
+        ClassLoader cl = JsonSchemaVerificationTest.class.getClassLoader();
+        try {
+            VERSION_12 = factory.getSchema(
+                    requireNonNull(cl.getResource("bom-1.2-strict.schema.json")).toURI());
+            VERSION_13 = factory.getSchema(
+                    requireNonNull(cl.getResource("bom-1.3-strict.schema.json")).toURI());
+            VERSION_14 = factory.getSchema(
+                    requireNonNull(cl.getResource("bom-1.4.schema.json")).toURI());
+            VERSION_15 = factory.getSchema(
+                    requireNonNull(cl.getResource("bom-1.5.schema.json")).toURI());
+            VERSION_16 = factory.getSchema(
+                    requireNonNull(cl.getResource("bom-1.6.schema.json")).toURI());
+        } catch (URISyntaxException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private static JsonMetaSchema addCustomKeywords(JsonMetaSchema metaSchema) {
+        return JsonMetaSchema.builder(metaSchema)
+                // Non-standard keywords in the CycloneDX schema files.
+                .keyword(new NonValidationKeyword("deprecated"))
+                .keyword(new NonValidationKeyword("meta:enum"))
+                .unknownKeywordFactory(new DisallowUnknownKeywordFactory())
+                .build();
+    }
 
     @TestFactory
     Collection<DynamicTest> dynamicTestsWithCollection() throws Exception {
-        final List<String> files = getAllResources();
+        final List<String> resources = getAllResources();
         final List<DynamicTest> dynamicTests = new ArrayList<>();
-        for (final String file: files) {
-            if (file.endsWith(".json")) {
-                final Version schemaVersion;
-                if (file.endsWith("-1.2.json")) {
-                    schemaVersion = Version.VERSION_12;
-                } else if (file.endsWith("-1.3.json")) {
-                    schemaVersion = Version.VERSION_13;
-                } else if (file.endsWith("-1.4.json")) {
-                    schemaVersion = Version.VERSION_14;
-                } else if (file.endsWith("-1.5.json")) {
-                    schemaVersion = Version.VERSION_15;
-                } else if (file.endsWith("-1.6.json")) {
-                    schemaVersion = Version.VERSION_16;
-                } else {
-                    schemaVersion = null;
-                }
-                if (file.startsWith("valid") && schemaVersion != null) {
-                    dynamicTests.add(DynamicTest.dynamicTest(file, () -> assertTrue(
-                            isValidJson(schemaVersion, "/" + schemaVersion.getVersionString() + "/" + file), file)));
-                } else if (file.startsWith("invalid") && schemaVersion != null) {
-                    dynamicTests.add(DynamicTest.dynamicTest(file, () -> assertFalse(
-                            isValidJson(schemaVersion, "/" + schemaVersion.getVersionString() + "/" + file), file)));
+        for (final String resource : resources) {
+            String resourceName = StringUtils.substringAfterLast(resource, "/");
+            if (resourceName.endsWith(".json")) {
+                JsonSchema schema = getSchema(resourceName);
+                if (schema != null) {
+                    if (resourceName.startsWith("valid")) {
+                        dynamicTests.add(DynamicTest.dynamicTest(
+                                resource, () -> assertTrue(isValid(schema, resource), resource)));
+                    } else if (resourceName.startsWith("invalid")) {
+                        dynamicTests.add(DynamicTest.dynamicTest(
+                                resource, () -> assertFalse(isValid(schema, resource), resource)));
+                    }
                 }
             }
         }
         return dynamicTests;
     }
 
-    private boolean isValidJson(Version version, String resource) throws Exception {
-        final File file = new File(this.getClass().getResource(resource).getFile());
-        final JsonParser parser = new JsonParser();
-        return parser.isValid(file, version);
-
-        // Uncomment to provide more detailed validation errors
-        /*
-        try {
-            final String jsonString = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-            parser.getJsonSchema(version, true).validate(new JSONObject(jsonString));
-            return true;
-        } catch (ValidationException e) {
-            e.printStackTrace();
+    private boolean isValid(JsonSchema schema, String resource) {
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream(resource);
+                JsonParser parser = MAPPER.createParser(input)) {
+            JsonNode node = parser.readValueAsTree();
+            return schema.validate(node).isEmpty();
+        } catch (IOException e) {
             return false;
         }
-        */
+    }
+
+    private JsonSchema getSchema(String resourceName) {
+        if (resourceName.endsWith("-1.2.json")) {
+            return VERSION_12;
+        }
+        if (resourceName.endsWith("-1.3.json")) {
+            return VERSION_13;
+        }
+        if (resourceName.endsWith("-1.4.json")) {
+            return VERSION_14;
+        }
+        if (resourceName.endsWith("-1.5.json")) {
+            return VERSION_15;
+        }
+        if (resourceName.endsWith("-1.6.json")) {
+            return VERSION_16;
+        }
+        return null;
     }
 }
