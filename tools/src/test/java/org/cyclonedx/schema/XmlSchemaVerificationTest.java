@@ -16,13 +16,10 @@ package org.cyclonedx.schema;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import javax.xml.XMLConstants;
-import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -45,36 +42,24 @@ public class XmlSchemaVerificationTest extends BaseSchemaVerificationTest {
     private static final Schema VERSION_16;
 
     static {
-        // Surefire sets a `basedir` system property
-        // Otherwise we assume that the project is in the current working directory (should work in IDEs)
-        Path toolsPath = Paths.get(System.getProperty("basedir", "."));
-        Path schemaPath = toolsPath.resolve("../schema");
-        SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        ClassLoader cl = XmlSchemaVerificationTest.class.getClassLoader();
         try {
-            VERSION_10 = factory.newSchema(
-                    new Source[] {spdxSource(), new StreamSource(cl.getResourceAsStream("bom-1.0.xsd"))});
-            VERSION_11 = factory.newSchema(
-                    new Source[] {spdxSource(), new StreamSource(cl.getResourceAsStream("bom-1.1.xsd"))});
-            VERSION_12 = factory.newSchema(
-                    new Source[] {spdxSource(), new StreamSource(cl.getResourceAsStream("bom-1.2.xsd"))});
-            VERSION_13 = factory.newSchema(
-                    new Source[] {spdxSource(), new StreamSource(cl.getResourceAsStream("bom-1.3.xsd"))});
-            VERSION_14 = factory.newSchema(
-                    new Source[] {spdxSource(), new StreamSource(cl.getResourceAsStream("bom-1.4.xsd"))});
-            VERSION_15 = factory.newSchema(new Source[] {
-                spdxSource(), new StreamSource(schemaPath.resolve("bom-1.5.xsd").toFile())
-            });
-            VERSION_16 = factory.newSchema(new Source[] {
-                spdxSource(), new StreamSource(schemaPath.resolve("bom-1.6.xsd").toFile())
-            });
+            SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "file");
+            ClassLoader cl = XmlSchemaVerificationTest.class.getClassLoader();
+            // Override the `schemaLocation` property in the file
+            factory.setProperty(
+                    "http://apache.org/xml/properties/schema/external-schemaLocation",
+                    "http://cyclonedx.org/schema/spdx spdx.xsd");
+            VERSION_10 = factory.newSchema(cl.getResource("bom-1.0.xsd"));
+            VERSION_11 = factory.newSchema(cl.getResource("bom-1.1.xsd"));
+            VERSION_12 = factory.newSchema(cl.getResource("bom-1.2.xsd"));
+            VERSION_13 = factory.newSchema(cl.getResource("bom-1.3.xsd"));
+            VERSION_14 = factory.newSchema(cl.getResource("bom-1.4.xsd"));
+            VERSION_15 = factory.newSchema(cl.getResource("bom-1.5.xsd"));
+            VERSION_16 = factory.newSchema(cl.getResource("bom-1.6.xsd"));
         } catch (SAXException e) {
             throw new IllegalStateException(e);
         }
-    }
-
-    private static Source spdxSource() {
-        return new StreamSource(XmlSchemaVerificationTest.class.getClassLoader().getResourceAsStream("spdx.xsd"));
     }
 
     /**
