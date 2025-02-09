@@ -13,7 +13,6 @@
  */
 package org.cyclonedx.schema;
 
-import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -29,10 +28,12 @@ import com.networknt.schema.JsonSchema;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.NonValidationKeyword;
 import com.networknt.schema.SchemaId;
+import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.SchemaValidatorsConfig;
+import com.networknt.schema.resource.ClasspathSchemaLoader;
+import com.networknt.schema.resource.DisallowSchemaLoader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -43,6 +44,9 @@ import org.junit.jupiter.api.TestFactory;
 class JsonSchemaVerificationTest extends BaseSchemaVerificationTest {
 
     private static final ObjectMapper MAPPER = new JsonMapper();
+
+    private static final String JSF_NAMESPACE = "http://cyclonedx.org/schema/jsf-0.82.schema.json";
+    private static final String SPDX_NAMESPACE = "http://cyclonedx.org/schema/spdx.schema.json";
 
     private static final JsonSchema VERSION_12;
     private static final JsonSchema VERSION_13;
@@ -62,22 +66,15 @@ class JsonSchemaVerificationTest extends BaseSchemaVerificationTest {
                 .defaultMetaSchemaIri(SchemaId.V7)
                 .metaSchema(addCustomKeywords(JsonMetaSchema.getV7()))
                 .metaSchemaFactory(metaSchemaFactory)
+                .schemaLoaders(b -> b.add(new ClasspathSchemaLoader()).add(DisallowSchemaLoader.getInstance()))
+                .schemaMappers(b -> b.mapPrefix(SPDX_NAMESPACE, "classpath:spdx.schema.json")
+                        .mapPrefix(JSF_NAMESPACE, "classpath:jsf-0.82.schema.json"))
                 .build();
-        ClassLoader cl = JsonSchemaVerificationTest.class.getClassLoader();
-        try {
-            VERSION_12 = factory.getSchema(
-                    requireNonNull(cl.getResource("bom-1.2-strict.schema.json")).toURI());
-            VERSION_13 = factory.getSchema(
-                    requireNonNull(cl.getResource("bom-1.3-strict.schema.json")).toURI());
-            VERSION_14 = factory.getSchema(
-                    requireNonNull(cl.getResource("bom-1.4.schema.json")).toURI());
-            VERSION_15 = factory.getSchema(
-                    requireNonNull(cl.getResource("bom-1.5.schema.json")).toURI());
-            VERSION_16 = factory.getSchema(
-                    requireNonNull(cl.getResource("bom-1.6.schema.json")).toURI());
-        } catch (URISyntaxException e) {
-            throw new IllegalStateException(e);
-        }
+        VERSION_12 = factory.getSchema(SchemaLocation.of("classpath:bom-1.2-strict.schema.json"));
+        VERSION_13 = factory.getSchema(SchemaLocation.of("classpath:bom-1.3-strict.schema.json"));
+        VERSION_14 = factory.getSchema(SchemaLocation.of("classpath:bom-1.4.schema.json"));
+        VERSION_15 = factory.getSchema(SchemaLocation.of("classpath:bom-1.5.schema.json"));
+        VERSION_16 = factory.getSchema(SchemaLocation.of("classpath:bom-1.6.schema.json"));
     }
 
     private static JsonMetaSchema addCustomKeywords(JsonMetaSchema metaSchema) {
