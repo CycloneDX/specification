@@ -5442,6 +5442,11 @@
                           "revoked": "A revoked certificate is a digital certificate that has been invalidated by the issuing certificate authority (CA) before its scheduled expiration date.",
                           "destroyed": "The certificate has been destroyed."
                         },
+                      },
+                      "reason": {
+                        "type": "string",
+                        "title": "Reason",
+                        "description": "A reason for the certificate being in this state."
                       }
                     }
                   },
@@ -5450,15 +5455,20 @@
                     "required": ["name"],
                     "additionalProperties": false,
                     "properties": {
-                      "name": {
+                      "state": {
                         "type": "string",
-                        "title": "Name",
-                        "description": "The name of the certificate lifecycle state"
+                        "title": "State",
+                        "description": "The name of the certificate lifecycle state."
                       },
                       "description": {
                         "type": "string",
                         "title": "Description",
-                        "description": "The description of the certificate lifecycle state"
+                        "description": "The description of the certificate lifecycle state."
+                      },
+                      "reason": {
+                        "type": "string",
+                        "title": "Reason",
+                        "description": "A reason for the certificate being in this state."
                       }
                     }
                   }
@@ -5512,7 +5522,7 @@
                       "name": {
                         "type": "string",
                         "title": "name",
-                        "description": "Extention name",
+                        "description": "The name if the extention.",
                         "enum": [
                           "basicConstraints",
                           "keyUsage",
@@ -5541,7 +5551,7 @@
                       "value": {
                         "type": "string",
                         "title": "Value",
-                        "description": ""
+                        "description": "The value of the certificate extension."
                       }
                     }
                   },
@@ -5553,12 +5563,12 @@
                       "name": {
                         "type": "string",
                         "title": "Name",
-                        "description": ""
+                        "description": "The name for the custom certificate extension."
                       },
                       "value": {
                         "type": "string",
                         "title": "Value",
-                        "description": ""
+                        "description": "The description of the custom certificate extension."
                       }
                     }
                   }
@@ -5568,7 +5578,7 @@
             "relatedCryptographicAssets": {
               "$ref": "#/definitions/relatedCryptographicAssets",
               "title": "Related Cryptographic Assets",
-              "description": "A list of bom-refs to cryptographic assets related to this protocol.",
+              "description": "A list of cryptographic assets related to this component.",
             },
           }
         },
@@ -5703,7 +5713,7 @@
             "relatedCryptographicAssets": {
               "$ref": "#/definitions/relatedCryptographicAssets",
               "title": "Related Cryptographic Assets",
-              "description": "A list of bom-refs to cryptographic assets related to this protocol.",
+              "description": "A list of cryptographic assets related to this component.",
             },
           }
         },
@@ -5804,7 +5814,7 @@
             "relatedCryptographicAssets": {
               "$ref": "#/definitions/relatedCryptographicAssets",
               "title": "Related Cryptographic Assets",
-              "description": "A list of bom-refs to cryptographic assets related to this protocol.",
+              "description": "A list of cryptographic assets related to this component.",
             },
           }
         },
@@ -5863,9 +5873,18 @@
       }
     },
     "relatedCryptographicAssets": {
-      "type": "object",
+      "type": "array",
       "title": "Related Cryptographic Assets",
-      "description": "A list of bom-refs to cryptographic assets related to this protocol.",
+      "description": "A list of cryptographic assets related to this component.",
+      "items": {
+        "$ref": "#/definitions/relatedCryptographicAsset",
+        "title": "Related Cryptographic Asset"
+      }
+    },
+    "relatedCryptographicAsset": {
+      "type": "object",
+      "title": "Related Cryptographic Asset",
+      "description": "A cryptographic assets related to this component.",
       "additionalProperties": false,
       "properties": {
         "type": {
@@ -5880,8 +5899,8 @@
         },
         "ref": {
           "$ref": "#/definitions/refType",
-          "title": "Algorithm Reference",
-          "description": "The bom-ref to the algorithm."
+          "title": "Reference to cryptographic asset",
+          "description": "The bom-ref to cryptographic asset."
         }
       }
     },
