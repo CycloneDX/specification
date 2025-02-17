@@ -923,7 +923,18 @@
         "version": {
           "$ref": "#/definitions/version",
           "title": "Component Version",
-          "description": "The component version. The version should ideally comply with semantic versioning but is not enforced."
+          "description": "The component version. The version should ideally comply with semantic versioning but is not enforced.\nMust be used exclusively, either 'version' or 'versionRange', but not both."
+        },
+        "versionRange": {
+          "$ref": "#/definitions/versionRange",
+          "title": "Component Version Range",
+          "description": "For an external component, this specifies the accepted version range.\nThe value must adhere to the Package URL Version Range syntax (vers), as defined at <https://github.com/package-url/purl-spec/blob/master/VERSION-RANGE-SPEC.rst>.\nMay only be used if `.isExternal` is set to `true`.\nMust be used exclusively, either 'version' or 'versionRange', but not both."
+        },
+        "isExternal": {
+          "type": "boolean",
+          "title": "Component Is External",
+          "description": "Determine whether this component is external.\nAn external component is one that is not part of an assembly, but is expected to be provided by the environment, regardless of the component's `.scope`. This setting can be useful for distinguishing which components are bundled with the product and which can be relied upon to be present in the deployment environment.\nThis may be set to `true` for runtime components only. For `$.metadata.component`, it must be set to `false`.",
+          "default": false
         },
         "description": {
           "type": "string",
@@ -1096,7 +1107,25 @@
           "title": "Signature",
           "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
         }
-      }
+      },
+      "allOf": [
+        {
+          "description": "Requirement: ensure that `version` and `versionRange` are not present simultaneously.",
+          "not": {
+            "required": ["version", "versionRange"]
+          }
+        },
+        {
+          "description": "Requirement: 'versionRange' must not be present when 'isExternal' is `false`.",
+          "if": {
+            "properties": { "isExternal": { "const": false } }
+          },
+          "then": {
+            "not": { "required": ["versionRange"] }
+          },
+          "else": true
+        }
+      ]
     },
     "swid": {
       "type": "object",
