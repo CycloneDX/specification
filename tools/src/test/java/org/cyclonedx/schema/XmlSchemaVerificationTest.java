@@ -13,57 +13,77 @@
  */
 package org.cyclonedx.schema;
 
-import java.io.File;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import org.cyclonedx.parsers.XmlParser;
-import org.cyclonedx.Version;
+import javax.xml.XMLConstants;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 public class XmlSchemaVerificationTest extends BaseSchemaVerificationTest {
 
-    @TestFactory
+    private static final Schema VERSION_10;
+    private static final Schema VERSION_11;
+    private static final Schema VERSION_12;
+    private static final Schema VERSION_13;
+    private static final Schema VERSION_14;
+    private static final Schema VERSION_15;
+    private static final Schema VERSION_16;
+
+    static {
+        try {
+            SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "file");
+            ClassLoader cl = XmlSchemaVerificationTest.class.getClassLoader();
+            // Override the `schemaLocation` property in the file
+            factory.setProperty(
+                    "http://apache.org/xml/properties/schema/external-schemaLocation",
+                    "http://cyclonedx.org/schema/spdx spdx.xsd");
+            VERSION_10 = factory.newSchema(cl.getResource("bom-1.0.xsd"));
+            VERSION_11 = factory.newSchema(cl.getResource("bom-1.1.xsd"));
+            VERSION_12 = factory.newSchema(cl.getResource("bom-1.2.xsd"));
+            VERSION_13 = factory.newSchema(cl.getResource("bom-1.3.xsd"));
+            VERSION_14 = factory.newSchema(cl.getResource("bom-1.4.xsd"));
+            VERSION_15 = factory.newSchema(cl.getResource("bom-1.5.xsd"));
+            VERSION_16 = factory.newSchema(cl.getResource("bom-1.6.xsd"));
+        } catch (SAXException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     /**
      * Generates a collection of dynamic tests based on the available XML files.
      *
      * @return Collection<DynamicTest> a collection of dynamic tests
      * @throws Exception if an error occurs during the generation of the dynamic tests
      */
+    @TestFactory
     Collection<DynamicTest> dynamicTestsWithCollection() throws Exception {
-        final List<String> files = getAllResources();
+        final List<String> resources = getAllResources();
         final List<DynamicTest> dynamicTests = new ArrayList<>();
-        for (final String file: files) {
-            if (file.endsWith(".xml")) {
-                final Version schemaVersion;
-                if (file.endsWith("-1.0.xml")) {
-                    schemaVersion = Version.VERSION_10;
-                } else if (file.endsWith("-1.1.xml")) {
-                    schemaVersion = Version.VERSION_11;
-                } else if (file.endsWith("-1.2.xml")) {
-                    schemaVersion = Version.VERSION_12;
-                } else if (file.endsWith("-1.3.xml")) {
-                    schemaVersion = Version.VERSION_13;
-                } else if (file.endsWith("-1.4.xml")) {
-                    schemaVersion = Version.VERSION_14;
-                } else if (file.endsWith("-1.5.xml")) {
-                    schemaVersion = Version.VERSION_15;
-                } else if (file.endsWith("-1.6.xml")) {
-                    schemaVersion = Version.VERSION_16;
-                } else {
-                    schemaVersion = null;
-                }
-                if (file.startsWith("valid") && schemaVersion != null) {
-                    dynamicTests.add(DynamicTest.dynamicTest(file, () -> assertTrue(
-                            isValid(schemaVersion, "/" + schemaVersion.getVersionString() + "/" + file), file)));
-                } else if (file.startsWith("invalid") && schemaVersion != null) {
-                    dynamicTests.add(DynamicTest.dynamicTest(file, () -> assertFalse(
-                            isValid(schemaVersion, "/" + schemaVersion.getVersionString() + "/" + file), file)));
+        for (final String resource : resources) {
+            String resourceName = StringUtils.substringAfterLast(resource, "/");
+            if (resourceName.endsWith(".xml")) {
+                Schema schema = getSchema(resourceName);
+                if (schema != null) {
+                    if (resourceName.startsWith("valid")) {
+                        dynamicTests.add(DynamicTest.dynamicTest(
+                                resource, () -> assertTrue(isValid(schema, resource), resource)));
+                    } else if (resourceName.startsWith("invalid")) {
+                        dynamicTests.add(DynamicTest.dynamicTest(
+                                resource, () -> assertFalse(isValid(schema, resource), resource)));
+                    }
                 }
             }
         }
@@ -73,14 +93,59 @@ public class XmlSchemaVerificationTest extends BaseSchemaVerificationTest {
     /**
      * Validates the given XML file against the specified CycloneDX schema version.
      *
-     * @param  version   the CycloneDX schema version to validate against
-     * @param  resource  the path to the XML file to be validated
+     * @param schema  the CycloneDX schema to validate against
+     * @param resource the path to the XML file to be validated
      * @return boolean   true if the XML file is valid according to the specified schema version, false otherwise
      * @throws Exception if an error occurs during the validation process
      */
-    private boolean isValid(Version version, String resource) throws Exception {
-        final File file = new File(this.getClass().getResource(resource).getFile());
-        final XmlParser parser = new XmlParser();
-        return parser.isValid(file, version);
+    private boolean isValid(Schema schema, String resource) throws Exception {
+        Validator validator = schema.newValidator();
+        validator.setErrorHandler(new ErrorHandler() {
+            @Override
+            public void warning(SAXParseException exception) throws SAXException {
+                throw exception;
+            }
+
+            @Override
+            public void error(SAXParseException exception) throws SAXException {
+                throw exception;
+            }
+
+            @Override
+            public void fatalError(SAXParseException exception) throws SAXException {
+                throw exception;
+            }
+        });
+        try {
+            validator.validate(new StreamSource(getClass().getClassLoader().getResourceAsStream(resource)));
+        } catch (SAXParseException e) {
+            return false;
+        }
+        return true;
+    }
+
+    private Schema getSchema(String resourceName) {
+        if (resourceName.endsWith("-1.0.xml")) {
+            return VERSION_10;
+        }
+        if (resourceName.endsWith("-1.1.xml")) {
+            return VERSION_11;
+        }
+        if (resourceName.endsWith("-1.2.xml")) {
+            return VERSION_12;
+        }
+        if (resourceName.endsWith("-1.3.xml")) {
+            return VERSION_13;
+        }
+        if (resourceName.endsWith("-1.4.xml")) {
+            return VERSION_14;
+        }
+        if (resourceName.endsWith("-1.5.xml")) {
+            return VERSION_15;
+        }
+        if (resourceName.endsWith("-1.6.xml")) {
+            return VERSION_16;
+        }
+        return null;
     }
 }
