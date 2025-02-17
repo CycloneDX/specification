@@ -53,6 +53,7 @@ class JsonSchemaVerificationTest extends BaseSchemaVerificationTest {
     private static final JsonSchema VERSION_14;
     private static final JsonSchema VERSION_15;
     private static final JsonSchema VERSION_16;
+    private static final JsonSchema VERSION_17;
 
     static {
         JsonMetaSchemaFactory metaSchemaFactory = new DefaultJsonMetaSchemaFactory() {
@@ -75,6 +76,7 @@ class JsonSchemaVerificationTest extends BaseSchemaVerificationTest {
         VERSION_14 = factory.getSchema(SchemaLocation.of("classpath:bom-1.4.schema.json"));
         VERSION_15 = factory.getSchema(SchemaLocation.of("classpath:bom-1.5.schema.json"));
         VERSION_16 = factory.getSchema(SchemaLocation.of("classpath:bom-1.6.schema.json"));
+        VERSION_17 = factory.getSchema(SchemaLocation.of("classpath:bom-1.7.schema.json"));
     }
 
     private static JsonMetaSchema addCustomKeywords(JsonMetaSchema metaSchema) {
@@ -133,6 +135,9 @@ class JsonSchemaVerificationTest extends BaseSchemaVerificationTest {
         }
         if (resourceName.endsWith("-1.6.json")) {
             return VERSION_16;
+        }
+        if (resourceName.endsWith("-1.7.json")) {
+            return VERSION_17;
         }
         return null;
     }
