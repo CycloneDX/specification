@@ -256,6 +256,12 @@ limitations under the License.
                         Formal registration is optional.</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="distribution" type="bom:tlpType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The Traffic Light Protocol (TLP) classification that controls the sharing and distribution
+                        of the component that the BOM describes.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                     <xs:documentation>
@@ -389,6 +395,49 @@ limitations under the License.
             </xs:annotation>
         </xs:anyAttribute>
     </xs:complexType>
+
+    <xs:simpleType name="tlpType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="CLEAR">
+                <xs:annotation>
+                    <xs:documentation>
+                        The BOM is not subject to any restrictions as regards the sharing of the information within the BOM.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="GREEN">
+                <xs:annotation>
+                    <xs:documentation>
+                        The BOM is subject to limited disclosure, and recipients can share the BOM within their community
+                        but not via publicly accessible channels.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="AMBER">
+                <xs:annotation>
+                    <xs:documentation>
+                        The BOM is subject to limited disclosure, and recipients can only share the BOM on a need-to-know
+                        basis within their organization and with clients.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="AMBER+STRICT">
+                <xs:annotation>
+                    <xs:documentation>
+                        The BOM is subject to limited disclosure, and recipients can only share the BOM on a need-to-know
+                        basis within their organization.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="RED">
+                <xs:annotation>
+                    <xs:documentation>
+                        The BOM is subject to restricted distribution to individual recipients only and must not be shared.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+         </xs:restriction>
+    </xs:simpleType>
 
     <xs:complexType name="toolType">
         <xs:annotation>

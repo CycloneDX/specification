@@ -514,6 +514,8 @@ message Metadata {
   repeated Lifecycles lifecycles = 9;
   // The organization that created the BOM. Manufacturer is common in BOMs created through automated processes. BOMs created through manual means may have '.authors' instead.
   optional OrganizationalEntity manufacturer = 10;
+  // The Traffic Light Protocol (TLP) classification that controls the sharing and distribution of the component that the BOM describes.
+  optional Tlp distribution = 11;
 }
 
 message Lifecycles {
@@ -674,6 +676,20 @@ message Swid {
   // The URL to the SWID file.
   optional string url = 7;
 }
+
+enum Tlp {
+  // Default
+  CLEAR = 0;
+  // Limited distribution but can be shared within a community.
+  GREEN = 1;
+  // Limited distribution but can be shared within an organization and with clients
+  AMBER = 2;
+  // Limited distribution but can be shared within an organization.
+  AMBER+STRICT = 3;
+  // Restricted distribution to individual recipients and must not be shared.
+  RED = 4;
+}
+
 
 // Specifies a tool (manual or automated).
 message Tool {
