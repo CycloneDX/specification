@@ -966,74 +966,74 @@ limitations under the License.
         <xs:attributeGroup ref="bom:licenseAttributes"/>
     </xs:complexType>
 
-    <xs:complexType name="expressionType">
-        <xs:choice>
-            <xs:simpleContent>
-                <xs:extension base="xs:normalizedString">
-                    <xs:annotation>
-                        <xs:documentation>A valid SPDX license expression.
-                            Refer to https://spdx.org/specifications for syntax requirements
+    <xs:complexType name="expressionSimpleType">
+        <xs:simpleContent>
+            <xs:extension base="xs:normalizedString">
+                <xs:annotation>
+                    <xs:documentation>A valid SPDX license expression.
+                        Refer to https://spdx.org/specifications for syntax requirements
 
-                            Example values:
-                            - Apache-2.0 AND (MIT OR GPL-2.0-only)
-                            - GPL-3.0-only WITH Classpath-exception-2.0
-                        </xs:documentation>
-                    </xs:annotation>
-                </xs:extension>
-            </xs:simpleContent>
-            <xs:complexContent>
-                <xs:sequence>
-                    <xs:element name="details" minOccurs="0" maxOccurs="unbounded">
-                        <xs:complexType>
-                            <xs:sequence>
-                                <xs:element name="text" type="bom:attachedTextType" minOccurs="0" maxOccurs="1">
-                                    <xs:annotation>
-                                        <xs:documentation>Specifies the optional full text of the attachment</xs:documentation>
-                                    </xs:annotation>
-                                </xs:element>
-                                <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
-                                    <xs:annotation>
-                                        <xs:documentation>
-                                            Allows any undeclared elements as long as the elements are placed in a different namespace.
-                                        </xs:documentation>
-                                    </xs:annotation>
-                                </xs:any>
-                            </xs:sequence>
-                            <xs:attribute name="license-identifier" type="xs:normalizedString" use="required">
-                                <xs:annotation>
-                                    <xs:documentation>
-                                        TODO
+                        Example values:
+                        - Apache-2.0 AND (MIT OR GPL-2.0-only)
+                        - GPL-3.0-only WITH Classpath-exception-2.0
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:attributeGroup ref="bom:licenseAttributes"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
 
-                                        Examples:
-                                        - Apache-2.0
-                                        - GPL-3.0-only WITH Classpath-exception-2.0
-                                    </xs:documentation>
-                                </xs:annotation>
-                            </xs:attribute>
-                        </xs:complexType>
-                    </xs:element>
-                    <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+    <xs:complexType name="expressionComplexType">
+        <xs:sequence>
+            <xs:element name="details" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="text" type="bom:attachedTextType" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>Specifies the optional full text of the attachment</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Allows any undeclared elements as long as the elements are placed in a different namespace.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:any>
+                    </xs:sequence>
+                    <xs:attribute name="license-identifier" type="xs:normalizedString" use="required">
                         <xs:annotation>
                             <xs:documentation>
-                                Allows any undeclared elements as long as the elements are placed in a different namespace.
+                                TODO
+
+                                Examples:
+                                - Apache-2.0
+                                - GPL-3.0-only WITH Classpath-exception-2.0
                             </xs:documentation>
                         </xs:annotation>
-                    </xs:any>
-                </xs:sequence>
-                <xs:attribute name="value" type="xs:normalizedString" use="required">
+                    </xs:attribute>
+                </xs:complexType>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
                     <xs:annotation>
-                        <xs:documentation>A valid SPDX license expression.
-                            Refer to https://spdx.org/specifications for syntax requirements
-
-                            Example values:
-                            - Apache-2.0 AND (MIT OR GPL-2.0-only)
-                            - GPL-3.0-only WITH Classpath-exception-2.0
+                        <xs:documentation>
+                            Allows any undeclared elements as long as the elements are placed in a different namespace.
                         </xs:documentation>
                     </xs:annotation>
-                </xs:attribute>
-            </xs:complexContent>
-        </xs:choice>
+                </xs:any>
+        </xs:sequence>
         <xs:attributeGroup ref="bom:licenseAttributes"/>
+        <xs:attribute name="expression" type="xs:normalizedString" use="required">
+            <xs:annotation>
+                <xs:documentation>A valid SPDX license expression.
+                    Refer to https://spdx.org/specifications for syntax requirements
+
+                    Example values:
+                    - Apache-2.0 AND (MIT OR GPL-2.0-only)
+                    - GPL-3.0-only WITH Classpath-exception-2.0
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
     </xs:complexType>
 
     <xs:complexType name="attachedTextType">
@@ -2373,7 +2373,8 @@ limitations under the License.
     <xs:complexType name="licenseChoiceType">
         <xs:choice>
             <xs:element name="license" type="bom:licenseType" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="expression" type="bom:expressionType" minOccurs="0" maxOccurs="1" />
+            <xs:element name="expression" type="bom:expressionSimpleType" minOccurs="0" maxOccurs="1" />
+            <xs:element name="expression-detailed" type="bom:expressionComplexType" minOccurs="0" maxOccurs="1" />
         </xs:choice>
     </xs:complexType>
 
