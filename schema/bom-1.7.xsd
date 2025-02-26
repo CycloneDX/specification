@@ -2388,7 +2388,18 @@ limitations under the License.
         <xs:choice>
             <xs:element name="license" type="bom:licenseType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="expression" type="bom:expressionType" minOccurs="0" maxOccurs="1" />
-            <xs:element name="expression-detailed" type="bom:expressionDetailedType" minOccurs="0" maxOccurs="1" />
+            <xs:element name="expression-detailed" type="bom:expressionDetailedType" minOccurs="0" maxOccurs="1">
+                <xs:unique name="expression-detailed_details_unique_license-identifier">
+                    <xs:annotation>
+                        <xs:documentation>
+                            The attribute `license-identifier` serves as the primary key, which uniquely identifies each record.
+                            Therefore, it must be unique.
+                        </xs:documentation>
+                    </xs:annotation>
+                    <xs:selector xpath="./bom:details"/>
+                    <xs:field xpath="@license-identifier"/>
+                </xs:unique>
+            </xs:element>
         </xs:choice>
     </xs:complexType>
 
