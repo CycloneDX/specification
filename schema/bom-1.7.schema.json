@@ -1230,6 +1230,161 @@
       "examples": ["3942447fac867ae5cdb3229b658f4d48"],
       "pattern": "^([a-fA-F0-9]{32}|[a-fA-F0-9]{40}|[a-fA-F0-9]{64}|[a-fA-F0-9]{96}|[a-fA-F0-9]{128})$"
     },
+    "licensing": {
+      "type": "object",
+      "title": "Licensing information",
+      "description": "Licensing details describing the licensor/licensee, license type, renewal and expiration dates, and other important metadata",
+      "additionalProperties": false,
+      "properties": {
+        "altIds": {
+          "type": "array",
+          "title": "Alternate License Identifiers",
+          "description": "License identifiers that may be used to manage licenses and their lifecycle",
+          "items": {
+            "type": "string"
+          }
+        },
+        "licensor": {
+          "title": "Licensor",
+          "description": "The individual or organization that grants a license to another individual or organization",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "organization": {
+              "title": "Licensor (Organization)",
+              "description": "The organization that granted the license",
+              "$ref": "#/definitions/organizationalEntity"
+            },
+            "individual": {
+              "title": "Licensor (Individual)",
+              "description": "The individual, not associated with an organization, that granted the license",
+              "$ref": "#/definitions/organizationalContact"
+            }
+          },
+          "oneOf":[
+            {
+              "required": ["organization"]
+            },
+            {
+              "required": ["individual"]
+            }
+          ]
+        },
+        "licensee": {
+          "title": "Licensee",
+          "description": "The individual or organization for which a license was granted to",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "organization": {
+              "title": "Licensee (Organization)",
+              "description": "The organization that was granted the license",
+              "$ref": "#/definitions/organizationalEntity"
+            },
+            "individual": {
+              "title": "Licensee (Individual)",
+              "description": "The individual, not associated with an organization, that was granted the license",
+              "$ref": "#/definitions/organizationalContact"
+            }
+          },
+          "oneOf":[
+            {
+              "required": ["organization"]
+            },
+            {
+              "required": ["individual"]
+            }
+          ]
+        },
+        "purchaser": {
+          "title": "Purchaser",
+          "description": "The individual or organization that purchased the license",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "organization": {
+              "title": "Purchaser (Organization)",
+              "description": "The organization that purchased the license",
+              "$ref": "#/definitions/organizationalEntity"
+            },
+            "individual": {
+              "title": "Purchaser (Individual)",
+              "description": "The individual, not associated with an organization, that purchased the license",
+              "$ref": "#/definitions/organizationalContact"
+            }
+          },
+          "oneOf":[
+            {
+              "required": ["organization"]
+            },
+            {
+              "required": ["individual"]
+            }
+          ]
+        },
+        "purchaseOrder": {
+          "type": "string",
+          "title": "Purchase Order",
+          "description": "The purchase order identifier the purchaser sent to a supplier or vendor to authorize a purchase"
+        },
+        "licenseTypes": {
+          "type": "array",
+          "title": "License Type",
+          "description": "The type of license(s) that was granted to the licensee.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "academic",
+              "appliance",
+              "client-access",
+              "concurrent-user",
+              "core-points",
+              "custom-metric",
+              "device",
+              "evaluation",
+              "named-user",
+              "node-locked",
+              "oem",
+              "perpetual",
+              "processor-points",
+              "subscription",
+              "user",
+              "other"
+            ],
+            "meta:enum": {
+              "academic": "A license that grants use of software solely for the purpose of education or research.",
+              "appliance": "A license covering use of software embedded in a specific piece of hardware.",
+              "client-access": "A Client Access License (CAL) allows client computers to access services provided by server software.",
+              "concurrent-user": "A Concurrent User license (aka floating license) limits the number of licenses for a software application and licenses are shared among a larger number of users.",
+              "core-points": "A license where the core of a computer's processor is assigned a specific number of points.",
+              "custom-metric": "A license for which consumption is measured by non-standard metrics.",
+              "device": "A license that covers a defined number of installations on computers and other types of devices.",
+              "evaluation": "A license that grants permission to install and use software for trial purposes.",
+              "named-user": "A license that grants access to the software to one or more pre-defined users.",
+              "node-locked": "A license that grants access to the software on one or more pre-defined computers or devices.",
+              "oem": "An Original Equipment Manufacturer license that is delivered with hardware, cannot be transferred to other hardware, and is valid for the life of the hardware.",
+              "perpetual": "A license where the software is sold on a one-time basis and the licensee can use a copy of the software indefinitely.",
+              "processor-points": "A license where each installation consumes points per processor.",
+              "subscription": "A license where the licensee pays a fee to use the software or service.",
+              "user": "A license that grants access to the software or service by a specified number of users.",
+              "other": "Another license type."
+            }
+          }
+        },
+        "lastRenewal": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Last Renewal",
+          "description": "The timestamp indicating when the license was last renewed. For new purchases, this is often the purchase or acquisition date. For non-perpetual licenses or subscriptions, this is the timestamp of when the license was last renewed."
+        },
+        "expiration": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Expiration",
+          "description": "The timestamp indicating when the current license expires (if applicable)."
+        }
+      }
+    },
     "license": {
       "type": "object",
       "title": "License",
@@ -1276,161 +1431,7 @@
           "examples": ["https://www.apache.org/licenses/LICENSE-2.0.txt"],
           "format": "iri-reference"
         },
-        "licensing": {
-          "type": "object",
-          "title": "Licensing information",
-          "description": "Licensing details describing the licensor/licensee, license type, renewal and expiration dates, and other important metadata",
-          "additionalProperties": false,
-          "properties": {
-            "altIds": {
-              "type": "array",
-              "title": "Alternate License Identifiers",
-              "description": "License identifiers that may be used to manage licenses and their lifecycle",
-              "items": {
-                "type": "string"
-              }
-            },
-            "licensor": {
-              "title": "Licensor",
-              "description": "The individual or organization that grants a license to another individual or organization",
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "organization": {
-                  "title": "Licensor (Organization)",
-                  "description": "The organization that granted the license",
-                  "$ref": "#/definitions/organizationalEntity"
-                },
-                "individual": {
-                  "title": "Licensor (Individual)",
-                  "description": "The individual, not associated with an organization, that granted the license",
-                  "$ref": "#/definitions/organizationalContact"
-                }
-              },
-              "oneOf":[
-                {
-                  "required": ["organization"]
-                },
-                {
-                  "required": ["individual"]
-                }
-              ]
-            },
-            "licensee": {
-              "title": "Licensee",
-              "description": "The individual or organization for which a license was granted to",
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "organization": {
-                  "title": "Licensee (Organization)",
-                  "description": "The organization that was granted the license",
-                  "$ref": "#/definitions/organizationalEntity"
-                },
-                "individual": {
-                  "title": "Licensee (Individual)",
-                  "description": "The individual, not associated with an organization, that was granted the license",
-                  "$ref": "#/definitions/organizationalContact"
-                }
-              },
-              "oneOf":[
-                {
-                  "required": ["organization"]
-                },
-                {
-                  "required": ["individual"]
-                }
-              ]
-            },
-            "purchaser": {
-              "title": "Purchaser",
-              "description": "The individual or organization that purchased the license",
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "organization": {
-                  "title": "Purchaser (Organization)",
-                  "description": "The organization that purchased the license",
-                  "$ref": "#/definitions/organizationalEntity"
-                },
-                "individual": {
-                  "title": "Purchaser (Individual)",
-                  "description": "The individual, not associated with an organization, that purchased the license",
-                  "$ref": "#/definitions/organizationalContact"
-                }
-              },
-              "oneOf":[
-                {
-                  "required": ["organization"]
-                },
-                {
-                  "required": ["individual"]
-                }
-              ]
-            },
-            "purchaseOrder": {
-              "type": "string",
-              "title": "Purchase Order",
-              "description": "The purchase order identifier the purchaser sent to a supplier or vendor to authorize a purchase"
-            },
-            "licenseTypes": {
-              "type": "array",
-              "title": "License Type",
-              "description": "The type of license(s) that was granted to the licensee.",
-              "items": {
-                "type": "string",
-                "enum": [
-                  "academic",
-                  "appliance",
-                  "client-access",
-                  "concurrent-user",
-                  "core-points",
-                  "custom-metric",
-                  "device",
-                  "evaluation",
-                  "named-user",
-                  "node-locked",
-                  "oem",
-                  "perpetual",
-                  "processor-points",
-                  "subscription",
-                  "user",
-                  "other"
-                ],
-                "meta:enum": {
-                  "academic": "A license that grants use of software solely for the purpose of education or research.",
-                  "appliance": "A license covering use of software embedded in a specific piece of hardware.",
-                  "client-access": "A Client Access License (CAL) allows client computers to access services provided by server software.",
-                  "concurrent-user": "A Concurrent User license (aka floating license) limits the number of licenses for a software application and licenses are shared among a larger number of users.",
-                  "core-points": "A license where the core of a computer's processor is assigned a specific number of points.",
-                  "custom-metric": "A license for which consumption is measured by non-standard metrics.",
-                  "device": "A license that covers a defined number of installations on computers and other types of devices.",
-                  "evaluation": "A license that grants permission to install and use software for trial purposes.",
-                  "named-user": "A license that grants access to the software to one or more pre-defined users.",
-                  "node-locked": "A license that grants access to the software on one or more pre-defined computers or devices.",
-                  "oem": "An Original Equipment Manufacturer license that is delivered with hardware, cannot be transferred to other hardware, and is valid for the life of the hardware.",
-                  "perpetual": "A license where the software is sold on a one-time basis and the licensee can use a copy of the software indefinitely.",
-                  "processor-points": "A license where each installation consumes points per processor.",
-                  "subscription": "A license where the licensee pays a fee to use the software or service.",
-                  "user": "A license that grants access to the software or service by a specified number of users.",
-                  "other": "Another license type."
-                }
-              }
-            },
-            "lastRenewal": {
-              "type": "string",
-              "format": "date-time",
-              "title": "Last Renewal",
-              "description": "The timestamp indicating when the license was last renewed. For new purchases, this is often the purchase or acquisition date. For non-perpetual licenses or subscriptions, this is the timestamp of when the license was last renewed."
-            },
-            "expiration": {
-              "type": "string",
-              "format": "date-time",
-              "title": "Expiration",
-              "description": "The timestamp indicating when the current license expires (if applicable)."
-            }
-          }
-        },
+        "licensing": {"$ref": "#/definitions/licensing"},
         "properties": {
           "type": "array",
           "title": "Properties",
@@ -1543,6 +1544,13 @@
                 "$ref": "#/definitions/refType",
                 "title": "BOM Reference",
                 "description": "An optional identifier which can be used to reference the license elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+              },
+              "licensing": {"$ref": "#/definitions/licensing"},
+              "properties": {
+                "type": "array",
+                "title": "Properties",
+                "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
+                "items": {"$ref": "#/definitions/property"}
               }
             }
           }]

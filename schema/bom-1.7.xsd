@@ -789,6 +789,126 @@ limitations under the License.
         </xs:attribute>
     </xs:attributeGroup>
 
+    <xs:complexType name="licensingType">
+        <xs:sequence>
+            <xs:element name="altIds" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>License identifiers that may be used to manage licenses and
+                        their lifecycle</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="altId" type="xs:normalizedString" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="licensor" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The individual or organization that grants a license to another
+                        individual or organization</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:choice>
+                            <xs:element name="organization" type="bom:organizationalEntity" minOccurs="0" maxOccurs="1">
+                                <xs:annotation>
+                                    <xs:documentation>The organization that granted the license</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element name="individual" type="bom:organizationalContact" minOccurs="0" maxOccurs="1">
+                                <xs:annotation>
+                                    <xs:documentation>The individual, not associated with an organization,
+                                        that granted the license</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:choice>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="licensee" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The individual or organization for which a license was granted to</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:choice>
+                            <xs:element name="organization" type="bom:organizationalEntity" minOccurs="0" maxOccurs="1">
+                                <xs:annotation>
+                                    <xs:documentation>The organization that was granted the license</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element name="individual" type="bom:organizationalContact" minOccurs="0" maxOccurs="1">
+                                <xs:annotation>
+                                    <xs:documentation>The individual, not associated with an organization,
+                                        that was granted the license</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:choice>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="purchaser" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The individual or organization that purchased the license</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:choice>
+                            <xs:element name="organization" type="bom:organizationalEntity" minOccurs="0" maxOccurs="1">
+                                <xs:annotation>
+                                    <xs:documentation>The organization that purchased the license</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element name="individual" type="bom:organizationalContact" minOccurs="0" maxOccurs="1">
+                                <xs:annotation>
+                                    <xs:documentation>The individual, not associated with an organization,
+                                        that purchased the license</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:choice>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="purchaseOrder" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The purchase order identifier the purchaser sent to a supplier or
+                        vendor to authorize a purchase</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="licenseTypes" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The type of license(s) that was granted to the licensee</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="licenseType" type="bom:licenseTypeEnum" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="lastRenewal" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The timestamp indicating when the license was last
+                        renewed. For new purchases, this is often the purchase or acquisition date.
+                        For non-perpetual licenses or subscriptions, this is the timestamp of when the
+                        license was last renewed.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="expiration" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The timestamp indicating when the current license
+                        expires (if applicable).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+    </xs:complexType>
+
     <xs:complexType name="licenseType">
         <xs:annotation>
             <xs:documentation>Specifies the details and attributes related to a software license.
@@ -820,130 +940,11 @@ limitations under the License.
                         an externalReference should also be specified for completeness.</xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="licensing" minOccurs="0" maxOccurs="1">
+            <xs:element name="licensing" type="bom:licensingType" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>Licensing details describing the licensor/licensee, license type, renewal and
                         expiration dates, and other important metadata</xs:documentation>
                 </xs:annotation>
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element name="altIds" minOccurs="0" maxOccurs="1">
-                            <xs:annotation>
-                                <xs:documentation>License identifiers that may be used to manage licenses and
-                                    their lifecycle</xs:documentation>
-                            </xs:annotation>
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element name="altId" type="xs:normalizedString" minOccurs="0" maxOccurs="unbounded"/>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element name="licensor" minOccurs="0" maxOccurs="1">
-                            <xs:annotation>
-                                <xs:documentation>The individual or organization that grants a license to another
-                                    individual or organization</xs:documentation>
-                            </xs:annotation>
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:choice>
-                                        <xs:element name="organization" type="bom:organizationalEntity" minOccurs="0" maxOccurs="1">
-                                            <xs:annotation>
-                                                <xs:documentation>The organization that granted the license</xs:documentation>
-                                            </xs:annotation>
-                                        </xs:element>
-                                        <xs:element name="individual" type="bom:organizationalContact" minOccurs="0" maxOccurs="1">
-                                            <xs:annotation>
-                                                <xs:documentation>The individual, not associated with an organization,
-                                                    that granted the license</xs:documentation>
-                                            </xs:annotation>
-                                        </xs:element>
-                                    </xs:choice>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element name="licensee" minOccurs="0" maxOccurs="1">
-                            <xs:annotation>
-                                <xs:documentation>The individual or organization for which a license was granted to</xs:documentation>
-                            </xs:annotation>
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:choice>
-                                        <xs:element name="organization" type="bom:organizationalEntity" minOccurs="0" maxOccurs="1">
-                                            <xs:annotation>
-                                                <xs:documentation>The organization that was granted the license</xs:documentation>
-                                            </xs:annotation>
-                                        </xs:element>
-                                        <xs:element name="individual" type="bom:organizationalContact" minOccurs="0" maxOccurs="1">
-                                            <xs:annotation>
-                                                <xs:documentation>The individual, not associated with an organization,
-                                                    that was granted the license</xs:documentation>
-                                            </xs:annotation>
-                                        </xs:element>
-                                    </xs:choice>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element name="purchaser" minOccurs="0" maxOccurs="1">
-                            <xs:annotation>
-                                <xs:documentation>The individual or organization that purchased the license</xs:documentation>
-                            </xs:annotation>
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:choice>
-                                        <xs:element name="organization" type="bom:organizationalEntity" minOccurs="0" maxOccurs="1">
-                                            <xs:annotation>
-                                                <xs:documentation>The organization that purchased the license</xs:documentation>
-                                            </xs:annotation>
-                                        </xs:element>
-                                        <xs:element name="individual" type="bom:organizationalContact" minOccurs="0" maxOccurs="1">
-                                            <xs:annotation>
-                                                <xs:documentation>The individual, not associated with an organization,
-                                                    that purchased the license</xs:documentation>
-                                            </xs:annotation>
-                                        </xs:element>
-                                    </xs:choice>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element name="purchaseOrder" type="xs:string" minOccurs="0" maxOccurs="1">
-                            <xs:annotation>
-                                <xs:documentation>The purchase order identifier the purchaser sent to a supplier or
-                                    vendor to authorize a purchase</xs:documentation>
-                            </xs:annotation>
-                        </xs:element>
-                        <xs:element name="licenseTypes" minOccurs="0" maxOccurs="1">
-                            <xs:annotation>
-                                <xs:documentation>The type of license(s) that was granted to the licensee</xs:documentation>
-                            </xs:annotation>
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element name="licenseType" type="bom:licenseTypeEnum" minOccurs="0" maxOccurs="unbounded"/>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element name="lastRenewal" type="xs:dateTime" minOccurs="0" maxOccurs="1">
-                            <xs:annotation>
-                                <xs:documentation xml:lang="en">The timestamp indicating when the license was last
-                                    renewed. For new purchases, this is often the purchase or acquisition date.
-                                    For non-perpetual licenses or subscriptions, this is the timestamp of when the
-                                    license was last renewed.</xs:documentation>
-                            </xs:annotation>
-                        </xs:element>
-                        <xs:element name="expiration" type="xs:dateTime" minOccurs="0" maxOccurs="1">
-                            <xs:annotation>
-                                <xs:documentation xml:lang="en">The timestamp indicating when the current license
-                                    expires (if applicable).</xs:documentation>
-                            </xs:annotation>
-                        </xs:element>
-                        <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
-                            <xs:annotation>
-                                <xs:documentation>
-                                    Allows any undeclared elements as long as the elements are placed in a different namespace.
-                                </xs:documentation>
-                            </xs:annotation>
-                        </xs:any>
-                    </xs:sequence>
-                </xs:complexType>
             </xs:element>
             <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
@@ -1044,6 +1045,22 @@ limitations under the License.
                         </xs:annotation>
                     </xs:attribute>
                 </xs:complexType>
+            </xs:element>
+            <xs:element name="licensing" type="bom:licensingType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Licensing details describing the licensor/licensee, license type, renewal and
+                        expiration dates, and other important metadata</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Provides the ability to document properties in a name/value store.
+                        This provides flexibility to include data not officially supported in the standard
+                        without having to use additional namespaces or create extensions. Property names
+                        of interest to the general public are encouraged to be registered in the
+                        CycloneDX Property Taxonomy - https://github.com/CycloneDX/cyclonedx-property-taxonomy.
+                        Formal registration is optional.</xs:documentation>
+                </xs:annotation>
             </xs:element>
             <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
