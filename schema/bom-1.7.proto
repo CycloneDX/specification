@@ -514,8 +514,8 @@ message Metadata {
   repeated Lifecycles lifecycles = 9;
   // The organization that created the BOM. Manufacturer is common in BOMs created through automated processes. BOMs created through manual means may have '.authors' instead.
   optional OrganizationalEntity manufacturer = 10;
-  // The Traffic Light Protocol (TLP) classification that controls the sharing and distribution of the data that the BOM describes.
-  optional Tlp distribution = 11;
+  // The Traffic Light Protocol (TLP) classification that controls the sharing and distribution of the component that the BOM describes.
+  optional TlpClassification distribution = 11;
 }
 
 message Lifecycles {
@@ -677,18 +677,20 @@ message Swid {
   optional string url = 7;
 }
 
-// The Traffic Light Protocol (TLP) classification for the data that the BOM describes. TLP is a classification system for identifying the potential risk associated with artefact, including whether it is subject to certain types of legal, financial, or technical threats. Refer to https://www.first.org/tlp/ for further information. The default classification is `TLP_CLEAR`
-enum Tlp {
-  // buf:lint:ignore ENUM_ZERO_VALUE_SUFFIX -- `TLP_CLEAR` is our fallback, the default.
-  TLP_CLEAR = 0;
-  // Limited distribution but can be shared within a community.
-  TLP_GREEN = 1;
-  // Limited distribution but can be shared within an organization and with clients
-  TLP_AMBER = 2;
-  // Limited distribution but can be shared within an organization.
-  TLP_AMBER_AND_STRICT = 3;
-  // Restricted distribution to individual recipients and must not be shared.
-  TLP_RED = 4;
+// Traffic Light Protocol (TLP) is a classification system for identifying the potential risk associated with artefact, including whether it is subject to certain types of legal, financial, or technical threats. Refer to https://www.first.org/tlp/ for further information.
+//The default classification is "CLEAR"
+enum TlpClassification {
+  // The information is not subject to any restrictions as regards the sharing.
+  // buf:lint:ignore ENUM_ZERO_VALUE_SUFFIX -- "CLEAR" is our fallback, the default.
+  TLP_CLASSIFICATION_CLEAR = 0;
+  // The information is subject to limited disclosure, and recipients can share it within their community but not via publicly accessible channels.
+  TLP_CLASSIFICATION_GREEN = 1;
+  // The information is subject to limited disclosure, and recipients can only share it on a need-to-know basis within their organization and with clients.
+  TLP_CLASSIFICATION_AMBER = 2;
+  // The information is subject to limited disclosure, and recipients can only share it on a need-to-know basis within their organization.
+  TLP_CLASSIFICATION_AMBER_AND_STRICT = 3;
+  // The information is subject to restricted distribution to individual recipients only and must not be shared.
+  TLP_CLASSIFICATION_RED = 4;
 }
 
 // Specifies a tool (manual or automated).
