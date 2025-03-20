@@ -5317,7 +5317,7 @@
             },
             "nistQuantumSecurityLevel": {
               "type": "integer",
-              "title": "NIST security strength category",
+              "title": "NIST security strength category.",
               "description": "The NIST security strength category as defined in https://csrc.nist.gov/projects/post-quantum-cryptography/post-quantum-cryptography-standardization/evaluation-criteria/security-(evaluation-criteria). A value of 0 indicates that none of the categories are met.",
               "minimum": 0,
               "maximum": 6
@@ -5327,56 +5327,62 @@
         "certificateProperties": {
           "type": "object",
           "title": "Certificate Properties",
-          "description": "Properties for cryptographic assets of asset type 'certificate'",
+          "description": "Properties for cryptographic assets of asset type 'certificate'.",
           "additionalProperties": false,
           "properties": {
+            "serialNumber": {
+              "type": "string",
+              "title": "Serial Number",
+              "description": "The serial number is a unique identifier for the certificate issued by a CA." // TODO: add pattern to validate serial number input - is that the same pattern for the all certificate types?
+            },
             "subjectName": {
               "type": "string",
               "title": "Subject Name",
-              "description": "The subject name for the certificate"
+              "description": "The subject name for the certificate."
             },
             "issuerName": {
               "type": "string",
               "title": "Issuer Name",
-              "description": "The issuer name for the certificate"
+              "description": "The issuer name for the certificate."
             },
             "notValidBefore": {
               "type": "string",
               "format": "date-time",
               "title": "Not Valid Before",
-              "description": "The date and time according to ISO-8601 standard from which the certificate is valid"
+              "description": "The date and time according to ISO-8601 standard from which the certificate is valid."
             },
             "notValidAfter": {
               "type": "string",
               "format": "date-time",
               "title": "Not Valid After",
-              "description": "The date and time according to ISO-8601 standard from which the certificate is not valid anymore"
+              "description": "The date and time according to ISO-8601 standard from which the certificate is not valid anymore."
             },
             "signatureAlgorithmRef": {
+              "deprecated": true,
               "$ref": "#/definitions/refType",
               "title": "Algorithm Reference",
-              "description": "The bom-ref to signature algorithm used by the certificate"
+              "description": "[Deprecated] The bom-ref to signature algorithm used by the certificate."
             },
             "subjectPublicKeyRef": {
+              "deprecated": true,
               "$ref": "#/definitions/refType",
               "title": "Key reference",
-              "description": "The bom-ref to the public key of the subject"
+              "description": "[Deprecated] The bom-ref to the public key of the subject."
             },
             "certificateFormat": {
               "type": "string",
               "title": "Certificate Format",
-              "description": "The format of the certificate",
+              "description": "The format of the certificate.",
               "examples": [
                 "X.509",
-                "PEM",
-                "DER",
                 "CVC"
               ]
             },
             "certificateExtension": {
+              "deprecated": true,
               "type": "string",
               "title": "Certificate File Extension",
-              "description": "The file extension of the certificate",
+              "description": "[Deprecated] The file extension of the certificate.",
               "examples": [
                 "crt",
                 "pem",
@@ -5384,7 +5390,206 @@
                 "der",
                 "p12"
               ]
-            }
+            },
+            "certificateFileExtension": {
+              "type": "string",
+              "title": "Certificate File Extension",
+              "description": "The file extension of the certificate.",
+              "examples": [
+                "crt",
+                "pem",
+                "cer",
+                "der",
+                "p12"
+              ]
+            },
+            "fingerprint": {
+              "type": "object",
+              "$ref": "#/definitions/hash",
+              "title": "Certificate Fingerprint",
+              "description": "The fingerprint is a cryptographic hash of the certificate excluding it's signature."
+            },
+            "certificateState": {
+              "type": "array",
+              "title": "Certificate Lifecycle State",
+              "description": "The certificate lifecycle is a comprehensive process that manages digital certificates from their initial creation to eventual expiration or revocation. It typically involves several stages",
+              "items": {
+                "type": "object",
+                "title": "State",
+                "description": "The state of the certificate.",
+                "oneOf": [
+                  {
+                    "title": "Pre-Defined State",
+                    "required": [
+                      "state"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "state": {
+                        "type": "string",
+                        "title": "State",
+                        "description": "A pre-defined state in the certificate lifecycle.",
+                        "enum": [
+                          "pre-activation",
+                          "active",
+                          "suspended",
+                          "deactivated",
+                          "revoked",
+                          "destroyed"
+                        ],
+                        "meta:enum": {
+                          "pre-activation": "The certificate has been issued by the issuing certificate authority (CA) but has not been authorized for use.",
+                          "active": "The certificate may be used to cryptographically protect information, cryptographically process previously protected information, or both.",
+                          "deactivated": "Certificates in the deactivated state shall not be used to apply cryptographic protection but, in some cases, may be used to process cryptographically protected information.",
+                          "suspended": "The use of a certifacte may be suspended for several possible reasons.",
+                          "revoked": "A revoked certificate is a digital certificate that has been invalidated by the issuing certificate authority (CA) before its scheduled expiration date.",
+                          "destroyed": "The certificate has been destroyed."
+                        },
+                      },
+                      "reason": {
+                        "type": "string",
+                        "title": "Reason",
+                        "description": "A reason for the certificate being in this state."
+                      }
+                    }
+                  },
+                  {
+                    "title": "Custom State",
+                    "required": [
+                      "name"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "state": {
+                        "type": "string",
+                        "title": "State",
+                        "description": "The name of the certificate lifecycle state."
+                      },
+                      "description": {
+                        "type": "string",
+                        "title": "Description",
+                        "description": "The description of the certificate lifecycle state."
+                      },
+                      "reason": {
+                        "type": "string",
+                        "title": "Reason",
+                        "description": "A reason for the certificate being in this state."
+                      }
+                    }
+                  }
+                ],
+              }
+            },
+            "creationDate": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Creation Date",
+              "description": "The date and time (timestamp) when the certificate was created or pre-activated."
+            },
+            "activationDate": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Activation Date",
+              "description": "The date and time (timestamp) when the certificate was activated."
+            },
+            "deactivationDate": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Deactivation Date",
+              "description": "The date and time (timestamp) when the related certificate was deactiviated."
+            },
+            "revokationDate": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Revokation Date",
+              "description": "The date and time (timestamp) when the certificate was revoked."
+            },
+            "destructionDate": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Destruction Date",
+              "description": "The date and time (timestamp) when the certificate was destroyed."
+            },
+            "certificateExtensions": {
+              "type": "array",
+              "title": "Certificate Extensions",
+              "description": "",
+              "items": {
+                "type": "object",
+                "title": "Extension",
+                "description": "",
+                "oneOf": [
+                  {
+                    "title": "Common Extensions",
+                    "required": [
+                      "name",
+                      "value"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "title": "name",
+                        "description": "The name of the extention.",
+                        "enum": [
+                          "basicConstraints",
+                          "keyUsage",
+                          "extendedKeyUsage",
+                          "subjectAlternativeName",
+                          "authorityKeyIdentifier",
+                          "subjectKeyIdentifier",
+                          "authorityInformationAccess",
+                          "certificatePolicies",
+                          "crlDistributionPoints",
+                          "signedCertificateTimestamp"
+                        ],
+                        "meta:enum": {
+                          "basicConstraints": "Specifies whether a certificate can be used as a CA certificate or not.",
+                          "keyUsage": "Specifies the allowed uses of the public key in the certificate.",
+                          "extendedKeyUsage": "Specifies additional purposes for which the public key can be used.",
+                          "subjectAlternativeName": "Allows inclusion of additional names to identify the entity associated with the certificate.",
+                          "authorityKeyIdentifier": "Identifies the public key of the CA that issued the certificate.",
+                          "subjectKeyIdentifier": "Identifies the public key associated with the entity the certificate was issued to.",
+                          "authorityInformationAccess": "Contains CA issuers and OCSP information.",
+                          "certificatePolicies": "Defines the policies under which the certificate was issued and can be used.",
+                          "crlDistributionPoints": "Contains one or more URLs where a Certificate Revocation List (CRL) can be obtained.",
+                          "signedCertificateTimestamp": "Shows that the certificate has been publicly logged, which helps prevent the issuance of rogue certificates by a CA. Log ID, timestamp and signature as proof.",
+                        },
+                      },
+                      "value": {
+                        "type": "string",
+                        "title": "Value",
+                        "description": "The value of the certificate extension."
+                      }
+                    }
+                  },
+                  {
+                    "title": "Custom Extensions",
+                    "required": [
+                      "name"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "title": "Name",
+                        "description": "The name for the custom certificate extension."
+                      },
+                      "value": {
+                        "type": "string",
+                        "title": "Value",
+                        "description": "The description of the custom certificate extension."
+                      }
+                    }
+                  }
+                ],
+              }
+            },
+            "relatedCryptographicAssets": {
+              "$ref": "#/definitions/relatedCryptographicAssets",
+              "title": "Related Cryptographic Assets",
+              "description": "A list of cryptographic assets related to this component.",
+            },
           }
         },
         "relatedCryptoMaterialProperties": {
@@ -5445,6 +5650,7 @@
               "title": "ID",
               "description": "The optional unique identifier for the related cryptographic material."
             },
+            // TODO: Should we allow adding custom states here too?
             "state": {
               "type": "string",
               "title": "State",
@@ -5459,9 +5665,10 @@
               ]
             },
             "algorithmRef": {
+              "deprecated": true,
               "$ref": "#/definitions/refType",
               "title": "Algorithm Reference",
-              "description": "The bom-ref to the algorithm used to generate the related cryptographic material."
+              "description": "[Deprecated] The bom-ref to the algorithm used to generate the related cryptographic material. Use relatedCryptographicAssets instead."
             },
             "creationDate": {
               "type": "string",
@@ -5506,7 +5713,18 @@
               "$ref": "#/definitions/securedBy",
               "title": "Secured By",
               "description": "The mechanism by which the cryptographic asset is secured by."
-            }
+            },
+            "fingerprint": {
+              "type": "object",
+              "$ref": "#/definitions/hash",
+              "title": "Fingerprint",
+              "description": "The fingerprint is a cryptographic hash of the asset."
+            },
+            "relatedCryptographicAssets": {
+              "$ref": "#/definitions/relatedCryptographicAssets",
+              "title": "Related Cryptographic Assets",
+              "description": "A list of cryptographic assets related to this component.",
+            },
           }
         },
         "protocolProperties": {
@@ -5598,10 +5816,16 @@
               }
             },
             "cryptoRefArray": {
+              "deprecated": true,
               "$ref": "#/definitions/cryptoRefArray",
               "title": "Cryptographic References",
-              "description": "A list of protocol-related cryptographic assets"
-            }
+              "description": "[Deprecated] A list of protocol-related cryptographic assets. Use relatedCryptographicAssets instead."
+            },
+            "relatedCryptographicAssets": {
+              "$ref": "#/definitions/relatedCryptographicAssets",
+              "title": "Related Cryptographic Assets",
+              "description": "A list of cryptographic assets related to this component.",
+            },
           }
         },
         "oid": {
@@ -5651,10 +5875,43 @@
         }
       }
     },
-    "cryptoRefArray" : {
+    "cryptoRefArray": {
+      "deprecated": true,
       "type": "array",
       "items": {
         "$ref": "#/definitions/refType"
+      }
+    },
+    "relatedCryptographicAssets": {
+      "type": "array",
+      "title": "Related Cryptographic Assets",
+      "description": "A list of cryptographic assets related to this component.",
+      "items": {
+        "$ref": "#/definitions/relatedCryptographicAsset",
+        "title": "Related Cryptographic Asset"
+      }
+    },
+    "relatedCryptographicAsset": {
+      "type": "object",
+      "title": "Related Cryptographic Asset",
+      "description": "A cryptographic assets related to this component.",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "title": "Type",
+          "description": "Specifies the mechanism by which the cryptographic asset is secured by.",
+          "examples": [
+            "publicKey",
+            "privateKey",
+            "algorithm"
+          ]
+        },
+        "ref": {
+          "$ref": "#/definitions/refType",
+          "title": "Reference to cryptographic asset",
+          "description": "The bom-ref to cryptographic asset."
+        }
       }
     },
     "securedBy": {
