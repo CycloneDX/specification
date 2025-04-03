@@ -554,12 +554,26 @@ limitations under the License.
                         of the component. Examples: commons-lang3 and jquery</xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="version" type="bom:versionType" minOccurs="0" maxOccurs="1">
+            <xs:choice minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation>The component version. The version should ideally comply with semantic versioning
-                        but is not enforced.</xs:documentation>
+                    <xs:documentation>Must be used exclusively, either 'version' or 'versionRange', but not both.</xs:documentation>
                 </xs:annotation>
-            </xs:element>
+                <xs:element name="version" type="bom:versionType">
+                    <xs:annotation>
+                        <xs:documentation>The component version. The version should ideally comply with semantic versioning
+                            but is not enforced.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="versionRange" type="bom:versionRangeType">
+                    <xs:annotation>
+                        <xs:documentation><![CDATA[
+                        For an external component, this specifies the accepted version range.
+                        The value must adhere to the Package URL Version Range syntax (vers), as defined at https://github.com/package-url/purl-spec/blob/master/VERSION-RANGE-SPEC.rst.
+                        May only be used if `@isExternal` is set to `true`.
+                        ]]></xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:choice>
             <xs:element name="description" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>Specifies a description for the component</xs:documentation>
@@ -745,6 +759,15 @@ limitations under the License.
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
+        <xs:attribute name="isExternal" type="xs:boolean" use="optional" default="false">
+            <xs:annotation>
+                <xs:documentation>
+                    Determine whether this component is external.
+                    An external component is one that is not part of an assembly, but is expected to be provided by the environment, regardless of the component's `@scope`. This setting can be useful for distinguishing which components are bundled with the product and which can be relied upon to be present in the deployment environment.
+                    This may be set to `true` for runtime components only. For `/metadata/component`, it must be set to `false`.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
         <xs:attribute name="bom-ref" type="bom:refType">
             <xs:annotation>
                 <xs:documentation>
@@ -759,6 +782,14 @@ limitations under the License.
                     do not have the same name as an existing attribute used by the schema.</xs:documentation>
             </xs:annotation>
         </xs:anyAttribute>
+        <!-- Attention:
+        This would be formal, if the support for XSD1.1's `assert` was properly implemented in validators and tools digesting XML.
+        <xs:assert vc:minVersion="1.1"
+                   id="versionRange_requires_isExternal_eq_true"
+                   test="if (versionRange) then (@isExternal eq 'true') else true()">
+            Child `versionRange` May only be present, if attribute `isExternal`=='true'.
+        </xs:assert>
+        -->
     </xs:complexType>
 
     <xs:complexType name="licenseType">
