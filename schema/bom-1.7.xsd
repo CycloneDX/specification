@@ -76,7 +76,7 @@ limitations under the License.
     <xs:simpleType name="versionRangeType">
         <xs:annotation>
             <xs:documentation xml:lang="en"><![CDATA[
-                A version range specified in Package URL Version Range syntax (vers) which is defined at https://github.com/package-url/purl-spec/VERSION-RANGE-SPEC.rst
+                A version range specified in Package URL Version Range syntax (vers) which is defined at https://github.com/package-url/purl-spec/blob/master/VERSION-RANGE-SPEC.rst
 
                 Example values:
                 - "vers:cargo/9.0.14"
@@ -572,6 +572,9 @@ limitations under the License.
                 </xs:annotation>
             </xs:element>
             <xs:element name="hashes" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The hashes of the component.</xs:documentation>
+                </xs:annotation>
                 <xs:complexType>
                     <xs:sequence minOccurs="0" maxOccurs="unbounded">
                         <xs:element name="hash" type="bom:hashType"/>
@@ -698,7 +701,7 @@ limitations under the License.
                         type `machine-learning-model` and must not be specified for other component types.</xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="data" type="bom:componentDataType" minOccurs="0" maxOccurs="1">
+            <xs:element name="data" type="bom:componentDataType" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                     <xs:documentation>This object SHOULD be specified for any component of type `data` and must not be
                         specified for other component types.</xs:documentation>
@@ -764,7 +767,7 @@ limitations under the License.
                 It can either include a valid SPDX license identifier or a named license, along with additional
                 properties such as license acknowledgment, comprehensive commercial licensing information, and
                 the full text of the license.</xs:documentation>
-            </xs:annotation>
+        </xs:annotation>
         <xs:sequence>
             <xs:choice>
                 <xs:element name="id" type="spdx:licenseId" minOccurs="1" maxOccurs="1">
@@ -1842,6 +1845,12 @@ limitations under the License.
                 </xs:complexType>
             </xs:element>
             <xs:element name="references" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        A collection of URL's for reference. Multiple URLs are allowed.
+                        Example: "https://example.com"
+                    </xs:documentation>
+                </xs:annotation>
                 <xs:complexType>
                     <xs:sequence minOccurs="0" maxOccurs="unbounded">
                         <xs:element name="url" type="xs:anyURI"/>
@@ -2058,6 +2067,12 @@ limitations under the License.
                 </xs:annotation>
             </xs:element>
             <xs:element name="endpoints" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The endpoint URIs of the service. Multiple endpoints are allowed.
+                        Example: "https://example.com/api/v1/ticker"
+                    </xs:documentation>
+                </xs:annotation>
                 <xs:complexType>
                     <xs:sequence minOccurs="0" maxOccurs="unbounded">
                         <xs:element name="endpoint" type="xs:anyURI" minOccurs="1">
@@ -2088,6 +2103,9 @@ limitations under the License.
                 </xs:annotation>
             </xs:element>
             <xs:element name="data" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Specifies information about the data including the directional flow of data and the data classification.</xs:documentation>
+                </xs:annotation>
                 <xs:complexType>
                     <xs:choice>
                         <xs:sequence minOccurs="0" maxOccurs="unbounded">
@@ -2253,10 +2271,28 @@ limitations under the License.
                 states that the direction is not known.</xs:documentation>
         </xs:annotation>
         <xs:restriction base="xs:string">
-            <xs:enumeration value="inbound"/>
-            <xs:enumeration value="outbound"/>
-            <xs:enumeration value="bi-directional"/>
-            <xs:enumeration value="unknown"/>
+            <xs:enumeration value="inbound">
+                <xs:annotation>
+                    <xs:documentation>
+                        Data that enters a service.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="outbound">
+                <xs:annotation>
+                    <xs:documentation>Data that exits a service.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="bi-directional">
+                <xs:annotation>
+                    <xs:documentation>Data flows in and out of the service.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="unknown">
+                <xs:annotation>
+                    <xs:documentation>The directional flow of data is not known.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
         </xs:restriction>
     </xs:simpleType>
 
@@ -2311,12 +2347,12 @@ limitations under the License.
     <xs:simpleType name="licenseAcknowledgementEnumerationType">
         <xs:restriction base="xs:string">
             <xs:enumeration value="declared">
-                    <xs:annotation>
-                        <xs:documentation>
-                            Declared licenses represent the initial intentions of authors regarding
-                            the licensing terms of their code.
-                        </xs:documentation>
-                    </xs:annotation>
+                <xs:annotation>
+                    <xs:documentation>
+                        Declared licenses represent the initial intentions of authors regarding
+                        the licensing terms of their code.
+                    </xs:documentation>
+                </xs:annotation>
             </xs:enumeration>
             <xs:enumeration value="concluded">
                 <xs:annotation>
@@ -2562,6 +2598,11 @@ limitations under the License.
                             <xs:complexType>
                                 <xs:sequence>
                                     <xs:element name="frame" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Within a call stack, a frame is a discrete unit that encapsulates an execution context, including local variables, parameters, and the return address. As function calls are made, frames are pushed onto the stack, forming an array-like structure that orchestrates the flow of program execution and manages the sequence of function invocations.
+                                            </xs:documentation>
+                                        </xs:annotation>
                                         <xs:complexType>
                                             <xs:sequence>
                                                 <xs:element name="package" type="xs:string" minOccurs="0" maxOccurs="1">
@@ -2628,7 +2669,13 @@ limitations under the License.
                 </xs:complexType>
             </xs:element>
             <xs:element name="licenses" type="bom:licenseChoiceType" minOccurs="0" maxOccurs="1"/>
-            <xs:element name="copyright" type="bom:copyrightsType" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="copyright" type="bom:copyrightsType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Copyright evidence captures intellectual property assertions, providing evidence of possible ownership and legal protection.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                     <xs:documentation>
@@ -2668,7 +2715,7 @@ limitations under the License.
         <xs:sequence minOccurs="0" maxOccurs="unbounded">
             <xs:element name="aggregate" type="bom:aggregateType" default="not_specified">
                 <xs:annotation>
-                    <xs:documentation>Specifies an aggregate type that describe how complete a relationship is.</xs:documentation>
+                    <xs:documentation>Specifies an aggregate type that describes how complete a relationship is.</xs:documentation>
                 </xs:annotation>
             </xs:element>
             <xs:element name="assemblies" minOccurs="0" maxOccurs="1">
@@ -2862,7 +2909,8 @@ limitations under the License.
                         <xs:element name="alias" type="xs:normalizedString">
                             <xs:annotation>
                                 <xs:documentation>One or more alternate names the release may be referred to. This may
-                                include unofficial terms used by development and marketing teams (e.g. code names).</xs:documentation>
+                                    include unofficial terms used by development and marketing teams (e.g. code names).
+                                </xs:documentation>
                             </xs:annotation>
                         </xs:element>
                     </xs:sequence>
@@ -2885,7 +2933,8 @@ limitations under the License.
                         <xs:element name="note">
                             <xs:annotation>
                                 <xs:documentation>Zero or more release notes containing the locale and content. Multiple
-                                note elements may be specified to support release notes in a wide variety of languages.</xs:documentation>
+                                    note elements may be specified to support release notes in a wide variety of languages.
+                                </xs:documentation>
                             </xs:annotation>
                             <xs:complexType>
                                 <xs:sequence minOccurs="0" maxOccurs="unbounded">
@@ -2932,13 +2981,13 @@ limitations under the License.
         </xs:anyAttribute>
     </xs:complexType>
 
-   <!--
-   Model card support in CycloneDX is derived from TensorFlow Model Card Toolkit released under the Apache 2.0 license and
-   available from https://github.com/tensorflow/model-card-toolkit/blob/main/model_card_toolkit/schema/v0.0.2/model_card.schema.json.
-   In addition, CycloneDX model card support includes portions of VerifyML, also released under the Apache 2.0 license and
-   available from https://github.com/cylynx/verifyml/blob/main/verifyml/model_card_toolkit/schema/v0.0.4/model_card.schema.json.
-   -->
     <xs:complexType name="modelCardType">
+        <!--
+        Model card support in CycloneDX is derived from TensorFlow Model Card Toolkit released under the Apache 2.0 license and
+        available from https://github.com/tensorflow/model-card-toolkit/blob/main/model_card_toolkit/schema/v0.0.2/model_card.schema.json.
+        In addition, CycloneDX model card support includes portions of VerifyML, also released under the Apache 2.0 license and
+        available from https://github.com/cylynx/verifyml/blob/main/verifyml/model_card_toolkit/schema/v0.0.4/model_card.schema.json.
+        -->
         <xs:annotation>
             <xs:documentation>
                 A model card describes the intended uses of a machine learning model and potential limitations, including
@@ -3014,7 +3063,11 @@ limitations under the License.
                                             <xs:union memberTypes="bom:refLinkType bom:bomLinkElementType"/>
                                         </xs:simpleType>
                                     </xs:element>
-                                    <xs:element name="dataset" type="bom:componentDataType" minOccurs="0" maxOccurs="1" />
+                                    <xs:element name="dataset" type="bom:componentDataType" minOccurs="0" maxOccurs="1">
+                                        <xs:annotation>
+                                            <xs:documentation>Inline Data Information</xs:documentation>
+                                        </xs:annotation>
+                                    </xs:element>
                                 </xs:choice>
                             </xs:complexType>
                         </xs:element>
@@ -3878,7 +3931,7 @@ limitations under the License.
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="sensitiveData" minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="sensitiveData" type="xs:string" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                     <xs:documentation>
                         A description of any sensitive data in a dataset.
@@ -3967,7 +4020,7 @@ limitations under the License.
             </xs:documentation>
         </xs:annotation>
         <xs:sequence>
-            <xs:element name="description" minOccurs="0" maxOccurs="1">
+            <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>
                         A description of this collection of graphics.
@@ -4218,9 +4271,9 @@ limitations under the License.
                     </xs:annotation>
                     <xs:sequence>
                         <xs:element name="reproductionSteps" type="xs:string" minOccurs="0" maxOccurs="1">
-                                <xs:annotation>
-                                    <xs:documentation>Precise steps to reproduce the vulnerability.</xs:documentation>
-                                </xs:annotation>
+                            <xs:annotation>
+                                <xs:documentation>Precise steps to reproduce the vulnerability.</xs:documentation>
+                            </xs:annotation>
                         </xs:element>
                         <xs:element name="environment" type="xs:string" minOccurs="0" maxOccurs="1">
                             <xs:annotation>
@@ -4424,7 +4477,7 @@ limitations under the License.
                                                                 </xs:element>
                                                                 <xs:element name="range" type="bom:versionRangeType" minOccurs="1" maxOccurs="1">
                                                                     <xs:annotation>
-                                                                        <xs:documentation>A version range specified in Package URL Version Range syntax (vers) which is defined at https://github.com/package-url/purl-spec/VERSION-RANGE-SPEC.rst</xs:documentation>
+                                                                        <xs:documentation>A version range specified in Package URL Version Range syntax (vers) which is defined at https://github.com/package-url/purl-spec/blob/master/VERSION-RANGE-SPEC.rst</xs:documentation>
                                                                     </xs:annotation>
                                                                 </xs:element>
                                                             </xs:choice>
@@ -4480,7 +4533,8 @@ limitations under the License.
             <xs:element name="url" type="xs:anyURI" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>The url of the vulnerability documentation as provided by the source.
-                    For example: https://nvd.nist.gov/vuln/detail/CVE-2021-39182</xs:documentation>
+                        For example: https://nvd.nist.gov/vuln/detail/CVE-2021-39182
+                    </xs:documentation>
                 </xs:annotation>
             </xs:element>
         </xs:sequence>
@@ -4649,13 +4703,41 @@ limitations under the License.
             </xs:documentation>
         </xs:annotation>
         <xs:restriction base="xs:string">
-            <xs:enumeration value="critical"/>
-            <xs:enumeration value="high"/>
-            <xs:enumeration value="medium"/>
-            <xs:enumeration value="low"/>
-            <xs:enumeration value="info"/>
-            <xs:enumeration value="none"/>
-            <xs:enumeration value="unknown"/>
+            <xs:enumeration value="critical">
+                <xs:annotation>
+                    <xs:documentation>Critical severity</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="high">
+                <xs:annotation>
+                    <xs:documentation>High severity</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="medium">
+                <xs:annotation>
+                    <xs:documentation>Medium severity</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="low">
+                <xs:annotation>
+                    <xs:documentation>Low severity</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="info">
+                <xs:annotation>
+                    <xs:documentation>Informational warning.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="none">
+                <xs:annotation>
+                    <xs:documentation>None</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="unknown">
+                <xs:annotation>
+                    <xs:documentation>The severity is not known</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
         </xs:restriction>
     </xs:simpleType>
 
@@ -4852,11 +4934,31 @@ limitations under the License.
             </xs:documentation>
         </xs:annotation>
         <xs:restriction base="xs:string">
-            <xs:enumeration value="can_not_fix"/>
-            <xs:enumeration value="will_not_fix"/>
-            <xs:enumeration value="update"/>
-            <xs:enumeration value="rollback"/>
-            <xs:enumeration value="workaround_available"/>
+            <xs:enumeration value="can_not_fix">
+                <xs:annotation>
+                    <xs:documentation>Can not fix</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="will_not_fix">
+                <xs:annotation>
+                    <xs:documentation>Will not fix</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="update">
+                <xs:annotation>
+                    <xs:documentation>Update to a different revision or release</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="rollback">
+                <xs:annotation>
+                    <xs:documentation>Revert to a previous revision or release</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="workaround_available">
+                <xs:annotation>
+                    <xs:documentation>There is a workaround available</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
         </xs:restriction>
     </xs:simpleType>
 
@@ -4871,9 +4973,21 @@ limitations under the License.
             </xs:documentation>
         </xs:annotation>
         <xs:restriction base="xs:string">
-            <xs:enumeration value="affected"/>
-            <xs:enumeration value="unaffected"/>
-            <xs:enumeration value="unknown"/>
+            <xs:enumeration value="affected">
+                <xs:annotation>
+                    <xs:documentation>The version is affected by the vulnerability.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="unaffected">
+                <xs:annotation>
+                    <xs:documentation>The version is not affected by the vulnerability.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="unknown">
+                <xs:annotation>
+                    <xs:documentation>It is unknown (or unspecified) whether the given version is affected.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
         </xs:restriction>
     </xs:simpleType>
 
@@ -7834,6 +7948,12 @@ limitations under the License.
                 </xs:complexType>
             </xs:element>
             <xs:element name="affirmation" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        A concise statement affirmed by an individual regarding all declarations, often used for third-party auditor acceptance or recipient acknowledgment.
+                        It includes a list of authorized signatories who assert the validity of the document on behalf of the organization.
+                    </xs:documentation>
+                </xs:annotation>
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element name="statement" type="xs:string" minOccurs="0" maxOccurs="1">
@@ -8027,7 +8147,7 @@ limitations under the License.
                                         </xs:annotation>
                                         <xs:complexType>
                                             <xs:sequence>
-                                                <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                                                <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
                                             </xs:sequence>
                                         </xs:complexType>
                                     </xs:element>
