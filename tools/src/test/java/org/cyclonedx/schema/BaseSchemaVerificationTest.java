@@ -30,20 +30,18 @@ public abstract class BaseSchemaVerificationTest {
         files.addAll(getResources("1.4/"));
         files.addAll(getResources("1.5/"));
         files.addAll(getResources("1.6/"));
+        files.addAll(getResources("1.7/"));
         return files;
     }
 
-    List<String> getResources(final String resourceDirectory) throws Exception {
-        final List<String> files = new ArrayList<>();
-        String dir = resourceDirectory;
-        if (!resourceDirectory.endsWith("/")) {
-            dir += "/";
-        }
-        try (InputStream in = this.getClass().getClassLoader().getResourceAsStream(dir)) {
+    private List<String> getResources(final String resourceDirectory) throws Exception {
+        final List<String> resources = new ArrayList<>();
+        try (InputStream in = this.getClass().getClassLoader().getResourceAsStream(resourceDirectory)) {
             if (in != null) {
-                files.addAll(IOUtils.readLines(in, StandardCharsets.UTF_8));
+                IOUtils.readLines(in, StandardCharsets.UTF_8)
+                        .forEach(resource -> resources.add(resourceDirectory + resource));
             }
         }
-        return files;
+        return resources;
     }
 }
