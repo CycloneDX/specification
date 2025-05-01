@@ -517,6 +517,14 @@
         }
       }
     },
+    "citations": {
+      "type": "array",
+      "additionalItems": false,
+      "items": {"$ref": "#/definitions/citation"},
+      "uniqueItems": true,
+      "title": "Citations",
+      "description": "A list of attributions indicating which entity supplied information for specific fields within the BOM."
+    },
     "properties": {
       "type": "array",
       "title": "Properties",
@@ -5724,6 +5732,61 @@
         "text-to-image",
         "translation",
         "object-detection"
+      ]
+    },
+    "citation": {
+      "type": "object",
+      "title": "Citation",
+      "description": "Details a specific attribution of data within the BOM to a contributing entity or process.",
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "#/definitions/refType",
+          "title": "BOM Reference"
+        },
+        "attributedTo": {
+          "$ref": "#/definitions/refLinkType",
+          "title": "Attributed To",
+          "description": "The `bom-ref` of an object, such as a component, service, organisational entity, or person that supplied the cited information."
+        },
+        "pointers": {
+          "type": "array",
+          "additionalItems": false,
+          "items": {
+            "type": "string",
+            "title": "Field Reference",
+            "description": "A [JSON Pointer](https://datatracker.ietf.org/doc/html/rfc6901) identifying the BOM field to which the attribution applies. Users of other serialisation formats (e.g. XML) shall use the JSON Pointer format to ensure consistent field referencing across representations."
+          },
+          "minItems": 1,
+          "title": "Field References",
+          "description": "One or more [JSON Pointers](https://datatracker.ietf.org/doc/html/rfc6901) identifying the BOM fields to which the attribution applies."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Timestamp",
+          "description": "The date and time when the attribution was made or the information was supplied."
+        },
+        "process": {
+          "$ref": "#/definitions/refLinkType",
+          "title": "Process Reference",
+          "description": "An optional `bom-ref` to a process (such as a formula, workflow, task, or step) defined in the `formulation` section that executed or generated the attributed data."
+        },
+        "note": {
+          "type": "string",
+          "title": "Note",
+          "description": "An optional description or comment about the context or quality of the data attribution."
+        },
+        "signature": {
+          "$ref": "#/definitions/signature",
+          "title": "Signature",
+          "description": "An optional digital signature verifying the authenticity or integrity of the attribution."
+        }
+      },
+      "required": ["pointers", "timestamp"],
+      "anyOf": [
+        { "required": ["attributedTo"] },
+        { "required": ["process"] }
       ]
     }
   }

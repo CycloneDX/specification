@@ -43,6 +43,8 @@ message Bom {
   repeated Declarations declarations = 14;
   // A collection of reusable objects that are defined and may be used elsewhere in the BOM.
   repeated Definition definitions = 15;
+  // Details a specific attribution of data within the BOM to a contributing entity or process.
+  repeated Citation citations = 16;
 }
 
 enum Classification {
@@ -2392,4 +2394,19 @@ message CryptoProperties {
   optional ProtocolProperties protocolProperties = 5;
   // The object identifier (OID) of the cryptographic asset.
   optional string oid = 6;
+}
+
+message Citation {
+  // Optional unique identifier for the citation
+  optional string bom_ref = 1;
+  // Field reference using JSON Pointer format
+  string pointer = 2;
+  // Timestamp when the citation occurred
+  google.protobuf.Timestamp timestamp = 3;
+  // The entity (component, service, org, or person) that supplied the data (optional)
+  optional string attributed_to = 4;
+  // The process (workflow/formula/task) that generated the data (optional)
+  optional string process = 5;
+  // Optional human-readable note
+  optional string note = 6;
 }

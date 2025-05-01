@@ -8349,6 +8349,55 @@ limitations under the License.
         </xs:sequence>
     </xs:complexType>
 
+    <xs:complexType name="citationsType">
+        <xs:sequence>
+            <xs:element name="citation" type="bom:citationType" minOccurs="1" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Details a specific attribution of data within the BOM to a contributing entity or process.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="citationType">
+        <xs:sequence>
+            <xs:element name="pointers" minOccurs="1" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="pointer" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="timestamp" type="xs:dateTime" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="attributedTo" type="bom:refLinkType" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="process" type="bom:refLinkType" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="note" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:attribute name="bom-ref" type="bom:refType" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                    An optional identifier which can be used to reference the object elsewhere in the BOM.
+                    Uniqueness is enforced within all elements and children of the root-level bom element.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:anyAttribute namespace="##other" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
     <xs:element name="bom">
         <xs:complexType>
             <xs:sequence>
@@ -8428,6 +8477,11 @@ limitations under the License.
                         <xs:documentation>
                             A collection of reusable objects that are defined and may be used elsewhere in the BOM.
                         </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="citations" type="bom:citationsType" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>A list of attributions indicating which entity supplied information for specific fields within the BOM.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
                 <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
