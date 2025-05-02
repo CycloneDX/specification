@@ -106,8 +106,16 @@ message Component {
   optional string group = 7;
   // The name of the component. This will often be a shortened, single name of the component. Examples: commons-lang3 and jquery
   string name = 8;
-  // The component version. The version should ideally comply with semantic versioning but is not enforced. Version was made optional in v1.4 of the spec. For backward compatibility, it is recommended to use an empty string to represent components without version information.
+  // The component version. The version should ideally comply with semantic versioning but is not enforced.
+  // Version was made optional in v1.4 of the spec.
+  // For backward compatibility, it is recommended to use an empty string to represent components without version information.
+  // Must be used exclusively, either 'version' or 'versionRange', but not both.
   string version = 9;
+  // For an external component, this specifies the accepted version range.
+  // The value must adhere to the Package URL Version Range syntax (vers), as defined at https://github.com/package-url/purl-spec/blob/master/VERSION-RANGE-SPEC.rst.
+  // May only be used if `isExternal` is set to `true`.
+  // Must be used exclusively, either 'version' or 'versionRange', but not both.
+  optional string versionRange = 33;
   // Specifies a description for the component
   optional string description = 10;
   // Specifies the scope of the component. If a scope is not specified, SCOPE_REQUIRED scope should be assumed by the consumer of the BOM
@@ -154,6 +162,10 @@ message Component {
   repeated string omniborId = 31;
   // Specifies the Software Heritage persistent identifier (SWHID). The SWHID, if specified, must be valid and conform to the specification defined at: https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html
   repeated string swhid = 32;
+  // Determine whether this component is external.
+  // An external component is one that is not part of an assembly, but is expected to be provided by the environment, regardless of the component's `scope`. This setting can be useful for distinguishing which components are bundled with the product and which can be relied upon to be present in the deployment environment.
+  // This may be set to `true` for runtime components only. For `Bom.metadata.component`, it must be set to `false`.
+  optional bool isExternal = 34; // implicit defaults to `false`
 }
 
 // Specifies the data flow.
@@ -325,6 +337,8 @@ enum HashAlg {
   HASH_ALG_BLAKE_2_B_384 = 10;
   HASH_ALG_BLAKE_2_B_512 = 11;
   HASH_ALG_BLAKE_3 = 12;
+  HASH_ALG_STREEBOG_256 = 13;
+  HASH_ALG_STREEBOG_512 = 14;
 }
 
 // Specifies the file hash of the component
