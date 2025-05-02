@@ -166,6 +166,8 @@ message Component {
   // An external component is one that is not part of an assembly, but is expected to be provided by the environment, regardless of the component's `scope`. This setting can be useful for distinguishing which components are bundled with the product and which can be relied upon to be present in the deployment environment.
   // This may be set to `true` for runtime components only. For `Bom.metadata.component`, it must be set to `false`.
   optional bool isExternal = 34; // implicit defaults to `false`
+  // A list of assertions made regarding patents associated with this component or service. Assertions distinguish between ownership, licensing, and other relevant interactions with patents.
+  repeated PatentAssertion patent_assertions = 35;
 }
 
 // Specifies the data flow.
@@ -320,6 +322,12 @@ enum ExternalReferenceType {
   EXTERNAL_REFERENCE_TYPE_RFC_9116 = 41;
   // Reference to release notes
   EXTERNAL_REFERENCE_TYPE_RELEASE_NOTES = 42;
+  // References information about patents which may be defined in human-readable documents or in machine-readable formats such as CycloneDX or ST.96. For detailed patent information or to reference the information provided directly by patent offices, it is recommended to leverage standards from the World Intellectual Property Organization (WIPO) such as [ST.96](https://www.wipo.int/standards/en/st96).
+  EXTERNAL_REFERENCE_TYPE_PATENT = 43;
+  // References information about a patent family which may be defined in human-readable documents or in machine-readable formats such as CycloneDX or ST.96. A patent family is a group of related patent applications or granted patents that cover the same or similar invention. For detailed patent family information or to reference the information provided directly by patent offices, it is recommended to leverage standards from the World Intellectual Property Organization (WIPO) such as [ST.96](https://www.wipo.int/standards/en/st96).
+  EXTERNAL_REFERENCE_TYPE_PATENT_FAMILY = 44;
+  // References assertions made regarding patents associated with a component or service. Assertions distinguish between ownership, licensing, and other relevant interactions with patents.
+  EXTERNAL_REFERENCE_TYPE_PATENT_ASSERTION = 45;
 }
 
 enum HashAlg {
@@ -669,6 +677,8 @@ message Service {
   optional string trustZone = 16;
   // Textual strings that aid in the discovery, search, and retrieval of the associated object. Tags often serve as a way to group or categorize similar or related objects by various attributes. Examples include "json-parser", "object-persistence", "text-to-image", "translation", and "object-detection".
   repeated string tags = 17;
+  // A list of assertions made regarding patents associated with this component or service. Assertions distinguish between ownership, licensing, and other relevant interactions with patents.
+  repeated PatentAssertion patent_assertions = 18;
 }
 
 // Specifies metadata and content for ISO-IEC 19770-2 Software Identification (SWID) Tags.
@@ -2038,6 +2048,8 @@ message Definition {
 
   // The list of standards which may consist of regulations, industry or organizational-specific standards, maturity models, best practices, or any other requirements which can be evaluated against or attested to.
   repeated Standard standards = 1;
+  // The list of either individual patents or patent families.
+  repeated PatentOrFamily patents = 2;
 }
 
 // "Cryptographic Properties
@@ -2392,4 +2404,120 @@ message CryptoProperties {
   optional ProtocolProperties protocolProperties = 5;
   // The object identifier (OID) of the cryptographic asset.
   optional string oid = 6;
+}
+
+message PatentOrFamily {
+  oneof item {
+    Patent patent = 1;
+    PatentFamily patent_family = 2;
+  }
+}
+
+// The priorityApplication contains the essential data necessary to identify and reference an earlier patent filing for priority rights. In line with WIPO ST.96 guidelines, it includes the jurisdiction (office code), application number, and filing date-the three key elements that uniquely specify the priority application in a global patent context.
+message PriorityApplication {
+  //The unique number assigned to a patent application when it is filed with a patent office. It is used to identify the specific application and track its progress through the examination process. Aligned with `ApplicationNumber` in ST.96. Refer to [ApplicationIdentificationType in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/ApplicationIdentificationType.xsd).
+  string application_number = 1;
+  // The jurisdiction or patent office where the priority application was filed, specified using WIPO ST.3 codes. Aligned with `IPOfficeCode` in ST.96. Refer to [IPOfficeCode in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Common/IPOfficeCode.xsd).
+  string jurisdiction = 2;
+  // The date the priority application was filed, aligned with `FilingDate` in ST.96. Refer to [FilingDate in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/FilingDate.xsd).
+  google.protobuf.Timestamp filing_date = 3;
+}
+
+// A patent is a legal instrument, granted by an authority, that confers certain rights over an invention for a specified period, contingent on public disclosure and adherence to relevant legal requirements. The summary information in this object is aligned with [WIPO ST.96](https://www.wipo.int/standards/en/st96/) principles where applicable.
+message Patent {
+  // An optional identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
+  optional string bom_ref = 1;
+  // The unique number assigned to the granted patent by the issuing authority. Aligned with `PatentNumber` in WIPO ST.96. Refer to [PatentNumber in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/PatentNumber.xsd).
+  string patent_number = 2;
+  // The unique number assigned to a patent application when it is filed with a patent office. It is used to identify the specific application and track its progress through the examination process. Aligned with `ApplicationNumber` in ST.96. Refer to [ApplicationIdentificationType in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/ApplicationIdentificationType.xsd).
+  optional string application_number = 3;
+  // The jurisdiction or patent office where the priority application was filed, specified using WIPO ST.3 codes. Aligned with `IPOfficeCode` in ST.96. Refer to [IPOfficeCode in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Common/IPOfficeCode.xsd).
+  string jurisdiction = 4;
+  // The priorityApplication contains the essential data necessary to identify and reference an earlier patent filing for priority rights. In line with WIPO ST.96 guidelines, it includes the jurisdiction (office code), application number, and filing date-the three key elements that uniquely specify the priority application in a global patent context.
+  optional PriorityApplication priority_application = 5;
+  // This is the number assigned to a patent application once it is published. Patent applications are generally published 18 months after filing (unless an applicant requests non-publication). This number is distinct from the application number.
+  optional string publication_number = 6;
+  // The title of the patent, summarising the invention it protects. Aligned with `InventionTitle` in WIPO ST.96. Refer to [InventionTitle in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/InventionTitle.xsd).
+  optional string title = 7;
+  // A brief summary of the invention described in the patent. Aligned with `Abstract` and `P` in WIPO ST.96. Refer to [Abstract in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/Abstract.xsd).
+  optional string abstract = 8;
+  // The date the patent application was filed with the jurisdiction. Aligned with `FilingDate` in WIPO ST.96. Refer to [FilingDate in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/FilingDate.xsd).
+  optional google.protobuf.Timestamp filing_date = 9;
+  // The date the patent was granted by the jurisdiction. Aligned with `GrantDate` in WIPO ST.96. Refer to [GrantDate in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/GrantDate.xsd).
+  optional google.protobuf.Timestamp grant_date = 10;
+  // The date the patent expires. Derived from grant or filing date according to jurisdiction-specific rules.
+  optional google.protobuf.Timestamp patent_expiration_date = 11;
+  // Indicates the current legal status of the patent or patent application, based on the WIPO ST.27 standard. This status reflects administrative, procedural, or legal events. Values include both active and inactive states and are useful for determining enforceability, procedural history, and maintenance status.
+  PatentLegalStatus patent_legal_status = 12;
+  // A collection of organisations or individuals to whom the patent rights are assigned. This supports joint ownership and allows for flexible representation of both corporate entities and individual inventors.
+  repeated OrganizationalEntityOrContact patent_assignee = 13;
+  // External references provide a way to document systems, sites, and information that may be relevant but are not included with the BOM. They may also establish specific relationships within or external to the BOM.
+  repeated ExternalReference external_references = 14;
+}
+
+// Indicates the current legal status of the patent or patent application, based on the WIPO ST.27 standard. This status reflects administrative, procedural, or legal events. Values include both active and inactive states and are useful for determining enforceability, procedural history, and maintenance status.
+enum PatentLegalStatus {
+  PATENT_LEGAL_STATUS_UNSPECIFIED = 0;
+  PATENT_LEGAL_STATUS_PENDING = 1;
+  PATENT_LEGAL_STATUS_GRANTED = 2;
+  PATENT_LEGAL_STATUS_REVOKED = 3;
+  PATENT_LEGAL_STATUS_EXPIRED = 4;
+  PATENT_LEGAL_STATUS_LAPSED = 5;
+  PATENT_LEGAL_STATUS_WITHDRAWN = 6;
+  PATENT_LEGAL_STATUS_ABANDONED = 7;
+  PATENT_LEGAL_STATUS_SUSPENDED = 8;
+  PATENT_LEGAL_STATUS_REINSTATED = 9;
+  PATENT_LEGAL_STATUS_OPPOSED = 10;
+  PATENT_LEGAL_STATUS_TERMINATED = 11;
+  PATENT_LEGAL_STATUS_INVALIDATED = 12;
+  PATENT_LEGAL_STATUS_IN_FORCE = 13;
+}
+
+// A patent family is a group of related patent applications or granted patents that cover the same or similar invention. These patents are filed in multiple jurisdictions to protect the invention across different regions or countries. A patent family typically includes patents that share a common priority date, originating from the same initial application, and may vary slightly in scope or claims to comply with regional legal frameworks. Fields align with WIPO ST.96 standards where applicable.
+message PatentFamily {
+  // An optional identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
+  optional string bom_ref = 1;
+  // The unique identifier for the patent family, aligned with the `id` attribute in WIPO ST.96 v8.0's `PatentFamilyType`. Refer to [PatentFamilyType in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/PatentFamilyType.xsd).
+  string family_id = 2;
+  // The priorityApplication contains the essential data necessary to identify and reference an earlier patent filing for priority rights. In line with WIPO ST.96 guidelines, it includes the jurisdiction (office code), application number, and filing date-the three key elements that uniquely specify the priority application in a global patent context.
+  optional PriorityApplication priority_application = 3;
+  // A collection of patents or applications that belong to this family, each identified by a `bom-ref` pointing to a patent object defined elsewhere in the BOM.
+  repeated string members = 4; // bom-ref strings
+  // External references provide a way to document systems, sites, and information that may be relevant but are not included with the BOM. They may also establish specific relationships within or external to the BOM.
+  repeated ExternalReference external_references = 5;
+}
+
+// An assertion linking a patent or patent family to this component or service.
+message PatentAssertion {
+  // An optional identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
+  optional string bom_ref = 1;
+  // The type of assertion being made about the patent or patent family. Examples include ownership, licensing, and standards inclusion.
+  PatentAssertionType assertion_type = 2;
+  // A list of BOM references (`bom-ref`) linking to patents or patent families associated with this assertion.
+  repeated string patent_refs = 3;
+  // A reference to a previously defined `organizationalContact` or `organizationalEntity` object in the BOM. The value must be a valid `bom-ref` pointing to one of these objects.
+  Asserter asserter = 4;
+  // Additional notes or clarifications regarding the assertion, if necessary. For example, geographical restrictions, duration, or limitations of a license.
+  string notes = 5;
+}
+
+message Asserter {
+  oneof value {
+    OrganizationalEntity organization = 1;
+    OrganizationalContact individual = 2;
+    string ref = 3;
+  }
+}
+
+// The type of assertion being made about the patent or patent family. Examples include ownership, licensing, and standards inclusion.
+enum PatentAssertionType {
+  PATENT_ASSERTION_TYPE_UNSPECIFIED = 0;
+  PATENT_ASSERTION_TYPE_OWNERSHIP = 1;
+  PATENT_ASSERTION_TYPE_LICENSE = 2;
+  PATENT_ASSERTION_TYPE_THIRD_PARTY_CLAIM = 3;
+  PATENT_ASSERTION_TYPE_STANDARDS_INCLUSION = 4;
+  PATENT_ASSERTION_TYPE_PRIOR_ART = 5;
+  PATENT_ASSERTION_TYPE_EXCLUSIVE_RIGHTS = 6;
+  PATENT_ASSERTION_TYPE_NON_ASSERTION = 7;
+  PATENT_ASSERTION_TYPE_RESEARCH_OR_EVALUATION = 8;
 }
