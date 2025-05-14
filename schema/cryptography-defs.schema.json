@@ -58,17 +58,58 @@
             }
           },
           "variant": {
-            "type": "string",
-            "title": "Variant",
-            "description": "Defines the pattern used to construct the complete algorithm name. Placeholders are defined by {} for algorithm-specific properties."
-          },
-          "primitive": {
-            "type": "string",
-            "title": "Primitive",
-            "description": "Type of cryptographic primitive (e.g., signature, encryption, hash)."
+            "type": "array",
+            "title": "Variants",
+            "description": "Defines algorithm variants by a naming pattern and the corrsponding cryptographic primitive.",
+            "additionalItems": false,
+            "items": {
+              "type": "object",
+              "title": "Standard Reference",
+              "description": "Reference to a standard, including its name and URL.",
+              "additionalProperties": false,
+              "properties": {
+                "pattern": {
+                  "type": "string",
+                  "title": "Standard Name",
+                  "description": "Defines the pattern used to construct the complete algorithm name. Placeholders are defined by {} for algorithm-specific properties."
+                },
+                "primitive": {
+                  "type": "string",
+                  "title": "Primitive",
+                  "description": "Type of cryptographic primitive (e.g., signature, encryption, hash)."
+                },
+                "standard": {
+                  "type": "array",
+                  "title": "Standards",
+                  "description": "List of standards defining or relating to the algorithm variant.",
+                  "additionalItems": false,
+                  "items": {
+                    "type": "object",
+                    "title": "Standard Reference",
+                    "description": "Reference to a standard, including its name and URL.",
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "title": "Standard Name",
+                        "description": "The name or identifier of the standard."
+                      },
+                      "url": {
+                        "type": "string",
+                        "format": "iri",
+                        "title": "Standard URL",
+                        "description": "A URL pointing to the standard's official documentation."
+                      }
+                    },
+                    "required": ["name", "url"]
+                  }
+                }
+              },
+              "required": ["pattern", "primitive"]
+            }
           }
         },
-        "required": ["family", "variant", "primitive"]
+        "required": ["family", "variant"]
       }
     }
   },
