@@ -2,6 +2,7 @@
 set -eu
 
 declare -a CDX_VERSIONS=(
+  '1.7'
   '1.6'
   '1.5'
   '1.4'
