@@ -8369,16 +8369,51 @@ limitations under the License.
     <xs:complexType name="citationType">
         <xs:sequence>
             <xs:element name="pointers" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        One or more JSON Pointers(https://datatracker.ietf.org/doc/html/rfc6901) identifying the BOM fields to which the attribution applies.
+                    </xs:documentation>
+                </xs:annotation>
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element name="pointer" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
+                        <xs:element name="pointer" type="xs:string" minOccurs="1" maxOccurs="unbounded">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    A JSON Pointer(https://datatracker.ietf.org/doc/html/rfc6901) identifying the BOM field to which the attribution applies. Users of other serialisation formats (e.g. XML) shall use the JSON Pointer format to ensure consistent field referencing across representations.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="timestamp" type="xs:dateTime" minOccurs="1" maxOccurs="1"/>
-            <xs:element name="attributedTo" type="bom:refLinkType" minOccurs="0" maxOccurs="1"/>
-            <xs:element name="process" type="bom:refLinkType" minOccurs="0" maxOccurs="1"/>
-            <xs:element name="note" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="timestamp" type="xs:dateTime" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The date and time when the attribution was made or the information was supplied.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="attributedTo" type="bom:refLinkType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The `bom-ref` of an object, such as a component, service, organisational entity, or person that supplied the cited information.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="process" type="bom:refLinkType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        An optional `bom-ref` to a process (such as a formula, workflow, task, or step) defined in the `formulation` section that executed or generated the attributed data.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="note" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        An optional description or comment about the context or quality of the data attribution.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                     <xs:documentation>
