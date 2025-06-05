@@ -400,12 +400,14 @@ message LicenseChoice {
   oneof choice {
     // A license
     License license = 1;
-    // A valid SPDX license expression. Refer to https://spdx.org/specifications for syntax requirements
+    // A valid SPDX license expression. Refer to https://spdx.org/specifications for syntax requirements.
     string expression = 2;
+    // A SPDX license expression and its details
+    LicenseExpressionDetailed expression_detailed = 5;
   }
-  // This field must only be used when "expression" is chosen as the License object has its own acknowledgement.
+  // This field must only be used when `expression` is chosen as the other options have their own acknowledgement.
   optional LicenseAcknowledgementEnumeration acknowledgement = 3;
-  // This field must only be used when "expression" is chosen as the License object has its own bom_ref.
+  // This field must only be used when `expression` is chosen as the other options have their own bom_ref.
   optional string bom_ref = 4;
 }
 
@@ -429,6 +431,46 @@ message License {
   repeated Property properties = 7;
   // Declared licenses and concluded licenses represent two different stages in the licensing process within software development. Declared licenses refer to the initial intention of the software authors regarding the licensing terms under which their code is released. On the other hand, concluded licenses are the result of a comprehensive analysis of the project's codebase to identify and confirm the actual licenses of the components used, which may differ from the initially declared licenses. While declared licenses provide an upfront indication of the licensing intentions, concluded licenses offer a more thorough understanding of the actual licensing within a project, facilitating proper compliance and risk management. Observed licenses are defined in `@.evidence.licenses`. Observed licenses form the evidence necessary to substantiate a concluded license.
   optional LicenseAcknowledgementEnumeration acknowledgement = 8;
+}
+
+// Specifies the details and attributes related to a software license.
+// It must be a valid SPDX license expression, along with additional properties such as license acknowledgment.
+message LicenseExpressionDetailed {
+
+  // This document specifies the details and attributes related to a software license identifier. An SPDX expression may be a compound of license identifiers.
+  // The `license_identifier` field serves as the key that identifies each record. Note that this key is not required to be unique, as the same license identifier could apply to multiple, different but similar license details, texts, etc.
+  message ExpressionDetails {
+    // A valid SPDX license identifier. Refer to https://spdx.org/specifications for syntax requirements.
+    // This field serves as the primary key, which uniquely identifies each record.
+    // Example values:
+    // - "Apache-2.0",
+    // - "GPL-3.0-only WITH Classpath-exception-2.0"
+    // - "LicenseRef-my-custom-license"
+    string license_identifier = 1;
+    // An optional identifier which can be used to reference the license elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
+    optional string bom_ref = 2;
+    // An optional way to include the textual content of the license.
+    optional AttachedText text = 3;
+    // The URL to the license file. If specified, a 'license' externalReference should also be specified for completeness
+    optional string url = 4;
+  }
+
+  // A valid SPDX license expression. Refer to https://spdx.org/specifications for syntax requirements.
+  // Example values:
+  // - "Apache-2.0 AND (MIT OR GPL-2.0-only)",
+  // - "GPL-3.0-only WITH Classpath-exception-2.0"
+  string expression = 1;
+  // Licensing details describing the licensor/licensee, license type, renewal and expiration dates, and other important metadata
+  // Details for parts of the `expression`.
+  repeated ExpressionDetails details = 2;
+  // An optional identifier which can be used to reference the license elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
+  optional string bom_ref = 3;
+  // Declared licenses and concluded licenses represent two different stages in the licensing process within software development. Declared licenses refer to the initial intention of the software authors regarding the licensing terms under which their code is released. On the other hand, concluded licenses are the result of a comprehensive analysis of the project's codebase to identify and confirm the actual licenses of the components used, which may differ from the initially declared licenses. While declared licenses provide an upfront indication of the licensing intentions, concluded licenses offer a more thorough understanding of the actual licensing within a project, facilitating proper compliance and risk management. Observed licenses are defined in `@.evidence.licenses`. Observed licenses form the evidence necessary to substantiate a concluded license.
+  optional LicenseAcknowledgementEnumeration acknowledgement = 4;
+  // Licensing details describing the licensor/licensee, license type, renewal and expiration dates, and other important metadata
+  optional Licensing licensing = 5;
+  // Specifies optional, custom, properties
+  repeated Property properties = 6;
 }
 
 // Declared licenses and concluded licenses represent two different stages in the licensing process within software development. Declared licenses refer to the initial intention of the software authors regarding the licensing terms under which their code is released. On the other hand, concluded licenses are the result of a comprehensive analysis of the project's codebase to identify and confirm the actual licenses of the components used, which may differ from the initially declared licenses. While declared licenses provide an upfront indication of the licensing intentions, concluded licenses offer a more thorough understanding of the actual licensing within a project, facilitating proper compliance and risk management. Observed licenses are defined in `@.evidence.licenses`. Observed licenses form the evidence necessary to substantiate a concluded license.
