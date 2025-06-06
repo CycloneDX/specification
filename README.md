@@ -1,4 +1,8 @@
-[![Build Status](https://github.com/CycloneDX/specification/workflows/CI%20Build/badge.svg)](https://github.com/CycloneDX/specification/actions?workflow=CI+Build)
+[![Build Docs](https://github.com/CycloneDX/specification/actions/workflows/build_docs.yml/badge.svg)](https://github.com/CycloneDX/specification/actions/workflows/build_docs.yml)
+[![CT Java](https://github.com/CycloneDX/specification/actions/workflows/test_java.yml/badge.svg)](https://github.com/CycloneDX/specification/actions/workflows/test_java.yml)
+[![CT JavaScript](https://github.com/CycloneDX/specification/actions/workflows/test_js.yml/badge.svg)](https://github.com/CycloneDX/specification/actions/workflows/test_js.yml)
+[![CT PHP](https://github.com/CycloneDX/specification/actions/workflows/test_php.yml/badge.svg)](https://github.com/CycloneDX/specification/actions/workflows/test_php.yml)
+[![CT ProtoBuf](https://github.com/CycloneDX/specification/actions/workflows/test_proto.yml/badge.svg)](https://github.com/CycloneDX/specification/actions/workflows/test_proto.yml)  
 [![License][license-image]][license-url]
 [![Website](https://img.shields.io/badge/https://-cyclonedx.org-blue.svg)](https://cyclonedx.org/)
 [![Slack Invite](https://img.shields.io/badge/Slack-Join-blue?logo=slack&labelColor=393939)](https://cyclonedx.org/slack/invite)
