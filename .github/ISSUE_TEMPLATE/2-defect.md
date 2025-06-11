@@ -6,8 +6,8 @@ labels: defect
 
 ---
 
-<!-- 
-THank you for taking the time to file a report.  
+<!--
+Thank you for taking the time to file a report.
 -->
 
 ## Describe the defect
