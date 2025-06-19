@@ -10,7 +10,7 @@
       ],
       "variant": [
         {
-          "pattern": "RSA-PKCS1-1.5-{digestAlgorithm}-{keyLength}",
+          "pattern": "RSA-PKCS1-1.5[-{digestAlgorithm}][-{keyLength}]",
           "primitive": "signature"
         }
       ]
@@ -23,7 +23,7 @@
       ],
       "variant": [
         {
-          "pattern": "RSA-PSS-{digestAlgorithm}-{saltLength}-{keyLength}",
+          "pattern": "RSA-PSS[-{digestAlgorithm}][-{saltLength}][-{keyLength}]",
           "primitive": "signature"
         }
       ]
@@ -35,7 +35,7 @@
       ],
       "variant": [
         {
-          "pattern": "RSA-PKCS1-1.5-{keyLength}",
+          "pattern": "RSA-PKCS1-1.5[-{keyLength}]",
           "primitive": "pke"
         }
       ]
@@ -47,7 +47,7 @@
       ],
       "variant": [
         {
-          "pattern": "RSA-OAEP-{hashAlgorithm}-{maskGenAlgorithm}-{keyLength}",
+          "pattern": "RSA-OAEP[-{hashAlgorithm}][-{maskGenAlgorithm}][-{keyLength}]",
           "primitive": "pke"
         }
       ]
@@ -59,7 +59,7 @@
       ],
       "variant": [
         {
-          "pattern": "Ed{25519|448}{|ph|ctx}",
+          "pattern": "Ed(25519|448)[-(ph|ctx)]",
           "primitive": "signature"
         }
       ]
@@ -72,7 +72,7 @@
       ],
       "variant": [
         {
-          "pattern": "ECDSA-{curve}-{hash}",
+          "pattern": "ECDSA[-{ellipticCurve}][-{hash}]",
           "primitive": "signature"
         }
       ]
@@ -84,7 +84,7 @@
       ],
       "variant": [
         {
-          "pattern": "DSA-{length}-{hash}",
+          "pattern": "DSA[-{length}][-{hash}]",
           "primitive": "signature"
         }
       ]
@@ -98,7 +98,7 @@
       ],
       "variant": [
         {
-          "pattern": "ECDH{E}-{curve}",
+          "pattern": "ECDH[E][-{ellipticCurve}]",
           "primitive": "key-agree"
         }
       ]
@@ -111,7 +111,7 @@
       ],
       "variant": [
         {
-          "pattern": "FFDH{E}-{named_group}",
+          "pattern": "FFDH(E)[-{namedGroup}]",
           "primitive": "key-agree"
         }
       ]
@@ -135,7 +135,7 @@
       ],
       "variant": [
         {
-          "pattern": "SHA-{224|256|384|512|512/224|512/256}",
+          "pattern": "SHA-(224|256|384|512|512/224|512/256)",
           "primitive": "hash"
         }
       ]
@@ -194,7 +194,7 @@
       ],
       "variant": [
         {
-          "pattern": "AES-{128|192|256}-(ECB|CBC|CFB(1|8|64|128)|OFB|CTR|XTS|CTS)-(padding)-(ivlen)",
+          "pattern": "AES[-(128|192|256)][-(ECB|CBC|CFB(1|8|64|128)|OFB|CTR|XTS|CTS)][-{padding}][-{ivlen}]",
           "primitive": "block-cipher"
         },
         {
@@ -202,22 +202,22 @@
             {"name": "SP800-38D", "url": "https://doi.org/10.6028/NIST.SP.800-38D"},
             {"name": "RFC 3610", "url": "https://doi.org/10.17487/RFC5116"}
           ],
-          "pattern": "AES-{128|192|256}-(GCM|CCM)-(taglen)-(ivlen)",
+          "pattern": "AES[-(128|192|256)][-(GCM|CCM)][-{tagLength}][-{ivLength}]",
           "primitive": "ae"
         },
         {
           "standard": [
             {"name": "RFC5649", "url": "https://doi.org/10.17487/RFC5649"}
           ],
-          "pattern": "AES-{128|192|256}-Wrap-(PAD|KWP|PKCS7)",
+          "pattern": "AES[-(128|192|256)]-Wrap[-(PAD|KWP|PKCS7)]",
           "primitive": "key-wrap"
         },
         {
-          "pattern": "AES-{128|192|256}-(GMAC|CMAC)",
+          "pattern": "AES[-(128|192|256)][-(GMAC|CMAC)]",
           "primitive": "mac"
         },
         {
-          "pattern": "AES-{128|192|256}-(XCBC_MAC(_96))",
+          "pattern": "AES[-(128|192|256)][-(XCBC_MAC[_96])]",
           "primitive": "mac"
         }
       ]
@@ -229,7 +229,7 @@
       ],
       "variant": [
         {
-          "pattern": "HKDF-{hash}",
+          "pattern": "HKDF[-{hashFunction}]",
           "primitive": "kdf"
         }
       ]
@@ -242,7 +242,7 @@
       ],
       "variant": [
         {
-          "pattern": "HMAC-{hash}-{length}",
+          "pattern": "HMAC[-{hashFunction}][-{tagLength}]",
           "primitive": "mac"
         }
       ]
@@ -254,7 +254,7 @@
       ],
       "variant": [
         {
-          "pattern": "CMAC-{cipher_algorithm}-{length}",
+          "pattern": "CMAC[-{cipherAlgorithm}][-{length}]",
           "primitive": "mac"
         }
       ]
@@ -266,7 +266,7 @@
       ],
       "variant": [
         {
-          "pattern": "KMAC-(128|256)",
+          "pattern": "KMAC[-(128|256)]",
           "primitive": "mac"
         }
       ]
@@ -278,7 +278,7 @@
       ],
       "variant": [
         {
-          "pattern": "ChaCha20-{AES|other}",
+          "pattern": "ChaCha20[-(AES|{otherBlockCipher})]",
           "primitive": "stream-cipher"
         }
       ]
@@ -354,7 +354,7 @@
       ],
       "variant": [
         {
-          "pattern": "RC4-{length}",
+          "pattern": "RC4[-{keyLength}]",
           "primitive": "stream-cipher"
         }
       ]
@@ -367,7 +367,7 @@
       ],
       "variant": [
         {
-          "pattern": "3DES-{length}-{mode}",
+          "pattern": "3DES[-{keyLength}][-{mode}]",
           "primitive": "block-cipher"
         }
       ]
@@ -380,7 +380,7 @@
       ],
       "variant": [
         {
-          "pattern": "DES-{length}-{mode}",
+          "pattern": "DES[-{keyLength}][-{mode}]",
           "primitive": "block-cipher"
         }
       ]
@@ -392,7 +392,7 @@
       ],
       "variant": [
         {
-          "pattern": "IDEA-{mode}",
+          "pattern": "IDEA[-{mode}]",
           "primitive": "block-cipher"
         }
       ]
@@ -404,7 +404,7 @@
       ],
       "variant": [
         {
-          "pattern": "RC2-{length}-{mode}",
+          "pattern": "RC2[-{keyLength}][-{mode}]",
           "primitive": "block-cipher"
         }
       ]
@@ -428,7 +428,7 @@
       ],
       "variant": [
         {
-          "pattern": "HashML-DSA-(44|65|87)-(hash)",
+          "pattern": "HashML-DSA-(44|65|87)[-{hashFunction}]",
           "primitive": "signature"
         }
       ]
@@ -440,7 +440,7 @@
       ],
       "variant": [
         {
-          "pattern": "HashSLH-DSA-(SHA2|SHAKE)-(128s|128f|192s|192f|256s|256f)-",
+          "pattern": "HashSLH-DSA-(SHA2|SHAKE)-(128s|128f|192s|192f|256s|256f)",
           "primitive": "signature"
         }
       ]
@@ -453,15 +453,15 @@
       ],
       "variant": [
         {
-          "pattern": "XMSS-(SHA2|SHAKE)_(h)_(nbits)",
+          "pattern": "XMSS-(SHA2|SHAKE)[_{h}][_{nbits}]",
           "primitive": "signature"
         },
         {
-          "pattern": "XMSSMT-(SHA2|SHAKE)_(h)/(d)_(nbits)",
+          "pattern": "XMSSMT-(SHA2|SHAKE)[_{h}/{d}][_{nbits}]",
           "primitive": "signature"
         },
         {
-          "pattern": "WOTSP-(SHA2|SHAKE)_(nbits)",
+          "pattern": "WOTSP-(SHA2|SHAKE)[_{nbits}]",
           "primitive": "signature"
         }
       ]
@@ -474,11 +474,11 @@
       ],
       "variant": [
         {
-          "pattern": "LMS_(hashfun)_M(bytespernode)_H(treeheight)",
+          "pattern": "LMS[_{hashFunction}][_M{bytesPerNode}][_H{treeHeight}]",
           "primitive": "signature"
         },
         {
-          "pattern": "LMOTS_(hashfun)_N(bytespernode)_H(treeheight)",
+          "pattern": "LMOTS[_{hashfun}][_N{bytespernode}][_H{treeheight}]",
           "primitive": "signature"
         }
       ]
@@ -544,7 +544,7 @@
           "standard": [
             {"name": "RFC4357", "url": "https://doi.org/10.17487/RFC4357"}
           ],
-          "pattern": "GOST38147-(mode)-(padding)",
+          "pattern": "GOST38147[-{mode}][-{padding}]",
           "primitive": "block-cipher"
         },
         {
@@ -564,11 +564,11 @@
       ],
       "variant": [
         {
-          "pattern": "SEED-128-(mode)-(padding)",
+          "pattern": "SEED-128[-{mode}][-{padding}]",
           "primitive": "block-cipher"
         },
         {
-          "pattern": "SEED-128-(mode)-(padding)-HMAC-(hash)-length",
+          "pattern": "SEED-128[-{mode}][-{padding}]-HMAC[-{hashFunction}][-{tagLength}]",
           "primitive": "ae"
         },
         {
@@ -584,11 +584,11 @@
       ],
       "variant": [
         {
-          "pattern": "ARIA-(128|192|256)-(mode)-(padding)",
+          "pattern": "ARIA-(128|192|256)[-{mode}][-{padding}]",
           "primitive": "block-cipher"
         },
         {
-          "pattern": "ARIA-(128|192|256)-(authmode)-(padding)",
+          "pattern": "ARIA-(128|192|256)[-{authmode}][-{padding}]",
           "primitive": "ae"
         }
       ]
@@ -600,11 +600,11 @@
       ],
       "variant": [
         {
-          "pattern": "CAMELLIA-(128|192|256)-(mode)-(padding)",
+          "pattern": "CAMELLIA-(128|192|256)[-{mode}][-{padding}]",
           "primitive": "block-cipher"
         },
         {
-          "pattern": "CAMELLIA-(128|192|256)-(authmode)-(padding)",
+          "pattern": "CAMELLIA-(128|192|256)[-{authmode}][-{padding}]",
           "primitive": "ae"
         }
       ]
@@ -616,7 +616,7 @@
       ],
       "variant": [
         {
-          "pattern": "Twofish-(128|192|256)-(mode)-(padding)",
+          "pattern": "Twofish-(128|192|256)[-{mode}][-{padding}]",
           "primitive": "block-cipher"
         }
       ]
@@ -628,7 +628,7 @@
       ],
       "variant": [
         {
-          "pattern": "Blowfish-(keylength)-(mode)-(padding)",
+          "pattern": "Blowfish[-{keyLength}][-{mode}][-{padding}]",
           "primitive": "block-cipher"
         }
       ]
@@ -640,7 +640,7 @@
       ],
       "variant": [
         {
-          "pattern": "SP800_108_(CounterKDF|FeedbackKDF|DoublePipelineKDF)-(prf-function)-(dkmlength)",
+          "pattern": "SP800_108_(CounterKDF|FeedbackKDF|DoublePipelineKDF)[-{prfFunction}][-{dkmLength}]",
           "primitive": "key-derive"
         }
       ]
@@ -670,7 +670,7 @@
           "primitive": "mac"
         },
         {
-          "pattern": "(hash)-PBE-(block_cipher)",
+          "pattern": "{hashFunction}-PBE-{blockCipher}",
           "primitive": "block-cipher"
         },
         {
@@ -702,8 +702,24 @@
       ],
       "variant": [
         {
-          "pattern": "X3DH-(hash)",
+          "pattern": "X3DH[-{hashFunction}]",
           "primitive": "key-agree"
+        }
+      ]
+    },
+    {
+      "family": "BLS",
+      "standard": [
+        {"name": "Short Signatures from the Weil Pairing", "url": "https://dx.doi.org/10.1007/3-540-45682-1_30"}
+      ],
+      "variant": [
+        {
+          "pattern": "BLS(13-381|13-377|BN254)",
+          "primitive": "signature"
+        },
+        {
+          "pattern": "BLS[-{ellipticCurve}]",
+          "primitive": "signature"
         }
       ]
     }
