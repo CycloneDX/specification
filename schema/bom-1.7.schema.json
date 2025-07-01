@@ -5342,6 +5342,11 @@
           "description": "Properties for cryptographic assets of asset type 'certificate'",
           "additionalProperties": false,
           "properties": {
+            "serialNumber": {
+              "type": "string",
+              "title": "Serial Number",
+              "description": "The serial number is a unique identifier for the certificate issued by a CA."
+            },
             "subjectName": {
               "type": "string",
               "title": "Subject Name",
@@ -5365,11 +5370,13 @@
               "description": "The date and time according to ISO-8601 standard from which the certificate is not valid anymore"
             },
             "signatureAlgorithmRef": {
+              "deprecated": true,
               "$ref": "#/definitions/refType",
               "title": "Algorithm Reference",
               "description": "The bom-ref to signature algorithm used by the certificate"
             },
             "subjectPublicKeyRef": {
+              "deprecated": true,
               "$ref": "#/definitions/refType",
               "title": "Key reference",
               "description": "The bom-ref to the public key of the subject"
@@ -5386,6 +5393,7 @@
               ]
             },
             "certificateExtension": {
+              "deprecated": true,
               "type": "string",
               "title": "Certificate File Extension",
               "description": "The file extension of the certificate",
@@ -5396,6 +5404,205 @@
                 "der",
                 "p12"
               ]
+            },
+            "certificateFileExtension": {
+              "type": "string",
+              "title": "Certificate File Extension",
+              "description": "The file extension of the certificate.",
+              "examples": [
+                "crt",
+                "pem",
+                "cer",
+                "der",
+                "p12"
+              ]
+            },
+            "fingerprint": {
+              "type": "object",
+              "$ref": "#/definitions/hash",
+              "title": "Certificate Fingerprint",
+              "description": "The fingerprint is a cryptographic hash of the certificate excluding it's signature."
+            },
+            "certificateState": {
+              "type": "array",
+              "title": "Certificate Lifecycle State",
+              "description": "The certificate lifecycle is a comprehensive process that manages digital certificates from their initial creation to eventual expiration or revocation. It typically involves several stages",
+              "items": {
+                "type": "object",
+                "title": "State",
+                "description": "The state of the certificate.",
+                "oneOf": [
+                  {
+                    "title": "Pre-Defined State",
+                    "required": [
+                      "state"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "state": {
+                        "type": "string",
+                        "title": "State",
+                        "description": "A pre-defined state in the certificate lifecycle.",
+                        "enum": [
+                          "pre-activation",
+                          "active",
+                          "suspended",
+                          "deactivated",
+                          "revoked",
+                          "destroyed"
+                        ],
+                        "meta:enum": {
+                          "pre-activation": "The certificate has been issued by the issuing certificate authority (CA) but has not been authorized for use.",
+                          "active": "The certificate may be used to cryptographically protect information, cryptographically process previously protected information, or both.",
+                          "deactivated": "Certificates in the deactivated state shall not be used to apply cryptographic protection but, in some cases, may be used to process cryptographically protected information.",
+                          "suspended": "The use of a certifacte may be suspended for several possible reasons.",
+                          "revoked": "A revoked certificate is a digital certificate that has been invalidated by the issuing certificate authority (CA) before its scheduled expiration date.",
+                          "destroyed": "The certificate has been destroyed."
+                        }
+                      },
+                      "reason": {
+                        "type": "string",
+                        "title": "Reason",
+                        "description": "A reason for the certificate being in this state."
+                      }
+                    }
+                  },
+                  {
+                    "title": "Custom State",
+                    "required": [
+                      "name"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "state": {
+                        "type": "string",
+                        "title": "State",
+                        "description": "The name of the certificate lifecycle state."
+                      },
+                      "description": {
+                        "type": "string",
+                        "title": "Description",
+                        "description": "The description of the certificate lifecycle state."
+                      },
+                      "reason": {
+                        "type": "string",
+                        "title": "Reason",
+                        "description": "A reason for the certificate being in this state."
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "creationDate": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Creation Date",
+              "description": "The date and time (timestamp) when the certificate was created or pre-activated."
+            },
+            "activationDate": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Activation Date",
+              "description": "The date and time (timestamp) when the certificate was activated."
+            },
+            "deactivationDate": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Deactivation Date",
+              "description": "The date and time (timestamp) when the related certificate was deactiviated."
+            },
+            "revocationDate": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Revokation Date",
+              "description": "The date and time (timestamp) when the certificate was revoked."
+            },
+            "destructionDate": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Destruction Date",
+              "description": "The date and time (timestamp) when the certificate was destroyed."
+            },
+            "certificateExtensions": {
+              "type": "array",
+              "title": "Certificate Extensions",
+              "description": "",
+              "items": {
+                "type": "object",
+                "title": "Extension",
+                "description": "",
+                "oneOf": [
+                  {
+                    "title": "Common Extensions",
+                    "required": [
+                      "name",
+                      "value"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "title": "name",
+                        "description": "The name of the extention.",
+                        "enum": [
+                          "basicConstraints",
+                          "keyUsage",
+                          "extendedKeyUsage",
+                          "subjectAlternativeName",
+                          "authorityKeyIdentifier",
+                          "subjectKeyIdentifier",
+                          "authorityInformationAccess",
+                          "certificatePolicies",
+                          "crlDistributionPoints",
+                          "signedCertificateTimestamp"
+                        ],
+                        "meta:enum": {
+                          "basicConstraints": "Specifies whether a certificate can be used as a CA certificate or not.",
+                          "keyUsage": "Specifies the allowed uses of the public key in the certificate.",
+                          "extendedKeyUsage": "Specifies additional purposes for which the public key can be used.",
+                          "subjectAlternativeName": "Allows inclusion of additional names to identify the entity associated with the certificate.",
+                          "authorityKeyIdentifier": "Identifies the public key of the CA that issued the certificate.",
+                          "subjectKeyIdentifier": "Identifies the public key associated with the entity the certificate was issued to.",
+                          "authorityInformationAccess": "Contains CA issuers and OCSP information.",
+                          "certificatePolicies": "Defines the policies under which the certificate was issued and can be used.",
+                          "crlDistributionPoints": "Contains one or more URLs where a Certificate Revocation List (CRL) can be obtained.",
+                          "signedCertificateTimestamp": "Shows that the certificate has been publicly logged, which helps prevent the issuance of rogue certificates by a CA. Log ID, timestamp and signature as proof."
+                        }
+                      },
+                      "value": {
+                        "type": "string",
+                        "title": "Value",
+                        "description": "The value of the certificate extension."
+                      }
+                    }
+                  },
+                  {
+                    "title": "Custom Extensions",
+                    "required": [
+                      "name"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "title": "Name",
+                        "description": "The name for the custom certificate extension."
+                      },
+                      "value": {
+                        "type": "string",
+                        "title": "Value",
+                        "description": "The description of the custom certificate extension."
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "relatedCryptographicAssets": {
+              "$ref": "#/definitions/relatedCryptographicAssets",
+              "title": "Related Cryptographic Assets",
+              "description": "A list of cryptographic assets related to this component."
             }
           }
         },
@@ -5471,6 +5678,7 @@
               ]
             },
             "algorithmRef": {
+              "deprecated": true,
               "$ref": "#/definitions/refType",
               "title": "Algorithm Reference",
               "description": "The bom-ref to the algorithm used to generate the related cryptographic material."
@@ -5518,6 +5726,17 @@
               "$ref": "#/definitions/securedBy",
               "title": "Secured By",
               "description": "The mechanism by which the cryptographic asset is secured by."
+            },
+            "fingerprint": {
+              "type": "object",
+              "$ref": "#/definitions/hash",
+              "title": "Fingerprint",
+              "description": "The fingerprint is a cryptographic hash of the asset."
+            },
+            "relatedCryptographicAssets": {
+              "$ref": "#/definitions/relatedCryptographicAssets",
+              "title": "Related Cryptographic Assets",
+              "description": "A list of cryptographic assets related to this component."
             }
           }
         },
@@ -5580,41 +5799,52 @@
               "additionalProperties": false,
               "properties": {
                 "encr": {
-                  "$ref": "#/definitions/cryptoRefArray",
-                  "title": "Encryption Algorithm (ENCR)",
+                  "type": "array",
+                  "$ref": "#/definitions/ikeV2Enc",
+                  "title": "Encryption Algorithms (ENCR)",
                   "description": "Transform Type 1: encryption algorithms"
                 },
                 "prf": {
-                  "$ref": "#/definitions/cryptoRefArray",
-                  "title": "Pseudorandom Function (PRF)",
+                  "type": "array",
+                  "$ref": "#/definitions/ikeV2Prf",
+                  "title": "Pseudorandom Functions (PRF)",
                   "description": "Transform Type 2: pseudorandom functions"
                 },
                 "integ": {
-                  "$ref": "#/definitions/cryptoRefArray",
-                  "title": "Integrity Algorithm (INTEG)",
+                  "type": "array",
+                  "$ref": "#/definitions/ikeV2Integ",
+                  "title": "Integrity Algorithms (INTEG)",
                   "description": "Transform Type 3: integrity algorithms"
                 },
                 "ke": {
-                  "$ref": "#/definitions/cryptoRefArray",
-                  "title": "Key Exchange Method (KE)",
+                  "type": "array",
+                  "$ref": "#/definitions/ikeV2Ke",
+                  "title": "Key Exchange Methods (KE)",
                   "description": "Transform Type 4: Key Exchange Method (KE) per [RFC 9370](https://www.ietf.org/rfc/rfc9370.html), formerly called Diffie-Hellman Group (D-H)."
                 },
                 "esn": {
                   "type": "boolean",
-                  "title": "Extended Sequence Numbers (ESN)",
+                  "title": "Extended Sequence Number (ESN)",
                   "description": "Specifies if an Extended Sequence Number (ESN) is used."
                 },
                 "auth": {
-                  "$ref": "#/definitions/cryptoRefArray",
-                  "title": "IKEv2 Authentication method",
-                  "description": "IKEv2 Authentication method"
+                  "type": "array",
+                  "$ref": "#/definitions/ikeV2Auth",
+                  "title": "IKEv2 Authentication methods",
+                  "description": "IKEv2 Authentication method per [RFC9593](https://www.ietf.org/rfc/rfc9593.html)."
                 }
               }
             },
             "cryptoRefArray": {
+              "deprecated": true,
               "$ref": "#/definitions/cryptoRefArray",
               "title": "Cryptographic References",
               "description": "A list of protocol-related cryptographic assets"
+            },
+            "relatedCryptographicAssets": {
+              "$ref": "#/definitions/relatedCryptographicAssets",
+              "title": "Related Cryptographic Assets",
+              "description": "A list of cryptographic assets related to this component."
             }
           }
         },
@@ -5665,10 +5895,147 @@
         }
       }
     },
+    "ikeV2Enc": {
+      "type": "object",
+      "title": "Encryption Algorithm (ENCR)",
+      "description": "Object representing an encryption algorithm (ENCR)",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "A name for the encryption method.",
+          "examples": [
+            "ENCR_AES_GCM_16"
+          ]
+        },
+        "keyLength": {
+          "type": "integer",
+          "title": "Encryption algorithm key length",
+          "description": "The key length of the encryption algorithm."
+        },
+        "algorithm": {
+          "$ref": "#/definitions/refType",
+          "title": "Algorithm reference",
+          "description": "The bom-ref to algorithm cryptographic asset."
+        }
+      }
+    },
+    "ikeV2Prf": {
+      "type": "object",
+      "title": "Pseudorandom Function (PRF)",
+      "description": "Object representing a pseudorandom function (PRF)",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "A name for the pseudorandom function.",
+          "examples": [
+            "PRF_HMAC_SHA2_256"
+          ]
+        },
+        "algorithm": {
+          "$ref": "#/definitions/refType",
+          "title": "Algorithm reference",
+          "description": "The bom-ref to algorithm cryptographic asset."
+        }
+      }
+    },
+    "ikeV2Integ": {
+      "type": "object",
+      "title": "Integrity Algorithm (INTEG)",
+      "description": "Object representing an integrity algorithm (INTEG)",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "A name for the integrity algorithm.",
+          "examples": [
+            "AUTH_HMAC_SHA2_256_128"
+          ]
+        },
+        "algorithm": {
+          "$ref": "#/definitions/refType",
+          "title": "Algorithm reference",
+          "description": "The bom-ref to algorithm cryptographic asset."
+        }
+      }
+    },
+    "ikeV2Ke": {
+      "type": "object",
+      "title": "Key Exchange Method (KE)",
+      "description": "Object representing a key exchange method (KE)",
+      "additionalProperties": false,
+      "properties": {
+        "group": {
+          "type": "integer",
+          "title": "Group Identifier",
+          "description": "A group identifier for the key exchange algorithm."
+        },
+        "algorithm": {
+          "$ref": "#/definitions/refType",
+          "title": "Algorithm reference",
+          "description": "The bom-ref to algorithm cryptographic asset."
+        }
+      }
+    },
+    "ikeV2Auth": {
+      "type": "object",
+      "title": "IKEv2 Authentication method",
+      "description": "Object representing a IKEv2 Authentication method",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "A name for the authentication method."
+        },
+        "algorithm": {
+          "$ref": "#/definitions/refType",
+          "title": "Algorithm reference",
+          "description": "The bom-ref to algorithm cryptographic asset."
+        }
+      }
+    },
     "cryptoRefArray" : {
+      "deprecated": true,
       "type": "array",
       "items": {
         "$ref": "#/definitions/refType"
+      }
+    },
+    "relatedCryptographicAssets": {
+      "type": "array",
+      "title": "Related Cryptographic Assets",
+      "description": "A list of cryptographic assets related to this component.",
+      "items": {
+        "$ref": "#/definitions/relatedCryptographicAsset",
+        "title": "Related Cryptographic Asset"
+      }
+    },
+    "relatedCryptographicAsset": {
+      "type": "object",
+      "title": "Related Cryptographic Asset",
+      "description": "A cryptographic assets related to this component.",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "title": "Type",
+          "description": "Specifies the mechanism by which the cryptographic asset is secured by.",
+          "examples": [
+            "publicKey",
+            "privateKey",
+            "algorithm"
+          ]
+        },
+        "ref": {
+          "$ref": "#/definitions/refType",
+          "title": "Reference to cryptographic asset",
+          "description": "The bom-ref to cryptographic asset."
+        }
       }
     },
     "securedBy": {
