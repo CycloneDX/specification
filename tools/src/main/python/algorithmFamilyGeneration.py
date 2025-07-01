@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Dict, List, Any
 
 # Step 1: Load JSON data safely using context managers
-SCHEMA_DIR = Path(__file__).parent.parent / "schema"
+SCHEMA_DIR = Path(__file__).parent.parent / "../../../schema"
 DEFS_FILE = SCHEMA_DIR / "cryptography-defs.json"
 SCHEMA_FILE = SCHEMA_DIR / "cryptography-defs.schema.json"
 
@@ -25,7 +25,7 @@ except KeyError as e:
 
 schema_data['$comment'] = datetime.now().isoformat()
 
-schema_data['properties']['algorithmFamilies'] = {
+schema_data['definitions']['algorithmFamiliesEnum'] = {
     "type": "string",
     "title": "Algorithm Families",
     "description": "An enum for the algorithm families.",
