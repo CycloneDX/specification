@@ -256,6 +256,12 @@ limitations under the License.
                         Formal registration is optional.</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="distribution" type="bom:tlpClassificationType" default="CLEAR" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The Traffic Light Protocol (TLP) classification that controls the sharing and distribution
+                        of the data that the BOM describes.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                     <xs:documentation>
@@ -389,6 +395,52 @@ limitations under the License.
             </xs:annotation>
         </xs:anyAttribute>
     </xs:complexType>
+
+    <xs:simpleType name="tlpClassificationType">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+                Traffic Light Protocol (TLP) is a classification system for identifying the potential risk associated with artefact, including whether it is subject to certain types of legal, financial, or technical threats. Refer to https://www.first.org/tlp/ for further information.
+                The default classification is "CLEAR"
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="CLEAR">
+                <xs:annotation>
+                    <xs:documentation>
+                        The information is not subject to any restrictions as regards the sharing.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="GREEN">
+                <xs:annotation>
+                    <xs:documentation>
+                        The information is subject to limited disclosure, and recipients can share it within their community but not via publicly accessible channels.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="AMBER">
+                <xs:annotation>
+                    <xs:documentation>
+                        The information is subject to limited disclosure, and recipients can only share it on a need-to-know basis within their organization and with clients.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="AMBER_AND_STRICT">
+                <xs:annotation>
+                    <xs:documentation>
+                        The information is subject to limited disclosure, and recipients can only share it on a need-to-know basis within their organization.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="RED">
+                <xs:annotation>
+                    <xs:documentation>
+                        The information is subject to restricted distribution to individual recipients only and must not be shared.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+         </xs:restriction>
+    </xs:simpleType>
 
     <xs:complexType name="toolType">
         <xs:annotation>
@@ -601,6 +653,18 @@ limitations under the License.
                     <xs:documentation>A copyright notice informing users of the underlying claims to copyright ownership in a published work.</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="patentAssertions" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        A list of assertions made regarding patents associated with this component or service. Assertions distinguish between ownership, licensing, and other relevant interactions with patents.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="patentAssertion" type="bom:patentAssertionType"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="cpe" type="bom:cpe" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>
@@ -792,6 +856,154 @@ limitations under the License.
         -->
     </xs:complexType>
 
+    <xs:attributeGroup name="licenseAttributes">
+        <xs:attribute name="bom-ref" type="bom:refType">
+            <xs:annotation>
+                <xs:documentation>
+                    An optional identifier which can be used to reference the license elsewhere in the BOM.
+                    Uniqueness is enforced within all elements and children of the root-level bom element.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="acknowledgement" type="bom:licenseAcknowledgementEnumerationType">
+            <xs:annotation>
+                <xs:documentation>
+                    Declared licenses and concluded licenses represent two different stages in the
+                    licensing process within software development. Declared licenses refer to the
+                    initial intention of the software authors regarding the licensing terms under
+                    which their code is released. On the other hand, concluded licenses are the
+                    result of a comprehensive analysis of the project's codebase to identify and
+                    confirm the actual licenses of the components used, which may differ from the
+                    initially declared licenses. While declared licenses provide an upfront indication
+                    of the licensing intentions, concluded licenses offer a more thorough understanding
+                    of the actual licensing within a project, facilitating proper compliance and risk
+                    management. Observed licenses are defined in `evidence.licenses`. Observed licenses
+                    form the evidence necessary to substantiate a concluded license.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:attributeGroup>
+
+    <xs:complexType name="licensingType">
+        <xs:sequence>
+            <xs:element name="altIds" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>License identifiers that may be used to manage licenses and
+                        their lifecycle</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="altId" type="xs:normalizedString" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="licensor" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The individual or organization that grants a license to another
+                        individual or organization</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:choice>
+                            <xs:element name="organization" type="bom:organizationalEntity" minOccurs="0" maxOccurs="1">
+                                <xs:annotation>
+                                    <xs:documentation>The organization that granted the license</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element name="individual" type="bom:organizationalContact" minOccurs="0" maxOccurs="1">
+                                <xs:annotation>
+                                    <xs:documentation>The individual, not associated with an organization,
+                                        that granted the license</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:choice>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="licensee" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The individual or organization for which a license was granted to</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:choice>
+                            <xs:element name="organization" type="bom:organizationalEntity" minOccurs="0" maxOccurs="1">
+                                <xs:annotation>
+                                    <xs:documentation>The organization that was granted the license</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element name="individual" type="bom:organizationalContact" minOccurs="0" maxOccurs="1">
+                                <xs:annotation>
+                                    <xs:documentation>The individual, not associated with an organization,
+                                        that was granted the license</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:choice>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="purchaser" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The individual or organization that purchased the license</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:choice>
+                            <xs:element name="organization" type="bom:organizationalEntity" minOccurs="0" maxOccurs="1">
+                                <xs:annotation>
+                                    <xs:documentation>The organization that purchased the license</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element name="individual" type="bom:organizationalContact" minOccurs="0" maxOccurs="1">
+                                <xs:annotation>
+                                    <xs:documentation>The individual, not associated with an organization,
+                                        that purchased the license</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:choice>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="purchaseOrder" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The purchase order identifier the purchaser sent to a supplier or
+                        vendor to authorize a purchase</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="licenseTypes" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The type of license(s) that was granted to the licensee</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="licenseType" type="bom:licenseTypeEnum" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="lastRenewal" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The timestamp indicating when the license was last
+                        renewed. For new purchases, this is often the purchase or acquisition date.
+                        For non-perpetual licenses or subscriptions, this is the timestamp of when the
+                        license was last renewed.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="expiration" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The timestamp indicating when the current license
+                        expires (if applicable).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+    </xs:complexType>
+
     <xs:complexType name="licenseType">
         <xs:annotation>
             <xs:documentation>Specifies the details and attributes related to a software license.
@@ -823,130 +1035,11 @@ limitations under the License.
                         an externalReference should also be specified for completeness.</xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="licensing" minOccurs="0" maxOccurs="1">
+            <xs:element name="licensing" type="bom:licensingType" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>Licensing details describing the licensor/licensee, license type, renewal and
                         expiration dates, and other important metadata</xs:documentation>
                 </xs:annotation>
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element name="altIds" minOccurs="0" maxOccurs="1">
-                            <xs:annotation>
-                                <xs:documentation>License identifiers that may be used to manage licenses and
-                                    their lifecycle</xs:documentation>
-                            </xs:annotation>
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element name="altId" type="xs:normalizedString" minOccurs="0" maxOccurs="unbounded"/>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element name="licensor" minOccurs="0" maxOccurs="1">
-                            <xs:annotation>
-                                <xs:documentation>The individual or organization that grants a license to another
-                                    individual or organization</xs:documentation>
-                            </xs:annotation>
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:choice>
-                                        <xs:element name="organization" type="bom:organizationalEntity" minOccurs="0" maxOccurs="1">
-                                            <xs:annotation>
-                                                <xs:documentation>The organization that granted the license</xs:documentation>
-                                            </xs:annotation>
-                                        </xs:element>
-                                        <xs:element name="individual" type="bom:organizationalContact" minOccurs="0" maxOccurs="1">
-                                            <xs:annotation>
-                                                <xs:documentation>The individual, not associated with an organization,
-                                                    that granted the license</xs:documentation>
-                                            </xs:annotation>
-                                        </xs:element>
-                                    </xs:choice>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element name="licensee" minOccurs="0" maxOccurs="1">
-                            <xs:annotation>
-                                <xs:documentation>The individual or organization for which a license was granted to</xs:documentation>
-                            </xs:annotation>
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:choice>
-                                        <xs:element name="organization" type="bom:organizationalEntity" minOccurs="0" maxOccurs="1">
-                                            <xs:annotation>
-                                                <xs:documentation>The organization that was granted the license</xs:documentation>
-                                            </xs:annotation>
-                                        </xs:element>
-                                        <xs:element name="individual" type="bom:organizationalContact" minOccurs="0" maxOccurs="1">
-                                            <xs:annotation>
-                                                <xs:documentation>The individual, not associated with an organization,
-                                                    that was granted the license</xs:documentation>
-                                            </xs:annotation>
-                                        </xs:element>
-                                    </xs:choice>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element name="purchaser" minOccurs="0" maxOccurs="1">
-                            <xs:annotation>
-                                <xs:documentation>The individual or organization that purchased the license</xs:documentation>
-                            </xs:annotation>
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:choice>
-                                        <xs:element name="organization" type="bom:organizationalEntity" minOccurs="0" maxOccurs="1">
-                                            <xs:annotation>
-                                                <xs:documentation>The organization that purchased the license</xs:documentation>
-                                            </xs:annotation>
-                                        </xs:element>
-                                        <xs:element name="individual" type="bom:organizationalContact" minOccurs="0" maxOccurs="1">
-                                            <xs:annotation>
-                                                <xs:documentation>The individual, not associated with an organization,
-                                                    that purchased the license</xs:documentation>
-                                            </xs:annotation>
-                                        </xs:element>
-                                    </xs:choice>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element name="purchaseOrder" type="xs:string" minOccurs="0" maxOccurs="1">
-                            <xs:annotation>
-                                <xs:documentation>The purchase order identifier the purchaser sent to a supplier or
-                                    vendor to authorize a purchase</xs:documentation>
-                            </xs:annotation>
-                        </xs:element>
-                        <xs:element name="licenseTypes" minOccurs="0" maxOccurs="1">
-                            <xs:annotation>
-                                <xs:documentation>The type of license(s) that was granted to the licensee</xs:documentation>
-                            </xs:annotation>
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element name="licenseType" type="bom:licenseTypeEnum" minOccurs="0" maxOccurs="unbounded"/>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element name="lastRenewal" type="xs:dateTime" minOccurs="0" maxOccurs="1">
-                            <xs:annotation>
-                                <xs:documentation xml:lang="en">The timestamp indicating when the license was last
-                                    renewed. For new purchases, this is often the purchase or acquisition date.
-                                    For non-perpetual licenses or subscriptions, this is the timestamp of when the
-                                    license was last renewed.</xs:documentation>
-                            </xs:annotation>
-                        </xs:element>
-                        <xs:element name="expiration" type="xs:dateTime" minOccurs="0" maxOccurs="1">
-                            <xs:annotation>
-                                <xs:documentation xml:lang="en">The timestamp indicating when the current license
-                                    expires (if applicable).</xs:documentation>
-                            </xs:annotation>
-                        </xs:element>
-                        <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
-                            <xs:annotation>
-                                <xs:documentation>
-                                    Allows any undeclared elements as long as the elements are placed in a different namespace.
-                                </xs:documentation>
-                            </xs:annotation>
-                        </xs:any>
-                    </xs:sequence>
-                </xs:complexType>
             </xs:element>
             <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
@@ -966,28 +1059,121 @@ limitations under the License.
                 </xs:annotation>
             </xs:any>
         </xs:sequence>
-        <xs:attribute name="bom-ref" type="bom:refType">
+        <xs:attributeGroup ref="bom:licenseAttributes"/>
+    </xs:complexType>
+
+    <xs:complexType name="licenseExpressionType">
+        <xs:simpleContent>
+            <xs:extension base="xs:normalizedString">
+                <xs:annotation>
+                    <xs:documentation>A valid SPDX license expression.
+                        Refer to https://spdx.org/specifications for syntax requirements.
+
+                        Example values:
+                        - Apache-2.0 AND (MIT OR GPL-2.0-only)
+                        - GPL-3.0-only WITH Classpath-exception-2.0
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:attributeGroup ref="bom:licenseAttributes"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="licenseExpressionDetailedType">
+        <xs:annotation>
+            <xs:documentation>
+                Specifies the details and attributes related to a software license.
+                It must be a valid SPDX license expression, along with additional properties such as license acknowledgment.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="details" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>Details for parts of the `expression`.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:annotation>
+                        <xs:documentation>
+                            This document specifies the details and attributes related to a software license identifier. An SPDX expression may be a compound of license identifiers.
+                            The `license-identifier` attribute serves as the key that identifies each record. Note that this key is not required to be unique, as the same license identifier could apply to multiple, different but similar license details, texts, etc.
+                        </xs:documentation>
+                    </xs:annotation>
+                    <xs:sequence>
+                        <xs:element name="text" type="bom:attachedTextType" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>An optional way to include the textual content of the license.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="url" type="xs:anyURI" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>The URL to the attachment file. If the attachment is a license or BOM,
+                                    an externalReference should also be specified for completeness.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Allows any undeclared elements as long as the elements are placed in a different namespace.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:any>
+                    </xs:sequence>
+                    <xs:attribute name="license-identifier" type="xs:normalizedString" use="required">
+                        <xs:annotation>
+                            <xs:documentation>
+                                A valid SPDX license identifier. Refer to https://spdx.org/specifications for syntax requirements.
+                                This attribute serves as the primary key, which uniquely identifies each record.
+
+                                Example values:
+                                - Apache-2.0
+                                - GPL-3.0-only WITH Classpath-exception-2.0
+                                - LicenseRef-my-custom-license
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="bom-ref" type="bom:refType">
+                        <xs:annotation>
+                            <xs:documentation>
+                                An optional identifier which can be used to reference the license elsewhere in the BOM.
+                                Uniqueness is enforced within all elements and children of the root-level bom element.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="licensing" type="bom:licensingType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Licensing details describing the licensor/licensee, license type, renewal and
+                        expiration dates, and other important metadata</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Provides the ability to document properties in a name/value store.
+                        This provides flexibility to include data not officially supported in the standard
+                        without having to use additional namespaces or create extensions. Property names
+                        of interest to the general public are encouraged to be registered in the
+                        CycloneDX Property Taxonomy - https://github.com/CycloneDX/cyclonedx-property-taxonomy.
+                        Formal registration is optional.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <xs:attributeGroup ref="bom:licenseAttributes"/>
+        <xs:attribute name="expression" type="xs:normalizedString" use="required">
             <xs:annotation>
-                <xs:documentation>
-                    An optional identifier which can be used to reference the license elsewhere in the BOM.
-                    Uniqueness is enforced within all elements and children of the root-level bom element.
-                </xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
-        <xs:attribute name="acknowledgement" type="bom:licenseAcknowledgementEnumerationType">
-            <xs:annotation>
-                <xs:documentation>
-                    Declared licenses and concluded licenses represent two different stages in the
-                    licensing process within software development. Declared licenses refer to the
-                    initial intention of the software authors regarding the licensing terms under
-                    which their code is released. On the other hand, concluded licenses are the
-                    result of a comprehensive analysis of the project's codebase to identify and
-                    confirm the actual licenses of the components used, which may differ from the
-                    initially declared licenses. While declared licenses provide an upfront indication
-                    of the licensing intentions, concluded licenses offer a more thorough understanding
-                    of the actual licensing within a project, facilitating proper compliance and risk
-                    management. Observed licenses are defined in `evidence.licenses`. Observed licenses
-                    form the evidence necessary to substantiate a concluded license.
+                <xs:documentation>A valid SPDX license expression.
+                    Refer to https://spdx.org/specifications for syntax requirements.
+
+                    Example values:
+                    - Apache-2.0 AND (MIT OR GPL-2.0-only)
+                    - GPL-3.0-only WITH Classpath-exception-2.0
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
@@ -1093,8 +1279,11 @@ limitations under the License.
             </xs:enumeration>
             <xs:enumeration value="platform">
                 <xs:annotation>
-                    <xs:documentation>A runtime environment which interprets or executes software. This may include
-                        runtimes such as those that execute bytecode or low-code/no-code application platforms.</xs:documentation>
+                    <xs:documentation>
+                        A runtime environment that interprets or executes software.
+                        This may include runtimes such as those that execute bytecode, just-in-time compilers,
+                        interpreters, or low-code/no-code application platforms.
+                    </xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
             <xs:enumeration value="operating-system">
@@ -1578,6 +1767,21 @@ limitations under the License.
                     <xs:documentation>Document that complies with RFC-9116 (A File Format to Aid in Security Vulnerability Disclosure)</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
+            <xs:enumeration value="patent">
+                <xs:annotation>
+                    <xs:documentation>References information about patents which may be defined in human-readable documents or in machine-readable formats such as CycloneDX or ST.96. For detailed patent information or to reference the information provided directly by patent offices, it is recommended to leverage standards from the World Intellectual Property Organization (WIPO) such as [ST.96](https://www.wipo.int/standards/en/st96).</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="patent-family">
+                <xs:annotation>
+                    <xs:documentation>References information about a patent family which may be defined in human-readable documents or in machine-readable formats such as CycloneDX or ST.96. A patent family is a group of related patent applications or granted patents that cover the same or similar invention. For detailed patent family information or to reference the information provided directly by patent offices, it is recommended to leverage standards from the World Intellectual Property Organization (WIPO) such as [ST.96](https://www.wipo.int/standards/en/st96).</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="patent-assertion">
+                <xs:annotation>
+                    <xs:documentation>References assertions made regarding patents associated with a component or service. Assertions distinguish between ownership, licensing, and other relevant interactions with patents.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
             <xs:enumeration value="citation">
                 <xs:annotation>
                     <xs:documentation>A reference to external citations applicable to the object identified by this BOM entry or the BOM itself. When used with a BOM-Link, this allows offloading citations into a separate CycloneDX BOM.</xs:documentation>
@@ -1634,6 +1838,16 @@ limitations under the License.
                         <xs:element name="hash" type="bom:hashType"/>
                     </xs:sequence>
                 </xs:complexType>
+            </xs:element>
+            <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Provides the ability to document properties in a name/value store.
+                        This provides flexibility to include data not officially supported in the standard
+                        without having to use additional namespaces or create extensions. Property names
+                        of interest to the general public are encouraged to be registered in the
+                        CycloneDX Property Taxonomy - https://github.com/CycloneDX/cyclonedx-property-taxonomy.
+                        Formal registration is optional.</xs:documentation>
+                </xs:annotation>
             </xs:element>
         </xs:sequence>
         <xs:attribute name="type" type="bom:externalReferenceType" use="required">
@@ -2220,6 +2434,18 @@ limitations under the License.
                 </xs:complexType>
             </xs:element>
             <xs:element name="licenses" type="bom:licenseChoiceType" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="patentAssertions" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        A list of assertions made regarding patents associated with this component or service. Assertions distinguish between ownership, licensing, and other relevant interactions with patents.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="patentAssertion" type="bom:patentAssertionType"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="externalReferences" type="bom:externalReferences" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>Provides the ability to document external references related to the service.</xs:documentation>
@@ -2337,48 +2563,8 @@ limitations under the License.
     <xs:complexType name="licenseChoiceType">
         <xs:choice>
             <xs:element name="license" type="bom:licenseType" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="expression" minOccurs="0" maxOccurs="1">
-                <xs:annotation>
-                    <xs:documentation>A valid SPDX license expression.
-                        Refer to https://spdx.org/specifications for syntax requirements
-
-                        Example values:
-                        - Apache-2.0 AND (MIT OR GPL-2.0-only)
-                        - GPL-3.0-only WITH Classpath-exception-2.0
-                    </xs:documentation>
-                </xs:annotation>
-                <xs:complexType>
-                    <xs:simpleContent>
-                        <xs:extension base="xs:normalizedString">
-                            <xs:attribute name="bom-ref" type="bom:refType">
-                                <xs:annotation>
-                                    <xs:documentation>
-                                        An optional identifier which can be used to reference the license elsewhere in the BOM.
-                                        Uniqueness is enforced within all elements and children of the root-level bom element.
-                                    </xs:documentation>
-                                </xs:annotation>
-                            </xs:attribute>
-                            <xs:attribute name="acknowledgement" type="bom:licenseAcknowledgementEnumerationType">
-                                <xs:annotation>
-                                    <xs:documentation>
-                                        Declared licenses and concluded licenses represent two different stages in the
-                                        licensing process within software development. Declared licenses refer to the
-                                        initial intention of the software authors regarding the licensing terms under
-                                        which their code is released. On the other hand, concluded licenses are the
-                                        result of a comprehensive analysis of the project's codebase to identify and
-                                        confirm the actual licenses of the components used, which may differ from the
-                                        initially declared licenses. While declared licenses provide an upfront indication
-                                        of the licensing intentions, concluded licenses offer a more thorough understanding
-                                        of the actual licensing within a project, facilitating proper compliance and risk
-                                        management. Observed licenses are defined in `evidence.licenses`. Observed licenses
-                                        form the evidence necessary to substantiate a concluded license.
-                                    </xs:documentation>
-                                </xs:annotation>
-                            </xs:attribute>
-                        </xs:extension>
-                    </xs:simpleContent>
-                </xs:complexType>
-            </xs:element>
+            <xs:element name="expression" type="bom:licenseExpressionType" minOccurs="0" maxOccurs="1" />
+            <xs:element name="expression-detailed" type="bom:licenseExpressionDetailedType" minOccurs="0" maxOccurs="1" />
         </xs:choice>
     </xs:complexType>
 
@@ -8083,6 +8269,16 @@ limitations under the License.
         </xs:annotation>
         <xs:sequence>
             <xs:element name="standards" type="bom:standardsType" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="patents" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:choice minOccurs="0" maxOccurs="unbounded">
+                            <xs:element name="patent" type="bom:patentType"/>
+                            <xs:element name="patentFamily" type="bom:patentFamilyType"/>
+                        </xs:choice>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
         </xs:sequence>
     </xs:complexType>
 
@@ -8351,6 +8547,317 @@ limitations under the License.
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="patentFamilyType">
+        <xs:annotation>
+            <xs:documentation>
+                A patent family is a group of related patent applications or granted patents that cover the same or similar invention. These patents are filed in multiple jurisdictions to protect the invention across different regions or countries. A patent family typically includes patents that share a common priority date, originating from the same initial application, and may vary slightly in scope or claims to comply with regional legal frameworks. Fields align with WIPO ST.96 standards where applicable.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="familyId" type="xs:string" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The unique identifier for the patent family, aligned with the `id` attribute in WIPO ST.96 v8.0's `PatentFamilyType`. Refer to [PatentFamilyType in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/PatentFamilyType.xsd).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="priorityApplication" type="bom:priorityApplicationType" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="members" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>A collection of patents or applications that belong to this family, each identified by a `bom-ref` pointing to a patent object defined elsewhere in the BOM.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="ref" type="bom:refLinkType" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="externalReferences" type="bom:externalReferences" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>External references provide a way to document systems, sites, and information that may be relevant but are not included with the BOM. They may also establish specific relationships within or external to the BOM.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="bom-ref" type="bom:refType">
+            <xs:annotation>
+                <xs:documentation>
+                    An optional identifier which can be used to reference the object elsewhere in the BOM.
+                    Uniqueness is enforced within all elements and children of the root-level bom element.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:anyAttribute namespace="##other" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:complexType name="patentType">
+        <xs:annotation>
+            <xs:documentation>
+                A patent is a legal instrument, granted by an authority, that confers certain rights over an invention for a specified period, contingent on public disclosure and adherence to relevant legal requirements. The summary information in this object is aligned with [WIPO ST.96](https://www.wipo.int/standards/en/st96/) principles where applicable.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="patentNumber" type="bom:patentNumberType" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The unique number assigned to the granted patent by the issuing authority. Aligned with `PatentNumber` in WIPO ST.96. Refer to [PatentNumber in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/PatentNumber.xsd).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="applicationNumber" type="bom:patentNumberType" minOccurs="0"/>
+            <xs:element name="jurisdiction" type="bom:patentJurisdictionType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="priorityApplication" type="bom:priorityApplicationType" minOccurs="0"/>
+            <xs:element name="publicationNumber" type="bom:patentNumberType" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>This is the number assigned to a patent application once it is published. Patent applications are generally published 18 months after filing (unless an applicant requests non-publication). This number is distinct from the application number.
+
+                        Purpose: Identifies the publicly available version of the application.
+
+                        Format: Varies by jurisdiction, often similar to application numbers but includes an additional suffix indicating publication.
+
+                        Example:
+                        - US: US20240000123A1 (indicates the first publication of application US20240000123)
+                        - Europe: EP23123456A1 (first publication of European application EP23123456).
+
+                        WIPO ST.96 v8.0:
+                        - Publication Number field: https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/PublicationNumber.xsd</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="title" type="xs:string" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>The title of the patent, summarising the invention it protects. Aligned with `InventionTitle` in WIPO ST.96. Refer to [InventionTitle in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/InventionTitle.xsd).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="abstract" type="xs:string" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>A brief summary of the invention described in the patent. Aligned with `Abstract` and `P` in WIPO ST.96. Refer to [Abstract in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/Abstract.xsd).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="filingDate" type="xs:date" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>The date the patent application was filed with the jurisdiction. Aligned with `FilingDate` in WIPO ST.96. Refer to [FilingDate in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/FilingDate.xsd).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="grantDate" type="xs:date" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>The date the patent was granted by the jurisdiction. Aligned with `GrantDate` in WIPO ST.96. Refer to [GrantDate in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/GrantDate.xsd).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="patentExpirationDate" type="xs:date" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>The date the patent expires. Derived from grant or filing date according to jurisdiction-specific rules.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="patentLegalStatus" type="bom:patentLegalStatusEnum" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Indicates the current legal status of the patent or patent application, based on the WIPO ST.27 standard. This status reflects administrative, procedural, or legal events. Values include both active and inactive states and are useful for determining enforceability, procedural history, and maintenance status.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="patentAssignee" type="bom:organizationOrIndividualType" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>Organisations or individuals to whom the patent rights are assigned. Supports joint ownership.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="externalReferences" type="bom:externalReferences" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>External references provide a way to document systems, sites, and information that may be relevant but are not included with the BOM. They may also establish specific relationships within or external to the BOM.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="bom-ref" type="bom:refType">
+            <xs:annotation>
+                <xs:documentation>
+                    An optional identifier which can be used to reference the object elsewhere in the BOM.
+                    Uniqueness is enforced within all elements and children of the root-level bom element.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:anyAttribute namespace="##other" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:complexType name="patentAssertionType">
+        <xs:annotation>
+            <xs:documentation>
+                An assertion linking a patent or patent family to a component or service. This allows expression of ownership, licensing, third-party claims, and other legal relationships.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="assertionType" type="bom:patentAssertionTypeEnum">
+                <xs:annotation>
+                    <xs:documentation>The type of assertion being made (e.g. ownership, license, third-party-claim, etc.).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="patentRefs" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>A list of references (`bom-ref`) linking to patents or families associated with this assertion.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="bom-ref" type="xs:string" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="asserter">
+                <xs:annotation>
+                    <xs:documentation>The organisation, individual, or BOM reference asserting the patent claim.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:choice>
+                        <xs:element name="organization" type="bom:organizationalEntity"/>
+                        <xs:element name="contact" type="bom:organizationalContact"/>
+                        <xs:element name="ref" type="bom:refLinkType"/>
+                    </xs:choice>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="notes" type="xs:string" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>Additional clarifications regarding the assertion, such as geographic or temporal constraints.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="bom-ref" type="bom:refType">
+            <xs:annotation>
+                <xs:documentation>
+                    An optional identifier which can be used to reference the object elsewhere in the BOM.
+                    Uniqueness is enforced within all elements and children of the root-level bom element.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:anyAttribute namespace="##other" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
+    <xs:simpleType name="patentLegalStatusEnum">
+        <xs:annotation>
+            <xs:documentation>
+                The legal status of the patent, reflecting various administrative or judicial states a patent or application may be in. Aligned with concepts in WIPO ST.27.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="pending">
+                <xs:annotation><xs:documentation>The patent application has been filed but not yet examined or granted.</xs:documentation></xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="granted">
+                <xs:annotation><xs:documentation>The patent application has been examined and a patent has been issued.</xs:documentation></xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="revoked">
+                <xs:annotation><xs:documentation>The patent has been declared invalid through a legal or administrative process.</xs:documentation></xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="expired">
+                <xs:annotation><xs:documentation>The patent has reached the end of its enforceable term.</xs:documentation></xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="lapsed">
+                <xs:annotation><xs:documentation>The patent is no longer in force due to non-payment of maintenance fees or other requirements.</xs:documentation></xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="withdrawn">
+                <xs:annotation><xs:documentation>The patent application was voluntarily withdrawn by the applicant.</xs:documentation></xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="abandoned">
+                <xs:annotation><xs:documentation>The patent application was abandoned, often due to lack of action or response.</xs:documentation></xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="suspended">
+                <xs:annotation><xs:documentation>Processing of the patent application has been temporarily halted.</xs:documentation></xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="reinstated">
+                <xs:annotation><xs:documentation>A previously abandoned or lapsed patent has been reinstated.</xs:documentation></xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="opposed">
+                <xs:annotation><xs:documentation>The patent application or granted patent is under formal opposition proceedings.</xs:documentation></xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="terminated">
+                <xs:annotation><xs:documentation>The patent or application has been officially terminated.</xs:documentation></xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="invalidated">
+                <xs:annotation><xs:documentation>The patent has been invalidated, either in part or in full.</xs:documentation></xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="in-force">
+                <xs:annotation><xs:documentation>The granted patent is active and enforceable.</xs:documentation></xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="patentAssertionTypeEnum">
+        <xs:annotation>
+            <xs:documentation>
+                Specifies the type of assertion made about a patent or patent family. Enables documentation of legal, ownership, or usage-related claims.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="ownership">
+                <xs:annotation><xs:documentation>The manufacturer asserts ownership of the patent or patent family.</xs:documentation></xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="license">
+                <xs:annotation><xs:documentation>The manufacturer asserts they have a license to use the patent or patent family.</xs:documentation></xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="third-party-claim">
+                <xs:annotation><xs:documentation>A third party has asserted a claim or potential infringement against the manufacturer’s component or service.</xs:documentation></xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="standards-inclusion">
+                <xs:annotation><xs:documentation>The patent is part of a standard essential patent (SEP) portfolio relevant to the component or service.</xs:documentation></xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="prior-art">
+                <xs:annotation><xs:documentation>The manufacturer asserts the patent or patent family as prior art that invalidates another patent or claim.</xs:documentation></xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="exclusive-rights">
+                <xs:annotation><xs:documentation>The manufacturer asserts exclusive rights granted through a licensing agreement.</xs:documentation></xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="non-assertion">
+                <xs:annotation><xs:documentation>The manufacturer asserts they will not enforce the patent or patent family against certain uses or users.</xs:documentation></xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="research-or-evaluation">
+                <xs:annotation><xs:documentation>The patent or patent family is being used under a research or evaluation license.</xs:documentation></xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="patentNumberType">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[A-Za-z0-9][A-Za-z0-9\-/.() ]{0,28}[A-Za-z0-9]"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="patentJurisdictionType">
+        <xs:annotation>
+            <xs:documentation>
+                The jurisdiction or patent office where the priority application was filed, specified using WIPO ST.3 codes. Aligned with `IPOfficeCode` in ST.96. Refer to [IPOfficeCode in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Common/IPOfficeCode.xsd).
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[A-Z]{2}"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="patentFilingDateType">
+        <xs:annotation>
+            <xs:documentation>
+                The date the priority application was filed. Aligned with `FilingDate` in WIPO ST.96.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:date"/>
+    </xs:simpleType>
+
+    <xs:complexType name="priorityApplicationType">
+        <xs:annotation>
+            <xs:documentation>
+                The priorityApplication contains the essential data necessary to identify and reference an earlier patent filing for priority rights. In line with WIPO ST.96 guidelines, it includes the jurisdiction (office code), application number, and filing date-the three key elements that uniquely specify the priority application in a global patent context.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="applicationNumber" type="bom:patentNumberType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="jurisdiction" type="bom:patentJurisdictionType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="filingDate" type="bom:patentFilingDateType" minOccurs="1" maxOccurs="1"/>
         </xs:sequence>
     </xs:complexType>
 
