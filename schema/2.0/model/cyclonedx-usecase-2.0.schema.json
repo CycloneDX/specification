@@ -1,0 +1,203 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "http://localhost:8080/schema/2.0/cyclonedx-usecase-2.0.schema.json",
+  "type": "object",
+  "title": "CycloneDX Transparency Expression Language: Use Case",
+  "$comment": "CycloneDX JSON schema is published under the terms of the Apache License 2.0.",
+  "additionalProperties": false,
+  "properties": {
+    "bom-ref": {
+      "type": "string",
+      "title": "BOM Reference",
+      "description": "An optional identifier which can be used to reference the use case elsewhere in the BOM. Every bom-ref must be unique within the BOM."
+    },
+    "name": {
+      "type": "string",
+      "title": "Name",
+      "description": "The name or title of the use case."
+    },
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "description": "A detailed description of the use case."
+    },
+    "actors": {
+      "type": ,"array",
+      "title": "Actors",
+      "description": "The stakeholders or users who interact with the system in this use case.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "preconditions": {
+      "type": "array",
+      "title": "Preconditions",
+      "description": "Conditions that must be true before the use case can be executed.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "postconditions": {
+      "type": "array",
+      "title": "Postconditions",
+      "description": "Conditions that will be true after the use case has been successfully executed.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "mainFlow": {
+      "type": "array",
+      "title": "Main Flow",
+      "description": "The primary sequence of steps that describe the use case.",
+      "items": {
+        "$ref": "#/$defs/step"
+      }
+    },
+    "alternativeFlows": {
+      "type": "array",
+      "title": "Alternative Flows",
+      "description": "Alternative sequences of steps that may occur in the use case.",
+      "items": {
+        "$ref": "#/$defs/flow"
+      }
+    },
+    "exceptions": {
+      "type": "array",
+      "title": "Exceptions",
+      "description": "Error scenarios that may occur during the execution of the use case.",
+      "items": {
+        "$ref": "#/$defs/exception"
+      }
+    },
+    "successCriteria": {
+      "type": "array",
+      "title": "Success Criteria",
+      "description": "Criteria that determine whether the use case has been successfully executed.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "notes": {
+      "type": "array",
+      "title": "Notes",
+      "description": "Additional information or comments about the use case.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "properties": {
+      "type": "array",
+      "title": "Properties",
+      "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard.",
+      "items": {
+        "$ref": "#/$defs/property"
+      }
+    }
+  },
+  "$defs": {
+    "step": {
+      "type": "object",
+      "title": "Step",
+      "description": "A single step in a use case flow.",
+      "additionalProperties": false,
+      "properties": {
+        "number": {
+          "type": "integer",
+          "title": "Number",
+          "description": "The sequence number of the step."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the step."
+        },
+        "actor": {
+          "type": "string",
+          "title": "Actor",
+          "description": "The actor who performs this step."
+        }
+      }
+    },
+    "flow": {
+      "type": "object",
+      "title": "Flow",
+      "description": "A sequence of steps in a use case.",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name of the flow."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the flow."
+        },
+        "condition": {
+          "type": "string",
+          "title": "Condition",
+          "description": "The condition under which this alternative flow is executed."
+        },
+        "steps": {
+          "type": "array",
+          "title": "Steps",
+          "description": "The sequence of steps in the flow.",
+          "items": {
+            "$ref": "#/$defs/step"
+          }
+        }
+      }
+    },
+    "exception": {
+      "type": "object",
+      "title": "Exception",
+      "description": "An error scenario in a use case.",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name of the exception."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the exception."
+        },
+        "condition": {
+          "type": "string",
+          "title": "Condition",
+          "description": "The condition under which this exception occurs."
+        },
+        "handling": {
+          "type": "string",
+          "title": "Handling",
+          "description": "How the exception is handled."
+        }
+      }
+    },
+    "property": {
+      "type": "object",
+      "title": "Property",
+      "description": "A name-value property.",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "value"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name of the property."
+        },
+        "value": {
+          "type": "string",
+          "title": "Value",
+          "description": "The value of the property."
+        }
+      }
+    }
+  }
+}
