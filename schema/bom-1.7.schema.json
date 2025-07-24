@@ -5474,7 +5474,7 @@
                     ],
                     "additionalProperties": false,
                     "properties": {
-                      "state": {
+                      "name": {
                         "type": "string",
                         "title": "State",
                         "description": "The name of the certificate lifecycle state."
@@ -5536,12 +5536,12 @@
                   {
                     "title": "Common Extensions",
                     "required": [
-                      "name",
-                      "value"
+                      "commonExtensionName",
+                      "commonExtensionValue"
                     ],
                     "additionalProperties": false,
                     "properties": {
-                      "name": {
+                      "commonExtensionName": {
                         "type": "string",
                         "title": "name",
                         "description": "The name of the extension.",
@@ -5570,7 +5570,7 @@
                           "signedCertificateTimestamp": "Shows that the certificate has been publicly logged, which helps prevent the issuance of rogue certificates by a CA. Log ID, timestamp and signature as proof."
                         }
                       },
-                      "value": {
+                      "commonExtensionValue": {
                         "type": "string",
                         "title": "Value",
                         "description": "The value of the certificate extension."
@@ -5581,16 +5581,16 @@
                     "title": "Custom Extensions",
                     "description": "Custom extensions may convey application-specific or vendor-specific data not covered by standard extensions. The structure and semantics of custom extensions are typically defined outside of public standards. CycloneDX leverages properties to support this capability.",
                     "required": [
-                      "name"
+                      "customExtensionName"
                     ],
                     "additionalProperties": false,
                     "properties": {
-                      "name": {
+                      "customExtensionName": {
                         "type": "string",
                         "title": "Name",
                         "description": "The name for the custom certificate extension."
                       },
-                      "value": {
+                      "customExtensionValue": {
                         "type": "string",
                         "title": "Value",
                         "description": "The description of the custom certificate extension."
@@ -5760,6 +5760,11 @@
                 "wpa",
                 "dtls",
                 "quic",
+                "eap-aka",
+                "eap-aka-prime",
+                "prins",
+                "5g-aka",
+                "jose",
                 "other",
                 "unknown"
               ],
@@ -5772,6 +5777,11 @@
                 "wpa": "Wi-Fi Protected Access",
                 "dtls": "Datagram Transport Layer Security",
                 "quic": "Quick UDP Internet Connections",
+                "eap-aka": "Extensible Authentication Protocol variant",
+                "eap-aka-prime": "Enhanced version of EAP-AKA",
+                "prins": "Protection of Inter-Network Signaling",
+                "5g-aka": "Authentication and Key Agreement for 5G",
+                "jose": "JSON Object Signing and Encryption",
                 "other": "Another protocol type",
                 "unknown": "The protocol type is not known"
               }
@@ -5803,27 +5813,39 @@
               "properties": {
                 "encr": {
                   "type": "array",
-                  "$ref": "#/definitions/ikeV2Enc",
                   "title": "Encryption Algorithms (ENCR)",
-                  "description": "Transform Type 1: encryption algorithms"
-                },
+                  "description": "Transform Type 1: encryption algorithms",
+                  "items": {
+                    "$ref": "#/definitions/ikeV2Enc",
+                    "title": "Encryption Algorithm (ENCR)"
+                  }
+                },  
                 "prf": {
                   "type": "array",
-                  "$ref": "#/definitions/ikeV2Prf",
                   "title": "Pseudorandom Functions (PRF)",
-                  "description": "Transform Type 2: pseudorandom functions"
+                  "description": "Transform Type 2: pseudorandom functions",
+                  "items": {
+                    "$ref": "#/definitions/ikeV2Prf",
+                    "title": "Pseudorandom Function (PRF)"
+                  }
                 },
                 "integ": {
                   "type": "array",
-                  "$ref": "#/definitions/ikeV2Integ",
                   "title": "Integrity Algorithms (INTEG)",
-                  "description": "Transform Type 3: integrity algorithms"
+                  "description": "Transform Type 3: integrity algorithms",
+                  "items": {
+                    "$ref": "#/definitions/ikeV2Integ",
+                    "title": "Integrity Algorithm (INTEG)"
+                  }
                 },
                 "ke": {
                   "type": "array",
-                  "$ref": "#/definitions/ikeV2Ke",
                   "title": "Key Exchange Methods (KE)",
-                  "description": "Transform Type 4: Key Exchange Method (KE) per [RFC 9370](https://www.ietf.org/rfc/rfc9370.html), formerly called Diffie-Hellman Group (D-H)."
+                  "description": "Transform Type 4: Key Exchange Method (KE) per [RFC 9370](https://www.ietf.org/rfc/rfc9370.html), formerly called Diffie-Hellman Group (D-H).",
+                  "items": {
+                    "$ref": "#/definitions/ikeV2Ke",
+                    "title": "Key Exchange Method (KE)"
+                  }
                 },
                 "esn": {
                   "type": "boolean",
@@ -5832,9 +5854,12 @@
                 },
                 "auth": {
                   "type": "array",
-                  "$ref": "#/definitions/ikeV2Auth",
                   "title": "IKEv2 Authentication methods",
-                  "description": "IKEv2 Authentication method per [RFC9593](https://www.ietf.org/rfc/rfc9593.html)."
+                  "description": "IKEv2 Authentication method per [RFC9593](https://www.ietf.org/rfc/rfc9593.html).",
+                  "items": {
+                    "$ref": "#/definitions/ikeV2Auth",
+                    "title": "IKEv2 Authentication Method"
+                  }
                 }
               }
             },
@@ -5893,6 +5918,35 @@
             "examples": [
               "0xC0",
               "0x9E"
+            ]
+          }
+        },
+        "tlsGroups": {
+          "type": "array",
+          "title": "TLS Groups",
+          "description": "A list of TLS named groups (formerly known as curves) for this cipher suite. These groups define the parameters for key exchange algorithms like ECDHE.",
+          "items": {
+            "type": "string",
+            "title": "Group Name",
+            "description": "The name of the TLS group",
+            "examples": [
+              "x25519",
+              "ffdhe2048"
+            ]
+          }
+        },
+        "tlsSignatureSchemes": {
+          "type": "array",
+          "title": "TLS Signature Schemes",
+          "description": "A list of signature schemes supported for cipher suite. These schemes specify the algorithms used for digital signatures in TLS handshakes and certificate verification.",
+          "items": {
+            "type": "string",
+            "title": "Signature Scheme",
+            "description": "The name of the TLS signature scheme",
+            "examples": [
+              "ecdsa_secp256r1_sha256",
+              "rsa_pss_rsae_sha256",
+              "ed25519"
             ]
           }
         }
