@@ -6499,6 +6499,14 @@ limitations under the License.
                                             </xs:documentation>
                                         </xs:annotation>
                                     </xs:enumeration>
+                                    <xs:enumeration value="key-wrap">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Key-wrap is a cryptographic technique used to securely encrypt and
+                                                protect cryptographic keys using algorithms like AES.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
                                     <xs:enumeration value="other">
                                         <xs:annotation>
                                             <xs:documentation>
@@ -6516,6 +6524,15 @@ limitations under the License.
                                 </xs:restriction>
                             </xs:simpleType>
                         </xs:element>
+                        <xs:element name="algorithmFamily" type="xs:string" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    A valid algorithm family identifier. If specified, this value must be one of the
+                                    enumeration of valid algorithm Family identifiers defined in the
+                                    cryptography-defs.json subschema. A corresponding schema for XML is not available.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
                         <xs:element name="parameterSetIdentifier" type="xs:string" minOccurs="0" maxOccurs="1">
                             <xs:annotation>
                                 <xs:documentation>
@@ -6529,11 +6546,21 @@ limitations under the License.
                         <xs:element name="curve" type="xs:string" minOccurs="0" maxOccurs="1">
                             <xs:annotation>
                                 <xs:documentation>
+                                    DEPRECATED. Use ellipticCurve instead.
                                     The specific underlying Elliptic Curve (EC) definition employed which is an indicator
                                     of the level of security strength, performance and complexity. Absent an
                                     authoritative source of curve names, CycloneDX recommends use of curve names as
                                     defined at https://neuromancer.sk/std/, the source from which can be found at
                                     https://github.com/J08nY/std-curves.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="ellipticCurve" type="xs:string" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The specific underlying Elliptic Curve (EC) definition employed which is an indicator
+                                    of the level of security strength, performance and complexity. Curves are defined in
+                                    the cryptography-defs.json subschema. A corresponding schema for XML is not available.
                                 </xs:documentation>
                             </xs:annotation>
                         </xs:element>
@@ -7030,6 +7057,13 @@ limitations under the License.
                 </xs:annotation>
                 <xs:complexType>
                     <xs:sequence>
+                        <xs:element name="serialNumber" type="xs:string" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The serial number is a unique identifier for the certificate issued by a CA.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
                         <xs:element name="subjectName" type="xs:string" minOccurs="0" maxOccurs="1">
                             <xs:annotation>
                                 <xs:documentation>
@@ -7061,6 +7095,7 @@ limitations under the License.
                         <xs:element name="signatureAlgorithmRef" type="bom:refType" minOccurs="0" maxOccurs="1">
                             <xs:annotation>
                                 <xs:documentation>
+                                    DEPRECATED] Use relatedCryptographicAssets instead.
                                     The bom-ref to signature algorithm used by the certificate
                                 </xs:documentation>
                             </xs:annotation>
@@ -7068,6 +7103,7 @@ limitations under the License.
                         <xs:element name="subjectPublicKeyRef" type="bom:refType" minOccurs="0" maxOccurs="1">
                             <xs:annotation>
                                 <xs:documentation>
+                                    DEPRECATED] Use relatedCryptographicAssets instead.
                                     The bom-ref to the public key of the subject
                                 </xs:documentation>
                             </xs:annotation>
@@ -7082,9 +7118,338 @@ limitations under the License.
                         <xs:element name="certificateExtension" type="xs:string" minOccurs="0" maxOccurs="1">
                             <xs:annotation>
                                 <xs:documentation>
+                                    [DEPRECATED] Use certificateFileExtension instead.
                                     The file extension of the certificate. Examples include crt, pem, cer, der, and p12.
                                 </xs:documentation>
                             </xs:annotation>
+                        </xs:element>
+                        <xs:element name="certificateFileExtension" type="xs:string" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The file extension of the certificate. Examples include crt, pem, cer, der, and p12.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="fingerprint" type="bom:hashType" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The fingerprint is a cryptographic hash of the certificate excluding it's signature.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="certificateState" minOccurs="0" maxOccurs="unbounded">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The certificate lifecycle is a comprehensive process that manages digital
+                                    certificates from their initial creation to eventual expiration or revocation.
+                                    It typically involves several stages.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:choice>
+                                    <!-- Pre-Defined State -->
+                                    <xs:sequence>
+                                        <xs:element name="state" minOccurs="1" maxOccurs="1">
+                                            <xs:annotation>
+                                                <xs:documentation>
+                                                    A pre-defined state in the certificate lifecycle.
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:enumeration value="pre-activation">
+                                                        <xs:annotation>
+                                                            <xs:documentation>
+                                                                The certificate has been issued by the issuing
+                                                                certificate authority (CA) but has not been authorized
+                                                                for use.
+                                                            </xs:documentation>
+                                                        </xs:annotation>
+                                                    </xs:enumeration>
+                                                    <xs:enumeration value="active">
+                                                        <xs:annotation>
+                                                            <xs:documentation>
+                                                                The certificate may be used to cryptographically protect
+                                                                information, cryptographically process previously protected
+                                                                information, or both.
+                                                            </xs:documentation>
+                                                        </xs:annotation>
+                                                    </xs:enumeration>
+                                                    <xs:enumeration value="suspended">
+                                                        <xs:annotation>
+                                                            <xs:documentation>
+                                                                Certificates in the deactivated state shall not be used
+                                                                to apply cryptographic protection but, in some cases,
+                                                                may be used to process cryptographically protected
+                                                                information.
+                                                            </xs:documentation>
+                                                        </xs:annotation>
+                                                    </xs:enumeration>
+                                                    <xs:enumeration value="deactivated">
+                                                        <xs:annotation>
+                                                            <xs:documentation>
+                                                                The use of a certificate may be suspended for several
+                                                                possible reasons.
+                                                            </xs:documentation>
+                                                        </xs:annotation>
+                                                    </xs:enumeration>
+                                                    <xs:enumeration value="revoked">
+                                                        <xs:annotation>
+                                                            <xs:documentation>
+                                                                A revoked certificate is a digital certificate that has
+                                                                been invalidated by the issuing certificate authority (CA)
+                                                                before its scheduled expiration date.
+                                                            </xs:documentation>
+                                                        </xs:annotation>
+                                                    </xs:enumeration>
+                                                    <xs:enumeration value="destroyed">
+                                                        <xs:annotation>
+                                                            <xs:documentation>
+                                                                The certificate has been destroyed.
+                                                            </xs:documentation>
+                                                        </xs:annotation>
+                                                    </xs:enumeration>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="reason" type="xs:string" minOccurs="0" maxOccurs="1">
+                                            <xs:annotation>
+                                                <xs:documentation>
+                                                    A reason for the certificate being in this state.
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                    </xs:sequence>
+                                    <!-- Custom State -->
+                                    <xs:sequence>
+                                        <xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1">
+                                            <xs:annotation>
+                                                <xs:documentation>
+                                                    The name of the certificate lifecycle state.
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1">
+                                            <xs:annotation>
+                                                <xs:documentation>
+                                                    The description of the certificate lifecycle state.
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element name="reason" type="xs:string" minOccurs="0" maxOccurs="1">
+                                            <xs:annotation>
+                                                <xs:documentation>
+                                                    A reason for the certificate being in this state.
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:choice>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="creationDate" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The date and time (timestamp) when the certificate was created or pre-activated.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="activationDate" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The date and time (timestamp) when the certificate was activated.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="deactivationDate" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The date and time (timestamp) when the related certificate was deactivated.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="revocationDate" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The date and time (timestamp) when the certificate was revoked.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="destructionDate" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The date and time (timestamp) when the certificate was destroyed.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="certificateExtensions" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    A certificate extension is an optional field that provides additional information about the certificate or its use. Extensions are used to convey additional information beyond the standard fields.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="certificateExtension" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Extension: This can be either a common extension
+                                                (with a well-known name and value) or a custom extension
+                                                (for application or vendor-specific data).
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                        <xs:complexType>
+                                            <xs:choice>
+                                                <!-- Common Extensions -->
+                                                <xs:sequence>
+                                                    <xs:element name="commonExtensionName" minOccurs="1" maxOccurs="1">
+                                                        <xs:annotation>
+                                                            <xs:documentation>
+                                                                The name of the extension.
+                                                            </xs:documentation>
+                                                        </xs:annotation>
+                                                        <xs:simpleType>
+                                                            <xs:restriction base="xs:string">
+                                                                <xs:enumeration value="basicConstraints">
+                                                                    <xs:annotation>
+                                                                        <xs:documentation>
+                                                                            Specifies whether a certificate can be used as a CA certificate or not.
+                                                                        </xs:documentation>
+                                                                    </xs:annotation>
+                                                                </xs:enumeration>
+                                                                <xs:enumeration value="keyUsage">
+                                                                    <xs:annotation>
+                                                                        <xs:documentation>
+                                                                            Specifies the allowed uses of the public key in the certificate.
+                                                                        </xs:documentation>
+                                                                    </xs:annotation>
+                                                                </xs:enumeration>
+                                                                <xs:enumeration value="extendedKeyUsage">
+                                                                    <xs:annotation>
+                                                                        <xs:documentation>
+                                                                            Specifies additional purposes for which the public key can be used.
+                                                                        </xs:documentation>
+                                                                    </xs:annotation>
+                                                                </xs:enumeration>
+                                                                <xs:enumeration value="subjectAlternativeName">
+                                                                    <xs:annotation>
+                                                                        <xs:documentation>
+                                                                            Allows inclusion of additional names to identify the entity associated with the certificate.
+                                                                        </xs:documentation>
+                                                                    </xs:annotation>
+                                                                </xs:enumeration>
+                                                                <xs:enumeration value="authorityKeyIdentifier">
+                                                                    <xs:annotation>
+                                                                        <xs:documentation>
+                                                                            Identifies the public key of the CA that issued the certificate.
+                                                                        </xs:documentation>
+                                                                    </xs:annotation>
+                                                                </xs:enumeration>
+                                                                <xs:enumeration value="subjectKeyIdentifier">
+                                                                    <xs:annotation>
+                                                                        <xs:documentation>
+                                                                            Identifies the public key associated with the entity the certificate was issued to.
+                                                                        </xs:documentation>
+                                                                    </xs:annotation>
+                                                                </xs:enumeration>
+                                                                <xs:enumeration value="authorityInformationAccess">
+                                                                    <xs:annotation>
+                                                                        <xs:documentation>
+                                                                            Contains CA issuers and OCSP information.
+                                                                        </xs:documentation>
+                                                                    </xs:annotation>
+                                                                </xs:enumeration>
+                                                                <xs:enumeration value="certificatePolicies">
+                                                                    <xs:annotation>
+                                                                        <xs:documentation>
+                                                                            Defines the policies under which the certificate was issued and can be used.
+                                                                        </xs:documentation>
+                                                                    </xs:annotation>
+                                                                </xs:enumeration>
+                                                                <xs:enumeration value="crlDistributionPoints">
+                                                                    <xs:annotation>
+                                                                        <xs:documentation>
+                                                                            Contains one or more URLs where a Certificate Revocation List (CRL) can be obtained.
+                                                                        </xs:documentation>
+                                                                    </xs:annotation>
+                                                                </xs:enumeration>
+                                                                <xs:enumeration value="signedCertificateTimestamp">
+                                                                    <xs:annotation>
+                                                                        <xs:documentation>
+                                                                            Shows that the certificate has been publicly logged, which helps prevent the issuance of rogue certificates by a CA. Log ID, timestamp and signature as proof.
+                                                                        </xs:documentation>
+                                                                    </xs:annotation>
+                                                                </xs:enumeration>
+                                                            </xs:restriction>
+                                                        </xs:simpleType>
+                                                    </xs:element>
+                                                    <xs:element name="commonExtensionValue" type="xs:string" minOccurs="1" maxOccurs="1">
+                                                        <xs:annotation>
+                                                            <xs:documentation>
+                                                                The value of the certificate extension.
+                                                            </xs:documentation>
+                                                        </xs:annotation>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                                <!-- Custom Extensions -->
+                                                <xs:sequence>
+                                                    <xs:element name="customExtensionName" type="xs:string" minOccurs="1" maxOccurs="1">
+                                                        <xs:annotation>
+                                                            <xs:documentation>
+                                                                The name for the custom certificate extension.
+                                                            </xs:documentation>
+                                                        </xs:annotation>
+                                                    </xs:element>
+                                                    <xs:element name="customExtensionValue" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                        <xs:annotation>
+                                                            <xs:documentation>
+                                                                The description of the custom certificate extension.
+                                                            </xs:documentation>
+                                                        </xs:annotation>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                            </xs:choice>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="relatedCryptographicAssets" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    A list of cryptographic assets related to this component.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="relatedCryptographicAsset" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                A cryptographic asset related to this component.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="type" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            Specifies the mechanism by which the cryptographic asset is secured by.
+                                                            Examples: "publicKey", "privateKey", "algorithm"
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="ref" type="bom:refType" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The bom-ref to cryptographic asset.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
                         </xs:element>
                     </xs:sequence>
                 </xs:complexType>
@@ -7233,6 +7598,50 @@ limitations under the License.
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
+                        <xs:element name="fingerprint" type="bom:hashType" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The fingerprint is a cryptographic hash of the related cryptographic material, excluding it's signature.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="relatedCryptographicAssets" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    A list of cryptographic assets related to this component.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="relatedCryptographicAsset" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                A cryptographic asset related to this component.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="type" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            Specifies the mechanism by which the cryptographic asset is secured by.
+                                                            Examples: "publicKey", "privateKey", "algorithm"
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="ref" type="bom:refType" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The bom-ref to cryptographic asset.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -7291,6 +7700,55 @@ limitations under the License.
                                         <xs:annotation>
                                             <xs:documentation>
                                                 Wi-Fi Protected Access
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="dtls">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Datagram Transport Layer Security
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="quic">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Quick UDP Internet Connections
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="eap-aka">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Extensible Authentication Protocol variant
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="eap-aka-prime">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Enhanced version of EAP-AKA
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="prins">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Protection of Inter-Network Signaling
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="5g-aka">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Authentication and Key Agreement for 5G
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="jose">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                JSON Object Signing and Encryption
                                             </xs:documentation>
                                         </xs:annotation>
                                     </xs:enumeration>
@@ -7372,6 +7830,48 @@ limitations under the License.
                                                         </xs:sequence>
                                                     </xs:complexType>
                                                 </xs:element>
+                                                <xs:element name="tlsGroups" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            A list of TLS named groups (formerly known as curves) for
+                                                            this cipher suite. These groups define the parameters for
+                                                            key exchange algorithms like ECDHE.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                    <xs:complexType>
+                                                        <xs:sequence>
+                                                            <xs:element name="group" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>
+                                                                        The name of the TLS group.
+                                                                        Example values: x25519, ffdhe2048
+                                                                    </xs:documentation>
+                                                                </xs:annotation>
+                                                            </xs:element>
+                                                        </xs:sequence>
+                                                    </xs:complexType>
+                                                </xs:element>
+                                                <xs:element name="tlsSignatureSchemes" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            A list of signature schemes supported for cipher suite.
+                                                            These schemes specify the algorithms used for digital
+                                                            signatures in TLS handshakes and certificate verification.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                    <xs:complexType>
+                                                        <xs:sequence>
+                                                            <xs:element name="signatureScheme" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>
+                                                                        The name of the TLS signature scheme.
+                                                                        Example values: ecdsa_secp256r1_sha256, rsa_pss_rsae_sha256, ed25519
+                                                                    </xs:documentation>
+                                                                </xs:annotation>
+                                                            </xs:element>
+                                                        </xs:sequence>
+                                                    </xs:complexType>
+                                                </xs:element>
                                             </xs:sequence>
                                         </xs:complexType>
                                     </xs:element>
@@ -7387,28 +7887,28 @@ limitations under the License.
                             </xs:annotation>
                             <xs:complexType>
                                 <xs:sequence>
-                                    <xs:element name="encr" type="bom:refType" minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element name="encr" type="bom:ikeV2Enc" minOccurs="0" maxOccurs="unbounded">
                                         <xs:annotation>
                                             <xs:documentation>
                                                 Transform Type 1: encryption algorithms
                                             </xs:documentation>
                                         </xs:annotation>
                                     </xs:element>
-                                    <xs:element name="prf" type="bom:refType" minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element name="prf" type="bom:ikeV2Prf" minOccurs="0" maxOccurs="unbounded">
                                         <xs:annotation>
                                             <xs:documentation>
                                                 Transform Type 2: pseudorandom functions
                                             </xs:documentation>
                                         </xs:annotation>
                                     </xs:element>
-                                    <xs:element name="integ" type="bom:refType" minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element name="integ" type="bom:ikeV2Integ" minOccurs="0" maxOccurs="unbounded">
                                         <xs:annotation>
                                             <xs:documentation>
                                                 Transform Type 3: integrity algorithms
                                             </xs:documentation>
                                         </xs:annotation>
                                     </xs:element>
-                                    <xs:element name="ke" type="bom:refType" minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element name="ke" type="bom:ikeV2Ke" minOccurs="0" maxOccurs="unbounded">
                                         <xs:annotation>
                                             <xs:documentation>
                                                 Transform Type 4: Key Exchange Method (KE) per RFC9370, formerly called Diffie-Hellman Group (D-H)
@@ -7422,7 +7922,7 @@ limitations under the License.
                                             </xs:documentation>
                                         </xs:annotation>
                                     </xs:element>
-                                    <xs:element name="auth" type="bom:refType" minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element name="auth" type="bom:ikeV2Auth" minOccurs="0" maxOccurs="unbounded">
                                         <xs:annotation>
                                             <xs:documentation>
                                                 IKEv2 Authentication method
@@ -7444,6 +7944,111 @@ limitations under the License.
                 <xs:annotation>
                     <xs:documentation>
                         The object identifier (OID) of the cryptographic asset.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ikeV2Enc">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>
+                        A name for the encryption method.
+                        Example: ENCR_AES_GCM_16
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="keyLength" type="xs:integer" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>
+                        The key length of the encryption algorithm.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="algorithm" type="bom:refType" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>
+                        The bom-ref to algorithm cryptographic asset.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ikeV2Prf">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>
+                        A name for the pseudorandom function.
+                        Example: PRF_HMAC_SHA2_256
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="algorithm" type="bom:refType" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>
+                        The bom-ref to algorithm cryptographic asset.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ikeV2Integ">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>
+                        A name for the integrity algorithm.
+                        Example: AUTH_HMAC_SHA2_256_128
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="algorithm" type="bom:refType" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>
+                        The bom-ref to algorithm cryptographic asset.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ikeV2Ke">
+        <xs:sequence>
+            <xs:element name="group" type="xs:integer" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>
+                        A group identifier for the key exchange algorithm.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="algorithm" type="bom:refType" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>
+                        The bom-ref to algorithm cryptographic asset.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ikeV2Auth">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>
+                        A name for the authentication method.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="algorithm" type="bom:refType" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>
+                        The bom-ref to algorithm cryptographic asset.
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
