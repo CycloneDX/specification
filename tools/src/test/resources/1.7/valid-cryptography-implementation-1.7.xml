@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<bom serialNumber="urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79" version="1" xmlns="http://cyclonedx.org/schema/bom/1.7">
+<bom serialNumber="urn:uuid:e8c355aa-2142-4084-a8c7-6d42c8610ba2" version="1" xmlns="http://cyclonedx.org/schema/bom/1.7">
     <metadata>
         <component type="application" bom-ref="acme-application">
             <name>Acme Application</name>
@@ -27,7 +27,64 @@
                     <classicalSecurityLevel>128</classicalSecurityLevel>
                     <nistQuantumSecurityLevel>1</nistQuantumSecurityLevel>
                 </algorithmProperties>
-                <oid>oid:2.16.840.1.101.3.4.1.7</oid>
+                <oid>2.16.840.1.101.3.4.1.6</oid>
+            </cryptoProperties>
+        </component>
+        <component type="cryptographic-asset" bom-ref="ecdhsecp521r1">
+            <name>ECDH-secp521r1</name>
+            <cryptoProperties>
+                <assetType>algorithm</assetType>
+                <algorithmProperties>
+                    <primitive>key-agree</primitive>
+                    <algorithmFamily>ECDH</algorithmFamily>
+                    <ellipticCurve>secg/secp521r1</ellipticCurve>
+                    <executionEnvironment>software-plain-ram</executionEnvironment>
+                    <implementationPlatform>x86_64</implementationPlatform>
+                    <certificationLevel>none</certificationLevel>
+                    <cryptoFunctions>
+                        <cryptoFunction>keygen</cryptoFunction>
+                        <cryptoFunction>keyderive</cryptoFunction>
+                    </cryptoFunctions>
+                    <nistQuantumSecurityLevel>0</nistQuantumSecurityLevel>
+                </algorithmProperties>
+                <oid>1.3.132.0.35</oid>
+            </cryptoProperties>
+        </component>
+        <component type="cryptographic-asset" bom-ref="mlkem1024">
+            <name>ML-KEM-1024</name>
+            <cryptoProperties>
+                <assetType>algorithm</assetType>
+                <algorithmProperties>
+                    <primitive>kem</primitive>
+                    <algorithmFamily>ML-KEM</algorithmFamily>
+                    <executionEnvironment>software-plain-ram</executionEnvironment>
+                    <implementationPlatform>x86_64</implementationPlatform>
+                    <certificationLevel>none</certificationLevel>
+                    <cryptoFunctions>
+                        <cryptoFunction>keygen</cryptoFunction>
+                        <cryptoFunction>keyderive</cryptoFunction>
+                    </cryptoFunctions>
+                    <nistQuantumSecurityLevel>5</nistQuantumSecurityLevel>
+                </algorithmProperties>
+                <oid>2.16.840.1.101.3.4.1.48</oid>
+            </cryptoProperties>
+        </component>
+        <component type="cryptographic-asset" bom-ref="draftietftlshybriddesign13">
+            <name>draft-ietf-tls-hybrid-design-13</name>
+            <cryptoProperties>
+                <assetType>algorithm</assetType>
+                <algorithmProperties>
+                    <primitive>combiner</primitive>
+                    <executionEnvironment>software-plain-ram</executionEnvironment>
+                    <implementationPlatform>x86_64</implementationPlatform>
+                    <certificationLevel>none</certificationLevel>
+                    <cryptoFunctions>
+                        <cryptoFunction>keygen</cryptoFunction>
+                        <cryptoFunction>keyderive</cryptoFunction>
+                    </cryptoFunctions>
+                    <nistQuantumSecurityLevel>0</nistQuantumSecurityLevel>
+                </algorithmProperties>
+                <oid>1.3.101.110</oid>
             </cryptoProperties>
         </component>
         <component type="library" bom-ref="crypto-library">
@@ -46,6 +103,10 @@
         <dependency ref="crypto-library">
             <provides ref="aes128gcm"/>
             <dependency ref="some-library"/>
+        </dependency>
+        <dependency ref="draftietftlshybriddesign13">
+            <dependency ref="mlkem1024"/>
+            <dependency ref="ecdhsecp521r1"/>
         </dependency>
     </dependencies>
 </bom>
