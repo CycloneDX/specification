@@ -12,55 +12,85 @@ components: [
     cryptoProperties: {
       assetType: CRYPTO_ASSET_TYPE_ALGORITHM
       algorithmProperties: {
-        primitive: CRYPTO_PRIMITIVE_AE
+        primitive: CRYPTO_PRIMITIVE_KEY_AGREE
         parameterSetIdentifier: "128"
-        curve: "brainpoolP160r1"
+        curve: "brainpool/brainpoolP160r1"
         executionEnvironment: CRYPTO_EXECUTION_ENVIRONMENT_SOFTWARE_PLAIN_RAM
         implementationPlatform: CRYPTO_IMPLEMENTATION_PLATFORM_X86_64
-        certificationLevel: [ "fips140-1-l4" ]
+        certificationLevel: [ "fips140-3-l4" ]
         mode: CRYPTO_ALGORITHM_MODE_GCM
         padding: CRYPTO_ALGORITHM_PADDING_PKCS5
         cryptoFunctions: [
           CRYPTO_ALGORITHM_FUNCTION_KEYGEN,
-          CRYPTO_ALGORITHM_FUNCTION_ENCRYPT,
-          CRYPTO_ALGORITHM_FUNCTION_DECRYPT,
-          CRYPTO_ALGORITHM_FUNCTION_TAG
+          CRYPTO_ALGORITHM_FUNCTION_KEYDERIVE
         ]
-        classicalSecurityLevel: 128
-        nistQuantumSecurityLevel: 1
-      },
+        classicalSecurityLevel: 96
+        nistQuantumSecurityLevel: 0
+      }
       oid: "oid:1.2.3.4.5.6.7.8.9"
     }
   },
   {
     type: CLASSIFICATION_CRYPTOGRAPHIC_ASSET
     bom_ref: "asset-2"
-    name: "Name here"
+    name: "Example Certificate with All Properties"
     cryptoProperties: {
       assetType: CRYPTO_ASSET_TYPE_CERTIFICATE
       certificateProperties: {
-        subjectName: "Subject name here"
-        issuerName: "Issuer name here"
+        subjectName: "CN=example.com, O=Example Corp, C=US"
+        issuerName: "CN=Example CA, O=Example Trust Services, C=US"
         notValidBefore {
           seconds: 1640995200
-          nanos: 0
         }
         notValidAfter {
           seconds: 1704067200
-          nanos: 0
         }
         signatureAlgorithmRef: "bom-ref-to-algorithm"
         subjectPublicKeyRef: "bom-ref-to-public-key"
         certificateFormat: "X.509"
-        certificateExtension: "crt"
+        certificateFileExtension: "crt"
+        certificateExtensions {
+          extensions: [
+            {
+              commonExtension {
+                name: COMMON_EXTENSION_NAME_BASIC_CONSTRAINTS
+                value: "CA:FALSE"
+              }
+            },
+            {
+              commonExtension {
+                name: COMMON_EXTENSION_NAME_KEY_USAGE
+                value: "Digital Signature, Key Encipherment"
+              }
+            },
+            {
+              commonExtension {
+                name: COMMON_EXTENSION_NAME_SUBJECT_ALTERNATIVE_NAME
+                value: "DNS:example.com, DNS:www.example.com"
+              }
+            }
+          ]
+        }
+        relatedCryptographicAssets {
+          assets: [
+            {
+              type: "algorithm"
+              ref: "asset-1"
+            },
+            {
+              type: "publicKey"
+              ref: "asset-4"
+            }
+          ]
+        }
       }
-    oid: "oid:1.2.3.4.5.6.7.8.9"
+      oid: "oid:2.5.4.3"
     }
   },
   {
     type: CLASSIFICATION_CRYPTOGRAPHIC_ASSET
     bom_ref: "asset-3"
-    name: "Name here"
+    name: "Example Protocol with All Properties"
     cryptoProperties: {
       assetType: CRYPTO_ASSET_TYPE_PROTOCOL
       protocolProperties: {
@@ -68,55 +98,140 @@ components: [
         version: "1.3"
         cipherSuites: [
           {
-            name: "TLS_DHE_RSA_WITH_AES_128_CCM"
+            name: "TLS_AES_128_GCM_SHA256"
             algorithms: [
-              "bom-ref-to-algorithm"
+              "aes-128-gcm-ref",
+              "sha256-ref"
             ]
             identifiers: [
-              "0xC0"
+              "0x1301"
+            ]
+            tlsGroups: [
+              "x25519",
+              "secp256r1",
+              "secp384r1",
+              "secp521r1",
+              "ffdhe2048",
+              "ffdhe3072"
+            ]
+            tlsSignatureSchemes: [
+              "ecdsa_secp256r1_sha256",
+              "ecdsa_secp384r1_sha384",
+              "ecdsa_secp521r1_sha512",
+              "rsa_pss_rsae_sha256",
+              "rsa_pss_rsae_sha384",
+              "rsa_pss_rsae_sha512",
+              "ed25519",
+              "ed448"
+            ]
+          },
+          {
+            name: "TLS_AES_256_GCM_SHA384"
+            algorithms: [
+              "aes-256-gcm-ref",
+              "sha384-ref"
+            ]
+            identifiers: [
+              "0x1302"
+            ]
+          },
+          {
+            name: "TLS_CHACHA20_POLY1305_SHA256"
+            algorithms: [
+              "chacha20-poly1305-ref",
+              "sha256-ref"
+            ]
+            identifiers: [
+              "0x1303"
             ]
           }
         ]
+        ikev2TransformTypes: {
+          encr: [
+            {
+              name: "ENCR_AES_GCM_16"
+              keyLength: 128
+              algorithm: "aes-128-gcm-ref"
+            }
+          ]
+          prf: [
+            {
+              name: "PRF_HMAC_SHA2_256"
+              algorithm: "sha256-ref"
+            }
+          ]
+          integ: [
+            {
+              name: "AUTH_HMAC_SHA2_256_128"
+              algorithm: "sha256-ref"
+            }
+          ]
+          ke: [
+            {
+              group: 14
+              algorithm: "dh-2048-ref"
+            }
+          ]
+          esn: true
+          auth: [
+            {
+              name: "ECDSA"
+              algorithm: "ecdsa-ref"
+            }
+          ]
+        }
+        relatedCryptographicAssets {
+          assets: [
+            {
+              type: "algorithm"
+              ref: "asset-1"
+            }
+          ]
+        }
       }
-      oid: "oid:1.2.3.4.5.6.7.8.9"
+      oid: "oid:1.3.6.1.5.5.7.3.1"
     }
   },
   {
     type: CLASSIFICATION_CRYPTOGRAPHIC_ASSET
     bom_ref: "asset-4"
-    name: "Name here"
+    name: "Example Related Crypto Material with All Properties"
     cryptoProperties: {
       assetType: CRYPTO_ASSET_TYPE_RELATED_CRYPTO_MATERIAL
       relatedCryptoMaterialProperties: {
-        type: CRYPTO_RELATED_TYPE_PRIVATE_KEY
-        id: "12345"
+        type: CRYPTO_RELATED_TYPE_PUBLIC_KEY
+        id: "key-12345-67890"
         state: CRYPTO_RELATED_STATE_ACTIVE
-        algorithmRef: "bom-ref-to-algorithm"
+        algorithmRef: "rsa-4096-ref"
         creationDate {
           seconds: 1704067200
-          nanos: 0
         }
         activationDate {
           seconds: 1704153600
-          nanos: 0
         }
         updateDate {
           seconds: 1704240000
-          nanos: 0
         }
         expirationDate {
-          seconds: 1704326400
-          nanos: 0
+          seconds: 1767225600
         }
-        value: "Value here"
-        size: 1024
-        format: "PEM"
+        value: "-----BEGIN PUBLIC KEY-----"
+        size: 4096
+        format: "PKCS#8"
         securedBy: {
           mechanism: "HSM"
-          algorithmRef: "bom-ref-to-algorithm"
+          algorithmRef: "aes-256-gcm-ref"
+        }
+        relatedCryptographicAssets {
+          assets: [
+            {
+              type: "algorithm"
+              ref: "asset-1"
+            }
+          ]
         }
       }
-      oid: "oid:1.2.3.4.5.6.7.8.9"
+      oid: "oid:1.2.840.113549.1.1.1"
     }
   }
 ]
