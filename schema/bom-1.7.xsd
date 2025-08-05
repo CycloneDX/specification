@@ -1669,7 +1669,7 @@ limitations under the License.
             </xs:enumeration>
             <xs:enumeration value="formulation">
                 <xs:annotation>
-                    <xs:documentation>Describes how a component or service was manufactured or deployed.</xs:documentation>
+                    <xs:documentation>Describes the formulation of any referencable object within the BOM, including components, services, metadata, declarations, or the BOM itself.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
             <xs:enumeration value="attestation">
@@ -5218,9 +5218,13 @@ limitations under the License.
     <xs:complexType name="formulationType">
         <xs:annotation>
             <xs:documentation>
-                Describes how a component or service was manufactured or deployed. This is achieved through the use
-                of formulas, workflows, tasks, and steps, which declare the precise steps to reproduce along with the
-                observed formulas describing the steps which transpired in the manufacturing process.
+                Describes the formulation of any referencable object within the BOM,
+                including components, services, metadata, declarations, or the BOM itself. This may
+                encompass how the object was created, assembled, deployed, tested, certified, or otherwise
+                brought into its present form. Common examples include software build pipelines,
+                deployment processes, AI/ML model training, cryptographic key generation or certification,
+                and third-party audits. Processes are modeled using declared and observed formulas,
+                composed of workflows, tasks, and individual steps.
             </xs:documentation>
         </xs:annotation>
         <xs:sequence minOccurs="0" maxOccurs="unbounded">
@@ -8880,24 +8884,44 @@ limitations under the License.
             </xs:documentation>
         </xs:annotation>
         <xs:sequence>
-            <xs:element name="pointers" minOccurs="1" maxOccurs="1">
-                <xs:annotation>
-                    <xs:documentation>
-                        One or more JSON Pointers(https://datatracker.ietf.org/doc/html/rfc6901) identifying the BOM fields to which the attribution applies.
-                    </xs:documentation>
-                </xs:annotation>
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element name="pointer" type="xs:string" minOccurs="1" maxOccurs="unbounded">
-                            <xs:annotation>
-                                <xs:documentation>
-                                    A JSON Pointer(https://datatracker.ietf.org/doc/html/rfc6901) identifying the BOM field to which the attribution applies. Users of other serialisation formats (e.g. XML) shall use the JSON Pointer format to ensure consistent field referencing across representations.
-                                </xs:documentation>
-                            </xs:annotation>
-                        </xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
+            <xs:choice>
+                <xs:element name="pointers" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>
+                            One or more JSON Pointers(https://datatracker.ietf.org/doc/html/rfc6901) identifying the BOM fields to which the attribution applies.
+                        </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="pointer" type="xs:string" minOccurs="1" maxOccurs="unbounded">
+                                <xs:annotation>
+                                    <xs:documentation>
+                                        A JSON Pointer(https://datatracker.ietf.org/doc/html/rfc6901) identifying the BOM field to which the attribution applies. Users of other serialisation formats (e.g. XML) shall use the JSON Pointer format to ensure consistent field referencing across representations.
+                                    </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="expressions" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>
+                            One or more path expressions used to locate values within a BOM.
+                        </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="expression" type="xs:string" minOccurs="1" maxOccurs="unbounded">
+                                <xs:annotation>
+                                    <xs:documentation>
+                                        Specifies a path expression used to locate a value within a BOM. The expression syntax shall conform to the format of the BOM's serialisation. Use [JSONPath](https://datatracker.ietf.org/doc/html/rfc9535) for JSON, [XPath](https://www.w3.org/TR/xpath/) for XML, and default to JSONPath for Protocol Buffers unless otherwise specified. Implementers shall ensure the expression is valid within the context of the applicable serialisation format.
+                                    </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:choice>
             <xs:element name="timestamp" type="xs:dateTime" minOccurs="1" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>
@@ -9020,10 +9044,13 @@ limitations under the License.
                 </xs:element>
                 <xs:element name="formulation" type="bom:formulationType" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
-                        <xs:documentation>Describes how a component or service was manufactured or deployed. This is
-                            achieved through the use of formulas, workflows, tasks, and steps, which declare the precise
-                            steps to reproduce along with the observed formulas describing the steps which transpired
-                            in the manufacturing process.</xs:documentation>
+                        <xs:documentation>Describes the formulation of any referencable object within the BOM,
+                            including components, services, metadata, declarations, or the BOM itself. This may
+                            encompass how the object was created, assembled, deployed, tested, certified, or otherwise
+                            brought into its present form. Common examples include software build pipelines,
+                            deployment processes, AI/ML model training, cryptographic key generation or certification,
+                            and third-party audits. Processes are modeled using declared and observed formulas,
+                            composed of workflows, tasks, and individual steps.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
                 <xs:element name="declarations" type="bom:declarationsType" minOccurs="0" maxOccurs="1">

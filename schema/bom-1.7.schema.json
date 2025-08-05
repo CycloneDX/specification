@@ -100,7 +100,7 @@
       "items": {"$ref": "#/definitions/formula"},
       "uniqueItems": true,
       "title": "Formulation",
-      "description": "Describes how a component or service was manufactured or deployed. This is achieved through the use of formulas, workflows, tasks, and steps, which declare the precise steps to reproduce along with the observed formulas describing the steps which transpired in the manufacturing process."
+      "description": "Describes the formulation of any referencable object within the BOM, including components, services, metadata, declarations, or the BOM itself. This may encompass how the object was created, assembled, deployed, tested, certified, or otherwise brought into its present form. Common examples include software build pipelines, deployment processes, AI/ML model training, cryptographic key generation or certification, and third-party audits. Processes are modeled using declared and observed formulas, composed of workflows, tasks, and individual steps."
     },
     "declarations": {
       "type": "object",
@@ -1932,7 +1932,7 @@
             "log": "A record of events that occurred in a computer system or application, such as problems, errors, or information on current operations.",
             "configuration": "Parameters or settings that may be used by other components or services.",
             "evidence": "Information used to substantiate a claim.",
-            "formulation": "Describes how a component or service was manufactured or deployed.",
+            "formulation": "Describes the formulation of any referencable object within the BOM, including components, services, metadata, declarations, or the BOM itself.",
             "attestation": "Human or machine-readable statements containing facts, evidence, or testimony.",
             "threat-model": "An enumeration of identified weaknesses, threats, and countermeasures, dataflow diagram (DFD), attack tree, and other supporting documentation in human-readable or machine-readable format.",
             "adversary-model": "The defined assumptions, goals, and capabilities of an adversary.",
@@ -6140,6 +6140,17 @@
           "title": "Field References",
           "description": "One or more [JSON Pointers](https://datatracker.ietf.org/doc/html/rfc6901) identifying the BOM fields to which the attribution applies."
         },
+        "expressions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "title": "Path Expression",
+            "description": "Specifies a path expression used to locate a value within a BOM. The expression syntax shall conform to the format of the BOM's serialisation. Use [JSONPath](https://datatracker.ietf.org/doc/html/rfc9535) for JSON, [XPath](https://www.w3.org/TR/xpath/) for XML, and default to JSONPath for Protocol Buffers unless otherwise specified. Implementers shall ensure the expression is valid within the context of the applicable serialisation format."
+          },
+          "minItems": 1,
+          "title": "Path Expressions",
+          "description": "One or more path expressions used to locate values within a BOM."
+        },
         "timestamp": {
           "type": "string",
           "format": "date-time",
@@ -6162,10 +6173,14 @@
           "description": "An optional digital signature verifying the authenticity or integrity of the attribution."
         }
       },
-      "required": ["pointers", "timestamp"],
+      "required": ["timestamp"],
       "anyOf": [
         { "required": ["attributedTo"] },
         { "required": ["process"] }
+      ],
+      "oneOf": [
+        { "required": ["pointers"] },
+        { "required": ["expressions"] }
       ]
     }
   }
