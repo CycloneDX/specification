@@ -2618,20 +2618,38 @@ enum PatentAssertionType {
   PATENT_ASSERTION_TYPE_RESEARCH_OR_EVALUATION = 8;
 }
 
-// At least one of the "attributedTo" or "process" elements must be present. This is equivalent to the "anyOf" constraint in the JSON schema.
+// Details a specific attribution of data within the BOM to a contributing entity or process.
 message Citation {
+  message Pointers {
+    // Users of other serialisation formats (e.g. XML) shall use the JSON Pointer format to ensure consistent field referencing across representations.
+    // Must contain at least 1 item.
+    repeated string pointer = 1;
+  }
+  message Expressions {
+    // Specifies a path expression used to locate a value within a BOM. The expression syntax shall conform to the format of the BOM's serialisation.
+    // Use [JSONPath](https://datatracker.ietf.org/doc/html/rfc9535) for JSON, [XPath](https://www.w3.org/TR/xpath/) for XML, and default to JSONPath for Protocol Buffers unless otherwise specified.
+    // Implementers shall ensure the expression is valid within the context of the applicable serialisation format. Use either "pointer" or "expression" but not both in this object.
+    // Must contain at least 1 item.
+    repeated string expression = 1;
+  }
+
   // Optional unique identifier for the citation
   optional string bom_ref = 1;
-  // One or more JSON Pointers(https://datatracker.ietf.org/doc/html/rfc6901) identifying the BOM fields to which the attribution applies.
-  repeated string pointer = 2;
-  // Specifies a path expression used to locate a value within a BOM. The expression syntax shall conform to the format of the BOM's serialisation. Use [JSONPath](https://datatracker.ietf.org/doc/html/rfc9535) for JSON, [XPath](https://www.w3.org/TR/xpath/) for XML, and default to JSONPath for Protocol Buffers unless otherwise specified. Implementers shall ensure the expression is valid within the context of the applicable serialisation format. Use either "pointer" or "expression" but not both in this object.
-  repeated string expression = 3;
+  // Exactly one of the "pointers" or "expressions" elements must be present.
+  oneof target {
+    // One or more JSON Pointers(https://datatracker.ietf.org/doc/html/rfc6901) identifying the BOM fields to which the attribution applies.
+    Pointers pointers = 2;
+    // One or more path expressions used to locate values within a BOM.
+    Expressions expressions = 3;
+  }
   // Timestamp when the attribution was made or the information was supplied.
   google.protobuf.Timestamp timestamp = 4;
-  // The `bom-ref` of an object, such as a component, service, organisational entity, or person that supplied the cited information.
+  // The `bom-ref` of an object, such as a component, service, tool, organisational entity, or person that supplied the cited information.
+  // At least one of the "attributed_to" or "process" elements must be present.
   optional string attributed_to = 5;
-  // An optional `bom-ref` to a process (such as a formula, workflow, task, or step) defined in the `formulation` section that executed or generated the attributed data. At least one of the "attributedTo" or "process" elements must be present.
+  // The `bom-ref` to a process (such as a formula, workflow, task, or step) defined in the `formulation` section that executed or generated the attributed data.
+  // At least one of the "attributed_to" or "process" elements must be present.
   optional string process = 6;
-  // An optional description or comment about the context or quality of the data attribution. At least one of the "attributedTo" or "process" elements must be present.
+  // An optional description or comment about the context or quality of the data attribution.
   optional string note = 7;
 }

@@ -8883,10 +8883,15 @@ limitations under the License.
     <xs:complexType name="citationType">
         <xs:annotation>
             <xs:documentation>
-                At least one of the "attributedTo" or "process" elements must be present. This is equivalent to the "anyOf" constraint in the JSON schema.
+                Details a specific attribution of data within the BOM to a contributing entity or process.
             </xs:documentation>
         </xs:annotation>
         <xs:sequence>
+            <xs:annotation>
+                <xs:documentation>
+                    Exactly one of the "pointers" or "expressions" elements must be present.
+                </xs:documentation>
+            </xs:annotation>
             <xs:choice>
                 <xs:element name="pointers" minOccurs="1" maxOccurs="1">
                     <xs:annotation>
@@ -8899,7 +8904,8 @@ limitations under the License.
                             <xs:element name="pointer" type="xs:string" minOccurs="1" maxOccurs="unbounded">
                                 <xs:annotation>
                                     <xs:documentation>
-                                        A JSON Pointer(https://datatracker.ietf.org/doc/html/rfc6901) identifying the BOM field to which the attribution applies. Users of other serialisation formats (e.g. XML) shall use the JSON Pointer format to ensure consistent field referencing across representations.
+                                        A JSON Pointer(https://datatracker.ietf.org/doc/html/rfc6901) identifying the BOM field to which the attribution applies.
+                                        Users of other serialisation formats (e.g. XML) shall use the JSON Pointer format to ensure consistent field referencing across representations.
                                     </xs:documentation>
                                 </xs:annotation>
                             </xs:element>
@@ -8917,7 +8923,9 @@ limitations under the License.
                             <xs:element name="expression" type="xs:string" minOccurs="1" maxOccurs="unbounded">
                                 <xs:annotation>
                                     <xs:documentation>
-                                        Specifies a path expression used to locate a value within a BOM. The expression syntax shall conform to the format of the BOM's serialisation. Use [JSONPath](https://datatracker.ietf.org/doc/html/rfc9535) for JSON, [XPath](https://www.w3.org/TR/xpath/) for XML, and default to JSONPath for Protocol Buffers unless otherwise specified. Implementers shall ensure the expression is valid within the context of the applicable serialisation format.
+                                        Specifies a path expression used to locate a value within a BOM. The expression syntax shall conform to the format of the BOM's serialisation.
+                                        Use [JSONPath](https://datatracker.ietf.org/doc/html/rfc9535) for JSON, [XPath](https://www.w3.org/TR/xpath/) for XML, and default to JSONPath for Protocol Buffers unless otherwise specified.
+                                        Implementers shall ensure the expression is valid within the context of the applicable serialisation format.
                                     </xs:documentation>
                                 </xs:annotation>
                             </xs:element>
@@ -8935,7 +8943,7 @@ limitations under the License.
             <xs:element name="attributedTo" type="bom:refLinkType" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>
-                        The `bom-ref` of an object, such as a component, service, organisational entity, or person that supplied the cited information.
+                        The `bom-ref` of an object, such as a component, service, tool, organisational entity, or person that supplied the cited information.
                         At least one of the "attributedTo" or "process" elements must be present.
                     </xs:documentation>
                 </xs:annotation>
