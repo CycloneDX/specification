@@ -888,7 +888,7 @@
             "framework": "A software framework. Refer to [https://en.wikipedia.org/wiki/Software_framework](https://en.wikipedia.org/wiki/Software_framework) for information on how frameworks vary slightly from libraries.",
             "library": "A software library. Refer to [https://en.wikipedia.org/wiki/Library_(computing)](https://en.wikipedia.org/wiki/Library_(computing)) for information about libraries. All third-party and open source reusable components will likely be a library. If the library also has key features of a framework, then it should be classified as a framework. If not, or is unknown, then specifying library is recommended.",
             "container": "A packaging and/or runtime format, not specific to any particular technology, which isolates software inside the container from software outside of a container through virtualization technology. Refer to [https://en.wikipedia.org/wiki/OS-level_virtualization](https://en.wikipedia.org/wiki/OS-level_virtualization).",
-            "platform": "A runtime environment which interprets or executes software. This may include runtimes such as those that execute bytecode or low-code/no-code application platforms.",
+            "platform": "A runtime environment that interprets or executes software. This may include runtimes such as those that execute bytecode, just-in-time compilers, interpreters, or low-code/no-code application platforms.",
             "operating-system": "A software operating system without regard to deployment model (i.e. installed on physical hardware, virtual machine, image, etc) Refer to [https://en.wikipedia.org/wiki/Operating_system](https://en.wikipedia.org/wiki/Operating_system).",
             "device": "A hardware device such as a processor or chip-set. A hardware device containing firmware SHOULD include a component for the physical hardware itself and another component of type 'firmware' or 'operating-system' (whichever is relevant), describing information about the software running on the device. See also the list of [known device properties](https://github.com/CycloneDX/cyclonedx-property-taxonomy/blob/main/cdx/device.md).",
             "device-driver": "A special type of software that operates or controls a particular type of device. Refer to [https://en.wikipedia.org/wiki/Device_driver](https://en.wikipedia.org/wiki/Device_driver).",
@@ -1526,36 +1526,31 @@
     },
     "licenseChoice": {
       "title": "License Choice",
-      "description": "EITHER (list of SPDX licenses and/or named licenses) OR (tuple of one SPDX License Expression)",
+      "description": "A list of SPDX licenses and/or named licenses and/or SPDX License Expression.",
       "type": "array",
-      "oneOf": [
-        {
-          "title": "Multiple licenses",
-          "description": "A list of SPDX licenses and/or named licenses.",
-          "type": "array",
-          "items": {
+      "items": {
+        "oneOf": [
+          {
             "type": "object",
             "title": "License",
-            "required": ["license"],
+            "required": [
+              "license"
+            ],
             "additionalProperties": false,
             "properties": {
-              "license": {"$ref": "#/definitions/license"}
+              "license": {
+                "$ref": "#/definitions/license"
+              }
             }
-          }
-        },
-        {
-          "title": "SPDX License Expression",
-          "description": "A tuple of exactly one SPDX License Expression.",
-          "type": "array",
-          "additionalItems": false,
-          "minItems": 1,
-          "maxItems": 1,
-          "items": [{
+          },
+          {
             "title": "License Expression",
             "description": "Specifies the details and attributes related to a software license.\nIt must be a valid SPDX license expression, along with additional properties such as license acknowledgment.",
             "type": "object",
             "additionalProperties": false,
-            "required": ["expression"],
+            "required": [
+              "expression"
+            ],
             "properties": {
               "expression": {
                 "type": "string",
@@ -1601,7 +1596,9 @@
                       "type": "string",
                       "title": "License URL",
                       "description": "The URL to the license file. If specified, a 'license' externalReference should also be specified for completeness",
-                      "examples": ["https://www.apache.org/licenses/LICENSE-2.0.txt"],
+                      "examples": [
+                        "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                      ],
                       "format": "iri-reference"
                     }
                   },
@@ -1616,17 +1613,21 @@
                 "title": "BOM Reference",
                 "description": "An optional identifier which can be used to reference the license elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
               },
-              "licensing": {"$ref": "#/definitions/licensing"},
+              "licensing": {
+                "$ref": "#/definitions/licensing"
+              },
               "properties": {
                 "type": "array",
                 "title": "Properties",
                 "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
-                "items": {"$ref": "#/definitions/property"}
+                "items": {
+                  "$ref": "#/definitions/property"
+                }
               }
             }
-          }]
-        }
-      ]
+          }
+        ]
+      }
     },
     "commit": {
       "type": "object",
