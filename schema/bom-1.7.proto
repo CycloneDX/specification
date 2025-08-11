@@ -2195,8 +2195,9 @@ message CryptoProperties {
     optional string algorithmFamily = 2;
     // An identifier for the parameter set of the cryptographic algorithm. Examples: in AES128, '128' identifies the key length in bits, in SHA256, '256' identifies the digest length, '128' in SHAKE128 identifies its maximum security level in bits, and 'SHA2-128s' identifies a parameter set used in SLH-DSA (FIPS205).
     optional string parameterSetIdentifier = 3;
-    // [DEPRECATED] The specific underlying Elliptic Curve (EC) definition employed which is an indicator of the level of security strength, performance and complexity. Absent an authoritative source of curve names, CycloneDX recommends use of curve names as defined at [https://neuromancer.sk/std/](https://neuromancer.sk/std/), the source from which can be found at [https://github.com/J08nY/std-curves](https://github.com/J08nY/std-curves).
-    optional string curve = 4;
+    // DEPRECATED - DO NOT USE - This will be removed in a future version - Use `.ellipticCurve` Instead.
+    // The specific underlying Elliptic Curve (EC) definition employed which is an indicator of the level of security strength, performance and complexity. Absent an authoritative source of curve names, CycloneDX recommends use of curve names as defined at [https://neuromancer.sk/std/](https://neuromancer.sk/std/), the source from which can be found at [https://github.com/J08nY/std-curves](https://github.com/J08nY/std-curves).
+    optional string curve = 4 [deprecated = true];
     // The specific underlying Elliptic Curve (EC) definition employed which is an indicator
     // of the level of security strength, performance and complexity. Curves are defined in
     // the cryptography-defs.json subschema. A corresponding schema for ProtoBuf is not available.
@@ -2264,14 +2265,16 @@ message CryptoProperties {
     optional google.protobuf.Timestamp notValidBefore = 3;
     // The date and time according to ISO-8601 standard from which the certificate is not valid anymore
     optional google.protobuf.Timestamp notValidAfter = 4;
-    // [DEPRECATED] Use relatedCryptographicAssets instead. The bom-ref to signature algorithm used by the certificate
-    optional string signatureAlgorithmRef = 5;
-    // [DEPRECATED] Use relatedCryptographicAssets instead. The bom-ref to the public key of the subject
-    optional string subjectPublicKeyRef = 6;
+    // DEPRECATED - DO NOT USE - This will be removed in a future version - Use `.relatedCryptographicAssets` instead. The bom-ref to signature algorithm used by the certificate
+    optional string signatureAlgorithmRef = 5 [deprecated = true];
+    // DEPRECATED - DO NOT USE - This will be removed in a future version - Use `.relatedCryptographicAssets` instead. The bom-ref to the public key of the subject
+    optional string subjectPublicKeyRef = 6 [deprecated = true];
     // The format of the certificate. Examples include X.509, PEM, DER, and CVC.
     optional string certificateFormat = 7;
-    // [DEPRECATED] Use certificateFileExtension instead. The file extension of the certificate. Examples include crt, pem, cer, der, and p12.
-    optional string certificateExtension = 8;
+    // DEPRECATED - DO NOT USE - This will be removed in a future version -  Use `.certificateFileExtension` instead. The file extension of the certificate. Examples include crt, pem, cer, der, and p12.
+    optional string certificateExtension = 8 [deprecated = true];
+    // A certificate extension is an optional field that provides additional information about the certificate or its use. Extensions are used to convey additional information beyond the standard fields.
+    optional CertificateExtensions certificateExtensions = 18;
     // The serial number is a unique identifier for the certificate issued by a CA.
     optional string serialNumber = 9;
     // The file extension of the certificate. Examples include crt, pem, cer, der, and p12.
@@ -2290,8 +2293,6 @@ message CryptoProperties {
     optional google.protobuf.Timestamp revocationDate = 16;
     // The date and time (timestamp) when the certificate was destroyed.
     optional google.protobuf.Timestamp destructionDate = 17;
-    // A certificate extension is an optional field that provides additional information about the certificate or its use. Extensions are used to convey additional information beyond the standard fields.
-    optional CertificateExtensions certificateExtensions = 18;
     // A list of cryptographic assets related to this component.
     optional RelatedCryptographicAssets relatedCryptographicAssets = 19;
   } // end of CertificateProperties
@@ -2414,8 +2415,8 @@ message CryptoProperties {
     optional string id = 2;
     // The key state as defined by NIST SP 800-57.
     optional CryptoRelatedState state = 3;
-    // [DEPRECATED] Use relatedCryptographicAssets instead. The bom-ref to the algorithm used to generate the related cryptographic material.
-    optional string algorithmRef = 4;
+    // DEPRECATED - DO NOT USE - This will be removed in a future version - Use `.relatedCryptographicAssets` instead. The bom-ref to the algorithm used to generate the related cryptographic material.
+    optional string algorithmRef = 4 [deprecated = true];
     // The date and time (timestamp) when the related cryptographic material was created.
     optional google.protobuf.Timestamp creationDate = 5;
     // The date and time (timestamp) when the related cryptographic material was activated.
