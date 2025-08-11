@@ -59,7 +59,7 @@ const ajv = new Ajv({
     schemas: {
         'http://cyclonedx.org/schema/spdx.schema.json': spdxSchema,
         'http://cyclonedx.org/schema/jsf-0.82.schema.json': jsfSchema,
-        'http://cyclonedx.org/schema/cryptography-defs.schema.json': cryptoDefsSchema
+        'http://cyclonedx.org/schema/cryptography-defs.schema.json': cryptoDefsSchema,
     }
 });
 addFormats(ajv)
