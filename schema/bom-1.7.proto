@@ -2044,6 +2044,7 @@ message CryptoProperties {
 
   // Algorithm Propertie
   message AlgorithmProperties {
+
     // Primitive
     enum CryptoPrimitive {
       // ProtoBuff's default value -- it differs from "unknown"
@@ -2192,36 +2193,37 @@ message CryptoProperties {
     // A valid algorithm family identifier. If specified, this value must be one of the
     // enumeration of valid algorithm Family identifiers defined in the
     // cryptography-defs.json subschema. A corresponding schema for ProtoBuf is not available.
-    optional string algorithmFamily = 2;
+    optional string algorithmFamily = 12;
     // An identifier for the parameter set of the cryptographic algorithm. Examples: in AES128, '128' identifies the key length in bits, in SHA256, '256' identifies the digest length, '128' in SHAKE128 identifies its maximum security level in bits, and 'SHA2-128s' identifies a parameter set used in SLH-DSA (FIPS205).
-    optional string parameterSetIdentifier = 3;
+    optional string parameterSetIdentifier = 2;
     // DEPRECATED - DO NOT USE - This will be removed in a future version - Use `.ellipticCurve` Instead.
     // The specific underlying Elliptic Curve (EC) definition employed which is an indicator of the level of security strength, performance and complexity. Absent an authoritative source of curve names, CycloneDX recommends use of curve names as defined at [https://neuromancer.sk/std/](https://neuromancer.sk/std/), the source from which can be found at [https://github.com/J08nY/std-curves](https://github.com/J08nY/std-curves).
-    optional string curve = 4 [deprecated = true];
+    optional string curve = 3 [deprecated = true];
     // The specific underlying Elliptic Curve (EC) definition employed which is an indicator
     // of the level of security strength, performance and complexity. Curves are defined in
     // the cryptography-defs.json subschema. A corresponding schema for ProtoBuf is not available.
     optional string ellipticCurve = 13;
     // The target and execution environment in which the algorithm is implemented in.
-    optional CryptoExecutionEnvironment executionEnvironment = 5;
+    optional CryptoExecutionEnvironment executionEnvironment = 4;
     // The target platform for which the algorithm is implemented. The implementation can be 'generic', running on any platform or for a specific platform.
-    optional CryptoImplementationPlatform implementationPlatform = 6;
+    optional CryptoImplementationPlatform implementationPlatform = 5;
     // The certification that the implementation of the cryptographic algorithm has received, if any. Certifications include revisions and levels of FIPS 140 or Common Criteria of different Extended Assurance Levels (CC-EAL).
-    repeated string certificationLevel = 7;
+    repeated string certificationLevel = 6;
     // The mode of operation in which the cryptographic algorithm (block cipher) is used.
-    optional CryptoAlgorithmMode mode = 8;
+    optional CryptoAlgorithmMode mode = 7;
     // The padding scheme that is used for the cryptographic algorithm.
-    optional CryptoAlgorithmPadding padding = 9;
+    optional CryptoAlgorithmPadding padding = 8;
     // The cryptographic functions implemented by the cryptographic algorithm.
-    repeated CryptoAlgorithmFunction cryptoFunctions = 10;
+    repeated CryptoAlgorithmFunction cryptoFunctions = 9;
     // The classical security level that a cryptographic algorithm provides (in bits).
-    optional int32 classicalSecurityLevel = 11;
+    optional int32 classicalSecurityLevel = 10;
     // The NIST security strength category as defined in https://csrc.nist.gov/projects/post-quantum-cryptography/post-quantum-cryptography-standardization/evaluation-criteria/security-(evaluation-criteria). A value of 0 indicates that none of the categories are met.
-    optional int32 nistQuantumSecurityLevel = 12;
+    optional int32 nistQuantumSecurityLevel = 11;
   } // end of AlgorithmProperties
 
   // Certificate State
   message CertificateState {
+    
     // Pre-defined certificate states
     enum PredefinedState {
       // ProtoBuff's default value
@@ -2242,7 +2244,6 @@ message CryptoProperties {
 
     // A reason for the certificate being in this state.
     optional string reason = 1;
-
     // The state can be either a predefined state or a custom state
     oneof state {
       // A pre-defined state in the certificate lifecycle.
@@ -2250,10 +2251,9 @@ message CryptoProperties {
       // The name of the certificate lifecycle state for custom states.
       string name = 3;
     }
-
     // The description of the certificate lifecycle state (only used with custom states).
     optional string description = 4;
-  }
+  } // end of CertificateState
 
   // Certificate Properties
   message CertificateProperties {
