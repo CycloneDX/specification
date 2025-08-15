@@ -1669,7 +1669,7 @@ limitations under the License.
             </xs:enumeration>
             <xs:enumeration value="formulation">
                 <xs:annotation>
-                    <xs:documentation>Describes how a component or service was manufactured or deployed.</xs:documentation>
+                    <xs:documentation>Describes the formulation of any referencable object within the BOM, including components, services, metadata, declarations, or the BOM itself.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
             <xs:enumeration value="attestation">
@@ -1780,6 +1780,11 @@ limitations under the License.
             <xs:enumeration value="patent-assertion">
                 <xs:annotation>
                     <xs:documentation>References assertions made regarding patents associated with a component or service. Assertions distinguish between ownership, licensing, and other relevant interactions with patents.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="citation">
+                <xs:annotation>
+                    <xs:documentation>A reference to external citations applicable to the object identified by this BOM entry or the BOM itself. When used with a BOM-Link, this allows offloading citations into a separate CycloneDX BOM.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
             <xs:enumeration value="other">
@@ -5216,9 +5221,13 @@ limitations under the License.
     <xs:complexType name="formulationType">
         <xs:annotation>
             <xs:documentation>
-                Describes how a component or service was manufactured or deployed. This is achieved through the use
-                of formulas, workflows, tasks, and steps, which declare the precise steps to reproduce along with the
-                observed formulas describing the steps which transpired in the manufacturing process.
+                Describes the formulation of any referencable object within the BOM,
+                including components, services, metadata, declarations, or the BOM itself. This may
+                encompass how the object was created, assembled, deployed, tested, certified, or otherwise
+                brought into its present form. Common examples include software build pipelines,
+                deployment processes, AI/ML model training, cryptographic key generation or certification,
+                and third-party audits. Processes are modeled using declared and observed formulas,
+                composed of workflows, tasks, and individual steps.
             </xs:documentation>
         </xs:annotation>
         <xs:sequence minOccurs="0" maxOccurs="unbounded">
@@ -8859,6 +8868,133 @@ limitations under the License.
         </xs:sequence>
     </xs:complexType>
 
+    <xs:complexType name="citationsType">
+        <xs:sequence>
+            <xs:element name="citation" type="bom:citationType" minOccurs="1" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Details a specific attribution of data within the BOM to a contributing entity or process.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="citationType">
+        <xs:annotation>
+            <xs:documentation>
+                Details a specific attribution of data within the BOM to a contributing entity or process.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:annotation>
+                <xs:documentation>
+                    Exactly one of the "pointers" or "expressions" elements must be present.
+                </xs:documentation>
+            </xs:annotation>
+            <xs:choice>
+                <xs:element name="pointers" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>
+                            One or more JSON Pointers(https://datatracker.ietf.org/doc/html/rfc6901) identifying the BOM fields to which the attribution applies.
+                        </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="pointer" type="xs:string" minOccurs="1" maxOccurs="unbounded">
+                                <xs:annotation>
+                                    <xs:documentation>
+                                        A JSON Pointer(https://datatracker.ietf.org/doc/html/rfc6901) identifying the BOM field to which the attribution applies.
+                                        Users of other serialisation formats (e.g. XML) shall use the JSON Pointer format to ensure consistent field referencing across representations.
+                                    </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="expressions" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>
+                            One or more path expressions used to locate values within a BOM.
+                        </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="expression" type="xs:string" minOccurs="1" maxOccurs="unbounded">
+                                <xs:annotation>
+                                    <xs:documentation>
+                                        Specifies a path expression used to locate a value within a BOM. The expression syntax shall conform to the format of the BOM's serialisation.
+                                        Use [JSONPath](https://datatracker.ietf.org/doc/html/rfc9535) for JSON, [XPath](https://www.w3.org/TR/xpath/) for XML, and default to JSONPath for Protocol Buffers unless otherwise specified.
+                                        Implementers shall ensure the expression is valid within the context of the applicable serialisation format.
+                                    </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:choice>
+            <xs:element name="timestamp" type="xs:dateTime" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The date and time when the attribution was made or the information was supplied.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="attributedTo" type="bom:refLinkType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The `bom-ref` of an object, such as a component, service, tool, organisational entity, or person that supplied the cited information.
+                        At least one of the "attributedTo" or "process" elements must be present.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="process" type="bom:refLinkType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The `bom-ref` to a process (such as a formula, workflow, task, or step) defined in the `formulation` section that executed or generated the attributed data.
+                        At least one of the "attributedTo" or "process" elements must be present.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="note" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        An optional description or comment about the context or quality of the data attribution.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <!-- Attention:
+        This would be formal, if the support for XSD1.1's `assert` was properly implemented in validators and tools digesting XML.
+        <xs:assert vc:minVersion="1.1"
+                   id="requires_attributedTo_or_process"
+                   test="attributedTo or process">
+           At least one of the "attributedTo" or "process" elements must be present.
+        </xs:assert>
+        /-->
+        <xs:attribute name="bom-ref" type="bom:refType" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                    An optional identifier which can be used to reference the object elsewhere in the BOM.
+                    Uniqueness is enforced within all elements and children of the root-level bom element.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:anyAttribute namespace="##other" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
     <xs:element name="bom">
         <xs:complexType>
             <xs:sequence>
@@ -8919,10 +9055,13 @@ limitations under the License.
                 </xs:element>
                 <xs:element name="formulation" type="bom:formulationType" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
-                        <xs:documentation>Describes how a component or service was manufactured or deployed. This is
-                            achieved through the use of formulas, workflows, tasks, and steps, which declare the precise
-                            steps to reproduce along with the observed formulas describing the steps which transpired
-                            in the manufacturing process.</xs:documentation>
+                        <xs:documentation>Describes the formulation of any referencable object within the BOM,
+                            including components, services, metadata, declarations, or the BOM itself. This may
+                            encompass how the object was created, assembled, deployed, tested, certified, or otherwise
+                            brought into its present form. Common examples include software build pipelines,
+                            deployment processes, AI/ML model training, cryptographic key generation or certification,
+                            and third-party audits. Processes are modeled using declared and observed formulas,
+                            composed of workflows, tasks, and individual steps.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
                 <xs:element name="declarations" type="bom:declarationsType" minOccurs="0" maxOccurs="1">
@@ -8938,6 +9077,11 @@ limitations under the License.
                         <xs:documentation>
                             A collection of reusable objects that are defined and may be used elsewhere in the BOM.
                         </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="citations" type="bom:citationsType" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>A collection of attributions indicating which entity supplied information for specific fields within the BOM.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
                 <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">

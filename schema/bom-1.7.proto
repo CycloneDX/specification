@@ -37,12 +37,14 @@ message Bom {
   repeated Annotation annotations = 11;
   // Specifies optional, custom, properties
   repeated Property properties = 12;
-  // Describes how a component or service was manufactured or deployed. This is achieved through the use of formulas, workflows, tasks, and steps, which declare the precise steps to reproduce along with the observed formulas describing the steps which transpired in the manufacturing process.
+  // Describes the formulation of any referencable object within the BOM, including components, services, metadata, declarations, or the BOM itself. This may encompass how the object was created, assembled, deployed, tested, certified, or otherwise brought into its present form. Common examples include software build pipelines, deployment processes, AI/ML model training, cryptographic key generation or certification, and third-party audits. Processes are modeled using declared and observed formulas, composed of workflows, tasks, and individual steps.
   repeated Formula formulation = 13;
   // The list of declarations which describe the conformance to standards. Each declaration may include attestations, claims, and evidence.
   repeated Declarations declarations = 14;
   // A collection of reusable objects that are defined and may be used elsewhere in the BOM.
   repeated Definition definitions = 15;
+  // A collection of attributions indicating which entity supplied information for specific fields within the BOM.
+  repeated Citation citations = 16;
 }
 
 enum Classification {
@@ -313,7 +315,7 @@ enum ExternalReferenceType {
   EXTERNAL_REFERENCE_TYPE_CONFIGURATION = 35;
   // Information used to substantiate a claim.
   EXTERNAL_REFERENCE_TYPE_EVIDENCE = 36;
-  // Describes how a component or service was manufactured or deployed.
+  // Describes the formulation of any referencable object within the BOM, including components, services, metadata, declarations, or the BOM itself.
   EXTERNAL_REFERENCE_TYPE_FORMULATION = 37;
   // The location where the source code distributable can be obtained. This is often an archive format such as zip or tar.gz. The source-distribution type complements the use of the version control (vcs) type.
   EXTERNAL_REFERENCE_TYPE_SOURCE_DISTRIBUTION = 38;
@@ -331,6 +333,8 @@ enum ExternalReferenceType {
   EXTERNAL_REFERENCE_TYPE_PATENT_FAMILY = 44;
   // References assertions made regarding patents associated with a component or service. Assertions distinguish between ownership, licensing, and other relevant interactions with patents.
   EXTERNAL_REFERENCE_TYPE_PATENT_ASSERTION = 45;
+  // A reference to external citations applicable to the object identified by this BOM entry or the BOM itself. When used with a BOM-Link, this allows offloading citations into a separate CycloneDX BOM.
+  EXTERNAL_REFERENCE_TYPE_CITATION = 46;
 }
 
 enum HashAlg {
@@ -2612,4 +2616,40 @@ enum PatentAssertionType {
   PATENT_ASSERTION_TYPE_NON_ASSERTION = 7;
   // The patent or patent family is being used under a research or evaluation license.
   PATENT_ASSERTION_TYPE_RESEARCH_OR_EVALUATION = 8;
+}
+
+// Details a specific attribution of data within the BOM to a contributing entity or process.
+message Citation {
+  message Pointers {
+    // Users of other serialisation formats (e.g. XML) shall use the JSON Pointer format to ensure consistent field referencing across representations.
+    // Must contain at least 1 item.
+    repeated string pointer = 1;
+  }
+  message Expressions {
+    // Specifies a path expression used to locate a value within a BOM. The expression syntax shall conform to the format of the BOM's serialisation.
+    // Use [JSONPath](https://datatracker.ietf.org/doc/html/rfc9535) for JSON, [XPath](https://www.w3.org/TR/xpath/) for XML, and default to JSONPath for Protocol Buffers unless otherwise specified.
+    // Implementers shall ensure the expression is valid within the context of the applicable serialisation format. Use either "pointer" or "expression" but not both in this object.
+    // Must contain at least 1 item.
+    repeated string expression = 1;
+  }
+
+  // Optional unique identifier for the citation
+  optional string bom_ref = 1;
+  // Exactly one of the "pointers" or "expressions" elements must be present.
+  oneof target {
+    // One or more JSON Pointers(https://datatracker.ietf.org/doc/html/rfc6901) identifying the BOM fields to which the attribution applies.
+    Pointers pointers = 2;
+    // One or more path expressions used to locate values within a BOM.
+    Expressions expressions = 3;
+  }
+  // Timestamp when the attribution was made or the information was supplied.
+  google.protobuf.Timestamp timestamp = 4;
+  // The `bom-ref` of an object, such as a component, service, tool, organisational entity, or person that supplied the cited information.
+  // At least one of the "attributed_to" or "process" elements must be present.
+  optional string attributed_to = 5;
+  // The `bom-ref` to a process (such as a formula, workflow, task, or step) defined in the `formulation` section that executed or generated the attributed data.
+  // At least one of the "attributed_to" or "process" elements must be present.
+  optional string process = 6;
+  // An optional description or comment about the context or quality of the data attribution.
+  optional string note = 7;
 }
