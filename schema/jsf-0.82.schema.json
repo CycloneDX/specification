@@ -3,7 +3,7 @@
   "$id": "http://cyclonedx.org/schema/jsf-0.82.schema.json",
   "type": "object",
   "title": "JSON Signature Format (JSF) standard",
-  "$comment" : "JSON Signature Format schema is published under the terms of the Apache License 2.0. JSF was developed by Anders Rundgren (anders.rundgren.net@gmail.com) as a part of the OpenKeyStore project. This schema supports the entirely of the JSF standard excluding 'extensions'.",
+  "$comment" : "JSON Signature Format schema is published under the terms of the Apache License 2.0. JSF was developed by Anders Rundgren (anders.rundgren.net@gmail.com) as a part of the OpenKeyStore project. This schema extends the JSF standard to include post-quantum algorithms (ML-DSA) following NIST FIPS 204, excluding 'extensions'.",
   "definitions": {
     "signature": {
       "type": "object",
@@ -15,7 +15,7 @@
             "signers": {
               "type": "array",
               "title": "Signature",
-              "description": "Unique top level property for Multiple Signatures. (multisignature)",
+              "description": "Unique top level property for Multiple Signatures. (multisignature). Can include both classical and post-quantum signatures.",
               "items": {"$ref": "#/definitions/signer"}
             }
           }
@@ -26,14 +26,14 @@
             "chain": {
               "type": "array",
               "title": "Signature",
-              "description": "Unique top level property for Signature Chains. (signaturechain)",
+              "description": "Unique top level property for Signature Chains. (signaturechain). Chain can include both classical and post-quantum signatures following NIST FIPS 204 standards.",
               "items": {"$ref": "#/definitions/signer"}
             }
           }
         },
         {
           "title": "Signature",
-          "description": "Unique top level property for simple signatures. (signaturecore)",
+          "description": "Unique top level property for simple signatures. (signaturecore). Supports both classical and post-quantum algorithms including ML-DSA variants.",
           "$ref": "#/definitions/signer"
         }
       ]
@@ -84,17 +84,17 @@
         "keyId": {
           "type": "string",
           "title": "Key ID",
-          "description": "Optional. Application specific string identifying the signature key."
+          "description": "Optional. Application specific string identifying the signature key. Can reference both classical and post-quantum keys."
         },
         "publicKey": {
           "title": "Public key",
-          "description": "Optional. Public key object.",
+          "description": "Optional. Public key object. Supports classical key types (EC, RSA, OKP) and post-quantum key types (PQ) for ML-DSA algorithms.",
           "$ref": "#/definitions/publicKey"
         },
         "certificatePath": {
           "type": "array",
           "title": "Certificate path",
-          "description": "Optional. Sorted array of X.509 [RFC5280] certificates, where the first element must contain the signature certificate. The certificate path must be contiguous but is not required to be complete.",
+          "description": "Optional. Sorted array of X.509 [RFC5280] certificates, where the first element must contain the signature certificate. The certificate path must be contiguous but is not required to be complete. Certificates may contain post-quantum public keys following NIST standards.",
           "items": {
             "type": "string"
           }
@@ -102,7 +102,7 @@
         "excludes": {
           "type": "array",
           "title": "Excludes",
-          "description": "Optional. Array holding the names of one or more application level properties that must be excluded from the signature process. Note that the \"excludes\" property itself, must also be excluded from the signature process. Since both the \"excludes\" property and the associated data it points to are unsigned, a conforming JSF implementation must provide options for specifying which properties to accept.",
+          "description": "Optional. Array holding the names of one or more application level properties that must be excluded from the signature process. Note that the \"excludes\" property itself, must also be excluded from the signature process. Since both the \"excludes\" property and the associated data it points to are unsigned, a conforming JSF implementation must provide options for specifying which properties to accept. This applies to both classical and post-quantum signatures.",
           "items": {
             "type": "string"
           }
@@ -110,14 +110,14 @@
         "value": {
           "type": "string",
           "title": "Signature",
-          "description": "The signature data. Note that the binary representation must follow the JWA [RFC7518] specifications."
+          "description": "The signature data encoded as base64url without padding. Encoding standards: (1) Classical algorithms (RS256, ES256, Ed25519, etc.): Follow JWA [RFC7518] specifications for signature serialization. (2) Post-quantum algorithms (ML-DSA-44, ML-DSA-65, ML-DSA-87): Follow NIST FIPS 204 standard for ML-DSA signature encoding."
         }
       }
     },
     "keyType": {
       "type": "string",
       "title": "Key type",
-      "description": "Key type indicator. 'PQ' indicates post-quantum algorithms following NIST standards.",
+      "description": "Key type indicator. 'PQ' indicates post-quantum algorithms following NIST FIPS 204 standards, specifically ML-DSA algorithms.",
       "enum": [
         "EC",
         "OKP",
@@ -127,7 +127,7 @@
     },
     "publicKey": {
       "title": "Public key",
-      "description": "Optional. Public key object.",
+      "description": "Optional. Public key object. Supports classical key types (EC, RSA, OKP) and post-quantum key types (PQ) for ML-DSA algorithms.",
       "type": "object",
       "required": [
         "kty"
@@ -266,7 +266,7 @@
               "x": {
                 "type": "string",
                 "title": "Public Key",
-                "description": "ML-DSA public key data in base64url encoding."
+                "description": "ML-DSA public key data encoded as base64url without padding, following NIST FIPS 204 specification for the corresponding algorithm variant."
               }
             }
           }
