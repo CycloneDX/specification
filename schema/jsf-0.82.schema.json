@@ -52,7 +52,7 @@
             {
               "type": "string",
               "title": "Algorithm",
-              "description": "Signature algorithm. The currently recognized JWA [RFC7518] and RFC8037 [RFC8037] asymmetric key algorithms. Note: Unlike RFC8037 [RFC8037] JSF requires explicit Ed* algorithm names instead of \"EdDSA\".",
+              "description": "Signature algorithm. The currently recognized JWA [RFC7518] and RFC8037 [RFC8037] asymmetric key algorithms, plus post-quantum algorithms. Note: Unlike RFC8037 [RFC8037] JSF requires explicit Ed* algorithm names instead of \"EdDSA\". Three post-quantum ML-DSA algorithms have been added following NIST FIPS 204 standardization.",
               "enum": [
                 "RS256",
                 "RS384",
@@ -67,7 +67,10 @@
                 "Ed448",
                 "HS256",
                 "HS384",
-                "HS512"
+                "HS512",
+                "ML-DSA-44",
+                "ML-DSA-65",
+                "ML-DSA-87"  
               ]
             },
             {
@@ -114,11 +117,12 @@
     "keyType": {
       "type": "string",
       "title": "Key type",
-      "description": "Key type indicator.",
+      "description": "Key type indicator. 'PQ' indicates post-quantum algorithms following NIST standards.",
       "enum": [
         "EC",
         "OKP",
-        "RSA"
+        "RSA",
+        "PQ"
       ]
     },
     "publicKey": {
@@ -230,6 +234,39 @@
                 "type": "string",
                 "title": "Exponent",
                 "description": "RSA exponent."
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "kty": { "const": "PQ" } }
+          },
+          "then": {
+            "required": [
+              "kty",
+              "alg",
+              "x"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "kty": {
+                "$ref": "#/definitions/keyType"
+              },
+              "alg": {
+                "type": "string",
+                "title": "Algorithm",
+                "description": "Post-quantum algorithm identifier.",
+                "enum": [
+                  "ML-DSA-44",
+                  "ML-DSA-65", 
+                  "ML-DSA-87"
+                ]
+              },
+              "x": {
+                "type": "string",
+                "title": "Public Key",
+                "description": "ML-DSA public key data in base64url encoding."
               }
             }
           }
