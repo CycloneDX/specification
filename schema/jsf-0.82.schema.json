@@ -3,7 +3,7 @@
   "$id": "http://cyclonedx.org/schema/jsf-0.82.schema.json",
   "type": "object",
   "title": "JSON Signature Format (JSF) standard",
-  "$comment" : "JSON Signature Format schema is published under the terms of the Apache License 2.0. JSF was developed by Anders Rundgren (anders.rundgren.net@gmail.com) as a part of the OpenKeyStore project. This schema extends the JSF standard to include post-quantum algorithms (ML-DSA) following NIST FIPS 204, excluding 'extensions'.",
+  "$comment" : "JSON Signature Format schema is published under the terms of the Apache License 2.0. JSF was developed by Anders Rundgren (anders.rundgren.net@gmail.com) as a part of the OpenKeyStore project. This schema extends the JSF standard to include post-quantum algorithms (ML-DSA and ML-KEM) following NIST FIPS 204 and FIPS 203 standards, excluding 'extensions'.",
   "definitions": {
     "signature": {
       "type": "object",
@@ -33,7 +33,7 @@
         },
         {
           "title": "Signature",
-          "description": "Unique top level property for simple signatures. (signaturecore). Supports both classical and post-quantum algorithms including ML-DSA variants.",
+          "description": "Unique top level property for simple signatures. (signaturecore). Supports both classical and post-quantum algorithms including ML-DSA and ML-KEM variants.",
           "$ref": "#/definitions/signer"
         }
       ]
@@ -52,7 +52,7 @@
             {
               "type": "string",
               "title": "Algorithm",
-              "description": "Signature algorithm. The currently recognized JWA [RFC7518] and RFC8037 [RFC8037] asymmetric key algorithms, plus post-quantum algorithms. Note: Unlike RFC8037 [RFC8037] JSF requires explicit Ed* algorithm names instead of \"EdDSA\". Three post-quantum ML-DSA algorithms have been added following NIST FIPS 204 standardization.",
+              "description": "Signature or KEM algorithm. The currently recognized JWA [RFC7518] and RFC8037 [RFC8037] asymmetric key algorithms, plus post-quantum algorithms. Note: Unlike RFC8037 [RFC8037] JSF requires explicit Ed* algorithm names instead of \"EdDSA\". Post-quantum ML-DSA signature algorithms and ML-KEM key encapsulation mechanisms have been added following NIST FIPS 204 and FIPS 203 standardization.",
               "enum": [
                 "RS256",
                 "RS384",
@@ -70,13 +70,16 @@
                 "HS512",
                 "ML-DSA-44",
                 "ML-DSA-65",
-                "ML-DSA-87"  
+                "ML-DSA-87",
+                "ML-KEM-512",
+                "ML-KEM-768",
+                "ML-KEM-1024"
               ]
             },
             {
               "type": "string",
               "title": "Algorithm",
-              "description": "Signature algorithm. Note: If proprietary signature algorithms are added, they must be expressed as URIs.",
+              "description": "Signature or KEM algorithm. Note: If proprietary algorithms are added, they must be expressed as URIs.",
               "format": "uri"
             }
           ]
@@ -88,7 +91,7 @@
         },
         "publicKey": {
           "title": "Public key",
-          "description": "Optional. Public key object. Supports classical key types (EC, RSA, OKP) and post-quantum key types (PQ) for ML-DSA algorithms.",
+          "description": "Optional. Public key object. Supports classical key types (EC, RSA, OKP) and post-quantum key types (PQ) for ML-DSA and ML-KEM algorithms.",
           "$ref": "#/definitions/publicKey"
         },
         "certificatePath": {
@@ -109,15 +112,15 @@
         },
         "value": {
           "type": "string",
-          "title": "Signature",
-          "description": "The signature data encoded as base64url without padding. Encoding standards: (1) Classical algorithms (RS256, ES256, Ed25519, etc.): Follow JWA [RFC7518] specifications for signature serialization. (2) Post-quantum algorithms (ML-DSA-44, ML-DSA-65, ML-DSA-87): Follow NIST FIPS 204 standard for ML-DSA signature encoding."
+          "title": "Signature or Encapsulated Key",
+          "description": "The signature data or encapsulated key encoded as base64url without padding. Encoding standards: (1) Classical algorithms (RS256, ES256, Ed25519, etc.): Follow JWA [RFC7518] specifications for signature serialization. (2) Post-quantum signature algorithms (ML-DSA-44, ML-DSA-65, ML-DSA-87): Follow NIST FIPS 204 standard for ML-DSA signature encoding. (3) Post-quantum KEM algorithms (ML-KEM-512, ML-KEM-768, ML-KEM-1024): Follow NIST FIPS 203 standard for ML-KEM encapsulated key encoding."
         }
       }
     },
     "keyType": {
       "type": "string",
       "title": "Key type",
-      "description": "Key type indicator. 'PQ' indicates post-quantum algorithms following NIST FIPS 204 standards, specifically ML-DSA algorithms.",
+      "description": "Key type indicator. 'PQ' indicates post-quantum algorithms following NIST FIPS 204 and FIPS 203 standards, including ML-DSA signature algorithms and ML-KEM key encapsulation mechanisms.",
       "enum": [
         "EC",
         "OKP",
@@ -127,7 +130,7 @@
     },
     "publicKey": {
       "title": "Public key",
-      "description": "Optional. Public key object. Supports classical key types (EC, RSA, OKP) and post-quantum key types (PQ) for ML-DSA algorithms.",
+      "description": "Optional. Public key object. Supports classical key types (EC, RSA, OKP) and post-quantum key types (PQ) for ML-DSA and ML-KEM algorithms.",
       "type": "object",
       "required": [
         "kty"
@@ -259,14 +262,17 @@
                 "description": "Post-quantum algorithm identifier.",
                 "enum": [
                   "ML-DSA-44",
-                  "ML-DSA-65", 
-                  "ML-DSA-87"
+                  "ML-DSA-65",
+                  "ML-DSA-87",
+                  "ML-KEM-512",
+                  "ML-KEM-768",
+                  "ML-KEM-1024"
                 ]
               },
               "x": {
                 "type": "string",
                 "title": "Public Key",
-                "description": "ML-DSA public key data encoded as base64url without padding, following NIST FIPS 204 specification for the corresponding algorithm variant."
+                "description": "Post-quantum public key data encoded as base64url without padding. For ML-DSA algorithms, follows NIST FIPS 204 specification. For ML-KEM algorithms, follows NIST FIPS 203 specification for the corresponding algorithm variant."
               }
             }
           }
