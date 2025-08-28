@@ -7880,33 +7880,115 @@ limitations under the License.
                             </xs:annotation>
                             <xs:complexType>
                                 <xs:sequence>
-                                    <xs:element name="encr" type="bom:ikeV2Enc" minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element name="encr" minOccurs="0" maxOccurs="unbounded">
                                         <xs:annotation>
                                             <xs:documentation>
                                                 Transform Type 1: encryption algorithms
                                             </xs:documentation>
                                         </xs:annotation>
+                                        <xs:complexType mixed="true">
+                                            <xs:sequence>
+                                                <xs:element name="name" type="xs:string" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            A name for the encryption method.
+                                                            Example: ENCR_AES_GCM_16
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="keyLength" type="xs:integer" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The key length of the encryption algorithm.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="algorithm" type="bom:refType" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The bom-ref to algorithm cryptographic asset.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                            </xs:sequence>
+                                        </xs:complexType>
                                     </xs:element>
-                                    <xs:element name="prf" type="bom:ikeV2Prf" minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element name="prf" minOccurs="0" maxOccurs="unbounded">
                                         <xs:annotation>
                                             <xs:documentation>
                                                 Transform Type 2: pseudorandom functions
                                             </xs:documentation>
                                         </xs:annotation>
+                                        <xs:complexType mixed="true">
+                                            <xs:sequence>
+                                                <xs:element name="name" type="xs:string" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            A name for the pseudorandom function.
+                                                            Example: PRF_HMAC_SHA2_256
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="algorithm" type="bom:refType" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The bom-ref to algorithm cryptographic asset.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                            </xs:sequence>
+                                        </xs:complexType>
                                     </xs:element>
-                                    <xs:element name="integ" type="bom:ikeV2Integ" minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element name="integ" minOccurs="0" maxOccurs="unbounded">
                                         <xs:annotation>
                                             <xs:documentation>
                                                 Transform Type 3: integrity algorithms
                                             </xs:documentation>
                                         </xs:annotation>
+                                        <xs:complexType mixed="true">
+                                            <xs:sequence>
+                                                <xs:element name="name" type="xs:string" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            A name for the integrity algorithm.
+                                                            Example: AUTH_HMAC_SHA2_256_128
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="algorithm" type="bom:refType" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The bom-ref to algorithm cryptographic asset.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                            </xs:sequence>
+                                        </xs:complexType>
                                     </xs:element>
-                                    <xs:element name="ke" type="bom:ikeV2Ke" minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element name="ke" minOccurs="0" maxOccurs="unbounded">
                                         <xs:annotation>
                                             <xs:documentation>
                                                 Transform Type 4: Key Exchange Method (KE) per RFC9370, formerly called Diffie-Hellman Group (D-H)
                                             </xs:documentation>
                                         </xs:annotation>
+                                        <xs:complexType mixed="true">
+                                            <xs:sequence>
+                                                <xs:element name="group" type="xs:integer" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            A group identifier for the key exchange algorithm.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="algorithm" type="bom:refType" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The bom-ref to algorithm cryptographic asset.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                            </xs:sequence>
+                                        </xs:complexType>
                                     </xs:element>
                                     <xs:element name="esn" type="xs:boolean" minOccurs="0" maxOccurs="1">
                                         <xs:annotation>
@@ -7915,12 +7997,30 @@ limitations under the License.
                                             </xs:documentation>
                                         </xs:annotation>
                                     </xs:element>
-                                    <xs:element name="auth" type="bom:ikeV2Auth" minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element name="auth" minOccurs="0" maxOccurs="unbounded">
                                         <xs:annotation>
                                             <xs:documentation>
                                                 IKEv2 Authentication method
                                             </xs:documentation>
                                         </xs:annotation>
+                                        <xs:complexType mixed="true">
+                                            <xs:sequence>
+                                                <xs:element name="name" type="xs:string" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            A name for the authentication method.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="algorithm" type="bom:refType" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The bom-ref to algorithm cryptographic asset.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                            </xs:sequence>
+                                        </xs:complexType>
                                     </xs:element>
                                 </xs:sequence>
                             </xs:complexType>
@@ -7937,111 +8037,6 @@ limitations under the License.
                 <xs:annotation>
                     <xs:documentation>
                         The object identifier (OID) of the cryptographic asset.
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:element>
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="ikeV2Enc">
-        <xs:sequence>
-            <xs:element name="name" type="xs:string" minOccurs="0">
-                <xs:annotation>
-                    <xs:documentation>
-                        A name for the encryption method.
-                        Example: ENCR_AES_GCM_16
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:element>
-            <xs:element name="keyLength" type="xs:integer" minOccurs="0">
-                <xs:annotation>
-                    <xs:documentation>
-                        The key length of the encryption algorithm.
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:element>
-            <xs:element name="algorithm" type="bom:refType" minOccurs="0">
-                <xs:annotation>
-                    <xs:documentation>
-                        The bom-ref to algorithm cryptographic asset.
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:element>
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="ikeV2Prf">
-        <xs:sequence>
-            <xs:element name="name" type="xs:string" minOccurs="0">
-                <xs:annotation>
-                    <xs:documentation>
-                        A name for the pseudorandom function.
-                        Example: PRF_HMAC_SHA2_256
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:element>
-            <xs:element name="algorithm" type="bom:refType" minOccurs="0">
-                <xs:annotation>
-                    <xs:documentation>
-                        The bom-ref to algorithm cryptographic asset.
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:element>
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="ikeV2Integ">
-        <xs:sequence>
-            <xs:element name="name" type="xs:string" minOccurs="0">
-                <xs:annotation>
-                    <xs:documentation>
-                        A name for the integrity algorithm.
-                        Example: AUTH_HMAC_SHA2_256_128
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:element>
-            <xs:element name="algorithm" type="bom:refType" minOccurs="0">
-                <xs:annotation>
-                    <xs:documentation>
-                        The bom-ref to algorithm cryptographic asset.
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:element>
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="ikeV2Ke">
-        <xs:sequence>
-            <xs:element name="group" type="xs:integer" minOccurs="0">
-                <xs:annotation>
-                    <xs:documentation>
-                        A group identifier for the key exchange algorithm.
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:element>
-            <xs:element name="algorithm" type="bom:refType" minOccurs="0">
-                <xs:annotation>
-                    <xs:documentation>
-                        The bom-ref to algorithm cryptographic asset.
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:element>
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="ikeV2Auth">
-        <xs:sequence>
-            <xs:element name="name" type="xs:string" minOccurs="0">
-                <xs:annotation>
-                    <xs:documentation>
-                        A name for the authentication method.
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:element>
-            <xs:element name="algorithm" type="bom:refType" minOccurs="0">
-                <xs:annotation>
-                    <xs:documentation>
-                        The bom-ref to algorithm cryptographic asset.
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
