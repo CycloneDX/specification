@@ -78,6 +78,51 @@
       ]
     },
     {
+      "family": "ECIES",
+      "standard": [
+        {"name": "SEC1", "url": "https://www.secg.org/sec1-v2.pdf"},
+        {"name": "ISO/IEC 18033-2", "url": "https://www.iso.org/standard/37971.html"}
+      ],
+      "variant": [
+        {
+          "pattern": "ECIES[-{ellipticCurve}][-{kdf}][-{symmetricCipher}][-{mac}]",
+          "primitive": "pke"
+        }
+      ]
+    },
+    {
+      "family": "MQV",
+      "standard": [
+        {"name": "SP800-56A", "url": "https://doi.org/10.6028/NIST.SP.800-56Ar3"}
+      ],
+      "variant": [
+        {
+          "pattern": "FFMQV[-{namedGroup}]",
+          "primitive": "key-agree"
+        },
+        {
+          "pattern": "ECMQV[-{ellipticCurve}]",
+          "primitive": "key-agree"
+        }
+      ]
+    },
+    {
+      "family": "ElGamal",
+      "standard": [
+        {"name": "ISO/IEC 18033-2", "url": "https://www.iso.org/standard/37971.html"}
+      ],
+      "variant": [
+        {
+          "pattern": "ElGamal[-{keyLength}]",
+          "primitive": "pke"
+        },
+        {
+          "pattern": "EC-ElGamal[-{ellipticCurve}]",
+          "primitive": "pke"
+        }
+      ]
+    },
+    {
       "family": "DSA",
       "standard": [
         {"name": "FIPS186-4", "url": "https://doi.org/10.6028/NIST.FIPS.186-4"}
@@ -638,6 +683,18 @@
       ]
     },
     {
+      "family": "Skipjack",
+      "standard": [
+        {"name": "Escrowed Encryption Standard (EES)", "url": "https://doi.org/10.6028/NIST.FIPS.185"}
+      ],
+      "variant": [
+        {
+          "pattern": "Skipjack[-{mode}][-{padding}]",
+          "primitive": "block-cipher"
+        }
+      ]
+    },
+    {
       "family": "SP800-108",
       "standard": [
         {"name": "SP800-108", "url": "https://doi.org/10.6028/NIST.SP.800-108r1-upd1"}
@@ -645,40 +702,6 @@
       "variant": [
         {
           "pattern": "SP800_108_(CounterKDF|FeedbackKDF|DoublePipelineKDF)[-{prfFunction}][-{dkmLength}]",
-          "primitive": "key-derive"
-        }
-      ]
-    },
-    {
-      "family": "PKCS12-PBEA",
-      "variant": [
-        {
-          "pattern": "SHA1-PBE-(2|3)K-3DES-CBC",
-          "primitive": "block-cipher"
-        },
-        {
-          "pattern": "SHA1-PBA-SHA1-HMAC",
-          "primitive": "mac"
-        }
-      ]
-    },
-    {
-      "family": "PKCS5-PBE",
-      "variant": [
-        {
-          "pattern": "SHA1-PBE-DES(2|3)-EDE-CBC",
-          "primitive": "block-cipher"
-        },
-        {
-          "pattern": "SHA1-PBA-SHA1-HMAC",
-          "primitive": "mac"
-        },
-        {
-          "pattern": "{hashFunction}-PBE-{blockCipher}",
-          "primitive": "block-cipher"
-        },
-        {
-          "pattern": "PBKDF2",
           "primitive": "key-derive"
         }
       ]
@@ -937,6 +960,18 @@
       ]
     },
     {
+      "family": "RC6",
+      "standard": [
+        {"name": "The RC6 Block Cipher", "url": "https://web.archive.org/web/20181223080309/http://people.csail.mit.edu/rivest/rc6.pdf"}
+      ],
+      "variant": [
+        {
+          "pattern": "RC6[-{keyLength}][-{mode}]",
+          "primitive": "block-cipher"
+        }
+      ]
+    },
+    {
       "family": "HC",
       "standard": [
         {"name": "eSTREAM", "url": "https://www.ecrypt.eu.org/stream/"}
@@ -1000,6 +1035,136 @@
           "primitive": "hash"
         }
       ]
+    },
+    {
+      "family": "PBKDF1",
+      "standard": [
+        {"name": "RFC8018", "url": "https://doi.org/10.17487/RFC8018"}
+      ],
+      "variant": [
+        {
+          "pattern": "PBKDF1[-{hashFunction}][-{iterations}][-{dkLen}]",
+          "primitive": "kdf"
+        }
+      ]
+    },
+    {
+      "family": "PBKDF2",
+      "standard": [
+        {"name": "RFC8018", "url": "https://doi.org/10.17487/RFC8018"},
+        {"name": "SP800-132", "url": "https://doi.org/10.6028/NIST.SP.800-132"}
+      ],
+      "variant": [
+        {
+          "pattern": "PBKDF2[-{hashFunction}][-{iterations}][-{dkLen}]",
+          "primitive": "kdf"
+        }
+      ]
+    },
+    {
+      "family": "PBES1",
+      "standard": [
+        {"name": "RFC8018", "url": "https://doi.org/10.17487/RFC8018"}
+      ],
+      "variant": [
+        {
+          "pattern": "PBES1[-{encryptionAlgorithm}][-{kdf}][-{dkLen}][-{iterations}]",
+          "primitive": "other"
+        }
+      ]
+    },
+    {
+      "family": "PBES2",
+      "standard": [
+        {"name": "RFC8018", "url": "https://doi.org/10.17487/RFC8018"}
+      ],
+      "variant": [
+        {
+          "pattern": "PBES2[-{encryptionAlgorithm}][-{kdf}][-{dkLen}][-{iterations}]",
+          "primitive": "other"
+        }
+      ]
+    },
+    {
+      "family": "PBMAC1",
+      "standard": [
+        {"name": "RFC8018", "url": "https://doi.org/10.17487/RFC8018"}
+      ],
+      "variant": [
+        {
+          "pattern": "PBMAC1[-{macAlgorithm}][-{hashFunction}][-{iterations}][-{dkLen}]",
+          "primitive": "mac"
+        }
+      ]
+    },
+    {
+      "family": "bcrypt",
+      "standard": [
+        {"name": "A Future-Adaptable Password Scheme", "url": "https://www.usenix.org/legacy/events/usenix99/provos/provos.pdf"}
+      ],
+      "variant": [
+        {
+          "pattern": "bcrypt[-{cost)]",
+          "primitive": "hash"
+        }
+      ]
+    },
+    {
+      "family": "A5/1",
+      "variant": [
+        {
+          "pattern": "A5/1",
+          "primitive": "stream-cipher"
+        }
+      ]
+    },
+    {
+      "family": "A5/2",
+      "standard": [
+        {"name": "ETSI ETR 278", "url": "https://www.etsi.org/deliver/etsi_etr/200_299/278/01_60/etr_278e01p.pdf"}
+      ],
+      "variant": [
+        {
+          "pattern": "A5/2",
+          "primitive": "stream-cipher"
+        }
+      ]
+    },
+    {
+      "family": "CMEA",
+      "standard": [
+        {"name": "TIA TR45.0.A", "url": ""}
+      ],
+      "variant": [
+        {
+          "pattern": "CMEA",
+          "primitive": "block-cipher"
+        }
+      ]
+    },
+    {
+      "family": "Fortuna",
+      "standard": [
+        {"name": "Fortuna - A secure pseudorandom number generator", "url": "https://www.schneier.com/academic/fortuna"}
+      ],
+      "variant": [
+        {
+          "pattern": "Fortuna[-{blockCipher}][-{hashFunction}]",
+          "primitive": "drbg"
+        }
+      ]
+    },
+    {
+      "family": "Yarrow",
+      "standard": [
+        {"name": "Yarrow - A secure pseudorandom number generator", "url": "https://www.schneier.com/academic/yarrow"}
+      ],
+      "variant": [
+        {
+          "pattern": "Yarrow[-{blockCipher}][-{hashFunction}]",
+          "primitive": "drbg"
+        }
+      ] 
     }
   ],
   "ellipticCurves": [
