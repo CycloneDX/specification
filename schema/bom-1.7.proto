@@ -2223,7 +2223,7 @@ message CryptoProperties {
 
   // Certificate State
   message CertificateState {
-    
+
     // Pre-defined certificate states
     enum PredefinedState {
       // ProtoBuff's default value
@@ -2488,50 +2488,68 @@ message CryptoProperties {
       repeated string tlsSignatureSchemes = 5;
     }
 
-    // Encryption Algorithm (ENCR)
-    message IkeV2Enc {
-      // A name for the encryption method
-      optional string name = 1;
-      // The key length of the encryption algorithm
-      optional int32 keyLength = 2;
-      // The bom-ref to algorithm cryptographic asset
-      optional string algorithm = 3;
-    }
 
-    // Pseudorandom Function (PRF)
-    message IkeV2Prf {
-      // A name for the pseudorandom function
-      optional string name = 1;
-      // The bom-ref to algorithm cryptographic asset
-      optional string algorithm = 2;
-    }
-
-    // Integrity Algorithm (INTEG)
-    message IkeV2Integ {
-      // A name for the integrity algorithm
-      optional string name = 1;
-      // The bom-ref to algorithm cryptographic asset
-      optional string algorithm = 2;
-    }
-
-    // Key Exchange Method (KE)
-    message IkeV2Ke {
-      // A group identifier for the key exchange algorithm
-      optional int32 group = 1;
-      // The bom-ref to algorithm cryptographic asset
-      optional string algorithm = 2;
-    }
-
-    // IKEv2 Authentication method
-    message IkeV2Auth {
-      // A name for the authentication method
-      optional string name = 1;
-      // The bom-ref to algorithm cryptographic asset
-      optional string algorithm = 2;
-    }
-
+    // DEPRECATED - DO NOT USE - This will be removed in a future version.
     // IKEv2 Transform Types
     message Ikev2TransformTypes {
+      // Transform Type 1: encryption algorithms
+      repeated string encr = 1;
+      // Transform Type 2: pseudorandom functions
+      repeated string prf = 2;
+      // Transform Type 3: integrity algorithms
+      repeated string integ = 3;
+      // Transform Type 4: Key Exchange Method (KE) per RFC9370, formerly called Diffie-Hellman Group (D-H)
+      repeated string ke = 4;
+      // Specifies if an Extended Sequence Number (ESN) is used.
+      optional bool esn = 5;
+      // IKEv2 Authentication method
+      repeated string auth = 6;
+    }
+
+    // IKEv2 Transform Types Detailed
+    message Ikev2TransformTypesDetailed {
+      // Encryption Algorithm (ENCR)
+      message IkeV2Enc {
+        // A name for the encryption method
+        optional string name = 1;
+        // The key length of the encryption algorithm
+        optional int32 keyLength = 2;
+        // The bom-ref to algorithm cryptographic asset
+        optional string algorithm = 3;
+      }
+
+      // Pseudorandom Function (PRF)
+      message IkeV2Prf {
+        // A name for the pseudorandom function
+        optional string name = 1;
+        // The bom-ref to algorithm cryptographic asset
+        optional string algorithm = 2;
+      }
+
+      // Integrity Algorithm (INTEG)
+      message IkeV2Integ {
+        // A name for the integrity algorithm
+        optional string name = 1;
+        // The bom-ref to algorithm cryptographic asset
+        optional string algorithm = 2;
+      }
+
+      // Key Exchange Method (KE)
+      message IkeV2Ke {
+        // A group identifier for the key exchange algorithm
+        optional int32 group = 1;
+        // The bom-ref to algorithm cryptographic asset
+        optional string algorithm = 2;
+      }
+
+      // IKEv2 Authentication method
+      message IkeV2Auth {
+        // A name for the authentication method
+        optional string name = 1;
+        // The bom-ref to algorithm cryptographic asset
+        optional string algorithm = 2;
+      }
+
       // Transform Type 1: encryption algorithms
       repeated IkeV2Enc encr = 1;
       // Transform Type 2: pseudorandom functions
@@ -2552,8 +2570,12 @@ message CryptoProperties {
     optional string version = 2;
     // A list of cipher suites related to the protocol.
     repeated CryptoProtocolCipherSuite cipherSuites = 3;
+    // DEPRECATED - DO NOT USE - This will be removed in a future version - Use `.ikev2TransformTypesDetailed` Instead.
     // The IKEv2 transform types supported (types 1-4), defined in RFC7296 section 3.3.2, and additional properties.
-    optional Ikev2TransformTypes ikev2TransformTypes = 4;
+    optional Ikev2TransformTypes ikev2TransformTypes = 4 [deprecated = true];
+    // The IKEv2 transform types supported (types 1-4), defined in RFC7296 section 3.3.2, and additional properties.
+    // If this field is present, the deprecated field `.ikev2TransformTypes` MUST be ignored.
+    optional Ikev2TransformTypesDetailed ikev2TransformTypesDetailed = 7;
     // The bom-ref(s) to protocol-related cryptographic assets
     repeated string cryptoRef = 5;
     // A list of cryptographic assets related to this component.
