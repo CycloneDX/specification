@@ -1,52 +1,770 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "http://localhost:8080/schema/2.0/cyclonedx-threat-2.0.schema.json",
-  "type": "null",
+  "$id": "http://localhost:8080/schema/2.0/model/cyclonedx-threat-2.0.schema.json",
+  "type": "object",
   "title": "CycloneDX Transparency Expression Language: Threat",
   "$comment": "CycloneDX JSON schema is published under the terms of the Apache License 2.0.",
   "$defs": {
-    "riskAttributes": {
-      "type": "string",
-      "description": "A classification of security and privacy attributes that represent potential impact areas when a threat is realised. These attributes help identify what is at risk, and can also be used to prioritise which attributes are most important to protect for a given application, system, or threat model.",
-      "enum": [
-        "accountability",
-        "authentication",
-        "authorization",
-        "authenticity",
-        "availability",
-        "compliance",
-        "confidentiality",
-        "connectivity",
-        "control",
-        "data_subject_rights",
-        "integrity",
-        "minimisation",
-        "non-repudiation",
-        "possession",
-        "privacy",
-        "purpose_limitation",
-        "transparency",
-        "utility"
-      ],
-      "meta:enum": {
-        "accountability": "Assigning responsibility for actions and decisions to individuals or entities.",
-        "authentication": "Verifying the identity of users, devices, or systems before granting access.",
-        "authorization": "Granting permissions based on identity and roles to perform specific actions or access resources.",
-        "authenticity": "Ensuring that data, communications, or entities are genuine and can be verified.",
-        "availability": "Ensuring systems, data, and services are accessible and operational when needed.",
-        "compliance": "Adherence to applicable laws, regulations, policies, and standards.",
-        "confidentiality": "Preventing unauthorised access to or disclosure of information.",
-        "connectivity": "Maintaining secure and reliable communication between systems or components.",
-        "control": "Enabling individuals to manage how their personal data is used and shared.",
-        "data_subject_rights": "Guaranteeing individuals' rights to access, correct, delete, or restrict their personal data.",
-        "integrity": "Ensuring information is accurate, complete, and unaltered by unauthorised actors.",
-        "minimisation": "Limiting data collection and retention to what is strictly necessary for the intended purpose.",
-        "non-repudiation": "Providing proof of origin and delivery to prevent denial of actions or communications.",
-        "possession": "Ensuring control or custody over data or assets, regardless of ownership.",
-        "privacy": "Protecting individuals' personal information in accordance with legal and ethical standards.",
-        "purpose_limitation": "Ensuring that personal data is only used for the purpose explicitly specified at collection.",
-        "transparency": "Ensuring individuals are informed about data practices, including collection, use, and sharing.",
-        "utility": "Ensuring data is usable and in a format suitable for the intended purpose."
+    "threatScenario": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "cyclonedx-risk-2.0.schema.json#/$defs/scenario"
+        },
+        {
+          "properties": {
+            "threatCategory": {
+              "type": "string",
+              "description": "Threat category based on methodology (e.g., STRIDE category)"
+            },
+            "threatActor": {
+              "$ref": "#/$defs/threatActorProfile"
+            },
+            "attackVector": {
+              "$ref": "#/$defs/attackVector"
+            },
+            "attackPattern": {
+              "$ref": "#/$defs/attackPatternReference"
+            },
+            "weakness": {
+              "$ref": "#/$defs/weaknessReference"
+            },
+            "exploitability": {
+              "$ref": "#/$defs/exploitability"
+            },
+            "indicators": {
+              "$ref": "#/$defs/indicators"
+            },
+            "killChainPhase": {
+              "type": "string",
+              "enum": [
+                "reconnaissance",
+                "weaponization",
+                "delivery",
+                "exploitation",
+                "installation",
+                "command-and-control",
+                "actions-on-objectives"
+              ],
+              "meta:enum": {
+                "reconnaissance": "Gathering information about the target",
+                "weaponization": "Creating malicious payloads",
+                "delivery": "Transmitting weapon to target",
+                "exploitation": "Exploiting vulnerabilities",
+                "installation": "Installing malware or backdoors",
+                "command-and-control": "Establishing C2 channel",
+                "actions-on-objectives": "Achieving attack goals"
+              }
+            },
+            "technicalImpact": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "unauthorized-access",
+                  "data-breach",
+                  "data-corruption",
+                  "service-disruption",
+                  "privilege-escalation",
+                  "code-execution",
+                  "information-disclosure",
+                  "denial-of-service"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "threatActor": {
+      "type": "object",
+      "required": ["bom-ref", "name", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name or identifier of the threat actor"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the threat actor"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["individual", "group", "organization", "nation-state", "unknown"],
+          "meta:enum": {
+            "individual": "Individual threat actor",
+            "group": "Organized group or collective",
+            "organization": "Corporate or criminal organization",
+            "nation-state": "Nation-state sponsored actor",
+            "unknown": "Unknown threat actor type"
+          }
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Known aliases or alternative names"
+        },
+        "profile": {
+          "$ref": "#/$defs/threatActorProfile"
+        },
+        "observedTTPs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ttp"
+          },
+          "description": "Observed tactics, techniques, and procedures"
+        },
+        "attributedAttacks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Attacks attributed to this actor"
+        },
+        "targeting": {
+          "$ref": "#/$defs/targeting"
+        },
+        "externalReferences": {
+          "type": "array",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference"
+          }
+        }
+      }
+    },
+    "threatActorProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sophistication": {
+          "type": "string",
+          "enum": ["none", "minimal", "intermediate", "advanced", "expert"],
+          "meta:enum": {
+            "none": "No technical sophistication",
+            "minimal": "Script kiddie level",
+            "intermediate": "Intermediate technical skills",
+            "advanced": "Advanced persistent threat",
+            "expert": "Nation-state level capabilities"
+          }
+        },
+        "motivation": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "financial",
+              "political",
+              "personal",
+              "ideological",
+              "espionage",
+              "destruction",
+              "disruption",
+              "reputation",
+              "curiosity",
+              "competitive",
+              "revenge",
+              "activism"
+            ]
+          },
+          "description": "Primary motivations"
+        },
+        "capability": {
+          "type": "string",
+          "enum": ["minimal", "limited", "moderate", "significant", "advanced"],
+          "description": "Overall capability level"
+        },
+        "intent": {
+          "type": "string",
+          "enum": ["accidental", "opportunistic", "targeted", "persistent"],
+          "description": "Intent level"
+        },
+        "resources": {
+          "type": "string",
+          "enum": ["minimal", "limited", "moderate", "substantial", "unlimited"],
+          "description": "Resource availability"
+        },
+        "accessLevel": {
+          "type": "string",
+          "enum": ["none", "external", "internal", "privileged", "physical"],
+          "description": "Level of access to target systems"
+        },
+        "skillSet": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Specific skills possessed"
+        }
+      }
+    },
+    "attackVector": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["network", "adjacent", "local", "physical"],
+          "meta:enum": {
+            "network": "Remotely exploitable via network",
+            "adjacent": "Exploitable from adjacent network",
+            "local": "Requires local access",
+            "physical": "Requires physical access"
+          }
+        },
+        "complexity": {
+          "type": "string",
+          "enum": ["low", "high"],
+          "description": "Attack complexity"
+        },
+        "privileges": {
+          "type": "string",
+          "enum": ["none", "low", "high"],
+          "description": "Privileges required"
+        },
+        "userInteraction": {
+          "type": "string",
+          "enum": ["none", "required"],
+          "description": "User interaction requirement"
+        },
+        "scope": {
+          "type": "string",
+          "enum": ["unchanged", "changed"],
+          "description": "Scope impact"
+        }
+      }
+    },
+    "attackPattern": {
+      "type": "object",
+      "required": ["bom-ref", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "capecId": {
+          "type": "integer",
+          "description": "CAPEC (Common Attack Pattern Enumeration and Classification) ID"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the attack pattern"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the attack pattern"
+        },
+        "severity": {
+          "$ref": "cyclonedx-risk-2.0.schema.json#/$defs/severity"
+        },
+        "likelihood": {
+          "type": "string",
+          "enum": ["low", "medium", "high"],
+          "description": "Likelihood of this pattern being used"
+        },
+        "prerequisites": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Prerequisites for the attack"
+        },
+        "techniques": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/technique"
+          },
+          "description": "Techniques used in the attack"
+        },
+        "mitigations": {
+          "type": "array",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          },
+          "description": "References to mitigations"
+        },
+        "examples": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Real-world examples"
+        }
+      }
+    },
+    "attackPatternReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "patternRef": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "Reference to attack pattern"
+        },
+        "capecId": {
+          "type": "integer",
+          "description": "CAPEC ID if not referencing internal pattern"
+        },
+        "customization": {
+          "type": "string",
+          "description": "How this pattern is customized for the specific scenario"
+        }
+      }
+    },
+    "technique": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Technique ID (e.g., MITRE ATT&CK ID)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the technique"
+        },
+        "tactic": {
+          "type": "string",
+          "description": "Associated tactic"
+        },
+        "procedure": {
+          "type": "string",
+          "description": "Specific procedure"
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Tools used with this technique"
+        }
+      }
+    },
+    "weakness": {
+      "type": "object",
+      "required": ["bom-ref"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "cweId": {
+          "type": "integer",
+          "description": "CWE (Common Weakness Enumeration) ID"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the weakness"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the weakness"
+        },
+        "abstraction": {
+          "type": "string",
+          "enum": ["pillar", "class", "base", "variant", "compound"],
+          "meta:enum": {
+            "pillar": "Most abstract type of weakness",
+            "class": "Weakness described in generic terms",
+            "base": "Weakness described in abstract terms",
+            "variant": "Weakness specific to a resource/technology",
+            "compound": "Combination of two or more weaknesses"
+          }
+        },
+        "ordinality": {
+          "type": "string",
+          "enum": ["primary", "resultant", "indirect"],
+          "meta:enum": {
+            "primary": "Weakness exists independent of other weaknesses",
+            "resultant": "Weakness is caused by another weakness",
+            "indirect": "Weakness is indirectly caused by another weakness"
+          }
+        },
+        "affectedAssets": {
+          "type": "array",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          },
+          "description": "Assets affected by this weakness"
+        },
+        "exploitationDifficulty": {
+          "type": "string",
+          "enum": ["trivial", "easy", "moderate", "difficult", "impractical"],
+          "description": "Difficulty of exploiting this weakness"
+        },
+        "detectionMethods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/detectionMethod"
+          },
+          "description": "Methods for detecting this weakness"
+        }
+      }
+    },
+    "weaknessReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "weaknessRef": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "Reference to weakness"
+        },
+        "cweId": {
+          "type": "integer",
+          "description": "CWE ID if not referencing internal weakness"
+        },
+        "instance": {
+          "type": "string",
+          "description": "Specific instance or manifestation of the weakness"
+        }
+      }
+    },
+    "exploitability": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["theoretical", "proof-of-concept", "functional", "weaponized"],
+          "meta:enum": {
+            "theoretical": "Theoretically possible but not demonstrated",
+            "proof-of-concept": "Proof of concept exists",
+            "functional": "Functional exploit exists",
+            "weaponized": "Weaponized exploit in the wild"
+          }
+        },
+        "complexity": {
+          "type": "string",
+          "enum": ["trivial", "low", "medium", "high", "very-high"],
+          "description": "Complexity to exploit"
+        },
+        "skillRequired": {
+          "type": "string",
+          "enum": ["none", "basic", "intermediate", "advanced", "expert"],
+          "description": "Skill level required"
+        },
+        "toolsRequired": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Tools required for exploitation"
+        },
+        "timeRequired": {
+          "type": "string",
+          "description": "Estimated time to develop exploit"
+        },
+        "reliability": {
+          "type": "string",
+          "enum": ["unreliable", "occasional", "reliable", "highly-reliable"],
+          "description": "Reliability of exploitation"
+        },
+        "automatable": {
+          "type": "boolean",
+          "description": "Whether exploitation can be automated"
+        }
+      }
+    },
+    "indicators": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "compromise": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Indicators of compromise"
+        },
+        "attack": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Indicators of attack"
+        },
+        "behavioral": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Behavioral indicators"
+        },
+        "signatures": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/signature"
+          },
+          "description": "Detection signatures"
+        }
+      }
+    },
+    "signature": {
+      "type": "object",
+      "required": ["type", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["yara", "snort", "regex", "hash", "behavior"],
+          "description": "Type of signature"
+        },
+        "value": {
+          "type": "string",
+          "description": "Signature value or pattern"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of what the signature detects"
+        },
+        "confidence": {
+          "type": "string",
+          "enum": ["low", "medium", "high"],
+          "description": "Confidence level of detection"
+        }
+      }
+    },
+    "ttp": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tactic": {
+          "type": "string",
+          "description": "High-level tactic"
+        },
+        "technique": {
+          "$ref": "#/$defs/technique"
+        },
+        "procedure": {
+          "type": "string",
+          "description": "Specific implementation"
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/tool"
+          },
+          "description": "Tools used"
+        },
+        "infrastructure": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Infrastructure used"
+        }
+      }
+    },
+    "tool": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Tool name"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["exploit", "scanner", "fuzzer", "proxy", "framework", "custom"],
+          "description": "Type of tool"
+        },
+        "version": {
+          "type": "string",
+          "description": "Tool version"
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Tool capabilities"
+        }
+      }
+    },
+    "targeting": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sectors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Targeted sectors or industries"
+        },
+        "regions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Targeted geographic regions"
+        },
+        "technologies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Targeted technologies or platforms"
+        },
+        "dataTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Types of data targeted"
+        }
+      }
+    },
+    "detectionMethod": {
+      "type": "object",
+      "required": ["method"],
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": ["static-analysis", "dynamic-analysis", "penetration-test", "code-review", "architecture-review", "automated-scan"],
+          "description": "Detection method type"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the detection method"
+        },
+        "effectiveness": {
+          "type": "string",
+          "enum": ["low", "medium", "high"],
+          "description": "Effectiveness of the method"
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Tools that implement this method"
+        }
+      }
+    },
+    "securityPolicy": {
+      "type": "object",
+      "required": ["bom-ref", "name", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "description": "Policy name"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["access-control", "data-protection", "network-security", "application-security", "operational-security", "compliance"],
+          "description": "Type of security policy"
+        },
+        "description": {
+          "type": "string",
+          "description": "Policy description"
+        },
+        "requirements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Policy requirements"
+        },
+        "enforcement": {
+          "type": "string",
+          "enum": ["mandatory", "recommended", "optional"],
+          "description": "Enforcement level"
+        },
+        "appliesTo": {
+          "type": "array",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          },
+          "description": "Assets this policy applies to"
+        },
+        "exceptions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Policy exceptions"
+        }
+      }
+    },
+    "trustBoundary": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "cyclonedx-blueprint-2.0.schema.json#/$defs/boundary"
+        },
+        {
+          "properties": {
+            "trustLevel": {
+              "type": "string",
+              "enum": ["untrusted", "semi-trusted", "trusted", "highly-trusted"],
+              "description": "Trust level differential"
+            },
+            "securityRequirements": {
+              "$ref": "#/$defs/boundarySecurityRequirements"
+            },
+            "threatsAtBoundary": {
+              "type": "array",
+              "items": {
+                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+              },
+              "description": "Threats that could exploit this boundary"
+            },
+            "controlsAtBoundary": {
+              "type": "array",
+              "items": {
+                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+              },
+              "description": "Controls implemented at this boundary"
+            }
+          }
+        }
+      ]
+    },
+    "boundarySecurityRequirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "authenticationStrength": {
+          "type": "string",
+          "enum": ["none", "weak", "moderate", "strong", "very-strong"],
+          "description": "Required authentication strength"
+        },
+        "authorizationGranularity": {
+          "type": "string",
+          "enum": ["coarse", "medium", "fine", "very-fine"],
+          "description": "Authorization granularity required"
+        },
+        "integrityVerification": {
+          "type": "boolean",
+          "description": "Whether integrity verification is required"
+        },
+        "confidentialityProtection": {
+          "type": "boolean",
+          "description": "Whether confidentiality protection is required"
+        },
+        "auditingLevel": {
+          "type": "string",
+          "enum": ["none", "basic", "detailed", "comprehensive"],
+          "description": "Level of auditing required"
+        },
+        "dataValidationRules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Data validation rules at boundary"
+        }
       }
     }
   }
