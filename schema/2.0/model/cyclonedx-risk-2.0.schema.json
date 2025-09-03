@@ -1,0 +1,669 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "http://localhost:8080/schema/2.0/model/cyclonedx-risk-2.0.schema.json",
+  "type": "object",
+  "title": "CycloneDX Transparency Expression Language: Risk",
+  "$comment": "CycloneDX JSON schema is published under the terms of the Apache License 2.0.",
+  "additionalProperties": false,
+  "properties": {
+    "bom-ref": {
+      "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+      "description": "An optional identifier which can be used to reference the risk assessment elsewhere in the BOM"
+    },
+    "domains": {
+      "type": "array",
+      "description": "Risk domains covered by this assessment",
+      "items": {
+        "$ref": "#/$defs/riskDomain"
+      }
+    },
+    "scenarios": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/scenario"
+      },
+      "description": "Risk scenarios identified"
+    },
+    "mitigations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/mitigation"
+      },
+      "description": "Controls, countermeasures, or mitigations to address identified risks"
+    },
+    "assessments": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/assessment"
+      },
+      "description": "Risk assessments and evaluations"
+    },
+    "properties": {
+      "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+    }
+  },
+  "$defs": {
+    "riskDomain": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "security",
+            "privacy",
+            "operational",
+            "financial",
+            "compliance",
+            "strategic",
+            "reputational",
+            "safety",
+            "environmental",
+            "supply_chain",
+            "technical",
+            "project"
+          ],
+          "meta:enum": {
+            "security": "Information security and cybersecurity risks",
+            "privacy": "Data protection and privacy risks",
+            "operational": "Business operations and continuity risks",
+            "financial": "Financial loss and economic impact risks",
+            "compliance": "Regulatory and legal compliance risks",
+            "strategic": "Strategic business and market risks",
+            "reputational": "Brand and reputation damage risks",
+            "safety": "Human safety and physical security risks",
+            "environmental": "Environmental impact and sustainability risks",
+            "supply_chain": "Supply chain and third-party risks",
+            "technical": "Technical and technology risks",
+            "project": "Project delivery and execution risks"
+          }
+        },
+        "priority": {
+          "$ref": "#/$defs/priority"
+        },
+        "description": {
+          "type": "string",
+          "description": "Additional context for this risk domain"
+        }
+      }
+    },
+    "riskAttribute": {
+      "type": "string",
+      "description": "A classification of security and privacy attributes that represent potential impact areas when a risk is realized",
+      "enum": [
+        "accountability",
+        "authentication",
+        "authorization",
+        "authenticity",
+        "availability",
+        "compliance",
+        "confidentiality",
+        "connectivity",
+        "control",
+        "data_subject_rights",
+        "integrity",
+        "minimisation",
+        "non-repudiation",
+        "possession",
+        "privacy",
+        "purpose_limitation",
+        "transparency",
+        "utility"
+      ],
+      "meta:enum": {
+        "accountability": "Assigning responsibility for actions and decisions to individuals or entities",
+        "authentication": "Verifying the identity of users, devices, or systems before granting access",
+        "authorization": "Granting permissions based on identity and roles to perform specific actions or access resources",
+        "authenticity": "Ensuring that data, communications, or entities are genuine and can be verified",
+        "availability": "Ensuring systems, data, and services are accessible and operational when needed",
+        "compliance": "Adherence to applicable laws, regulations, policies, and standards",
+        "confidentiality": "Preventing unauthorised access to or disclosure of information",
+        "connectivity": "Maintaining secure and reliable communication between systems or components",
+        "control": "Enabling individuals to manage how their personal data is used and shared",
+        "data_subject_rights": "Guaranteeing individuals' rights to access, correct, delete, or restrict their personal data",
+        "integrity": "Ensuring information is accurate, complete, and unaltered by unauthorised actors",
+        "minimisation": "Limiting data collection and retention to what is strictly necessary for the intended purpose",
+        "non-repudiation": "Providing proof of origin and delivery to prevent denial of actions or communications",
+        "possession": "Ensuring control or custody over data or assets, regardless of ownership",
+        "privacy": "Protecting individuals' personal information in accordance with legal and ethical standards",
+        "purpose_limitation": "Ensuring that personal data is only used for the purpose explicitly specified at collection",
+        "transparency": "Ensuring individuals are informed about data practices, including collection, use, and sharing",
+        "utility": "Ensuring data is usable and in a format suitable for the intended purpose"
+      }
+    },
+    "scenario": {
+      "type": "object",
+      "required": ["bom-ref", "name", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the risk scenario"
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of the scenario"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["threat", "vulnerability", "weakness", "risk", "incident", "opportunity", "hazard"],
+          "meta:enum": {
+            "threat": "Security threat scenario",
+            "vulnerability": "Exploitable vulnerability",
+            "weakness": "System or design weakness",
+            "risk": "General risk scenario",
+            "incident": "Potential incident scenario",
+            "opportunity": "Positive risk (opportunity)",
+            "hazard": "Safety hazard scenario"
+          }
+        },
+        "domain": {
+          "$ref": "#/$defs/riskDomain"
+        },
+        "category": {
+          "type": "string",
+          "description": "Category or classification of the scenario"
+        },
+        "likelihood": {
+          "$ref": "#/$defs/likelihood"
+        },
+        "impact": {
+          "$ref": "#/$defs/impact"
+        },
+        "riskScore": {
+          "$ref": "#/$defs/riskScore"
+        },
+        "riskAttributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/riskAttribute"
+          },
+          "description": "Risk attributes affected by this scenario"
+        },
+        "affectedAssets": {
+          "type": "array",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          },
+          "description": "References to affected assets"
+        },
+        "mitigations": {
+          "type": "array",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          },
+          "description": "References to mitigations that address this scenario"
+        },
+        "externalReferences": {
+          "type": "array",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference"
+          }
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "likelihood": {
+      "type": "object",
+      "required": ["level"],
+      "additionalProperties": false,
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["veryLow", "low", "medium", "high", "veryHigh", "certain"],
+          "description": "Likelihood level",
+          "meta:enum": {
+            "veryLow": "Very unlikely to occur (< 10%)",
+            "low": "Unlikely to occur (10-30%)",
+            "medium": "Possible to occur (30-60%)",
+            "high": "Likely to occur (60-90%)",
+            "veryHigh": "Very likely to occur (> 90%)",
+            "certain": "Will certainly occur (100%)"
+          }
+        },
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10,
+          "description": "Numeric likelihood score"
+        },
+        "probability": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Probability as a decimal (0-1)"
+        },
+        "rationale": {
+          "type": "string",
+          "description": "Justification for the likelihood rating"
+        }
+      }
+    },
+    "impact": {
+      "type": "object",
+      "required": ["level"],
+      "additionalProperties": false,
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["negligible", "low", "moderate", "high", "severe", "catastrophic"],
+          "description": "Impact severity level",
+          "meta:enum": {
+            "negligible": "Minimal impact with no significant consequences",
+            "low": "Minor impact with limited consequences",
+            "moderate": "Moderate impact affecting some operations",
+            "high": "Significant impact with serious consequences",
+            "severe": "Severe impact with critical consequences",
+            "catastrophic": "Catastrophic impact with existential consequences"
+          }
+        },
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10,
+          "description": "Numeric impact score"
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "confidentiality",
+              "integrity",
+              "availability",
+              "financial",
+              "reputation",
+              "regulatory",
+              "safety",
+              "privacy",
+              "operational",
+              "strategic"
+            ],
+            "meta:enum": {
+              "confidentiality": "Impact on data confidentiality",
+              "integrity": "Impact on data or system integrity",
+              "availability": "Impact on service availability",
+              "financial": "Financial loss or impact",
+              "reputation": "Reputational damage",
+              "regulatory": "Regulatory compliance impact",
+              "safety": "Human safety impact",
+              "privacy": "Privacy violation impact",
+              "operational": "Operational disruption",
+              "strategic": "Strategic business impact"
+            }
+          },
+          "description": "Categories of impact"
+        },
+        "riskAttributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/riskAttribute"
+          },
+          "description": "Risk attributes affected"
+        },
+        "quantification": {
+          "$ref": "#/$defs/impactQuantification"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the potential impact"
+        }
+      }
+    },
+    "impactQuantification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "financialLoss": {
+          "type": "number",
+          "description": "Estimated financial loss in currency units"
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "ISO 4217 currency code"
+        },
+        "affectedUsers": {
+          "type": "integer",
+          "description": "Number of affected users"
+        },
+        "downtime": {
+          "type": "string",
+          "pattern": "^P(?!$)(\\d+Y)?(\\d+M)?(\\d+W)?(\\d+D)?(T(\\d+H)?(\\d+M)?(\\d+(\\.\\d+)?S)?)?$",
+          "description": "Expected downtime as ISO 8601 duration"
+        },
+        "dataRecords": {
+          "type": "integer",
+          "description": "Number of data records affected"
+        },
+        "recovery": {
+          "type": "string",
+          "pattern": "^P(?!$)(\\d+Y)?(\\d+M)?(\\d+W)?(\\d+D)?(T(\\d+H)?(\\d+M)?(\\d+(\\.\\d+)?S)?)?$",
+          "description": "Recovery time as ISO 8601 duration"
+        }
+      }
+    },
+    "riskScore": {
+      "type": "object",
+      "required": ["level"],
+      "additionalProperties": false,
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["info", "low", "medium", "high", "critical"],
+          "description": "Overall risk level",
+          "meta:enum": {
+            "info": "Informational - no immediate action required",
+            "low": "Low risk - monitor and address in normal cycle",
+            "medium": "Medium risk - plan mitigation activities",
+            "high": "High risk - prioritize mitigation efforts",
+            "critical": "Critical risk - immediate action required"
+          }
+        },
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Numeric risk score"
+        },
+        "vector": {
+          "type": "string",
+          "description": "Risk scoring vector (e.g., L:H/I:M)"
+        },
+        "methodology": {
+          "type": "string",
+          "description": "Risk scoring methodology used"
+        }
+      }
+    },
+    "mitigation": {
+      "type": "object",
+      "required": ["bom-ref", "name", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the mitigation"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of what the mitigation does"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "avoid",
+            "reduce",
+            "transfer",
+            "accept",
+            "control",
+            "countermeasure",
+            "safeguard",
+            "practice",
+            "procedure"
+          ],
+          "meta:enum": {
+            "avoid": "Avoid the risk entirely",
+            "reduce": "Reduce likelihood or impact",
+            "transfer": "Transfer risk to another party",
+            "accept": "Accept the risk",
+            "control": "Preventive or detective control",
+            "countermeasure": "Reactive measure to counter risks",
+            "safeguard": "Protective measure",
+            "practice": "Risk management practice",
+            "procedure": "Documented procedure"
+          }
+        },
+        "strategy": {
+          "type": "string",
+          "enum": ["prevent", "detect", "respond", "recover"],
+          "meta:enum": {
+            "prevent": "Prevents the risk from occurring",
+            "detect": "Detects when the risk occurs",
+            "respond": "Responds to the risk when detected",
+            "recover": "Recovers from the impact"
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": ["proposed", "approved", "planned", "inProgress", "implemented", "verified"],
+          "meta:enum": {
+            "proposed": "Mitigation has been proposed",
+            "approved": "Mitigation has been approved",
+            "planned": "Implementation is planned",
+            "inProgress": "Implementation is in progress",
+            "implemented": "Mitigation has been implemented",
+            "verified": "Effectiveness has been verified"
+          }
+        },
+        "priority": {
+          "$ref": "#/$defs/priority"
+        },
+        "effectiveness": {
+          "$ref": "#/$defs/effectiveness"
+        },
+        "cost": {
+          "type": "string",
+          "enum": ["trivial", "low", "medium", "high", "extreme"],
+          "meta:enum": {
+            "trivial": "Minimal cost and effort",
+            "low": "Low cost and effort",
+            "medium": "Moderate cost and effort",
+            "high": "High cost and significant effort",
+            "extreme": "Extreme cost and major effort"
+          }
+        },
+        "addresses": {
+          "type": "array",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          },
+          "description": "References to scenarios this mitigation addresses"
+        },
+        "implementedBy": {
+          "type": "array",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          },
+          "description": "References to assets that implement this mitigation"
+        },
+        "externalReferences": {
+          "type": "array",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference"
+          }
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "effectiveness": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "percentage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Effectiveness as percentage"
+        },
+        "rating": {
+          "type": "string",
+          "enum": ["ineffective", "marginal", "adequate", "good", "excellent"],
+          "meta:enum": {
+            "ineffective": "Does not meaningfully reduce risk",
+            "marginal": "Slightly reduces risk",
+            "adequate": "Adequately reduces risk",
+            "good": "Significantly reduces risk",
+            "excellent": "Nearly eliminates risk"
+          }
+        }
+      }
+    },
+    "assessment": {
+      "type": "object",
+      "required": ["bom-ref", "type", "timestamp"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["initial", "periodic", "continuous", "triggered"],
+          "meta:enum": {
+            "initial": "Initial risk assessment",
+            "periodic": "Scheduled periodic assessment",
+            "continuous": "Continuous monitoring assessment",
+            "triggered": "Event-triggered assessment"
+          }
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the assessment was performed"
+        },
+        "assessor": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntityOrContact",
+          "description": "Who performed the assessment"
+        },
+        "summary": {
+          "type": "string",
+          "description": "Executive summary of the assessment"
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/finding"
+          },
+          "description": "Specific findings from the assessment"
+        },
+        "overallRisk": {
+          "$ref": "#/$defs/riskScore",
+          "description": "Overall risk score/level"
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Recommendations from the assessment"
+        },
+        "nextReview": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the next review should occur"
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "required": ["title", "severity"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the finding"
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of the finding"
+        },
+        "severity": {
+          "$ref": "#/$defs/severity"
+        },
+        "relatedScenarios": {
+          "type": "array",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          },
+          "description": "Scenarios related to this finding"
+        },
+        "relatedAssets": {
+          "type": "array",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          },
+          "description": "Assets affected by this finding"
+        },
+        "remediation": {
+          "type": "string",
+          "description": "Recommended remediation"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["open", "inProgress", "resolved", "accepted"],
+          "meta:enum": {
+            "open": "Finding is open and unaddressed",
+            "inProgress": "Remediation is in progress",
+            "resolved": "Finding has been resolved",
+            "accepted": "Risk has been accepted"
+          }
+        }
+      }
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["none", "low", "medium", "high", "critical"],
+      "description": "Priority level",
+      "meta:enum": {
+        "none": "No priority assigned",
+        "low": "Low priority - address when convenient",
+        "medium": "Medium priority - address in normal cycle",
+        "high": "High priority - address soon",
+        "critical": "Critical priority - address immediately"
+      }
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["info", "low", "medium", "high", "critical"],
+      "description": "Severity level",
+      "meta:enum": {
+        "info": "Informational finding",
+        "low": "Low severity issue",
+        "medium": "Medium severity issue",
+        "high": "High severity issue",
+        "critical": "Critical severity issue"
+      }
+    },
+    "criticality": {
+      "type": "string",
+      "enum": ["minimal", "low", "moderate", "high", "critical"],
+      "description": "Business criticality level",
+      "meta:enum": {
+        "minimal": "Minimal impact on business operations",
+        "low": "Low impact with minor inconvenience",
+        "moderate": "Moderate impact affecting some operations",
+        "high": "High impact affecting critical operations",
+        "critical": "Critical impact with severe business consequences"
+      }
+    },
+    "dataSensitivity": {
+      "type": "string",
+      "enum": ["public", "internal", "confidential", "restricted", "secret"],
+      "description": "Data sensitivity classification",
+      "meta:enum": {
+        "public": "Public information that can be freely shared",
+        "internal": "Internal use only within the organization",
+        "confidential": "Confidential information requiring protection",
+        "restricted": "Highly restricted information with limited access",
+        "secret": "Secret information requiring special handling"
+      }
+    }
+  }
+}
