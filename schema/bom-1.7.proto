@@ -564,6 +564,11 @@ enum LicensingTypeEnum {
 }
 
 message Metadata {
+  message DistributionConstraints {
+    // The Traffic Light Protocol (TLP) classification that controls the sharing and distribution of the data that the BOM describes.
+    optional TlpClassification tlp = 1;
+  }
+
   // The date and time (timestamp) when the document was created.
   optional google.protobuf.Timestamp timestamp = 1;
   // The tool(s) used in the creation of the BOM.
@@ -585,8 +590,8 @@ message Metadata {
   repeated Lifecycles lifecycles = 9;
   // The organization that created the BOM. Manufacturer is common in BOMs created through automated processes. BOMs created through manual means may have '.authors' instead.
   optional OrganizationalEntity manufacturer = 10;
-  // The Traffic Light Protocol (TLP) classification that controls the sharing and distribution of the data that the BOM describes.
-  optional TlpClassification distribution = 11;
+  // Conditions and constraints governing the sharing and distribution of the data or components described by this BOM.
+  optional DistributionConstraints distributionConstraints = 11;
 }
 
 message Lifecycles {
