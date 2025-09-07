@@ -6,7 +6,7 @@ import "google/protobuf/timestamp.proto";
 message AttachedText {
   // Specifies the format and nature of the data being attached, helping systems correctly interpret and process the content. Common content type examples include `application/json` for JSON data and `text/plain` for plan text documents. [RFC 2045 section 5.1](https://www.ietf.org/rfc/rfc2045.html#section-5.1) outlines the structure and use of content types. For a comprehensive list of registered content types, refer to the [IANA media types registry](https://www.iana.org/assignments/media-types/media-types.xhtml).
   optional string content_type = 1;
-  // Specifies the optional encoding the text is represented in
+  // Specifies the encoding the text is represented in
   optional string encoding = 2;
   // SimpleContent value of element. Proactive controls such as input validation and sanitization should be employed to prevent misuse of attachment text.
   string value = 3;
@@ -33,16 +33,18 @@ message Bom {
   repeated Composition compositions = 9;
   // Vulnerabilities identified in components or services.
   repeated Vulnerability vulnerabilities = 10;
-  // Comments made by people, organizations, or tools about any object with a bom-ref, such as components, services, vulnerabilities, or the BOM itself. Unlike inventory information, annotations may contain opinion or commentary from various stakeholders.
+  // Comments made by people, organizations, or tools about any object with a bom_ref, such as components, services, vulnerabilities, or the BOM itself. Unlike inventory information, annotations may contain opinion or commentary from various stakeholders.
   repeated Annotation annotations = 11;
-  // Specifies optional, custom, properties
+  // Specifies custom properties.
   repeated Property properties = 12;
-  // Describes how a component or service was manufactured or deployed. This is achieved through the use of formulas, workflows, tasks, and steps, which declare the precise steps to reproduce along with the observed formulas describing the steps which transpired in the manufacturing process.
+  // Describes the formulation of any referencable object within the BOM, including components, services, metadata, declarations, or the BOM itself. This may encompass how the object was created, assembled, deployed, tested, certified, or otherwise brought into its present form. Common examples include software build pipelines, deployment processes, AI/ML model training, cryptographic key generation or certification, and third-party audits. Processes are modeled using declared and observed formulas, composed of workflows, tasks, and individual steps.
   repeated Formula formulation = 13;
   // The list of declarations which describe the conformance to standards. Each declaration may include attestations, claims, and evidence.
   repeated Declarations declarations = 14;
   // A collection of reusable objects that are defined and may be used elsewhere in the BOM.
   repeated Definition definitions = 15;
+  // A collection of attributions indicating which entity supplied information for specific fields within the BOM.
+  repeated Citation citations = 16;
 }
 
 enum Classification {
@@ -66,7 +68,8 @@ enum Classification {
   CLASSIFICATION_FIRMWARE = 8;
   // A special type of software that operates or controls a particular type of device. Refer to https://en.wikipedia.org/wiki/Device_driver
   CLASSIFICATION_DEVICE_DRIVER = 9;
-  // A runtime environment which interprets or executes software. This may include runtimes such as those that execute bytecode or low-code/no-code application platforms.
+  // A runtime environment that interprets or executes software.
+  // This may include runtimes such as those that execute bytecode, just-in-time compilers, interpreters, or low-code/no-code application platforms.
   CLASSIFICATION_PLATFORM = 10;
   // A model based on training data that can make predictions or decisions without being explicitly programmed to do so.
   CLASSIFICATION_MACHINE_LEARNING_MODEL = 11;
@@ -92,9 +95,9 @@ message Commit {
 message Component {
   // Specifies the type of component. For software components, classify as an application if no more specific appropriate classification is available or cannot be determined for the component.
   Classification type = 1;
-  // The optional mime-type of the component. When used on file components, the mime-type can provide additional context about the kind of file being represented, such as an image, font, or executable. Some library or framework components may also have an associated mime-type.
+  // The mime-type of the component. When used on file components, the mime-type can provide additional context about the kind of file being represented, such as an image, font, or executable. Some library or framework components may also have an associated mime-type.
   optional string mime_type = 2;
-  // An optional identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
+  // A identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
   optional string bom_ref = 3;
   // The organization that supplied the component. The supplier may often be the manufacturer but may also be a distributor or repackager.
   optional OrganizationalEntity supplier = 4;
@@ -106,17 +109,25 @@ message Component {
   optional string group = 7;
   // The name of the component. This will often be a shortened, single name of the component. Examples: commons-lang3 and jquery
   string name = 8;
-  // The component version. The version should ideally comply with semantic versioning but is not enforced. Version was made optional in v1.4 of the spec. For backward compatibility, it is recommended to use an empty string to represent components without version information.
+  // The component version. The version should ideally comply with semantic versioning but is not enforced.
+  // Version was made optional in v1.4 of the spec.
+  // For backward compatibility, it is recommended to use an empty string to represent components without version information.
+  // Must be used exclusively, either 'version' or 'versionRange', but not both.
   string version = 9;
+  // For an external component, this specifies the accepted version range.
+  // The value must adhere to the Package URL Version Range syntax (vers), as defined at https://github.com/package-url/purl-spec/blob/master/VERSION-RANGE-SPEC.rst.
+  // May only be used if `isExternal` is set to `true`.
+  // Must be used exclusively, either 'version' or 'versionRange', but not both.
+  optional string versionRange = 33;
   // Specifies a description for the component
   optional string description = 10;
   // Specifies the scope of the component. If a scope is not specified, SCOPE_REQUIRED scope should be assumed by the consumer of the BOM
   optional Scope scope = 11;
   // The hashes of the component.
   repeated Hash hashes = 12;
-  // EITHER (list of SPDX licenses and/or named licenses) OR (tuple of one SPDX License Expression)
+  // A list of SPDX licenses and/or named licenses and/or SPDX License Expression.
   repeated LicenseChoice licenses = 13;
-  // An optional copyright notice informing users of the underlying claims to copyright ownership in a published work.
+  // An copyright notice informing users of the underlying claims to copyright ownership in a published work.
   optional string copyright = 14;
   // DEPRECATED - DO NOT USE. This will be removed in a future version. Specifies a well-formed CPE name. See https://nvd.nist.gov/products/cpe
   optional string cpe = 15;
@@ -130,13 +141,13 @@ message Component {
   optional Pedigree pedigree = 19;
   // Provides the ability to document external references related to the component or to the project the component describes.
   repeated ExternalReference external_references = 20;
-  // Specifies optional sub-components. This is not a dependency tree. It provides a way to specify a hierarchical representation of component assemblies, similar to system -> subsystem -> parts assembly in physical supply chains.
+  // Specifies sub-components. This is not a dependency tree. It provides a way to specify a hierarchical representation of component assemblies, similar to system -> subsystem -> parts assembly in physical supply chains.
   repeated Component components = 21;
-  // Specifies optional, custom, properties
+  // Specifies custom properties.
   repeated Property properties = 22;
-  // Specifies optional license and copyright evidence.
+  // Specifies license and copyright evidence.
   optional Evidence evidence = 23;
-  // Specifies optional release notes.
+  // Specifies release notes.
   optional ReleaseNotes releaseNotes = 24;
   // A model card describes the intended uses of a machine learning model, potential limitations, biases, ethical considerations, training parameters, datasets used to train the model, performance metrics, and other relevant data useful for ML transparency.
   optional ModelCard modelCard = 25;
@@ -154,6 +165,12 @@ message Component {
   repeated string omniborId = 31;
   // Specifies the Software Heritage persistent identifier (SWHID). The SWHID, if specified, must be valid and conform to the specification defined at: https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html
   repeated string swhid = 32;
+  // Determine whether this component is external.
+  // An external component is one that is not part of an assembly, but is expected to be provided by the environment, regardless of the component's `scope`. This setting can be useful for distinguishing which components are bundled with the product and which can be relied upon to be present in the deployment environment.
+  // This may be set to `true` for runtime components only. For `Bom.metadata.component`, it must be set to `false`.
+  optional bool isExternal = 34; // implicit defaults to `false`
+  // A list of assertions made regarding patents associated with this component or service. Assertions distinguish between ownership, licensing, and other relevant interactions with patents.
+  repeated PatentAssertion patent_assertions = 35;
 }
 
 // Specifies the data flow.
@@ -177,7 +194,7 @@ message DataFlow {
 // Specifies the flow direction of the data. Valid values are: inbound, outbound, bi-directional, and unknown. Direction is relative to the service. Inbound flow states that data enters the service. Outbound flow states that data leaves the service. Bi-directional states that data flows both ways, and unknown states that the direction is not known.
 // buf:lint:ignore ENUM_VALUE_PREFIX -- Enum value names should be prefixed with "DATA_FLOW_DIRECTION_"
 enum DataFlowDirection {
-  // Default
+  // Default.
   // buf:lint:ignore ENUM_ZERO_VALUE_SUFFIX -- `null` is our fallback, doubling `unspecified`
   DATA_FLOW_NULL = 0;
   // Data that enters a service.
@@ -192,17 +209,17 @@ enum DataFlowDirection {
 
 // Defines the direct dependencies of a component, service, or the components provided/implemented by a given component. Components or services that do not have their own dependencies must be declared as empty elements within the graph. Components or services that are not represented in the dependency graph may have unknown dependencies. It is recommended that implementations assume this to be opaque and not an indicator of an object being dependency-free. It is recommended to leverage compositions to indicate unknown dependency graphs.
 message Dependency {
-  // References a component or service by its bom-ref attribute
+  // References a component or service by its bom_ref attribute
   string ref = 1;
-  // The bom-ref identifiers of the components or services that are dependencies of this dependency object.
+  // The bom_ref identifiers of the components or services that are dependencies of this dependency object.
   repeated Dependency dependencies = 2;
-  // The bom-ref identifiers of the components or services that define a given specification or standard, which are provided or implemented by this dependency object.
+  // The bom_ref identifiers of the components or services that define a given specification or standard, which are provided or implemented by this dependency object.
   repeated string provides = 3;
 }
 
 // The patch file (or diff) that shows changes. Refer to https://en.wikipedia.org/wiki/Diff
 message Diff {
-  // Specifies the optional text of the diff
+  // Specifies the text of the diff
   optional AttachedText text = 1;
   // Specifies the URL to the diff
   optional string url = 2;
@@ -214,14 +231,16 @@ message ExternalReference {
   ExternalReferenceType type = 1;
   // The URL to the external reference
   string url = 2;
-  // An optional comment describing the external reference
+  // A comment describing the external reference
   optional string comment = 3;
-  // Optional integrity hashes for the external resource content
+  // Integrity hashes for the external resource content
   repeated Hash hashes = 4;
+  // Specifies custom properties.
+  repeated Property properties = 5;
 }
 
 enum ExternalReferenceType {
-  // Use this if no other types accurately describe the purpose of the external reference
+  // Use this if no other types accurately describe the purpose of the external reference.
   // buf:lint:ignore ENUM_ZERO_VALUE_SUFFIX -- `other` is our fallback, doubling `unspecified`
   EXTERNAL_REFERENCE_TYPE_OTHER = 0;
   // Version Control System
@@ -296,7 +315,7 @@ enum ExternalReferenceType {
   EXTERNAL_REFERENCE_TYPE_CONFIGURATION = 35;
   // Information used to substantiate a claim.
   EXTERNAL_REFERENCE_TYPE_EVIDENCE = 36;
-  // Describes how a component or service was manufactured or deployed.
+  // Describes the formulation of any referencable object within the BOM, including components, services, metadata, declarations, or the BOM itself.
   EXTERNAL_REFERENCE_TYPE_FORMULATION = 37;
   // The location where the source code distributable can be obtained. This is often an archive format such as zip or tar.gz. The source-distribution type complements the use of the version control (vcs) type.
   EXTERNAL_REFERENCE_TYPE_SOURCE_DISTRIBUTION = 38;
@@ -308,6 +327,14 @@ enum ExternalReferenceType {
   EXTERNAL_REFERENCE_TYPE_RFC_9116 = 41;
   // Reference to release notes
   EXTERNAL_REFERENCE_TYPE_RELEASE_NOTES = 42;
+  // References information about patents which may be defined in human-readable documents or in machine-readable formats such as CycloneDX or ST.96. For detailed patent information or to reference the information provided directly by patent offices, it is recommended to leverage standards from the World Intellectual Property Organization (WIPO) such as [ST.96](https://www.wipo.int/standards/en/st96).
+  EXTERNAL_REFERENCE_TYPE_PATENT = 43;
+  // References information about a patent family which may be defined in human-readable documents or in machine-readable formats such as CycloneDX or ST.96. A patent family is a group of related patent applications or granted patents that cover the same or similar invention. For detailed patent family information or to reference the information provided directly by patent offices, it is recommended to leverage standards from the World Intellectual Property Organization (WIPO) such as [ST.96](https://www.wipo.int/standards/en/st96).
+  EXTERNAL_REFERENCE_TYPE_PATENT_FAMILY = 44;
+  // References assertions made regarding patents associated with a component or service. Assertions distinguish between ownership, licensing, and other relevant interactions with patents.
+  EXTERNAL_REFERENCE_TYPE_PATENT_ASSERTION = 45;
+  // A reference to external citations applicable to the object identified by this BOM entry or the BOM itself. When used with a BOM-Link, this allows offloading citations into a separate CycloneDX BOM.
+  EXTERNAL_REFERENCE_TYPE_CITATION = 46;
 }
 
 enum HashAlg {
@@ -325,6 +352,8 @@ enum HashAlg {
   HASH_ALG_BLAKE_2_B_384 = 10;
   HASH_ALG_BLAKE_2_B_512 = 11;
   HASH_ALG_BLAKE_3 = 12;
+  HASH_ALG_STREEBOG_256 = 13;
+  HASH_ALG_STREEBOG_512 = 14;
 }
 
 // Specifies the file hash of the component
@@ -345,7 +374,7 @@ message IdentifiableAction {
 }
 
 enum IssueClassification {
-  // Default
+  // Default.
   // buf:lint:ignore ENUM_ZERO_VALUE_SUFFIX -- `null` is our fallback, doubling `unspecified`
   ISSUE_CLASSIFICATION_NULL = 0;
   // A fault, flaw, or bug in software
@@ -384,12 +413,14 @@ message LicenseChoice {
   oneof choice {
     // A license
     License license = 1;
-    // A valid SPDX license expression. Refer to https://spdx.org/specifications for syntax requirements
+    // A valid SPDX license expression. Refer to https://spdx.org/specifications for syntax requirements.
     string expression = 2;
+    // A SPDX license expression and its details
+    LicenseExpressionDetailed expression_detailed = 5;
   }
-  // This field must only be used when "expression" is chosen as the License object has its own acknowledgement.
+  // This field must only be used when `expression` is chosen as the other options have their own acknowledgement.
   optional LicenseAcknowledgementEnumeration acknowledgement = 3;
-  // This field must only be used when "expression" is chosen as the License object has its own bom_ref.
+  // This field must only be used when `expression` is chosen as the other options have their own bom_ref.
   optional string bom_ref = 4;
 }
 
@@ -401,18 +432,58 @@ message License {
     // The name of the license. This may include the name of a commercial or proprietary license or an open source license that may not be defined by SPDX.
     string name = 2;
   }
-  // Specifies the optional full text of the attachment
+  // Specifies the full text of the attachment
   optional AttachedText text = 3;
   // The URL to the attachment file. If the attachment is a license or BOM, an externalReference should also be specified for completeness.
   optional string url = 4;
-  // An optional identifier which can be used to reference the license elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
+  // A identifier which can be used to reference the license elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
   optional string bom_ref = 5;
   // Licensing details describing the licensor/licensee, license type, renewal and expiration dates, and other important metadata
   optional Licensing licensing = 6;
-  // Specifies optional, custom, properties
+  // Specifies custom properties.
   repeated Property properties = 7;
   // Declared licenses and concluded licenses represent two different stages in the licensing process within software development. Declared licenses refer to the initial intention of the software authors regarding the licensing terms under which their code is released. On the other hand, concluded licenses are the result of a comprehensive analysis of the project's codebase to identify and confirm the actual licenses of the components used, which may differ from the initially declared licenses. While declared licenses provide an upfront indication of the licensing intentions, concluded licenses offer a more thorough understanding of the actual licensing within a project, facilitating proper compliance and risk management. Observed licenses are defined in `@.evidence.licenses`. Observed licenses form the evidence necessary to substantiate a concluded license.
   optional LicenseAcknowledgementEnumeration acknowledgement = 8;
+}
+
+// Specifies the details and attributes related to a software license.
+// It must be a valid SPDX license expression, along with additional properties such as license acknowledgment.
+message LicenseExpressionDetailed {
+
+  // This document specifies the details and attributes related to a software license identifier. An SPDX expression may be a compound of license identifiers.
+  // The `license_identifier` field serves as the key that identifies each record. Note that this key is not required to be unique, as the same license identifier could apply to multiple, different but similar license details, texts, etc.
+  message ExpressionDetails {
+    // A valid SPDX license identifier. Refer to https://spdx.org/specifications for syntax requirements.
+    // This field serves as the primary key, which uniquely identifies each record.
+    // Example values:
+    // - "Apache-2.0",
+    // - "GPL-3.0-only WITH Classpath-exception-2.0"
+    // - "LicenseRef-my-custom-license"
+    string license_identifier = 1;
+    // A identifier which can be used to reference the license elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
+    optional string bom_ref = 2;
+    // A way to include the textual content of the license.
+    optional AttachedText text = 3;
+    // The URL to the license file. If specified, a 'license' externalReference should also be specified for completeness
+    optional string url = 4;
+  }
+
+  // A valid SPDX license expression. Refer to https://spdx.org/specifications for syntax requirements.
+  // Example values:
+  // - "Apache-2.0 AND (MIT OR GPL-2.0-only)",
+  // - "GPL-3.0-only WITH Classpath-exception-2.0"
+  string expression = 1;
+  // Licensing details describing the licensor/licensee, license type, renewal and expiration dates, and other important metadata
+  // Details for parts of the `expression`.
+  repeated ExpressionDetails details = 2;
+  // A identifier which can be used to reference the license elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
+  optional string bom_ref = 3;
+  // Declared licenses and concluded licenses represent two different stages in the licensing process within software development. Declared licenses refer to the initial intention of the software authors regarding the licensing terms under which their code is released. On the other hand, concluded licenses are the result of a comprehensive analysis of the project's codebase to identify and confirm the actual licenses of the components used, which may differ from the initially declared licenses. While declared licenses provide an upfront indication of the licensing intentions, concluded licenses offer a more thorough understanding of the actual licensing within a project, facilitating proper compliance and risk management. Observed licenses are defined in `@.evidence.licenses`. Observed licenses form the evidence necessary to substantiate a concluded license.
+  optional LicenseAcknowledgementEnumeration acknowledgement = 4;
+  // Licensing details describing the licensor/licensee, license type, renewal and expiration dates, and other important metadata
+  optional Licensing licensing = 5;
+  // Specifies custom properties.
+  repeated Property properties = 6;
 }
 
 // Declared licenses and concluded licenses represent two different stages in the licensing process within software development. Declared licenses refer to the initial intention of the software authors regarding the licensing terms under which their code is released. On the other hand, concluded licenses are the result of a comprehensive analysis of the project's codebase to identify and confirm the actual licenses of the components used, which may differ from the initially declared licenses. While declared licenses provide an upfront indication of the licensing intentions, concluded licenses offer a more thorough understanding of the actual licensing within a project, facilitating proper compliance and risk management. Observed licenses are defined in `@.evidence.licenses`. Observed licenses form the evidence necessary to substantiate a concluded license.
@@ -493,6 +564,11 @@ enum LicensingTypeEnum {
 }
 
 message Metadata {
+  message DistributionConstraints {
+    // The Traffic Light Protocol (TLP) classification that controls the sharing and distribution of the data that the BOM describes.
+    optional TlpClassification tlp = 1;
+  }
+
   // The date and time (timestamp) when the document was created.
   optional google.protobuf.Timestamp timestamp = 1;
   // The tool(s) used in the creation of the BOM.
@@ -506,14 +582,16 @@ message Metadata {
   // The organization that supplied the component that the BOM describes. The supplier may often be the manufacture, but may also be a distributor or repackager.
   optional OrganizationalEntity supplier = 6;
   // The license information for the BOM document. This may be different from the license(s) of the component(s) that the BOM describes.
-  // EITHER (list of SPDX licenses and/or named licenses) OR (tuple of one SPDX License Expression)
+  // A list of SPDX licenses and/or named licenses and/or SPDX License Expression.
   repeated LicenseChoice licenses = 7;
-  // Specifies optional, custom, properties
+  // Specifies custom properties.
   repeated Property properties = 8;
   // Lifecycles communicate the stage(s) in which data in the BOM was captured. Different types of data may be available at various phases of a lifecycle, such as the Software Development Lifecycle (SDLC), IT Asset Management (ITAM), and Software Asset Management (SAM). Thus, a BOM may include data specific to or only obtainable in a given lifecycle.
   repeated Lifecycles lifecycles = 9;
   // The organization that created the BOM. Manufacturer is common in BOMs created through automated processes. BOMs created through manual means may have '.authors' instead.
   optional OrganizationalEntity manufacturer = 10;
+  // Conditions and constraints governing the sharing and distribution of the data or components described by this BOM.
+  optional DistributionConstraints distributionConstraints = 11;
 }
 
 message Lifecycles {
@@ -552,7 +630,7 @@ message OrganizationalContact {
   optional string email = 2;
   // The phone number of the contact.
   optional string phone = 3;
-  // An optional identifier which can be used to reference the object elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
+  // A identifier which can be used to reference the object elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
   optional string bom_ref = 4;
 }
 
@@ -563,14 +641,14 @@ message OrganizationalEntity {
   repeated string url = 2;
   // A contact person at the organization. Multiple contacts are allowed.
   repeated OrganizationalContact contact = 3;
-  // An optional identifier which can be used to reference the object elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
+  // A identifier which can be used to reference the object elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
   optional string bom_ref = 4;
   // The physical address (location) of the organization
   optional PostalAddressType address = 5;
 }
 
 enum PatchClassification {
-  // Default
+  // Default.
   // buf:lint:ignore ENUM_ZERO_VALUE_SUFFIX -- `null` is our fallback, doubling `unspecified`
   PATCH_CLASSIFICATION_NULL = 0;
   // A patch which is not developed by the creators or maintainers of the software being patched. Refer to https://en.wikipedia.org/wiki/Unofficial_patch
@@ -621,7 +699,7 @@ enum Scope {
 }
 
 message Service {
-  // An optional identifier which can be used to reference the service elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
+  // A identifier which can be used to reference the service elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
   optional string bom_ref = 1;
   // The organization that provides the service.
   optional OrganizationalEntity provider = 2;
@@ -641,20 +719,22 @@ message Service {
   optional bool x_trust_boundary = 9;
   // Specifies information about the data including the directional flow of data and the data classification.
   repeated DataFlow data = 10;
-  // EITHER (list of SPDX licenses and/or named licenses) OR (tuple of one SPDX License Expression)
+  // A list of SPDX licenses and/or named licenses and/or SPDX License Expression.
   repeated LicenseChoice licenses = 11;
   // Provides the ability to document external references related to the service.
   repeated ExternalReference external_references = 12;
-  // Specifies optional sub-service. This is not a dependency tree. It provides a way to specify a hierarchical representation of service assemblies, similar to system -> subsystem -> parts assembly in physical supply chains.
+  // Specifies sub-service. This is not a dependency tree. It provides a way to specify a hierarchical representation of service assemblies, similar to system -> subsystem -> parts assembly in physical supply chains.
   repeated Service services = 13;
-  // Specifies optional, custom, properties
+  // Specifies custom properties.
   repeated Property properties = 14;
-  // Specifies optional release notes.
+  // Specifies release notes.
   optional ReleaseNotes releaseNotes = 15;
   // The name of the trust zone the service resides in.
   optional string trustZone = 16;
   // Textual strings that aid in the discovery, search, and retrieval of the associated object. Tags often serve as a way to group or categorize similar or related objects by various attributes. Examples include "json-parser", "object-persistence", "text-to-image", "translation", and "object-detection".
   repeated string tags = 17;
+  // A list of assertions made regarding patents associated with this component or service. Assertions distinguish between ownership, licensing, and other relevant interactions with patents.
+  repeated PatentAssertion patent_assertions = 18;
 }
 
 // Specifies metadata and content for ISO-IEC 19770-2 Software Identification (SWID) Tags.
@@ -673,6 +753,22 @@ message Swid {
   optional AttachedText text = 6;
   // The URL to the SWID file.
   optional string url = 7;
+}
+
+// Traffic Light Protocol (TLP) is a classification system for identifying the potential risk associated with artefact, including whether it is subject to certain types of legal, financial, or technical threats. Refer to https://www.first.org/tlp/ for further information.
+//The default classification is "CLEAR"
+enum TlpClassification {
+  // The information is not subject to any restrictions as regards the sharing.
+  // buf:lint:ignore ENUM_ZERO_VALUE_SUFFIX -- "CLEAR" is our fallback, the default.
+  TLP_CLASSIFICATION_CLEAR = 0;
+  // The information is subject to limited disclosure, and recipients can share it within their community but not via publicly accessible channels.
+  TLP_CLASSIFICATION_GREEN = 1;
+  // The information is subject to limited disclosure, and recipients can only share it on a need-to-know basis within their organization and with clients.
+  TLP_CLASSIFICATION_AMBER = 2;
+  // The information is subject to limited disclosure, and recipients can only share it on a need-to-know basis within their organization.
+  TLP_CLASSIFICATION_AMBER_AND_STRICT = 3;
+  // The information is subject to restricted distribution to individual recipients only and must not be shared.
+  TLP_CLASSIFICATION_RED = 4;
 }
 
 // Specifies a tool (manual or automated).
@@ -732,9 +828,9 @@ message Composition {
   repeated string assemblies = 2;
   // The dependencies the aggregate completeness applies to
   repeated string dependencies = 3;
-  // The bom-ref identifiers of the vulnerabilities being described.
+  // The bom_ref identifiers of the vulnerabilities being described.
   repeated string vulnerabilities = 4;
-  // An optional identifier which can be used to reference the composition elsewhere in the BOM. Every bom-ref must be unique within the BOM.
+  // A identifier which can be used to reference the composition elsewhere in the BOM. Every `bom_ref` must be unique within the BOM.
   optional string bom_ref = 5;
 }
 
@@ -745,7 +841,7 @@ message EvidenceCopyright {
 
 // Provides the ability to document evidence collected through various forms of extraction or analysis.
 message Evidence {
-  // EITHER (list of SPDX licenses and/or named licenses) OR (tuple of one SPDX License Expression)
+  // A list of SPDX licenses and/or named licenses and/or SPDX License Expression.
   repeated LicenseChoice licenses = 1;
   // Copyright evidence captures intellectual property assertions, providing evidence of possible ownership and legal protection.
   repeated EvidenceCopyright copyright = 2;
@@ -768,7 +864,7 @@ message Callstack {
     string module = 2;
     // A block of code designed to perform a particular task.
     optional string function = 3;
-    // Optional arguments that are passed to the module or function.
+    // Arguments that are passed to the module or function.
     repeated string parameters = 4;
     // The line number the code that is called resides on.
     optional int32 line = 5;
@@ -786,7 +882,7 @@ message EvidenceIdentity {
   optional float confidence = 2;
   // The methods used to extract and/or analyze the evidence.
   repeated EvidenceMethods methods = 3;
-  // The object in the BOM identified by its bom-ref. This is often a component or service, but may be any object type supporting bom-refs. Tools used for analysis should already be defined in the BOM, either in the metadata/tools, components, or formulation.
+  // The object in the BOM identified by its bom_ref. This is often a component or service, but may be any object type supporting bom_refs. Tools used for analysis should already be defined in the BOM, either in the metadata/tools, components, or formulation.
   repeated string tools = 4;
   // The value of the field (cpe, purl, etc) that has been concluded based on the aggregate of all methods (if available).
   optional string concludedValue = 5;
@@ -802,7 +898,7 @@ message EvidenceMethods {
 }
 
 message EvidenceOccurrences {
-  // An optional identifier which can be used to reference the occurrence elsewhere in the BOM. Every bom-ref must be unique within the BOM.
+  // A identifier which can be used to reference the occurrence elsewhere in the BOM. Every `bom_ref` must be unique within the BOM.
   optional string bom_ref = 1;
   // The location or path to where the component was found.
   string location = 2;
@@ -866,7 +962,7 @@ message ReleaseNotes {
   optional string description = 5;
   // The date and time (timestamp) when the release note was created.
   optional google.protobuf.Timestamp timestamp = 6;
-  // Optional alternate names the release may be referred to. This may include unofficial terms used by development and marketing teams (e.g. code names).
+  // Alternate names the release may be referred to. This may include unofficial terms used by development and marketing teams (e.g. code names).
   repeated string aliases = 7;
   // Textual strings that aid in the discovery, search, and retrieval of the associated object. Tags often serve as a way to group or categorize similar or related objects by various attributes. Examples include "json-parser", "object-persistence", "text-to-image", "translation", and "object-detection".
   repeated string tags = 8;
@@ -874,13 +970,13 @@ message ReleaseNotes {
   repeated Issue resolves = 9;
   // Zero or more release notes containing the locale and content. Multiple note messages may be specified to support release notes in a wide variety of languages.
   repeated Note notes = 10;
-  // Specifies optional, custom, properties
+  // Specifies custom properties.
   repeated Property properties = 11;
 }
 
 // Defines a weakness in a component or service that could be exploited or triggered by a threat source.
 message Vulnerability {
-  // An optional identifier which can be used to reference the vulnerability elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
+  // A identifier which can be used to reference the vulnerability elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
   optional string bom_ref = 1;
   // The identifier that uniquely identifies the vulnerability.
   optional string id = 2;
@@ -914,7 +1010,7 @@ message Vulnerability {
   optional VulnerabilityAnalysis analysis = 16;
   // affects
   repeated VulnerabilityAffects affects = 17;
-  // Specifies optional, custom, properties
+  // Specifies custom properties.
   repeated Property properties = 18;
   // The date and time (timestamp) when the vulnerability record was rejected (if applicable).
   optional google.protobuf.Timestamp rejected = 19;
@@ -951,13 +1047,13 @@ message VulnerabilityRating {
   optional ScoreMethod method = 4;
   // Textual representation of the metric values used to score the vulnerability.
   optional string vector = 5;
-  // An optional reason for rating the vulnerability as it was.
+  // A reason for rating the vulnerability as it was.
   optional string justification = 6;
 }
 
 // Textual representation of the severity of the vulnerability adopted by the analysis method. If the analysis method uses values other than what is provided, the user is expected to translate appropriately.
 enum Severity {
-  // The severity is not known
+  // The severity is not known.
   // buf:lint:ignore ENUM_ZERO_VALUE_SUFFIX -- `unknown` is our fallback, doubling `unspecified`
   SEVERITY_UNKNOWN = 0;
   // Critical severity
@@ -975,7 +1071,7 @@ enum Severity {
 }
 
 enum ScoreMethod {
-  // An undefined score method
+  // An undefined score method.
   // buf:lint:ignore ENUM_ZERO_VALUE_SUFFIX -- `null` is our fallback, doubling `unspecified`
   SCORE_METHOD_NULL = 0;
   // Common Vulnerability Scoring System v2 - https://www.first.org/cvss/v2/
@@ -996,7 +1092,7 @@ enum ScoreMethod {
 
 // Title and location where advisory information can be obtained. An advisory is a notification of a threat to a component, service, or system.
 message Advisory {
-  // An optional name of the advisory.
+  // A name of the advisory.
   optional string title = 1;
   // Location where the advisory can be obtained.
   string url = 2;
@@ -1025,7 +1121,7 @@ message VulnerabilityAnalysis {
 }
 
 enum ImpactAnalysisState {
-  // An undefined impact analysis state
+  // An undefined impact analysis state.
   // buf:lint:ignore ENUM_ZERO_VALUE_SUFFIX -- `null` is our fallback, doubling `unspecified`
   IMPACT_ANALYSIS_STATE_NULL = 0;
   // The vulnerability has been remediated.
@@ -1043,7 +1139,7 @@ enum ImpactAnalysisState {
 }
 
 enum ImpactAnalysisJustification {
-  // An undefined impact analysis justification
+  // An undefined impact analysis justification.
   // buf:lint:ignore ENUM_ZERO_VALUE_SUFFIX -- `null` is our fallback, doubling `unspecified`
   IMPACT_ANALYSIS_JUSTIFICATION_NULL = 0;
   // The code has been removed or tree-shaked.
@@ -1067,7 +1163,7 @@ enum ImpactAnalysisJustification {
 }
 
 enum VulnerabilityResponse {
-  // unspecified value
+  // unspecified value.
   // buf:lint:ignore ENUM_ZERO_VALUE_SUFFIX -- `null` is our fallback, doubling `unspecified`
   VULNERABILITY_RESPONSE_NULL = 0;
   // Can not fix
@@ -1083,7 +1179,7 @@ enum VulnerabilityResponse {
 }
 
 message VulnerabilityAffects {
-  // References a component or service by the objects bom-ref
+  // References a component or service by the objects bom_ref
   string ref = 1;
   // Zero or more individual versions or range of versions.
   repeated VulnerabilityAffectedVersions versions = 2;
@@ -1125,9 +1221,9 @@ message AnnotatorChoice {
 }
 
 message Annotation {
-  // An optional identifier which can be used to reference the annotation elsewhere in the BOM. Every bom-ref must be unique within the BOM.
+  // A identifier which can be used to reference the annotation elsewhere in the BOM. Every `bom_ref` must be unique within the BOM.
   optional string bom_ref = 1;
-  // The object in the BOM identified by its bom-ref. This is often a component or service but may be any object type supporting bom-refs.
+  // The object in the BOM identified by its bom_ref. This is often a component or service but may be any object type supporting bom_refs.
   repeated string subjects = 2;
   // The organization, person, component, or service which created the textual content of the annotation.
   AnnotatorChoice annotator = 3;
@@ -1144,7 +1240,7 @@ message Annotation {
  * Model card support in CycloneDX is derived from TensorFlow Model Card Toolkit released under the Apache 2.0 license and available from https://github.com/tensorflow/model-card-toolkit/blob/main/model_card_toolkit/schema/v0.0.2/model_card.schema.json. In addition, CycloneDX model card support includes portions of VerifyML, also released under the Apache 2.0 license and available from https://github.com/cylynx/verifyml/blob/main/verifyml/model_card_toolkit/schema/v0.0.4/model_card.schema.json.
  */
 message ModelCard {
-  // An optional identifier which can be used to reference the model card elsewhere in the BOM. Every bom-ref must be unique within the BOM.
+  // A identifier which can be used to reference the model card elsewhere in the BOM. Every `bom_ref` must be unique within the BOM.
   optional string bom_ref = 1;
   // Hyper-parameters for construction of the model.
   optional ModelParameters modelParameters = 2;
@@ -1178,7 +1274,7 @@ message ModelCard {
       oneof choice {
         // Inline Data Information
         ComponentData dataset = 1;
-        // References a data component by the components bom-ref attribute
+        // References a data component by the components bom_ref attribute
         string ref = 2;
       }
     }
@@ -1247,7 +1343,7 @@ message ModelCard {
     message EnvironmentalConsiderations {
       // Describes energy consumption information incurred for one or more component lifecycle activities.
       repeated EnergyConsumption energyConsumptions = 1;
-      // Specifies optional, custom properties for environment considerations
+      // Specifies custom properties for environment considerations.
       repeated Property properties = 2;
     }
     // Describes energy consumption information incurred for the specified lifecycle activity.
@@ -1286,7 +1382,7 @@ message ModelCard {
       optional CO2MeasureType co2CostEquivalent = 4;
       // The CO2 offset or credit for the CO2 equivalent cost.
       optional CO2MeasureType co2CostOffset = 5;
-      // Specifies optional, custom properties for environment considerations
+      // Specifies custom properties for environment considerations.
       repeated Property properties = 6;
     }
   }
@@ -1370,7 +1466,7 @@ message CO2MeasureType {
 
 // An address used to identify a contactable location.
 message PostalAddressType {
-  // An optional identifier which can be used to reference the address elsewhere in the BOM. Every bom-ref must be unique within the BOM.
+  // A identifier which can be used to reference the address elsewhere in the BOM. Every `bom_ref` must be unique within the BOM.
   optional string bom_ref = 1;
   // The country name or the two-letter ISO 3166-1 country code.
   optional string country = 2;
@@ -1387,8 +1483,8 @@ message PostalAddressType {
 }
 
 enum ModelParameterApproachType {
-  // buf:lint:ignore ENUM_ZERO_VALUE_SUFFIX -- value `0` is a fallback(meaning "unspecified") in protobuf3. this usage here is an error, it shall be fixed with v2.0 of this very schema
   // Supervised machine learning involves training an algorithm on labeled data to predict or classify new data based on the patterns learned from the labeled examples.
+  // buf:lint:ignore ENUM_ZERO_VALUE_SUFFIX -- value `0` is a fallback(meaning "unspecified") in protobuf3. this usage here is an error, it shall be fixed with v2.0 of this very schema
   MODEL_PARAMETER_APPROACH_TYPE_SUPERVISED = 0;
   // Unsupervised machine learning involves training algorithms on unlabeled data to discover patterns, structures, or relationships without explicit guidance, allowing the model to identify inherent structures or clusters within the data.
   MODEL_PARAMETER_APPROACH_TYPE_UNSUPERVISED = 1;
@@ -1401,7 +1497,7 @@ enum ModelParameterApproachType {
 }
 
 message ComponentData {
-  // An optional identifier which can be used to reference the dataset elsewhere in the BOM. Every bom-ref must be unique within the BOM.
+  // A identifier which can be used to reference the dataset elsewhere in the BOM. Every `bom_ref` must be unique within the BOM.
   optional string bom_ref = 1;
   // The general theme or subject matter of the data being specified.
   ComponentDataType type = 2;
@@ -1421,7 +1517,7 @@ message ComponentData {
   optional DataGovernance governance = 9;
 
   message ComponentDataContents {
-    // An optional way to include textual or encoded data.
+    // A way to include textual or encoded data.
     optional AttachedText attachment = 1;
     // The URL to where the data can be retrieved.
     optional string url = 2;
@@ -1747,10 +1843,10 @@ message OutputType {
   }
 }
 
-// Type that permits a choice to reference a resource using an iternal bom-ref identifier or an external reference.
+// Type that permits a choice to reference a resource using an iternal bom_ref identifier or an external reference.
 message ResourceReferenceChoice {
   oneof choice {
-    // References an object by its bom-ref attribute
+    // References an object by its bom_ref attribute
     string ref = 1;
     // Reference to an externally accessible resource
     ExternalReference externalReference = 2;
@@ -1817,7 +1913,7 @@ message EnvironmentVars {
 // The list of declarations which describe the conformance to standards. Each declaration may include attestations, claims, and evidence.
 message Declarations {
   message Assessor {
-    // An optional identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
+    // A identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
     optional string bom_ref = 1;
     // The boolean indicating if the assessor is outside the organization generating claims. A value of false indicates a self assessor.
     optional bool thirdParty = 2;
@@ -1836,7 +1932,7 @@ message Declarations {
         optional double score = 1;
         // The rationale for the conformance score.
         optional string rationale = 2;
-        // The list of  `bom-ref` to the evidence provided describing the mitigation strategies.
+        // The list of  `bom_ref` to the evidence provided describing the mitigation strategies.
         repeated string mitigationStrategies = 3;
       }
 
@@ -1848,11 +1944,11 @@ message Declarations {
         optional string rationale = 2;
       }
 
-      // The `bom-ref` to the requirement being attested to.
+      // The `bom_ref` to the requirement being attested to.
       optional string requirement = 1;
-      // The list of `bom-ref` to the claims being attested to.
+      // The list of `bom_ref` to the claims being attested to.
       repeated string claims = 2;
-      // The list of  `bom-ref` to the counter claims being attested to.
+      // The list of  `bom_ref` to the counter claims being attested to.
       repeated string counterClaims = 3;
       // The conformance of the claim meeting a requirement.
       optional AttestationConformance conformance = 4;
@@ -1862,26 +1958,26 @@ message Declarations {
 
     // The short description explaining the main points of the attestation.
     optional string summary = 1;
-    // The `bom-ref` to the assessor asserting the attestation.
+    // The `bom_ref` to the assessor asserting the attestation.
     optional string assessor = 2;
     // The grouping of requirements to claims and the attestors' declared conformance and confidence thereof.
     repeated AttestationMap map = 3;
   }
 
   message Claim {
-    // An optional identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
+    // A identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
     optional string bom_ref = 1;
-    // The `bom-ref` to a target representing a specific system, application, API, module, team, person, process, business unit, company, etc...  that this claim is being applied to.
+    // The `bom_ref` to a target representing a specific system, application, API, module, team, person, process, business unit, company, etc...  that this claim is being applied to.
     optional string target = 2;
     // The specific statement or assertion about the target.
     optional string predicate = 3;
-    // The list of  `bom-ref` to the evidence provided describing the mitigation strategies. Each mitigation strategy should include an explanation of how any weaknesses in the evidence will be mitigated.
+    // The list of  `bom_ref` to the evidence provided describing the mitigation strategies. Each mitigation strategy should include an explanation of how any weaknesses in the evidence will be mitigated.
     repeated string mitigationStrategies = 4;
     // The written explanation of why the evidence provided substantiates the claim.
     optional string reasoning = 5;
-    // The list of `bom-ref` to evidence that supports this claim.
+    // The list of `bom_ref` to evidence that supports this claim.
     repeated string evidence = 6;
-    // The list of `bom-ref` to counterEvidence that supports this claim.
+    // The list of `bom_ref` to counterEvidence that supports this claim.
     repeated string counterEvidence = 7;
     // External references provide a way to document systems, sites, and information that may be relevant but are not included with the BOM. They may also establish specific relationships within or external to the BOM.
     repeated ExternalReference externalReferences = 8;
@@ -1890,7 +1986,7 @@ message Declarations {
   message Evidence {
     message Data {
       message Contents {
-        // An optional way to include textual or encoded data.
+        // A way to include textual or encoded data.
         optional AttachedText attachment = 1;
         // The URL to where the data can be retrieved.
         optional string url = 2;
@@ -1908,7 +2004,7 @@ message Declarations {
       optional DataGovernance governance = 5;
     }
 
-    // An optional identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
+    // A identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
     optional string bom_ref = 1;
     // The reference to the property name as defined in the CycloneDX Property Taxonomy: https://github.com/CycloneDX/cyclonedx-property-taxonomy/.
     optional string propertyName = 2;
@@ -1918,7 +2014,7 @@ message Declarations {
     repeated Data data = 4;
     // The date and time (timestamp) when the evidence was created.
     optional google.protobuf.Timestamp created = 5;
-    // The optional date and time (timestamp) when the evidence is no longer valid.
+    // The date and time (timestamp) when the evidence is no longer valid.
     optional google.protobuf.Timestamp expires = 6;
     // The author of the evidence.
     optional OrganizationalContact author = 7;
@@ -1971,9 +2067,9 @@ message Definition {
   // A standard may consist of regulations, industry or organizational-specific standards, maturity models, best practices, or any other requirements which can be evaluated against or attested to.
   message Standard {
     message Requirement {
-      // An optional identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
+      // A identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
       optional string bom_ref = 1;
-      // The unique identifier used in the standard to identify a specific requirement. This should match what is in the standard and should not be the requirements bom-ref.
+      // The unique identifier used in the standard to identify a specific requirement. This should match what is in the standard and should not be the requirements bom_ref.
       optional string identifier = 2;
       // The title of the requirement.
       optional string title = 3;
@@ -1983,16 +2079,16 @@ message Definition {
       repeated string descriptions = 5;
       // The Common Requirements Enumeration (CRE) identifier(s). CRE is a structured and standardized framework for uniting security standards and guidelines. CRE links each section of a resource to a shared topic identifier (a Common Requirement). Through this shared topic link, all resources map to each other. The use of CRE promotes clear and unambiguous communication among stakeholders.
       repeated string openCre = 6;
-      // The optional `bom-ref` to a parent requirement. This establishes a hierarchy of requirements. Top-level requirements must not define a parent. Only child requirements should define parents.
+      // The `bom_ref` to a parent requirement. This establishes a hierarchy of requirements. Top-level requirements must not define a parent. Only child requirements should define parents.
       optional string parent = 7;
-      // Specifies optional, custom, properties
+      // Specifies custom properties.
       repeated Property properties = 8;
       // External references provide a way to document systems, sites, and information that may be relevant but are not included with the BOM. They may also establish specific relationships within or external to the BOM.
       repeated ExternalReference externalReferences = 9;
     }
 
     message Level {
-      // An optional identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
+      // A identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
       optional string bom_ref = 1;
       // The identifier used in the standard to identify a specific level.
       optional string identifier = 2;
@@ -2000,11 +2096,11 @@ message Definition {
       optional string title = 3;
       // The description of the level.
       optional string description = 4;
-      // The list of requirement `bom-ref`s that comprise the level.
+      // The list of requirement `bom_ref`s that comprise the level.
       repeated string requirements = 5;
     }
 
-    // An optional identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
+    // A identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
     optional string bom_ref = 1;
     // The name of the standard. This will often be a shortened, single name of the standard.
     optional string name = 2;
@@ -2024,6 +2120,8 @@ message Definition {
 
   // The list of standards which may consist of regulations, industry or organizational-specific standards, maturity models, best practices, or any other requirements which can be evaluated against or attested to.
   repeated Standard standards = 1;
+  // The list of either individual patents or patent families.
+  repeated PatentOrFamily patents = 2;
 }
 
 // "Cryptographic Properties
@@ -2267,9 +2365,11 @@ message CryptoProperties {
     optional google.protobuf.Timestamp notValidBefore = 3;
     // The date and time according to ISO-8601 standard from which the certificate is not valid anymore
     optional google.protobuf.Timestamp notValidAfter = 4;
-    // DEPRECATED - DO NOT USE - This will be removed in a future version - Use `.relatedCryptographicAssets` instead. The bom-ref to signature algorithm used by the certificate
+    // DEPRECATED - DO NOT USE - This will be removed in a future version - Use `.relatedCryptographicAssets` instead.
+    // The bom-ref to signature algorithm used by the certificate
     optional string signatureAlgorithmRef = 5 [deprecated = true];
-    // DEPRECATED - DO NOT USE - This will be removed in a future version - Use `.relatedCryptographicAssets` instead. The bom-ref to the public key of the subject
+    // DEPRECATED - DO NOT USE - This will be removed in a future version - Use `.relatedCryptographicAssets` instead.
+    // The bom-ref to the public key of the subject
     optional string subjectPublicKeyRef = 6 [deprecated = true];
     // The format of the certificate. Examples include X.509, PEM, DER, and CVC.
     optional string certificateFormat = 7;
@@ -2405,17 +2505,18 @@ message CryptoProperties {
     message CryptoRelatedSecuredBy {
       // Specifies the mechanism by which the cryptographic asset is secured. Examples include HSM, TPM, SGX, Software, and None
       optional string mechanism = 1;
-      // The bom-ref to the algorithm.
+      // The bom_ref to the algorithm.
       optional string algorithmRef = 2;
     }
 
     // The type for the related cryptographic material
     optional CryptoRelatedType type = 1;
-    // The optional unique identifier for the related cryptographic material.
+    // The unique identifier for the related cryptographic material.
     optional string id = 2;
     // The key state as defined by NIST SP 800-57.
     optional CryptoRelatedState state = 3;
-    // DEPRECATED - DO NOT USE - This will be removed in a future version - Use `.relatedCryptographicAssets` instead. The bom-ref to the algorithm used to generate the related cryptographic material.
+    // DEPRECATED - DO NOT USE - This will be removed in a future version - Use `.relatedCryptographicAssets` instead.
+    // The bom-ref to the algorithm used to generate the related cryptographic material.
     optional string algorithmRef = 4 [deprecated = true];
     // The date and time (timestamp) when the related cryptographic material was created.
     optional google.protobuf.Timestamp creationDate = 5;
@@ -2478,7 +2579,7 @@ message CryptoProperties {
     message CryptoProtocolCipherSuite {
       // A common name for the cipher suite. For example: TLS_DHE_RSA_WITH_AES_128_CCM
       optional string name = 1;
-      // A list of algorithms related to the cipher suite. Use the bom-ref to the algorithm cryptographic asset.
+      // A list of algorithms related to the cipher suite. Use the bom_ref to the algorithm cryptographic asset.
       repeated string algorithms = 2;
       // A list of common identifiers for the cipher suite. For example: 0xC0 and 0x9E
       repeated string identifiers = 3;
@@ -2594,4 +2695,185 @@ message CryptoProperties {
   optional ProtocolProperties protocolProperties = 5;
   // The object identifier (OID) of the cryptographic asset.
   optional string oid = 6;
+}
+
+// Either an individual patents or patent families.
+message PatentOrFamily {
+  oneof item {
+    // An individual patent
+    Patent patent = 1;
+    // A patent family
+    PatentFamily patent_family = 2;
+  }
+}
+
+// The priorityApplication contains the essential data necessary to identify and reference an earlier patent filing for priority rights. In line with WIPO ST.96 guidelines, it includes the jurisdiction (office code), application number, and filing date-the three key elements that uniquely specify the priority application in a global patent context.
+message PriorityApplication {
+  //The unique number assigned to a patent application when it is filed with a patent office. It is used to identify the specific application and track its progress through the examination process. Aligned with `ApplicationNumber` in ST.96. Refer to [ApplicationIdentificationType in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/ApplicationIdentificationType.xsd).
+  string application_number = 1;
+  // The jurisdiction or patent office where the priority application was filed, specified using WIPO ST.3 codes. Aligned with `IPOfficeCode` in ST.96. Refer to [IPOfficeCode in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Common/IPOfficeCode.xsd).
+  string jurisdiction = 2;
+  // The date the priority application was filed, aligned with `FilingDate` in ST.96. Refer to [FilingDate in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/FilingDate.xsd).
+  google.protobuf.Timestamp filing_date = 3;
+}
+
+// A patent is a legal instrument, granted by an authority, that confers certain rights over an invention for a specified period, contingent on public disclosure and adherence to relevant legal requirements. The summary information in this object is aligned with [WIPO ST.96](https://www.wipo.int/standards/en/st96/) principles where applicable.
+message Patent {
+  // A identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
+  optional string bom_ref = 1;
+  // The unique number assigned to the granted patent by the issuing authority. Aligned with `PatentNumber` in WIPO ST.96. Refer to [PatentNumber in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/PatentNumber.xsd).
+  string patent_number = 2;
+  // The unique number assigned to a patent application when it is filed with a patent office. It is used to identify the specific application and track its progress through the examination process. Aligned with `ApplicationNumber` in ST.96. Refer to [ApplicationIdentificationType in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/ApplicationIdentificationType.xsd).
+  optional string application_number = 3;
+  // The jurisdiction or patent office where the priority application was filed, specified using WIPO ST.3 codes. Aligned with `IPOfficeCode` in ST.96. Refer to [IPOfficeCode in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Common/IPOfficeCode.xsd).
+  string jurisdiction = 4;
+  // The priorityApplication contains the essential data necessary to identify and reference an earlier patent filing for priority rights. In line with WIPO ST.96 guidelines, it includes the jurisdiction (office code), application number, and filing date-the three key elements that uniquely specify the priority application in a global patent context.
+  optional PriorityApplication priority_application = 5;
+  // This is the number assigned to a patent application once it is published. Patent applications are generally published 18 months after filing (unless an applicant requests non-publication). This number is distinct from the application number.
+  optional string publication_number = 6;
+  // The title of the patent, summarising the invention it protects. Aligned with `InventionTitle` in WIPO ST.96. Refer to [InventionTitle in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/InventionTitle.xsd).
+  optional string title = 7;
+  // A brief summary of the invention described in the patent. Aligned with `Abstract` and `P` in WIPO ST.96. Refer to [Abstract in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/Abstract.xsd).
+  optional string abstract = 8;
+  // The date the patent application was filed with the jurisdiction. Aligned with `FilingDate` in WIPO ST.96. Refer to [FilingDate in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/FilingDate.xsd).
+  optional google.protobuf.Timestamp filing_date = 9;
+  // The date the patent was granted by the jurisdiction. Aligned with `GrantDate` in WIPO ST.96. Refer to [GrantDate in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/GrantDate.xsd).
+  optional google.protobuf.Timestamp grant_date = 10;
+  // The date the patent expires. Derived from grant or filing date according to jurisdiction-specific rules.
+  optional google.protobuf.Timestamp patent_expiration_date = 11;
+  // Indicates the current legal status of the patent or patent application, based on the WIPO ST.27 standard. This status reflects administrative, procedural, or legal events. Values include both active and inactive states and are useful for determining enforceability, procedural history, and maintenance status.
+  PatentLegalStatus patent_legal_status = 12;
+  // A collection of organisations or individuals to whom the patent rights are assigned. This supports joint ownership and allows for flexible representation of both corporate entities and individual inventors.
+  repeated OrganizationalEntityOrContact patent_assignee = 13;
+  // External references provide a way to document systems, sites, and information that may be relevant but are not included with the BOM. They may also establish specific relationships within or external to the BOM.
+  repeated ExternalReference external_references = 14;
+}
+
+// Indicates the current legal status of the patent or patent application, based on the WIPO ST.27 standard. This status reflects administrative, procedural, or legal events. Values include both active and inactive states and are useful for determining enforceability, procedural history, and maintenance status.
+enum PatentLegalStatus {
+  // Default
+  PATENT_LEGAL_STATUS_UNSPECIFIED = 0;
+  // The patent application has been filed but not yet examined or granted.
+  PATENT_LEGAL_STATUS_PENDING = 1;
+  // The patent application has been examined and a patent has been issued.
+  PATENT_LEGAL_STATUS_GRANTED = 2;
+  // The patent has been declared invalid through a legal or administrative process.
+  PATENT_LEGAL_STATUS_REVOKED = 3;
+  // The patent has reached the end of its enforceable term.
+  PATENT_LEGAL_STATUS_EXPIRED = 4;
+  // The patent is no longer in force due to non-payment of maintenance fees or other requirements.
+  PATENT_LEGAL_STATUS_LAPSED = 5;
+  // The patent application was voluntarily withdrawn by the applicant.
+  PATENT_LEGAL_STATUS_WITHDRAWN = 6;
+  // The patent application was abandoned, often due to lack of action or response.
+  PATENT_LEGAL_STATUS_ABANDONED = 7;
+  // Processing of the patent application has been temporarily halted.
+  PATENT_LEGAL_STATUS_SUSPENDED = 8;
+  // A previously abandoned or lapsed patent has been reinstated.
+  PATENT_LEGAL_STATUS_REINSTATED = 9;
+  // The patent application or granted patent is under formal opposition proceedings.
+  PATENT_LEGAL_STATUS_OPPOSED = 10;
+  // The patent or application has been officially terminated.
+  PATENT_LEGAL_STATUS_TERMINATED = 11;
+  // The patent has been invalidated, either in part or in full.
+  PATENT_LEGAL_STATUS_INVALIDATED = 12;
+  // The granted patent is active and enforceable.
+  PATENT_LEGAL_STATUS_IN_FORCE = 13;
+}
+
+// A patent family is a group of related patent applications or granted patents that cover the same or similar invention. These patents are filed in multiple jurisdictions to protect the invention across different regions or countries. A patent family typically includes patents that share a common priority date, originating from the same initial application, and may vary slightly in scope or claims to comply with regional legal frameworks. Fields align with WIPO ST.96 standards where applicable.
+message PatentFamily {
+  // A identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
+  optional string bom_ref = 1;
+  // The unique identifier for the patent family, aligned with the `id` attribute in WIPO ST.96 v8.0's `PatentFamilyType`. Refer to [PatentFamilyType in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/PatentFamilyType.xsd).
+  string family_id = 2;
+  // The priorityApplication contains the essential data necessary to identify and reference an earlier patent filing for priority rights. In line with WIPO ST.96 guidelines, it includes the jurisdiction (office code), application number, and filing date-the three key elements that uniquely specify the priority application in a global patent context.
+  optional PriorityApplication priority_application = 3;
+  // A collection of patents or applications that belong to this family, each identified by a `bom_ref` pointing to a patent object defined elsewhere in the BOM.
+  repeated string members = 4; // bom_ref strings
+  // External references provide a way to document systems, sites, and information that may be relevant but are not included with the BOM. They may also establish specific relationships within or external to the BOM.
+  repeated ExternalReference external_references = 5;
+}
+
+// An assertion linking a patent or patent family to this component or service.
+message PatentAssertion {
+  // A identifier which can be used to reference the component elsewhere in the BOM. Uniqueness is enforced within all elements and children of the root-level bom element.
+  optional string bom_ref = 1;
+  // The type of assertion being made about the patent or patent family. Examples include ownership, licensing, and standards inclusion.
+  PatentAssertionType assertion_type = 2;
+  // A list of BOM references (`bom_ref`) linking to patents or patent families associated with this assertion.
+  repeated string patent_refs = 3;
+  // A reference to a previously defined `organizationalContact` or `organizationalEntity` object in the BOM. The value must be a valid `bom_ref` pointing to one of these objects.
+  Asserter asserter = 4;
+  // Additional notes or clarifications regarding the assertion, if necessary. For example, geographical restrictions, duration, or limitations of a license.
+  string notes = 5;
+}
+
+message Asserter {
+  oneof value {
+    // An organization
+    OrganizationalEntity organization = 1;
+    // An individual
+    OrganizationalContact individual = 2;
+    // A reference to a previously defined `organizationalContact` or `organizationalEntity` object in the BOM. The value must be a valid `bom_ref` pointing to one of these objects.
+    string ref = 3;
+  }
+}
+
+// The type of assertion being made about the patent or patent family. Examples include ownership, licensing, and standards inclusion.
+enum PatentAssertionType {
+  // Default
+  PATENT_ASSERTION_TYPE_UNSPECIFIED = 0;
+  // The manufacturer asserts ownership of the patent or patent family.
+  PATENT_ASSERTION_TYPE_OWNERSHIP = 1;
+  // The manufacturer asserts they have a license to use the patent or patent family.
+  PATENT_ASSERTION_TYPE_LICENSE = 2;
+  // A third party has asserted a claim or potential infringement against the manufacturer’s component or service.
+  PATENT_ASSERTION_TYPE_THIRD_PARTY_CLAIM = 3;
+  // The patent is part of a standard essential patent (SEP) portfolio relevant to the component or service.
+  PATENT_ASSERTION_TYPE_STANDARDS_INCLUSION = 4;
+  // The manufacturer asserts the patent or patent family as prior art that invalidates another patent or claim.
+  PATENT_ASSERTION_TYPE_PRIOR_ART = 5;
+  // The manufacturer asserts exclusive rights granted through a licensing agreement.
+  PATENT_ASSERTION_TYPE_EXCLUSIVE_RIGHTS = 6;
+  // he manufacturer asserts they will not enforce the patent or patent family against certain uses or users.
+  PATENT_ASSERTION_TYPE_NON_ASSERTION = 7;
+  // The patent or patent family is being used under a research or evaluation license.
+  PATENT_ASSERTION_TYPE_RESEARCH_OR_EVALUATION = 8;
+}
+
+// Details a specific attribution of data within the BOM to a contributing entity or process.
+message Citation {
+  message Pointers {
+    // Users of other serialisation formats (e.g. XML) shall use the JSON Pointer format to ensure consistent field referencing across representations.
+    // Must contain at least 1 item.
+    repeated string pointer = 1;
+  }
+  message Expressions {
+    // Specifies a path expression used to locate a value within a BOM. The expression syntax shall conform to the format of the BOM's serialisation.
+    // Use [JSONPath](https://datatracker.ietf.org/doc/html/rfc9535) for JSON, [XPath](https://www.w3.org/TR/xpath/) for XML, and default to JSONPath for Protocol Buffers unless otherwise specified.
+    // Implementers shall ensure the expression is valid within the context of the applicable serialisation format. Use either "pointer" or "expression" but not both in this object.
+    // Must contain at least 1 item.
+    repeated string expression = 1;
+  }
+
+  // Unique identifier for the citation.
+  optional string bom_ref = 1;
+  // Exactly one of the "pointers" or "expressions" elements must be present.
+  oneof target {
+    // One or more JSON Pointers(https://datatracker.ietf.org/doc/html/rfc6901) identifying the BOM fields to which the attribution applies.
+    Pointers pointers = 2;
+    // One or more path expressions used to locate values within a BOM.
+    Expressions expressions = 3;
+  }
+  // Timestamp when the attribution was made or the information was supplied.
+  google.protobuf.Timestamp timestamp = 4;
+  // The `bom_ref` of an object, such as a component, service, tool, organisational entity, or person that supplied the cited information.
+  // At least one of the "attributed_to" or "process" elements must be present.
+  optional string attributed_to = 5;
+  // The `bom_ref` to a process (such as a formula, workflow, task, or step) defined in the `formulation` section that executed or generated the attributed data.
+  // At least one of the "attributed_to" or "process" elements must be present.
+  optional string process = 6;
+  // A description or comment about the context or quality of the data attribution.
+  optional string note = 7;
 }

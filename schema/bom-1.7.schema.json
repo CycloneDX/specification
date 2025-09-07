@@ -100,7 +100,7 @@
       "items": {"$ref": "#/definitions/formula"},
       "uniqueItems": true,
       "title": "Formulation",
-      "description": "Describes how a component or service was manufactured or deployed. This is achieved through the use of formulas, workflows, tasks, and steps, which declare the precise steps to reproduce along with the observed formulas describing the steps which transpired in the manufacturing process."
+      "description": "Describes the formulation of any referencable object within the BOM, including components, services, metadata, declarations, or the BOM itself. This may encompass how the object was created, assembled, deployed, tested, certified, or otherwise brought into its present form. Common examples include software build pipelines, deployment processes, AI/ML model training, cryptographic key generation or certification, and third-party audits. Processes are modeled using declared and observed formulas, composed of workflows, tasks, and individual steps."
     },
     "declarations": {
       "type": "object",
@@ -121,7 +121,7 @@
               "bom-ref": {
                 "$ref": "#/definitions/refType",
                 "title": "BOM Reference",
-                "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref must be unique within the BOM."
+                "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
               },
               "thirdParty": {
                 "type": "boolean",
@@ -250,7 +250,7 @@
               "bom-ref": {
                 "$ref": "#/definitions/refType",
                 "title": "BOM Reference",
-                "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref must be unique within the BOM."
+                "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
               },
               "target": {
                 "$ref": "#/definitions/refLinkType",
@@ -311,7 +311,7 @@
               "bom-ref": {
                 "$ref": "#/definitions/refType",
                 "title": "BOM Reference",
-                "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref must be unique within the BOM."
+                "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
               },
               "propertyName": {
                 "type": "string",
@@ -345,7 +345,7 @@
                       "properties": {
                         "attachment": {
                           "title": "Data Attachment",
-                          "description": "An optional way to include textual or encoded data.",
+                          "description": "A way to include textual or encoded data.",
                           "$ref": "#/definitions/attachment"
                         },
                         "url": {
@@ -384,7 +384,7 @@
                 "type": "string",
                 "format": "date-time",
                 "title": "Expires",
-                "description": "The optional date and time (timestamp) when the evidence is no longer valid."
+                "description": "The date and time (timestamp) when the evidence is no longer valid."
               },
               "author": {
                 "$ref": "#/definitions/organizationalContact",
@@ -514,8 +514,25 @@
           "items": {
             "$ref": "#/definitions/standard"
           }
+        },
+        "patents": {
+          "type": "array",
+          "description": "The list of either individual patents or patent families.",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/definitions/patent" },
+              { "$ref": "#/definitions/patentFamily" }
+            ]
+          }
         }
       }
+    },
+    "citations": {
+      "type": "array",
+      "items": {"$ref": "#/definitions/citation"},
+      "uniqueItems": true,
+      "title": "Citations",
+      "description": "A collection of attributions indicating which entity supplied information for specific fields within the BOM."
     },
     "properties": {
       "type": "array",
@@ -712,7 +729,39 @@
           "title": "Properties",
           "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "items": {"$ref": "#/definitions/property"}
+        },
+        "distributionConstraints": {
+          "title": "Distribution Constraints",
+          "description": "Conditions and constraints governing the sharing and distribution of the data or components described by this BOM.",
+          "type": "object",
+          "properties": {
+            "tlp": {
+              "$ref": "#/definitions/tlpClassification",
+              "description": "The Traffic Light Protocol (TLP) classification that controls the sharing and distribution of the data that the BOM describes."
+            }
+          },
+          "additionalProperties": false
         }
+      }
+    },
+    "tlpClassification": {
+      "title": "Traffic Light Protocol (TLP) Classification",
+      "description": "Traffic Light Protocol (TLP) is a classification system for identifying the potential risk associated with artefact, including whether it is subject to certain types of legal, financial, or technical threats. Refer to [https://www.first.org/tlp/](https://www.first.org/tlp/) for further information.\nThe default classification is \"CLEAR\"",
+      "type" : "string",
+      "default": "CLEAR",
+      "enum": [
+        "CLEAR",
+        "GREEN",
+        "AMBER",
+        "AMBER_AND_STRICT",
+        "RED"
+      ],
+      "meta:enum": {
+        "CLEAR": "The information is not subject to any restrictions as regards the sharing.",
+        "GREEN": "The information is subject to limited disclosure, and recipients can share it within their community but not via publicly accessible channels.",
+        "AMBER": "The information is subject to limited disclosure, and recipients can only share it on a need-to-know basis within their organization and with clients.",
+        "AMBER_AND_STRICT": "The information is subject to limited disclosure, and recipients can only share it on a need-to-know basis within their organization.",
+        "RED": "The information is subject to restricted distribution to individual recipients only and must not be shared."
       }
     },
     "tool": {
@@ -758,7 +807,7 @@
         "bom-ref": {
           "$ref": "#/definitions/refType",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+          "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "name": {
           "type": "string",
@@ -799,7 +848,7 @@
         "bom-ref": {
           "$ref": "#/definitions/refType",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+          "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "name": {
           "type": "string",
@@ -853,7 +902,7 @@
             "framework": "A software framework. Refer to [https://en.wikipedia.org/wiki/Software_framework](https://en.wikipedia.org/wiki/Software_framework) for information on how frameworks vary slightly from libraries.",
             "library": "A software library. Refer to [https://en.wikipedia.org/wiki/Library_(computing)](https://en.wikipedia.org/wiki/Library_(computing)) for information about libraries. All third-party and open source reusable components will likely be a library. If the library also has key features of a framework, then it should be classified as a framework. If not, or is unknown, then specifying library is recommended.",
             "container": "A packaging and/or runtime format, not specific to any particular technology, which isolates software inside the container from software outside of a container through virtualization technology. Refer to [https://en.wikipedia.org/wiki/OS-level_virtualization](https://en.wikipedia.org/wiki/OS-level_virtualization).",
-            "platform": "A runtime environment which interprets or executes software. This may include runtimes such as those that execute bytecode or low-code/no-code application platforms.",
+            "platform": "A runtime environment that interprets or executes software. This may include runtimes such as those that execute bytecode, just-in-time compilers, interpreters, or low-code/no-code application platforms.",
             "operating-system": "A software operating system without regard to deployment model (i.e. installed on physical hardware, virtual machine, image, etc) Refer to [https://en.wikipedia.org/wiki/Operating_system](https://en.wikipedia.org/wiki/Operating_system).",
             "device": "A hardware device such as a processor or chip-set. A hardware device containing firmware SHOULD include a component for the physical hardware itself and another component of type 'firmware' or 'operating-system' (whichever is relevant), describing information about the software running on the device. See also the list of [known device properties](https://github.com/CycloneDX/cyclonedx-property-taxonomy/blob/main/cdx/device.md).",
             "device-driver": "A special type of software that operates or controls a particular type of device. Refer to [https://en.wikipedia.org/wiki/Device_driver](https://en.wikipedia.org/wiki/Device_driver).",
@@ -870,14 +919,14 @@
         "mime-type": {
           "type": "string",
           "title": "Mime-Type",
-          "description": "The optional mime-type of the component. When used on file components, the mime-type can provide additional context about the kind of file being represented, such as an image, font, or executable. Some library or framework components may also have an associated mime-type.",
+          "description": "The mime-type of the component. When used on file components, the mime-type can provide additional context about the kind of file being represented, such as an image, font, or executable. Some library or framework components may also have an associated mime-type.",
           "examples": ["image/jpeg"],
           "pattern": "^[-+a-z0-9.]+/[-+a-z0-9.]+$"
         },
         "bom-ref": {
           "$ref": "#/definitions/refType",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the component elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+          "description": "An identifier which can be used to reference the component elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "supplier": {
           "title": "Component Supplier",
@@ -923,7 +972,18 @@
         "version": {
           "$ref": "#/definitions/version",
           "title": "Component Version",
-          "description": "The component version. The version should ideally comply with semantic versioning but is not enforced."
+          "description": "The component version. The version should ideally comply with semantic versioning but is not enforced.\nMust be used exclusively, either 'version' or 'versionRange', but not both."
+        },
+        "versionRange": {
+          "$ref": "#/definitions/versionRange",
+          "title": "Component Version Range",
+          "description": "For an external component, this specifies the accepted version range.\nThe value must adhere to the Package URL Version Range syntax (vers), as defined at <https://github.com/package-url/purl-spec/blob/master/VERSION-RANGE-SPEC.rst>.\nMay only be used if `.isExternal` is set to `true`.\nMust be used exclusively, either 'version' or 'versionRange', but not both."
+        },
+        "isExternal": {
+          "type": "boolean",
+          "title": "Component Is External",
+          "description": "Determine whether this component is external.\nAn external component is one that is not part of an assembly, but is expected to be provided by the environment, regardless of the component's `.scope`. This setting can be useful for distinguishing which components are bundled with the product and which can be relied upon to be present in the deployment environment.\nThis may be set to `true` for runtime components only. For `$.metadata.component`, it must be set to `false`.",
+          "default": false
         },
         "description": {
           "type": "string",
@@ -961,6 +1021,10 @@
           "title": "Component Copyright",
           "description": "A copyright notice informing users of the underlying claims to copyright ownership in a published work.",
           "examples": ["Acme Inc"]
+        },
+        "patentAssertions": {
+          "$ref": "#/definitions/patentAssertions",
+          "title": "Component Patent(s)"
         },
         "cpe": {
           "type": "string",
@@ -1065,7 +1129,7 @@
         "releaseNotes": {
           "$ref": "#/definitions/releaseNotes",
           "title": "Release notes",
-          "description": "Specifies optional release notes."
+          "description": "Specifies release notes."
         },
         "modelCard": {
           "$ref": "#/definitions/modelCard",
@@ -1096,7 +1160,25 @@
           "title": "Signature",
           "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
         }
-      }
+      },
+      "allOf": [
+        {
+          "description": "Requirement: ensure that `version` and `versionRange` are not present simultaneously.",
+          "not": {
+            "required": ["version", "versionRange"]
+          }
+        },
+        {
+          "description": "Requirement: 'versionRange' must not be present when 'isExternal' is `false`.",
+          "if": {
+            "properties": { "isExternal": { "const": false } }
+          },
+          "then": {
+            "not": { "required": ["versionRange"] }
+          },
+          "else": true
+        }
+      ]
     },
     "swid": {
       "type": "object",
@@ -1172,7 +1254,7 @@
         "encoding": {
           "type": "string",
           "title": "Encoding",
-          "description": "Specifies the optional encoding the text is represented in.",
+          "description": "Specifies the encoding the text is represented in.",
           "enum": [
             "base64"
           ],
@@ -1220,7 +1302,9 @@
         "BLAKE2b-256",
         "BLAKE2b-384",
         "BLAKE2b-512",
-        "BLAKE3"
+        "BLAKE3",
+        "Streebog-256",
+        "Streebog-512"
       ]
     },
     "hash-content": {
@@ -1229,6 +1313,161 @@
       "description": "The value of the hash.",
       "examples": ["3942447fac867ae5cdb3229b658f4d48"],
       "pattern": "^([a-fA-F0-9]{32}|[a-fA-F0-9]{40}|[a-fA-F0-9]{64}|[a-fA-F0-9]{96}|[a-fA-F0-9]{128})$"
+    },
+    "licensing": {
+      "type": "object",
+      "title": "Licensing information",
+      "description": "Licensing details describing the licensor/licensee, license type, renewal and expiration dates, and other important metadata",
+      "additionalProperties": false,
+      "properties": {
+        "altIds": {
+          "type": "array",
+          "title": "Alternate License Identifiers",
+          "description": "License identifiers that may be used to manage licenses and their lifecycle",
+          "items": {
+            "type": "string"
+          }
+        },
+        "licensor": {
+          "title": "Licensor",
+          "description": "The individual or organization that grants a license to another individual or organization",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "organization": {
+              "title": "Licensor (Organization)",
+              "description": "The organization that granted the license",
+              "$ref": "#/definitions/organizationalEntity"
+            },
+            "individual": {
+              "title": "Licensor (Individual)",
+              "description": "The individual, not associated with an organization, that granted the license",
+              "$ref": "#/definitions/organizationalContact"
+            }
+          },
+          "oneOf":[
+            {
+              "required": ["organization"]
+            },
+            {
+              "required": ["individual"]
+            }
+          ]
+        },
+        "licensee": {
+          "title": "Licensee",
+          "description": "The individual or organization for which a license was granted to",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "organization": {
+              "title": "Licensee (Organization)",
+              "description": "The organization that was granted the license",
+              "$ref": "#/definitions/organizationalEntity"
+            },
+            "individual": {
+              "title": "Licensee (Individual)",
+              "description": "The individual, not associated with an organization, that was granted the license",
+              "$ref": "#/definitions/organizationalContact"
+            }
+          },
+          "oneOf":[
+            {
+              "required": ["organization"]
+            },
+            {
+              "required": ["individual"]
+            }
+          ]
+        },
+        "purchaser": {
+          "title": "Purchaser",
+          "description": "The individual or organization that purchased the license",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "organization": {
+              "title": "Purchaser (Organization)",
+              "description": "The organization that purchased the license",
+              "$ref": "#/definitions/organizationalEntity"
+            },
+            "individual": {
+              "title": "Purchaser (Individual)",
+              "description": "The individual, not associated with an organization, that purchased the license",
+              "$ref": "#/definitions/organizationalContact"
+            }
+          },
+          "oneOf":[
+            {
+              "required": ["organization"]
+            },
+            {
+              "required": ["individual"]
+            }
+          ]
+        },
+        "purchaseOrder": {
+          "type": "string",
+          "title": "Purchase Order",
+          "description": "The purchase order identifier the purchaser sent to a supplier or vendor to authorize a purchase"
+        },
+        "licenseTypes": {
+          "type": "array",
+          "title": "License Type",
+          "description": "The type of license(s) that was granted to the licensee.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "academic",
+              "appliance",
+              "client-access",
+              "concurrent-user",
+              "core-points",
+              "custom-metric",
+              "device",
+              "evaluation",
+              "named-user",
+              "node-locked",
+              "oem",
+              "perpetual",
+              "processor-points",
+              "subscription",
+              "user",
+              "other"
+            ],
+            "meta:enum": {
+              "academic": "A license that grants use of software solely for the purpose of education or research.",
+              "appliance": "A license covering use of software embedded in a specific piece of hardware.",
+              "client-access": "A Client Access License (CAL) allows client computers to access services provided by server software.",
+              "concurrent-user": "A Concurrent User license (aka floating license) limits the number of licenses for a software application and licenses are shared among a larger number of users.",
+              "core-points": "A license where the core of a computer's processor is assigned a specific number of points.",
+              "custom-metric": "A license for which consumption is measured by non-standard metrics.",
+              "device": "A license that covers a defined number of installations on computers and other types of devices.",
+              "evaluation": "A license that grants permission to install and use software for trial purposes.",
+              "named-user": "A license that grants access to the software to one or more pre-defined users.",
+              "node-locked": "A license that grants access to the software on one or more pre-defined computers or devices.",
+              "oem": "An Original Equipment Manufacturer license that is delivered with hardware, cannot be transferred to other hardware, and is valid for the life of the hardware.",
+              "perpetual": "A license where the software is sold on a one-time basis and the licensee can use a copy of the software indefinitely.",
+              "processor-points": "A license where each installation consumes points per processor.",
+              "subscription": "A license where the licensee pays a fee to use the software or service.",
+              "user": "A license that grants access to the software or service by a specified number of users.",
+              "other": "Another license type."
+            }
+          }
+        },
+        "lastRenewal": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Last Renewal",
+          "description": "The timestamp indicating when the license was last renewed. For new purchases, this is often the purchase or acquisition date. For non-perpetual licenses or subscriptions, this is the timestamp of when the license was last renewed."
+        },
+        "expiration": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Expiration",
+          "description": "The timestamp indicating when the current license expires (if applicable)."
+        }
+      }
     },
     "license": {
       "type": "object",
@@ -1247,7 +1486,7 @@
         "bom-ref": {
           "$ref": "#/definitions/refType",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the license elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+          "description": "An identifier which can be used to reference the license elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "id": {
           "$ref": "spdx.schema.json",
@@ -1266,7 +1505,7 @@
         },
         "text": {
           "title": "License text",
-          "description": "An optional way to include the textual content of a license.",
+          "description": "A way to include the textual content of a license.",
           "$ref": "#/definitions/attachment"
         },
         "url": {
@@ -1276,161 +1515,7 @@
           "examples": ["https://www.apache.org/licenses/LICENSE-2.0.txt"],
           "format": "iri-reference"
         },
-        "licensing": {
-          "type": "object",
-          "title": "Licensing information",
-          "description": "Licensing details describing the licensor/licensee, license type, renewal and expiration dates, and other important metadata",
-          "additionalProperties": false,
-          "properties": {
-            "altIds": {
-              "type": "array",
-              "title": "Alternate License Identifiers",
-              "description": "License identifiers that may be used to manage licenses and their lifecycle",
-              "items": {
-                "type": "string"
-              }
-            },
-            "licensor": {
-              "title": "Licensor",
-              "description": "The individual or organization that grants a license to another individual or organization",
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "organization": {
-                  "title": "Licensor (Organization)",
-                  "description": "The organization that granted the license",
-                  "$ref": "#/definitions/organizationalEntity"
-                },
-                "individual": {
-                  "title": "Licensor (Individual)",
-                  "description": "The individual, not associated with an organization, that granted the license",
-                  "$ref": "#/definitions/organizationalContact"
-                }
-              },
-              "oneOf":[
-                {
-                  "required": ["organization"]
-                },
-                {
-                  "required": ["individual"]
-                }
-              ]
-            },
-            "licensee": {
-              "title": "Licensee",
-              "description": "The individual or organization for which a license was granted to",
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "organization": {
-                  "title": "Licensee (Organization)",
-                  "description": "The organization that was granted the license",
-                  "$ref": "#/definitions/organizationalEntity"
-                },
-                "individual": {
-                  "title": "Licensee (Individual)",
-                  "description": "The individual, not associated with an organization, that was granted the license",
-                  "$ref": "#/definitions/organizationalContact"
-                }
-              },
-              "oneOf":[
-                {
-                  "required": ["organization"]
-                },
-                {
-                  "required": ["individual"]
-                }
-              ]
-            },
-            "purchaser": {
-              "title": "Purchaser",
-              "description": "The individual or organization that purchased the license",
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "organization": {
-                  "title": "Purchaser (Organization)",
-                  "description": "The organization that purchased the license",
-                  "$ref": "#/definitions/organizationalEntity"
-                },
-                "individual": {
-                  "title": "Purchaser (Individual)",
-                  "description": "The individual, not associated with an organization, that purchased the license",
-                  "$ref": "#/definitions/organizationalContact"
-                }
-              },
-              "oneOf":[
-                {
-                  "required": ["organization"]
-                },
-                {
-                  "required": ["individual"]
-                }
-              ]
-            },
-            "purchaseOrder": {
-              "type": "string",
-              "title": "Purchase Order",
-              "description": "The purchase order identifier the purchaser sent to a supplier or vendor to authorize a purchase"
-            },
-            "licenseTypes": {
-              "type": "array",
-              "title": "License Type",
-              "description": "The type of license(s) that was granted to the licensee.",
-              "items": {
-                "type": "string",
-                "enum": [
-                  "academic",
-                  "appliance",
-                  "client-access",
-                  "concurrent-user",
-                  "core-points",
-                  "custom-metric",
-                  "device",
-                  "evaluation",
-                  "named-user",
-                  "node-locked",
-                  "oem",
-                  "perpetual",
-                  "processor-points",
-                  "subscription",
-                  "user",
-                  "other"
-                ],
-                "meta:enum": {
-                  "academic": "A license that grants use of software solely for the purpose of education or research.",
-                  "appliance": "A license covering use of software embedded in a specific piece of hardware.",
-                  "client-access": "A Client Access License (CAL) allows client computers to access services provided by server software.",
-                  "concurrent-user": "A Concurrent User license (aka floating license) limits the number of licenses for a software application and licenses are shared among a larger number of users.",
-                  "core-points": "A license where the core of a computer's processor is assigned a specific number of points.",
-                  "custom-metric": "A license for which consumption is measured by non-standard metrics.",
-                  "device": "A license that covers a defined number of installations on computers and other types of devices.",
-                  "evaluation": "A license that grants permission to install and use software for trial purposes.",
-                  "named-user": "A license that grants access to the software to one or more pre-defined users.",
-                  "node-locked": "A license that grants access to the software on one or more pre-defined computers or devices.",
-                  "oem": "An Original Equipment Manufacturer license that is delivered with hardware, cannot be transferred to other hardware, and is valid for the life of the hardware.",
-                  "perpetual": "A license where the software is sold on a one-time basis and the licensee can use a copy of the software indefinitely.",
-                  "processor-points": "A license where each installation consumes points per processor.",
-                  "subscription": "A license where the licensee pays a fee to use the software or service.",
-                  "user": "A license that grants access to the software or service by a specified number of users.",
-                  "other": "Another license type."
-                }
-              }
-            },
-            "lastRenewal": {
-              "type": "string",
-              "format": "date-time",
-              "title": "Last Renewal",
-              "description": "The timestamp indicating when the license was last renewed. For new purchases, this is often the purchase or acquisition date. For non-perpetual licenses or subscriptions, this is the timestamp of when the license was last renewed."
-            },
-            "expiration": {
-              "type": "string",
-              "format": "date-time",
-              "title": "Expiration",
-              "description": "The timestamp indicating when the current license expires (if applicable)."
-            }
-          }
-        },
+        "licensing": {"$ref": "#/definitions/licensing"},
         "properties": {
           "type": "array",
           "title": "Properties",
@@ -1454,43 +1539,84 @@
     },
     "licenseChoice": {
       "title": "License Choice",
-      "description": "EITHER (list of SPDX licenses and/or named licenses) OR (tuple of one SPDX License Expression)",
+      "description": "A list of SPDX licenses and/or named licenses and/or SPDX License Expression.",
       "type": "array",
-      "oneOf": [
-        {
-          "title": "Multiple licenses",
-          "description": "A list of SPDX licenses and/or named licenses.",
-          "type": "array",
-          "items": {
+      "items": {
+        "oneOf": [
+          {
             "type": "object",
             "title": "License",
-            "required": ["license"],
+            "required": [
+              "license"
+            ],
             "additionalProperties": false,
             "properties": {
-              "license": {"$ref": "#/definitions/license"}
+              "license": {
+                "$ref": "#/definitions/license"
+              }
             }
-          }
-        },
-        {
-          "title": "SPDX License Expression",
-          "description": "A tuple of exactly one SPDX License Expression.",
-          "type": "array",
-          "additionalItems": false,
-          "minItems": 1,
-          "maxItems": 1,
-          "items": [{
+          },
+          {
+            "title": "License Expression",
+            "description": "Specifies the details and attributes related to a software license.\nIt must be a valid SPDX license expression, along with additional properties such as license acknowledgment.",
             "type": "object",
             "additionalProperties": false,
-            "required": ["expression"],
+            "required": [
+              "expression"
+            ],
             "properties": {
               "expression": {
                 "type": "string",
                 "title": "SPDX License Expression",
-                "description": "A valid SPDX license expression.\nRefer to https://spdx.org/specifications for syntax requirements",
+                "description": "A valid SPDX license expression.\nRefer to https://spdx.org/specifications for syntax requirements.",
                 "examples": [
                   "Apache-2.0 AND (MIT OR GPL-2.0-only)",
                   "GPL-3.0-only WITH Classpath-exception-2.0"
                 ]
+              },
+              "expressionDetails": {
+                "title": "Expression Details",
+                "description": "Details for parts of the `expression`.",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "description": "This document specifies the details and attributes related to a software license identifier. An SPDX expression may be a compound of license identifiers.\nThe `license_identifier` property serves as the key that identifies each record. Note that this key is not required to be unique, as the same license identifier could apply to multiple, different but similar license details, texts, etc.",
+                  "required": [
+                    "licenseIdentifier"
+                  ],
+                  "properties": {
+                    "licenseIdentifier": {
+                      "title": "License Identifier",
+                      "description": "The valid SPDX license identifier. Refer to https://spdx.org/specifications for syntax requirements.\nThis property serves as the primary key, which uniquely identifies each record.",
+                      "type": "string",
+                      "examples": [
+                        "Apache-2.0",
+                        "GPL-3.0-only WITH Classpath-exception-2.0",
+                        "LicenseRef-my-custom-license"
+                      ]
+                    },
+                    "bom-ref": {
+                      "$ref": "#/definitions/refType",
+                      "title": "BOM Reference",
+                      "description": "An identifier which can be used to reference the license elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+                    },
+                    "text": {
+                      "title": "License texts",
+                      "description": "A way to include the textual content of the license.",
+                      "$ref": "#/definitions/attachment"
+                    },
+                    "url": {
+                      "type": "string",
+                      "title": "License URL",
+                      "description": "The URL to the license file. If specified, a 'license' externalReference should also be specified for completeness",
+                      "examples": [
+                        "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                      ],
+                      "format": "iri-reference"
+                    }
+                  },
+                  "additionalProperties": false
+                }
               },
               "acknowledgement": {
                 "$ref": "#/definitions/licenseAcknowledgementEnumeration"
@@ -1498,12 +1624,23 @@
               "bom-ref": {
                 "$ref": "#/definitions/refType",
                 "title": "BOM Reference",
-                "description": "An optional identifier which can be used to reference the license elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+                "description": "An identifier which can be used to reference the license elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+              },
+              "licensing": {
+                "$ref": "#/definitions/licensing"
+              },
+              "properties": {
+                "type": "array",
+                "title": "Properties",
+                "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
+                "items": {
+                  "$ref": "#/definitions/property"
+                }
               }
             }
-          }]
-        }
-      ]
+          }
+        ]
+      }
     },
     "commit": {
       "type": "object",
@@ -1586,7 +1723,7 @@
       "properties": {
         "text": {
           "title": "Diff text",
-          "description": "Specifies the optional text of the diff",
+          "description": "Specifies the text of the diff",
           "$ref": "#/definitions/attachment"
         },
         "url": {
@@ -1725,7 +1862,7 @@
         "comment": {
           "type": "string",
           "title": "Comment",
-          "description": "An optional comment describing the external reference"
+          "description": "A comment describing the external reference"
         },
         "type": {
           "type": "string",
@@ -1774,6 +1911,10 @@
             "electronic-signature",
             "digital-signature",
             "rfc-9116",
+            "patent",
+            "patent-family",
+            "patent-assertion",
+            "citation",
             "other"
           ],
           "meta:enum": {
@@ -1799,7 +1940,7 @@
             "log": "A record of events that occurred in a computer system or application, such as problems, errors, or information on current operations.",
             "configuration": "Parameters or settings that may be used by other components or services.",
             "evidence": "Information used to substantiate a claim.",
-            "formulation": "Describes how a component or service was manufactured or deployed.",
+            "formulation": "Describes the formulation of any referencable object within the BOM, including components, services, metadata, declarations, or the BOM itself.",
             "attestation": "Human or machine-readable statements containing facts, evidence, or testimony.",
             "threat-model": "An enumeration of identified weaknesses, threats, and countermeasures, dataflow diagram (DFD), attack tree, and other supporting documentation in human-readable or machine-readable format.",
             "adversary-model": "The defined assumptions, goals, and capabilities of an adversary.",
@@ -1819,6 +1960,10 @@
             "electronic-signature": "An e-signature is commonly a scanned representation of a written signature or a stylized script of the person's name.",
             "digital-signature": "A signature that leverages cryptography, typically public/private key pairs, which provides strong authenticity verification.",
             "rfc-9116": "Document that complies with [RFC 9116](https://www.ietf.org/rfc/rfc9116.html) (A File Format to Aid in Security Vulnerability Disclosure)",
+            "patent": "References information about patents which may be defined in human-readable documents or in machine-readable formats such as CycloneDX or ST.96. For detailed patent information or to reference the information provided directly by patent offices, it is recommended to leverage standards from the World Intellectual Property Organization (WIPO) such as [ST.96](https://www.wipo.int/standards/en/st96).",
+            "patent-family": "References information about a patent family which may be defined in human-readable documents or in machine-readable formats such as CycloneDX or ST.96. A patent family is a group of related patent applications or granted patents that cover the same or similar invention. For detailed patent family information or to reference the information provided directly by patent offices, it is recommended to leverage standards from the World Intellectual Property Organization (WIPO) such as [ST.96](https://www.wipo.int/standards/en/st96).",
+            "patent-assertion" : "References assertions made regarding patents associated with a component or service. Assertions distinguish between ownership, licensing, and other relevant interactions with patents.",
+            "citation": "A reference to external citations applicable to the object identified by this BOM entry or the BOM itself. When used with a BOM-Link, this allows offloading citations into a separate CycloneDX BOM.",
             "other": "Use this if no other types accurately describe the purpose of the external reference."
           }
         },
@@ -1827,6 +1972,12 @@
           "items": {"$ref": "#/definitions/hash"},
           "title": "Hashes",
           "description": "The hashes of the external reference (if applicable)."
+        },
+        "properties": {
+          "type": "array",
+          "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
+          "items": {"$ref": "#/definitions/property"}
         }
       }
     },
@@ -1875,7 +2026,7 @@
         "bom-ref": {
           "$ref": "#/definitions/refType",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the service elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+          "description": "An identifier which can be used to reference the service elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "provider": {
           "title": "Provider",
@@ -1939,6 +2090,10 @@
           "$ref": "#/definitions/licenseChoice",
           "title": "Service License(s)"
         },
+        "patentAssertions": {
+          "$ref": "#/definitions/patentAssertions",
+          "title": "Service Patent(s)"
+        },
         "externalReferences": {
           "type": "array",
           "items": {"$ref": "#/definitions/externalReference"},
@@ -1955,7 +2110,7 @@
         "releaseNotes": {
           "$ref": "#/definitions/releaseNotes",
           "title": "Release notes",
-          "description": "Specifies optional release notes."
+          "description": "Specifies release notes."
         },
         "properties": {
           "type": "array",
@@ -2117,7 +2272,7 @@
               "bom-ref": {
                 "$ref": "#/definitions/refType",
                 "title": "BOM Reference",
-                "description": "An optional identifier which can be used to reference the occurrence elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+                "description": "An identifier which can be used to reference the occurrence elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
               },
               "location": {
                 "type": "string",
@@ -2183,7 +2338,7 @@
                   },
                   "parameters": {
                     "title": "Parameters",
-                    "description": "Optional arguments that are passed to the module or function.",
+                    "description": "Arguments that are passed to the module or function.",
                     "type": "array",
                     "items": {
                       "type": "string"
@@ -2232,7 +2387,7 @@
         "bom-ref": {
           "$ref": "#/definitions/refType",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the composition elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+          "description": "An identifier which can be used to reference the composition elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "aggregate": {
           "$ref": "#/definitions/aggregateType",
@@ -2452,7 +2607,7 @@
         "title": {
           "type": "string",
           "title": "Title",
-          "description": "An optional name of the advisory."
+          "description": "A name of the advisory."
         },
         "url": {
           "type": "string",
@@ -2592,7 +2747,7 @@
         "justification": {
           "type": "string",
           "title": "Justification",
-          "description": "An optional reason for rating the vulnerability as it was"
+          "description": "A reason for rating the vulnerability as it was"
         }
       }
     },
@@ -2633,7 +2788,7 @@
         "bom-ref": {
           "$ref": "#/definitions/refType",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the vulnerability elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+          "description": "An identifier which can be used to reference the vulnerability elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "id": {
           "type": "string",
@@ -3015,7 +3170,7 @@
         "bom-ref": {
           "$ref": "#/definitions/refType",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the annotation elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+          "description": "An identifier which can be used to reference the annotation elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "subjects": {
           "type": "array",
@@ -3109,7 +3264,7 @@
         "bom-ref": {
           "$ref": "#/definitions/refType",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the model card elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+          "description": "An identifier which can be used to reference the model card elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "modelParameters": {
           "type": "object",
@@ -3313,7 +3468,7 @@
         "bom-ref": {
           "$ref": "#/definitions/refType",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the dataset elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+          "description": "An identifier which can be used to reference the dataset elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "type": {
           "type": "string",
@@ -3347,7 +3502,7 @@
           "properties": {
             "attachment": {
               "title": "Data Attachment",
-              "description": "An optional way to include textual or encoded data.",
+              "description": "A way to include textual or encoded data.",
               "$ref": "#/definitions/attachment"
             },
             "url": {
@@ -3723,7 +3878,7 @@
       "properties": {
         "bom-ref": {
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the energy provider elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+          "description": "An identifier which can be used to reference the energy provider elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
           "$ref": "#/definitions/refType"
         },
         "description": {
@@ -3789,7 +3944,7 @@
       "properties": {
         "bom-ref": {
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the address elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+          "description": "An identifier which can be used to reference the address elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
           "$ref": "#/definitions/refType"
         },
         "country": {
@@ -3837,7 +3992,7 @@
       "properties": {
         "bom-ref": {
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the formula elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+          "description": "An identifier which can be used to reference the formula elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
           "$ref": "#/definitions/refType"
         },
         "components": {
@@ -3892,7 +4047,7 @@
       "properties": {
         "bom-ref": {
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the workflow elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+          "description": "An identifier which can be used to reference the workflow elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
           "$ref": "#/definitions/refType"
         },
         "uid": {
@@ -4036,7 +4191,7 @@
       "properties": {
         "bom-ref": {
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the task elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+          "description": "An identifier which can be used to reference the task elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
           "$ref": "#/definitions/refType"
         },
         "uid": {
@@ -4211,7 +4366,7 @@
       "properties": {
         "bom-ref": {
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the workspace elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+          "description": "An identifier which can be used to reference the workspace elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
           "$ref": "#/definitions/refType"
         },
         "uid": {
@@ -4360,7 +4515,7 @@
       "properties": {
         "bom-ref": {
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the trigger elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+          "description": "An identifier which can be used to reference the trigger elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
           "$ref": "#/definitions/refType"
         },
         "uid": {
@@ -4896,7 +5051,7 @@
         "bom-ref": {
           "$ref": "#/definitions/refType",
           "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref must be unique within the BOM."
+          "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
         },
         "name": {
           "type": "string",
@@ -4930,7 +5085,7 @@
               "bom-ref": {
                 "$ref": "#/definitions/refType",
                 "title": "BOM Reference",
-                "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref must be unique within the BOM."
+                "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
               },
               "identifier": {
                 "type": "string",
@@ -4966,7 +5121,7 @@
               "parent": {
                 "$ref": "#/definitions/refLinkType",
                 "title": "Parent BOM Reference",
-                "description": "The optional `bom-ref` to a parent requirement. This establishes a hierarchy of requirements. Top-level requirements must not define a parent. Only child requirements should define parents."
+                "description": "The `bom-ref` to a parent requirement. This establishes a hierarchy of requirements. Top-level requirements must not define a parent. Only child requirements should define parents."
               },
               "properties": {
                 "type": "array",
@@ -4997,7 +5152,7 @@
               "bom-ref": {
                 "$ref": "#/definitions/refType",
                 "title": "BOM Reference",
-                "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref must be unique within the BOM."
+                "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
               },
               "identifier": {
                 "type": "string",
@@ -5663,7 +5818,7 @@
             "id": {
               "type": "string",
               "title": "ID",
-              "description": "The optional unique identifier for the related cryptographic material."
+              "description": "The unique identifier for the related cryptographic material."
             },
             "state": {
               "type": "string",
@@ -6176,6 +6331,347 @@
         "text-to-image",
         "translation",
         "object-detection"
+      ]
+    },
+    "patentFamily": {
+      "type": "object",
+      "title": "Patent Family",
+      "description": "A patent family is a group of related patent applications or granted patents that cover the same or similar invention. These patents are filed in multiple jurisdictions to protect the invention across different regions or countries. A patent family typically includes patents that share a common priority date, originating from the same initial application, and may vary slightly in scope or claims to comply with regional legal frameworks. Fields align with WIPO ST.96 standards where applicable.",
+      "required": ["familyId"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "#/definitions/refType",
+          "title": "BOM Reference",
+          "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `bom-ref` must be unique within the BOM. \n\nFor a patent, it might be a good idea to use a patent number as the BOM reference ID."
+        },
+        "familyId": {
+          "type": "string",
+          "title": "Patent Family ID",
+          "description": "The unique identifier for the patent family, aligned with the `id` attribute in WIPO ST.96 v8.0's `PatentFamilyType`. Refer to [PatentFamilyType in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/PatentFamilyType.xsd)."
+        },
+        "priorityApplication": {
+          "$ref": "#/definitions/priorityApplication"
+        },
+        "members": {
+          "type": "array",
+          "title": "Family Members",
+          "description": "A collection of patents or applications that belong to this family, each identified by a `bom-ref` pointing to a patent object defined elsewhere in the BOM.",
+          "items": {
+            "$ref": "#/definitions/refLinkType",
+            "title": "BOM Reference",
+            "description": "A `bom-ref` linking to a patent or application object within the BOM."
+          }
+        },
+        "externalReferences": {
+          "type": "array",
+          "title": "External References",
+          "description": "External references provide a way to document systems, sites, and information that may be relevant but are not included with the BOM. They may also establish specific relationships within or external to the BOM.",
+          "items": {
+            "$ref": "#/definitions/externalReference"
+          }
+        }
+      }
+    },
+    "patent": {
+      "type": "object",
+      "title": "Patent",
+      "description": "A patent is a legal instrument, granted by an authority, that confers certain rights over an invention for a specified period, contingent on public disclosure and adherence to relevant legal requirements. The summary information in this object is aligned with [WIPO ST.96](https://www.wipo.int/standards/en/st96/) principles where applicable.",
+      "required": ["patentNumber", "jurisdiction", "patentLegalStatus"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "#/definitions/refType",
+          "title": "BOM Reference",
+          "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
+        },
+        "patentNumber": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9\\-/.()\\s]{0,28}[A-Za-z0-9]$",
+          "title": "Patent Number",
+          "description": "The unique number assigned to the granted patent by the issuing authority. Aligned with `PatentNumber` in WIPO ST.96. Refer to [PatentNumber in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/PatentNumber.xsd).",
+          "examples": ["US987654321", "EP1234567B1"]
+        },
+        "applicationNumber": {
+          "$ref": "#/definitions/patentApplicationNumber"
+        },
+        "jurisdiction": {
+          "$ref": "#/definitions/patentJurisdiction"
+        },
+        "priorityApplication": {
+          "$ref": "#/definitions/priorityApplication"
+        },
+        "publicationNumber": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9\\-/.()\\s]{0,28}[A-Za-z0-9]$",
+          "title": "Patent Publication Number",
+          "description": "This is the number assigned to a patent application once it is published. Patent applications are generally published 18 months after filing (unless an applicant requests non-publication). This number is distinct from the application number. \n\nPurpose: Identifies the publicly available version of the application. \n\nFormat: Varies by jurisdiction, often similar to application numbers but includes an additional suffix indicating publication. \n\nExample:\n - US: US20240000123A1 (indicates the first publication of application US20240000123) \n - Europe: EP23123456A1 (first publication of European application EP23123456). \n\nWIPO ST.96 v8.0: \n - Publication Number field: https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/PublicationNumber.xsd"
+        },
+        "title": {
+          "type": "string",
+          "title": "Patent Title",
+          "description": "The title of the patent, summarising the invention it protects. Aligned with `InventionTitle` in WIPO ST.96. Refer to [InventionTitle in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/InventionTitle.xsd)."
+        },
+        "abstract": {
+          "type": "string",
+          "title": "Patent Abstract",
+          "description": "A brief summary of the invention described in the patent. Aligned with `Abstract` and `P` in WIPO ST.96. Refer to [Abstract in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/Abstract.xsd)."
+        },
+        "filingDate": {
+          "type": "string",
+          "format": "date",
+          "title": "Filing Date",
+          "description": "The date the patent application was filed with the jurisdiction. Aligned with `FilingDate` in WIPO ST.96. Refer to [FilingDate in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/FilingDate.xsd)."
+        },
+        "grantDate": {
+          "type": "string",
+          "format": "date",
+          "title": "Grant Date",
+          "description": "The date the patent was granted by the jurisdiction. Aligned with `GrantDate` in WIPO ST.96. Refer to [GrantDate in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/GrantDate.xsd)."
+        },
+        "patentExpirationDate": {
+          "type": "string",
+          "format": "date",
+          "title": "Expiration Date",
+          "description": "The date the patent expires. Derived from grant or filing date according to jurisdiction-specific rules."
+        },
+        "patentLegalStatus": {
+          "type": "string",
+          "title": "Legal Status",
+          "description": "Indicates the current legal status of the patent or patent application, based on the WIPO ST.27 standard. This status reflects administrative, procedural, or legal events. Values include both active and inactive states and are useful for determining enforceability, procedural history, and maintenance status.",
+          "enum": [
+            "pending",
+            "granted",
+            "revoked",
+            "expired",
+            "lapsed",
+            "withdrawn",
+            "abandoned",
+            "suspended",
+            "reinstated",
+            "opposed",
+            "terminated",
+            "invalidated",
+            "in-force"
+          ],
+          "meta:enum": {
+            "pending": "The patent application has been filed but not yet examined or granted.",
+            "granted": "The patent application has been examined and a patent has been issued.",
+            "revoked": "The patent has been declared invalid through a legal or administrative process.",
+            "expired": "The patent has reached the end of its enforceable term.",
+            "lapsed": "The patent is no longer in force due to non-payment of maintenance fees or other requirements.",
+            "withdrawn": "The patent application was voluntarily withdrawn by the applicant.",
+            "abandoned": "The patent application was abandoned, often due to lack of action or response.",
+            "suspended": "Processing of the patent application has been temporarily halted.",
+            "reinstated": "A previously abandoned or lapsed patent has been reinstated.",
+            "opposed": "The patent application or granted patent is under formal opposition proceedings.",
+            "terminated": "The patent or application has been officially terminated.",
+            "invalidated": "The patent has been invalidated, either in part or in full.",
+            "in-force": "The granted patent is active and enforceable."
+          }
+        },
+        "patentAssignee": {
+          "type": "array",
+          "title": "Patent Assignees",
+          "description": "A collection of organisations or individuals to whom the patent rights are assigned. This supports joint ownership and allows for flexible representation of both corporate entities and individual inventors.",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/organizationalContact"
+              },
+              {
+                "$ref": "#/definitions/organizationalEntity"
+              }
+            ]
+          }
+        },
+        "externalReferences": {
+          "type": "array",
+          "title": "External References",
+          "description": "External references provide a way to document systems, sites, and information that may be relevant but are not included with the BOM. They may also establish specific relationships within or external to the BOM.",
+          "items": {
+            "$ref": "#/definitions/externalReference"
+          }
+        }
+      }
+    },
+    "patentAssertions": {
+      "type": "array",
+      "title": "Patent Assertions",
+      "description": "A list of assertions made regarding patents associated with this component or service. Assertions distinguish between ownership, licensing, and other relevant interactions with patents.",
+      "items": {
+        "type": "object",
+        "title": "Patent Assertion",
+        "description": "An assertion linking a patent or patent family to this component or service.",
+        "required": ["assertionType", "asserter"],
+        "additionalProperties": false,
+        "properties": {
+          "bom-ref": {
+            "$ref": "#/definitions/refType",
+            "title": "BOM Reference",
+            "description": "A reference to the patent or patent family object within the BOM. This must match the `bom-ref` of a `patent` or `patentFamily` object."
+          },
+          "assertionType": {
+            "type": "string",
+            "title": "Assertion Type",
+            "description": "The type of assertion being made about the patent or patent family. Examples include ownership, licensing, and standards inclusion.",
+            "enum": [
+              "ownership",
+              "license",
+              "third-party-claim",
+              "standards-inclusion",
+              "prior-art",
+              "exclusive-rights",
+              "non-assertion",
+              "research-or-evaluation"
+            ],
+            "meta:enum": {
+              "ownership": "The manufacturer asserts ownership of the patent or patent family.",
+              "license": "The manufacturer asserts they have a license to use the patent or patent family.",
+              "third-party-claim": "A third party has asserted a claim or potential infringement against the manufacturer’s component or service.",
+              "standards-inclusion": "The patent is part of a standard essential patent (SEP) portfolio relevant to the component or service.",
+              "prior-art": "The manufacturer asserts the patent or patent family as prior art that invalidates another patent or claim.",
+              "exclusive-rights": "The manufacturer asserts exclusive rights granted through a licensing agreement.",
+              "non-assertion": "The manufacturer asserts they will not enforce the patent or patent family against certain uses or users.",
+              "research-or-evaluation": "The patent or patent family is being used under a research or evaluation license."
+            }
+          },
+          "patentRefs": {
+            "type": "array",
+            "title": "Patent References",
+            "description": "A list of BOM references (`bom-ref`) linking to patents or patent families associated with this assertion.",
+            "items": {
+              "$ref": "#/definitions/refType"
+            }
+          },
+          "asserter": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/organizationalEntity"
+              },
+              {
+                "$ref": "#/definitions/organizationalContact"
+              },
+              {
+                "$ref": "#/definitions/refLinkType",
+                "title": "Reference",
+                "description": "A reference to a previously defined `organizationalContact` or `organizationalEntity` object in the BOM. The value must be a valid `bom-ref` pointing to one of these objects."
+              }
+            ]
+          },
+          "notes": {
+            "type": "string",
+            "title": "Notes",
+            "description": "Additional notes or clarifications regarding the assertion, if necessary. For example, geographical restrictions, duration, or limitations of a license."
+          }
+        }
+      }
+    },
+    "patentApplicationNumber": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9\\-/.()\\s]{0,28}[A-Za-z0-9]$",
+      "title": "Patent Application Number",
+      "description": "The unique number assigned to a patent application when it is filed with a patent office. It is used to identify the specific application and track its progress through the examination process. Aligned with `ApplicationNumber` in ST.96. Refer to [ApplicationIdentificationType in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/ApplicationIdentificationType.xsd).",
+      "examples": ["US20240000123", "EP23123456"]
+    },
+    "patentJurisdiction": {
+      "type": "string",
+      "title": "Jurisdiction",
+      "description": "The jurisdiction or patent office where the priority application was filed, specified using WIPO ST.3 codes. Aligned with `IPOfficeCode` in ST.96. Refer to [IPOfficeCode in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Common/IPOfficeCode.xsd).",
+      "pattern": "^[A-Z]{2}$",
+      "examples": ["US", "EP", "JP"]
+    },
+    "patentFilingDate": {
+      "type": "string",
+      "format": "date",
+      "title": "Filing Date",
+      "description": "The date the priority application was filed, aligned with `FilingDate` in ST.96. Refer to [FilingDate in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/FilingDate.xsd)."
+    },
+    "priorityApplication": {
+      "type": "object",
+      "title": "Priority Application",
+      "description": "The priorityApplication contains the essential data necessary to identify and reference an earlier patent filing for priority rights. In line with WIPO ST.96 guidelines, it includes the jurisdiction (office code), application number, and filing date-the three key elements that uniquely specify the priority application in a global patent context.",
+      "required": ["applicationNumber", "jurisdiction", "filingDate"],
+      "additionalProperties": false,
+      "properties": {
+        "applicationNumber": {
+          "$ref": "#/definitions/patentApplicationNumber"
+        },
+        "jurisdiction": {
+          "$ref": "#/definitions/patentJurisdiction"
+        },
+        "filingDate": {
+          "$ref": "#/definitions/patentFilingDate"
+        }
+      }
+    },
+    "citation": {
+      "type": "object",
+      "title": "Citation",
+      "description": "Details a specific attribution of data within the BOM to a contributing entity or process.",
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "#/definitions/refType",
+          "title": "BOM Reference"
+        },
+        "pointers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "title": "Field Reference",
+            "description": "A [JSON Pointer](https://datatracker.ietf.org/doc/html/rfc6901) identifying the BOM field to which the attribution applies.\nUsers of other serialisation formats (e.g. XML) shall use the JSON Pointer format to ensure consistent field referencing across representations."
+          },
+          "minItems": 1,
+          "title": "Field References",
+          "description": "One or more [JSON Pointers](https://datatracker.ietf.org/doc/html/rfc6901) identifying the BOM fields to which the attribution applies.\nExactly one of the \"pointers\" or \"expressions\" elements must be present."
+        },
+        "expressions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "title": "Path Expression",
+            "description": "Specifies a path expression used to locate a value within a BOM. The expression syntax shall conform to the format of the BOM's serialisation.\nUse [JSONPath](https://datatracker.ietf.org/doc/html/rfc9535) for JSON, [XPath](https://www.w3.org/TR/xpath/) for XML, and default to JSONPath for Protocol Buffers unless otherwise specified.\nImplementers shall ensure the expression is valid within the context of the applicable serialisation format."
+          },
+          "minItems": 1,
+          "title": "Path Expressions",
+          "description": "One or more path expressions used to locate values within a BOM.\nExactly one of the \"pointers\" or \"expressions\" elements must be present."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Timestamp",
+          "description": "The date and time when the attribution was made or the information was supplied."
+        },
+        "attributedTo": {
+          "$ref": "#/definitions/refLinkType",
+          "title": "Attributed To",
+          "description": "The `bom-ref` of an object, such as a component, service, tool, organisational entity, or person that supplied the cited information.\nAt least one of the \"attributedTo\" or \"process\" elements must be present."
+        },
+        "process": {
+          "$ref": "#/definitions/refLinkType",
+          "title": "Process Reference",
+          "description": "The `bom-ref` to a process (such as a formula, workflow, task, or step) defined in the `formulation` section that executed or generated the attributed data.\nAt least one of the \"attributedTo\" or \"process\" elements must be present."
+        },
+        "note": {
+          "type": "string",
+          "title": "Note",
+          "description": "A description or comment about the context or quality of the data attribution."
+        },
+        "signature": {
+          "$ref": "#/definitions/signature",
+          "title": "Signature",
+          "description": "A digital signature verifying the authenticity or integrity of the attribution."
+        }
+      },
+      "required": ["timestamp"],
+      "anyOf": [
+        { "required": ["attributedTo"] },
+        { "required": ["process"] }
+      ],
+      "oneOf": [
+        { "required": ["pointers"] },
+        { "required": ["expressions"] }
       ]
     }
   }
