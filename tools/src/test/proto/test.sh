@@ -54,7 +54,7 @@ function schema-breaking-version () {
     NEW_NP="$(mktemp)"
     OLD_NP="$(mktemp)"
 
-    # remove package identifier -> so that the comparisson works as expected
+    # remove package identifier -> so that the comparison works as expected
     sed 's/^package .*//' "${ROOT_PATH}/${SCHEMA_DIR}/${NEW}" > "$NEW_NP"
     sed 's/^package .*//' "${ROOT_PATH}/${SCHEMA_DIR}/${OLD}" > "$OLD_NP"
 
