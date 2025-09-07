@@ -1,13 +1,13 @@
 ---
 name: Feature request
-about: Request or propose a core enhancement or feature 
+about: Request or propose a core enhancement or feature
 title: "[FEATURE]: <your title here>"
 labels: proposed core enhancement
 
 ---
 
-<!-- 
-THank you for taking the time to file a feature request or core enhancement proposal 
+<!--
+Thank you for taking the time to file a feature request or core enhancement proposal.
 -->
 
 ## Describe the feature
@@ -18,7 +18,7 @@ Please include scopes and out-of-scopes.
 
 ## Possible solutions
 
-Do you have asolution in mind> Please describe.
+Do you have a solution in mind? Please describe.
 What is to be considdered? Any draw-backs?
 
 ## Alternatives
