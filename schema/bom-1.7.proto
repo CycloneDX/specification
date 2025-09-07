@@ -2142,6 +2142,7 @@ message CryptoProperties {
 
   // Algorithm Propertie
   message AlgorithmProperties {
+
     // Primitive
     enum CryptoPrimitive {
       // ProtoBuff's default value -- it differs from "unknown"
@@ -2176,6 +2177,8 @@ message CryptoProperties {
       CRYPTO_PRIMITIVE_AE = 14;
       // A combiner aggregates many candidates for a cryptographic primitive and generates a new candidate for the same primitive.
       CRYPTO_PRIMITIVE_COMBINER = 15;
+      // Key-wrap is a cryptographic technique used to securely encrypt and protect cryptographic keys using algorithms like AES.
+      CRYPTO_PRIMITIVE_KEY_WRAP = 16;
     }
 
     // Execution Environment
@@ -2285,10 +2288,19 @@ message CryptoProperties {
 
     // Cryptographic building blocks used in higher-level cryptographic systems and protocols. Primitives represent different cryptographic routines: deterministic random bit generators (drbg, e.g. CTR_DRBG from NIST SP800-90A-r1), message authentication codes (mac, e.g. HMAC-SHA-256), blockciphers (e.g. AES), streamciphers (e.g. Salsa20), signatures (e.g. ECDSA), hash functions (e.g. SHA-256), public-key encryption schemes (pke, e.g. RSA), extended output functions (xof, e.g. SHAKE256), key derivation functions (e.g. pbkdf2), key agreement algorithms (e.g. ECDH), key encapsulation mechanisms (e.g. ML-KEM), authenticated encryption (ae, e.g. AES-GCM) and the combination of multiple algorithms (combiner, e.g. SP800-56Cr2).
     optional CryptoPrimitive primitive = 1;
+    // A valid algorithm family identifier. If specified, this value must be one of the
+    // enumeration of valid algorithm Family identifiers defined in the
+    // cryptography-defs.json subschema. A corresponding schema for ProtoBuf is not available.
+    optional string algorithmFamily = 12;
     // An identifier for the parameter set of the cryptographic algorithm. Examples: in AES128, '128' identifies the key length in bits, in SHA256, '256' identifies the digest length, '128' in SHAKE128 identifies its maximum security level in bits, and 'SHA2-128s' identifies a parameter set used in SLH-DSA (FIPS205).
     optional string parameterSetIdentifier = 2;
+    // DEPRECATED - DO NOT USE - This will be removed in a future version - Use `.ellipticCurve` Instead.
     // The specific underlying Elliptic Curve (EC) definition employed which is an indicator of the level of security strength, performance and complexity. Absent an authoritative source of curve names, CycloneDX recommends use of curve names as defined at [https://neuromancer.sk/std/](https://neuromancer.sk/std/), the source from which can be found at [https://github.com/J08nY/std-curves](https://github.com/J08nY/std-curves).
-    optional string curve = 3;
+    optional string curve = 3 [deprecated = true];
+    // The specific underlying Elliptic Curve (EC) definition employed which is an indicator
+    // of the level of security strength, performance and complexity. Curves are defined in
+    // the cryptography-defs.json subschema. A corresponding schema for ProtoBuf is not available.
+    optional string ellipticCurve = 13;
     // The target and execution environment in which the algorithm is implemented in.
     optional CryptoExecutionEnvironment executionEnvironment = 4;
     // The target platform for which the algorithm is implemented. The implementation can be 'generic', running on any platform or for a specific platform.
@@ -2307,8 +2319,44 @@ message CryptoProperties {
     optional int32 nistQuantumSecurityLevel = 11;
   } // end of AlgorithmProperties
 
+  // Certificate State
+  message CertificateState {
+
+    // Pre-defined certificate states
+    enum PredefinedState {
+      // ProtoBuff's default value
+      PREDEFINED_STATE_UNSPECIFIED = 0;
+      // The certificate has been issued by the issuing certificate authority (CA) but has not been authorized for use.
+      PREDEFINED_STATE_PRE_ACTIVATION = 1;
+      // The certificate may be used to cryptographically protect information, cryptographically process previously protected information, or both.
+      PREDEFINED_STATE_ACTIVE = 2;
+      // The use of a certificate may be suspended for several possible reasons.
+      PREDEFINED_STATE_SUSPENDED = 3;
+      // Certificates in the deactivated state shall not be used to apply cryptographic protection but, in some cases, may be used to process cryptographically protected information.
+      PREDEFINED_STATE_DEACTIVATED = 4;
+      // A revoked certificate is a digital certificate that has been invalidated by the issuing certificate authority (CA) before its scheduled expiration date.
+      PREDEFINED_STATE_REVOKED = 5;
+      // The certificate has been destroyed.
+      PREDEFINED_STATE_DESTROYED = 6;
+    }
+
+    // A reason for the certificate being in this state.
+    optional string reason = 1;
+    // The state can be either a predefined state or a custom state
+    oneof state {
+      // A pre-defined state in the certificate lifecycle.
+      PredefinedState predefined_state = 2;
+      // The name of the certificate lifecycle state for custom states.
+      string name = 3;
+    }
+    // The description of the certificate lifecycle state (only used with custom states).
+    optional string description = 4;
+  } // end of CertificateState
+
   // Certificate Properties
   message CertificateProperties {
+    // The serial number is a unique identifier for the certificate issued by a CA.
+    optional string serialNumber = 9;
     // The subject name for the certificate
     optional string subjectName = 1;
     // The issuer name for the certificate
@@ -2317,15 +2365,99 @@ message CryptoProperties {
     optional google.protobuf.Timestamp notValidBefore = 3;
     // The date and time according to ISO-8601 standard from which the certificate is not valid anymore
     optional google.protobuf.Timestamp notValidAfter = 4;
-    // The bom_ref to signature algorithm used by the certificate
-    optional string signatureAlgorithmRef = 5;
-    // The bom_ref to the public key of the subject
-    optional string subjectPublicKeyRef = 6;
+    // DEPRECATED - DO NOT USE - This will be removed in a future version - Use `.relatedCryptographicAssets` instead.
+    // The bom-ref to signature algorithm used by the certificate
+    optional string signatureAlgorithmRef = 5 [deprecated = true];
+    // DEPRECATED - DO NOT USE - This will be removed in a future version - Use `.relatedCryptographicAssets` instead.
+    // The bom-ref to the public key of the subject
+    optional string subjectPublicKeyRef = 6 [deprecated = true];
     // The format of the certificate. Examples include X.509, PEM, DER, and CVC.
     optional string certificateFormat = 7;
+    // DEPRECATED - DO NOT USE - This will be removed in a future version -  Use `.certificateFileExtension` instead. The file extension of the certificate. Examples include crt, pem, cer, der, and p12.
+    optional string certificateExtension = 8 [deprecated = true];
     // The file extension of the certificate. Examples include crt, pem, cer, der, and p12.
-    optional string certificateExtension = 8;
+    optional string certificateFileExtension = 10;
+    // The fingerprint is a cryptographic hash of the certificate excluding it's signature.
+    optional Hash fingerprint = 11;
+    // The certificate lifecycle is a comprehensive process that manages digital certificates from their initial creation to eventual expiration or revocation. It typically involves several stages.
+    repeated CertificateState certificateState = 12;
+    // The date and time (timestamp) when the certificate was created or pre-activated.
+    optional google.protobuf.Timestamp creationDate = 13;
+    // The date and time (timestamp) when the certificate was activated.
+    optional google.protobuf.Timestamp activationDate = 14;
+    // The date and time (timestamp) when the related certificate was deactivated.
+    optional google.protobuf.Timestamp deactivationDate = 15;
+    // The date and time (timestamp) when the certificate was revoked.
+    optional google.protobuf.Timestamp revocationDate = 16;
+    // The date and time (timestamp) when the certificate was destroyed.
+    optional google.protobuf.Timestamp destructionDate = 17;
+    // A certificate extension is a field that provides additional information about the certificate or its use. Extensions are used to convey additional information beyond the standard fields.
+    optional CertificateExtensions certificateExtensions = 18;
+    // A list of cryptographic assets related to this component.
+    optional RelatedCryptographicAssets relatedCryptographicAssets = 19;
   } // end of CertificateProperties
+
+  // Certificate Extensions
+  message CertificateExtensions {
+    // Common extension names
+    enum CommonExtensionName {
+      // ProtoBuff's default value
+      COMMON_EXTENSION_NAME_UNSPECIFIED = 0;
+      COMMON_EXTENSION_NAME_BASIC_CONSTRAINTS = 1;
+      COMMON_EXTENSION_NAME_KEY_USAGE = 2;
+      COMMON_EXTENSION_NAME_EXTENDED_KEY_USAGE = 3;
+      COMMON_EXTENSION_NAME_SUBJECT_ALTERNATIVE_NAME = 4;
+      COMMON_EXTENSION_NAME_AUTHORITY_KEY_IDENTIFIER = 5;
+      COMMON_EXTENSION_NAME_SUBJECT_KEY_IDENTIFIER = 6;
+      COMMON_EXTENSION_NAME_AUTHORITY_INFORMATION_ACCESS = 7;
+      COMMON_EXTENSION_NAME_CERTIFICATE_POLICIES = 8;
+      COMMON_EXTENSION_NAME_CRL_DISTRIBUTION_POINTS = 9;
+      COMMON_EXTENSION_NAME_SIGNED_CERTIFICATE_TIMESTAMP = 10;
+    }
+
+    // Extension represents either a common extension or a custom extension
+    message Extension {
+      oneof extension_type {
+        // Common extension with predefined name
+        CommonExtension commonExtension = 1;
+        // Custom extension with user-defined name
+        CustomExtension customExtension = 2;
+      }
+    }
+
+    // Common extension with predefined name
+    message CommonExtension {
+      // The name of the extension
+      CommonExtensionName name = 1;
+      // The value of the certificate extension
+      string value = 2;
+    }
+
+    // Custom extension with user-defined name
+    message CustomExtension {
+      // The name for the custom certificate extension
+      string name = 1;
+      // The description of the custom certificate extension
+      optional string value = 2;
+    }
+
+    // List of certificate extensions
+    repeated Extension extensions = 1;
+  }
+
+  // Related Cryptographic Assets
+  message RelatedCryptographicAssets {
+    // Related Cryptographic Asset
+    message RelatedCryptographicAsset {
+      // The type of the related cryptographic asset
+      string type = 1;
+      // The reference to the related cryptographic asset
+      string ref = 2;
+    }
+
+    // List of related cryptographic assets
+    repeated RelatedCryptographicAsset assets = 1;
+  }
 
   // Related Cryptographic Material Properties
   message RelatedCryptoMaterialProperties {
@@ -2383,8 +2515,9 @@ message CryptoProperties {
     optional string id = 2;
     // The key state as defined by NIST SP 800-57.
     optional CryptoRelatedState state = 3;
-    // The bom_ref to the algorithm used to generate the related cryptographic material.
-    optional string algorithmRef = 4;
+    // DEPRECATED - DO NOT USE - This will be removed in a future version - Use `.relatedCryptographicAssets` instead.
+    // The bom-ref to the algorithm used to generate the related cryptographic material.
+    optional string algorithmRef = 4 [deprecated = true];
     // The date and time (timestamp) when the related cryptographic material was created.
     optional google.protobuf.Timestamp creationDate = 5;
     // The date and time (timestamp) when the related cryptographic material was activated.
@@ -2401,6 +2534,10 @@ message CryptoProperties {
     optional string format = 11;
     // The mechanism by which the cryptographic asset is secured.
     optional CryptoRelatedSecuredBy securedBy = 12;
+    // The fingerprint is a cryptographic hash of the asset.
+    optional Hash fingerprint = 13;
+    // A list of cryptographic assets related to this component.
+    optional RelatedCryptographicAssets relatedCryptographicAssets = 14;
   } // end of RelatedCryptoMaterialProperties
 
   // Protocol Properties
@@ -2424,6 +2561,18 @@ message CryptoProperties {
       CRYPTO_PROTOCOL_TYPE_SSTP = 7;
       // Wi-Fi Protected Access
       CRYPTO_PROTOCOL_TYPE_WPA = 8;
+      // Datagram Transport Layer Security
+      CRYPTO_PROTOCOL_TYPE_DTLS = 9;
+      // Quick UDP Internet Connections
+      CRYPTO_PROTOCOL_TYPE_QUIC = 10;
+      // Extensible Authentication Protocol variant
+      CRYPTO_PROTOCOL_TYPE_EAP_AKA = 11;
+      // Enhanced version of EAP-AKA
+      CRYPTO_PROTOCOL_TYPE_EAP_AKA_PRIME = 12;
+      // Protection of Inter-Network Signaling
+      CRYPTO_PROTOCOL_TYPE_PRINS = 13;
+      // Authentication and Key Agreement for 5G
+      CRYPTO_PROTOCOL_TYPE_5G_AKA = 14;
     }
 
     // Object representing a cipher suite
@@ -2434,8 +2583,14 @@ message CryptoProperties {
       repeated string algorithms = 2;
       // A list of common identifiers for the cipher suite. For example: 0xC0 and 0x9E
       repeated string identifiers = 3;
+      // A list of TLS named groups (formerly known as curves) for this cipher suite. These groups define the parameters for key exchange algorithms like ECDHE.
+      repeated string tlsGroups = 4;
+      // A list of signature schemes supported for cipher suite. These schemes specify the algorithms used for digital signatures in TLS handshakes and certificate verification.
+      repeated string tlsSignatureSchemes = 5;
     }
 
+
+    // DEPRECATED - DO NOT USE - This will be removed in a future version.
     // IKEv2 Transform Types
     message Ikev2TransformTypes {
       // Transform Type 1: encryption algorithms
@@ -2452,16 +2607,80 @@ message CryptoProperties {
       repeated string auth = 6;
     }
 
+    // IKEv2 Transform Types Detailed
+    message Ikev2TransformTypesDetailed {
+      // IKEv2 Encryption Algorithm (ENCR)
+      message Encr {
+        // A name for the encryption method
+        optional string name = 1;
+        // The key length of the encryption algorithm
+        optional int32 keyLength = 2;
+        // The bom-ref to algorithm cryptographic asset
+        optional string algorithm = 3;
+      }
+
+      // IKEv2 Pseudorandom Function (PRF)
+      message Prf {
+        // A name for the pseudorandom function
+        optional string name = 1;
+        // The bom-ref to algorithm cryptographic asset
+        optional string algorithm = 2;
+      }
+
+      // IKEv2 Integrity Algorithm (INTEG)
+      message Integ {
+        // A name for the integrity algorithm
+        optional string name = 1;
+        // The bom-ref to algorithm cryptographic asset
+        optional string algorithm = 2;
+      }
+
+      // IKEv2 Key Exchange Method (KE)
+      message Ke {
+        // A group identifier for the key exchange algorithm
+        optional int32 group = 1;
+        // The bom-ref to algorithm cryptographic asset
+        optional string algorithm = 2;
+      }
+
+      // IKEv2 Authentication method
+      message Auth {
+        // A name for the authentication method
+        optional string name = 1;
+        // The bom-ref to algorithm cryptographic asset
+        optional string algorithm = 2;
+      }
+
+      // Transform Type 1: encryption algorithms
+      repeated Encr encr = 1;
+      // Transform Type 2: pseudorandom functions
+      repeated Prf prf = 2;
+      // Transform Type 3: integrity algorithms
+      repeated Integ integ = 3;
+      // Transform Type 4: Key Exchange Method (KE) per RFC9370, formerly called Diffie-Hellman Group (D-H)
+      repeated Ke ke = 4;
+      // Specifies if an Extended Sequence Number (ESN) is used.
+      optional bool esn = 5;
+      // IKEv2 Authentication method
+      repeated Auth auth = 6;
+    }
+
     // The concrete protocol type.
     optional CryptoProtocolType type = 1;
     // The version of the protocol. Examples include 1.0, 1.2, and 1.99.
     optional string version = 2;
     // A list of cipher suites related to the protocol.
     repeated CryptoProtocolCipherSuite cipherSuites = 3;
+    // DEPRECATED - DO NOT USE - This will be removed in a future version - Use `.ikev2TransformTypesDetailed` Instead.
     // The IKEv2 transform types supported (types 1-4), defined in RFC7296 section 3.3.2, and additional properties.
-    optional Ikev2TransformTypes ikev2TransformTypes = 4;
-    // The bom_ref(s) to protocol-related cryptographic assets
+    optional Ikev2TransformTypes ikev2TransformTypes = 4 [deprecated = true];
+    // The IKEv2 transform types supported (types 1-4), defined in RFC7296 section 3.3.2, and additional properties.
+    // If this field is present, the deprecated field `.ikev2TransformTypes` MUST be ignored.
+    optional Ikev2TransformTypesDetailed ikev2TransformTypesDetailed = 7;
+    // The bom-ref(s) to protocol-related cryptographic assets
     repeated string cryptoRef = 5;
+    // A list of cryptographic assets related to this component.
+    optional RelatedCryptographicAssets relatedCryptographicAssets = 6;
   } // end of ProtocolProperties
 
   // Cryptographic assets occur in several forms. Algorithms and protocols are most commonly implemented in specialized cryptographic libraries. They may, however, also be 'hardcoded' in software components. Certificates and related cryptographic material like keys, tokens, secrets or passwords are other cryptographic assets to be modelled.
