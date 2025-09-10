@@ -812,6 +812,14 @@ limitations under the License.
                 </xs:annotation>
             </xs:element>
             <xs:element name="tags" type="bom:tagsType" minOccurs="0" maxOccurs="1" />
+            <xs:element name="classifier" type="bom:classifier" minOccurs="0" maxOccurs="1" default="binary">
+                <xs:annotation>
+		    <xs:documentation>
+			Specifies the classifier of the component. If the classifier is not specified, 'binary' SHOULD
+			be assumed by the consumer of the BOM.
+		    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                     <xs:documentation>
@@ -1257,6 +1265,24 @@ limitations under the License.
                     <xs:documentation>Components that are excluded provide the ability to document component usage
                         for test and other non-runtime purposes. Excluded components are not reachable within a call
                         graph at runtime.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="classifier">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="binary">
+                <xs:annotation>
+		    <xs:documentation>The component can be classified as 'binary'. This is the case for most
+			components. If a component includes both source and binary parts it is still considered
+		        'binary'.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="sources">
+                <xs:annotation>
+		    <xs:documentation>The component can be classified as 'sources'. Examples are Debian Source
+			packages (as opposed to Debian Binary packages), or a source JAR in Java.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
         </xs:restriction>
