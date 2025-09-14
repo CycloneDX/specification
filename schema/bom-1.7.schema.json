@@ -551,12 +551,14 @@
   },
   "definitions": {
     "refType": {
+      "title": "BOM Reference",
       "description": "Identifier for referable and therefore interlinkable elements.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
       "type": "string",
       "minLength": 1,
       "$comment": "TODO (breaking change): add a format constraint that prevents the value from staring with 'urn:cdx:'"
     },
     "refLinkType": {
+      "title": "BOM Reference",
       "description": "Descriptor for an element identified by the attribute 'bom-ref' in the same BOM document.\nIn contrast to `bomLinkElementType`.",
       "$ref": "#/definitions/refType"
     },
@@ -845,6 +847,7 @@
     "organizationalContact": {
       "type": "object",
       "additionalProperties": false,
+      "title": "Organizational Person",
       "properties": {
         "bom-ref": {
           "$ref": "#/definitions/refType",
@@ -2474,6 +2477,7 @@
       "required": [
         "name"
       ],
+      "additionalProperties": false,
       "properties": {
         "name": {
           "type": "string",
@@ -2485,8 +2489,7 @@
           "title": "Value",
           "description": "The value of the property."
         }
-      },
-      "additionalProperties": false
+      }
     },
     "localeType": {
       "type": "string",
@@ -4728,7 +4731,9 @@
                 "$ref": "#/definitions/property"
               },
               {
-                "type": "string"
+                "type": "string",
+                "title": "String-Based Environment Variables",
+                "description": "In addition to the more common key–value pair format, some environment variables may consist of a single string without an explicit value assignment. These string-based environment variables typically act as flags or signals to software, indicating that a feature should be enabled, a mode should be activated, or a specific condition is present. Their presence alone conveys meaning."
               }
             ]
           }
@@ -4818,7 +4823,9 @@
                 "$ref": "#/definitions/property"
               },
               {
-                "type": "string"
+                "type": "string",
+                "title": "String-Based Environment Variables",
+                "description": "In addition to the more common key–value pair format, some environment variables may consist of a single string without an explicit value assignment. These string-based environment variables typically act as flags or signals to software, indicating that a feature should be enabled, a mode should be activated, or a specific condition is present. Their presence alone conveys meaning."
               }
             ]
           },
@@ -5973,6 +5980,7 @@
                   "anyOf": [
                     {
                       "type": "array",
+                      "title": "Encryption Algorithms (ENCR)",
                       "items": {
                         "$ref": "#/definitions/ikeV2Enc",
                         "title": "Encryption Algorithm (ENCR)"
@@ -5981,6 +5989,7 @@
                     {
                       "deprecated": true,
                       "$ref": "#/definitions/cryptoRefArray",
+                      "title": "Encryption Algorithm (ENCR) References",
                       "description": "[DEPRECATED] This will be removed in a future version.\nTransform Type 1: encryption algorithms"
                     }
                   ]
@@ -5991,6 +6000,7 @@
                   "anyOf": [
                     {
                       "type": "array",
+                      "title": "Pseudorandom Functions (PRF)",
                       "items": {
                         "$ref": "#/definitions/ikeV2Prf",
                         "title": "Pseudorandom Function (PRF)"
@@ -6009,6 +6019,7 @@
                   "anyOf": [
                     {
                       "type": "array",
+                      "title": "Integrity Algorithms (INTEG)",
                       "items": {
                         "$ref": "#/definitions/ikeV2Integ",
                         "title": "Integrity Algorithm (INTEG)"
@@ -6027,6 +6038,7 @@
                   "anyOf": [
                     {
                       "type": "array",
+                      "title": "Key Exchange Methods (KE)",
                       "items": {
                         "$ref": "#/definitions/ikeV2Ke",
                         "title": "Key Exchange Method (KE)"
@@ -6050,6 +6062,7 @@
                   "anyOf": [
                     {
                       "type": "array",
+                      "title": "IKEv2 Authentication Methods",
                       "items": {
                         "$ref": "#/definitions/ikeV2Auth",
                         "title": "IKEv2 Authentication Method"
@@ -6259,6 +6272,7 @@
     },
     "cryptoRefArray" : {
       "deprecated": true,
+      "title": "Encryption Algorithm (ENCR) Reference Array",
       "description": "Deprecated definition.",
       "type": "array",
       "items": {
@@ -6553,10 +6567,12 @@
           "asserter": {
             "oneOf": [
               {
-                "$ref": "#/definitions/organizationalEntity"
+                "$ref": "#/definitions/organizationalEntity",
+                "title": "Organizational Entity"
               },
               {
-                "$ref": "#/definitions/organizationalContact"
+                "$ref": "#/definitions/organizationalContact",
+                "title": "Person"
               },
               {
                 "$ref": "#/definitions/refLinkType",
