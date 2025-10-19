@@ -1,17 +1,20 @@
+
+# CycloneDX Bill of Materials Specification (ECMA-424)
+
+[![License][license-image]][license-url]
+[![ECMA TC54](https://img.shields.io/badge/ECMA-TC54-FC7C00?labelColor=404040)](https://tc54.org) 
+[![Website](https://img.shields.io/badge/https://-cyclonedx.org-blue.svg)](https://cyclonedx.org/)
+[![Slack Invite](https://img.shields.io/badge/Slack-Join-blue?logo=slack&labelColor=393939)](https://cyclonedx.org/slack/invite)
+[![Group Discussion](https://img.shields.io/badge/discussion-groups.io-blue.svg)](https://groups.io/g/CycloneDX)
+[![Twitter](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&label=Follow)](https://twitter.com/CycloneDX_Spec)  
 [![Build Docs](https://github.com/CycloneDX/specification/actions/workflows/build_docs.yml/badge.svg)](https://github.com/CycloneDX/specification/actions/workflows/build_docs.yml)
 [![CT Java](https://github.com/CycloneDX/specification/actions/workflows/test_java.yml/badge.svg)](https://github.com/CycloneDX/specification/actions/workflows/test_java.yml)
 [![CT JavaScript](https://github.com/CycloneDX/specification/actions/workflows/test_js.yml/badge.svg)](https://github.com/CycloneDX/specification/actions/workflows/test_js.yml)
 [![CT PHP](https://github.com/CycloneDX/specification/actions/workflows/test_php.yml/badge.svg)](https://github.com/CycloneDX/specification/actions/workflows/test_php.yml)
-[![CT ProtoBuf](https://github.com/CycloneDX/specification/actions/workflows/test_proto.yml/badge.svg)](https://github.com/CycloneDX/specification/actions/workflows/test_proto.yml)  
-[![License][license-image]][license-url]
-[![Website](https://img.shields.io/badge/https://-cyclonedx.org-blue.svg)](https://cyclonedx.org/)
-[![Slack Invite](https://img.shields.io/badge/Slack-Join-blue?logo=slack&labelColor=393939)](https://cyclonedx.org/slack/invite)
-[![Group Discussion](https://img.shields.io/badge/discussion-groups.io-blue.svg)](https://groups.io/g/CycloneDX)
-[![Twitter](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&label=Follow)](https://twitter.com/CycloneDX_Spec)
-[![ECMA TC54](https://img.shields.io/badge/ECMA-TC54-FC7C00?labelColor=404040)](https://tc54.org)
+[![CT ProtoBuf](https://github.com/CycloneDX/specification/actions/workflows/test_proto.yml/badge.svg)](https://github.com/CycloneDX/specification/actions/workflows/test_proto.yml)    
 
+----
 
-# CycloneDX Bill of Materials Specification (ECMA-424)
 OWASP CycloneDX is a full-stack Bill of Materials (BOM) standard that provides advanced supply chain capabilities for 
 cyber risk reduction. CycloneDX is an [Ecma International](https://ecma-international.org/) standard published as 
 [ECMA-424](https://ecma-international.org/publications-and-standards/standards/ecma-424/). 
