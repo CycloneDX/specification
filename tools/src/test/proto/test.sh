@@ -11,7 +11,7 @@ TEST_RES_DIR='tools/src/test/resources'
 REMOTE="https://github.com/${GITHUB_REPOSITORY:-CycloneDX/specification}.git"
 
 BUF_IMAGE_VERSION='1.50.0'
-BUF_IMAGE="bufbuild/buf:$BUF_IMAGE_VERSION"
+BUF_IMAGE="bufbuild/buf:${BUF_IMAGE_VERSION}"
 
 LOG_FORMAT='text'  # set to 'json' to see details
 if [[ -n "${GITHUB_WORKFLOW:-}" ]]
@@ -88,7 +88,7 @@ function schema-breaking-remote () {
     --workdir '/workspace' \
     "$BUF_IMAGE" \
       breaking --path "$SCHEMA_DIR" \
-      --against "${REMOTE}" \
+      --against "$REMOTE" \
       --error-format "$LOG_FORMAT"
 
   echo '>> OK.' >&2
