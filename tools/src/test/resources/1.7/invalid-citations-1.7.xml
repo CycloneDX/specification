@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bom xmlns="http://cyclonedx.org/schema/bom/1.7"
+     serialNumber="urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79"
+     version="1"
+>
+    <metadata>
+        <timestamp>2025-05-01T14:23:00Z</timestamp>
+        <authors>
+            <author bom-ref="person-1">
+                <name>Alice Example</name>
+                <email>alice@example.com</email>
+            </author>
+        </authors>
+    </metadata>
+    <components>
+        <component type="library" bom-ref="component-1">
+            <name>example-lib</name>
+            <version>1.2.3</version>
+            <licenses>
+                <license>
+                    <id>Apache-2.0</id>
+                </license>
+            </licenses>
+        </component>
+    </components>
+    <formulation>
+        <formula bom-ref="formula-1">
+            <components>
+                <component type="application" bom-ref="scan-tool-1">
+                    <name>My Scan Tool</name>
+                </component>
+            </components>
+            <workflows>
+                <workflow bom-ref="workflow-1">
+                    <uid>259bae74-5ec4-4de8-9386-c91b1f7719b8</uid>
+                    <name>My workflow</name>
+                    <tasks>
+                        <task bom-ref="task-license-scan">
+                            <uid>6d75f8d6-a008-41cf-8b65-c4129fc249f9</uid>
+                            <description>License scan of the source files using OpenSourceScanner v2.1</description>
+                            <taskTypes>
+                                <taskType>scan</taskType>
+                            </taskTypes>
+                        </task>
+                        <task bom-ref="task-license-scan-2">
+                            <uid>dfc0268a-89cb-4823-bb88-84115a06b64d</uid>
+                            <description>License scan of the source files using [REDACTED]</description>
+                            <taskTypes>
+                                <taskType>scan</taskType>
+                            </taskTypes>
+                        </task>
+                    </tasks>
+                    <taskTypes>
+                        <taskType>scan</taskType>
+                    </taskTypes>
+                </workflow>
+            </workflows>
+        </formula>
+    </formulation>
+    <citations>
+        <!-- spec-requirement that is not formalized in the XSD:
+        <citation bom-ref="citation-1">
+            <pointers>
+                <pointer>/components/0/name</pointer>
+            </pointers>
+            <timestamp>2025-05-01T14:00:00Z</timestamp>
+            <note>Should have at least one of the following children 'attributedTo' or 'process'</note>
+        </citation>
+        -->
+        <citation bom-ref="citation-2">
+            <pointers>
+                <pointer>/components/0/licenses/0/license/id</pointer>
+            </pointers>
+            <timestamp>2025-05-01T14:05:00Z</timestamp>
+            <attributedTo>person-1</attributedTo>
+            <attributedTo>scan-tool-1</attributedTo>
+            <note>Should have at max one 'attributedTo'</note>
+        </citation>
+        <citation bom-ref="citation-3">
+            <pointers>
+                <pointer>/components/0/licenses/0/license/id</pointer>
+            </pointers>
+            <timestamp>2025-05-01T14:05:00Z</timestamp>
+            <process>task-license-scan</process>
+            <process>task-license-scan-2</process>
+            <note>Should have at max one 'process'</note>
+        </citation>
+        <citation bom-ref="citation-4">
+            <pointers>
+                <pointer>/components/0/licenses/0/license/id</pointer>
+            </pointers>
+            <expressions>
+                <expression>//*[@bom-ref='component-1']/version</expression>
+            </expressions>
+            <timestamp>2025-05-01T14:05:00Z</timestamp>
+            <process>task-license-scan</process>
+            <note>Should not have both a pointer and expression.</note>
+        </citation>
+    </citations>
+</bom>
