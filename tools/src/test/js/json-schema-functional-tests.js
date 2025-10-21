@@ -44,9 +44,10 @@ console.debug('DEBUG | testdataDir = ', testdataDir);
 
 // region validator
 
-const [spdxSchema, jsfSchema, bomSchema] = await Promise.all([
+const [spdxSchema, jsfSchema, cryptoDefsSchema, bomSchema] = await Promise.all([
     readFile(join(schemaDir, 'spdx.schema.json'), 'utf-8').then(JSON.parse),
     readFile(join(schemaDir, 'jsf-0.82.schema.json'), 'utf-8').then(JSON.parse),
+    readFile(join(schemaDir, 'cryptography-defs.schema.json'), 'utf-8').then(JSON.parse),
     readFile(schemaFile, 'utf-8').then(JSON.parse)
 ])
 
@@ -57,7 +58,8 @@ const ajv = new Ajv({
     addUsedSchema: false,
     schemas: {
         'http://cyclonedx.org/schema/spdx.schema.json': spdxSchema,
-        'http://cyclonedx.org/schema/jsf-0.82.schema.json': jsfSchema
+        'http://cyclonedx.org/schema/jsf-0.82.schema.json': jsfSchema,
+        'http://cyclonedx.org/schema/cryptography-defs.schema.json': cryptoDefsSchema,
     }
 });
 addFormats(ajv)

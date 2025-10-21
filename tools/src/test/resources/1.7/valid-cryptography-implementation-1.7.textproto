@@ -1,0 +1,121 @@
+# proto-file: schema/bom-1.7.proto
+# proto-message: Bom
+
+spec_version: "1.7"
+version: 1
+serial_number: "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79"
+
+metadata: {
+  component{
+    type: CLASSIFICATION_APPLICATION
+    bom_ref: "acme-application"
+    name: "Acme Application"
+    version: "1.0"
+  }
+}
+
+components: {
+  type: CLASSIFICATION_CRYPTOGRAPHIC_ASSET
+  name: "AES-128-GCM-128-12"
+  cryptoProperties{
+    assetType: CRYPTO_ASSET_TYPE_ALGORITHM
+    algorithmProperties{
+      algorithmFamily: "AES"
+      primitive: CRYPTO_PRIMITIVE_AE
+      parameterSetIdentifier: "128"
+      mode: CRYPTO_ALGORITHM_MODE_GCM
+      executionEnvironment: CRYPTO_EXECUTION_ENVIRONMENT_SOFTWARE_PLAIN_RAM
+      implementationPlatform: CRYPTO_IMPLEMENTATION_PLATFORM_X86_64
+      certificationLevel: "none"
+      cryptoFunctions: CRYPTO_ALGORITHM_FUNCTION_KEYGEN
+      cryptoFunctions: CRYPTO_ALGORITHM_FUNCTION_ENCRYPT
+      cryptoFunctions: CRYPTO_ALGORITHM_FUNCTION_DECRYPT
+      cryptoFunctions: CRYPTO_ALGORITHM_FUNCTION_TAG
+      classicalSecurityLevel: 128
+      nistQuantumSecurityLevel: 1
+    }
+    oid: "2.16.840.1.101.3.4.1.6"
+  }
+}
+components: {
+  name: "RSA-PKCS1-1.5-SHA512-2048"
+  type: CLASSIFICATION_CRYPTOGRAPHIC_ASSET
+  cryptoProperties{
+    assetType: CRYPTO_ASSET_TYPE_ALGORITHM
+    algorithmProperties{
+      algorithmFamily: "RSASSA-PKCS1"
+      primitive: CRYPTO_PRIMITIVE_SIGNATURE
+      parameterSetIdentifier: "512"
+      executionEnvironment: CRYPTO_EXECUTION_ENVIRONMENT_SOFTWARE_PLAIN_RAM
+      implementationPlatform: CRYPTO_IMPLEMENTATION_PLATFORM_X86_64
+      certificationLevel: "none"
+      cryptoFunctions: CRYPTO_ALGORITHM_FUNCTION_SIGN
+      cryptoFunctions: CRYPTO_ALGORITHM_FUNCTION_VERIFY
+      nistQuantumSecurityLevel: 0
+    }
+    oid: "1.2.840.113549.1.1.13"
+  }
+}
+components: {
+  name: "ECDH-secp521r1"
+  bom_ref: "ecdhsecp521r1"
+  type: CLASSIFICATION_CRYPTOGRAPHIC_ASSET
+  cryptoProperties{
+    assetType: CRYPTO_ASSET_TYPE_ALGORITHM
+    algorithmProperties{
+      algorithmFamily: "ECDH"
+      ellipticCurve: "secg/secp521r1"
+      primitive: CRYPTO_PRIMITIVE_KEY_AGREE
+      executionEnvironment: CRYPTO_EXECUTION_ENVIRONMENT_SOFTWARE_PLAIN_RAM
+      implementationPlatform: CRYPTO_IMPLEMENTATION_PLATFORM_X86_64
+      certificationLevel: "none"
+      cryptoFunctions: CRYPTO_ALGORITHM_FUNCTION_KEYGEN
+      cryptoFunctions: CRYPTO_ALGORITHM_FUNCTION_KEYDERIVE
+      nistQuantumSecurityLevel: 0
+    }
+    oid: "1.3.132.0.35"
+  }
+}
+components: {
+  name: "ML-KEM-1024"
+  bom_ref: "mlkem1024"
+  type: CLASSIFICATION_CRYPTOGRAPHIC_ASSET
+  cryptoProperties{
+    assetType: CRYPTO_ASSET_TYPE_ALGORITHM
+    algorithmProperties{
+      algorithmFamily: "ML-KEM"
+      primitive: CRYPTO_PRIMITIVE_KEM
+      executionEnvironment: CRYPTO_EXECUTION_ENVIRONMENT_SOFTWARE_PLAIN_RAM
+      implementationPlatform: CRYPTO_IMPLEMENTATION_PLATFORM_X86_64
+      certificationLevel: "none"
+      cryptoFunctions: CRYPTO_ALGORITHM_FUNCTION_KEYGEN
+      cryptoFunctions: CRYPTO_ALGORITHM_FUNCTION_KEYDERIVE
+      nistQuantumSecurityLevel: 5
+    }
+    oid: "2.16.840.1.101.3.4.1.48"
+  }
+}
+components: {
+  name: "draft-ietf-tls-hybrid-design-13"
+  bom_ref: "draftietftlshybriddesign13"
+  type: CLASSIFICATION_CRYPTOGRAPHIC_ASSET
+  cryptoProperties{
+    assetType: CRYPTO_ASSET_TYPE_ALGORITHM
+    algorithmProperties{
+      primitive: CRYPTO_PRIMITIVE_COMBINER
+      executionEnvironment: CRYPTO_EXECUTION_ENVIRONMENT_SOFTWARE_PLAIN_RAM
+      implementationPlatform: CRYPTO_IMPLEMENTATION_PLATFORM_X86_64
+      certificationLevel: "none"
+      cryptoFunctions: CRYPTO_ALGORITHM_FUNCTION_KEYGEN
+      cryptoFunctions: CRYPTO_ALGORITHM_FUNCTION_KEYDERIVE
+      nistQuantumSecurityLevel: 0
+    }
+    oid: "1.3.101.110"
+  }
+}
+
+dependencies: {
+  ref: "draftietftlshybriddesign13"
+  dependencies: { ref: "mlkem1024" }
+  dependencies: { ref: "ecdhsecp521r1" }
+}
