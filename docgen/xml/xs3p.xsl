@@ -340,12 +340,14 @@
                         <li class="dropdown">
                            <a href="#" class="dropdown-toggle version-selector" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">v<xsl:value-of select="$cycloneDxVersion"/> (XML)<span class="caret"></span></a>
                            <ul class="dropdown-menu">
+                              <li><a class="dropdown-item" href="/docs/1.7/json/">v1.7 (JSON)</a></li>
                               <li><a class="dropdown-item" href="/docs/1.6/json/">v1.6 (JSON)</a></li>
                               <li><a class="dropdown-item" href="/docs/1.5/json/">v1.5 (JSON)</a></li>
                               <li><a class="dropdown-item" href="/docs/1.4/json/">v1.4 (JSON)</a></li>
                               <li><a class="dropdown-item" href="/docs/1.3/json/">v1.3 (JSON)</a></li>
                               <li><a class="dropdown-item" href="/docs/1.2/json/">v1.2 (JSON)</a></li>
                               <li style="padding:0"><hr class="dropdown-divider"/></li>
+                              <li><a class="dropdown-item" href="/docs/1.7/xml/">v1.7 (XML)</a></li>
                               <li><a class="dropdown-item" href="/docs/1.6/xml/">v1.6 (XML)</a></li>
                               <li><a class="dropdown-item" href="/docs/1.5/xml/">v1.5 (XML)</a></li>
                               <li><a class="dropdown-item" href="/docs/1.4/xml/">v1.4 (XML)</a></li>
@@ -354,6 +356,7 @@
                               <li><a class="dropdown-item" href="/docs/1.1/xml/">v1.1 (XML)</a></li>
                               <li><a class="dropdown-item" href="/docs/1.0/xml/">v1.0 (XML)</a></li>
                               <li style="padding:0"><hr class="dropdown-divider"/></li>
+                              <li><a class="dropdown-item" href="/docs/1.7/proto/">v1.7 (Protobuf)</a></li>
                               <li><a class="dropdown-item" href="/docs/1.6/proto/">v1.6 (Protobuf)</a></li>
                               <li><a class="dropdown-item" href="/docs/1.5/proto/">v1.5 (Protobuf)</a></li>
                               <li><a class="dropdown-item" href="/docs/1.4/proto/">v1.4 (Protobuf)</a></li>

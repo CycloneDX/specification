@@ -40,6 +40,7 @@ public class XmlSchemaVerificationTest extends BaseSchemaVerificationTest {
     private static final Schema VERSION_14;
     private static final Schema VERSION_15;
     private static final Schema VERSION_16;
+    private static final Schema VERSION_17;
 
     static {
         try {
@@ -57,6 +58,7 @@ public class XmlSchemaVerificationTest extends BaseSchemaVerificationTest {
             VERSION_14 = factory.newSchema(cl.getResource("bom-1.4.xsd"));
             VERSION_15 = factory.newSchema(cl.getResource("bom-1.5.xsd"));
             VERSION_16 = factory.newSchema(cl.getResource("bom-1.6.xsd"));
+            VERSION_17 = factory.newSchema(cl.getResource("bom-1.7.xsd"));
         } catch (SAXException e) {
             throw new IllegalStateException(e);
         }
@@ -145,6 +147,9 @@ public class XmlSchemaVerificationTest extends BaseSchemaVerificationTest {
         }
         if (resourceName.endsWith("-1.6.xml")) {
             return VERSION_16;
+        }
+        if (resourceName.endsWith("-1.7.xml")) {
+            return VERSION_17;
         }
         return null;
     }
