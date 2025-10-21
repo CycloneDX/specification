@@ -1,0 +1,48 @@
+# proto-file: schema/bom-1.7.proto
+# proto-message: Bom
+
+spec_version: "1.7"
+serial_number: "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79"
+version: 1
+
+metadata: {
+  timestamp: {
+    seconds: 1754424907
+    nanos: 0
+  }
+}
+
+components: {
+  type: CLASSIFICATION_LIBRARY
+  bom_ref: "component-1"
+  name: "example-lib"
+  version: "1.2.3"
+  licenses: {
+    license: {
+      id: "Apache-2.0"
+    }
+  }
+}
+
+## !! NO formal check possible
+#citations: {
+#  bom_ref: "citation-1"
+#  pointers: { pointer: "/components/0/name" }
+#  timestamp: {
+#    seconds: 1746108000
+#    nanos: 0
+#  }
+#  note: "Should have at least one of the following property sets: property 'attributedTo' or property 'process'"
+#}
+
+
+citations: {
+  bom_ref: "citation-1"
+  pointers: { pointer: "/components/0/name" }
+  expressions: { expression: "$..[?(bom_ref=='component-1')].version" }
+  timestamp: {
+    seconds: 1746108000
+    nanos: 0
+  }
+  note: "Should not have both a pointer and expression."
+}

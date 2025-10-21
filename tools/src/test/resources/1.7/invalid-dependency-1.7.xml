@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<bom xmlns="http://cyclonedx.org/schema/bom/1.7"
+     serialNumber="urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79"
+     version="1"
+>
+    <components>
+        <component type="library" bom-ref="library-a">
+            <name>acme-library-a</name>
+            <version>1.0.0</version>
+        </component>
+        <component type="library" bom-ref="library-b">
+            <name>acme-library-b</name>
+            <version>1.0.0</version>
+        </component>
+        <component type="library" bom-ref="library-c">
+            <name>acme-library-b</name>
+            <version>1.0.0</version>
+        </component>
+    </components>
+    <dependencies>
+        <dependency>
+            <!-- invalid: missing attribute `ref` -->
+        </dependency>
+        <dependency ref="">
+            <!-- invalid: attribute `ref` is empty -->
+            <dependency ref="library-a"/>
+        </dependency>
+        <dependency ref="library-b">
+            <dependency ref="library-c">
+                <!-- valid -->
+            </dependency>
+        </dependency>
+    </dependencies>
+</bom>
