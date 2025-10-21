@@ -11,7 +11,7 @@ TEST_RES_DIR='tools/src/test/resources'
 REMOTE="https://github.com/${GITHUB_REPOSITORY:-CycloneDX/specification}.git"
 
 BUF_IMAGE_VERSION='1.50.0'
-BUF_IMAGE="bufbuild/buf:$BUF_IMAGE_VERSION"
+BUF_IMAGE="bufbuild/buf:${BUF_IMAGE_VERSION}"
 
 LOG_FORMAT='text'  # set to 'json' to see details
 if [[ -n "${GITHUB_WORKFLOW:-}" ]]
@@ -54,7 +54,7 @@ function schema-breaking-version () {
     NEW_NP="$(mktemp)"
     OLD_NP="$(mktemp)"
 
-    # remove package identifier -> so that the comparisson works as expected
+    # remove package identifier -> so that the comparison works as expected
     sed 's/^package .*//' "${ROOT_PATH}/${SCHEMA_DIR}/${NEW}" > "$NEW_NP"
     sed 's/^package .*//' "${ROOT_PATH}/${SCHEMA_DIR}/${OLD}" > "$OLD_NP"
 
@@ -71,6 +71,7 @@ function schema-breaking-version () {
         --error-format "$LOG_FORMAT"
   }
 
+  compare '1.7' '1.6'
   compare '1.6' '1.5' || echo "possible breaks are acknowledged for this specific version only"
   compare '1.5' '1.4' || echo "possible breaks are acknowledged for this specific version only"
   compare '1.4' '1.3'
@@ -87,7 +88,7 @@ function schema-breaking-remote () {
     --workdir '/workspace' \
     "$BUF_IMAGE" \
       breaking --path "$SCHEMA_DIR" \
-      --against "${REMOTE}" \
+      --against "$REMOTE" \
       --error-format "$LOG_FORMAT"
 
   echo '>> OK.' >&2

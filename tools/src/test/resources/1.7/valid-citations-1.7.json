@@ -1,0 +1,91 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.7.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.7",
+  "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2025-05-01T14:23:00Z",
+    "authors": [
+      {
+        "bom-ref": "person-1",
+        "name": "Alice Example",
+        "email": "alice@example.com"
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "component-1",
+      "name": "example-lib",
+      "version": "1.2.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
+    }
+  ],
+  "citations": [
+    {
+      "bom-ref": "citation-1",
+      "pointers": ["/components/0/name"],
+      "timestamp": "2025-05-01T14:00:00Z",
+      "attributedTo": "person-1",
+      "note": "Manually entered by Alice Example - with `attributedTo`"
+    },
+    {
+      "bom-ref": "citation-2",
+      "pointers": ["/components/0/name"],
+      "timestamp": "2025-05-01T14:00:00Z",
+      "process": "task-license-scan",
+      "note": "Semi-manually entered by Alice Example - with `process`"
+    },
+    {
+      "bom-ref": "citation-3",
+      "expressions": ["$..[?(@.bom-ref=='component-1')].version"],
+      "timestamp": "2025-05-01T14:00:00Z",
+      "process": "task-license-scan",
+      "note": "Semi-manually entered by Alice Example - with `process`"
+    },
+    {
+      "bom-ref": "citation-4",
+      "expressions": ["$.components[*].licenses[*].license.id"],
+      "timestamp": "2025-05-01T14:05:00Z",
+      "attributedTo": "scan-tool-1",
+      "process": "task-license-scan",
+      "note": "Auto-detected by license scanner tool - with both, 'attributedTo' and 'process'"
+    }
+  ],
+  "formulation": [
+    {
+      "components": [
+        {
+          "bom-ref": "scan-tool-1",
+          "type": "application",
+          "name": "My Scan Tool"
+        }
+      ],
+      "bom-ref": "workflow-1",
+      "workflows": [
+        {
+          "bom-ref": "workflow-1",
+          "uid": "259bae74-5ec4-4de8-9386-c91b1f7719b8",
+          "name": "My workflow",
+          "tasks": [
+            {
+              "bom-ref": "task-license-scan",
+              "uid": "6d75f8d6-a008-41cf-8b65-c4129fc249f9",
+              "taskTypes": ["scan"],
+              "description": "License scan of the source files using OpenSourceScanner v2.1"
+            }
+          ],
+          "taskTypes": ["scan"]
+        }
+      ]
+    }
+  ]
+}
