@@ -925,6 +925,10 @@
           "title": "Component Version",
           "description": "The component version. The version should ideally comply with semantic versioning but is not enforced."
         },
+        "versionRange": {
+          "$ref": "#/definitions/versionRange",
+          "title": "Component Version Range"
+        },
         "description": {
           "type": "string",
           "title": "Component Description",
@@ -945,6 +949,12 @@
           "title": "Component Scope",
           "description": "Specifies the scope of the component. If scope is not specified, 'required' scope SHOULD be assumed by the consumer of the BOM.",
           "default": "required"
+        },
+        "isExtraneous": {
+          "type": "boolean",
+          "title": "Component Is Extraneous",
+          "description": "Whether this component is extraneous.\nAn extraneous component is not part of an assembly, but are (expected to be) provided by the environment, regardless of the component's `scope`.",
+          "default": false
         },
         "hashes": {
           "type": "array",
@@ -1096,7 +1106,18 @@
           "title": "Signature",
           "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
         }
-      }
+      },
+      "allOf": [
+        {
+          "$comment": "property `version` and `versionRange` MUST NOT exist at the same time.",
+          "not": { "required": ["version", "versionRange"] }
+        },
+        {
+          "$comment": "`version-range` MUST only be present, if `isExtraneous` is `true`",
+          "if": { "properties": { "isExtraneous": { "const": false } } },
+          "then": { "not": { "required": ["versionRange"] } }
+        }
+      ]
     },
     "swid": {
       "type": "object",
