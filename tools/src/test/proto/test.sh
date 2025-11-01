@@ -10,7 +10,7 @@ TEST_RES_DIR='tools/src/test/resources'
 
 REMOTE="https://github.com/${GITHUB_REPOSITORY:-CycloneDX/specification}.git"
 
-BUF_IMAGE_VERSION='1.50.0'
+BUF_IMAGE_VERSION='1.58.0'
 BUF_IMAGE="bufbuild/buf:${BUF_IMAGE_VERSION}"
 
 LOG_FORMAT='text'  # set to 'json' to see details
