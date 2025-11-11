@@ -1,0 +1,366 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "http://localhost:8080/schema/2.0/cyclonedx-behavior-2.0.schema.json",
+  "type": "object",
+  "title": "CycloneDX Transparency Expression Language: Behavior",
+  "$comment": "CycloneDX JSON schema is published under the terms of the Apache License 2.0.",
+  "additionalProperties": false,
+  "properties": {
+    "bom-ref": {
+      "type": "string",
+      "title": "BOM Reference",
+      "description": "An optional identifier which can be used to reference the behavior elsewhere in the BOM. Every bom-ref must be unique within the BOM."
+    },
+    "name": {
+      "type": "string",
+      "title": "Name",
+      "description": "The name of the behavior."
+    },
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "description": "A detailed description of the behavior."
+    },
+    "type": {
+      "type": "string",
+      "title": "Behavior Type",
+      "description": "The type of behavior that could potentially be misused or abused by malicious actors or code.",
+      "enum": [
+        "network_request",
+        "file_operation",
+        "data_processing",
+        "system_operation",
+        "input_validation",
+        "authentication",
+        "authorization",
+        "encryption",
+        "logging",
+        "error_handling",
+        "other"
+      ],
+      "meta:enum": {
+        "network_request": "Represents behaviors that involve network communication (HTTP, MQTT, BTLE, etc.).",
+        "file_operation": "Represents behaviors that involve file system operations (reading, writing, deleting files).",
+        "data_processing": "Represents behaviors that involve processing, transforming, or analyzing data.",
+        "system_operation": "Represents behaviors that interact with the operating system or hardware.",
+        "input_validation": "Represents behaviors that validate user or system inputs to prevent injection attacks or other malicious inputs.",
+        "authentication": "Represents behaviors that verify the identity of users, systems, or components.",
+        "authorization": "Represents behaviors that control access to resources based on identity and permissions.",
+        "encryption": "Represents behaviors that encrypt or decrypt data.",
+        "logging": "Represents behaviors that record events or activities for auditing or monitoring purposes.",
+        "error_handling": "Represents behaviors that handle errors or exceptions in a secure manner.",
+        "other": "A behavior type not covered by the standard types."
+      }
+    },
+    "securityImpact": {
+      "type": "array",
+      "title": "Security Impact",
+      "description": "The potential security or privacy impacts if this behavior is misused or abused.",
+      "items": {
+        "$ref": "cyclonedx-threat-2.0.schema.json#/$defs/riskAttributes"
+      }
+    },
+    "executionMode": {
+      "type": "string",
+      "title": "Execution Mode",
+      "description": "Specifies how the behavior or group of behaviors is executed.",
+      "enum": [
+        "sequential",
+        "parallel",
+        "conditional",
+        "unspecified"
+      ],
+      "meta:enum": {
+        "sequential": "Behaviors are executed in sequence, one after another.",
+        "parallel": "Behaviors are executed concurrently.",
+        "conditional": "Execution depends on specific conditions.",
+        "unspecified": "The execution mode is not specified."
+      },
+      "default": "unspecified"
+    },
+    "order": {
+      "type": "integer",
+      "title": "Order",
+      "description": "The optional order of execution within a group of behaviors. Only applicable when the parent behavior or containing group has executionMode set to 'sequential'."
+    },
+    "condition": {
+      "type": "string",
+      "title": "Condition",
+      "description": "A condition that determines whether this behavior is executed. Only applicable when executionMode is set to 'conditional'."
+    },
+    "parent": {
+      "type": "string",
+      "title": "Parent BOM Reference",
+      "description": "The optional `bom-ref` to a parent behavior. This establishes a hierarchy of behaviors."
+    },
+    "children": {
+      "type": "array",
+      "title": "Child Behaviors",
+      "description": "The list of child behaviors that are part of this behavior. This establishes a hierarchy of behaviors.",
+      "items": {
+        "$ref": "#/$defs/behavior"
+      }
+    },
+    "dependencies": {
+      "type": "array",
+      "title": "Dependencies",
+      "description": "Other behaviors that this behavior depends on.",
+      "items": {
+        "$ref": "#/$defs/dependency"
+      }
+    },
+    "properties": {
+      "type": "array",
+      "title": "Properties",
+      "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard.",
+      "items": {
+        "$ref": "#/$defs/property"
+      }
+    },
+    "externalReferences": {
+      "type": "array",
+      "title": "External References",
+      "description": "External references provide a way to document systems, sites, and information that may be relevant to the behavior.",
+      "items": {
+        "$ref": "#/$defs/externalReference"
+      }
+    }
+  },
+  "$defs": {
+    "behavior": {
+      "type": "object",
+      "title": "Behavior",
+      "description": "A behavior represents an action, operation, or activity performed by a system or application that could potentially be misused or abused by malicious actors or code.",
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "type": "string",
+          "title": "BOM Reference",
+          "description": "An optional identifier which can be used to reference the behavior elsewhere in the BOM. Every bom-ref must be unique within the BOM."
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name of the behavior."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A detailed description of the behavior."
+        },
+        "type": {
+          "type": "string",
+          "title": "Behavior Type",
+          "description": "The type of behavior that could potentially be misused or abused by malicious actors or code.",
+          "enum": [
+            "network_request",
+            "file_operation",
+            "data_processing",
+            "system_operation",
+            "input_validation",
+            "authentication",
+            "authorization",
+            "encryption",
+            "logging",
+            "error_handling",
+            "other"
+          ],
+          "meta:enum": {
+            "network_request": "Represents behaviors that involve network communication (HTTP, MQTT, BTLE, etc.).",
+            "file_operation": "Represents behaviors that involve file system operations (reading, writing, deleting files).",
+            "data_processing": "Represents behaviors that involve processing, transforming, or analyzing data.",
+            "system_operation": "Represents behaviors that interact with the operating system or hardware.",
+            "input_validation": "Represents behaviors that validate user or system inputs to prevent injection attacks or other malicious inputs.",
+            "authentication": "Represents behaviors that verify the identity of users, systems, or components.",
+            "authorization": "Represents behaviors that control access to resources based on identity and permissions.",
+            "encryption": "Represents behaviors that encrypt or decrypt data.",
+            "logging": "Represents behaviors that record events or activities for auditing or monitoring purposes.",
+            "error_handling": "Represents behaviors that handle errors or exceptions in a secure manner.",
+            "other": "A behavior type not covered by the standard types."
+          }
+        },
+        "securityImpact": {
+          "type": "array",
+          "title": "Security Impact",
+          "description": "The potential security or privacy impacts if this behavior is misused or abused.",
+          "items": {
+            "$ref": "cyclonedx-threat-2.0.schema.json#/$defs/riskAttributes"
+          }
+        },
+        "executionMode": {
+          "type": "string",
+          "title": "Execution Mode",
+          "description": "Specifies how the behavior or group of behaviors is executed.",
+          "enum": [
+            "sequential",
+            "parallel",
+            "conditional",
+            "unspecified"
+          ],
+          "meta:enum": {
+            "sequential": "Behaviors are executed in sequence, one after another.",
+            "parallel": "Behaviors are executed concurrently.",
+            "conditional": "Execution depends on specific conditions.",
+            "unspecified": "The execution mode is not specified."
+          },
+          "default": "unspecified"
+        },
+        "order": {
+          "type": "integer",
+          "title": "Order",
+          "description": "The optional order of execution within a group of behaviors. Only applicable when the parent behavior or containing group has executionMode set to 'sequential'."
+        },
+        "condition": {
+          "type": "string",
+          "title": "Condition",
+          "description": "A condition that determines whether this behavior is executed. Only applicable when executionMode is set to 'conditional'."
+        },
+        "parent": {
+          "type": "string",
+          "title": "Parent BOM Reference",
+          "description": "The optional `bom-ref` to a parent behavior. This establishes a hierarchy of behaviors."
+        },
+        "children": {
+          "type": "array",
+          "title": "Child Behaviors",
+          "description": "The list of child behaviors that are part of this behavior. This establishes a hierarchy of behaviors.",
+          "items": {
+            "$ref": "#/$defs/behavior"
+          }
+        },
+        "dependencies": {
+          "type": "array",
+          "title": "Dependencies",
+          "description": "Other behaviors that this behavior depends on.",
+          "items": {
+            "$ref": "#/$defs/dependency"
+          }
+        },
+        "properties": {
+          "type": "array",
+          "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard.",
+          "items": {
+            "$ref": "#/$defs/property"
+          }
+        },
+        "externalReferences": {
+          "type": "array",
+          "title": "External References",
+          "description": "External references provide a way to document systems, sites, and information that may be relevant to the behavior.",
+          "items": {
+            "$ref": "#/$defs/externalReference"
+          }
+        }
+      }
+    },
+    "dependency": {
+      "type": "object",
+      "title": "Dependency",
+      "description": "A dependency on another behavior.",
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "type": "string",
+          "title": "Reference",
+          "description": "The bom-ref of the behavior that this behavior depends on."
+        },
+        "type": {
+          "type": "string",
+          "title": "Dependency Type",
+          "description": "The type of dependency relationship.",
+          "enum": [
+            "requires",
+            "triggers",
+            "follows",
+            "precedes",
+            "other"
+          ],
+          "meta:enum": {
+            "requires": "This behavior requires the referenced behavior to be completed before it can start.",
+            "triggers": "This behavior triggers the referenced behavior.",
+            "follows": "This behavior follows the referenced behavior but does not strictly depend on it.",
+            "precedes": "This behavior precedes the referenced behavior but does not strictly trigger it.",
+            "other": "A dependency type not covered by the standard types."
+          }
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the dependency relationship."
+        }
+      }
+    },
+    "property": {
+      "type": "object",
+      "title": "Property",
+      "description": "A name-value property.",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "value"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name of the property."
+        },
+        "value": {
+          "type": "string",
+          "title": "Value",
+          "description": "The value of the property."
+        }
+      }
+    },
+    "externalReference": {
+      "type": "object",
+      "title": "External Reference",
+      "description": "An external reference provides a way to document systems, sites, and information that may be relevant to the behavior.",
+      "additionalProperties": false,
+      "required": [
+        "url",
+        "type"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "title": "URL",
+          "description": "The URL to the external reference."
+        },
+        "type": {
+          "type": "string",
+          "title": "Type",
+          "description": "The type of external reference.",
+          "enum": [
+            "documentation",
+            "website",
+            "advisories",
+            "bom",
+            "evidence",
+            "formulation",
+            "license",
+            "build-meta",
+            "build-system",
+            "chat",
+            "distribution",
+            "distribution-intake",
+            "distribution-meta",
+            "issue-tracker",
+            "mailing-list",
+            "social",
+            "support",
+            "vcs",
+            "other"
+          ]
+        },
+        "comment": {
+          "type": "string",
+          "title": "Comment",
+          "description": "An optional comment describing the external reference."
+        }
+      }
+    }
+  }
+}

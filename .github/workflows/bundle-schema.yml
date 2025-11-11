@@ -1,0 +1,42 @@
+name: Bundle JSON Schema with Versioned Output
+
+on:
+  push:
+    paths:
+      - 'schemas/**'
+      - '.github/workflows/bundle-schema.yml'
+  workflow_dispatch:
+
+jobs:
+  bundle-schema:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install AJV CLI
+        run: npm install -g ajv-cli
+
+      - name: Extract Version and Bundle Schema
+        run: |
+          VERSION=$(basename schemas/cyclonedx-bom-*.schema.json | sed -E 's/bom-([0-9]+\.[0-9]+)\.schema\.json/\1/')
+          echo "Detected version: $VERSION"
+
+          mkdir -p dist
+
+          ajv compile \
+            -s schemas/cyclonedx-bom-$VERSION.schema.json \
+            -r schemas/cyclonedx-metadata-$VERSION.schema.json \
+            -o dist/cyclonedx-bom-combined-$VERSION.schema.json \
+            --strict=false
+
+      - name: Upload Combined Schema
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundled-schema
+          path: dist/bom-*-combined.schema.json
