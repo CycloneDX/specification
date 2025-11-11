@@ -30,12 +30,11 @@ import java.util.Set;
 
 public class SpdxXsdGenerator {
 
-    private static final String SPDX_VERSION = "3.24.0";
+    //todo : automatically obtain latest release from: https://api.github.com/repos/spdx/license-list-data/releases
+    //todo : make configurable
+    private static final String SPDX_VERSION = "3.27.0";
 
     public static void main(String args[]) throws Exception {
-
-        //todo : automatically obtain latest release from: https://api.github.com/repos/spdx/license-list-data/releases
-        //todo : make configurable
         String licenseUrl = "https://raw.githubusercontent.com/spdx/license-list-data/v" + SPDX_VERSION + "/json/licenses.json";
         String exceptionsUrl = "https://raw.githubusercontent.com/spdx/license-list-data/v" + SPDX_VERSION + "/json/exceptions.json";
 
@@ -61,8 +60,6 @@ public class SpdxXsdGenerator {
 
         createXmlSchema(licenseMap, exceptionMap);
         createJsonSchema(licenseMap, exceptionMap);
-        createLicenseListJson(licenseMap, exceptionMap);
-        mirrorLicenses(licenseRoot);
     }
 
 
@@ -87,8 +84,9 @@ public class SpdxXsdGenerator {
             .append(indent(4)).append("</xs:simpleType>").append("\n").append("\n")
             .append("</xs:schema>");
 
-        //todo : make configurable
-        File file = new File("/Users/steve/Development/CycloneDX/specification/schema/spdx.xsd");
+        String filePath = System.getProperty("cdx.schema.dir") + "/spdx.xsd";
+        System.out.println("Write SPDX xml schema to: " + filePath);
+        File file = new File(filePath);
         FileUtils.writeStringToFile(file, sb.toString(), StandardCharsets.UTF_8);
     }
 
@@ -110,25 +108,9 @@ public class SpdxXsdGenerator {
                 .append("\n").append(indent(2)).append("]").append("\n")
                 .append("}").append("\n");
 
-        //todo : make configurable
-        File file = new File("/Users/steve/Development/CycloneDX/specification/schema/spdx.schema.json");
-        FileUtils.writeStringToFile(file, sb.toString(), StandardCharsets.UTF_8);
-    }
-
-    private static void createLicenseListJson(Map<String, String> licenses, Map<String, String> exceptions) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        sb.append("[").append("\n");
-        for (Map.Entry<String, String> license : licenses.entrySet()) {
-            sb.append("\"").append(license.getKey()).append("\"").append(",").append("\n");
-        }
-        for (Map.Entry<String, String> license : exceptions.entrySet()) {
-            sb.append("\"").append(license.getKey()).append("\"").append(",").append("\n");
-        }
-        sb.delete(sb.length() - 2, sb.length());
-        sb.append("\n").append("]").append("\n");
-
-        //todo : make configurable
-        File file = new File("/Users/steve/Development/CycloneDX/cyclonedx-node-module/spdx-licenses.json");
+        String filePath = System.getProperty("cdx.schema.dir") + "/spdx.schema.json";
+        System.out.println("Write SPDX json schema to: " + filePath);
+        File file = new File(filePath);
         FileUtils.writeStringToFile(file, sb.toString(), StandardCharsets.UTF_8);
     }
 
@@ -160,21 +142,6 @@ public class SpdxXsdGenerator {
             sb.append(" ");
         }
         return sb.toString();
-    }
-
-    private static void mirrorLicenses(final JSONObject licenseRoot) throws IOException, UnirestException {
-        File file = new File("/Users/steve/Development/CycloneDX/cyclonedx-core-java/src/main/resources/licenses/licenses.json");
-        FileUtils.writeStringToFile(file, licenseRoot.toString(2), StandardCharsets.UTF_8);
-
-        JSONArray licenses = licenseRoot.getJSONArray("licenses");
-        for (int i = 0; i < licenses.length(); i++) {
-            JSONObject license = licenses.getJSONObject(i);
-            String licenseId = license.getString("licenseId");
-            String url = "https://raw.githubusercontent.com/spdx/license-list-data/v" + SPDX_VERSION + "/text/" + licenseId + ".txt";
-            String text = Unirest.get(url).asString().getBody();
-            File textFile = new File("/Users/steve/Development/CycloneDX/cyclonedx-core-java/src/main/resources/licenses/" + licenseId + ".txt");
-            FileUtils.writeStringToFile(textFile, text, StandardCharsets.UTF_8);
-        }
     }
 
 }

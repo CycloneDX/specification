@@ -16,6 +16,9 @@ defaults:
   run:
     working-directory: tools/src/test/js
 
+# https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token
+permissions: {}
+
 jobs:
   test:
     timeout-minutes: 30
@@ -23,13 +26,14 @@ jobs:
     steps:
       - name: Checkout
         # see https://github.com/actions/checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Setup Node.js
         # see https://github.com/actions/setup-node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: '20.x'
-      - name: Install Depenencies
+          node-version: '24.x'
+          package-manager-cache: false
+      - name: Install Dependencies
         run: npm install
       - name: Run test 
         run: npm test

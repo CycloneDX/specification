@@ -1,0 +1,79 @@
+# proto-file: schema/bom-1.7.proto
+# proto-message: Bom
+
+spec_version: "1.7"
+version: 1
+serial_number: "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79"
+components: {
+  type: CLASSIFICATION_LIBRARY
+  bom_ref: "pkg:maven/com.acme/stock-java-client@1.0.12"
+  publisher: "Acme Inc"
+  group: "com.acme"
+  name: "stock-java-client"
+  version: "1.0.12"
+  hashes: {
+    alg: HASH_ALG_SHA_1
+    value: "e6b1000b94e835ffd37f4c6dcbdad43f4b48a02a"
+  }
+  licenses: {
+    license: {
+      id: "Apache-2.0"
+    }
+  }
+  purl: "pkg:maven/com.acme/stock-java-client@1.0.12"
+}
+services: {
+  bom_ref: "b2a46a4b-8367-4bae-9820-95557cfe03a8"
+  provider: {
+    name: "Partner Org"
+    url: "https://partner.org"
+    contact: {
+      name: "Support"
+      email: "support@partner.org"
+      phone: "800-555-1212"
+    }
+  }
+  group: "org.partner"
+  name: "Stock ticker service"
+  version: "2020-Q2"
+  description: "Provides real-time stock information"
+  endpoints: "https://partner.org/api/v1/lookup"
+  endpoints: "https://partner.org/api/v1/stock"
+  authenticated: true
+  x_trust_boundary: true
+  data: {
+    flow: DATA_FLOW_INBOUND
+    value: "PII"
+  }
+  data: {
+    flow: DATA_FLOW_OUTBOUND
+    value: "PIFI"
+  }
+  data: {
+    flow: DATA_FLOW_BI_DIRECTIONAL
+    value: "public"
+  }
+  data: {
+    flow: DATA_FLOW_UNKNOWN
+    value: "partner-data"
+  }
+  licenses: {
+    license: {
+      name: "Partner license"
+    }
+  }
+  external_references: {
+    type: EXTERNAL_REFERENCE_TYPE_WEBSITE
+    url: "http://partner.org"
+  }
+  external_references: {
+    type: EXTERNAL_REFERENCE_TYPE_DOCUMENTATION
+    url: "http://api.partner.org/swagger"
+  }
+}
+dependencies: {
+  ref: "pkg:maven/com.acme/stock-java-client@1.0.12"
+  dependencies: {
+    ref: "b2a46a4b-8367-4bae-9820-95557cfe03a8"
+  }
+}
