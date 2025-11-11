@@ -42,8 +42,18 @@ jobs:
       - name: Check for changes
         id: git-check
         run: |
-          git diff --exit-code schema/2.0/cyclonedx-2.0-bundled.schema.json || echo "changed=true" >> $GITHUB_OUTPUT
-
+          # Check if bundled schema exists and has changes, or if it's new
+          if [ ! -f schema/2.0/cyclonedx-2.0-bundled.schema.json ]; then
+            echo "Bundled schema is new"
+            echo "changed=true" >> $GITHUB_OUTPUT
+          elif git diff --exit-code schema/2.0/cyclonedx-2.0-bundled.schema.json; then
+            echo "No changes to bundled schema"
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "Bundled schema has changes"
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+      
       - name: Commit and push changes
         if: steps.git-check.outputs.changed == 'true'
         run: |
