@@ -42,16 +42,21 @@ jobs:
       - name: Check for changes
         id: git-check
         run: |
-          # Check if bundled schema exists and has changes, or if it's new
-          if [ ! -f schema/2.0/cyclonedx-2.0-bundled.schema.json ]; then
-            echo "Bundled schema is new"
+          BUNDLED_FILE="schema/2.0/cyclonedx-2.0-bundled.schema.json"
+          
+          # Check if file is untracked (new)
+          if ! git ls-files --error-unmatch "$BUNDLED_FILE" > /dev/null 2>&1; then
+            echo "Bundled schema is new, adding to git"
+            git add "$BUNDLED_FILE"
             echo "changed=true" >> $GITHUB_OUTPUT
-          elif git diff --exit-code schema/2.0/cyclonedx-2.0-bundled.schema.json; then
+          # Check if tracked file has changes
+          elif ! git diff --exit-code "$BUNDLED_FILE" > /dev/null 2>&1; then
+            echo "Bundled schema has changes"
+            git add "$BUNDLED_FILE"
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
             echo "No changes to bundled schema"
             echo "changed=false" >> $GITHUB_OUTPUT
-          else
-            echo "Bundled schema has changes"
-            echo "changed=true" >> $GITHUB_OUTPUT
           fi
       
       - name: Commit and push changes
@@ -59,6 +64,5 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add schema/2.0/cyclonedx-2.0-bundled.schema.json
           git commit -m "chore: update bundled schema [skip ci]"
           git push
