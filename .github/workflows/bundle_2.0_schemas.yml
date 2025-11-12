@@ -39,16 +39,20 @@ jobs:
             ../../../../schema/2.0/model \
             ../../../../schema/2.0/cyclonedx-2.0.schema.json
 
-      - name: Check for changes
-        id: git-check
+      - name: Check for changes and commit
         run: |
-          git diff --exit-code schema/2.0/cyclonedx-2.0-bundled.schema.json || echo "changed=true" >> $GITHUB_OUTPUT
-
-      - name: Commit and push changes
-        if: steps.git-check.outputs.changed == 'true'
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add schema/2.0/cyclonedx-2.0-bundled.schema.json
-          git commit -m "chore: update bundled schema [skip ci]"
-          git push
+          BUNDLED_FILE="schema/2.0/cyclonedx-2.0-bundled.schema.json"
+          
+          # Add the file (works for both new and modified files)
+          git add "$BUNDLED_FILE"
+          
+          # Check if there are staged changes
+          if git diff --staged --quiet; then
+            echo "No changes to bundled schema"
+          else
+            echo "Committing bundled schema changes"
+            git config --local user.email "github-actions[bot]@users.noreply.github.com"
+            git config --local user.name "github-actions[bot]"
+            git commit -m "chore: update bundled schema [skip ci]"
+            git push
+          fi
