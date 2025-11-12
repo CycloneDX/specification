@@ -61,11 +61,16 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
         console.log(`Models directory: ${absoluteModelsDir}`);
         console.log(`Root schema: ${absoluteRootPath}`);
 
-        // Generate output filename by inserting "-bundled" before ".schema.json"
-        const outputFilename = rootSchemaFilename.replace('.schema.json', '-bundled.schema.json');
-        const outputPath = path.join(rootSchemaDir, outputFilename);
+        // Generate output filenames
+        const baseFilename = rootSchemaFilename.replace('.schema.json', '');
+        const bundledFilename = `${baseFilename}-bundled.schema.json`;
+        const minifiedFilename = `${baseFilename}-bundled.min.schema.json`;
 
-        console.log(`Output: ${outputPath}\n`);
+        const bundledPath = path.join(rootSchemaDir, bundledFilename);
+        const minifiedPath = path.join(rootSchemaDir, minifiedFilename);
+
+        console.log(`Output (bundled): ${bundledPath}`);
+        console.log(`Output (minified): ${minifiedPath}\n`);
 
         // Read all schema files in the models directory
         const files = await fs.readdir(absoluteModelsDir);
@@ -96,7 +101,7 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
         // Read the root schema
         console.log(`\nReading root schema...`);
         const rootContent = await fs.readFile(absoluteRootPath, 'utf8');
-        const rootSchema = JSON.parse(rootContent);  // Fixed: was 'content', should be 'rootContent'
+        const rootSchema = JSON.parse(rootContent);
         const rootSchemaName = path.basename(rootSchemaFilename, '.schema.json');
 
         // Add root schema to the schemas collection
@@ -156,14 +161,21 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
             }
         }
 
-        await fs.writeFile(outputPath, JSON.stringify(finalSchema, null, 2));
+        // Write bundled (pretty) version
+        console.log('\nWriting bundled schema...');
+        await fs.writeFile(bundledPath, JSON.stringify(finalSchema, null, 2));
+        const bundledStats = await fs.stat(bundledPath);
+        const bundledSizeKB = (bundledStats.size / 1024).toFixed(2);
+        console.log(`✓ Bundled schema: ${bundledFilename} (${bundledSizeKB} KB)`);
 
-        console.log(`\n✓ Bundled ${Object.keys(schemas).length} schemas to ${outputFilename}`);
+        // Write minified version
+        console.log('Writing minified schema...');
+        await fs.writeFile(minifiedPath, JSON.stringify(finalSchema));
+        const minifiedStats = await fs.stat(minifiedPath);
+        const minifiedSizeKB = (minifiedStats.size / 1024).toFixed(2);
+        console.log(`✓ Minified schema: ${minifiedFilename} (${minifiedSizeKB} KB)`);
 
-        // Show file size
-        const stats = await fs.stat(outputPath);
-        const sizeKB = (stats.size / 1024).toFixed(2);
-        console.log(`  File size: ${sizeKB} KB`);
+        console.log(`\n✓ Successfully bundled ${Object.keys(schemas).length} schemas`);
 
         return finalSchema;
 
@@ -185,7 +197,9 @@ if (require.main === module) {
         console.log('    ./schema/2.0/model \\');
         console.log('    ./schema/2.0/cyclonedx-2.0.schema.json');
         console.log('');
-        console.log('This will create: ./schema/2.0/cyclonedx-2.0-bundled.schema.json');
+        console.log('This will create:');
+        console.log('  ./schema/2.0/cyclonedx-2.0-bundled.schema.json (pretty-printed)');
+        console.log('  ./schema/2.0/cyclonedx-2.0-bundled.min.schema.json (minified)');
         process.exit(1);
     }
 

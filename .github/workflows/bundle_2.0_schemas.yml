@@ -42,17 +42,18 @@ jobs:
       - name: Check for changes and commit
         run: |
           BUNDLED_FILE="schema/2.0/cyclonedx-2.0-bundled.schema.json"
+          MINIFIED_FILE="schema/2.0/cyclonedx-2.0-bundled.min.schema.json"
           
-          # Add the file (works for both new and modified files)
-          git add "$BUNDLED_FILE"
+          # Add both files (works for both new and modified files)
+          git add "$BUNDLED_FILE" "$MINIFIED_FILE"
           
           # Check if there are staged changes
           if git diff --staged --quiet; then
-            echo "No changes to bundled schema"
+            echo "No changes to bundled schemas"
           else
             echo "Committing bundled schema changes"
             git config --local user.email "github-actions[bot]@users.noreply.github.com"
             git config --local user.name "github-actions[bot]"
-            git commit -m "chore: update bundled schema [skip ci]"
+            git commit -m "chore: update bundled schemas [skip ci]"
             git push
           fi
