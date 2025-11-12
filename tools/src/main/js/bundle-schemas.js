@@ -46,6 +46,34 @@ function rewriteRefs(obj, schemaFiles, defsKeyword, currentSchemaName) {
     return newObj;
 }
 
+/**
+ * Recursively removes $comment properties from an object (except at root level)
+ */
+function removeComments(obj, isRoot = false) {
+    if (typeof obj !== 'object' || obj === null) {
+        return obj;
+    }
+
+    if (Array.isArray(obj)) {
+        return obj.map(item => removeComments(item, false));
+    }
+
+    const newObj = {};
+    for (const [key, value] of Object.entries(obj)) {
+        // Skip $comment unless we're at root level
+        if (key === '$comment' && !isRoot) {
+            continue;
+        }
+
+        if (typeof value === 'object' && value !== null) {
+            newObj[key] = removeComments(value, false);
+        } else {
+            newObj[key] = value;
+        }
+    }
+    return newObj;
+}
+
 async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
     try {
         const absoluteModelsDir = path.resolve(modelsDirectory);
@@ -163,17 +191,26 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
 
         // Write bundled (pretty) version
         console.log('\nWriting bundled schema...');
-        await fs.writeFile(bundledPath, JSON.stringify(finalSchema, null, 2));
+        const prettyJson = JSON.stringify(finalSchema, null, 2);
+        await fs.writeFile(bundledPath, prettyJson);
         const bundledStats = await fs.stat(bundledPath);
         const bundledSizeKB = (bundledStats.size / 1024).toFixed(2);
         console.log(`✓ Bundled schema: ${bundledFilename} (${bundledSizeKB} KB)`);
 
         // Write minified version
         console.log('Writing minified schema...');
-        await fs.writeFile(minifiedPath, JSON.stringify(finalSchema));
+        const minifiedSchema = removeComments(finalSchema, true);
+        const minifiedJson = JSON.stringify(minifiedSchema);
+
+        // Verify it's a single line
+        const lineCount = minifiedJson.split('\n').length;
+        console.log(`  Minified JSON is on ${lineCount} line(s)`);
+
+        await fs.writeFile(minifiedPath, minifiedJson);
         const minifiedStats = await fs.stat(minifiedPath);
         const minifiedSizeKB = (minifiedStats.size / 1024).toFixed(2);
-        console.log(`✓ Minified schema: ${minifiedFilename} (${minifiedSizeKB} KB)`);
+        const compressionRatio = ((1 - minifiedStats.size / bundledStats.size) * 100).toFixed(1);
+        console.log(`✓ Minified schema: ${minifiedFilename} (${minifiedSizeKB} KB, ${compressionRatio}% smaller)`);
 
         console.log(`\n✓ Successfully bundled ${Object.keys(schemas).length} schemas`);
 
@@ -198,8 +235,8 @@ if (require.main === module) {
         console.log('    ./schema/2.0/cyclonedx-2.0.schema.json');
         console.log('');
         console.log('This will create:');
-        console.log('  ./schema/2.0/cyclonedx-2.0-bundled.schema.json (pretty-printed)');
-        console.log('  ./schema/2.0/cyclonedx-2.0-bundled.min.schema.json (minified)');
+        console.log('  ./schema/2.0/cyclonedx-2.0-bundled.schema.json (pretty-printed with all $comment)');
+        console.log('  ./schema/2.0/cyclonedx-2.0-bundled.min.schema.json (minified, root $comment only)');
         process.exit(1);
     }
 
