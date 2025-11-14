@@ -1,0 +1,58 @@
+name: Bundle CycloneDX 2.0 JSON Schemas
+
+on:
+  push:
+    branches:
+      - 2.0-dev
+      - 2.0-dev-threatmodeling
+    paths:
+      - 'schema/2.0/**/*.schema.json'
+      - 'tools/src/main/js/bundle-schemas.js'
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  bundle-schemas:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write  # Required to push changes
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: tools/src/main/js
+        run: npm install
+
+      - name: Bundle schemas
+        working-directory: tools/src/main/js
+        run: |
+          node bundle-schemas.js \
+            ../../../../schema/2.0/model \
+            ../../../../schema/2.0/cyclonedx-2.0.schema.json
+
+      - name: Check for changes and commit
+        run: |
+          BUNDLED_FILE="schema/2.0/cyclonedx-2.0-bundled.schema.json"
+          
+          # Add the file (works for both new and modified files)
+          git add "$BUNDLED_FILE"
+          
+          # Check if there are staged changes
+          if git diff --staged --quiet; then
+            echo "No changes to bundled schema"
+          else
+            echo "Committing bundled schema changes"
+            git config --local user.email "github-actions[bot]@users.noreply.github.com"
+            git config --local user.name "github-actions[bot]"
+            git commit -m "chore: update bundled schema [skip ci]"
+            git push
+          fi
