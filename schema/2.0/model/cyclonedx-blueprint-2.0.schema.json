@@ -46,6 +46,20 @@
       },
       "description": "The assets (components, services, data, actors) included in the model"
     },
+    "dataStores": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/dataStore"
+      },
+      "description": "Structured description of data stores used in the model"
+    },
+    "dataSets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/dataSet"
+      },
+      "description": "Datasets handled by the system, including placements and sensitivity"
+    },
     "zones": {
       "type": "array",
       "items": {
@@ -321,6 +335,9 @@
             "compliance",
             "risk",
             "stakeholder",
+            "use-case",
+            "abuse-case",
+            "design-review",
             "custom"
           ],
           "meta:enum": {
@@ -340,6 +357,8 @@
             "compliance": "Regulatory compliance perspective",
             "risk": "Risk management perspective",
             "stakeholder": "General stakeholder perspective",
+            "use-case": "A high level persepctive that captures the data-flows of the use case, rather than deep granularity of systems",
+            "abuse-case": "A high level persepctive that captures the data-flows of a certain abuse case, rather than deep granularity of systems",
             "custom": "Custom or other perspective"
           }
         },
@@ -535,7 +554,7 @@
             "component": "Software component or application",
             "service": "Service or microservice",
             "dataStore": "Database, file system, or data repository",
-            "data": "Data asset or dataset",
+            "data": "Dataset",
             "actor": "User, system, or external entity",
             "process": "Business or system process",
             "infrastructure": "Infrastructure component",
@@ -616,8 +635,8 @@
           "description": "Authentication methods supported/required"
         },
         "authorization": {
-          "$ref": "#/$defs/authorizationType",
-          "description": "Authorization model used"
+          "$ref": "#/$defs/accessControlType",
+          "description": "Access control model used"
         },
         "encryption": {
           "$ref": "#/$defs/encryptionType"
@@ -633,6 +652,169 @@
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference"
           }
+        }
+      }
+    },
+    "dataStore": {
+      "type": "object",
+      "required": ["bom-ref", "name", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the data store"
+        },
+        "description": {
+          "type": "string",
+          "description": "Purpose and contents of the store"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "sql",
+            "keyValue",
+            "document",
+            "object",
+            "graph",
+            "timeSeries",
+            "file",
+            "blob",
+            "cache",
+            "custom"
+          ],
+          "meta:enum": {
+            "sql": "Relational database",
+            "keyValue": "Key-value store",
+            "document": "Document database (e.g., MongoDB)",
+            "object": "Object storage",
+            "graph": "Graph database",
+            "timeSeries": "Time-series database",
+            "file": "File system or NAS",
+            "blob": "Binary/blob storage",
+            "cache": "Caching tier",
+            "custom": "Other or mixed storage technology"
+          }
+        },
+        "vendor": {
+          "type": "string"
+        },
+        "product": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "environment": {
+          "type": "string",
+          "description": "Deployment environment (prod, test, etc.)"
+        },
+        "trustZone": {
+          "$ref": "#/$defs/trustZoneRef"
+        },
+        "location": {
+          "type": "string",
+          "description": "Physical or logical hosting location"
+        },
+        "technologies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Supporting technologies or services"
+        },
+        "dataSets": {
+          "type": "array",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          },
+          "description": "References to data sets stored here"
+        },
+        "accessControl": {
+          "$ref": "#/$defs/accessControlType"
+        },
+        "encryption": {
+          "$ref": "#/$defs/encryptionType"
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "dataSet": {
+      "type": "object",
+      "required": ["bom-ref", "name", "description"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the dataset"
+        },
+        "description": {
+          "type": "string",
+          "description": "What information is contained and why it exists"
+        },
+        "classification": {
+          "$ref": "#/$defs/dataClassification"
+        },
+        "dataTypes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dataObjectType"
+          },
+          "description": "Categories of data stored (PII, PHI, etc.)"
+        },
+        "recordCount": {
+          "type": "integer",
+          "description": "Approximate number of records"
+        },
+        "owners": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntityOrContact"
+        },
+        "regulations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Applicable regulations or contracts"
+        },
+        "accessControl": {
+          "$ref": "#/$defs/accessControlType"
+        },
+        "placements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["dataStore"],
+            "additionalProperties": false,
+            "properties": {
+              "dataStore": {
+                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+                "description": "Reference to the store holding this dataset"
+              },
+              "encrypted": {
+                "type": "boolean",
+                "description": "Whether the dataset is encrypted at this location"
+              },
+              "retention": {
+                "type": "string",
+                "description": "Retention policy for this placement"
+              },
+              "replicated": {
+                "type": "boolean",
+                "description": "Indicates if this placement is a replica"
+              }
+            }
+          },
+          "description": "Where the dataset resides"
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
         }
       }
     },
@@ -787,8 +969,8 @@
           "description": "Authentication required to cross this boundary"
         },
         "authorization": {
-          "$ref": "#/$defs/authorizationType",
-          "description": "Authorization model at this boundary"
+          "$ref": "#/$defs/accessControlType",
+          "description": "Access control model at this boundary"
         },
         "dataValidation": {
           "type": "boolean",
@@ -888,6 +1070,13 @@
         "classification": {
           "$ref": "#/$defs/dataClassification"
         },
+        "dataObjects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dataObject"
+          },
+          "description": "The data object(s) transported in this flow"
+        },
         "authentication": {
           "type": "array",
           "items": {
@@ -896,6 +1085,11 @@
         },
         "encryption": {
           "$ref": "#/$defs/encryptionType"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Ordering hint so flows can be assembled into sequence diagrams"
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
@@ -914,10 +1108,10 @@
           "type": "string",
           "description": "The assumption being made"
         },
-        "category": {
+        "topic": {
           "type": "string",
           "enum": ["technical", "business", "operational", "security", "compliance", "performance", "availability"],
-          "description": "Category of the assumption"
+          "description": "Topic of the assumption"
         },
         "relatedAssets": {
           "type": "array",
@@ -1071,9 +1265,6 @@
         "criticality": {
           "$ref": "cyclonedx-risk-2.0.schema.json#/$defs/criticality"
         },
-        "sensitivity": {
-          "$ref": "cyclonedx-risk-2.0.schema.json#/$defs/dataSensitivity"
-        },
         "dataClassification": {
           "$ref": "#/$defs/dataClassification"
         },
@@ -1108,8 +1299,16 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "sensitivity": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/dataSensitivity"
+        "level": {
+          "type": "string",
+          "enum": ["public", "internal", "confidential", "restricted"],
+          "description": "Data sensitivity classification",
+          "meta:enum": {
+            "public": "Public information that can be freely shared",
+            "internal": "Internal use only within the organization",
+            "confidential": "Confidential information requiring protection",
+            "restricted": "Highly restricted information with limited access and special protection measures"
+          }
         },
         "dataTypes": {
           "type": "array",
@@ -1137,6 +1336,85 @@
           },
           "description": "Applicable regulations"
         }
+      }
+    },
+    "dataObject": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "Unique identifier for this data object"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the transported data object"
+        },
+        "description": {
+          "type": "string",
+          "description": "Additional details about the data contents"
+        },
+        "classification": {
+          "$ref": "#/$defs/dataClassification",
+          "description": "Inline classification details for this data object"
+        },
+        "classificationRef": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "Reference to a shared classification definition elsewhere in the model"
+        },
+        "type": {
+          "$ref": "#/$defs/dataObjectType",
+          "description": "Type of data (PII, PHI, PCI, etc.)"
+        },
+        "schema": {
+          "type": "string",
+          "description": "Reference to a schema contract or document describing the data structure"
+        },
+        "format": {
+          "type": "string",
+          "description": "Serialization or encoding format (JSON, HL7, CSV, etc.)"
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Key attributes or fields transported"
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "dataObjectType": {
+      "type": "string",
+      "enum": [
+        "pii",
+        "phi",
+        "pci",
+        "financial",
+        "intellectualProperty",
+        "telemetry",
+        "logs",
+        "credentials",
+        "safety",
+        "operational",
+        "custom"
+      ],
+      "description": "Common data object classifications",
+      "meta:enum": {
+        "pii": "Personally identifiable information",
+        "phi": "Protected health information",
+        "pci": "Payment card industry data",
+        "financial": "Financial statements or transaction data",
+        "intellectualProperty": "Intellectual property or trade secrets",
+        "telemetry": "System or product telemetry data",
+        "logs": "Operational or security log data",
+        "credentials": "Secrets, tokens, or credentials",
+        "safety": "Safety critical data or signals",
+        "operational": "Operational or process data",
+        "custom": "Other data types not covered by the enumerated values"
       }
     },
     "ownership": {
@@ -1230,6 +1508,10 @@
           "description": "Whether data is encrypted during processing"
         }
       }
+    },
+    "trustZoneRef": {
+      "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+      "description": "Reference to a zone entry whose type is 'trust'"
     }
   }
 }
