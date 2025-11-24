@@ -3,6 +3,61 @@
 const fs = require('fs').promises;
 const path = require('path');
 
+function isObject(value) {
+    return typeof value === 'object' && value !== null;
+}
+
+/**
+ * Resolve a JSON Pointer (RFC6901) against an object. Returns { ok: boolean, value?: any, error?: string }
+ */
+function resolveJsonPointer(root, pointer) {
+    if (typeof pointer !== 'string' || pointer.length === 0) {
+        return { ok: false, error: 'Empty JSON Pointer' };
+    }
+    // Allow pointers like "#/..." or "/..."; strip leading '#'
+    let p = pointer.startsWith('#') ? pointer.slice(1) : pointer;
+    if (p === '') return { ok: true, value: root };
+    if (!p.startsWith('/')) {
+        return { ok: false, error: `Pointer must start with '/': ${pointer}` };
+    }
+    const parts = p.split('/').slice(1).map(seg => seg.replace(/~1/g, '/').replace(/~0/g, '~'));
+    let current = root;
+    for (const key of parts) {
+        if (!isObject(current) && !Array.isArray(current)) {
+            return { ok: false, error: `Non-object encountered before end at '${key}' in ${pointer}` };
+        }
+        if (!(key in current)) {
+            return { ok: false, error: `Missing key '${key}' in ${pointer}` };
+        }
+        current = current[key];
+    }
+    return { ok: true, value: current };
+}
+
+/**
+ * Traverse an object and collect all ref-like keyword values matching a predicate
+ */
+function collectRefKeywords(obj, keys, predicate, pathStack = []) {
+    const result = [];
+    if (!isObject(obj)) return result;
+
+    if (Array.isArray(obj)) {
+        obj.forEach((item, idx) => {
+            result.push(...collectRefKeywords(item, keys, predicate, pathStack.concat(`[${idx}]`)));
+        });
+        return result;
+    }
+
+    for (const [k, v] of Object.entries(obj)) {
+        const nextPath = pathStack.concat(k);
+        if (keys.includes(k) && typeof v === 'string' && (!predicate || predicate(v, k))) {
+            result.push({ ref: v, key: k, path: nextPath.join('.') });
+        }
+        result.push(...collectRefKeywords(v, keys, predicate, nextPath));
+    }
+    return result;
+}
+
 /**
  * Recursively walks through an object and rewrites $ref paths
  */
@@ -162,6 +217,24 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
 
         console.log(`\nUsing schema version: ${schemaVersion}`);
         console.log(`Using keyword: ${defsKeyword}`);
+
+        // Pre-check: external file $ref targets must exist among loaded schemas
+        console.log('Validating external $ref targets...');
+        const allowedFiles = new Set([...schemaFiles, rootSchemaFilename]);
+        for (const [name, schema] of Object.entries(schemas)) {
+            // Only $ref can be external; $dynamicRef/$recursiveRef are JSON Pointers by spec
+            const refs = collectRefKeywords(schema, ['$ref'], (v) => /^(.+\.schema\.json)(#.*)?$/.test(v));
+            for (const { ref, key, path: refPath } of refs) {
+                const m = ref.match(/^(.+\.schema\.json)(#.*)?$/);
+                if (!m) continue;
+                const target = m[1];
+                const base = path.basename(target);
+                if (!allowedFiles.has(base)) {
+                    throw new Error(`Unresolved external ${key} target file '${target}' referenced from schema '${name}' at '${refPath}'`);
+                }
+            }
+        }
+
         console.log('Rewriting $ref pointers...');
 
         // Rewrite all $refs in all schemas
@@ -180,6 +253,20 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
             "$schema": schemaVersion,
             [defsKeyword]: rewrittenDefinitions
         };
+
+        // Post-check: ensure all internal JSON Pointer refs resolve in the final bundle
+        console.log('Validating internal ref pointers ($ref, $dynamicRef, $recursiveRef)...');
+        const internalRefs = collectRefKeywords(
+            finalSchema,
+            ['$ref', '$dynamicRef', '$recursiveRef'],
+            (v) => typeof v === 'string' && v.startsWith('#')
+        );
+        for (const { ref, key, path: refPath } of internalRefs) {
+            const resolved = resolveJsonPointer(finalSchema, ref);
+            if (!resolved.ok) {
+                throw new Error(`Unresolved internal ${key} '${ref}' at '${refPath}': ${resolved.error}`);
+            }
+        }
 
         // Optionally validate with AJV
         if (options.validate) {
