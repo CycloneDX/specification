@@ -27,8 +27,17 @@ function rewriteRefs(obj, schemaFiles, defsKeyword, currentSchemaName) {
                 const basename = path.basename(filename);
                 const schemaName = basename.replace('.schema.json', '');
 
+                // Normalize fragment: drop leading '#' and optional leading '/'
+                let fragPath = '';
+                if (fragment) {
+                    fragPath = fragment.startsWith('#') ? fragment.slice(1) : fragment;
+                    if (fragPath.startsWith('/')) fragPath = fragPath.slice(1);
+                }
+
                 // Rewrite to point to the bundled schema's definitions
-                newObj[key] = `#/${defsKeyword}/${schemaName}${fragment}`;
+                newObj[key] = fragPath
+                    ? `#/${defsKeyword}/${schemaName}/${fragPath}`
+                    : `#/${defsKeyword}/${schemaName}`;
             }
             // Case 2: Internal reference within the same schema (starts with #)
             else if (value.startsWith('#')) {
