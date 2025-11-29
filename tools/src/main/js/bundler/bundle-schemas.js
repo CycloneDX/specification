@@ -3,6 +3,14 @@
 const fs = require('fs').promises;
 const path = require('path');
 
+// Default list of external schema files to bypass for validation and rewriting.
+// This constant is used as the default value for ref exceptions; can be overridden via options.refExceptions.
+const DEFAULT_REF_EXCEPTION_FILES = [
+    'spdx.schema.json',
+    'cryptography-defs.schema.json',
+    'jsf-0.82.schema.json'
+];
+
 function isObject(value) {
     return typeof value === 'object' && value !== null;
 }
@@ -61,13 +69,13 @@ function collectRefKeywords(obj, keys, predicate, pathStack = []) {
 /**
  * Recursively walks through an object and rewrites $ref paths
  */
-function rewriteRefs(obj, schemaFiles, defsKeyword, currentSchemaName) {
+function rewriteRefs(obj, schemaFiles, defsKeyword, currentSchemaName, refExceptionSet) {
     if (typeof obj !== 'object' || obj === null) {
         return obj;
     }
 
     if (Array.isArray(obj)) {
-        return obj.map(item => rewriteRefs(item, schemaFiles, defsKeyword, currentSchemaName));
+        return obj.map(item => rewriteRefs(item, schemaFiles, defsKeyword, currentSchemaName, refExceptionSet));
     }
 
     const newObj = {};
@@ -82,17 +90,22 @@ function rewriteRefs(obj, schemaFiles, defsKeyword, currentSchemaName) {
                 const basename = path.basename(filename);
                 const schemaName = basename.replace('.schema.json', '');
 
-                // Normalize fragment: drop leading '#' and optional leading '/'
-                let fragPath = '';
-                if (fragment) {
-                    fragPath = fragment.startsWith('#') ? fragment.slice(1) : fragment;
-                    if (fragPath.startsWith('/')) fragPath = fragPath.slice(1);
-                }
+                // If the target file is in the exception list, leave the ref as-is
+                if (refExceptionSet && refExceptionSet.has(basename.toLowerCase())) {
+                    newObj[key] = value;
+                } else {
+                    // Normalize fragment: drop leading '#' and optional leading '/'
+                    let fragPath = '';
+                    if (fragment) {
+                        fragPath = fragment.startsWith('#') ? fragment.slice(1) : fragment;
+                        if (fragPath.startsWith('/')) fragPath = fragPath.slice(1);
+                    }
 
-                // Rewrite to point to the bundled schema's definitions
-                newObj[key] = fragPath
-                    ? `#/${defsKeyword}/${schemaName}/${fragPath}`
-                    : `#/${defsKeyword}/${schemaName}`;
+                    // Rewrite to point to the bundled schema's definitions
+                    newObj[key] = fragPath
+                        ? `#/${defsKeyword}/${schemaName}/${fragPath}`
+                        : `#/${defsKeyword}/${schemaName}`;
+                }
             }
             // Case 2: Internal reference within the same schema (starts with #)
             else if (value.startsWith('#')) {
@@ -104,7 +117,7 @@ function rewriteRefs(obj, schemaFiles, defsKeyword, currentSchemaName) {
                 newObj[key] = value;
             }
         } else {
-            newObj[key] = rewriteRefs(value, schemaFiles, defsKeyword, currentSchemaName);
+            newObj[key] = rewriteRefs(value, schemaFiles, defsKeyword, currentSchemaName, refExceptionSet);
         }
     }
     return newObj;
@@ -218,17 +231,22 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
         console.log(`\nUsing schema version: ${schemaVersion}`);
         console.log(`Using keyword: ${defsKeyword}`);
 
+        // Build exception set for external refs not to check or rewrite
+        const refExceptionSet = new Set((options.refExceptions || DEFAULT_REF_EXCEPTION_FILES).map(s => s.toLowerCase()));
+
         // Pre-check: external file $ref targets must exist among loaded schemas
         console.log('Validating external $ref targets...');
         const allowedFiles = new Set([...schemaFiles, rootSchemaFilename]);
         for (const [name, schema] of Object.entries(schemas)) {
             // Only $ref can be external; $dynamicRef/$recursiveRef are JSON Pointers by spec
-            const refs = collectRefKeywords(schema, ['$ref'], (v) => /^(.+\.schema\.json)(#.*)?$/.test(v));
+            const refs = collectRefKeywords(schema, ['$ref'], (v) => /^(\.?.*\.schema\.json)(#.*)?$/.test(v));
             for (const { ref, key, path: refPath } of refs) {
                 const m = ref.match(/^(.+\.schema\.json)(#.*)?$/);
                 if (!m) continue;
                 const target = m[1];
                 const base = path.basename(target);
+                // Skip validation if target file is in exceptions
+                if (refExceptionSet.has(base.toLowerCase())) continue;
                 if (!allowedFiles.has(base)) {
                     throw new Error(`Unresolved external ${key} target file '${target}' referenced from schema '${name}' at '${refPath}'`);
                 }
@@ -241,7 +259,7 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
         const rewrittenDefinitions = {};
         for (const [name, schema] of Object.entries(schemas)) {
             console.log(`  Rewriting refs in ${name}...`);
-            rewrittenDefinitions[name] = rewriteRefs(schema, [...schemaFiles, rootSchemaFilename], defsKeyword, name);
+            rewrittenDefinitions[name] = rewriteRefs(schema, [...schemaFiles, rootSchemaFilename], defsKeyword, name, refExceptionSet);
         }
 
         // Get the rewritten root schema

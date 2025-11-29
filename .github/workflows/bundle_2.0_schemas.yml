@@ -7,7 +7,7 @@ on:
       - 2.0-dev-threatmodeling
     paths:
       - 'schema/2.0/**/*.schema.json'
-      - 'tools/src/main/js/bundle-schemas.js'
+      - 'tools/src/main/js/bundler/bundle-schemas.js'
   workflow_dispatch:  # Allows manual trigger
 
 jobs:
@@ -29,15 +29,15 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        working-directory: tools/src/main/js
+        working-directory: tools/src/main/js/bundler
         run: npm install
 
       - name: Bundle schemas
-        working-directory: tools/src/main/js
+        working-directory: tools/src/main/js/bundler
         run: |
           node bundle-schemas.js \
-            ../../../../schema/2.0/model \
-            ../../../../schema/2.0/cyclonedx-2.0.schema.json
+            ../../../../../schema/2.0/model \
+            ../../../../../schema/2.0/cyclonedx-2.0.schema.json
 
       - name: Check for changes and commit
         run: |
