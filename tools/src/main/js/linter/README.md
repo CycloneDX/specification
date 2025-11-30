@@ -38,6 +38,7 @@ node cli.js --list-checks
 | Check | Description |
 |-------|-------------|
 | `schema-id-pattern` | Validates `$id` matches CycloneDX URL pattern |
+| `schema-comment` | Validates `$comment` contains required standard notice |
 | `formatting-indent` | Validates 2-space indentation |
 | `description-full-stop` | Descriptions must end with full stop |
 | `meta-enum-full-stop` | `meta:enum` values must end with full stop |
