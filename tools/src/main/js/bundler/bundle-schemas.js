@@ -151,6 +151,15 @@ function removeComments(obj, isRoot = false) {
     return newObj;
 }
 
+function stripTopLevelKeys(obj, keysToRemove = []) {
+    if (!isObject(obj)) return obj;
+    const clone = { ...obj };
+    for (const k of keysToRemove) {
+        if (k in clone) delete clone[k];
+    }
+    return clone;
+}
+
 async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
     try {
         const absoluteModelsDir = path.resolve(modelsDirectory);
@@ -265,11 +274,18 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
         // Get the rewritten root schema
         const rootSchemaRewritten = rewrittenDefinitions[rootSchemaName];
 
+        // Strip top-level metadata keys from each embedded definition ($defs)
+        const keysToStripFromDefs = ['$schema', '$id', '$comment'];
+        const cleanedDefinitions = {};
+        for (const [defName, defSchema] of Object.entries(rewrittenDefinitions)) {
+            cleanedDefinitions[defName] = stripTopLevelKeys(defSchema, keysToStripFromDefs);
+        }
+
         // Build the final schema with root schema properties at the top level
         const finalSchema = {
             ...rootSchemaRewritten,
             "$schema": schemaVersion,
-            [defsKeyword]: rewrittenDefinitions
+            [defsKeyword]: cleanedDefinitions
         };
 
         // Post-check: ensure all internal JSON Pointer refs resolve in the final bundle
