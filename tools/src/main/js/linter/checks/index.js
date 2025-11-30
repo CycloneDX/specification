@@ -37,6 +37,7 @@ export async function loadAllChecks() {
 // Export individual check modules for direct access if needed
 export * from './schema-id-pattern.check.js';
 export * from './schema-comment.check.js';
+export * from './schema-draft.check.js';
 export * from './formatting-indent.check.js';
 export * from './description-full-stop.check.js';
 export * from './meta-enum-full-stop.check.js';
