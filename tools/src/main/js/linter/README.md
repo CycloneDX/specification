@@ -36,7 +36,7 @@ cdx-lint --list-checks
 Or run directly with Node:
 
 ```bash
-node src/cli.js schema.json
+node cli.js schema.json
 ```
 
 ## Checks
