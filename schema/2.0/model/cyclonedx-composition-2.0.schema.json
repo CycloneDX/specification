@@ -1,9 +1,98 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "http://localhost:8080/schema/2.0/cyclonedx-composition-2.0.schema.json",
+  "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-composition-2.0.schema.json",
   "type": "null",
   "title": "CycloneDX Transparency Expression Language: Composition",
-  "$comment" : "CycloneDX JSON schema is published under the terms of the Apache License 2.0.",
+  "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
+    "compositions": {
+      "type": "object",
+      "title": "Compositions",
+      "required": [
+        "aggregate"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "BOM Reference",
+          "description": "An identifier which can be used to reference the composition elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        },
+        "aggregate": {
+          "$ref": "#/$defs/aggregateType",
+          "title": "Aggregate",
+          "description": "Specifies an aggregate type that describes how complete a relationship is."
+        },
+        "assemblies": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "anyOf": [
+              {
+                "title": "Ref",
+                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+              },
+              {
+                "title": "BOM-Link Element",
+                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+              }
+            ]
+          },
+          "title": "BOM references",
+          "description": "The bom-ref identifiers of the components or services being described. Assemblies refer to nested relationships whereby a constituent part may include other constituent parts. References do not cascade to child parts. References are explicit for the specified constituent part only."
+        },
+        "dependencies": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "title": "BOM references",
+          "description": "The bom-ref identifiers of the components or services being described. Dependencies refer to a relationship whereby an independent constituent part requires another independent constituent part. References do not cascade to transitive dependencies. References are explicit for the specified dependency only."
+        },
+        "vulnerabilities": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "title": "BOM references",
+          "description": "The bom-ref identifiers of the vulnerabilities being described."
+        },
+        "signature": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/signature",
+          "title": "Signature",
+          "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
+        }
+      }
+    },
+    "aggregateType": {
+      "type": "string",
+      "default": "not_specified",
+      "enum": [
+        "complete",
+        "incomplete",
+        "incomplete_first_party_only",
+        "incomplete_first_party_proprietary_only",
+        "incomplete_first_party_opensource_only",
+        "incomplete_third_party_only",
+        "incomplete_third_party_proprietary_only",
+        "incomplete_third_party_opensource_only",
+        "unknown",
+        "not_specified"
+      ],
+      "meta:enum": {
+        "complete": "The relationship is complete. No further relationships including constituent components, services, or dependencies are known to exist.",
+        "incomplete": "The relationship is incomplete. Additional relationships exist and may include constituent components, services, or dependencies.",
+        "incomplete_first_party_only": "The relationship is incomplete. Only relationships for first-party components, services, or their dependencies are represented.",
+        "incomplete_first_party_proprietary_only": "The relationship is incomplete. Only relationships for first-party components, services, or their dependencies are represented, limited specifically to those that are proprietary.",
+        "incomplete_first_party_opensource_only": "The relationship is incomplete. Only relationships for first-party components, services, or their dependencies are represented, limited specifically to those that are opensource.",
+        "incomplete_third_party_only": "The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented.",
+        "incomplete_third_party_proprietary_only": "The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented, limited specifically to those that are proprietary.",
+        "incomplete_third_party_opensource_only": "The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented, limited specifically to those that are opensource.",
+        "unknown": "The relationship may be complete or incomplete. This usually signifies a 'best-effort' to obtain constituent components, services, or dependencies but the completeness is inconclusive.",
+        "not_specified": "The relationship completeness is not specified."
+      }
+    }
   }
 }

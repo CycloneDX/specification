@@ -1,9 +1,50 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "http://localhost:8080/schema/2.0/cyclonedx-dependency-2.0.schema.json",
+  "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-dependency-2.0.schema.json",
   "type": "null",
-  "title": "CycloneDX Transparency Expression Language: Dependency",
-  "$comment" : "CycloneDX JSON schema is published under the terms of the Apache License 2.0.",
+  "title": "CycloneDX Dependency Model",
+  "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
+    "dependencies": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/dependency"},
+      "uniqueItems": true,
+      "title": "Dependencies",
+      "description": "Provides the ability to document dependency relationships including provided & implemented components."
+    },
+    "dependency": {
+      "type": "object",
+      "title": "Dependency",
+      "description": "Defines the direct dependencies of a component, service, or the components provided/implemented by a given component. Components or services that do not have their own dependencies must be declared as empty elements within the graph. Components or services that are not represented in the dependency graph may have unknown dependencies. It is recommended that implementations assume this to be opaque and not an indicator of an object being dependency-free. It is recommended to leverage compositions to indicate unknown dependency graphs.",
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "title": "Reference",
+          "description": "References a component or service by its bom-ref attribute"
+        },
+        "dependsOn": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "title": "Depends On",
+          "description": "The bom-ref identifiers of the components or services that are dependencies of this dependency object."
+        },
+        "provides": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "title": "Provides",
+          "description": "The bom-ref identifiers of the components or services that define a given specification or standard, which are provided or implemented by this dependency object.\nFor example, a cryptographic library which implements a cryptographic algorithm. A component which implements another component does not imply that the implementation is in use."
+        }
+      }
+    }
   }
 }
