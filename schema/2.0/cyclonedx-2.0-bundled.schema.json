@@ -63,6 +63,9 @@
     },
     "vulnerabilities": {
       "$ref": "#/$defs/cyclonedx-vulnerability-2.0/$defs/vulnerabilities"
+    },
+    "annotations": {
+      "$ref": "#/$defs/cyclonedx-annotation-2.0/$defs/annotations"
     }
   },
   "$defs": {
@@ -641,8 +644,117 @@
     },
     "cyclonedx-annotation-2.0": {
       "type": "null",
-      "title": "CycloneDX Transparency Expression Language: Annotation",
-      "$defs": {}
+      "title": "CycloneDX Annotation Model",
+      "$defs": {
+        "annotations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/cyclonedx-annotation-2.0/$defs/annotation"
+          },
+          "uniqueItems": true,
+          "title": "Annotations",
+          "description": "Comments made by people, organizations, or tools about any object with a bom-ref, such as components, services, vulnerabilities, or the BOM itself. Unlike inventory information, annotations may contain opinions or commentary from various stakeholders. Annotations may be inline (with inventory) or externalized via BOM-Link and may optionally be signed."
+        },
+        "annotation": {
+          "type": "object",
+          "title": "Annotations",
+          "description": "A comment, note, explanation, or similar textual content which provides additional context to the object(s) being annotated.",
+          "required": [
+            "subjects",
+            "annotator",
+            "timestamp",
+            "text"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "title": "BOM Reference",
+              "description": "An identifier which can be used to reference the annotation elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+            },
+            "subjects": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "anyOf": [
+                  {
+                    "title": "Ref",
+                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
+                  },
+                  {
+                    "title": "BOM-Link Element",
+                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/bomLinkElementType"
+                  }
+                ]
+              },
+              "title": "Subjects",
+              "description": "The object in the BOM identified by its bom-ref. This is often a component or service, but may be any object type supporting bom-refs."
+            },
+            "annotator": {
+              "type": "object",
+              "title": "Annotator",
+              "description": "The organization, person, component, or service which created the textual content of the annotation.",
+              "oneOf": [
+                {
+                  "required": [
+                    "organization"
+                  ]
+                },
+                {
+                  "required": [
+                    "individual"
+                  ]
+                },
+                {
+                  "required": [
+                    "component"
+                  ]
+                },
+                {
+                  "required": [
+                    "service"
+                  ]
+                }
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "organization": {
+                  "description": "The organization that created the annotation",
+                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/organizationalEntity"
+                },
+                "individual": {
+                  "description": "The person that created the annotation",
+                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/organizationalContact"
+                },
+                "component": {
+                  "description": "The tool or component that created the annotation",
+                  "$ref": "#/$defs/cyclonedx-component-2.0/$defs/component"
+                },
+                "service": {
+                  "description": "The service that created the annotation",
+                  "$ref": "#/$defs/cyclonedx-service-2.0/$defs/service"
+                }
+              }
+            },
+            "timestamp": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Timestamp",
+              "description": "The date and time (timestamp) when the annotation was created."
+            },
+            "text": {
+              "type": "string",
+              "title": "Text",
+              "description": "The textual content of the annotation."
+            },
+            "signature": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/signature",
+              "title": "Signature",
+              "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
+            }
+          }
+        }
+      }
     },
     "cyclonedx-common-2.0": {
       "type": "null",
@@ -4829,6 +4941,9 @@
         },
         "vulnerabilities": {
           "$ref": "#/$defs/cyclonedx-vulnerability-2.0/$defs/vulnerabilities"
+        },
+        "annotations": {
+          "$ref": "#/$defs/cyclonedx-annotation-2.0/$defs/annotations"
         }
       }
     }
