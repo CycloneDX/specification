@@ -2,7 +2,8 @@
  * CycloneDX Schema Linter - Formatting and Indentation Check
  * 
  * Validates that JSON schemas follow consistent formatting rules:
- * - Correct indentation based on nesting level
+ * - Correct indentation based on nesting level (2 spaces per level)
+ * - No tabs
  * - No trailing whitespace
  * - Consistent line endings
  * - Final newline
@@ -31,7 +32,7 @@ class FormattingIndentCheck extends LintCheck {
     const spaces = config.spaces ?? 2;
     const requireFinalNewline = config.requireFinalNewline ?? true;
     const allowTrailingWhitespace = config.allowTrailingWhitespace ?? false;
-    const lineEnding = config.lineEnding ?? 'lf'; // lf or crlf
+    const lineEnding = config.lineEnding ?? 'lf';
     
     const lines = rawContent.split(/\r?\n/);
     
@@ -62,125 +63,154 @@ class FormattingIndentCheck extends LintCheck {
       ));
     }
     
-    // Check trailing whitespace
-    if (!allowTrailingWhitespace) {
-      lines.forEach((line, index) => {
-        if (/[ \t]+$/.test(line)) {
-          issues.push(this.createIssue(
-            `Line ${index + 1} has trailing whitespace.`,
-            '$',
-            { line: index + 1 },
-            Severity.WARNING
-          ));
-        }
-      });
-    }
+    // Track nesting depth
+    let depth = 0;
     
-    // Check for tabs
-    lines.forEach((line, index) => {
-      if (/^\t/.test(line)) {
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const lineNum = i + 1;
+      const trimmed = line.trim();
+      
+      // Skip empty lines
+      if (trimmed === '') continue;
+      
+      // Check trailing whitespace
+      if (!allowTrailingWhitespace && /[ \t]+$/.test(line)) {
         issues.push(this.createIssue(
-          `Line ${index + 1} uses tabs for indentation. Use ${spaces} spaces instead.`,
+          `Line ${lineNum} has trailing whitespace.`,
           '$',
-          { line: index + 1 }
+          { line: lineNum },
+          Severity.WARNING
         ));
       }
-    });
-    
-    // Generate canonical formatting and compare line by line
-    try {
-      const canonical = JSON.stringify(schema, null, spaces);
-      const canonicalLines = canonical.split('\n');
       
-      // Normalise input lines (remove \r)
-      const normalisedLines = rawContent.replace(/\r\n/g, '\n').split('\n');
-      
-      // Remove trailing empty line from normalised if it exists (final newline)
-      if (normalisedLines[normalisedLines.length - 1] === '') {
-        normalisedLines.pop();
+      // Check for tabs in indentation
+      if (/^\t+/.test(line)) {
+        issues.push(this.createIssue(
+          `Line ${lineNum} uses tabs for indentation. Use ${spaces} spaces instead.`,
+          '$',
+          { line: lineNum }
+        ));
+        // Still update depth tracking
+        depth += this.getDepthChange(trimmed);
+        continue;
       }
       
-      // Compare line by line
-      const maxLines = Math.max(canonicalLines.length, normalisedLines.length);
+      // Count openers/closers outside of strings for this line
+      const { openersBeforeContent, closersAtStart, netChange } = this.analyzeLineStructure(trimmed);
       
-      for (let i = 0; i < maxLines; i++) {
-        const expected = canonicalLines[i];
-        const actual = normalisedLines[i];
-        
-        // Handle missing lines
-        if (expected === undefined) {
-          issues.push(this.createIssue(
-            `Line ${i + 1} is unexpected. File has more lines than expected.`,
-            '$',
-            { line: i + 1, actual: this.truncate(actual, 50) }
-          ));
-          continue;
-        }
-        
-        if (actual === undefined) {
-          issues.push(this.createIssue(
-            `Line ${i + 1} is missing. Expected: "${this.truncate(expected, 50)}"`,
-            '$',
-            { line: i + 1, expected: this.truncate(expected, 50) }
-          ));
-          continue;
-        }
-        
-        // Compare indentation
-        const expectedIndent = this.getLeadingSpaces(expected);
-        const actualIndent = this.getLeadingSpaces(actual);
-        
-        if (expectedIndent !== actualIndent) {
-          issues.push(this.createIssue(
-            `Line ${i + 1} has incorrect indentation. Expected ${expectedIndent} spaces, found ${actualIndent}.`,
-            '$',
-            { 
-              line: i + 1, 
-              expectedIndent, 
-              actualIndent,
-              content: this.truncate(actual.trim(), 40)
-            }
-          ));
-          continue;
-        }
-        
-        // Compare content (after trimming to focus on structure)
-        const expectedTrimmed = expected.trim();
-        const actualTrimmed = actual.trim();
-        
-        if (expectedTrimmed !== actualTrimmed) {
-          // Check if it's a key ordering difference
-          if (this.isKeyOrderDifference(expectedTrimmed, actualTrimmed)) {
-            issues.push(this.createIssue(
-              `Line ${i + 1} has different key ordering than canonical format.`,
-              '$',
-              { 
-                line: i + 1, 
-                expected: this.truncate(expectedTrimmed, 50),
-                actual: this.truncate(actualTrimmed, 50)
-              },
-              Severity.INFO
-            ));
-          } else {
-            issues.push(this.createIssue(
-              `Line ${i + 1} content differs from canonical format.`,
-              '$',
-              { 
-                line: i + 1, 
-                expected: this.truncate(expectedTrimmed, 50),
-                actual: this.truncate(actualTrimmed, 50)
-              },
-              Severity.WARNING
-            ));
+      // If line starts with closer, decrease depth for this line
+      if (closersAtStart > 0) {
+        depth = Math.max(0, depth - closersAtStart);
+      }
+      
+      // Validate indentation
+      const actualIndent = this.getLeadingSpaces(line);
+      const expectedIndent = depth * spaces;
+      
+      if (actualIndent !== expectedIndent) {
+        issues.push(this.createIssue(
+          `Line ${lineNum} has incorrect indentation. Expected ${expectedIndent} spaces, found ${actualIndent}.`,
+          '$',
+          { 
+            line: lineNum, 
+            expectedIndent, 
+            actualIndent,
+            content: this.truncate(trimmed, 40)
           }
-        }
+        ));
       }
       
-    } catch (err) {
-      // JSON parsing errors are handled elsewhere
+      // Update depth for next line based on net openers (excluding leading closers already handled)
+      depth += netChange + closersAtStart; // Add back closersAtStart since netChange includes them
+      depth = Math.max(0, depth);
     }
     
     return issues;
+  }
+  
+  /**
+   * Analyze line structure for bracket counting
+   * Returns closers at start, and net depth change
+   */
+  analyzeLineStructure(trimmed) {
+    let closersAtStart = 0;
+    let inString = false;
+    let escapeNext = false;
+    let openers = 0;
+    let closers = 0;
+    let foundNonBracket = false;
+    
+    for (let i = 0; i < trimmed.length; i++) {
+      const char = trimmed[i];
+      
+      if (escapeNext) {
+        escapeNext = false;
+        continue;
+      }
+      
+      if (char === '\\' && inString) {
+        escapeNext = true;
+        continue;
+      }
+      
+      if (char === '"') {
+        inString = !inString;
+        foundNonBracket = true;
+        continue;
+      }
+      
+      if (inString) continue;
+      
+      if (char === '{' || char === '[') {
+        openers++;
+        foundNonBracket = true;
+      } else if (char === '}' || char === ']') {
+        closers++;
+        // Count closers at start (before any non-bracket content)
+        if (!foundNonBracket) {
+          closersAtStart++;
+        }
+      } else if (!/\s/.test(char)) {
+        foundNonBracket = true;
+      }
+    }
+    
+    return {
+      openersBeforeContent: openers,
+      closersAtStart,
+      netChange: openers - closers
+    };
+  }
+  
+  /**
+   * Get simple depth change (openers - closers) for a line
+   */
+  getDepthChange(trimmed) {
+    let inString = false;
+    let escapeNext = false;
+    let change = 0;
+    
+    for (const char of trimmed) {
+      if (escapeNext) {
+        escapeNext = false;
+        continue;
+      }
+      if (char === '\\' && inString) {
+        escapeNext = true;
+        continue;
+      }
+      if (char === '"') {
+        inString = !inString;
+        continue;
+      }
+      if (inString) continue;
+      
+      if (char === '{' || char === '[') change++;
+      else if (char === '}' || char === ']') change--;
+    }
+    
+    return change;
   }
   
   /**
@@ -197,15 +227,6 @@ class FormattingIndentCheck extends LintCheck {
   truncate(str, maxLength) {
     if (str.length <= maxLength) return str;
     return str.substring(0, maxLength - 3) + '...';
-  }
-  
-  /**
-   * Check if difference is likely due to key ordering
-   */
-  isKeyOrderDifference(expected, actual) {
-    // Both are object keys
-    const keyPattern = /^"[^"]+"\s*:/;
-    return keyPattern.test(expected) && keyPattern.test(actual);
   }
 }
 
