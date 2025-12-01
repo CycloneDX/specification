@@ -1,9 +1,173 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "http://localhost:8080/schema/2.0/cyclonedx-standard-2.0.schema.json",
+  "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-standard-2.0.schema.json",
   "type": "null",
-  "title": "CycloneDX Transparency Expression Language: Standard",
-  "$comment": "CycloneDX JSON schema is published under the terms of the Apache License 2.0.",
+  "title": "CycloneDX Standard Model",
+  "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
+    "standards": {
+      "type": "array",
+      "title": "Standards",
+      "description": "The list of standards which may consist of regulations, industry or organizational-specific standards, maturity models, best practices, or any other requirements which can be evaluated against or attested to.",
+      "items": {
+        "$ref": "#/$defs/standard"
+      }
+    },
+    "standard": {
+      "type": "object",
+      "title": "Standard",
+      "description": "A standard may consist of regulations, industry or organizational-specific standards, maturity models, best practices, or any other requirements which can be evaluated against or attested to.",
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "BOM Reference",
+          "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name of the standard. This will often be a shortened, single name of the standard."
+        },
+        "version": {
+          "type": "string",
+          "title": "Version",
+          "description": "The version of the standard."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "The description of the standard."
+        },
+        "owner": {
+          "type": "string",
+          "title": "Owner",
+          "description": "The owner of the standard, often the entity responsible for its release."
+        },
+        "requirements": {
+          "$ref": "#/$defs/requirements"
+        },
+        "levels": {
+          "$ref": "#/$defs/levels"
+        },
+        "externalReferences": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReferences"
+        },
+        "signature": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/signature",
+          "title": "Signature",
+          "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
+        }
+      }
+    },
+    "requirements": {
+      "type": "array",
+      "title": "Requirements",
+      "description": "The list of requirements comprising the standard.",
+      "items": {
+        "$ref": "#/$defs/requirement"
+      }
+    },
+    "requirement": {
+      "type": "object",
+      "title": "Requirement",
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "BOM Reference",
+          "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
+        },
+        "identifier": {
+          "type": "string",
+          "title": "Identifier",
+          "description": "The unique identifier used in the standard to identify a specific requirement. This should match what is in the standard and should not be the requirements bom-ref."
+        },
+        "title": {
+          "type": "string",
+          "title": "Title",
+          "description": "The title of the requirement."
+        },
+        "text": {
+          "type": "string",
+          "title": "Text",
+          "description": "The textual content of the requirement."
+        },
+        "descriptions": {
+          "type": "array",
+          "title": "Descriptions",
+          "description": "The supplemental text that provides additional guidance or context to the requirement, but is not directly part of the requirement.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "openCre": {
+          "type": "array",
+          "title": "OWASP OpenCRE Identifier(s)",
+          "description": "The Common Requirements Enumeration (CRE) identifier(s). CRE is a structured and standardized framework for uniting security standards and guidelines. CRE links each section of a resource to a shared topic identifier (a Common Requirement). Through this shared topic link, all resources map to each other. Use of CRE promotes clear and unambiguous communication among stakeholders.",
+          "items": {
+            "type": "string",
+            "pattern": "^CRE:[0-9]+-[0-9]+$",
+            "examples": [
+              "CRE:764-507"
+            ]
+          }
+        },
+        "parent": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "title": "Parent BOM Reference",
+          "description": "The `bom-ref` to a parent requirement. This establishes a hierarchy of requirements. Top-level requirements must not define a parent. Only child requirements should define parents."
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        },
+        "externalReferences": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReferences"
+        }
+      }
+    },
+    "levels": {
+      "type": "array",
+      "title": "Levels",
+      "description": "The list of levels associated with the standard. Some standards have different levels of compliance.",
+      "items": {
+        "$ref": "#/$defs/level"
+      }
+    },
+    "level": {
+      "type": "object",
+      "title": "Level",
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "BOM Reference",
+          "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
+        },
+        "identifier": {
+          "type": "string",
+          "title": "Identifier",
+          "description": "The identifier used in the standard to identify a specific level."
+        },
+        "title": {
+          "type": "string",
+          "title": "Title",
+          "description": "The title of the level."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "The description of the level."
+        },
+        "requirements": {
+          "type": "array",
+          "title": "Requirements",
+          "description": "The list of requirement `bom-ref`s that comprise the level.",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          }
+        }
+      }
+    }
   }
 }
