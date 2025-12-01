@@ -60,6 +60,9 @@
     },
     "compositions": {
       "$ref": "#/$defs/cyclonedx-composition-2.0/$defs/compositions"
+    },
+    "vulnerabilities": {
+      "$ref": "#/$defs/cyclonedx-vulnerability-2.0/$defs/vulnerabilities"
     }
   },
   "$defs": {
@@ -4227,8 +4230,542 @@
     },
     "cyclonedx-vulnerability-2.0": {
       "type": "null",
-      "title": "CycloneDX Transparency Expression Language: Vulnerability",
-      "$defs": {}
+      "title": "CycloneDX Vulnerability Model",
+      "$defs": {
+        "vulnerabilities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/cyclonedx-vulnerability-2.0/$defs/vulnerability"
+          },
+          "uniqueItems": true,
+          "title": "Vulnerabilities",
+          "description": "Vulnerabilities identified in components or services."
+        },
+        "vulnerability": {
+          "type": "object",
+          "title": "Vulnerability",
+          "description": "Defines a weakness in a component or service that could be exploited or triggered by a threat source.",
+          "additionalProperties": false,
+          "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "title": "BOM Reference",
+              "description": "An identifier which can be used to reference the vulnerability elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+            },
+            "id": {
+              "type": "string",
+              "title": "ID",
+              "description": "The identifier that uniquely identifies the vulnerability.",
+              "examples": [
+                "CVE-2021-39182",
+                "GHSA-35m5-8cvj-8783",
+                "SNYK-PYTHON-ENROCRYPT-1912876"
+              ]
+            },
+            "source": {
+              "$ref": "#/$defs/cyclonedx-vulnerability-2.0/$defs/vulnerabilitySource",
+              "description": "The source that published the vulnerability."
+            },
+            "references": {
+              "type": "array",
+              "title": "References",
+              "description": "Zero or more pointers to vulnerabilities that are the equivalent of the vulnerability specified. Often times, the same vulnerability may exist in multiple sources of vulnerability intelligence, but have different identifiers. References provide a way to correlate vulnerabilities across multiple sources of vulnerability intelligence.",
+              "items": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "source"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "title": "ID",
+                    "description": "An identifier that uniquely identifies the vulnerability.",
+                    "examples": [
+                      "CVE-2021-39182",
+                      "GHSA-35m5-8cvj-8783",
+                      "SNYK-PYTHON-ENROCRYPT-1912876"
+                    ]
+                  },
+                  "source": {
+                    "$ref": "#/$defs/cyclonedx-vulnerability-2.0/$defs/vulnerabilitySource",
+                    "description": "The source that published the vulnerability."
+                  }
+                }
+              }
+            },
+            "ratings": {
+              "type": "array",
+              "title": "Ratings",
+              "description": "List of vulnerability ratings",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-vulnerability-2.0/$defs/rating"
+              }
+            },
+            "cwes": {
+              "type": "array",
+              "title": "CWEs",
+              "description": "List of Common Weaknesses Enumerations (CWEs) codes that describes this vulnerability.",
+              "examples": [
+                399
+              ],
+              "items": {
+                "$ref": "#/$defs/cyclonedx-vulnerability-2.0/$defs/cwe"
+              }
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the vulnerability as provided by the source."
+            },
+            "detail": {
+              "type": "string",
+              "title": "Details",
+              "description": "If available, an in-depth description of the vulnerability as provided by the source organization. Details often include information useful in understanding root cause."
+            },
+            "recommendation": {
+              "type": "string",
+              "title": "Recommendation",
+              "description": "Recommendations of how the vulnerability can be remediated or mitigated."
+            },
+            "workaround": {
+              "type": "string",
+              "title": "Workarounds",
+              "description": "A bypass, usually temporary, of the vulnerability that reduces its likelihood and/or impact. Workarounds often involve changes to configuration or deployments."
+            },
+            "proofOfConcept": {
+              "type": "object",
+              "title": "Proof of Concept",
+              "description": "Evidence used to reproduce the vulnerability.",
+              "properties": {
+                "reproductionSteps": {
+                  "type": "string",
+                  "title": "Steps to Reproduce",
+                  "description": "Precise steps to reproduce the vulnerability."
+                },
+                "environment": {
+                  "type": "string",
+                  "title": "Environment",
+                  "description": "A description of the environment in which reproduction was possible."
+                },
+                "supportingMaterial": {
+                  "type": "array",
+                  "title": "Supporting Material",
+                  "description": "Supporting material that helps in reproducing or understanding how reproduction is possible. This may include screenshots, payloads, and PoC exploit code.",
+                  "items": {
+                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/attachment"
+                  }
+                }
+              }
+            },
+            "advisories": {
+              "type": "array",
+              "title": "Advisories",
+              "description": "Published advisories of the vulnerability if provided.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-vulnerability-2.0/$defs/advisory"
+              }
+            },
+            "created": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Created",
+              "description": "The date and time (timestamp) when the vulnerability record was created in the vulnerability database."
+            },
+            "published": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Published",
+              "description": "The date and time (timestamp) when the vulnerability record was first published."
+            },
+            "updated": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Updated",
+              "description": "The date and time (timestamp) when the vulnerability record was last updated."
+            },
+            "rejected": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Rejected",
+              "description": "The date and time (timestamp) when the vulnerability record was rejected (if applicable)."
+            },
+            "credits": {
+              "type": "object",
+              "title": "Credits",
+              "description": "Individuals or organizations credited with the discovery of the vulnerability.",
+              "additionalProperties": false,
+              "properties": {
+                "organizations": {
+                  "type": "array",
+                  "title": "Organizations",
+                  "description": "The organizations credited with vulnerability discovery.",
+                  "items": {
+                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/organizationalEntity"
+                  }
+                },
+                "individuals": {
+                  "type": "array",
+                  "title": "Individuals",
+                  "description": "The individuals, not associated with organizations, that are credited with vulnerability discovery.",
+                  "items": {
+                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/organizationalContact"
+                  }
+                }
+              }
+            },
+            "tools": {
+              "type": "object",
+              "title": "Tools",
+              "description": "The tool(s) used to identify, confirm, or score the vulnerability.",
+              "additionalProperties": false,
+              "properties": {
+                "components": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/cyclonedx-component-2.0/$defs/component"
+                  },
+                  "uniqueItems": true,
+                  "title": "Components",
+                  "description": "A list of software and hardware components used as tools."
+                },
+                "services": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/cyclonedx-service-2.0/$defs/service"
+                  },
+                  "uniqueItems": true,
+                  "title": "Services",
+                  "description": "A list of services used as tools. This may include microservices, function-as-a-service, and other types of network or intra-process services."
+                }
+              }
+            },
+            "analysis": {
+              "type": "object",
+              "title": "Impact Analysis",
+              "description": "An assessment of the impact and exploitability of the vulnerability.",
+              "additionalProperties": false,
+              "properties": {
+                "state": {
+                  "$ref": "#/$defs/cyclonedx-vulnerability-2.0/$defs/impactAnalysisState"
+                },
+                "justification": {
+                  "$ref": "#/$defs/cyclonedx-vulnerability-2.0/$defs/impactAnalysisJustification"
+                },
+                "response": {
+                  "type": "array",
+                  "title": "Response",
+                  "description": "A response to the vulnerability by the manufacturer, supplier, or project responsible for the affected component or service. More than one response is allowed. Responses are strongly encouraged for vulnerabilities where the analysis state is exploitable.",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "can_not_fix",
+                      "will_not_fix",
+                      "update",
+                      "rollback",
+                      "workaround_available"
+                    ],
+                    "meta:enum": {
+                      "can_not_fix": "Can not fix",
+                      "will_not_fix": "Will not fix",
+                      "update": "Update to a different revision or release",
+                      "rollback": "Revert to a previous revision or release",
+                      "workaround_available": "There is a workaround available"
+                    }
+                  }
+                },
+                "detail": {
+                  "type": "string",
+                  "title": "Detail",
+                  "description": "Detailed description of the impact including methods used during assessment. If a vulnerability is not exploitable, this field should include specific details on why the component or service is not impacted by this vulnerability."
+                },
+                "firstIssued": {
+                  "type": "string",
+                  "format": "date-time",
+                  "title": "First Issued",
+                  "description": "The date and time (timestamp) when the analysis was first issued."
+                },
+                "lastUpdated": {
+                  "type": "string",
+                  "format": "date-time",
+                  "title": "Last Updated",
+                  "description": "The date and time (timestamp) when the analysis was last updated."
+                }
+              }
+            },
+            "affects": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "object",
+                "required": [
+                  "ref"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "ref": {
+                    "anyOf": [
+                      {
+                        "title": "Ref",
+                        "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
+                      },
+                      {
+                        "title": "BOM-Link Element",
+                        "$ref": "#/$defs/cyclonedx-common-2.0/$defs/bomLinkElementType"
+                      }
+                    ],
+                    "title": "Reference",
+                    "description": "References a component or service by the objects bom-ref"
+                  },
+                  "versions": {
+                    "type": "array",
+                    "title": "Versions",
+                    "description": "Zero or more individual versions or range of versions.",
+                    "items": {
+                      "type": "object",
+                      "oneOf": [
+                        {
+                          "required": [
+                            "version"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "range"
+                          ]
+                        }
+                      ],
+                      "additionalProperties": false,
+                      "properties": {
+                        "version": {
+                          "title": "Version",
+                          "description": "A single version of a component or service.",
+                          "$ref": "#/$defs/cyclonedx-component-2.0/$defs/version"
+                        },
+                        "range": {
+                          "title": "Version Range",
+                          "description": "A version range specified in Package URL Version Range syntax (vers) which is defined at https://github.com/package-url/vers-spec",
+                          "$ref": "#/$defs/cyclonedx-component-2.0/$defs/versionRange"
+                        },
+                        "status": {
+                          "title": "Status",
+                          "description": "The vulnerability status for the version or range of versions.",
+                          "$ref": "#/$defs/cyclonedx-vulnerability-2.0/$defs/affectedStatus",
+                          "default": "affected"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "title": "Affects",
+              "description": "The components or services that are affected by the vulnerability."
+            },
+            "properties": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
+            }
+          }
+        },
+        "advisory": {
+          "type": "object",
+          "title": "Advisory",
+          "description": "Title and location where advisory information can be obtained. An advisory is a notification of a threat to a component, service, or system.",
+          "required": [
+            "url"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "title": {
+              "type": "string",
+              "title": "Title",
+              "description": "A name of the advisory."
+            },
+            "url": {
+              "type": "string",
+              "title": "URL",
+              "format": "iri-reference",
+              "description": "Location where the advisory can be obtained."
+            }
+          }
+        },
+        "cwe": {
+          "type": "integer",
+          "minimum": 1,
+          "title": "CWE",
+          "description": "Integer representation of a Common Weaknesses Enumerations (CWE). For example 399 (of https://cwe.mitre.org/data/definitions/399.html)"
+        },
+        "severity": {
+          "type": "string",
+          "title": "Severity",
+          "description": "Textual representation of the severity of the vulnerability adopted by the analysis method. If the analysis method uses values other than what is provided, the user is expected to translate appropriately.",
+          "enum": [
+            "critical",
+            "high",
+            "medium",
+            "low",
+            "info",
+            "none",
+            "unknown"
+          ],
+          "meta:enum": {
+            "critical": "Critical severity",
+            "high": "High severity",
+            "medium": "Medium severity",
+            "low": "Low severity",
+            "info": "Informational warning.",
+            "none": "None",
+            "unknown": "The severity is not known"
+          }
+        },
+        "scoreMethod": {
+          "type": "string",
+          "title": "Method",
+          "description": "Specifies the severity or risk scoring methodology or standard used.",
+          "enum": [
+            "CVSSv2",
+            "CVSSv3",
+            "CVSSv31",
+            "CVSSv4",
+            "OWASP",
+            "SSVC",
+            "other"
+          ],
+          "meta:enum": {
+            "CVSSv2": "Common Vulnerability Scoring System v2.0",
+            "CVSSv3": "Common Vulnerability Scoring System v3.0",
+            "CVSSv31": "Common Vulnerability Scoring System v3.1",
+            "CVSSv4": "Common Vulnerability Scoring System v4.0",
+            "OWASP": "OWASP Risk Rating Methodology",
+            "SSVC": "Stakeholder Specific Vulnerability Categorization",
+            "other": "Another severity or risk scoring methodology"
+          }
+        },
+        "impactAnalysisState": {
+          "type": "string",
+          "title": "Impact Analysis State",
+          "description": "Declares the current state of an occurrence of a vulnerability, after automated or manual analysis.",
+          "enum": [
+            "resolved",
+            "resolved_with_pedigree",
+            "exploitable",
+            "in_triage",
+            "false_positive",
+            "not_affected"
+          ],
+          "meta:enum": {
+            "resolved": "The vulnerability has been remediated.",
+            "resolved_with_pedigree": "The vulnerability has been remediated and evidence of the changes are provided in the affected components pedigree containing verifiable commit history and/or diff(s).",
+            "exploitable": "The vulnerability may be directly or indirectly exploitable.",
+            "in_triage": "The vulnerability is being investigated.",
+            "false_positive": "The vulnerability is not specific to the component or service and was falsely identified or associated.",
+            "not_affected": "The component or service is not affected by the vulnerability. Justification should be specified for all not_affected cases."
+          }
+        },
+        "impactAnalysisJustification": {
+          "type": "string",
+          "title": "Impact Analysis Justification",
+          "description": "The rationale of why the impact analysis state was asserted.",
+          "enum": [
+            "code_not_present",
+            "code_not_reachable",
+            "requires_configuration",
+            "requires_dependency",
+            "requires_environment",
+            "protected_by_compiler",
+            "protected_at_runtime",
+            "protected_at_perimeter",
+            "protected_by_mitigating_control"
+          ],
+          "meta:enum": {
+            "code_not_present": "The code has been removed or tree-shaked.",
+            "code_not_reachable": "The vulnerable code is not invoked at runtime.",
+            "requires_configuration": "Exploitability requires a configurable option to be set/unset.",
+            "requires_dependency": "Exploitability requires a dependency that is not present.",
+            "requires_environment": "Exploitability requires a certain environment which is not present.",
+            "protected_by_compiler": "Exploitability requires a compiler flag to be set/unset.",
+            "protected_at_runtime": "Exploits are prevented at runtime.",
+            "protected_at_perimeter": "Attacks are blocked at physical, logical, or network perimeter.",
+            "protected_by_mitigating_control": "Preventative measures have been implemented that reduce the likelihood and/or impact of the vulnerability."
+          }
+        },
+        "rating": {
+          "type": "object",
+          "title": "Rating",
+          "description": "Defines the severity or risk ratings of a vulnerability.",
+          "additionalProperties": false,
+          "properties": {
+            "source": {
+              "$ref": "#/$defs/cyclonedx-vulnerability-2.0/$defs/vulnerabilitySource",
+              "description": "The source that calculated the severity or risk rating of the vulnerability."
+            },
+            "score": {
+              "type": "number",
+              "title": "Score",
+              "description": "The numerical score of the rating."
+            },
+            "severity": {
+              "$ref": "#/$defs/cyclonedx-vulnerability-2.0/$defs/severity",
+              "description": "Textual representation of the severity that corresponds to the numerical score of the rating."
+            },
+            "method": {
+              "$ref": "#/$defs/cyclonedx-vulnerability-2.0/$defs/scoreMethod"
+            },
+            "vector": {
+              "type": "string",
+              "title": "Vector",
+              "description": "Textual representation of the metric values used to score the vulnerability"
+            },
+            "justification": {
+              "type": "string",
+              "title": "Justification",
+              "description": "A reason for rating the vulnerability as it was"
+            }
+          }
+        },
+        "vulnerabilitySource": {
+          "type": "object",
+          "title": "Source",
+          "description": "The source of vulnerability information. This is often the organization that published the vulnerability.",
+          "additionalProperties": false,
+          "properties": {
+            "url": {
+              "type": "string",
+              "title": "URL",
+              "description": "The url of the vulnerability documentation as provided by the source.",
+              "examples": [
+                "https://nvd.nist.gov/vuln/detail/CVE-2021-39182"
+              ]
+            },
+            "name": {
+              "type": "string",
+              "title": "Name",
+              "description": "The name of the source.",
+              "examples": [
+                "NVD",
+                "National Vulnerability Database",
+                "OSS Index",
+                "VulnDB",
+                "GitHub Advisories"
+              ]
+            }
+          }
+        },
+        "affectedStatus": {
+          "description": "The vulnerability status of a given version or range of versions of a product. The statuses 'affected' and 'unaffected' indicate that the version is affected or unaffected by the vulnerability. The status 'unknown' indicates that it is unknown or unspecified whether the given version is affected. There can be many reasons for an 'unknown' status, including that an investigation has not been undertaken or that a vendor has not disclosed the status.",
+          "type": "string",
+          "enum": [
+            "affected",
+            "unaffected",
+            "unknown"
+          ],
+          "meta:enum": {
+            "affected": "The version is affected by the vulnerability.",
+            "unaffected": "The version is not affected by the vulnerability.",
+            "unknown": "It is unknown (or unspecified) whether the given version is affected."
+          }
+        }
+      }
     },
     "cyclonedx-2.0": {
       "type": "object",
@@ -4289,6 +4826,9 @@
         },
         "compositions": {
           "$ref": "#/$defs/cyclonedx-composition-2.0/$defs/compositions"
+        },
+        "vulnerabilities": {
+          "$ref": "#/$defs/cyclonedx-vulnerability-2.0/$defs/vulnerabilities"
         }
       }
     }
