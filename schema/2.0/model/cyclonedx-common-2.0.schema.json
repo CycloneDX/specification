@@ -1,9 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "http://localhost:8080/schema/2.0/cyclonedx-common-2.0.schema.json",
+  "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-common-2.0.schema.json",
   "type": "null",
-  "title": "CycloneDX Transparency Expression Language: Common",
-  "$comment" : "CycloneDX JSON schema is published under the terms of the Apache License 2.0.",
+  "title": "CycloneDX Common Model",
+  "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
     "refType": {
       "description": "Identifier for referable and therefore interlinkable elements.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
@@ -392,6 +392,9 @@
         }
       }
     },
+    "organizationalEntityOrContact": {
+
+    },
     "properties": {
       "type": "array",
       "title": "Properties",
@@ -423,13 +426,14 @@
     },
     "extensibleProperties": {
       "type": "object",
-      "description": "CycloneDX supports a structured and namespace-aware mechanism for extensibility through the use of extensible properties. This mechanism enables organisations, ecosystems, and tool vendors to safely introduce custom properties without conflicting with the core schema or other extensions.\n\nExtensible properties are defined as a JSON object whose keys must conform to a strict pattern that resembles a reverse domain name structure, prefixed with ext:. This pattern provides a namespacing convention that aligns with well-established practices in other structured formats (e.g., XML namespaces).",
-      "examples": [
-        "ext:<domain>:<name>",
-        "ext:acme.org:myExtension"
-      ],
+      "title": "Extensible Properties",
       "patternProperties": {
         "^ext:[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}:.+$": {
+          "description": "CycloneDX supports a structured and namespace-aware mechanism for extensibility through the use of extensible properties. This mechanism enables organizations, ecosystems, and tool vendors to safely introduce custom properties without conflicting with the core schema or other extensions.\n\nExtensible properties are defined as a JSON object whose keys must conform to a strict pattern that resembles a reverse domain name structure, prefixed with ext:. This pattern provides a namespacing convention that aligns with well-established practices in other structured formats (e.g., XML namespaces).",
+          "examples": [
+            "ext:<domain>:<name>",
+            "ext:example.org:myExtension"
+          ],
           "if": {
             "type": ["object", "array"]
           },
@@ -451,6 +455,20 @@
       },
       "additionalProperties": false
     },
+    "baseObject": {
+      "description": "Base object for all CycloneDX entities. Automatically includes support for extensible properties.",
+      "allOf": [
+        { "$ref": "cyclonedx-common-2.0.schema.json#/$defs/extensibleProperties" }
+      ],
+      "properties": {
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        },
+        "externalReferences": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReferences"
+        }
+      }
+    },
     "timestamp": {
       "type": "string",
       "format": "date-time",
@@ -458,12 +476,84 @@
       "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$",
       "description": "An RFC 3339-compliant UTC timestamp using Zulu time (i.e., ending with 'Z'). The format must be 'YYYY-MM-DDTHH:MM:SSZ' or include optional fractional seconds, e.g., 'YYYY-MM-DDTHH:MM:SS.sssZ'. Offsets such as '+00:00' are not allowed."
     },
-
-
-
-
-
-
+    "lifecycle": {
+      "type": "object",
+      "title": "Lifecycle",
+      "description": "The product lifecycle(s) that this BOM represents.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/preDefinedLifecyclePhase"
+        },
+        {
+          "title": "Custom Lifecycle Phase",
+          "required": ["name"],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Name",
+              "description": "The name of the lifecycle phase"
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "The description of the lifecycle phase"
+            }
+          }
+        }
+      ]
+    },
+    "lifecycles": {
+      "type": "array",
+      "title": "Lifecycles",
+      "description": "Lifecycles communicate the stage(s) in which data in the BOM was captured. Different types of data may be available at various phases of a lifecycle, such as the Software Development Lifecycle (SDLC), IT Asset Management (ITAM), and Software Asset Management (SAM). Thus, a BOM may include data specific to or only obtainable in a given lifecycle.",
+      "items": { "$ref":  "#/$defs/lifecycle"}
+    },
+    "preDefinedLifecyclePhase": {
+      "title": "Pre-Defined Phase",
+      "required": ["phase"],
+      "additionalProperties": false,
+      "properties": {
+        "phase": {
+          "type": "string",
+          "title": "Phase",
+          "description": "A pre-defined phase in the product lifecycle.",
+          "enum": [
+            "design",
+            "pre-build",
+            "build",
+            "post-build",
+            "operations",
+            "discovery",
+            "decommission"
+          ],
+          "meta:enum": {
+            "design": "BOM produced early in the development lifecycle containing an inventory of components and services that are proposed or planned to be used. The inventory may need to be procured, retrieved, or resourced prior to use.",
+            "pre-build": "BOM consisting of information obtained prior to a build process and may contain source files and development artifacts and manifests. The inventory may need to be resolved and retrieved prior to use.",
+            "build": "BOM consisting of information obtained during a build process where component inventory is available for use. The precise versions of resolved components are usually available at this time as well as the provenance of where the components were retrieved from.",
+            "post-build": "BOM consisting of information obtained after a build process has completed and the resulting components(s) are available for further analysis. Built components may exist as the result of a CI/CD process, may have been installed or deployed to a system or device, and may need to be retrieved or extracted from the system or device.",
+            "operations": "BOM produced that represents inventory that is running and operational. This may include staging or production environments and will generally encompass multiple SBOMs describing the applications and operating system, along with HBOMs describing the hardware that makes up the system. Operations Bill of Materials (OBOM) can provide full-stack inventory of runtime environments, configurations, and additional dependencies.",
+            "discovery": "BOM consisting of information observed through network discovery providing point-in-time enumeration of embedded, on-premise, and cloud-native services such as server applications, connected devices, microservices, and serverless functions.",
+            "decommission": "BOM containing inventory that will be, or has been retired from operations."
+          }
+        }
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Tags",
+      "description": "Textual strings that aid in discovery, search, and retrieval of the associated object. Tags often serve as a way to group or categorize similar or related objects by various attributes.",
+      "examples": [
+        "json-parser",
+        "object-persistence",
+        "text-to-image",
+        "translation",
+        "object-detection"
+      ]
+    },
     "commit": {
       "type": "object",
       "title": "Commit",
@@ -655,6 +745,17 @@
           "description": "The email address of the individual who performed the action"
         }
       }
+    },
+    "locale": {
+      "type": "string",
+      "pattern": "^([a-z]{2})(-[A-Z]{2})?$",
+      "title": "Locale",
+      "description": "Defines a syntax for representing two character language code (ISO-639) followed by an optional two character country code. The language code must be lower case. If the country code is specified, the country code must be upper case. The language code and country code must be separated by a minus sign. Examples: en, en-US, fr, fr-CA"
+    },
+    "signature": {
+      "$ref": "../jsf-0.82.schema.json#/definitions/signature",
+      "title": "Signature",
+      "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
     }
   }
 }

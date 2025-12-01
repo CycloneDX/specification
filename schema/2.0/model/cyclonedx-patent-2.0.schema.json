@@ -1,9 +1,121 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "http://localhost:8080/schema/2.0/cyclonedx-patent-2.0.schema.json",
+  "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-patent-2.0.schema.json",
   "type": "null",
-  "title": "CycloneDX Transparency Expression Language: Patent",
-  "$comment": "CycloneDX JSON schema is published under the terms of the Apache License 2.0.",
+  "title": "CycloneDX Patent Model",
+  "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
+    "patentAssertions": {
+      "type": "array",
+      "title": "Patent Assertions",
+      "description": "A list of assertions made regarding patents associated with this component or service. Assertions distinguish between ownership, licensing, and other relevant interactions with patents.",
+      "items": {
+        "type": "object",
+        "title": "Patent Assertion",
+        "description": "An assertion linking a patent or patent family to this component or service.",
+        "required": ["assertionType", "asserter"],
+        "additionalProperties": false,
+        "properties": {
+          "bom-ref": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+            "title": "BOM Reference",
+            "description": "A reference to the patent or patent family object within the BOM. This must match the `bom-ref` of a `patent` or `patentFamily` object."
+          },
+          "assertionType": {
+            "type": "string",
+            "title": "Assertion Type",
+            "description": "The type of assertion being made about the patent or patent family. Examples include ownership, licensing, and standards inclusion.",
+            "enum": [
+              "ownership",
+              "license",
+              "third-party-claim",
+              "standards-inclusion",
+              "prior-art",
+              "exclusive-rights",
+              "non-assertion",
+              "research-or-evaluation"
+            ],
+            "meta:enum": {
+              "ownership": "The manufacturer asserts ownership of the patent or patent family.",
+              "license": "The manufacturer asserts they have a license to use the patent or patent family.",
+              "third-party-claim": "A third party has asserted a claim or potential infringement against the manufacturer’s component or service.",
+              "standards-inclusion": "The patent is part of a standard essential patent (SEP) portfolio relevant to the component or service.",
+              "prior-art": "The manufacturer asserts the patent or patent family as prior art that invalidates another patent or claim.",
+              "exclusive-rights": "The manufacturer asserts exclusive rights granted through a licensing agreement.",
+              "non-assertion": "The manufacturer asserts they will not enforce the patent or patent family against certain uses or users.",
+              "research-or-evaluation": "The patent or patent family is being used under a research or evaluation license."
+            }
+          },
+          "patentRefs": {
+            "type": "array",
+            "title": "Patent References",
+            "description": "A list of BOM references (`bom-ref`) linking to patents or patent families associated with this assertion.",
+            "items": {
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+            }
+          },
+          "asserter": {
+            "oneOf": [
+              {
+                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntity",
+                "title": "Organizational Entity"
+              },
+              {
+                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalContact",
+                "title": "Person"
+              },
+              {
+                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+                "title": "Reference",
+                "description": "A reference to a previously defined `organizationalContact` or `organizationalEntity` object in the BOM. The value must be a valid `bom-ref` pointing to one of these objects."
+              }
+            ]
+          },
+          "notes": {
+            "type": "string",
+            "title": "Notes",
+            "description": "Additional notes or clarifications regarding the assertion, if necessary. For example, geographical restrictions, duration, or limitations of a license."
+          }
+        }
+      }
+    },
+    "patentApplicationNumber": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9\\-/.()\\s]{0,28}[A-Za-z0-9]$",
+      "title": "Patent Application Number",
+      "description": "The unique number assigned to a patent application when it is filed with a patent office. It is used to identify the specific application and track its progress through the examination process. Aligned with `ApplicationNumber` in ST.96. Refer to [ApplicationIdentificationType in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/ApplicationIdentificationType.xsd).",
+      "examples": ["US20240000123", "EP23123456"]
+    },
+    "patentJurisdiction": {
+      "type": "string",
+      "title": "Jurisdiction",
+      "description": "The jurisdiction or patent office where the priority application was filed, specified using WIPO ST.3 codes. Aligned with `IPOfficeCode` in ST.96. Refer to [IPOfficeCode in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Common/IPOfficeCode.xsd).",
+      "pattern": "^[A-Z]{2}$",
+      "examples": ["US", "EP", "JP"]
+    },
+    "patentFilingDate": {
+      "type": "string",
+      "format": "date",
+      "title": "Filing Date",
+      "description": "The date the priority application was filed, aligned with `FilingDate` in ST.96. Refer to [FilingDate in ST.96](https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/FilingDate.xsd)."
+    },
+    "priorityApplication": {
+      "type": "object",
+      "title": "Priority Application",
+      "description": "The priorityApplication contains the essential data necessary to identify and reference an earlier patent filing for priority rights. In line with WIPO ST.96 guidelines, it includes the jurisdiction (office code), application number, and filing date-the three key elements that uniquely specify the priority application in a global patent context.",
+      "required": ["applicationNumber", "jurisdiction", "filingDate"],
+      "additionalProperties": false,
+      "properties": {
+        "applicationNumber": {
+          "$ref": "#/$defs/patentApplicationNumber"
+        },
+        "jurisdiction": {
+          "$ref": "#/$defs/patentJurisdiction"
+        },
+        "filingDate": {
+          "$ref": "#/$defs/patentFilingDate"
+        }
+      }
+    }
   }
 }
