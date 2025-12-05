@@ -1,9 +1,104 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "http://localhost:8080/schema/2.0/cyclonedx-metadata-2.0.schema.json",
+  "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-metadata-2.0.schema.json",
   "type": "null",
-  "title": "CycloneDX Transparency Expression Language: Metadata",
-  "$comment" : "CycloneDX JSON schema is published under the terms of the Apache License 2.0.",
+  "title": "CycloneDX Metadata Model",
+  "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
+    "metadata": {
+      "type": "object",
+      "title": "BOM Metadata",
+      "description": "Provides additional information about a BOM.",
+      "additionalProperties": false,
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Timestamp",
+          "description": "The date and time (timestamp) when the BOM was created."
+        },
+        "lifecycles": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/lifecycles"
+        },
+        "tools": {
+          "type": "object",
+          "title": "Tools",
+          "description": "The tool(s) used in the creation, enrichment, and validation of the BOM.",
+          "additionalProperties": false,
+          "properties": {
+            "components": {
+              "$ref": "cyclonedx-component-2.0.schema.json#/$defs/components",
+              "description": "A list of software and hardware components used as tools."
+            },
+            "services": {
+              "$ref": "cyclonedx-service-2.0.schema.json#/$defs/services",
+              "description": "A list of services used as tools. This may include microservices, function-as-a-service, and other types of network or intra-process services."
+            }
+          }
+        },
+        "manufacturer": {
+          "title": "BOM Manufacturer",
+          "description": "The organization that created the BOM.\nManufacturer is common in BOMs created through automated processes. BOMs created through manual means may have `@.authors` instead.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntity"
+        },
+        "authors": {
+          "type": "array",
+          "title": "BOM Authors",
+          "description": "The person(s) who created the BOM.\nAuthors are common in BOMs created through manual processes. BOMs created through automated means may have `@.manufacturer` instead.",
+          "items": {"$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalContact"}
+        },
+        "component": {
+          "description": "The component that the BOM describes.",
+          "$ref": "cyclonedx-component-2.0.schema.json#/$defs/component"
+        },
+        "supplier": {
+          "title": "Supplier",
+          "description": " The organization that supplied the component that the BOM describes. The supplier may often be the manufacturer, but may also be a distributor or repackager.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntity"
+        },
+        "licenses": {
+          "title": "BOM License(s)",
+          "description": "The license information for the BOM document.\nThis may be different from the license(s) of the component(s) that the BOM describes.",
+          "$ref": "cyclonedx-license-2.0.schema.json#/$defs/licenseChoice"
+        },
+        "distributionConstraints": {
+          "$ref": "#/$defs/distributionConstraints"
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "distributionConstraints": {
+      "title": "Distribution Constraints",
+      "description": "Conditions and constraints governing the sharing and distribution of the data or components described by this BOM.",
+      "type": "object",
+      "properties": {
+        "tlp": {
+          "$ref": "#/$defs/tlpClassification",
+          "description": "The Traffic Light Protocol (TLP) classification that controls the sharing and distribution of the data that the BOM describes."
+        }
+      }
+    },
+    "tlpClassification": {
+      "title": "Traffic Light Protocol (TLP) Classification",
+      "description": "Traffic Light Protocol (TLP) is a classification system for identifying the potential risk associated with artefact, including whether it is subject to certain types of legal, financial, or technical threats. Refer to [https://www.first.org/tlp/](https://www.first.org/tlp/) for further information.\nThe default classification is \"CLEAR\"",
+      "type" : "string",
+      "default": "CLEAR",
+      "enum": [
+        "CLEAR",
+        "GREEN",
+        "AMBER",
+        "AMBER_AND_STRICT",
+        "RED"
+      ],
+      "meta:enum": {
+        "CLEAR": "The information is not subject to any restrictions as regards the sharing.",
+        "GREEN": "The information is subject to limited disclosure, and recipients can share it within their community but not via publicly accessible channels.",
+        "AMBER": "The information is subject to limited disclosure, and recipients can only share it on a need-to-know basis within their organization and with clients.",
+        "AMBER_AND_STRICT": "The information is subject to limited disclosure, and recipients can only share it on a need-to-know basis within their organization.",
+        "RED": "The information is subject to restricted distribution to individual recipients only and must not be shared."
+      }
+    }
   }
 }

@@ -1,9 +1,547 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "http://localhost:8080/schema/2.0/cyclonedx-ai-modelcard-2.0.schema.json",
+  "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-ai-modelcard-2.0.schema.json",
   "type": "null",
-  "title": "CycloneDX Transparency Expression Language: AI Model Card",
-  "$comment": "CycloneDX JSON schema is published under the terms of the Apache License 2.0.",
+  "title": "CycloneDX AI Model Card",
+  "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
+    "modelCard": {
+      "$comment": "Model card support in CycloneDX is derived from TensorFlow Model Card Toolkit released under the Apache 2.0 license and available from https://github.com/tensorflow/model-card-toolkit/blob/main/model_card_toolkit/schema/v0.0.2/model_card.schema.json. In addition, CycloneDX model card support includes portions of VerifyML, also released under the Apache 2.0 license and available from https://github.com/cylynx/verifyml/blob/main/verifyml/model_card_toolkit/schema/v0.0.4/model_card.schema.json.",
+      "type": "object",
+      "title": "Model Card",
+      "description": "A model card describes the intended uses of a machine learning model and potential limitations, including biases and ethical considerations. Model cards typically contain the training parameters, which datasets were used to train the model, performance metrics, and other relevant data useful for ML transparency. This object SHOULD be specified for any component of type `machine-learning-model` and must not be specified for other component types.",
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "BOM Reference",
+          "description": "An identifier which can be used to reference the model card elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        },
+        "modelParameters": {
+          "type": "object",
+          "title": "Model Parameters",
+          "description": "Hyper-parameters for construction of the model.",
+          "additionalProperties": false,
+          "properties": {
+            "approach": {
+              "type": "object",
+              "title": "Approach",
+              "description": "The overall approach to learning used by the model for problem solving.",
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "title": "Learning Type",
+                  "description": "Learning types describing the learning problem or hybrid learning problem.",
+                  "enum": [
+                    "supervised",
+                    "unsupervised",
+                    "reinforcement-learning",
+                    "semi-supervised",
+                    "self-supervised"
+                  ],
+                  "meta:enum": {
+                    "supervised": "Supervised machine learning involves training an algorithm on labeled data to predict or classify new data based on the patterns learned from the labeled examples.",
+                    "unsupervised": "Unsupervised machine learning involves training algorithms on unlabeled data to discover patterns, structures, or relationships without explicit guidance, allowing the model to identify inherent structures or clusters within the data.",
+                    "reinforcement-learning": "Reinforcement learning is a type of machine learning where an agent learns to make decisions by interacting with an environment to maximize cumulative rewards, through trial and error.",
+                    "semi-supervised": "Semi-supervised machine learning utilizes a combination of labeled and unlabeled data during training to improve model performance, leveraging the benefits of both supervised and unsupervised learning techniques.",
+                    "self-supervised": "Self-supervised machine learning involves training models to predict parts of the input data from other parts of the same data, without requiring external labels, enabling learning from large amounts of unlabeled data."
+                  }
+                }
+              }
+            },
+            "task": {
+              "type": "string",
+              "title": "Task",
+              "description": "Directly influences the input and/or output. Examples include classification, regression, clustering, etc."
+            },
+            "architectureFamily": {
+              "type": "string",
+              "title": "Architecture Family",
+              "description": "The model architecture family such as transformer network, convolutional neural network, residual neural network, LSTM neural network, etc."
+            },
+            "modelArchitecture": {
+              "type": "string",
+              "title": "Model Architecture",
+              "description": "The specific architecture of the model such as GPT-1, ResNet-50, YOLOv3, etc."
+            },
+            "datasets": {
+              "type": "array",
+              "title": "Datasets",
+              "description": "The datasets used to train and evaluate the model.",
+              "items" : {
+                "oneOf" : [
+                  {
+                    "title": "Inline Data Information",
+                    "$ref": "cyclonedx-component-2.0.schema.json#/$defs/componentData"
+                  },
+                  {
+                    "type": "object",
+                    "title": "Data Reference",
+                    "additionalProperties": false,
+                    "properties": {
+                      "ref": {
+                        "anyOf": [
+                          {
+                            "title": "Ref",
+                            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+                          },
+                          {
+                            "title": "BOM-Link Element",
+                            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+                          }
+                        ],
+                        "title": "Reference",
+                        "type": "string",
+                        "description": "References a data component by the components bom-ref attribute"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "inputs": {
+              "type": "array",
+              "title": "Inputs",
+              "description": "The input format(s) of the model",
+              "items": { "$ref": "#/$defs/inputOutputMLParameters" }
+            },
+            "outputs": {
+              "type": "array",
+              "title": "Outputs",
+              "description": "The output format(s) from the model",
+              "items": { "$ref": "#/$defs/inputOutputMLParameters" }
+            }
+          }
+        },
+        "quantitativeAnalysis": {
+          "type": "object",
+          "title": "Quantitative Analysis",
+          "description": "A quantitative analysis of the model",
+          "additionalProperties": false,
+          "properties": {
+            "performanceMetrics": {
+              "type": "array",
+              "title": "Performance Metrics",
+              "description": "The model performance metrics being reported. Examples may include accuracy, F1 score, precision, top-3 error rates, MSC, etc.",
+              "items": { "$ref": "#/$defs/performanceMetric" }
+            },
+            "graphics": { "$ref": "#/$defs/graphicsCollection" }
+          }
+        },
+        "considerations": {
+          "type": "object",
+          "title": "Considerations",
+          "description": "What considerations should be taken into account regarding the model's construction, training, and application?",
+          "additionalProperties": false,
+          "properties": {
+            "users": {
+              "type": "array",
+              "title": "Users",
+              "description": "Who are the intended users of the model?",
+              "items": {
+                "type": "string"
+              }
+            },
+            "useCases": {
+              "type": "array",
+              "title": "Use Cases",
+              "description": "What are the intended use cases of the model?",
+              "items": {
+                "type": "string"
+              }
+            },
+            "technicalLimitations": {
+              "type": "array",
+              "title": "Technical Limitations",
+              "description": "What are the known technical limitations of the model? E.g. What kind(s) of data should the model be expected not to perform well on? What are the factors that might degrade model performance?",
+              "items": {
+                "type": "string"
+              }
+            },
+            "performanceTradeoffs": {
+              "type": "array",
+              "title": "Performance Tradeoffs",
+              "description": "What are the known tradeoffs in accuracy/performance of the model?",
+              "items": {
+                "type": "string"
+              }
+            },
+            "ethicalConsiderations": {
+              "type": "array",
+              "title": "Ethical Considerations",
+              "description": "What are the ethical risks involved in the application of this model?",
+              "items": { "$ref": "#/$defs/risk" }
+            },
+            "environmentalConsiderations":{
+              "$ref": "#/$defs/environmentalConsiderations",
+              "title": "Environmental Considerations",
+              "description": "What are the various environmental impacts the corresponding machine learning model has exhibited across its lifecycle?"
+            },
+            "fairnessAssessments": {
+              "type": "array",
+              "title": "Fairness Assessments",
+              "description": "How does the model affect groups at risk of being systematically disadvantaged? What are the harms and benefits to the various affected groups?",
+              "items": {
+                "$ref": "#/$defs/fairnessAssessment"
+              }
+            }
+          }
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "inputOutputMLParameters": {
+      "type": "object",
+      "title": "Input and Output Parameters",
+      "additionalProperties": false,
+      "properties": {
+        "format": {
+          "title": "Input/Output Format",
+          "description": "The data format for input/output to the model.",
+          "type": "string",
+          "examples": [ "string", "image", "time-series"]
+        }
+      }
+    },
+    "environmentalConsiderations": {
+      "type": "object",
+      "title": "Environmental Considerations",
+      "description": "Describes various environmental impact metrics.",
+      "additionalProperties": false,
+      "properties": {
+        "energyConsumptions": {
+          "title": "Energy Consumptions",
+          "description": "Describes energy consumption information incurred for one or more component lifecycle activities.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/energyConsumption"
+          }
+        },
+        "properties": {
+          "type": "array",
+          "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/property"
+          }
+        }
+      }
+    },
+    "energyConsumption": {
+      "title": "Energy consumption",
+      "description": "Describes energy consumption information incurred for the specified lifecycle activity.",
+      "type": "object",
+      "required": [
+        "activity",
+        "energyProviders",
+        "activityEnergyCost"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "activity": {
+          "type": "string",
+          "title": "Activity",
+          "description": "The type of activity that is part of a machine learning model development or operational lifecycle.",
+          "enum": [
+            "design",
+            "data-collection",
+            "data-preparation",
+            "training",
+            "fine-tuning",
+            "validation",
+            "deployment",
+            "inference",
+            "other"
+          ],
+          "meta:enum": {
+            "design": "A model design including problem framing, goal definition and algorithm selection.",
+            "data-collection": "Model data acquisition including search, selection and transfer.",
+            "data-preparation": "Model data preparation including data cleaning, labeling and conversion.",
+            "training": "Model building, training and generalized tuning.",
+            "fine-tuning": "Refining a trained model to produce desired outputs for a given problem space.",
+            "validation": "Model validation including model output evaluation and testing.",
+            "deployment": "Explicit model deployment to a target hosting infrastructure.",
+            "inference": "Generating an output response from a hosted model from a set of inputs.",
+            "other": "A lifecycle activity type whose description does not match currently defined values."
+          }
+        },
+        "energyProviders": {
+          "title": "Energy Providers",
+          "description": "The provider(s) of the energy consumed by the associated model development lifecycle activity.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/energyProvider" }
+        },
+        "activityEnergyCost": {
+          "title": "Activity Energy Cost",
+          "description": "The total energy cost associated with the model lifecycle activity.",
+          "$ref": "#/$defs/energyMeasure"
+        },
+        "co2CostEquivalent": {
+          "title": "CO2 Equivalent Cost",
+          "description": "The CO2 cost (debit) equivalent to the total energy cost.",
+          "$ref": "#/$defs/co2Measure"
+        },
+        "co2CostOffset": {
+          "title": "CO2 Cost Offset",
+          "description": "The CO2 offset (credit) for the CO2 equivalent cost.",
+          "$ref": "#/$defs/co2Measure"
+        },
+        "properties": {
+          "type": "array",
+          "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/property"
+          }
+        }
+      }
+    },
+    "energyMeasure": {
+      "type": "object",
+      "title": "Energy Measure",
+      "description": "A measure of energy.",
+      "required": [
+        "value",
+        "unit"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "type": "number",
+          "title": "Value",
+          "description": "Quantity of energy."
+        },
+        "unit": {
+          "type": "string",
+          "enum": [ "kWh" ],
+          "title": "Unit",
+          "description": "Unit of energy.",
+          "meta:enum": {
+            "kWh": "Kilowatt-hour (kWh) is the energy delivered by one kilowatt (kW) of power for one hour (h)."
+          }
+        }
+      }
+    },
+    "co2Measure": {
+      "type": "object",
+      "title": "CO2 Measure",
+      "description": "A measure of carbon dioxide (CO2).",
+      "required": [
+        "value",
+        "unit"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "type": "number",
+          "title": "Value",
+          "description": "Quantity of carbon dioxide (CO2)."
+        },
+        "unit": {
+          "type": "string",
+          "enum": [ "tCO2eq" ],
+          "title": "Unit",
+          "description": "Unit of carbon dioxide (CO2).",
+          "meta:enum": {
+            "tCO2eq": "Tonnes (t) of carbon dioxide (CO2) equivalent (eq)."
+          }
+        }
+      }
+    },
+    "energyProvider": {
+      "type": "object",
+      "title": "Energy Provider",
+      "description": "Describes the physical provider of energy used for model development or operations.",
+      "required": [
+        "organization",
+        "energySource",
+        "energyProvided"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "title": "BOM Reference",
+          "description": "An identifier which can be used to reference the energy provider elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the energy provider."
+        },
+        "organization": {
+          "type": "object",
+          "title": "Organization",
+          "description": "The organization that provides energy.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntity"
+        },
+        "energySource": {
+          "type": "string",
+          "enum": [
+            "coal",
+            "oil",
+            "natural-gas",
+            "nuclear",
+            "wind",
+            "solar",
+            "geothermal",
+            "hydropower",
+            "biofuel",
+            "unknown",
+            "other"
+          ],
+          "meta:enum": {
+            "coal": "Energy produced by types of coal.",
+            "oil": "Petroleum products (primarily crude oil and its derivative fuel oils).",
+            "natural-gas": "Hydrocarbon gas liquids (HGL) that occur as gases at atmospheric pressure and as liquids under higher pressures including Natural gas (C5H12 and heavier), Ethane (C2H6), Propane (C3H8), etc.",
+            "nuclear": "Energy produced from the cores of atoms (i.e., through nuclear fission or fusion).",
+            "wind": "Energy produced from moving air.",
+            "solar": "Energy produced from the sun (i.e., solar radiation).",
+            "geothermal": "Energy produced from heat within the earth.",
+            "hydropower": "Energy produced from flowing water.",
+            "biofuel": "Liquid fuels produced from biomass feedstocks (i.e., organic materials such as plants or animals).",
+            "unknown": "The energy source is unknown.",
+            "other": "An energy source that is not listed."
+          },
+          "title": "Energy Source",
+          "description": "The energy source for the energy provider."
+        },
+        "energyProvided": {
+          "$ref": "#/$defs/energyMeasure",
+          "title": "Energy Provided",
+          "description": "The energy provided by the energy source for an associated activity."
+        },
+        "externalReferences": {
+          "type": "array",
+          "items": {"$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference"},
+          "title": "External References",
+          "description": "External references provide a way to document systems, sites, and information that may be relevant but are not included with the BOM. They may also establish specific relationships within or external to the BOM."
+        }
+      }
+    },
+    "graphicsCollection": {
+      "type": "object",
+      "title": "Graphics Collection",
+      "description": "A collection of graphics that represent various measurements.",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "title": "Description",
+          "description": "A description of this collection of graphics.",
+          "type": "string"
+        },
+        "collection": {
+          "title": "Collection",
+          "description": "A collection of graphics.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/graphic" }
+        }
+      }
+    },
+    "graphic": {
+      "type": "object",
+      "title": "Graphic",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "description": "The name of the graphic.",
+          "type": "string"
+        },
+        "image": {
+          "title": "Graphic Image",
+          "description": "The graphic (vector or raster). Base64 encoding must be specified for binary images.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/attachment"
+        }
+      }
+    },
+    "performanceMetric": {
+      "type": "object",
+      "title": "Performance Metric",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "title": "Type",
+          "description": "The type of performance metric.",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "description": "The value of the performance metric.",
+          "type": "string"
+        },
+        "slice": {
+          "title": "Slice",
+          "description": "The name of the slice this metric was computed on. By default, assume this metric is not sliced.",
+          "type": "string"
+        },
+        "confidenceInterval": {
+          "title": "Confidence Interval",
+          "description": "The confidence interval of the metric.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "lowerBound": {
+              "title": "Lower Bound",
+              "description": "The lower bound of the confidence interval.",
+              "type": "string"
+            },
+            "upperBound": {
+              "title": "Upper Bound",
+              "description": "The upper bound of the confidence interval.",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "risk": {
+      "type": "object",
+      "title": "Risk",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "description": "The name of the risk.",
+          "type": "string"
+        },
+        "mitigationStrategy": {
+          "title": "Mitigation Strategy",
+          "description": "Strategy used to address this risk.",
+          "type": "string"
+        }
+      }
+    },
+    "fairnessAssessment": {
+      "type": "object",
+      "title": "Fairness Assessment",
+      "description": "Information about the benefits and harms of the model to an identified at risk group.",
+      "additionalProperties": false,
+      "properties": {
+        "groupAtRisk": {
+          "type": "string",
+          "title": "Group at Risk",
+          "description": "The groups or individuals at risk of being systematically disadvantaged by the model."
+        },
+        "benefits": {
+          "type": "string",
+          "title": "Benefits",
+          "description": "Expected benefits to the identified groups."
+        },
+        "harms": {
+          "type": "string",
+          "title": "Harms",
+          "description": "Expected harms to the identified groups."
+        },
+        "mitigationStrategy": {
+          "type": "string",
+          "title": "Mitigation Strategy",
+          "description": "With respect to the benefits and harms outlined, please describe any mitigation strategy implemented."
+        }
+      }
+    }
   }
 }

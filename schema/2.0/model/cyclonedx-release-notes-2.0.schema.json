@@ -1,9 +1,114 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "http://localhost:8080/schema/2.0/cyclonedx-release-notes-2.0.schema.json",
+  "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-release-notes-2.0.schema.json",
   "type": "null",
-  "title": "CycloneDX Transparency Expression Language: Release Notes",
-  "$comment": "CycloneDX JSON schema is published under the terms of the Apache License 2.0.",
+  "title": "CycloneDX Release Notes Model",
+  "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
+    "releaseNotes": {
+      "type": "object",
+      "title": "Release notes",
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "$ref": "#/$defs/releaseType",
+          "title": "Type",
+          "description": "The software versioning type the release note describes."
+        },
+        "title": {
+          "type": "string",
+          "title": "Title",
+          "description": "The title of the release."
+        },
+        "featuredImage": {
+          "type": "string",
+          "format": "iri-reference",
+          "title": "Featured image",
+          "description": "The URL to an image that may be prominently displayed with the release note."
+        },
+        "socialImage": {
+          "type": "string",
+          "format": "iri-reference",
+          "title": "Social image",
+          "description": "The URL to an image that may be used in messaging on social media platforms."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A short description of the release."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Timestamp",
+          "description": "The date and time (timestamp) when the release note was created."
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Aliases",
+          "description": "One or more alternate names the release may be referred to. This may include unofficial terms used by development and marketing teams (e.g. code names)."
+        },
+        "tags": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/tags",
+          "title": "Tags"
+        },
+        "resolves": {
+          "type": "array",
+          "items": {"$ref": "cyclonedx-common-2.0.schema.json#/$defs/issue"},
+          "title": "Resolves",
+          "description": "A collection of issues that have been resolved."
+        },
+        "notes": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/note"},
+          "title": "Notes",
+          "description": "Zero or more release notes containing the locale and content. Multiple note objects may be specified to support release notes in a wide variety of languages."
+        },
+        "properties": {
+          "type": "array",
+          "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
+          "items": {"$ref": "cyclonedx-common-2.0.schema.json#/$defs/property"}
+        }
+      }
+    },
+    "releaseType": {
+      "type": "string",
+      "examples": [
+        "major",
+        "minor",
+        "patch",
+        "pre-release",
+        "internal"
+      ],
+      "description": "The software versioning type. It is recommended that the release type use one of 'major', 'minor', 'patch', 'pre-release', or 'internal'. Representing all possible software release types is not practical, so standardizing on the recommended values, whenever possible, is strongly encouraged.\n\n* __major__ = A major release may contain significant changes or may introduce breaking changes.\n* __minor__ = A minor release, also known as an update, may contain a smaller number of changes than major releases.\n* __patch__ = Patch releases are typically unplanned and may resolve defects or important security issues.\n* __pre-release__ = A pre-release may include alpha, beta, or release candidates and typically have limited support. They provide the ability to preview a release prior to its general availability.\n* __internal__ = Internal releases are not for public consumption and are intended to be used exclusively by the project or manufacturer that produced it."
+    },
+    "note": {
+      "type": "object",
+      "title": "Note",
+      "description": "A note containing the locale and content.",
+      "required": [
+        "text"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "locale": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/locale",
+          "title": "Locale",
+          "description": "The ISO-639 (or higher) language code and optional ISO-3166 (or higher) country code. Examples include: \"en\", \"en-US\", \"fr\" and \"fr-CA\""
+        },
+        "text": {
+          "title": "Release note content",
+          "description": "Specifies the full content of the release note.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/attachment"
+        }
+      }
+    }
   }
 }

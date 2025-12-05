@@ -1,9 +1,710 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "http://localhost:8080/schema/2.0/cyclonedx-component-2.0.schema.json",
+  "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-component-2.0.schema.json",
   "type": "null",
-  "title": "CycloneDX Transparency Expression Language: Component",
-  "$comment" : "CycloneDX JSON schema is published under the terms of the Apache License 2.0.",
+  "title": "CycloneDX Component Model",
+  "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
+    "components": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/component"},
+      "uniqueItems": true,
+      "title": "Components"
+    },
+    "component": {
+      "type": "object",
+      "title": "Component",
+      "required": [
+        "type",
+        "name"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "application",
+            "framework",
+            "library",
+            "container",
+            "platform",
+            "operating-system",
+            "device",
+            "device-driver",
+            "firmware",
+            "file",
+            "machine-learning-model",
+            "data",
+            "cryptographic-asset"
+          ],
+          "meta:enum": {
+            "application": "A software application. Refer to [https://en.wikipedia.org/wiki/Application_software](https://en.wikipedia.org/wiki/Application_software) for information about applications.",
+            "framework": "A software framework. Refer to [https://en.wikipedia.org/wiki/Software_framework](https://en.wikipedia.org/wiki/Software_framework) for information on how frameworks vary slightly from libraries.",
+            "library": "A software library. Refer to [https://en.wikipedia.org/wiki/Library_(computing)](https://en.wikipedia.org/wiki/Library_(computing)) for information about libraries. All third-party and open source reusable components will likely be a library. If the library also has key features of a framework, then it should be classified as a framework. If not, or is unknown, then specifying library is recommended.",
+            "container": "A packaging and/or runtime format, not specific to any particular technology, which isolates software inside the container from software outside of a container through virtualization technology. Refer to [https://en.wikipedia.org/wiki/OS-level_virtualization](https://en.wikipedia.org/wiki/OS-level_virtualization).",
+            "platform": "A runtime environment that interprets or executes software. This may include runtimes such as those that execute bytecode, just-in-time compilers, interpreters, or low-code/no-code application platforms.",
+            "operating-system": "A software operating system without regard to deployment model (i.e. installed on physical hardware, virtual machine, image, etc) Refer to [https://en.wikipedia.org/wiki/Operating_system](https://en.wikipedia.org/wiki/Operating_system).",
+            "device": "A hardware device such as a processor or chip-set. A hardware device containing firmware SHOULD include a component for the physical hardware itself and another component of type 'firmware' or 'operating-system' (whichever is relevant), describing information about the software running on the device. See also the list of [known device properties](https://github.com/CycloneDX/cyclonedx-property-taxonomy/blob/main/cdx/device.md).",
+            "device-driver": "A special type of software that operates or controls a particular type of device. Refer to [https://en.wikipedia.org/wiki/Device_driver](https://en.wikipedia.org/wiki/Device_driver).",
+            "firmware": "A special type of software that provides low-level control over a device's hardware. Refer to [https://en.wikipedia.org/wiki/Firmware](https://en.wikipedia.org/wiki/Firmware).",
+            "file": "A computer file. Refer to [https://en.wikipedia.org/wiki/Computer_file](https://en.wikipedia.org/wiki/Computer_file) for information about files.",
+            "machine-learning-model": "A model based on training data that can make predictions or decisions without being explicitly programmed to do so.",
+            "data": "A collection of discrete values that convey information.",
+            "cryptographic-asset": "A cryptographic asset including algorithms, protocols, certificates, keys, tokens, and secrets."
+          },
+          "title": "Component Type",
+          "description": "Specifies the type of component. For software components, classify as application if no more specific appropriate classification is available or cannot be determined for the component.",
+          "examples": ["library"]
+        },
+        "mime-type": {
+          "type": "string",
+          "title": "Mime-Type",
+          "description": "The mime-type of the component. When used on file components, the mime-type can provide additional context about the kind of file being represented, such as an image, font, or executable. Some library or framework components may also have an associated mime-type.",
+          "examples": ["image/jpeg"],
+          "pattern": "^[-+a-z0-9.]+/[-+a-z0-9.]+$"
+        },
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "BOM Reference",
+          "description": "An identifier which can be used to reference the component elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        },
+        "supplier": {
+          "title": "Component Supplier",
+          "description": " The organization that supplied the component. The supplier may often be the manufacturer, but may also be a distributor or repackager.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntity"
+        },
+        "manufacturer": {
+          "title": "Component Manufacturer",
+          "description": "The organization that created the component.\nManufacturer is common in components created through automated processes. Components created through manual means may have `@.authors` instead.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntity"
+        },
+        "authors" :{
+          "type": "array",
+          "title": "Component Authors",
+          "description": "The person(s) who created the component.\nAuthors are common in components created through manual processes. Components created through automated means may have `@.manufacturer` instead.",
+          "items": {"$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalContact"}
+        },
+        "publisher": {
+          "type": "string",
+          "title": "Component Publisher",
+          "description": "The person(s) or organization(s) that published the component",
+          "examples": ["Acme Inc"]
+        },
+        "group": {
+          "type": "string",
+          "title": "Component Group",
+          "description": "The grouping name or identifier. This will often be a shortened, single name of the company or project that produced the component, or the source package or domain name. Whitespace and special characters should be avoided. Examples include: apache, org.apache.commons, and apache.org.",
+          "examples": ["com.acme"]
+        },
+        "name": {
+          "type": "string",
+          "title": "Component Name",
+          "description": "The name of the component. This will often be a shortened, single name of the component. Examples: commons-lang3 and jquery",
+          "examples": ["tomcat-catalina"]
+        },
+        "version": {
+          "$ref": "#/$defs/version",
+          "title": "Component Version",
+          "description": "The component version. The version should ideally comply with semantic versioning but is not enforced.\nMust be used exclusively, either 'version' or 'versionRange', but not both."
+        },
+        "versionRange": {
+          "$ref": "#/$defs/versionRange",
+          "title": "Component Version Range",
+          "description": "For an external component, this specifies the accepted version range.\nThe value must adhere to the Package URL Version Range syntax (vers), as defined at <https://github.com/package-url/vers-spec\nMay only be used if `.isExternal` is set to `true`.\nMust be used exclusively, either 'version' or 'versionRange', but not both."
+        },
+        "isExternal": {
+          "type": "boolean",
+          "title": "Component Is External",
+          "description": "Determine whether this component is external.\nAn external component is one that is not part of an assembly, but is expected to be provided by the environment, regardless of the component's `.scope`. This setting can be useful for distinguishing which components are bundled with the product and which can be relied upon to be present in the deployment environment.\nThis may be set to `true` for runtime components only. For `$.metadata.component`, it must be set to `false`.",
+          "default": false
+        },
+        "description": {
+          "type": "string",
+          "title": "Component Description",
+          "description": "Specifies a description for the component"
+        },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "required",
+            "optional",
+            "excluded"
+          ],
+          "meta:enum": {
+            "required": "The component is required for runtime",
+            "optional": "The component is optional at runtime. Optional components are components that are not capable of being called due to them not being installed or otherwise accessible by any means. Components that are installed but due to configuration or other restrictions are prohibited from being called must be scoped as 'required'.",
+            "excluded": "Components that are excluded provide the ability to document component usage for test and other non-runtime purposes. Excluded components are not reachable within a call graph at runtime."
+          },
+          "title": "Component Scope",
+          "description": "Specifies the scope of the component. If scope is not specified, 'required' scope SHOULD be assumed by the consumer of the BOM.",
+          "default": "required"
+        },
+        "hashes": {
+          "type": "array",
+          "title": "Component Hashes",
+          "description": "The hashes of the component.",
+          "items": {"$ref": "cyclonedx-common-2.0.schema.json#/$defs/hash"}
+        },
+        "licenses": {
+          "$ref": "cyclonedx-license-2.0.schema.json#/$defs/licenseChoice",
+          "title": "Component License(s)"
+        },
+        "copyright": {
+          "$ref": "#/$defs/copyrightText"
+        },
+        "patentAssertions": {
+          "$ref": "cyclonedx-patent-2.0.schema.json#/$defs/patentAssertions",
+          "title": "Component Patent(s)"
+        },
+        "cpe": {
+          "type": "string",
+          "title": "Common Platform Enumeration (CPE)",
+          "description": "Asserts the identity of the component using CPE. The CPE must conform to the CPE 2.2 or 2.3 specification. See [https://nvd.nist.gov/products/cpe](https://nvd.nist.gov/products/cpe). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity.",
+          "examples": ["cpe:2.3:a:acme:component_framework:-:*:*:*:*:*:*:*"]
+        },
+        "purl": {
+          "type": "string",
+          "title": "Package URL (purl)",
+          "description": "Asserts the identity of the component using package-url (purl). The purl, if specified, must be valid and conform to the specification defined at: [https://github.com/package-url/purl-spec](https://github.com/package-url/purl-spec). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity.",
+          "examples": ["pkg:maven/com.acme/tomcat-catalina@9.0.14?packaging=jar"]
+        },
+        "omniborId": {
+          "type": "array",
+          "title": "OmniBOR Artifact Identifier (gitoid)",
+          "description": "Asserts the identity of the component using the OmniBOR Artifact ID. The OmniBOR, if specified, must be valid and conform to the specification defined at: [https://www.iana.org/assignments/uri-schemes/prov/gitoid](https://www.iana.org/assignments/uri-schemes/prov/gitoid). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity.",
+          "items": { "type": "string" },
+          "examples": [
+            "gitoid:blob:sha1:a94a8fe5ccb19ba61c4c0873d391e987982fbbd3",
+            "gitoid:blob:sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+          ]
+        },
+        "swhid": {
+          "type": "array",
+          "title": "Software Heritage Identifier",
+          "description": "Asserts the identity of the component using the Software Heritage persistent identifier (SWHID). The SWHID, if specified, must be valid and conform to the specification defined at: [https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html](https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity.",
+          "items": { "type": "string" },
+          "examples": ["swh:1:cnt:94a9ed024d3859793618152ea559a168bbcbb5e2"]
+        },
+        "swid": {
+          "$ref": "#/$defs/swid",
+          "title": "SWID Tag",
+          "description": "Asserts the identity of the component using [ISO-IEC 19770-2 Software Identification (SWID) Tags](https://www.iso.org/standard/65666.html). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity."
+        },
+        "pedigree": {
+          "type": "object",
+          "title": "Component Pedigree",
+          "description": "Component pedigree is a way to document complex supply chain scenarios where components are created, distributed, modified, redistributed, combined with other components, etc. Pedigree supports viewing this complex chain from the beginning, the end, or anywhere in the middle. It also provides a way to document variants where the exact relation may not be known.",
+          "additionalProperties": false,
+          "properties": {
+            "ancestors": {
+              "type": "array",
+              "title": "Ancestors",
+              "description": "Describes zero or more components in which a component is derived from. This is commonly used to describe forks from existing projects where the forked version contains an ancestor node containing the original component it was forked from. For example, Component A is the original component. Component B is the component being used and documented in the BOM. However, Component B contains a pedigree node with a single ancestor documenting Component A - the original component from which Component B is derived from.",
+              "items": {"$ref": "#/$defs/component"}
+            },
+            "descendants": {
+              "type": "array",
+              "title": "Descendants",
+              "description": "Descendants are the exact opposite of ancestors. This provides a way to document all forks (and their forks) of an original or root component.",
+              "items": {"$ref": "#/$defs/component"}
+            },
+            "variants": {
+              "type": "array",
+              "title": "Variants",
+              "description": "Variants describe relations where the relationship between the components is not known. For example, if Component A contains nearly identical code to Component B. They are both related, but it is unclear if one is derived from the other, or if they share a common ancestor.",
+              "items": {"$ref": "#/$defs/component"}
+            },
+            "commits": {
+              "type": "array",
+              "title": "Commits",
+              "description": "A list of zero or more commits which provide a trail describing how the component deviates from an ancestor, descendant, or variant.",
+              "items": {"$ref": "cyclonedx-common-2.0.schema.json#/$defs/commit"}
+            },
+            "patches": {
+              "type": "array",
+              "title": "Patches",
+              "description": ">A list of zero or more patches describing how the component deviates from an ancestor, descendant, or variant. Patches may be complementary to commits or may be used in place of commits.",
+              "items": {"$ref": "cyclonedx-common-2.0.schema.json#/$defs/patch"}
+            },
+            "notes": {
+              "type": "string",
+              "title": "Notes",
+              "description": "Notes, observations, and other non-structured commentary describing the components pedigree."
+            }
+          }
+        },
+        "components": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/component"},
+          "uniqueItems": true,
+          "title": "Components",
+          "description": "A list of software and hardware components included in the parent component. This is not a dependency tree. It provides a way to specify a hierarchical representation of component assemblies, similar to system &#8594; subsystem &#8594; parts assembly in physical supply chains."
+        },
+        "evidence": {
+          "$ref": "#/$defs/componentEvidence",
+          "title": "Evidence",
+          "description": "Provides the ability to document evidence collected through various forms of extraction or analysis."
+        },
+        "releaseNotes": {
+          "$ref": "cyclonedx-release-notes-2.0.schema.json#/$defs/releaseNotes",
+          "title": "Release notes",
+          "description": "Specifies release notes."
+        },
+        "modelCard": {
+          "$ref": "cyclonedx-ai-modelcard-2.0.schema.json#/$defs/modelCard",
+          "title": "AI/ML Model Card"
+        },
+        "data": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/componentData"},
+          "title": "Data",
+          "description": "This object SHOULD be specified for any component of type `data` and must not be specified for other component types."
+        },
+        "cryptoProperties": {
+          "$ref": "cyclonedx-cryptography-2.0.schema.json#/$defs/cryptoProperties",
+          "title": "Cryptographic Properties"
+        },
+        "tags": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/tags",
+          "title": "Tags"
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        },
+        "externalReferences": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReferences"
+        },
+        "signature": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/signature",
+          "title": "Signature",
+          "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
+        }
+      },
+      "allOf": [
+        {
+          "description": "Requirement: ensure that `version` and `versionRange` are not present simultaneously.",
+          "not": {
+            "required": ["version", "versionRange"]
+          }
+        },
+        {
+          "description": "Requirement: 'versionRange' must not be present when 'isExternal' is `false`.",
+          "if": {
+            "properties": { "isExternal": { "const": false } }
+          },
+          "then": {
+            "not": { "required": ["versionRange"] }
+          },
+          "else": true
+        }
+      ]
+    },
+    "version": {
+      "description": "A single disjunctive version identifier, for a component or service.",
+      "type": "string",
+      "maxLength": 1024,
+      "examples": [
+        "9.0.14",
+        "v1.33.7",
+        "7.0.0-M1",
+        "2.0pre1",
+        "1.0.0-beta1",
+        "0.8.15"
+      ]
+    },
+    "versionRange": {
+      "description": "A version range specified in Package-URL Version Range syntax (vers) which is defined at https://github.com/package-url/vers-spec",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "examples": [
+        "vers:cargo/9.0.14",
+        "vers:npm/1.2.3|>=2.0.0|<5.0.0",
+        "vers:pypi/0.0.0|0.0.1|0.0.2|0.0.3|1.0|2.0pre1",
+        "vers:tomee/>=1.0.0-beta1|<=1.7.5|>=7.0.0-M1|<=7.0.7|>=7.1.0|<=7.1.2|>=8.0.0-M1|<=8.0.1",
+        "vers:gem/>=2.2.0|!= 2.2.1|<2.3.0"
+      ]
+    },
+    "copyrightText": {
+      "type": "string",
+      "title": "Component Copyright",
+      "description": "A copyright notice informing users of the underlying claims to copyright ownership in a published work.",
+      "examples": ["Acme Inc"]
+    },
+    "copyright": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/copyrightObject"},
+      "title": "Copyright",
+      "description": "Captures intellectual property assertions, providing evidence of possible ownership and legal protection."
+    },
+    "copyrightObject": {
+      "type": "object",
+      "title": "Copyright",
+      "description": "A copyright notice informing users of the underlying claims to copyright ownership in a published work.",
+      "required": [
+        "text"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "type": "string",
+          "title": "Copyright Text",
+          "description": "The textual content of the copyright."
+        }
+      }
+    },
+    "swid": {
+      "type": "object",
+      "title": "SWID Tag",
+      "description": "Specifies metadata and content for ISO-IEC 19770-2 Software Identification (SWID) Tags.",
+      "required": [
+        "tagId",
+        "name"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tagId": {
+          "type": "string",
+          "title": "Tag ID",
+          "description": "Maps to the tagId of a SoftwareIdentity."
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "Maps to the name of a SoftwareIdentity."
+        },
+        "version": {
+          "type": "string",
+          "title": "Version",
+          "default": "0.0",
+          "description": "Maps to the version of a SoftwareIdentity."
+        },
+        "tagVersion": {
+          "type": "integer",
+          "title": "Tag Version",
+          "default": 0,
+          "description": "Maps to the tagVersion of a SoftwareIdentity."
+        },
+        "patch": {
+          "type": "boolean",
+          "title": "Patch",
+          "default": false,
+          "description": "Maps to the patch of a SoftwareIdentity."
+        },
+        "text": {
+          "title": "Attachment text",
+          "description": "Specifies the metadata and content of the SWID tag.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/attachment"
+        },
+        "url": {
+          "type": "string",
+          "title": "URL",
+          "description": "The URL to the SWID file.",
+          "format": "iri-reference"
+        }
+      }
+    },
+    "componentEvidence": {
+      "type": "object",
+      "title": "Evidence",
+      "description": "Provides the ability to document evidence collected through various forms of extraction or analysis.",
+      "additionalProperties": false,
+      "properties": {
+        "identity": {
+          "type": "array",
+          "title": "Identity Evidence",
+          "description": "Evidence that substantiates the identity of a component. The identity may be an object or an array of identity objects. Support for specifying identity as a single object was introduced in CycloneDX v1.5. Arrays were introduced in v1.6. It is recommended that all implementations use arrays, even if only one identity object is specified.",
+          "items": { "$ref": "#/$defs/componentIdentityEvidence" }
+        },
+        "occurrences": {
+          "type": "array",
+          "title": "Occurrences",
+          "description": "Evidence of individual instances of a component spread across multiple locations.",
+          "items": {
+            "type": "object",
+            "required": [ "location" ],
+            "additionalProperties": false,
+            "properties": {
+              "bom-ref": {
+                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+                "title": "BOM Reference",
+                "description": "An identifier which can be used to reference the occurrence elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+              },
+              "location": {
+                "type": "string",
+                "title": "Location",
+                "description": "The location or path to where the component was found."
+              },
+              "line": {
+                "type": "integer",
+                "minimum": 0,
+                "title": "Line Number",
+                "description": "The line number where the component was found."
+              },
+              "offset": {
+                "type": "integer",
+                "minimum": 0,
+                "title": "Offset",
+                "description": "The offset where the component was found."
+              },
+              "symbol": {
+                "type": "string",
+                "title": "Symbol",
+                "description": "The symbol name that was found associated with the component."
+              },
+              "additionalContext": {
+                "type": "string",
+                "title": "Additional Context",
+                "description": "Any additional context of the detected component (e.g. a code snippet)."
+              }
+            }
+          }
+        },
+        "callstack": {
+          "type": "object",
+          "title": "Call Stack",
+          "description": "Evidence of the components use through the callstack.",
+          "additionalProperties": false,
+          "properties": {
+            "frames": {
+              "type": "array",
+              "title": "Frames",
+              "description": "Within a call stack, a frame is a discrete unit that encapsulates an execution context, including local variables, parameters, and the return address. As function calls are made, frames are pushed onto the stack, forming an array-like structure that orchestrates the flow of program execution and manages the sequence of function invocations.",
+              "items": {
+                "type": "object",
+                "required": [
+                  "module"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "package": {
+                    "title": "Package",
+                    "description": "A package organizes modules into namespaces, providing a unique namespace for each type it contains.",
+                    "type": "string"
+                  },
+                  "module": {
+                    "title": "Module",
+                    "description": "A module or class that encloses functions/methods and other code.",
+                    "type": "string"
+                  },
+                  "function": {
+                    "title": "Function",
+                    "description": "A block of code designed to perform a particular task.",
+                    "type": "string"
+                  },
+                  "parameters": {
+                    "title": "Parameters",
+                    "description": "Arguments that are passed to the module or function.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "line": {
+                    "title": "Line",
+                    "description": "The line number the code that is called resides on.",
+                    "type": "integer"
+                  },
+                  "column": {
+                    "title": "Column",
+                    "description": "The column the code that is called resides.",
+                    "type": "integer"
+                  },
+                  "fullFilename": {
+                    "title": "Full Filename",
+                    "description": "The full path and filename of the module.",
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "licenses": {
+          "$ref": "cyclonedx-license-2.0.schema.json#/$defs/licenseChoice",
+          "title": "License Evidence"
+        },
+        "copyright": {
+          "$ref": "#/$defs/copyright"
+        }
+      }
+    },
+    "componentIdentityEvidence": {
+      "type": "object",
+      "title": "Identity Evidence",
+      "description": "Evidence that substantiates the identity of a component.",
+      "required": [ "field" ],
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "type": "string",
+          "enum": [
+            "group", "name", "version", "purl", "cpe", "omniborId", "swhid", "swid", "hash"
+          ],
+          "title": "Field",
+          "description": "The identity field of the component which the evidence describes."
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "title": "Confidence",
+          "description": "The overall confidence of the evidence from 0 - 1, where 1 is 100% confidence."
+        },
+        "concludedValue": {
+          "type": "string",
+          "title": "Concluded Value",
+          "description": "The value of the field (cpe, purl, etc) that has been concluded based on the aggregate of all methods (if available)."
+        },
+        "methods": {
+          "type": "array",
+          "title": "Methods",
+          "description": "The methods used to extract and/or analyze the evidence.",
+          "items": {
+            "type": "object",
+            "required": [
+              "technique" ,
+              "confidence"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "technique": {
+                "title": "Technique",
+                "description": "The technique used in this method of analysis.",
+                "type": "string",
+                "enum": [
+                  "source-code-analysis",
+                  "binary-analysis",
+                  "manifest-analysis",
+                  "ast-fingerprint",
+                  "hash-comparison",
+                  "instrumentation",
+                  "dynamic-analysis",
+                  "filename",
+                  "attestation",
+                  "other"
+                ]
+              },
+              "confidence": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "title": "Confidence",
+                "description": "The confidence of the evidence from 0 - 1, where 1 is 100% confidence. Confidence is specific to the technique used. Each technique of analysis can have independent confidence."
+              },
+              "value": {
+                "type": "string",
+                "title": "Value",
+                "description": "The value or contents of the evidence."
+              }
+            }
+          }
+        },
+        "tools": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "anyOf": [
+              {
+                "title": "Ref",
+                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+              },
+              {
+                "title": "BOM-Link Element",
+                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+              }
+            ]
+          },
+          "title": "BOM References",
+          "description": "The object in the BOM identified by its bom-ref. This is often a component or service but may be any object type supporting bom-refs. Tools used for analysis should already be defined in the BOM, either in the metadata/tools, components, or formulation."
+        }
+      }
+    },
+    "componentData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "BOM Reference",
+          "description": "An identifier which can be used to reference the dataset elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        },
+        "type": {
+          "type": "string",
+          "title": "Type of Data",
+          "description": "The general theme or subject matter of the data being specified.",
+          "enum": [
+            "source-code",
+            "configuration",
+            "dataset",
+            "definition",
+            "other"
+          ],
+          "meta:enum": {
+            "source-code": "Any type of code, code snippet, or data-as-code.",
+            "configuration": "Parameters or settings that may be used by other components.",
+            "dataset": "A collection of data.",
+            "definition": "Data that can be used to create new instances of what the definition defines.",
+            "other": "Any other type of data that does not fit into existing definitions."
+          }
+        },
+        "name": {
+          "title": "Dataset Name",
+          "description": "The name of the dataset.",
+          "type": "string"
+        },
+        "contents": {
+          "type": "object",
+          "title": "Data Contents",
+          "description": "The contents or references to the contents of the data being described.",
+          "additionalProperties": false,
+          "properties": {
+            "attachment": {
+              "title": "Data Attachment",
+              "description": "A way to include textual or encoded data.",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/attachment"
+            },
+            "url": {
+              "type": "string",
+              "title": "Data URL",
+              "description": "The URL to where the data can be retrieved.",
+              "format": "iri-reference"
+            },
+            "properties": {
+              "type": "array",
+              "title": "Configuration Properties",
+              "description": "Provides the ability to document name-value parameters used for configuration.",
+              "items": {
+                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/property"
+              }
+            }
+          }
+        },
+        "classification": {
+          "$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataClassification"
+        },
+        "sensitiveData": {
+          "type": "array",
+          "title": "Sensitive Data",
+          "description": "A description of any sensitive data in a dataset.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "graphics": { "$ref": "cyclonedx-ai-modelcard-2.0.schema.json#/$defs/graphicsCollection" },
+        "description": {
+          "title": "Dataset Description",
+          "description": "A description of the dataset. Can describe size of dataset, whether it's used for source code, training, testing, or validation, etc.",
+          "type": "string"
+        },
+        "governance": {
+          "title": "Data Governance",
+          "$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataGovernance"
+        }
+      }
+    }
   }
 }
