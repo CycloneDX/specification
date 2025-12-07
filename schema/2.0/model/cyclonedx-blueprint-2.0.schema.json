@@ -81,12 +81,62 @@
       },
       "description": "Data, control, or process flows between assets"
     },
+    "actors": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/actor"
+      },
+      "description": "Human or system actors involved in the model, distinct from assets"
+    },
     "assumptions": {
       "type": "array",
       "items": {
         "$ref": "#/$defs/assumption"
       },
       "description": "Assumptions made during the modeling process"
+    },
+    "actor": {
+      "type": "object",
+      "required": ["bom-ref", "name", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "Unique identifier for the actor"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name or title of the actor"
+        },
+        "description": {
+          "type": "string",
+          "description": "Narrative describing the actor's role and context"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["user", "engineer", "administrator", "operator", "system", "external"],
+          "description": "Classification of the actor",
+          "meta:enum": {
+            "user": "End user of a client application or service",
+            "engineer": "Developer or platform/DevOps engineer",
+            "administrator": "Administrative or privileged operator",
+            "operator": "Operational staff running the system",
+            "system": "Automated system actor or service account",
+            "external": "Third-party or external entity"
+          }
+        },
+        "permissions": {
+          "type": "string",
+          "description": "Key permissions, capabilities, or duties the actor holds"
+        },
+        "trustZone": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "Reference to the trust zone where the actor resides"
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
     },
     "visualizations": {
       "type": "array",
@@ -335,8 +385,6 @@
             "compliance",
             "risk",
             "stakeholder",
-            "use-case",
-            "abuse-case",
             "design-review",
             "custom"
           ],
@@ -357,8 +405,6 @@
             "compliance": "Regulatory compliance perspective",
             "risk": "Risk management perspective",
             "stakeholder": "General stakeholder perspective",
-            "use-case": "A high level persepctive that captures the data-flows of the use case, rather than deep granularity of systems",
-            "abuse-case": "A high level persepctive that captures the data-flows of a certain abuse case, rather than deep granularity of systems",
             "custom": "Custom or other perspective"
           }
         },
