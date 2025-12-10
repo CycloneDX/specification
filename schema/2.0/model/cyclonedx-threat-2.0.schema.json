@@ -26,6 +26,13 @@
             "attackPattern": {
               "$ref": "#/$defs/attackPatternReference"
             },
+            "abuseCases": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/abuseCase"
+              },
+              "description": "Abuse or misuse cases that illustrate how this threat can be exercised"
+            },
             "weakness": {
               "$ref": "#/$defs/weaknessReference"
             },
@@ -174,11 +181,6 @@
           },
           "description": "Primary motivations"
         },
-        "capability": {
-          "type": "string",
-          "enum": ["minimal", "limited", "moderate", "significant", "advanced"],
-          "description": "Overall capability level"
-        },
         "intent": {
           "type": "string",
           "enum": ["accidental", "opportunistic", "targeted", "persistent"],
@@ -219,7 +221,10 @@
         },
         "complexity": {
           "type": "string",
-          "enum": ["low", "high"],
+          "enum": [
+            "low",
+            "high"
+          ],
           "description": "Attack complexity"
         },
         "privileges": {
@@ -236,6 +241,42 @@
           "type": "string",
           "enum": ["unchanged", "changed"],
           "description": "Scope impact"
+        }
+      }
+    },
+    "abuseCase": {
+      "type": "object",
+      "required": ["bom-ref", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the abuse case"
+        },
+        "description": {
+          "type": "string",
+          "description": "Narrative describing how the system can be misused or abused"
+        },
+        "abuser": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "Reference (bom-ref) to a threat actor involved in the abuse case"
+        },
+        "targets": {
+          "type": "array",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          },
+          "description": "References (bom-refs) to assets or flows targeted in this abuse case"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Ordered steps the abuser follows"
         }
       }
     },
@@ -258,14 +299,6 @@
         "description": {
           "type": "string",
           "description": "Description of the attack pattern"
-        },
-        "severity": {
-          "$ref": "cyclonedx-risk-2.0.schema.json#/$defs/severity"
-        },
-        "likelihood": {
-          "type": "string",
-          "enum": ["low", "medium", "high"],
-          "description": "Likelihood of this pattern being used"
         },
         "prerequisites": {
           "type": "array",
