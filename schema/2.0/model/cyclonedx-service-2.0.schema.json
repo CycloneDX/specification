@@ -1,9 +1,198 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "http://localhost:8080/schema/2.0/cyclonedx-service-2.0.schema.json",
+  "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-service-2.0.schema.json",
   "type": "null",
-  "title": "CycloneDX Transparency Expression Language: Service",
-  "$comment" : "CycloneDX JSON schema is published under the terms of the Apache License 2.0.",
+  "title": "CycloneDX Service Model",
+  "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
+    "services": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/service"},
+      "uniqueItems": true,
+      "title": "Services"
+    },
+    "service": {
+      "type": "object",
+      "title": "Service",
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "BOM Reference",
+          "description": "An identifier which can be used to reference the service elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        },
+        "provider": {
+          "title": "Provider",
+          "description": "The organization that provides the service.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntity"
+        },
+        "group": {
+          "type": "string",
+          "title": "Service Group",
+          "description": "The grouping name, namespace, or identifier. This will often be a shortened, single name of the company or project that produced the service or domain name. Whitespace and special characters should be avoided.",
+          "examples": ["com.acme"]
+        },
+        "name": {
+          "type": "string",
+          "title": "Service Name",
+          "description": "The name of the service. This will often be a shortened, single name of the service.",
+          "examples": ["ticker-service"]
+        },
+        "version": {
+          "$ref": "cyclonedx-component-2.0.schema.json#/$defs/version",
+          "title": "Service Version",
+          "description": "The service version."
+        },
+        "description": {
+          "type": "string",
+          "title": "Service Description",
+          "description": "Specifies a description for the service"
+        },
+        "endpoints": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "iri-reference"
+          },
+          "title": "Endpoints",
+          "description": "The endpoint URIs of the service. Multiple endpoints are allowed.",
+          "examples": ["https://example.com/api/v1/ticker"]
+        },
+        "authenticated": {
+          "type": "boolean",
+          "title": "Authentication Required",
+          "description": "A boolean value indicating if the service requires authentication. A value of true indicates the service requires authentication prior to use. A value of false indicates the service does not require authentication."
+        },
+        "x-trust-boundary": {
+          "type": "boolean",
+          "title": "Crosses Trust Boundary",
+          "description": "A boolean value indicating if use of the service crosses a trust zone or boundary. A value of true indicates that by using the service, a trust boundary is crossed. A value of false indicates that by using the service, a trust boundary is not crossed."
+        },
+        "trustZone": {
+          "type": "string",
+          "title": "Trust Zone",
+          "description": "The name of the trust zone the service resides in."
+        },
+        "data": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/serviceData"},
+          "title": "Data",
+          "description": "Specifies information about the data including the directional flow of data and the data classification."
+        },
+        "licenses": {
+          "$ref": "cyclonedx-license-2.0.schema.json#/$defs/licenseChoice",
+          "title": "Service License(s)"
+        },
+        "patentAssertions": {
+          "$ref": "cyclonedx-patent-2.0.schema.json#/$defs/patentAssertions",
+          "title": "Service Patent(s)"
+        },
+        "externalReferences": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReferences"
+        },
+        "services": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/service"},
+          "uniqueItems": true,
+          "title": "Services",
+          "description": "A list of services included or deployed behind the parent service. This is not a dependency tree. It provides a way to specify a hierarchical representation of service assemblies."
+        },
+        "releaseNotes": {
+          "$ref": "cyclonedx-release-notes-2.0.schema.json#/$defs/releaseNotes",
+          "title": "Release notes",
+          "description": "Specifies release notes."
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        },
+        "tags": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/tags",
+          "title": "Tags"
+        },
+        "signature": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/signature",
+          "title": "Signature",
+          "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
+        }
+      }
+    },
+    "serviceData": {
+      "type": "object",
+      "title": "Hash Objects",
+      "required": [
+        "flow",
+        "classification"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "flow": {
+          "$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataFlowDirection",
+          "title": "Directional Flow",
+          "description": "Specifies the flow direction of the data. Direction is relative to the service. Inbound flow states that data enters the service. Outbound flow states that data leaves the service. Bi-directional states that data flows both ways and unknown states that the direction is not known."
+        },
+        "classification": {
+          "$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataClassification"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "Name for the defined data",
+          "examples": [
+            "Credit card reporting"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "Short description of the data content and usage",
+          "examples": [
+            "Credit card information being exchanged in between the web app and the database"
+          ]
+        },
+        "governance": {
+          "title": "Data Governance",
+          "$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataGovernance"
+        },
+        "source": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "title": "URL",
+                "type": "string",
+                "format": "iri-reference"
+              },
+              {
+                "title": "BOM-Link Element",
+                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+              }
+            ]
+          },
+          "title": "Source",
+          "description": "The URI, URL, or BOM-Link of the components or services the data came in from"
+        },
+        "destination": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "title": "URL",
+                "type": "string",
+                "format": "iri-reference"
+              },
+              {
+                "title": "BOM-Link Element",
+                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+              }
+            ]
+          },
+          "title": "Destination",
+          "description": "The URI, URL, or BOM-Link of the components or services the data is sent to"
+        }
+      }
+    }
   }
 }

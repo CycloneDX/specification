@@ -1,9 +1,1030 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "http://localhost:8080/schema/2.0/cyclonedx-cryptography-2.0.schema.json",
+  "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-cryptography-2.0.schema.json",
   "type": "null",
-  "title": "CycloneDX Transparency Expression Language: Cryptography",
-  "$comment": "CycloneDX JSON schema is published under the terms of the Apache License 2.0.",
+  "title": "CycloneDX Cryptography Model",
+  "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
+    "cryptoProperties": {
+      "type": "object",
+      "title": "Cryptographic Properties",
+      "description": "Cryptographic assets have properties that uniquely define them and that make them actionable for further reasoning. As an example, it makes a difference if one knows the algorithm family (e.g. AES) or the specific variant or instantiation (e.g. AES-128-GCM). This is because the security level and the algorithm primitive (authenticated encryption) are only defined by the definition of the algorithm variant. The presence of a weak cryptographic algorithm like SHA1 vs. HMAC-SHA1 also makes a difference.",
+      "additionalProperties": false,
+      "required": [
+        "assetType"
+      ],
+      "properties": {
+        "assetType": {
+          "type": "string",
+          "title": "Asset Type",
+          "description": "Cryptographic assets occur in several forms. Algorithms and protocols are most commonly implemented in specialized cryptographic libraries. They may, however, also be 'hardcoded' in software components. Certificates and related cryptographic material like keys, tokens, secrets or passwords are other cryptographic assets to be modelled.",
+          "enum": [
+            "algorithm",
+            "certificate",
+            "protocol",
+            "related-crypto-material"
+          ],
+          "meta:enum": {
+            "algorithm": "Mathematical function commonly used for data encryption, authentication, and digital signatures.",
+            "certificate": "An electronic document that is used to provide the identity or validate a public key.",
+            "protocol": "A set of rules and guidelines that govern the behavior and communication with each other.",
+            "related-crypto-material": "Other cryptographic assets related to algorithms, certificates, and protocols such as keys and tokens."
+          }
+        },
+        "algorithmProperties": {
+          "type": "object",
+          "title": "Algorithm Properties",
+          "description": "Additional properties specific to a cryptographic algorithm.",
+          "additionalProperties": false,
+          "properties": {
+            "primitive": {
+              "type": "string",
+              "title": "primitive",
+              "description": "Cryptographic building blocks used in higher-level cryptographic systems and protocols. Primitives represent different cryptographic routines: deterministic random bit generators (drbg, e.g. CTR_DRBG from NIST SP800-90A-r1), message authentication codes (mac, e.g. HMAC-SHA-256), blockciphers (e.g. AES), streamciphers (e.g. Salsa20), signatures (e.g. ECDSA), hash functions (e.g. SHA-256), public-key encryption schemes (pke, e.g. RSA), extended output functions (xof, e.g. SHAKE256), key derivation functions (e.g. pbkdf2), key agreement algorithms (e.g. ECDH), key encapsulation mechanisms (e.g. ML-KEM), authenticated encryption (ae, e.g. AES-GCM) and the combination of multiple algorithms (combiner, e.g. SP800-56Cr2).",
+              "enum": [
+                "drbg",
+                "mac",
+                "block-cipher",
+                "stream-cipher",
+                "signature",
+                "hash",
+                "pke",
+                "xof",
+                "kdf",
+                "key-agree",
+                "kem",
+                "ae",
+                "combiner",
+                "key-wrap",
+                "other",
+                "unknown"
+              ],
+              "meta:enum": {
+                "drbg": "Deterministic Random Bit Generator (DRBG) is a type of pseudorandom number generator designed to produce a sequence of bits from an initial seed value. DRBGs are commonly used in cryptographic applications where reproducibility of random values is important.",
+                "mac": "In cryptography, a Message Authentication Code (MAC) is information used for authenticating and integrity-checking a message.",
+                "block-cipher": "A block cipher is a symmetric key algorithm that operates on fixed-size blocks of data. It encrypts or decrypts the data in block units, providing confidentiality. Block ciphers are widely used in various cryptographic modes and protocols for secure data transmission.",
+                "stream-cipher": "A stream cipher is a symmetric key cipher where plaintext digits are combined with a pseudorandom cipher digit stream (keystream).",
+                "signature": "In cryptography, a signature is a digital representation of a message or data that proves its origin, identity, and integrity. Digital signatures are generated using cryptographic algorithms and are widely used for authentication and verification in secure communication.",
+                "hash": "A hash function is a mathematical algorithm that takes an input (or 'message') and produces a fixed-size string of characters, which is typically a hash value. Hash functions are commonly used in various cryptographic applications, including data integrity verification and password hashing.",
+                "pke": "Public Key Encryption (PKE) is a type of encryption that uses a pair of public and private keys for secure communication. The public key is used for encryption, while the private key is used for decryption. PKE is a fundamental component of public-key cryptography.",
+                "xof": "An XOF is an extendable output function that can take arbitrary input and creates a stream of output, up to a limit determined by the size of the internal state of the hash function that underlies the XOF.",
+                "kdf": "A Key Derivation Function (KDF) derives key material from another source of entropy while preserving the entropy of the input.",
+                "key-agree": "In cryptography, a key-agreement is a protocol whereby two or more parties agree on a cryptographic key in such a way that both influence the outcome.",
+                "kem": "A Key Encapsulation Mechanism (KEM) algorithm is a mechanism for transporting random keying material to a recipient using the recipient's public key.",
+                "ae": "Authenticated Encryption (AE) is a cryptographic process that provides both confidentiality and data integrity. It ensures that the encrypted data has not been tampered with and comes from a legitimate source. AE is commonly used in secure communication protocols.",
+                "combiner": "A combiner aggregates many candidates for a cryptographic primitive and generates a new candidate for the same primitive.",
+                "key-wrap": "Key-wrap is a cryptographic technique used to securely encrypt and protect cryptographic keys using algorithms like AES.",
+                "other": "Another primitive type.",
+                "unknown": "The primitive is not known."
+              }
+            },
+            "algorithmFamily": {
+              "$ref": "../cryptography-defs.schema.json#/definitions/algorithmFamiliesEnum",
+              "title": "Algorithm Family",
+              "description": "A valid algorithm family identifier. If specified, this value shall be one of the enumeration of valid algorithm Family identifiers defined in the `cryptography-defs.schema.json` subschema.",
+              "examples": [
+                "3DES",
+                "Blowfish",
+                "ECDH"
+              ]
+            },
+            "parameterSetIdentifier": {
+              "type": "string",
+              "title": "Parameter Set Identifier",
+              "description": "An identifier for the parameter set of the cryptographic algorithm. Examples: in AES128, '128' identifies the key length in bits, in SHA256, '256' identifies the digest length, '128' in SHAKE128 identifies its maximum security level in bits, and 'SHA2-128s' identifies a parameter set used in SLH-DSA (FIPS205)."
+            },
+            "ellipticCurve": {
+              "$ref": "../cryptography-defs.schema.json#/definitions/ellipticCurvesEnum",
+              "title": "Elliptic Curve",
+              "description": "The specific underlying Elliptic Curve (EC) definition employed which is an indicator of the level of security strength, performance and complexity. If specified, this value shall be one of the enumeration of valid elliptic curves identifiers defined in the `cryptography-defs.schema.json` subschema."
+            },
+            "executionEnvironment": {
+              "type": "string",
+              "title": "Execution Environment",
+              "description": "The target and execution environment in which the algorithm is implemented in.",
+              "enum": [
+                "software-plain-ram",
+                "software-encrypted-ram",
+                "software-tee",
+                "hardware",
+                "other",
+                "unknown"
+              ],
+              "meta:enum": {
+                "software-plain-ram": "A software implementation running in plain unencrypted RAM.",
+                "software-encrypted-ram": "A software implementation running in encrypted RAM.",
+                "software-tee": "A software implementation running in a trusted execution environment.",
+                "hardware": "A hardware implementation.",
+                "other": "Another implementation environment.",
+                "unknown": "The execution environment is not known."
+              }
+            },
+            "implementationPlatform": {
+              "type": "string",
+              "title": "Implementation platform",
+              "description": "The target platform for which the algorithm is implemented. The implementation can be 'generic', running on any platform or for a specific platform.",
+              "enum": [
+                "generic",
+                "x86_32",
+                "x86_64",
+                "armv7-a",
+                "armv7-m",
+                "armv8-a",
+                "armv8-m",
+                "armv9-a",
+                "armv9-m",
+                "s390x",
+                "ppc64",
+                "ppc64le",
+                "other",
+                "unknown"
+              ]
+            },
+            "certificationLevel": {
+              "type": "array",
+              "title": "Certification Level",
+              "description": "The certification that the implementation of the cryptographic algorithm has received, if any. Certifications include revisions and levels of FIPS 140 or Common Criteria of different Extended Assurance Levels (CC-EAL).",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "fips140-1-l1",
+                  "fips140-1-l2",
+                  "fips140-1-l3",
+                  "fips140-1-l4",
+                  "fips140-2-l1",
+                  "fips140-2-l2",
+                  "fips140-2-l3",
+                  "fips140-2-l4",
+                  "fips140-3-l1",
+                  "fips140-3-l2",
+                  "fips140-3-l3",
+                  "fips140-3-l4",
+                  "cc-eal1",
+                  "cc-eal1+",
+                  "cc-eal2",
+                  "cc-eal2+",
+                  "cc-eal3",
+                  "cc-eal3+",
+                  "cc-eal4",
+                  "cc-eal4+",
+                  "cc-eal5",
+                  "cc-eal5+",
+                  "cc-eal6",
+                  "cc-eal6+",
+                  "cc-eal7",
+                  "cc-eal7+",
+                  "other",
+                  "unknown"
+                ],
+                "meta:enum": {
+                  "none": "No certification obtained",
+                  "fips140-1-l1": "FIPS 140-1 Level 1",
+                  "fips140-1-l2": "FIPS 140-1 Level 2",
+                  "fips140-1-l3": "FIPS 140-1 Level 3",
+                  "fips140-1-l4": "FIPS 140-1 Level 4",
+                  "fips140-2-l1": "FIPS 140-2 Level 1",
+                  "fips140-2-l2": "FIPS 140-2 Level 2",
+                  "fips140-2-l3": "FIPS 140-2 Level 3",
+                  "fips140-2-l4": "FIPS 140-2 Level 4",
+                  "fips140-3-l1": "FIPS 140-3 Level 1",
+                  "fips140-3-l2": "FIPS 140-3 Level 2",
+                  "fips140-3-l3": "FIPS 140-3 Level 3",
+                  "fips140-3-l4": "FIPS 140-3 Level 4",
+                  "cc-eal1": "Common Criteria - Evaluation Assurance Level 1",
+                  "cc-eal1+": "Common Criteria - Evaluation Assurance Level 1 (Augmented)",
+                  "cc-eal2": "Common Criteria - Evaluation Assurance Level 2",
+                  "cc-eal2+": "Common Criteria - Evaluation Assurance Level 2 (Augmented)",
+                  "cc-eal3": "Common Criteria - Evaluation Assurance Level 3",
+                  "cc-eal3+": "Common Criteria - Evaluation Assurance Level 3 (Augmented)",
+                  "cc-eal4": "Common Criteria - Evaluation Assurance Level 4",
+                  "cc-eal4+": "Common Criteria - Evaluation Assurance Level 4 (Augmented)",
+                  "cc-eal5": "Common Criteria - Evaluation Assurance Level 5",
+                  "cc-eal5+": "Common Criteria - Evaluation Assurance Level 5 (Augmented)",
+                  "cc-eal6": "Common Criteria - Evaluation Assurance Level 6",
+                  "cc-eal6+": "Common Criteria - Evaluation Assurance Level 6 (Augmented)",
+                  "cc-eal7": "Common Criteria - Evaluation Assurance Level 7",
+                  "cc-eal7+": "Common Criteria - Evaluation Assurance Level 7 (Augmented)",
+                  "other": "Another certification",
+                  "unknown": "The certification level is not known"
+                }
+              }
+            },
+            "mode": {
+              "type": "string",
+              "title": "Mode",
+              "description": "The mode of operation in which the cryptographic algorithm (block cipher) is used.",
+              "enum": [
+                "cbc",
+                "ecb",
+                "ccm",
+                "gcm",
+                "cfb",
+                "ofb",
+                "ctr",
+                "other",
+                "unknown"
+              ],
+              "meta:enum": {
+                "cbc": "Cipher block chaining",
+                "ecb": "Electronic codebook",
+                "ccm": "Counter with cipher block chaining message authentication code",
+                "gcm": "Galois/counter",
+                "cfb": "Cipher feedback",
+                "ofb": "Output feedback",
+                "ctr": "Counter",
+                "other": "Another mode of operation",
+                "unknown": "The mode of operation is not known"
+              }
+            },
+            "padding": {
+              "type": "string",
+              "title": "Padding",
+              "description": "The padding scheme that is used for the cryptographic algorithm.",
+              "enum": [
+                "pkcs5",
+                "pkcs7",
+                "pkcs1v15",
+                "oaep",
+                "raw",
+                "other",
+                "unknown"
+              ],
+              "meta:enum": {
+                "pkcs5": "Public Key Cryptography Standard: Password-Based Cryptography",
+                "pkcs7": "Public Key Cryptography Standard: Cryptographic Message Syntax",
+                "pkcs1v15": "Public Key Cryptography Standard: RSA Cryptography v1.5",
+                "oaep": "Optimal asymmetric encryption padding",
+                "raw": "Raw",
+                "other": "Another padding scheme",
+                "unknown": "The padding scheme is not known"
+              }
+            },
+            "cryptoFunctions": {
+              "type": "array",
+              "title": "Cryptographic functions",
+              "description": "The cryptographic functions implemented by the cryptographic algorithm.",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "generate",
+                  "keygen",
+                  "encrypt",
+                  "decrypt",
+                  "digest",
+                  "tag",
+                  "keyderive",
+                  "sign",
+                  "verify",
+                  "encapsulate",
+                  "decapsulate",
+                  "other",
+                  "unknown"
+                ]
+              }
+            },
+            "classicalSecurityLevel": {
+              "type": "integer",
+              "title": "classical security level",
+              "description": "The classical security level that a cryptographic algorithm provides (in bits).",
+              "minimum": 0
+            },
+            "nistQuantumSecurityLevel": {
+              "type": "integer",
+              "title": "NIST security strength category",
+              "description": "The NIST security strength category as defined in https://csrc.nist.gov/projects/post-quantum-cryptography/post-quantum-cryptography-standardization/evaluation-criteria/security-(evaluation-criteria). A value of 0 indicates that none of the categories are met.",
+              "minimum": 0,
+              "maximum": 6
+            }
+          }
+        },
+        "certificateProperties": {
+          "type": "object",
+          "title": "Certificate Properties",
+          "description": "Properties for cryptographic assets of asset type 'certificate'.",
+          "additionalProperties": false,
+          "properties": {
+            "serialNumber": {
+              "type": "string",
+              "title": "Serial Number",
+              "description": "The serial number is a unique identifier for the certificate issued by a CA."
+            },
+            "subjectName": {
+              "type": "string",
+              "title": "Subject Name",
+              "description": "The subject name for the certificate."
+            },
+            "issuerName": {
+              "type": "string",
+              "title": "Issuer Name",
+              "description": "The issuer name for the certificate."
+            },
+            "notValidBefore": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Not Valid Before",
+              "description": "The date and time according to ISO-8601 standard from which the certificate is valid."
+            },
+            "notValidAfter": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Not Valid After",
+              "description": "The date and time according to ISO-8601 standard from which the certificate is not valid anymore."
+            },
+            "certificateFormat": {
+              "type": "string",
+              "title": "Certificate Format",
+              "description": "The format of the certificate.",
+              "examples": [
+                "X.509",
+                "PEM",
+                "DER",
+                "CVC"
+              ]
+            },
+            "certificateFileExtension": {
+              "type": "string",
+              "title": "Certificate File Extension",
+              "description": "The file extension of the certificate.",
+              "examples": [
+                "crt",
+                "pem",
+                "cer",
+                "der",
+                "p12"
+              ]
+            },
+            "fingerprint": {
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/hash",
+              "title": "Certificate Fingerprint",
+              "description": "The fingerprint is a cryptographic hash of the certificate excluding it's signature."
+            },
+            "certificateState": {
+              "type": "array",
+              "title": "Certificate Lifecycle State",
+              "description": "The certificate lifecycle is a comprehensive process that manages digital certificates from their initial creation to eventual expiration or revocation. It typically involves several stages.",
+              "items": {
+                "type": "object",
+                "title": "State",
+                "description": "The state of the certificate.",
+                "oneOf": [
+                  {
+                    "title": "Pre-Defined State",
+                    "required": [
+                      "state"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "state": {
+                        "type": "string",
+                        "title": "State",
+                        "description": "A pre-defined state in the certificate lifecycle.",
+                        "enum": [
+                          "pre-activation",
+                          "active",
+                          "suspended",
+                          "deactivated",
+                          "revoked",
+                          "destroyed"
+                        ],
+                        "meta:enum": {
+                          "pre-activation": "The certificate has been issued by the issuing certificate authority (CA) but has not been authorized for use.",
+                          "active": "The certificate may be used to cryptographically protect information, cryptographically process previously protected information, or both.",
+                          "deactivated": "Certificates in the deactivated state shall not be used to apply cryptographic protection but, in some cases, may be used to process cryptographically protected information.",
+                          "suspended": "The use of a certificate may be suspended for several possible reasons.",
+                          "revoked": "A revoked certificate is a digital certificate that has been invalidated by the issuing certificate authority (CA) before its scheduled expiration date.",
+                          "destroyed": "The certificate has been destroyed."
+                        }
+                      },
+                      "reason": {
+                        "type": "string",
+                        "title": "Reason",
+                        "description": "A reason for the certificate being in this state."
+                      }
+                    }
+                  },
+                  {
+                    "title": "Custom State",
+                    "required": [
+                      "name"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "title": "State",
+                        "description": "The name of the certificate lifecycle state."
+                      },
+                      "description": {
+                        "type": "string",
+                        "title": "Description",
+                        "description": "The description of the certificate lifecycle state."
+                      },
+                      "reason": {
+                        "type": "string",
+                        "title": "Reason",
+                        "description": "A reason for the certificate being in this state."
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "creationDate": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Creation Date",
+              "description": "The date and time (timestamp) when the certificate was created or pre-activated."
+            },
+            "activationDate": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Activation Date",
+              "description": "The date and time (timestamp) when the certificate was activated."
+            },
+            "deactivationDate": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Deactivation Date",
+              "description": "The date and time (timestamp) when the related certificate was deactivated."
+            },
+            "revocationDate": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Revocation Date",
+              "description": "The date and time (timestamp) when the certificate was revoked."
+            },
+            "destructionDate": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Destruction Date",
+              "description": "The date and time (timestamp) when the certificate was destroyed."
+            },
+            "certificateExtensions": {
+              "type": "array",
+              "title": "Certificate Extensions",
+              "description": "A certificate extension is a field that provides additional information about the certificate or its use. Extensions are used to convey additional information beyond the standard fields.",
+              "items": {
+                "type": "object",
+                "title": "Extension",
+                "description": "",
+                "oneOf": [
+                  {
+                    "title": "Common Extensions",
+                    "required": [
+                      "commonExtensionName",
+                      "commonExtensionValue"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "commonExtensionName": {
+                        "type": "string",
+                        "title": "name",
+                        "description": "The name of the extension.",
+                        "enum": [
+                          "basicConstraints",
+                          "keyUsage",
+                          "extendedKeyUsage",
+                          "subjectAlternativeName",
+                          "authorityKeyIdentifier",
+                          "subjectKeyIdentifier",
+                          "authorityInformationAccess",
+                          "certificatePolicies",
+                          "crlDistributionPoints",
+                          "signedCertificateTimestamp"
+                        ],
+                        "meta:enum": {
+                          "basicConstraints": "Specifies whether a certificate can be used as a CA certificate or not.",
+                          "keyUsage": "Specifies the allowed uses of the public key in the certificate.",
+                          "extendedKeyUsage": "Specifies additional purposes for which the public key can be used.",
+                          "subjectAlternativeName": "Allows inclusion of additional names to identify the entity associated with the certificate.",
+                          "authorityKeyIdentifier": "Identifies the public key of the CA that issued the certificate.",
+                          "subjectKeyIdentifier": "Identifies the public key associated with the entity the certificate was issued to.",
+                          "authorityInformationAccess": "Contains CA issuers and OCSP information.",
+                          "certificatePolicies": "Defines the policies under which the certificate was issued and can be used.",
+                          "crlDistributionPoints": "Contains one or more URLs where a Certificate Revocation List (CRL) can be obtained.",
+                          "signedCertificateTimestamp": "Shows that the certificate has been publicly logged, which helps prevent the issuance of rogue certificates by a CA. Log ID, timestamp and signature as proof."
+                        }
+                      },
+                      "commonExtensionValue": {
+                        "type": "string",
+                        "title": "Value",
+                        "description": "The value of the certificate extension."
+                      }
+                    }
+                  },
+                  {
+                    "title": "Custom Extensions",
+                    "description": "Custom extensions may convey application-specific or vendor-specific data not covered by standard extensions. The structure and semantics of custom extensions are typically defined outside of public standards. CycloneDX leverages properties to support this capability.",
+                    "required": [
+                      "customExtensionName"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "customExtensionName": {
+                        "type": "string",
+                        "title": "Name",
+                        "description": "The name for the custom certificate extension."
+                      },
+                      "customExtensionValue": {
+                        "type": "string",
+                        "title": "Value",
+                        "description": "The description of the custom certificate extension."
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "relatedCryptographicAssets": {
+              "$ref": "#/$defs/relatedCryptographicAssets"
+            }
+          }
+        },
+        "relatedCryptoMaterialProperties": {
+          "type": "object",
+          "title": "Related Cryptographic Material Properties",
+          "description": "Properties for cryptographic assets of asset type: `related-crypto-material`.",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "title": "relatedCryptoMaterialType",
+              "description": "The type for the related cryptographic material.",
+              "enum": [
+                "private-key",
+                "public-key",
+                "secret-key",
+                "key",
+                "ciphertext",
+                "signature",
+                "digest",
+                "initialization-vector",
+                "nonce",
+                "seed",
+                "salt",
+                "shared-secret",
+                "tag",
+                "additional-data",
+                "password",
+                "credential",
+                "token",
+                "other",
+                "unknown"
+              ],
+              "meta:enum": {
+                "private-key": "The confidential key of a key pair used in asymmetric cryptography.",
+                "public-key": "The non-confidential key of a key pair used in asymmetric cryptography.",
+                "secret-key": "A key used to encrypt and decrypt messages in symmetric cryptography.",
+                "key": "A piece of information, usually an octet string, which, when processed through a cryptographic algorithm, processes cryptographic data.",
+                "ciphertext": "The result of encryption performed on plaintext using an algorithm (or cipher).",
+                "signature": "A cryptographic value that is calculated from the data and a key known only by the signer.",
+                "digest": "The output of the hash function.",
+                "initialization-vector": "A fixed-size random or pseudo-random value used as an input parameter for cryptographic algorithms.",
+                "nonce": "A random or pseudo-random number that can only be used once in a cryptographic communication.",
+                "seed": "The input to a pseudo-random number generator. Different seeds generate different pseudo-random sequences.",
+                "salt": "A value used in a cryptographic process, usually to ensure that the results of computations for one instance cannot be reused by an attacker.",
+                "shared-secret": "A piece of data known only to the parties involved, in a secure communication.",
+                "tag": "A message authentication code (MAC), sometimes known as an authentication tag, is a short piece of information used for authenticating and integrity-checking a message.",
+                "additional-data": "An unspecified collection of data with relevance to cryptographic activity.",
+                "password": "A secret word, phrase, or sequence of characters used during authentication or authorization.",
+                "credential": "Establishes the identity of a party to communication, usually in the form of cryptographic keys or passwords.",
+                "token": "An object encapsulating a security identity.",
+                "other": "Another type of cryptographic asset.",
+                "unknown": "The type of cryptographic asset is not known."
+              }
+            },
+            "id": {
+              "type": "string",
+              "title": "ID",
+              "description": "The unique identifier for the related cryptographic material."
+            },
+            "state": {
+              "type": "string",
+              "title": "State",
+              "description": "The key state as defined by NIST SP 800-57.",
+              "enum": [
+                "pre-activation",
+                "active",
+                "suspended",
+                "deactivated",
+                "compromised",
+                "destroyed"
+              ]
+            },
+            "creationDate": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Creation Date",
+              "description": "The date and time (timestamp) when the related cryptographic material was created."
+            },
+            "activationDate": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Activation Date",
+              "description": "The date and time (timestamp) when the related cryptographic material was activated."
+            },
+            "updateDate": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Update Date",
+              "description": "The date and time (timestamp) when the related cryptographic material was updated."
+            },
+            "expirationDate": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Expiration Date",
+              "description": "The date and time (timestamp) when the related cryptographic material expires."
+            },
+            "value": {
+              "type": "string",
+              "title": "Value",
+              "description": "The associated value of the cryptographic material."
+            },
+            "size": {
+              "type": "integer",
+              "title": "Size",
+              "description": "The size of the cryptographic asset (in bits)."
+            },
+            "format": {
+              "type": "string",
+              "title": "Format",
+              "description": "The format of the related cryptographic material (e.g. P8, PEM, DER)."
+            },
+            "securedBy": {
+              "$ref": "#/$defs/securedBy",
+              "title": "Secured By",
+              "description": "The mechanism by which the cryptographic asset is secured by."
+            },
+            "fingerprint": {
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/hash",
+              "title": "Fingerprint",
+              "description": "The fingerprint is a cryptographic hash of the asset."
+            },
+            "relatedCryptographicAssets": {
+              "$ref": "#/$defs/relatedCryptographicAssets"
+            }
+          }
+        },
+        "protocolProperties": {
+          "type": "object",
+          "title": "Protocol Properties",
+          "description": "Properties specific to cryptographic assets of type: `protocol`.",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "title": "Type",
+              "description": "The concrete protocol type.",
+              "enum": [
+                "tls",
+                "ssh",
+                "ipsec",
+                "ike",
+                "sstp",
+                "wpa",
+                "dtls",
+                "quic",
+                "eap-aka",
+                "eap-aka-prime",
+                "prins",
+                "5g-aka",
+                "other",
+                "unknown"
+              ],
+              "meta:enum": {
+                "tls": "Transport Layer Security",
+                "ssh": "Secure Shell",
+                "ipsec": "Internet Protocol Security",
+                "ike": "Internet Key Exchange",
+                "sstp": "Secure Socket Tunneling Protocol",
+                "wpa": "Wi-Fi Protected Access",
+                "dtls": "Datagram Transport Layer Security",
+                "quic": "Quick UDP Internet Connections",
+                "eap-aka": "Extensible Authentication Protocol variant",
+                "eap-aka-prime": "Enhanced version of EAP-AKA",
+                "prins": "Protection of Inter-Network Signaling",
+                "5g-aka": "Authentication and Key Agreement for 5G",
+                "other": "Another protocol type",
+                "unknown": "The protocol type is not known"
+              }
+            },
+            "version": {
+              "type": "string",
+              "title": "Protocol Version",
+              "description": "The version of the protocol.",
+              "examples": [
+                "1.0",
+                "1.2",
+                "1.99"
+              ]
+            },
+            "cipherSuites": {
+              "type": "array",
+              "title": "Cipher Suites",
+              "description": "A list of cipher suites related to the protocol.",
+              "items": {
+                "$ref": "#/$defs/cipherSuite",
+                "title": "Cipher Suite"
+              }
+            },
+            "ikev2TransformTypes": {
+              "type": "object",
+              "title": "IKEv2 Transform Types",
+              "description": "The IKEv2 transform types supported (types 1-4), defined in [RFC 7296 section 3.3.2](https://www.ietf.org/rfc/rfc7296.html#section-3.3.2), and additional properties.",
+              "additionalProperties": false,
+              "properties": {
+                "encr": {
+                  "type": "array",
+                  "title": "Encryption Algorithms (ENCR)",
+                  "description": "Transform Type 1: encryption algorithms.",
+                  "items": {
+                    "$ref": "#/$defs/ikeV2Enc",
+                    "title": "Encryption Algorithm (ENCR)"
+                  }
+                },
+                "prf": {
+                  "type": "array",
+                  "title": "Pseudorandom Functions (PRF)",
+                  "description": "Transform Type 2: pseudorandom functions.",
+                  "items": {
+                    "$ref": "#/$defs/ikeV2Prf",
+                    "title": "Pseudorandom Function (PRF)"
+                  }
+                },
+                "integ": {
+                  "type": "array",
+                  "title": "Integrity Algorithms (INTEG)",
+                  "description": "Transform Type 3: integrity algorithms.",
+                  "items": {
+                    "$ref": "#/$defs/ikeV2Integ",
+                    "title": "Integrity Algorithm (INTEG)"
+                  }
+                },
+                "ke": {
+                  "type": "array",
+                  "title": "Key Exchange Methods (KE)",
+                  "description": "Transform Type 4: Key Exchange Method (KE) per [RFC 9370](https://www.ietf.org/rfc/rfc9370.html), formerly called Diffie-Hellman Group (D-H).",
+                  "items": {
+                    "$ref": "#/$defs/ikeV2Ke"
+                  }
+                },
+                "esn": {
+                  "type": "boolean",
+                  "title": "Extended Sequence Number (ESN)",
+                  "description": "Specifies if an Extended Sequence Number (ESN) is used."
+                },
+                "auth": {
+                  "type": "array",
+                  "title": "IKEv2 Authentication methods",
+                  "description": "IKEv2 Authentication method per [RFC9593](https://www.ietf.org/rfc/rfc9593.html).",
+                  "items": {
+                    "$ref": "#/$defs/ikeV2Auth",
+                    "title": "IKEv2 Authentication Method"
+                  }
+                }
+              }
+            },
+            "relatedCryptographicAssets": {
+              "$ref": "#/$defs/relatedCryptographicAssets"
+            }
+          }
+        },
+        "oid": {
+          "type": "string",
+          "title": "OID",
+          "description": "The object identifier (OID) of the cryptographic asset."
+        }
+      }
+    },
+    "cipherSuite": {
+      "type": "object",
+      "title": "Cipher Suite",
+      "description": "Object representing a cipher suite.",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Common Name",
+          "description": "A common name for the cipher suite.",
+          "examples": [
+            "TLS_DHE_RSA_WITH_AES_128_CCM"
+          ]
+        },
+        "algorithms": {
+          "type": "array",
+          "title": "Related Algorithms",
+          "description": "A list of algorithms related to the cipher suite.",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+            "title": "Algorithm reference",
+            "description": "The bom-ref to algorithm cryptographic asset."
+          }
+        },
+        "identifiers": {
+          "type": "array",
+          "title": "Cipher Suite Identifiers",
+          "description": "A list of common identifiers for the cipher suite.",
+          "items": {
+            "type": "string",
+            "title": "identifier",
+            "description": "Cipher suite identifier.",
+            "examples": [
+              "0xC0",
+              "0x9E"
+            ]
+          }
+        },
+        "tlsGroups": {
+          "type": "array",
+          "title": "TLS Groups",
+          "description": "A list of TLS named groups (formerly known as curves) for this cipher suite. These groups define the parameters for key exchange algorithms like ECDHE.",
+          "items": {
+            "type": "string",
+            "title": "Group Name",
+            "description": "The name of the TLS group.",
+            "examples": [
+              "x25519",
+              "ffdhe2048"
+            ]
+          }
+        },
+        "tlsSignatureSchemes": {
+          "type": "array",
+          "title": "TLS Signature Schemes",
+          "description": "A list of signature schemes supported for cipher suite. These schemes specify the algorithms used for digital signatures in TLS handshakes and certificate verification.",
+          "items": {
+            "type": "string",
+            "title": "Signature Scheme",
+            "description": "The name of the TLS signature scheme.",
+            "examples": [
+              "ecdsa_secp256r1_sha256",
+              "rsa_pss_rsae_sha256",
+              "ed25519"
+            ]
+          }
+        }
+      }
+    },
+    "ikeV2Enc": {
+      "type": "object",
+      "title": "Encryption Algorithm (ENCR)",
+      "description": "Object representing an encryption algorithm (ENCR).",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "A name for the encryption method.",
+          "examples": [
+            "ENCR_AES_GCM_16"
+          ]
+        },
+        "keyLength": {
+          "type": "integer",
+          "title": "Encryption algorithm key length",
+          "description": "The key length of the encryption algorithm."
+        },
+        "algorithm": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "Algorithm reference",
+          "description": "The bom-ref to algorithm cryptographic asset."
+        }
+      }
+    },
+    "ikeV2Prf": {
+      "type": "object",
+      "title": "Pseudorandom Function (PRF)",
+      "description": "Object representing a pseudorandom function (PRF).",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "A name for the pseudorandom function.",
+          "examples": [
+            "PRF_HMAC_SHA2_256"
+          ]
+        },
+        "algorithm": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "Algorithm reference",
+          "description": "The bom-ref to algorithm cryptographic asset."
+        }
+      }
+    },
+    "ikeV2Integ": {
+      "type": "object",
+      "title": "Integrity Algorithm (INTEG)",
+      "description": "Object representing an integrity algorithm (INTEG).",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "A name for the integrity algorithm.",
+          "examples": [
+            "AUTH_HMAC_SHA2_256_128"
+          ]
+        },
+        "algorithm": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "Algorithm reference",
+          "description": "The bom-ref to algorithm cryptographic asset."
+        }
+      }
+    },
+    "ikeV2Ke": {
+      "type": "object",
+      "title": "Key Exchange Method (KE)",
+      "description": "Object representing a key exchange method (KE).",
+      "additionalProperties": false,
+      "properties": {
+        "group": {
+          "type": "integer",
+          "title": "Group Identifier",
+          "description": "A group identifier for the key exchange algorithm."
+        },
+        "algorithm": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "Algorithm reference",
+          "description": "The bom-ref to algorithm cryptographic asset."
+        }
+      }
+    },
+    "ikeV2Auth": {
+      "type": "object",
+      "title": "IKEv2 Authentication method",
+      "description": "Object representing a IKEv2 Authentication method.",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "A name for the authentication method."
+        },
+        "algorithm": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "Algorithm reference",
+          "description": "The bom-ref to algorithm cryptographic asset."
+        }
+      }
+    },
+    "relatedCryptographicAssets": {
+      "type": "array",
+      "title": "Related Cryptographic Assets",
+      "description": "A list of cryptographic assets related to this component.",
+      "items": {
+        "$ref": "#/$defs/relatedCryptographicAsset"
+      }
+    },
+    "relatedCryptographicAsset": {
+      "type": "object",
+      "title": "Related Cryptographic Asset",
+      "description": "A cryptographic assets related to this component.",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "title": "Type",
+          "description": "Specifies the mechanism by which the cryptographic asset is secured by.",
+          "examples": [
+            "publicKey",
+            "privateKey",
+            "algorithm"
+          ]
+        },
+        "ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "Reference to cryptographic asset",
+          "description": "The bom-ref to cryptographic asset."
+        }
+      }
+    },
+    "securedBy": {
+      "type": "object",
+      "title": "Secured By",
+      "description": "Specifies the mechanism by which the cryptographic asset is secured by.",
+      "additionalProperties": false,
+      "properties": {
+        "mechanism": {
+          "type": "string",
+          "title": "Mechanism",
+          "description": "Specifies the mechanism by which the cryptographic asset is secured by.",
+          "examples": [
+            "HSM",
+            "TPM",
+            "SGX",
+            "Software",
+            "None"
+          ]
+        },
+        "algorithmRef": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "Algorithm Reference",
+          "description": "The bom-ref to the algorithm."
+        }
+      }
+    }
   }
 }

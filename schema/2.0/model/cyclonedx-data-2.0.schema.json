@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-data-2.0.schema.json",
+  "type": "null",
+  "title": "CycloneDX Data Model",
+  "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
+  "$defs": {
+    "dataClassification": {
+      "type": "string",
+      "title": "Data Classification",
+      "description": "Data classification tags data according to its type, sensitivity, and value if altered, stolen, or destroyed."
+    },
+    "dataSensitivity": {
+      "type": "string",
+      "enum": ["public", "internal", "confidential", "restricted", "secret"],
+      "description": "Data sensitivity classification",
+      "meta:enum": {
+        "public": "Public information that can be freely shared",
+        "internal": "Internal use only within the organization",
+        "confidential": "Confidential information requiring protection",
+        "restricted": "Highly restricted information with limited access",
+        "secret": "Secret information requiring special handling"
+      }
+    },
+    "dataGovernance": {
+      "type": "object",
+      "title": "Data Governance",
+      "description": "Data governance captures information regarding data ownership, stewardship, and custodianship, providing insights into the individuals or entities responsible for managing, overseeing, and safeguarding the data throughout its lifecycle.",
+      "additionalProperties": false,
+      "properties": {
+        "custodians": {
+          "type": "array",
+          "title": "Data Custodians",
+          "description": "Data custodians are responsible for the safe custody, transport, and storage of data.",
+          "items": { "$ref": "#/$defs/dataGovernanceResponsibleParty" }
+        },
+        "stewards": {
+          "type": "array",
+          "title": "Data Stewards",
+          "description": "Data stewards are responsible for data content, context, and associated business rules.",
+          "items": { "$ref": "#/$defs/dataGovernanceResponsibleParty" }
+        },
+        "owners": {
+          "type": "array",
+          "title": "Data Owners",
+          "description": "Data owners are concerned with risk and appropriate access to data.",
+          "items": { "$ref": "#/$defs/dataGovernanceResponsibleParty" }
+        }
+      }
+    },
+    "dataGovernanceResponsibleParty": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "organization": {
+          "title": "Organization",
+          "description": "The organization that is responsible for specific data governance role(s).",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntity"
+        },
+        "contact": {
+          "title": "Individual",
+          "description": "The individual that is responsible for specific data governance role(s).",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalContact"
+        }
+      },
+      "oneOf":[
+        {
+          "required": ["organization"]
+        },
+        {
+          "required": ["contact"]
+        }
+      ]
+    },
+    "dataFlowDirection": {
+      "type": "string",
+      "enum": [
+        "inbound",
+        "outbound",
+        "bi-directional",
+        "unknown"
+      ],
+      "meta:enum": {
+        "inbound": "Data that enters a service.",
+        "outbound": "Data that exits a service.",
+        "bi-directional": "Data flows in and out of the service.",
+        "unknown": "The directional flow of data is not known."
+      },
+      "title": "Data flow direction",
+      "description": "Specifies the flow direction of the data. Direction is relative to the service."
+    }
+  }
+}

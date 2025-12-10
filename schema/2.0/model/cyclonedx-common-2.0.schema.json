@@ -1,9 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "http://localhost:8080/schema/2.0/cyclonedx-common-2.0.schema.json",
+  "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-common-2.0.schema.json",
   "type": "null",
-  "title": "CycloneDX Transparency Expression Language: Common",
-  "$comment" : "CycloneDX JSON schema is published under the terms of the Apache License 2.0.",
+  "title": "CycloneDX Common Model",
+  "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
     "refType": {
       "description": "Identifier for referable and therefore interlinkable elements.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
@@ -77,7 +77,9 @@
         "BLAKE2b-256",
         "BLAKE2b-384",
         "BLAKE2b-512",
-        "BLAKE3"
+        "BLAKE3",
+        "Streebog-256",
+        "Streebog-512"
       ]
     },
     "hashValue": {
@@ -167,7 +169,7 @@
         "comment": {
           "type": "string",
           "title": "Comment",
-          "description": "An optional comment describing the external reference"
+          "description": "A comment describing the external reference"
         },
         "type": {
           "type": "string",
@@ -216,6 +218,10 @@
             "electronic-signature",
             "digital-signature",
             "rfc-9116",
+            "patent",
+            "patent-family",
+            "patent-assertion",
+            "citation",
             "other"
           ],
           "meta:enum": {
@@ -241,7 +247,7 @@
             "log": "A record of events that occurred in a computer system or application, such as problems, errors, or information on current operations.",
             "configuration": "Parameters or settings that may be used by other components or services.",
             "evidence": "Information used to substantiate a claim.",
-            "formulation": "Describes how a component or service was manufactured or deployed.",
+            "formulation": "Describes the formulation of any referencable object within the BOM, including components, services, metadata, declarations, or the BOM itself.",
             "attestation": "Human or machine-readable statements containing facts, evidence, or testimony.",
             "threat-model": "An enumeration of identified weaknesses, threats, and countermeasures, dataflow diagram (DFD), attack tree, and other supporting documentation in human-readable or machine-readable format.",
             "adversary-model": "The defined assumptions, goals, and capabilities of an adversary.",
@@ -261,6 +267,10 @@
             "electronic-signature": "An e-signature is commonly a scanned representation of a written signature or a stylized script of the person's name.",
             "digital-signature": "A signature that leverages cryptography, typically public/private key pairs, which provides strong authenticity verification.",
             "rfc-9116": "Document that complies with [RFC 9116](https://www.ietf.org/rfc/rfc9116.html) (A File Format to Aid in Security Vulnerability Disclosure)",
+            "patent": "References information about patents which may be defined in human-readable documents or in machine-readable formats such as CycloneDX or ST.96. For detailed patent information or to reference the information provided directly by patent offices, it is recommended to leverage standards from the World Intellectual Property Organization (WIPO) such as [ST.96](https://www.wipo.int/standards/en/st96).",
+            "patent-family": "References information about a patent family which may be defined in human-readable documents or in machine-readable formats such as CycloneDX or ST.96. A patent family is a group of related patent applications or granted patents that cover the same or similar invention. For detailed patent family information or to reference the information provided directly by patent offices, it is recommended to leverage standards from the World Intellectual Property Organization (WIPO) such as [ST.96](https://www.wipo.int/standards/en/st96).",
+            "patent-assertion" : "References assertions made regarding patents associated with a component or service. Assertions distinguish between ownership, licensing, and other relevant interactions with patents.",
+            "citation": "A reference to external citations applicable to the object identified by this BOM entry or the BOM itself. When used with a BOM-Link, this allows offloading citations into a separate CycloneDX BOM.",
             "other": "Use this if no other types accurately describe the purpose of the external reference."
           }
         },
@@ -269,6 +279,9 @@
           "items": {"$ref": "#/$defs/hash"},
           "title": "Hashes",
           "description": "The hashes of the external reference (if applicable)."
+        },
+        "properties": {
+          "$ref": "#/$defs/properties"
         }
       }
     },
@@ -393,10 +406,7 @@
       }
     },
     "organizationalEntityOrContact": {
-      "oneOf": [
-        { "$ref": "#/$defs/organizationalEntity" },
-        { "$ref": "#/$defs/organizationalContact" }
-      ]
+
     },
     "properties": {
       "type": "array",
@@ -429,13 +439,14 @@
     },
     "extensibleProperties": {
       "type": "object",
-      "description": "CycloneDX supports a structured and namespace-aware mechanism for extensibility through the use of extensible properties. This mechanism enables organisations, ecosystems, and tool vendors to safely introduce custom properties without conflicting with the core schema or other extensions.\n\nExtensible properties are defined as a JSON object whose keys must conform to a strict pattern that resembles a reverse domain name structure, prefixed with ext:. This pattern provides a namespacing convention that aligns with well-established practices in other structured formats (e.g., XML namespaces).",
-      "examples": [
-        "ext:<domain>:<name>",
-        "ext:acme.org:myExtension"
-      ],
+      "title": "Extensible Properties",
       "patternProperties": {
         "^ext:[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}:.+$": {
+          "description": "CycloneDX supports a structured and namespace-aware mechanism for extensibility through the use of extensible properties. This mechanism enables organizations, ecosystems, and tool vendors to safely introduce custom properties without conflicting with the core schema or other extensions.\n\nExtensible properties are defined as a JSON object whose keys must conform to a strict pattern that resembles a reverse domain name structure, prefixed with ext:. This pattern provides a namespacing convention that aligns with well-established practices in other structured formats (e.g., XML namespaces).",
+          "examples": [
+            "ext:<domain>:<name>",
+            "ext:example.org:myExtension"
+          ],
           "if": {
             "type": ["object", "array"]
           },
@@ -447,15 +458,27 @@
                 "type": "string",
                 "format": "uri"
               }
-            },
-            "additionalProperties": true
+            }
           },
           "else": {
             "type": ["string", "number", "boolean", "null"]
           }
         }
-      },
-      "additionalProperties": false
+      }
+    },
+    "baseObject": {
+      "description": "Base object for all CycloneDX entities. Automatically includes support for extensible properties.",
+      "allOf": [
+        { "$ref": "cyclonedx-common-2.0.schema.json#/$defs/extensibleProperties" }
+      ],
+      "properties": {
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        },
+        "externalReferences": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReferences"
+        }
+      }
     },
     "timestamp": {
       "type": "string",
@@ -483,37 +506,10 @@
       "description": "The product lifecycle(s) that this BOM represents.",
       "oneOf": [
         {
-          "title": "Pre-Defined Phase",
-          "required": ["phase"],
-          "additionalProperties": false,
-          "properties": {
-            "phase": {
-              "type": "string",
-              "title": "Phase",
-              "description": "A pre-defined phase in the product lifecycle.",
-              "enum": [
-                "design",
-                "pre-build",
-                "build",
-                "post-build",
-                "operations",
-                "discovery",
-                "decommission"
-              ],
-              "meta:enum": {
-                "design": "BOM produced early in the development lifecycle containing an inventory of components and services that are proposed or planned to be used. The inventory may need to be procured, retrieved, or resourced prior to use.",
-                "pre-build": "BOM consisting of information obtained prior to a build process and may contain source files and development artifacts and manifests. The inventory may need to be resolved and retrieved prior to use.",
-                "build": "BOM consisting of information obtained during a build process where component inventory is available for use. The precise versions of resolved components are usually available at this time as well as the provenance of where the components were retrieved from.",
-                "post-build": "BOM consisting of information obtained after a build process has completed and the resulting components(s) are available for further analysis. Built components may exist as the result of a CI/CD process, may have been installed or deployed to a system or device, and may need to be retrieved or extracted from the system or device.",
-                "operations": "BOM produced that represents inventory that is running and operational. This may include staging or production environments and will generally encompass multiple SBOMs describing the applications and operating system, along with HBOMs describing the hardware that makes up the system. Operations Bill of Materials (OBOM) can provide full-stack inventory of runtime environments, configurations, and additional dependencies.",
-                "discovery": "BOM consisting of information observed through network discovery providing point-in-time enumeration of embedded, on-premise, and cloud-native services such as server applications, connected devices, microservices, and serverless functions.",
-                "decommission": "BOM containing inventory that will be, or has been retired from operations."
-              }
-            }
-          }
+          "$ref": "#/$defs/preDefinedLifecyclePhase"
         },
         {
-          "title": "Custom Phase",
+          "title": "Custom Lifecycle Phase",
           "required": ["name"],
           "additionalProperties": false,
           "properties": {
@@ -534,10 +530,53 @@
     "lifecycles": {
       "type": "array",
       "title": "Lifecycles",
-      "description": "Lifecycles communicate the stage(s) in which data was captured. Different types of data may be available at various phases of a lifecycle, such as the Software Development Lifecycle (SDLC), IT Asset Management (ITAM), and Software Asset Management (SAM). Thus, a BOM may include data specific to or only obtainable in a given lifecycle.",
-      "items": {
-        "$ref": "#/$defs/lifecycle"
+      "description": "Lifecycles communicate the stage(s) in which data in the BOM was captured. Different types of data may be available at various phases of a lifecycle, such as the Software Development Lifecycle (SDLC), IT Asset Management (ITAM), and Software Asset Management (SAM). Thus, a BOM may include data specific to or only obtainable in a given lifecycle.",
+      "items": { "$ref":  "#/$defs/lifecycle"}
+    },
+    "preDefinedLifecyclePhase": {
+      "title": "Pre-Defined Phase",
+      "required": ["phase"],
+      "additionalProperties": false,
+      "properties": {
+        "phase": {
+          "type": "string",
+          "title": "Phase",
+          "description": "A pre-defined phase in the product lifecycle.",
+          "enum": [
+            "design",
+            "pre-build",
+            "build",
+            "post-build",
+            "operations",
+            "discovery",
+            "decommission"
+          ],
+          "meta:enum": {
+            "design": "BOM produced early in the development lifecycle containing an inventory of components and services that are proposed or planned to be used. The inventory may need to be procured, retrieved, or resourced prior to use.",
+            "pre-build": "BOM consisting of information obtained prior to a build process and may contain source files and development artifacts and manifests. The inventory may need to be resolved and retrieved prior to use.",
+            "build": "BOM consisting of information obtained during a build process where component inventory is available for use. The precise versions of resolved components are usually available at this time as well as the provenance of where the components were retrieved from.",
+            "post-build": "BOM consisting of information obtained after a build process has completed and the resulting components(s) are available for further analysis. Built components may exist as the result of a CI/CD process, may have been installed or deployed to a system or device, and may need to be retrieved or extracted from the system or device.",
+            "operations": "BOM produced that represents inventory that is running and operational. This may include staging or production environments and will generally encompass multiple SBOMs describing the applications and operating system, along with HBOMs describing the hardware that makes up the system. Operations Bill of Materials (OBOM) can provide full-stack inventory of runtime environments, configurations, and additional dependencies.",
+            "discovery": "BOM consisting of information observed through network discovery providing point-in-time enumeration of embedded, on-premise, and cloud-native services such as server applications, connected devices, microservices, and serverless functions.",
+            "decommission": "BOM containing inventory that will be, or has been retired from operations."
+          }
+        }
       }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Tags",
+      "description": "Textual strings that aid in discovery, search, and retrieval of the associated object. Tags often serve as a way to group or categorize similar or related objects by various attributes.",
+      "examples": [
+        "json-parser",
+        "object-persistence",
+        "text-to-image",
+        "translation",
+        "object-detection"
+      ]
     },
     "commit": {
       "type": "object",
@@ -730,6 +769,17 @@
           "description": "The email address of the individual who performed the action"
         }
       }
+    },
+    "locale": {
+      "type": "string",
+      "pattern": "^([a-z]{2})(-[A-Z]{2})?$",
+      "title": "Locale",
+      "description": "Defines a syntax for representing two character language code (ISO-639) followed by an optional two character country code. The language code must be lower case. If the country code is specified, the country code must be upper case. The language code and country code must be separated by a minus sign. Examples: en, en-US, fr, fr-CA"
+    },
+    "signature": {
+      "$ref": "../jsf-0.82.schema.json#/definitions/signature",
+      "title": "Signature",
+      "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
     }
   }
 }
