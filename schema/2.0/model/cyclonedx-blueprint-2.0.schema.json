@@ -1,0 +1,1574 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-blueprint-2.0.schema.json",
+  "type": "null",
+  "title": "CycloneDX Blueprint Model",
+  "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
+  "required": ["modelTypes", "methodologies"],
+  "additionalProperties": false,
+  "properties": {
+    "bom-ref": {
+      "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+    },
+    "modelTypes": {
+      "type": "array",
+      "minItems": 1,
+      "description": "The types of models being represented",
+      "items": {
+        "$ref": "#/$defs/modelType"
+      }
+    },
+    "methodologies": {
+      "type": "array",
+      "minItems": 1,
+      "description": "The modeling methodologies used",
+      "items": {
+        "$ref": "#/$defs/methodology"
+      }
+    },
+    "perspectives": {
+      "type": "array",
+      "description": "Different viewpoints or perspectives used in the model analysis",
+      "items": {
+        "$ref": "#/$defs/perspective"
+      }
+    },
+    "metadata": {
+      "$ref": "#/$defs/blueprintMetadata"
+    },
+    "scope": {
+      "$ref": "#/$defs/scope"
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/asset"
+      },
+      "description": "The assets (components, services, data, actors) included in the model"
+    },
+    "dataStores": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/dataStore"
+      },
+      "description": "Structured description of data stores used in the model"
+    },
+    "dataSets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/dataSet"
+      },
+      "description": "Datasets handled by the system, including placements and sensitivity"
+    },
+    "zones": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/zone"
+      },
+      "description": "Logical, physical, or trust zones that group assets with similar characteristics"
+    },
+    "boundaries": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/boundary"
+      },
+      "description": "Boundaries between zones"
+    },
+    "flows": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/flow"
+      },
+      "description": "Data, control, or process flows between assets"
+    },
+    "actors": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/actor"
+      },
+      "description": "Human or system actors involved in the model, distinct from assets"
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/assumption"
+      },
+      "description": "Assumptions made during the modeling process"
+    },
+    "actor": {
+      "type": "object",
+      "required": ["bom-ref", "name", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "Unique identifier for the actor"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name or title of the actor"
+        },
+        "description": {
+          "type": "string",
+          "description": "Narrative describing the actor's role and context"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["user", "engineer", "administrator", "operator", "system", "external"],
+          "description": "Classification of the actor",
+          "meta:enum": {
+            "user": "End user of a client application or service",
+            "engineer": "Developer or platform/DevOps engineer",
+            "administrator": "Administrative or privileged operator",
+            "operator": "Operational staff running the system",
+            "system": "Automated system actor or service account",
+            "external": "Third-party or external entity"
+          }
+        },
+        "permissions": {
+          "type": "string",
+          "description": "Key permissions, capabilities, or duties the actor holds"
+        },
+        "trustZone": {
+          "$ref": "#/$defs/trustZoneRef",
+          "description": "Reference to the trust zone where the actor resides"
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "visualizations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/visualization"
+      },
+      "description": "Visual representations of the model"
+    },
+    "useCases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "cyclonedx-usecase-2.0.schema.json"
+          },
+          {
+            "properties": {
+              "assets": {
+                "type": "array",
+                "items": {
+                  "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+                },
+                "description": "References to assets involved in this use case"
+              },
+              "flows": {
+                "type": "array",
+                "items": {
+                  "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+                },
+                "description": "References to flows that are part of this use case"
+              },
+              "requirements": {
+                "type": "array",
+                "items": {
+                  "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+                },
+                "description": "References to requirements implemented by this use case"
+              }
+            }
+          }
+        ]
+      },
+      "description": "Use cases analyzed as part of the model"
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "$ref": "cyclonedx-requirement-2.0.schema.json#/$defs/requirement"
+      },
+      "description": "Requirements derived from or related to the model"
+    },
+    "externalReferences": {
+      "type": "array",
+      "items": {
+        "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference"
+      },
+      "description": "External references related to the blueprint"
+    },
+    "properties": {
+      "type": "array",
+      "items": {
+        "$ref": "cyclonedx-common-2.0.schema.json#/$defs/property"
+      },
+      "description": "Additional properties and extensions"
+    }
+  },
+  "$defs": {
+    "modelType": {
+      "type": "object",
+      "oneOf": [
+        {
+          "required": ["type"],
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "architecture",
+                "dataFlow",
+                "process",
+                "deployment",
+                "network",
+                "threat",
+                "risk",
+                "privacy",
+                "operational",
+                "conceptual",
+                "logical",
+                "physical",
+                "behavioral",
+                "structural"
+              ],
+              "meta:enum": {
+                "architecture": "System or software architecture model",
+                "dataFlow": "Data flow model showing how data moves through the system",
+                "process": "Business or system process model",
+                "deployment": "Deployment or infrastructure model",
+                "network": "Network topology or connectivity model",
+                "threat": "Security threat model",
+                "risk": "Risk assessment model",
+                "privacy": "Privacy impact assessment model",
+                "operational": "Operational model",
+                "conceptual": "High-level conceptual model",
+                "logical": "Logical system model",
+                "physical": "Physical infrastructure model",
+                "behavioral": "System behavior model",
+                "structural": "System structure model"
+              }
+            }
+          }
+        },
+        {
+          "required": ["name"],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Custom model type name"
+            },
+            "description": {
+              "type": "string",
+              "description": "Description of the custom model type"
+            }
+          }
+        }
+      ]
+    },
+    "methodology": {
+      "type": "object",
+      "oneOf": [
+        {
+          "required": ["type"],
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "C4",
+                "UML",
+                "TOGAF",
+                "Archimate",
+                "BPMN",
+                "DFD",
+                "ERD",
+                "4+1",
+                "Zachman",
+                "SABSA",
+                "DODAF",
+                "MODAF",
+                "NAF",
+                "Kruchten",
+                "IDEF",
+                "SysML",
+                "STRIDE",
+                "PASTA",
+                "LINDDUN",
+                "OCTAVE",
+                "ISO27005",
+                "NIST",
+                "FAIR"
+              ],
+              "meta:enum": {
+                "C4": "C4 Model for software architecture",
+                "UML": "Unified Modeling Language",
+                "TOGAF": "The Open Group Architecture Framework",
+                "Archimate": "Enterprise architecture modeling language",
+                "BPMN": "Business Process Model and Notation",
+                "DFD": "Data Flow Diagrams",
+                "ERD": "Entity Relationship Diagrams",
+                "4+1": "4+1 Architectural View Model",
+                "Zachman": "Zachman Framework",
+                "SABSA": "Sherwood Applied Business Security Architecture",
+                "DODAF": "Department of Defense Architecture Framework",
+                "MODAF": "Ministry of Defence Architecture Framework",
+                "NAF": "NATO Architecture Framework",
+                "Kruchten": "Kruchten's 4+1 View Model",
+                "IDEF": "Integration Definition Methods",
+                "SysML": "Systems Modeling Language",
+                "STRIDE": "Microsoft's threat modeling methodology",
+                "PASTA": "Process for Attack Simulation and Threat Analysis",
+                "LINDDUN": "Privacy threat modeling methodology",
+                "OCTAVE": "Operationally Critical Threat, Asset, and Vulnerability Evaluation",
+                "ISO27005": "ISO/IEC 27005 Information security risk management",
+                "NIST": "NIST Risk Management Framework",
+                "FAIR": "Factor Analysis of Information Risk"
+              }
+            },
+            "version": {
+              "type": "string",
+              "description": "Version of the methodology"
+            }
+          }
+        },
+        {
+          "required": ["name"],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Custom methodology name"
+            },
+            "version": {
+              "type": "string",
+              "description": "Version of the methodology"
+            },
+            "description": {
+              "type": "string",
+              "description": "Description of the custom methodology"
+            },
+            "externalReferences": {
+              "type": "array",
+              "items": {
+                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "perspective": {
+      "type": "object",
+      "required": ["bom-ref", "type", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "Unique identifier for the perspective"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "business",
+            "technical",
+            "user",
+            "operational",
+            "development",
+            "architectural",
+            "functional",
+            "informational",
+            "contextual",
+            "conceptual",
+            "logical",
+            "physical",
+            "security",
+            "compliance",
+            "risk",
+            "stakeholder",
+            "design-review",
+            "custom"
+          ],
+          "meta:enum": {
+            "business": "Business stakeholder perspective",
+            "technical": "Technical implementation perspective",
+            "user": "End user or customer perspective",
+            "operational": "Operations and maintenance perspective",
+            "development": "Software development perspective",
+            "architectural": "System architecture perspective",
+            "functional": "Functional requirements perspective",
+            "informational": "Information and data perspective",
+            "contextual": "Business context perspective",
+            "conceptual": "High-level conceptual perspective",
+            "logical": "Logical design perspective",
+            "physical": "Physical implementation perspective",
+            "security": "Security perspective",
+            "compliance": "Regulatory compliance perspective",
+            "risk": "Risk management perspective",
+            "stakeholder": "General stakeholder perspective",
+            "custom": "Custom or other perspective"
+          }
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the perspective"
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of the perspective and its focus"
+        },
+        "role": {
+          "type": "string",
+          "description": "The role or persona associated with this perspective"
+        },
+        "objectives": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Primary objectives or goals from this perspective"
+        },
+        "concerns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Primary concerns from this perspective"
+        },
+        "viewpoint": {
+          "type": "string",
+          "description": "The architectural viewpoint this perspective represents"
+        },
+        "scope": {
+          "type": "string",
+          "description": "The scope of this perspective"
+        },
+        "properties": {
+          "type": "array",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/property"
+          }
+        }
+      }
+    },
+    "blueprintMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the blueprint was created or last updated"
+        },
+        "authors": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntityOrContact",
+          "description": "The person(s) or organization(s) who created the blueprint"
+        },
+        "reviewer": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntityOrContact",
+          "description": "The person(s) or organization(s) who reviewed the blueprint"
+        },
+        "reviewDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the blueprint was reviewed"
+        },
+        "approver": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntityOrContact",
+          "description": "The person(s) or organization(s) who approved the blueprint"
+        },
+        "approvalDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the blueprint was approved"
+        },
+        "ordinalVersion": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/ordinalVersion"
+        },
+        "lifecycles": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/lifecycles"
+        },
+        "validityPeriod": {
+          "$ref": "#/$defs/validityPeriod"
+        }
+      }
+    },
+    "validityPeriod": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the blueprint becomes valid"
+        },
+        "end": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the blueprint expires"
+        },
+        "reviewFrequency": {
+          "type": "string",
+          "pattern": "^P(?!$)(\\d+Y)?(\\d+M)?(\\d+W)?(\\d+D)?$",
+          "description": "ISO 8601 duration for review frequency (e.g., P3M for quarterly)"
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the scope"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of what is included and excluded from the model"
+        },
+        "boundaries": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Explicit boundaries of the model"
+        },
+        "includedComponents": {
+          "type": "array",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          },
+          "description": "References to components explicitly included"
+        },
+        "excludedComponents": {
+          "type": "array",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          },
+          "description": "References to components explicitly excluded"
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "asset": {
+      "type": "object",
+      "required": ["bom-ref", "type", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "Unique identifier for the asset"
+        },
+        "componentRef": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "Reference to the component this asset represents"
+        },
+        "serviceRef": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "Reference to the service this asset represents"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "component",
+            "service",
+            "dataStore",
+            "data",
+            "actor",
+            "process",
+            "infrastructure",
+            "device",
+            "network",
+            "container",
+            "function",
+            "api",
+            "queue",
+            "stream",
+            "system",
+            "subsystem",
+            "module",
+            "interface",
+            "endpoint",
+            "resource"
+          ],
+          "meta:enum": {
+            "component": "Software component or application",
+            "service": "Service or microservice",
+            "dataStore": "Database, file system, or data repository",
+            "data": "Dataset",
+            "actor": "User, system, or external entity",
+            "process": "Business or system process",
+            "infrastructure": "Infrastructure component",
+            "device": "Physical or IoT device",
+            "network": "Network segment or resource",
+            "container": "Container or orchestration unit",
+            "function": "Serverless function or lambda",
+            "api": "API endpoint or interface",
+            "queue": "Message queue or event bus",
+            "stream": "Data stream or event stream",
+            "system": "Complete system or application",
+            "subsystem": "Part of a larger system",
+            "module": "Software module or package",
+            "interface": "System interface or contract",
+            "endpoint": "Service endpoint or URL",
+            "resource": "Generic resource or artifact"
+          }
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the asset"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the asset's role and purpose"
+        },
+        "zone": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "Reference to the zone containing this asset"
+        },
+        "parent": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "Reference to parent asset if this is a sub-component"
+        },
+        "classification": {
+          "$ref": "#/$defs/assetClassification"
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Generic attributes or tags for the asset"
+        },
+        "responsibilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Responsibilities or functions of this asset"
+        },
+        "interfaces": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/interface"
+          },
+          "description": "Interfaces exposed by this asset"
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          },
+          "description": "References to assets this asset depends on"
+        },
+        "useCases": {
+          "type": "array",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          },
+          "description": "References to use cases that involve this asset"
+        },
+        "authentication": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/authenticationType"
+          },
+          "description": "Authentication methods supported/required"
+        },
+        "authorization": {
+          "$ref": "#/$defs/accessControlType",
+          "description": "Access control model used"
+        },
+        "encryption": {
+          "$ref": "#/$defs/encryptionType"
+        },
+        "ownership": {
+          "$ref": "#/$defs/ownership"
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        },
+        "externalReferences": {
+          "type": "array",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference"
+          }
+        }
+      }
+    },
+    "dataStore": {
+      "type": "object",
+      "required": ["bom-ref", "name", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the data store"
+        },
+        "description": {
+          "type": "string",
+          "description": "Purpose and contents of the store"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "sql",
+            "keyValue",
+            "document",
+            "object",
+            "graph",
+            "timeSeries",
+            "file",
+            "blob",
+            "cache",
+            "custom"
+          ],
+          "meta:enum": {
+            "sql": "Relational database",
+            "keyValue": "Key-value store",
+            "document": "Document database (e.g., MongoDB)",
+            "object": "Object storage",
+            "graph": "Graph database",
+            "timeSeries": "Time-series database",
+            "file": "File system or NAS",
+            "blob": "Binary/blob storage",
+            "cache": "Caching tier",
+            "custom": "Other or mixed storage technology"
+          }
+        },
+        "vendor": {
+          "type": "string"
+        },
+        "product": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "environment": {
+          "type": "string",
+          "description": "Deployment environment (prod, test, etc.)"
+        },
+        "trustZone": {
+          "$ref": "#/$defs/trustZoneRef"
+        },
+        "location": {
+          "type": "string",
+          "description": "Physical or logical hosting location"
+        },
+        "technologies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Supporting technologies or services"
+        },
+        "dataSets": {
+          "type": "array",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          },
+          "description": "References to data sets stored here"
+        },
+        "accessControl": {
+          "$ref": "#/$defs/accessControlType"
+        },
+        "encryption": {
+          "$ref": "#/$defs/encryptionType"
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "dataSet": {
+      "type": "object",
+      "required": ["bom-ref", "name", "description"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the dataset"
+        },
+        "description": {
+          "type": "string",
+          "description": "What information is contained and why it exists"
+        },
+        "classification": {
+          "$ref": "#/$defs/dataClassification"
+        },
+        "dataTypes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dataObjectType"
+          },
+          "description": "Categories of data stored (PII, PHI, etc.)"
+        },
+        "recordCount": {
+          "type": "integer",
+          "description": "Approximate number of records"
+        },
+        "owners": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntityOrContact"
+        },
+        "regulations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Applicable regulations or contracts"
+        },
+        "accessControl": {
+          "$ref": "#/$defs/accessControlType"
+        },
+        "placements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["dataStore"],
+            "additionalProperties": false,
+            "properties": {
+              "dataStore": {
+                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+                "description": "Reference to the store holding this dataset"
+              },
+              "encrypted": {
+                "type": "boolean",
+                "description": "Whether the dataset is encrypted at this location"
+              },
+              "retention": {
+                "type": "string",
+                "description": "Retention policy for this placement"
+              },
+              "replicated": {
+                "type": "boolean",
+                "description": "Indicates if this placement is a replica"
+              }
+            }
+          },
+          "description": "Where the dataset resides"
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "interface": {
+      "type": "object",
+      "required": ["name", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the interface"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["rest", "graphql", "grpc", "soap", "messaging", "file", "database", "cli", "gui", "api", "event", "stream"],
+          "description": "Type of interface"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the interface"
+        },
+        "specification": {
+          "type": "string",
+          "description": "Link or reference to interface specification"
+        },
+        "protocol": {
+          "type": "string",
+          "description": "Communication protocol used"
+        },
+        "dataFormat": {
+          "type": "string",
+          "description": "Data format (e.g., JSON, XML, Protocol Buffers)"
+        },
+        "authentication": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/authenticationType"
+          }
+        },
+        "operations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Operations or methods exposed"
+        }
+      }
+    },
+    "zone": {
+      "type": "object",
+      "required": ["bom-ref", "name", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the zone"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the zone's characteristics"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["trust", "network", "physical", "logical", "deployment", "organizational", "functional", "security"],
+          "meta:enum": {
+            "trust": "Security trust zone",
+            "network": "Network segmentation zone",
+            "physical": "Physical location or boundary",
+            "logical": "Logical grouping or boundary",
+            "deployment": "Deployment environment (e.g., dev, staging, prod)",
+            "organizational": "Organizational or administrative boundary",
+            "functional": "Functional grouping",
+            "security": "Security zone or perimeter"
+          }
+        },
+        "parent": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "Reference to parent zone if this is a sub-zone"
+        },
+        "characteristics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Key characteristics of this zone"
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Constraints or limitations of this zone"
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "boundary": {
+      "type": "object",
+      "required": ["bom-ref", "zones"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the boundary"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["trust", "network", "process", "data", "physical", "organizational", "functional"],
+          "meta:enum": {
+            "trust": "Trust boundary between different security zones",
+            "network": "Network boundary or firewall",
+            "process": "Process or execution boundary",
+            "data": "Data classification boundary",
+            "physical": "Physical security boundary",
+            "organizational": "Organizational boundary",
+            "functional": "Functional boundary"
+          }
+        },
+        "zones": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          },
+          "description": "The zones this boundary connects or separates"
+        },
+        "crossingRequirements": {
+          "$ref": "#/$defs/crossingRequirements"
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "crossingRequirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "authentication": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/authenticationType"
+          },
+          "description": "Authentication required to cross this boundary"
+        },
+        "authorization": {
+          "$ref": "#/$defs/accessControlType",
+          "description": "Access control model at this boundary"
+        },
+        "dataValidation": {
+          "type": "boolean",
+          "description": "Whether data is validated when crossing this boundary"
+        },
+        "dataTransformation": {
+          "type": "boolean",
+          "description": "Whether data is transformed when crossing this boundary"
+        },
+        "encryption": {
+          "$ref": "#/$defs/encryptionType",
+          "description": "Encryption requirements for crossing this boundary"
+        },
+        "logging": {
+          "type": "boolean",
+          "description": "Whether crossings are logged"
+        },
+        "monitoring": {
+          "type": "boolean",
+          "description": "Whether crossings are monitored"
+        },
+        "rateLimit": {
+          "type": "string",
+          "description": "Rate limiting policy"
+        },
+        "protocols": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Allowed protocols for crossing"
+        }
+      }
+    },
+    "flow": {
+      "type": "object",
+      "required": ["bom-ref", "name", "source", "destination", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name or description of the flow"
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of what flows and why"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["data", "control", "process", "message", "event", "dependency", "interaction"],
+          "meta:enum": {
+            "data": "Data or information flow",
+            "control": "Control or command flow",
+            "process": "Business process flow",
+            "message": "Message or communication flow",
+            "event": "Event or notification flow",
+            "dependency": "Dependency relationship",
+            "interaction": "User or system interaction"
+          }
+        },
+        "source": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "Reference to the source asset"
+        },
+        "destination": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "Reference to the destination asset"
+        },
+        "bidirectional": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether flow occurs in both directions"
+        },
+        "synchronous": {
+          "type": "boolean",
+          "description": "Whether the flow is synchronous or asynchronous"
+        },
+        "volume": {
+          "type": "string",
+          "description": "Expected volume or frequency of flow"
+        },
+        "timing": {
+          "type": "string",
+          "description": "Timing characteristics (real-time, batch, scheduled)"
+        },
+        "protocol": {
+          "type": "string",
+          "description": "Communication protocol used"
+        },
+        "dataFormat": {
+          "type": "string",
+          "description": "Format of data in the flow"
+        },
+        "classification": {
+          "$ref": "#/$defs/dataClassification"
+        },
+        "dataObjects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dataObject"
+          },
+          "description": "The data object(s) transported in this flow"
+        },
+        "authentication": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/authenticationType"
+          }
+        },
+        "encryption": {
+          "$ref": "#/$defs/encryptionType"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Ordering hint so flows can be assembled into sequence diagrams"
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "assumption": {
+      "type": "object",
+      "required": ["description"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "description": {
+          "type": "string",
+          "description": "The assumption being made"
+        },
+        "topic": {
+          "type": "string",
+          "enum": ["technical", "business", "operational", "security", "compliance", "performance", "availability"],
+          "description": "Topic of the assumption"
+        },
+        "relatedAssets": {
+          "type": "array",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          },
+          "description": "Assets this assumption relates to"
+        },
+        "validity": {
+          "type": "string",
+          "enum": ["unknown", "verified", "unverified", "invalid"],
+          "default": "unknown",
+          "description": "Whether the assumption has been validated"
+        },
+        "impact": {
+          "type": "string",
+          "description": "Impact if this assumption proves false"
+        },
+        "owner": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntityOrContact",
+          "description": "Who owns or is responsible for this assumption"
+        },
+        "validationMethod": {
+          "type": "string",
+          "description": "How this assumption can be validated"
+        },
+        "validationDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the assumption was last validated"
+        }
+      }
+    },
+    "visualization": {
+      "type": "object",
+      "required": ["name", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name or title of the visualization"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of what the visualization shows"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "architecture",
+            "dataFlow",
+            "sequence",
+            "state",
+            "deployment",
+            "network",
+            "process",
+            "useCase",
+            "component",
+            "class",
+            "entity",
+            "activity",
+            "collaboration",
+            "context",
+            "container",
+            "code"
+          ],
+          "meta:enum": {
+            "architecture": "System architecture diagram",
+            "dataFlow": "Data flow diagram (DFD)",
+            "sequence": "Sequence or interaction diagram",
+            "state": "State machine diagram",
+            "deployment": "Deployment or infrastructure diagram",
+            "network": "Network topology diagram",
+            "process": "Business process diagram",
+            "useCase": "Use case diagram",
+            "component": "Component diagram",
+            "class": "Class or object diagram",
+            "entity": "Entity relationship diagram",
+            "activity": "Activity or workflow diagram",
+            "collaboration": "Collaboration diagram",
+            "context": "Context diagram",
+            "container": "Container diagram (C4)",
+            "code": "Code structure diagram"
+          }
+        },
+        "format": {
+          "type": "string",
+          "enum": ["mermaid", "graphviz", "plantuml", "drawio", "svg", "png", "jpeg", "d3", "cytoscape", "visio", "archimate"],
+          "meta:enum": {
+            "mermaid": "Mermaid diagram language",
+            "graphviz": "GraphViz DOT language",
+            "plantuml": "PlantUML diagram language",
+            "drawio": "Draw.io/diagrams.net format",
+            "svg": "Scalable Vector Graphics",
+            "png": "Portable Network Graphics",
+            "jpeg": "JPEG image format",
+            "d3": "D3.js visualization",
+            "cytoscape": "Cytoscape graph format",
+            "visio": "Microsoft Visio format",
+            "archimate": "ArchiMate model format"
+          }
+        },
+        "content": {
+          "type": "string",
+          "description": "The diagram content (source code or base64 encoded image)"
+        },
+        "url": {
+          "type": "string",
+          "format": "iri-reference",
+          "description": "URL to the diagram if stored externally"
+        },
+        "level": {
+          "type": "string",
+          "enum": ["overview", "high", "medium", "detailed"],
+          "description": "Level of detail in the visualization"
+        },
+        "perspective": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "Reference to the perspective this visualization represents"
+        },
+        "elements": {
+          "type": "array",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          },
+          "description": "References to elements shown in this visualization"
+        },
+        "interactive": {
+          "type": "boolean",
+          "description": "Whether the visualization is interactive"
+        },
+        "layers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Layers or views available in the visualization"
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "assetClassification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "criticality": {
+          "$ref": "cyclonedx-risk-2.0.schema.json#/$defs/criticality"
+        },
+        "sensitivity": {
+          "$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataSensitivity"
+        },
+        "dataClassification": {
+          "$ref": "#/$defs/dataClassification"
+        },
+        "tier": {
+          "type": "string",
+          "enum": ["tier0", "tier1", "tier2", "tier3", "tier4"],
+          "meta:enum": {
+            "tier0": "Mission critical - highest priority",
+            "tier1": "Business critical - high priority",
+            "tier2": "Business important - medium priority",
+            "tier3": "Business supporting - low priority",
+            "tier4": "Non-critical - minimal priority"
+          }
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Business or technical categories"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Tags for classification and search"
+        }
+      }
+    },
+    "dataClassification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": [
+            "public",
+            "internal",
+            "confidential",
+            "restricted"
+          ],
+          "description": "Data sensitivity classification",
+          "meta:enum": {
+            "public": "Public information that can be freely shared",
+            "internal": "Internal use only within the organization",
+            "confidential": "Confidential information requiring protection",
+            "restricted": "Highly restricted information with limited access and special protection measures"
+          }
+        },
+        "sensitivity": {
+          "$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataSensitivity"
+        },
+        "dataTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Specific types of data"
+        },
+        "handling": {
+          "type": "string",
+          "description": "Data handling requirements"
+        },
+        "retention": {
+          "type": "string",
+          "description": "Data retention requirements"
+        },
+        "disposal": {
+          "type": "string",
+          "description": "Data disposal requirements"
+        },
+        "regulations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Applicable regulations"
+        }
+      }
+    },
+    "dataObject": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "Unique identifier for this data object"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the transported data object"
+        },
+        "description": {
+          "type": "string",
+          "description": "Additional details about the data contents"
+        },
+        "classification": {
+          "$ref": "#/$defs/dataClassification",
+          "description": "Inline classification details for this data object"
+        },
+        "classificationRef": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "Reference to a shared classification definition elsewhere in the model"
+        },
+        "type": {
+          "$ref": "#/$defs/dataObjectType",
+          "description": "Type of data (PII, PHI, PCI, etc.)"
+        },
+        "schema": {
+          "type": "string",
+          "description": "Reference to a schema contract or document describing the data structure"
+        },
+        "format": {
+          "type": "string",
+          "description": "Serialization or encoding format (JSON, HL7, CSV, etc.)"
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Key attributes or fields transported"
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "dataObjectType": {
+      "type": "string",
+      "enum": [
+        "pii",
+        "phi",
+        "pci",
+        "financial",
+        "intellectualProperty",
+        "telemetry",
+        "logs",
+        "credentials",
+        "safety",
+        "operational",
+        "custom"
+      ],
+      "description": "Common data object classifications",
+      "meta:enum": {
+        "pii": "Personally identifiable information",
+        "phi": "Protected health information",
+        "pci": "Payment card industry data",
+        "financial": "Financial statements or transaction data",
+        "intellectualProperty": "Intellectual property or trade secrets",
+        "telemetry": "System or product telemetry data",
+        "logs": "Operational or security log data",
+        "credentials": "Secrets, tokens, or credentials",
+        "safety": "Safety critical data or signals",
+        "operational": "Operational or process data",
+        "custom": "Other data types not covered by the enumerated values"
+      }
+    },
+    "ownership": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "owner": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntityOrContact",
+          "description": "Primary owner of the asset"
+        },
+        "steward": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntityOrContact",
+          "description": "Steward responsible for the asset"
+        },
+        "custodian": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntityOrContact",
+          "description": "Custodian responsible for protecting the asset"
+        },
+        "users": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntityOrContact",
+          "description": "Primary users of the asset"
+        }
+      }
+    },
+    "authenticationType": {
+      "type": "string",
+      "enum": [
+        "none",
+        "basic",
+        "bearer",
+        "digest",
+        "certificate",
+        "apiKey",
+        "oauth1",
+        "oauth2",
+        "openIdConnect",
+        "saml",
+        "kerberos",
+        "ntlm",
+        "jwt",
+        "custom"
+      ],
+      "description": "Authentication method",
+      "meta:enum": {
+        "none": "No authentication required",
+        "basic": "Basic authentication (username/password)",
+        "bearer": "Bearer token authentication",
+        "digest": "Digest authentication",
+        "certificate": "Certificate-based authentication",
+        "apiKey": "API key authentication",
+        "oauth1": "OAuth 1.0 authentication",
+        "oauth2": "OAuth 2.0 authentication",
+        "openIdConnect": "OpenID Connect authentication",
+        "saml": "SAML authentication",
+        "kerberos": "Kerberos authentication",
+        "ntlm": "NTLM authentication",
+        "jwt": "JSON Web Token authentication",
+        "custom": "Custom authentication method"
+      }
+    },
+    "authorizationType": {
+      "type": "string",
+      "enum": ["none", "acl", "rbac", "abac", "mac", "dac", "pbac", "cbac", "custom"],
+      "description": "Authorization model",
+      "meta:enum": {
+        "none": "No authorization controls",
+        "acl": "Access Control Lists",
+        "rbac": "Role-Based Access Control",
+        "abac": "Attribute-Based Access Control",
+        "mac": "Mandatory Access Control",
+        "dac": "Discretionary Access Control",
+        "pbac": "Policy-Based Access Control",
+        "cbac": "Claims-Based Access Control",
+        "custom": "Custom authorization model"
+      }
+    },
+    "encryptionType": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "inTransit": {
+          "type": "boolean",
+          "description": "Whether data is encrypted in transit"
+        },
+        "atRest": {
+          "type": "boolean",
+          "description": "Whether data is encrypted at rest"
+        },
+        "inProcessing": {
+          "type": "boolean",
+          "description": "Whether data is encrypted during processing"
+        }
+      }
+    },
+    "trustZoneRef": {
+      "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+      "description": "Reference to a zone entry whose type is 'trust'"
+    }
+  }
+}

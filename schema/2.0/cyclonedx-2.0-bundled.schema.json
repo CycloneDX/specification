@@ -777,6 +777,1364 @@
         }
       }
     },
+    "cyclonedx-blueprint-2.0": {
+      "type": "null",
+      "title": "CycloneDX Blueprint Model",
+      "required": [
+        "modelTypes",
+        "methodologies"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+        },
+        "modelTypes": {
+          "type": "array",
+          "minItems": 1,
+          "description": "The types of models being represented",
+          "items": {
+            "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/modelType"
+          }
+        },
+        "methodologies": {
+          "type": "array",
+          "minItems": 1,
+          "description": "The modeling methodologies used",
+          "items": {
+            "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/methodology"
+          }
+        },
+        "perspectives": {
+          "type": "array",
+          "description": "Different viewpoints or perspectives used in the model analysis",
+          "items": {
+            "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/perspective"
+          }
+        },
+        "metadata": {
+          "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/blueprintMetadata"
+        },
+        "scope": {
+          "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/scope"
+        },
+        "assets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/asset"
+          },
+          "description": "The assets (components, services, data, actors) included in the model"
+        },
+        "zones": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/zone"
+          },
+          "description": "Logical, physical, or trust zones that group assets with similar characteristics"
+        },
+        "boundaries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/boundary"
+          },
+          "description": "Boundaries between zones"
+        },
+        "flows": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/flow"
+          },
+          "description": "Data, control, or process flows between assets"
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/assumption"
+          },
+          "description": "Assumptions made during the modeling process"
+        },
+        "visualizations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/visualization"
+          },
+          "description": "Visual representations of the model"
+        },
+        "useCases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/$defs/cyclonedx-usecase-2.0"
+              },
+              {
+                "properties": {
+                  "assets": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+                    },
+                    "description": "References to assets involved in this use case"
+                  },
+                  "flows": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+                    },
+                    "description": "References to flows that are part of this use case"
+                  },
+                  "requirements": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+                    },
+                    "description": "References to requirements implemented by this use case"
+                  }
+                }
+              }
+            ]
+          },
+          "description": "Use cases analyzed as part of the model"
+        },
+        "requirements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/cyclonedx-requirement-2.0/$defs/requirement"
+          },
+          "description": "Requirements derived from or related to the model"
+        },
+        "externalReferences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/cyclonedx-common-2.0/$defs/externalReference"
+          },
+          "description": "External references related to the blueprint"
+        },
+        "properties": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/cyclonedx-common-2.0/$defs/property"
+          },
+          "description": "Additional properties and extensions"
+        }
+      },
+      "$defs": {
+        "modelType": {
+          "type": "object",
+          "oneOf": [
+            {
+              "required": [
+                "type"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "architecture",
+                    "dataFlow",
+                    "process",
+                    "deployment",
+                    "network",
+                    "threat",
+                    "risk",
+                    "privacy",
+                    "operational",
+                    "conceptual",
+                    "logical",
+                    "physical",
+                    "behavioral",
+                    "structural"
+                  ],
+                  "meta:enum": {
+                    "architecture": "System or software architecture model",
+                    "dataFlow": "Data flow model showing how data moves through the system",
+                    "process": "Business or system process model",
+                    "deployment": "Deployment or infrastructure model",
+                    "network": "Network topology or connectivity model",
+                    "threat": "Security threat model",
+                    "risk": "Risk assessment model",
+                    "privacy": "Privacy impact assessment model",
+                    "operational": "Operational model",
+                    "conceptual": "High-level conceptual model",
+                    "logical": "Logical system model",
+                    "physical": "Physical infrastructure model",
+                    "behavioral": "System behavior model",
+                    "structural": "System structure model"
+                  }
+                }
+              }
+            },
+            {
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Custom model type name"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Description of the custom model type"
+                }
+              }
+            }
+          ]
+        },
+        "methodology": {
+          "type": "object",
+          "oneOf": [
+            {
+              "required": [
+                "type"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "C4",
+                    "UML",
+                    "TOGAF",
+                    "Archimate",
+                    "BPMN",
+                    "DFD",
+                    "ERD",
+                    "4+1",
+                    "Zachman",
+                    "SABSA",
+                    "DODAF",
+                    "MODAF",
+                    "NAF",
+                    "Kruchten",
+                    "IDEF",
+                    "SysML",
+                    "STRIDE",
+                    "PASTA",
+                    "LINDDUN",
+                    "OCTAVE",
+                    "ISO27005",
+                    "NIST",
+                    "FAIR"
+                  ],
+                  "meta:enum": {
+                    "C4": "C4 Model for software architecture",
+                    "UML": "Unified Modeling Language",
+                    "TOGAF": "The Open Group Architecture Framework",
+                    "Archimate": "Enterprise architecture modeling language",
+                    "BPMN": "Business Process Model and Notation",
+                    "DFD": "Data Flow Diagrams",
+                    "ERD": "Entity Relationship Diagrams",
+                    "4+1": "4+1 Architectural View Model",
+                    "Zachman": "Zachman Framework",
+                    "SABSA": "Sherwood Applied Business Security Architecture",
+                    "DODAF": "Department of Defense Architecture Framework",
+                    "MODAF": "Ministry of Defence Architecture Framework",
+                    "NAF": "NATO Architecture Framework",
+                    "Kruchten": "Kruchten's 4+1 View Model",
+                    "IDEF": "Integration Definition Methods",
+                    "SysML": "Systems Modeling Language",
+                    "STRIDE": "Microsoft's threat modeling methodology",
+                    "PASTA": "Process for Attack Simulation and Threat Analysis",
+                    "LINDDUN": "Privacy threat modeling methodology",
+                    "OCTAVE": "Operationally Critical Threat, Asset, and Vulnerability Evaluation",
+                    "ISO27005": "ISO/IEC 27005 Information security risk management",
+                    "NIST": "NIST Risk Management Framework",
+                    "FAIR": "Factor Analysis of Information Risk"
+                  }
+                },
+                "version": {
+                  "type": "string",
+                  "description": "Version of the methodology"
+                }
+              }
+            },
+            {
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Custom methodology name"
+                },
+                "version": {
+                  "type": "string",
+                  "description": "Version of the methodology"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Description of the custom methodology"
+                },
+                "externalReferences": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/externalReference"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "perspective": {
+          "type": "object",
+          "required": [
+            "bom-ref",
+            "type",
+            "name"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "description": "Unique identifier for the perspective"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "business",
+                "technical",
+                "user",
+                "operational",
+                "development",
+                "architectural",
+                "functional",
+                "informational",
+                "contextual",
+                "conceptual",
+                "logical",
+                "physical",
+                "security",
+                "compliance",
+                "risk",
+                "stakeholder",
+                "custom"
+              ],
+              "meta:enum": {
+                "business": "Business stakeholder perspective",
+                "technical": "Technical implementation perspective",
+                "user": "End user or customer perspective",
+                "operational": "Operations and maintenance perspective",
+                "development": "Software development perspective",
+                "architectural": "System architecture perspective",
+                "functional": "Functional requirements perspective",
+                "informational": "Information and data perspective",
+                "contextual": "Business context perspective",
+                "conceptual": "High-level conceptual perspective",
+                "logical": "Logical design perspective",
+                "physical": "Physical implementation perspective",
+                "security": "Security perspective",
+                "compliance": "Regulatory compliance perspective",
+                "risk": "Risk management perspective",
+                "stakeholder": "General stakeholder perspective",
+                "custom": "Custom or other perspective"
+              }
+            },
+            "name": {
+              "type": "string",
+              "description": "Name of the perspective"
+            },
+            "description": {
+              "type": "string",
+              "description": "Detailed description of the perspective and its focus"
+            },
+            "role": {
+              "type": "string",
+              "description": "The role or persona associated with this perspective"
+            },
+            "objectives": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Primary objectives or goals from this perspective"
+            },
+            "concerns": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Primary concerns from this perspective"
+            },
+            "viewpoint": {
+              "type": "string",
+              "description": "The architectural viewpoint this perspective represents"
+            },
+            "scope": {
+              "type": "string",
+              "description": "The scope of this perspective"
+            },
+            "properties": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/property"
+              }
+            }
+          }
+        },
+        "blueprintMetadata": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "timestamp": {
+              "type": "string",
+              "format": "date-time",
+              "description": "When the blueprint was created or last updated"
+            },
+            "authors": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/organizationalEntityOrContact",
+              "description": "The person(s) or organization(s) who created the blueprint"
+            },
+            "reviewer": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/organizationalEntityOrContact",
+              "description": "The person(s) or organization(s) who reviewed the blueprint"
+            },
+            "reviewDate": {
+              "type": "string",
+              "format": "date-time",
+              "description": "When the blueprint was reviewed"
+            },
+            "approver": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/organizationalEntityOrContact",
+              "description": "The person(s) or organization(s) who approved the blueprint"
+            },
+            "approvalDate": {
+              "type": "string",
+              "format": "date-time",
+              "description": "When the blueprint was approved"
+            },
+            "ordinalVersion": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/ordinalVersion"
+            },
+            "lifecycles": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/lifecycles"
+            },
+            "validityPeriod": {
+              "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/validityPeriod"
+            }
+          }
+        },
+        "validityPeriod": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "start": {
+              "type": "string",
+              "format": "date-time",
+              "description": "When the blueprint becomes valid"
+            },
+            "end": {
+              "type": "string",
+              "format": "date-time",
+              "description": "When the blueprint expires"
+            },
+            "reviewFrequency": {
+              "type": "string",
+              "pattern": "^P(?!$)(\\d+Y)?(\\d+M)?(\\d+W)?(\\d+D)?$",
+              "description": "ISO 8601 duration for review frequency (e.g., P3M for quarterly)"
+            }
+          }
+        },
+        "scope": {
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            },
+            "name": {
+              "type": "string",
+              "description": "Name of the scope"
+            },
+            "description": {
+              "type": "string",
+              "description": "Description of what is included and excluded from the model"
+            },
+            "boundaries": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Explicit boundaries of the model"
+            },
+            "includedComponents": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+              },
+              "description": "References to components explicitly included"
+            },
+            "excludedComponents": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+              },
+              "description": "References to components explicitly excluded"
+            },
+            "properties": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
+            }
+          }
+        },
+        "asset": {
+          "type": "object",
+          "required": [
+            "bom-ref",
+            "type",
+            "name"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "description": "Unique identifier for the asset"
+            },
+            "componentRef": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "description": "Reference to the component this asset represents"
+            },
+            "serviceRef": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "description": "Reference to the service this asset represents"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "component",
+                "service",
+                "dataStore",
+                "data",
+                "actor",
+                "process",
+                "infrastructure",
+                "device",
+                "network",
+                "container",
+                "function",
+                "api",
+                "queue",
+                "stream",
+                "system",
+                "subsystem",
+                "module",
+                "interface",
+                "endpoint",
+                "resource"
+              ],
+              "meta:enum": {
+                "component": "Software component or application",
+                "service": "Service or microservice",
+                "dataStore": "Database, file system, or data repository",
+                "data": "Data asset or dataset",
+                "actor": "User, system, or external entity",
+                "process": "Business or system process",
+                "infrastructure": "Infrastructure component",
+                "device": "Physical or IoT device",
+                "network": "Network segment or resource",
+                "container": "Container or orchestration unit",
+                "function": "Serverless function or lambda",
+                "api": "API endpoint or interface",
+                "queue": "Message queue or event bus",
+                "stream": "Data stream or event stream",
+                "system": "Complete system or application",
+                "subsystem": "Part of a larger system",
+                "module": "Software module or package",
+                "interface": "System interface or contract",
+                "endpoint": "Service endpoint or URL",
+                "resource": "Generic resource or artifact"
+              }
+            },
+            "name": {
+              "type": "string",
+              "description": "Name of the asset"
+            },
+            "description": {
+              "type": "string",
+              "description": "Description of the asset's role and purpose"
+            },
+            "zone": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "description": "Reference to the zone containing this asset"
+            },
+            "parent": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "description": "Reference to parent asset if this is a sub-component"
+            },
+            "classification": {
+              "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/assetClassification"
+            },
+            "attributes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Generic attributes or tags for the asset"
+            },
+            "responsibilities": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Responsibilities or functions of this asset"
+            },
+            "interfaces": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/interface"
+              },
+              "description": "Interfaces exposed by this asset"
+            },
+            "dependencies": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+              },
+              "description": "References to assets this asset depends on"
+            },
+            "useCases": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+              },
+              "description": "References to use cases that involve this asset"
+            },
+            "authentication": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/authenticationType"
+              },
+              "description": "Authentication methods supported/required"
+            },
+            "authorization": {
+              "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/authorizationType",
+              "description": "Authorization model used"
+            },
+            "encryption": {
+              "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/encryptionType"
+            },
+            "ownership": {
+              "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/ownership"
+            },
+            "properties": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
+            },
+            "externalReferences": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/externalReference"
+              }
+            }
+          }
+        },
+        "interface": {
+          "type": "object",
+          "required": [
+            "name",
+            "type"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Name of the interface"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "rest",
+                "graphql",
+                "grpc",
+                "soap",
+                "messaging",
+                "file",
+                "database",
+                "cli",
+                "gui",
+                "api",
+                "event",
+                "stream"
+              ],
+              "description": "Type of interface"
+            },
+            "description": {
+              "type": "string",
+              "description": "Description of the interface"
+            },
+            "specification": {
+              "type": "string",
+              "description": "Link or reference to interface specification"
+            },
+            "protocol": {
+              "type": "string",
+              "description": "Communication protocol used"
+            },
+            "dataFormat": {
+              "type": "string",
+              "description": "Data format (e.g., JSON, XML, Protocol Buffers)"
+            },
+            "authentication": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/authenticationType"
+              }
+            },
+            "operations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Operations or methods exposed"
+            }
+          }
+        },
+        "zone": {
+          "type": "object",
+          "required": [
+            "bom-ref",
+            "name",
+            "type"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            },
+            "name": {
+              "type": "string",
+              "description": "Name of the zone"
+            },
+            "description": {
+              "type": "string",
+              "description": "Description of the zone's characteristics"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "trust",
+                "network",
+                "physical",
+                "logical",
+                "deployment",
+                "organizational",
+                "functional",
+                "security"
+              ],
+              "meta:enum": {
+                "trust": "Security trust zone",
+                "network": "Network segmentation zone",
+                "physical": "Physical location or boundary",
+                "logical": "Logical grouping or boundary",
+                "deployment": "Deployment environment (e.g., dev, staging, prod)",
+                "organizational": "Organizational or administrative boundary",
+                "functional": "Functional grouping",
+                "security": "Security zone or perimeter"
+              }
+            },
+            "parent": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "description": "Reference to parent zone if this is a sub-zone"
+            },
+            "characteristics": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Key characteristics of this zone"
+            },
+            "constraints": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Constraints or limitations of this zone"
+            },
+            "properties": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
+            }
+          }
+        },
+        "boundary": {
+          "type": "object",
+          "required": [
+            "bom-ref",
+            "zones"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            },
+            "name": {
+              "type": "string",
+              "description": "Name of the boundary"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "trust",
+                "network",
+                "process",
+                "data",
+                "physical",
+                "organizational",
+                "functional"
+              ],
+              "meta:enum": {
+                "trust": "Trust boundary between different security zones",
+                "network": "Network boundary or firewall",
+                "process": "Process or execution boundary",
+                "data": "Data classification boundary",
+                "physical": "Physical security boundary",
+                "organizational": "Organizational boundary",
+                "functional": "Functional boundary"
+              }
+            },
+            "zones": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+              },
+              "description": "The zones this boundary connects or separates"
+            },
+            "crossingRequirements": {
+              "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/crossingRequirements"
+            },
+            "properties": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
+            }
+          }
+        },
+        "crossingRequirements": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "authentication": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/authenticationType"
+              },
+              "description": "Authentication required to cross this boundary"
+            },
+            "authorization": {
+              "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/authorizationType",
+              "description": "Authorization model at this boundary"
+            },
+            "dataValidation": {
+              "type": "boolean",
+              "description": "Whether data is validated when crossing this boundary"
+            },
+            "dataTransformation": {
+              "type": "boolean",
+              "description": "Whether data is transformed when crossing this boundary"
+            },
+            "encryption": {
+              "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/encryptionType",
+              "description": "Encryption requirements for crossing this boundary"
+            },
+            "logging": {
+              "type": "boolean",
+              "description": "Whether crossings are logged"
+            },
+            "monitoring": {
+              "type": "boolean",
+              "description": "Whether crossings are monitored"
+            },
+            "rateLimit": {
+              "type": "string",
+              "description": "Rate limiting policy"
+            },
+            "protocols": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Allowed protocols for crossing"
+            }
+          }
+        },
+        "flow": {
+          "type": "object",
+          "required": [
+            "bom-ref",
+            "name",
+            "source",
+            "destination",
+            "type"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            },
+            "name": {
+              "type": "string",
+              "description": "Name or description of the flow"
+            },
+            "description": {
+              "type": "string",
+              "description": "Detailed description of what flows and why"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "data",
+                "control",
+                "process",
+                "message",
+                "event",
+                "dependency",
+                "interaction"
+              ],
+              "meta:enum": {
+                "data": "Data or information flow",
+                "control": "Control or command flow",
+                "process": "Business process flow",
+                "message": "Message or communication flow",
+                "event": "Event or notification flow",
+                "dependency": "Dependency relationship",
+                "interaction": "User or system interaction"
+              }
+            },
+            "source": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "description": "Reference to the source asset"
+            },
+            "destination": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "description": "Reference to the destination asset"
+            },
+            "bidirectional": {
+              "type": "boolean",
+              "default": false,
+              "description": "Whether flow occurs in both directions"
+            },
+            "synchronous": {
+              "type": "boolean",
+              "description": "Whether the flow is synchronous or asynchronous"
+            },
+            "volume": {
+              "type": "string",
+              "description": "Expected volume or frequency of flow"
+            },
+            "timing": {
+              "type": "string",
+              "description": "Timing characteristics (real-time, batch, scheduled)"
+            },
+            "protocol": {
+              "type": "string",
+              "description": "Communication protocol used"
+            },
+            "dataFormat": {
+              "type": "string",
+              "description": "Format of data in the flow"
+            },
+            "classification": {
+              "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/dataClassification"
+            },
+            "authentication": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/authenticationType"
+              }
+            },
+            "encryption": {
+              "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/encryptionType"
+            },
+            "properties": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
+            }
+          }
+        },
+        "assumption": {
+          "type": "object",
+          "required": [
+            "description"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            },
+            "description": {
+              "type": "string",
+              "description": "The assumption being made"
+            },
+            "category": {
+              "type": "string",
+              "enum": [
+                "technical",
+                "business",
+                "operational",
+                "security",
+                "compliance",
+                "performance",
+                "availability"
+              ],
+              "description": "Category of the assumption"
+            },
+            "relatedAssets": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+              },
+              "description": "Assets this assumption relates to"
+            },
+            "validity": {
+              "type": "string",
+              "enum": [
+                "unknown",
+                "verified",
+                "unverified",
+                "invalid"
+              ],
+              "default": "unknown",
+              "description": "Whether the assumption has been validated"
+            },
+            "impact": {
+              "type": "string",
+              "description": "Impact if this assumption proves false"
+            },
+            "owner": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/organizationalEntityOrContact",
+              "description": "Who owns or is responsible for this assumption"
+            },
+            "validationMethod": {
+              "type": "string",
+              "description": "How this assumption can be validated"
+            },
+            "validationDate": {
+              "type": "string",
+              "format": "date-time",
+              "description": "When the assumption was last validated"
+            }
+          }
+        },
+        "visualization": {
+          "type": "object",
+          "required": [
+            "name",
+            "type"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            },
+            "name": {
+              "type": "string",
+              "description": "Name or title of the visualization"
+            },
+            "description": {
+              "type": "string",
+              "description": "Description of what the visualization shows"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "architecture",
+                "dataFlow",
+                "sequence",
+                "state",
+                "deployment",
+                "network",
+                "process",
+                "useCase",
+                "component",
+                "class",
+                "entity",
+                "activity",
+                "collaboration",
+                "context",
+                "container",
+                "code"
+              ],
+              "meta:enum": {
+                "architecture": "System architecture diagram",
+                "dataFlow": "Data flow diagram (DFD)",
+                "sequence": "Sequence or interaction diagram",
+                "state": "State machine diagram",
+                "deployment": "Deployment or infrastructure diagram",
+                "network": "Network topology diagram",
+                "process": "Business process diagram",
+                "useCase": "Use case diagram",
+                "component": "Component diagram",
+                "class": "Class or object diagram",
+                "entity": "Entity relationship diagram",
+                "activity": "Activity or workflow diagram",
+                "collaboration": "Collaboration diagram",
+                "context": "Context diagram",
+                "container": "Container diagram (C4)",
+                "code": "Code structure diagram"
+              }
+            },
+            "format": {
+              "type": "string",
+              "enum": [
+                "mermaid",
+                "graphviz",
+                "plantuml",
+                "drawio",
+                "svg",
+                "png",
+                "jpeg",
+                "d3",
+                "cytoscape",
+                "visio",
+                "archimate"
+              ],
+              "meta:enum": {
+                "mermaid": "Mermaid diagram language",
+                "graphviz": "GraphViz DOT language",
+                "plantuml": "PlantUML diagram language",
+                "drawio": "Draw.io/diagrams.net format",
+                "svg": "Scalable Vector Graphics",
+                "png": "Portable Network Graphics",
+                "jpeg": "JPEG image format",
+                "d3": "D3.js visualization",
+                "cytoscape": "Cytoscape graph format",
+                "visio": "Microsoft Visio format",
+                "archimate": "ArchiMate model format"
+              }
+            },
+            "content": {
+              "type": "string",
+              "description": "The diagram content (source code or base64 encoded image)"
+            },
+            "url": {
+              "type": "string",
+              "format": "iri-reference",
+              "description": "URL to the diagram if stored externally"
+            },
+            "level": {
+              "type": "string",
+              "enum": [
+                "overview",
+                "high",
+                "medium",
+                "detailed"
+              ],
+              "description": "Level of detail in the visualization"
+            },
+            "perspective": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "description": "Reference to the perspective this visualization represents"
+            },
+            "elements": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+              },
+              "description": "References to elements shown in this visualization"
+            },
+            "interactive": {
+              "type": "boolean",
+              "description": "Whether the visualization is interactive"
+            },
+            "layers": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Layers or views available in the visualization"
+            },
+            "properties": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
+            }
+          }
+        },
+        "assetClassification": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "criticality": {
+              "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/criticality"
+            },
+            "sensitivity": {
+              "$ref": "#/$defs/cyclonedx-data-2.0/$defs/dataSensitivity"
+            },
+            "dataClassification": {
+              "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/dataClassification"
+            },
+            "tier": {
+              "type": "string",
+              "enum": [
+                "tier0",
+                "tier1",
+                "tier2",
+                "tier3",
+                "tier4"
+              ],
+              "meta:enum": {
+                "tier0": "Mission critical - highest priority",
+                "tier1": "Business critical - high priority",
+                "tier2": "Business important - medium priority",
+                "tier3": "Business supporting - low priority",
+                "tier4": "Non-critical - minimal priority"
+              }
+            },
+            "categories": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Business or technical categories"
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Tags for classification and search"
+            }
+          }
+        },
+        "dataClassification": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "sensitivity": {
+              "$ref": "#/$defs/cyclonedx-data-2.0/$defs/dataSensitivity"
+            },
+            "dataTypes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Specific types of data"
+            },
+            "handling": {
+              "type": "string",
+              "description": "Data handling requirements"
+            },
+            "retention": {
+              "type": "string",
+              "description": "Data retention requirements"
+            },
+            "disposal": {
+              "type": "string",
+              "description": "Data disposal requirements"
+            },
+            "regulations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Applicable regulations"
+            }
+          }
+        },
+        "ownership": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "owner": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/organizationalEntityOrContact",
+              "description": "Primary owner of the asset"
+            },
+            "steward": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/organizationalEntityOrContact",
+              "description": "Steward responsible for the asset"
+            },
+            "custodian": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/organizationalEntityOrContact",
+              "description": "Custodian responsible for protecting the asset"
+            },
+            "users": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/organizationalEntityOrContact",
+              "description": "Primary users of the asset"
+            }
+          }
+        },
+        "authenticationType": {
+          "type": "string",
+          "enum": [
+            "none",
+            "basic",
+            "bearer",
+            "digest",
+            "certificate",
+            "apiKey",
+            "oauth1",
+            "oauth2",
+            "openIdConnect",
+            "saml",
+            "kerberos",
+            "ntlm",
+            "jwt",
+            "custom"
+          ],
+          "description": "Authentication method",
+          "meta:enum": {
+            "none": "No authentication required",
+            "basic": "Basic authentication (username/password)",
+            "bearer": "Bearer token authentication",
+            "digest": "Digest authentication",
+            "certificate": "Certificate-based authentication",
+            "apiKey": "API key authentication",
+            "oauth1": "OAuth 1.0 authentication",
+            "oauth2": "OAuth 2.0 authentication",
+            "openIdConnect": "OpenID Connect authentication",
+            "saml": "SAML authentication",
+            "kerberos": "Kerberos authentication",
+            "ntlm": "NTLM authentication",
+            "jwt": "JSON Web Token authentication",
+            "custom": "Custom authentication method"
+          }
+        },
+        "authorizationType": {
+          "type": "string",
+          "enum": [
+            "none",
+            "acl",
+            "rbac",
+            "abac",
+            "mac",
+            "dac",
+            "pbac",
+            "cbac",
+            "custom"
+          ],
+          "description": "Authorization model",
+          "meta:enum": {
+            "none": "No authorization controls",
+            "acl": "Access Control Lists",
+            "rbac": "Role-Based Access Control",
+            "abac": "Attribute-Based Access Control",
+            "mac": "Mandatory Access Control",
+            "dac": "Discretionary Access Control",
+            "pbac": "Policy-Based Access Control",
+            "cbac": "Claims-Based Access Control",
+            "custom": "Custom authorization model"
+          }
+        },
+        "encryptionType": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "inTransit": {
+              "type": "boolean",
+              "description": "Whether data is encrypted in transit"
+            },
+            "atRest": {
+              "type": "boolean",
+              "description": "Whether data is encrypted at rest"
+            },
+            "inProcessing": {
+              "type": "boolean",
+              "description": "Whether data is encrypted during processing"
+            }
+          }
+        }
+      }
+    },
     "cyclonedx-citation-2.0": {
       "type": "null",
       "title": "CycloneDX Citation Model",
@@ -1400,6 +2758,19 @@
           "title": "Timestamp",
           "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$",
           "description": "An RFC 3339-compliant UTC timestamp using Zulu time (i.e., ending with 'Z'). The format must be 'YYYY-MM-DDTHH:MM:SSZ' or include optional fractional seconds, e.g., 'YYYY-MM-DDTHH:MM:SS.sssZ'. Offsets such as '+00:00' are not allowed."
+        },
+        "ordinalVersion": {
+          "title": "Ordinal Version",
+          "description": "An ordinal version is a dot-delimited, purely numeric identifier where each segment represents an ordered level in the hierarchy. The segments have no prescribed meaning beyond numeric ordering, allowing straightforward comparison and sorting.",
+          "type": "string",
+          "pattern": "^\\d+(\\.\\d+)*$",
+          "examples": [
+            "1",
+            "1.2",
+            "1.2.3",
+            "2025.09.02",
+            "10.4.7.3"
+          ]
         },
         "lifecycle": {
           "type": "object",
@@ -3611,6 +4982,24 @@
           "type": "string",
           "title": "Data Classification",
           "description": "Data classification tags data according to its type, sensitivity, and value if altered, stolen, or destroyed."
+        },
+        "dataSensitivity": {
+          "type": "string",
+          "enum": [
+            "public",
+            "internal",
+            "confidential",
+            "restricted",
+            "secret"
+          ],
+          "description": "Data sensitivity classification",
+          "meta:enum": {
+            "public": "Public information that can be freely shared",
+            "internal": "Internal use only within the organization",
+            "confidential": "Confidential information requiring protection",
+            "restricted": "Highly restricted information with limited access",
+            "secret": "Secret information requiring special handling"
+          }
         },
         "dataGovernance": {
           "type": "object",
@@ -6019,6 +7408,1039 @@
         }
       }
     },
+    "cyclonedx-requirement-2.0": {
+      "type": "null",
+      "title": "CycloneDX Engineering Requirement Model",
+      "$defs": {
+        "requirement": {
+          "type": "object",
+          "title": "Requirement",
+          "description": "A requirement represents a specific need, constraint, or capability that must be met.",
+          "additionalProperties": false,
+          "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            },
+            "id": {
+              "type": "string",
+              "title": "Identifier",
+              "description": "A unique identifier for the requirement, often used in requirement management systems (e.g., REQ-001)."
+            },
+            "name": {
+              "type": "string",
+              "title": "Name",
+              "description": "A short name or title for the requirement."
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A detailed description of the requirement."
+            },
+            "type": {
+              "type": "array",
+              "title": "Requirement Types",
+              "description": "The categories or classifications applicable to the requirement.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-requirement-2.0/$defs/requirementType"
+              },
+              "uniqueItems": true
+            },
+            "priority": {
+              "type": "string",
+              "title": "Priority",
+              "description": "The priority level of the requirement.",
+              "enum": [
+                "critical",
+                "high",
+                "medium",
+                "low"
+              ]
+            },
+            "status": {
+              "$ref": "#/$defs/cyclonedx-requirement-2.0/$defs/requirementStatus"
+            },
+            "version": {
+              "type": "string",
+              "title": "Version",
+              "description": "The version of the requirement."
+            },
+            "stakeholders": {
+              "type": "array",
+              "title": "Stakeholders",
+              "description": "The individuals or groups who have an interest in the requirement.",
+              "items": {
+                "type": "string"
+              }
+            },
+            "acceptanceCriteria": {
+              "type": "array",
+              "title": "Acceptance Criteria",
+              "description": "Criteria that must be met for the requirement to be considered satisfied.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-requirement-2.0/$defs/acceptanceCriterion"
+              }
+            },
+            "dependencies": {
+              "type": "array",
+              "title": "Dependencies",
+              "description": "Other requirements that this requirement depends on.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-requirement-2.0/$defs/dependency"
+              }
+            },
+            "parent": {
+              "type": "string",
+              "title": "Parent BOM Reference",
+              "description": "The optional `bom-ref` to a parent requirement. This establishes a hierarchy of requirements."
+            },
+            "rationale": {
+              "type": "string",
+              "title": "Rationale",
+              "description": "The reasoning or justification for the requirement."
+            },
+            "fitCriterion": {
+              "type": "string",
+              "title": "Fit Criterion",
+              "description": "A measurable test that the solution must pass to be acceptable to the stakeholders."
+            },
+            "effort": {
+              "type": "string",
+              "title": "Effort Estimation",
+              "description": "An estimation of the effort required to implement the requirement."
+            },
+            "risk": {
+              "type": "string",
+              "title": "Risk",
+              "description": "The risk level associated with implementing or not implementing the requirement.",
+              "enum": [
+                "critical",
+                "high",
+                "medium",
+                "low"
+              ]
+            },
+            "attachments": {
+              "type": "array",
+              "title": "Attachments",
+              "description": "Files or documents attached to the requirement.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/attachment"
+              }
+            },
+            "properties": {
+              "type": "array",
+              "title": "Properties",
+              "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/property"
+              }
+            },
+            "externalReferences": {
+              "type": "array",
+              "title": "External References",
+              "description": "External references provide a way to document systems, sites, and information that may be relevant to the requirement.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/externalReference"
+              }
+            }
+          }
+        },
+        "requirementType": {
+          "type": "string",
+          "title": "Requirement Type",
+          "description": "The category or classification applicable to the requirement.",
+          "enum": [
+            "accessibility",
+            "auditability",
+            "availability",
+            "business",
+            "compatibility",
+            "compliance",
+            "deployment",
+            "functional",
+            "interoperability",
+            "localization",
+            "maintainability",
+            "non-functional",
+            "other",
+            "performance",
+            "portability",
+            "privacy",
+            "regulatory",
+            "reliability",
+            "scalability",
+            "security",
+            "system",
+            "testability",
+            "usability",
+            "user"
+          ],
+          "meta:enum": {
+            "accessibility": "Requirements ensuring inclusive access for people with disabilities or impairments.",
+            "auditability": "Requirements defining the capability of a system to record activities for review and compliance purposes.",
+            "availability": "Requirements describing the uptime and operational availability of systems or services.",
+            "business": "Requirements derived from organizational goals, strategies, or business processes.",
+            "compatibility": "Requirements ensuring the software or system functions correctly with other systems or legacy components.",
+            "compliance": "Requirements ensuring adherence to internal policies, industry standards, or external agreements beyond regulatory mandates.",
+            "deployment": "Requirements related to deploying, configuring, and operating the system in production environments.",
+            "functional": "Requirements specifying the fundamental behaviors and capabilities of the system or application.",
+            "interoperability": "Requirements addressing the ability of the system to interact seamlessly with external systems or products.",
+            "localization": "Requirements specifying adaptations for specific languages, cultures, or regional needs.",
+            "maintainability": "Requirements aimed at ensuring the ease of performing maintenance, enhancements, or repairs.",
+            "non-functional": "Requirements that define constraints or qualities such as performance, usability, reliability, etc., rather than specific functionality.",
+            "other": "Requirements that do not clearly fit into other specified categories.",
+            "performance": "Requirements specifying response times, throughput, or other efficiency-related aspects.",
+            "portability": "Requirements enabling the system or components to be transferred easily across various environments or platforms.",
+            "privacy": "Requirements specifically addressing the handling and protection of personal and sensitive data.",
+            "regulatory": "Requirements necessary for legal compliance, dictated by laws, regulations, or standards.",
+            "reliability": "Requirements ensuring the system consistently performs under specified conditions and duration.",
+            "scalability": "Requirements focused on the ability of the system to grow and manage increased demand effectively.",
+            "security": "Requirements intended to protect systems, data, and users from malicious actions or threats.",
+            "system": "Technical requirements defining infrastructure, architecture, or underlying technologies.",
+            "testability": "Requirements ensuring the system can be effectively validated and tested.",
+            "usability": "Requirements addressing the ease of use, intuitiveness, and overall user experience.",
+            "user": "Requirements captured directly from user needs, tasks, and expectations."
+          }
+        },
+        "requirementStatus": {
+          "type": "string",
+          "title": "Status",
+          "description": "The current status of the requirement in the development lifecycle.",
+          "enum": [
+            "draft",
+            "proposed",
+            "approved",
+            "implemented",
+            "verified",
+            "deferred",
+            "rejected",
+            "replaced",
+            "obsolete"
+          ]
+        },
+        "acceptanceCriterion": {
+          "type": "object",
+          "title": "Acceptance Criterion",
+          "description": "A specific condition that must be met for the requirement to be considered satisfied.",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "title": "Identifier",
+              "description": "A unique identifier for the acceptance criterion."
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the acceptance criterion."
+            },
+            "status": {
+              "type": "string",
+              "title": "Status",
+              "description": "The current status of the acceptance criterion.",
+              "enum": [
+                "pending",
+                "passed",
+                "failed"
+              ]
+            }
+          }
+        },
+        "dependency": {
+          "type": "object",
+          "title": "Dependency",
+          "description": "A dependency on another requirement.",
+          "additionalProperties": false,
+          "properties": {
+            "ref": {
+              "oneOf": [
+                {
+                  "title": "Ref",
+                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
+                },
+                {
+                  "title": "BOM-Link Element",
+                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/bomLinkElementType"
+                }
+              ]
+            },
+            "type": {
+              "type": "string",
+              "title": "Dependency Type",
+              "description": "The type of dependency relationship.",
+              "enum": [
+                "requires",
+                "conflicts-with",
+                "enhances",
+                "implements",
+                "other"
+              ]
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the dependency relationship."
+            }
+          }
+        }
+      }
+    },
+    "cyclonedx-risk-2.0": {
+      "type": "null",
+      "title": "CycloneDX Risk Model",
+      "properties": {
+        "bom-ref": {
+          "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+          "description": "An optional identifier which can be used to reference the risk assessment elsewhere in the BOM"
+        },
+        "domains": {
+          "type": "array",
+          "description": "Risk domains covered by this assessment",
+          "items": {
+            "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/riskDomain"
+          }
+        },
+        "scenarios": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/scenario"
+          },
+          "description": "Risk scenarios identified"
+        },
+        "mitigations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/mitigation"
+          },
+          "description": "Controls, countermeasures, or mitigations to address identified risks"
+        },
+        "assessments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/assessment"
+          },
+          "description": "Risk assessments and evaluations"
+        },
+        "properties": {
+          "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
+        }
+      },
+      "$defs": {
+        "riskDomain": {
+          "type": "object",
+          "required": [
+            "type"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "security",
+                "privacy",
+                "operational",
+                "financial",
+                "compliance",
+                "strategic",
+                "reputational",
+                "safety",
+                "environmental",
+                "supply_chain",
+                "technical",
+                "project"
+              ],
+              "meta:enum": {
+                "security": "Information security and cybersecurity risks",
+                "privacy": "Data protection and privacy risks",
+                "operational": "Business operations and continuity risks",
+                "financial": "Financial loss and economic impact risks",
+                "compliance": "Regulatory and legal compliance risks",
+                "strategic": "Strategic business and market risks",
+                "reputational": "Brand and reputation damage risks",
+                "safety": "Human safety and physical security risks",
+                "environmental": "Environmental impact and sustainability risks",
+                "supply_chain": "Supply chain and third-party risks",
+                "technical": "Technical and technology risks",
+                "project": "Project delivery and execution risks"
+              }
+            },
+            "priority": {
+              "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/priority"
+            },
+            "description": {
+              "type": "string",
+              "description": "Additional context for this risk domain"
+            }
+          }
+        },
+        "riskAttribute": {
+          "type": "string",
+          "description": "A classification of security and privacy attributes that represent potential impact areas when a risk is realized",
+          "enum": [
+            "accountability",
+            "authentication",
+            "authorization",
+            "authenticity",
+            "availability",
+            "compliance",
+            "confidentiality",
+            "connectivity",
+            "control",
+            "data_subject_rights",
+            "integrity",
+            "minimisation",
+            "non-repudiation",
+            "possession",
+            "privacy",
+            "purpose_limitation",
+            "transparency",
+            "utility"
+          ],
+          "meta:enum": {
+            "accountability": "Assigning responsibility for actions and decisions to individuals or entities",
+            "authentication": "Verifying the identity of users, devices, or systems before granting access",
+            "authorization": "Granting permissions based on identity and roles to perform specific actions or access resources",
+            "authenticity": "Ensuring that data, communications, or entities are genuine and can be verified",
+            "availability": "Ensuring systems, data, and services are accessible and operational when needed",
+            "compliance": "Adherence to applicable laws, regulations, policies, and standards",
+            "confidentiality": "Preventing unauthorised access to or disclosure of information",
+            "connectivity": "Maintaining secure and reliable communication between systems or components",
+            "control": "Enabling individuals to manage how their personal data is used and shared",
+            "data_subject_rights": "Guaranteeing individuals' rights to access, correct, delete, or restrict their personal data",
+            "integrity": "Ensuring information is accurate, complete, and unaltered by unauthorised actors",
+            "minimisation": "Limiting data collection and retention to what is strictly necessary for the intended purpose",
+            "non-repudiation": "Providing proof of origin and delivery to prevent denial of actions or communications",
+            "possession": "Ensuring control or custody over data or assets, regardless of ownership",
+            "privacy": "Protecting individuals' personal information in accordance with legal and ethical standards",
+            "purpose_limitation": "Ensuring that personal data is only used for the purpose explicitly specified at collection",
+            "transparency": "Ensuring individuals are informed about data practices, including collection, use, and sharing",
+            "utility": "Ensuring data is usable and in a format suitable for the intended purpose"
+          }
+        },
+        "scenario": {
+          "type": "object",
+          "required": [
+            "bom-ref",
+            "name",
+            "type"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            },
+            "name": {
+              "type": "string",
+              "description": "Name of the risk scenario"
+            },
+            "description": {
+              "type": "string",
+              "description": "Detailed description of the scenario"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "threat",
+                "vulnerability",
+                "weakness",
+                "risk",
+                "incident",
+                "opportunity",
+                "hazard"
+              ],
+              "meta:enum": {
+                "threat": "Security threat scenario",
+                "vulnerability": "Exploitable vulnerability",
+                "weakness": "System or design weakness",
+                "risk": "General risk scenario",
+                "incident": "Potential incident scenario",
+                "opportunity": "Positive risk (opportunity)",
+                "hazard": "Safety hazard scenario"
+              }
+            },
+            "domain": {
+              "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/riskDomain"
+            },
+            "category": {
+              "type": "string",
+              "description": "Category or classification of the scenario"
+            },
+            "likelihood": {
+              "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/likelihood"
+            },
+            "impact": {
+              "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/impact"
+            },
+            "riskScore": {
+              "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/riskScore"
+            },
+            "riskAttributes": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/riskAttribute"
+              },
+              "description": "Risk attributes affected by this scenario"
+            },
+            "affectedAssets": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+              },
+              "description": "References to affected assets"
+            },
+            "mitigations": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+              },
+              "description": "References to mitigations that address this scenario"
+            },
+            "externalReferences": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/externalReference"
+              }
+            },
+            "properties": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
+            }
+          }
+        },
+        "likelihood": {
+          "type": "object",
+          "required": [
+            "level"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "level": {
+              "type": "string",
+              "enum": [
+                "veryLow",
+                "low",
+                "medium",
+                "high",
+                "veryHigh",
+                "certain"
+              ],
+              "description": "Likelihood level",
+              "meta:enum": {
+                "veryLow": "Very unlikely to occur (< 10%)",
+                "low": "Unlikely to occur (10-30%)",
+                "medium": "Possible to occur (30-60%)",
+                "high": "Likely to occur (60-90%)",
+                "veryHigh": "Very likely to occur (> 90%)",
+                "certain": "Will certainly occur (100%)"
+              }
+            },
+            "score": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10,
+              "description": "Numeric likelihood score"
+            },
+            "probability": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Probability as a decimal (0-1)"
+            },
+            "rationale": {
+              "type": "string",
+              "description": "Justification for the likelihood rating"
+            }
+          }
+        },
+        "impact": {
+          "type": "object",
+          "required": [
+            "level"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "level": {
+              "type": "string",
+              "enum": [
+                "negligible",
+                "low",
+                "moderate",
+                "high",
+                "severe",
+                "catastrophic"
+              ],
+              "description": "Impact severity level",
+              "meta:enum": {
+                "negligible": "Minimal impact with no significant consequences",
+                "low": "Minor impact with limited consequences",
+                "moderate": "Moderate impact affecting some operations",
+                "high": "Significant impact with serious consequences",
+                "severe": "Severe impact with critical consequences",
+                "catastrophic": "Catastrophic impact with existential consequences"
+              }
+            },
+            "score": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10,
+              "description": "Numeric impact score"
+            },
+            "categories": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "confidentiality",
+                  "integrity",
+                  "availability",
+                  "financial",
+                  "reputation",
+                  "regulatory",
+                  "safety",
+                  "privacy",
+                  "operational",
+                  "strategic"
+                ],
+                "meta:enum": {
+                  "confidentiality": "Impact on data confidentiality",
+                  "integrity": "Impact on data or system integrity",
+                  "availability": "Impact on service availability",
+                  "financial": "Financial loss or impact",
+                  "reputation": "Reputational damage",
+                  "regulatory": "Regulatory compliance impact",
+                  "safety": "Human safety impact",
+                  "privacy": "Privacy violation impact",
+                  "operational": "Operational disruption",
+                  "strategic": "Strategic business impact"
+                }
+              },
+              "description": "Categories of impact"
+            },
+            "riskAttributes": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/riskAttribute"
+              },
+              "description": "Risk attributes affected"
+            },
+            "quantification": {
+              "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/impactQuantification"
+            },
+            "description": {
+              "type": "string",
+              "description": "Description of the potential impact"
+            }
+          }
+        },
+        "impactQuantification": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "financialLoss": {
+              "type": "number",
+              "description": "Estimated financial loss in currency units"
+            },
+            "currency": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$",
+              "description": "ISO 4217 currency code"
+            },
+            "affectedUsers": {
+              "type": "integer",
+              "description": "Number of affected users"
+            },
+            "downtime": {
+              "type": "string",
+              "pattern": "^P(?!$)(\\d+Y)?(\\d+M)?(\\d+W)?(\\d+D)?(T(\\d+H)?(\\d+M)?(\\d+(\\.\\d+)?S)?)?$",
+              "description": "Expected downtime as ISO 8601 duration"
+            },
+            "dataRecords": {
+              "type": "integer",
+              "description": "Number of data records affected"
+            },
+            "recovery": {
+              "type": "string",
+              "pattern": "^P(?!$)(\\d+Y)?(\\d+M)?(\\d+W)?(\\d+D)?(T(\\d+H)?(\\d+M)?(\\d+(\\.\\d+)?S)?)?$",
+              "description": "Recovery time as ISO 8601 duration"
+            }
+          }
+        },
+        "riskScore": {
+          "type": "object",
+          "required": [
+            "level"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "level": {
+              "type": "string",
+              "enum": [
+                "info",
+                "low",
+                "medium",
+                "high",
+                "critical"
+              ],
+              "description": "Overall risk level",
+              "meta:enum": {
+                "info": "Informational - no immediate action required",
+                "low": "Low risk - monitor and address in normal cycle",
+                "medium": "Medium risk - plan mitigation activities",
+                "high": "High risk - prioritize mitigation efforts",
+                "critical": "Critical risk - immediate action required"
+              }
+            },
+            "score": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Numeric risk score"
+            },
+            "vector": {
+              "type": "string",
+              "description": "Risk scoring vector (e.g., L:H/I:M)"
+            },
+            "methodology": {
+              "type": "string",
+              "description": "Risk scoring methodology used"
+            }
+          }
+        },
+        "mitigation": {
+          "type": "object",
+          "required": [
+            "bom-ref",
+            "name",
+            "type"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            },
+            "name": {
+              "type": "string",
+              "description": "Name of the mitigation"
+            },
+            "description": {
+              "type": "string",
+              "description": "Description of what the mitigation does"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "avoid",
+                "reduce",
+                "transfer",
+                "accept",
+                "control",
+                "countermeasure",
+                "safeguard",
+                "practice",
+                "procedure"
+              ],
+              "meta:enum": {
+                "avoid": "Avoid the risk entirely",
+                "reduce": "Reduce likelihood or impact",
+                "transfer": "Transfer risk to another party",
+                "accept": "Accept the risk",
+                "control": "Preventive or detective control",
+                "countermeasure": "Reactive measure to counter risks",
+                "safeguard": "Protective measure",
+                "practice": "Risk management practice",
+                "procedure": "Documented procedure"
+              }
+            },
+            "strategy": {
+              "type": "string",
+              "enum": [
+                "prevent",
+                "detect",
+                "respond",
+                "recover"
+              ],
+              "meta:enum": {
+                "prevent": "Prevents the risk from occurring",
+                "detect": "Detects when the risk occurs",
+                "respond": "Responds to the risk when detected",
+                "recover": "Recovers from the impact"
+              }
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "proposed",
+                "approved",
+                "planned",
+                "inProgress",
+                "implemented",
+                "verified"
+              ],
+              "meta:enum": {
+                "proposed": "Mitigation has been proposed",
+                "approved": "Mitigation has been approved",
+                "planned": "Implementation is planned",
+                "inProgress": "Implementation is in progress",
+                "implemented": "Mitigation has been implemented",
+                "verified": "Effectiveness has been verified"
+              }
+            },
+            "priority": {
+              "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/priority"
+            },
+            "effectiveness": {
+              "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/effectiveness"
+            },
+            "cost": {
+              "type": "string",
+              "enum": [
+                "trivial",
+                "low",
+                "medium",
+                "high",
+                "extreme"
+              ],
+              "meta:enum": {
+                "trivial": "Minimal cost and effort",
+                "low": "Low cost and effort",
+                "medium": "Moderate cost and effort",
+                "high": "High cost and significant effort",
+                "extreme": "Extreme cost and major effort"
+              }
+            },
+            "addresses": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+              },
+              "description": "References to scenarios this mitigation addresses"
+            },
+            "implementedBy": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+              },
+              "description": "References to assets that implement this mitigation"
+            },
+            "externalReferences": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/externalReference"
+              }
+            },
+            "properties": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
+            }
+          }
+        },
+        "effectiveness": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "percentage": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Effectiveness as percentage"
+            },
+            "rating": {
+              "type": "string",
+              "enum": [
+                "ineffective",
+                "marginal",
+                "adequate",
+                "good",
+                "excellent"
+              ],
+              "meta:enum": {
+                "ineffective": "Does not meaningfully reduce risk",
+                "marginal": "Slightly reduces risk",
+                "adequate": "Adequately reduces risk",
+                "good": "Significantly reduces risk",
+                "excellent": "Nearly eliminates risk"
+              }
+            }
+          }
+        },
+        "assessment": {
+          "type": "object",
+          "required": [
+            "bom-ref",
+            "type",
+            "timestamp"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "initial",
+                "periodic",
+                "continuous",
+                "triggered"
+              ],
+              "meta:enum": {
+                "initial": "Initial risk assessment",
+                "periodic": "Scheduled periodic assessment",
+                "continuous": "Continuous monitoring assessment",
+                "triggered": "Event-triggered assessment"
+              }
+            },
+            "timestamp": {
+              "type": "string",
+              "format": "date-time",
+              "description": "When the assessment was performed"
+            },
+            "assessor": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/organizationalEntityOrContact",
+              "description": "Who performed the assessment"
+            },
+            "summary": {
+              "type": "string",
+              "description": "Executive summary of the assessment"
+            },
+            "findings": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/finding"
+              },
+              "description": "Specific findings from the assessment"
+            },
+            "overallRisk": {
+              "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/riskScore",
+              "description": "Overall risk score/level"
+            },
+            "recommendations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Recommendations from the assessment"
+            },
+            "nextReview": {
+              "type": "string",
+              "format": "date-time",
+              "description": "When the next review should occur"
+            },
+            "properties": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
+            }
+          }
+        },
+        "finding": {
+          "type": "object",
+          "required": [
+            "title",
+            "severity"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            },
+            "title": {
+              "type": "string",
+              "description": "Title of the finding"
+            },
+            "description": {
+              "type": "string",
+              "description": "Detailed description of the finding"
+            },
+            "severity": {
+              "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/severity"
+            },
+            "relatedScenarios": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+              },
+              "description": "Scenarios related to this finding"
+            },
+            "relatedAssets": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+              },
+              "description": "Assets affected by this finding"
+            },
+            "remediation": {
+              "type": "string",
+              "description": "Recommended remediation"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "open",
+                "inProgress",
+                "resolved",
+                "accepted"
+              ],
+              "meta:enum": {
+                "open": "Finding is open and unaddressed",
+                "inProgress": "Remediation is in progress",
+                "resolved": "Finding has been resolved",
+                "accepted": "Risk has been accepted"
+              }
+            }
+          }
+        },
+        "priority": {
+          "type": "string",
+          "enum": [
+            "none",
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ],
+          "description": "Priority level",
+          "meta:enum": {
+            "none": "No priority assigned",
+            "low": "Low priority - address when convenient",
+            "medium": "Medium priority - address in normal cycle",
+            "high": "High priority - address soon",
+            "critical": "Critical priority - address immediately"
+          }
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "info",
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ],
+          "description": "Severity level",
+          "meta:enum": {
+            "info": "Informational finding",
+            "low": "Low severity issue",
+            "medium": "Medium severity issue",
+            "high": "High severity issue",
+            "critical": "Critical severity issue"
+          }
+        },
+        "criticality": {
+          "type": "string",
+          "enum": [
+            "minimal",
+            "low",
+            "moderate",
+            "high",
+            "critical"
+          ],
+          "description": "Business criticality level",
+          "meta:enum": {
+            "minimal": "Minimal impact on business operations",
+            "low": "Low impact with minor inconvenience",
+            "moderate": "Moderate impact affecting some operations",
+            "high": "High impact affecting critical operations",
+            "critical": "Critical impact with severe business consequences"
+          }
+        }
+      }
+    },
     "cyclonedx-service-2.0": {
       "type": "null",
       "title": "CycloneDX Service Model",
@@ -6391,6 +8813,1148 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               }
+            }
+          }
+        }
+      }
+    },
+    "cyclonedx-threat-2.0": {
+      "type": "null",
+      "title": "CycloneDX Threat Model",
+      "$defs": {
+        "threatScenario": {
+          "type": "object",
+          "allOf": [
+            {
+              "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/scenario"
+            },
+            {
+              "properties": {
+                "threatCategory": {
+                  "type": "string",
+                  "description": "Threat category based on methodology (e.g., STRIDE category)"
+                },
+                "threatActor": {
+                  "$ref": "#/$defs/cyclonedx-threat-2.0/$defs/threatActorProfile"
+                },
+                "attackVector": {
+                  "$ref": "#/$defs/cyclonedx-threat-2.0/$defs/attackVector"
+                },
+                "attackPattern": {
+                  "$ref": "#/$defs/cyclonedx-threat-2.0/$defs/attackPatternReference"
+                },
+                "weakness": {
+                  "$ref": "#/$defs/cyclonedx-threat-2.0/$defs/weaknessReference"
+                },
+                "exploitability": {
+                  "$ref": "#/$defs/cyclonedx-threat-2.0/$defs/exploitability"
+                },
+                "indicators": {
+                  "$ref": "#/$defs/cyclonedx-threat-2.0/$defs/indicators"
+                },
+                "killChainPhase": {
+                  "type": "string",
+                  "enum": [
+                    "reconnaissance",
+                    "weaponization",
+                    "delivery",
+                    "exploitation",
+                    "installation",
+                    "command-and-control",
+                    "actions-on-objectives"
+                  ],
+                  "meta:enum": {
+                    "reconnaissance": "Gathering information about the target",
+                    "weaponization": "Creating malicious payloads",
+                    "delivery": "Transmitting weapon to target",
+                    "exploitation": "Exploiting vulnerabilities",
+                    "installation": "Installing malware or backdoors",
+                    "command-and-control": "Establishing C2 channel",
+                    "actions-on-objectives": "Achieving attack goals"
+                  }
+                },
+                "technicalImpact": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "unauthorized-access",
+                      "data-breach",
+                      "data-corruption",
+                      "service-disruption",
+                      "privilege-escalation",
+                      "code-execution",
+                      "information-disclosure",
+                      "denial-of-service"
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "threatActor": {
+          "type": "object",
+          "required": [
+            "bom-ref",
+            "name",
+            "type"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            },
+            "name": {
+              "type": "string",
+              "description": "Name or identifier of the threat actor"
+            },
+            "description": {
+              "type": "string",
+              "description": "Description of the threat actor"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "individual",
+                "group",
+                "organization",
+                "nation-state",
+                "unknown"
+              ],
+              "meta:enum": {
+                "individual": "Individual threat actor",
+                "group": "Organized group or collective",
+                "organization": "Corporate or criminal organization",
+                "nation-state": "Nation-state sponsored actor",
+                "unknown": "Unknown threat actor type"
+              }
+            },
+            "aliases": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Known aliases or alternative names"
+            },
+            "profile": {
+              "$ref": "#/$defs/cyclonedx-threat-2.0/$defs/threatActorProfile"
+            },
+            "observedTTPs": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-threat-2.0/$defs/ttp"
+              },
+              "description": "Observed tactics, techniques, and procedures"
+            },
+            "attributedAttacks": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Attacks attributed to this actor"
+            },
+            "targeting": {
+              "$ref": "#/$defs/cyclonedx-threat-2.0/$defs/targeting"
+            },
+            "externalReferences": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/externalReference"
+              }
+            }
+          }
+        },
+        "threatActorProfile": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "sophistication": {
+              "type": "string",
+              "enum": [
+                "none",
+                "minimal",
+                "intermediate",
+                "advanced",
+                "expert"
+              ],
+              "meta:enum": {
+                "none": "No technical sophistication",
+                "minimal": "Script kiddie level",
+                "intermediate": "Intermediate technical skills",
+                "advanced": "Advanced persistent threat",
+                "expert": "Nation-state level capabilities"
+              }
+            },
+            "motivation": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "financial",
+                  "political",
+                  "personal",
+                  "ideological",
+                  "espionage",
+                  "destruction",
+                  "disruption",
+                  "reputation",
+                  "curiosity",
+                  "competitive",
+                  "revenge",
+                  "activism"
+                ]
+              },
+              "description": "Primary motivations"
+            },
+            "capability": {
+              "type": "string",
+              "enum": [
+                "minimal",
+                "limited",
+                "moderate",
+                "significant",
+                "advanced"
+              ],
+              "description": "Overall capability level"
+            },
+            "intent": {
+              "type": "string",
+              "enum": [
+                "accidental",
+                "opportunistic",
+                "targeted",
+                "persistent"
+              ],
+              "description": "Intent level"
+            },
+            "resources": {
+              "type": "string",
+              "enum": [
+                "minimal",
+                "limited",
+                "moderate",
+                "substantial",
+                "unlimited"
+              ],
+              "description": "Resource availability"
+            },
+            "accessLevel": {
+              "type": "string",
+              "enum": [
+                "none",
+                "external",
+                "internal",
+                "privileged",
+                "physical"
+              ],
+              "description": "Level of access to target systems"
+            },
+            "skillSet": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Specific skills possessed"
+            }
+          }
+        },
+        "attackVector": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "network",
+                "adjacent",
+                "local",
+                "physical"
+              ],
+              "meta:enum": {
+                "network": "Remotely exploitable via network",
+                "adjacent": "Exploitable from adjacent network",
+                "local": "Requires local access",
+                "physical": "Requires physical access"
+              }
+            },
+            "complexity": {
+              "type": "string",
+              "enum": [
+                "low",
+                "high"
+              ],
+              "description": "Attack complexity"
+            },
+            "privileges": {
+              "type": "string",
+              "enum": [
+                "none",
+                "low",
+                "high"
+              ],
+              "description": "Privileges required"
+            },
+            "userInteraction": {
+              "type": "string",
+              "enum": [
+                "none",
+                "required"
+              ],
+              "description": "User interaction requirement"
+            },
+            "scope": {
+              "type": "string",
+              "enum": [
+                "unchanged",
+                "changed"
+              ],
+              "description": "Scope impact"
+            }
+          }
+        },
+        "attackPattern": {
+          "type": "object",
+          "required": [
+            "bom-ref",
+            "name"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            },
+            "capecId": {
+              "type": "integer",
+              "description": "CAPEC (Common Attack Pattern Enumeration and Classification) ID"
+            },
+            "name": {
+              "type": "string",
+              "description": "Name of the attack pattern"
+            },
+            "description": {
+              "type": "string",
+              "description": "Description of the attack pattern"
+            },
+            "severity": {
+              "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/severity"
+            },
+            "likelihood": {
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high"
+              ],
+              "description": "Likelihood of this pattern being used"
+            },
+            "prerequisites": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Prerequisites for the attack"
+            },
+            "techniques": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-threat-2.0/$defs/technique"
+              },
+              "description": "Techniques used in the attack"
+            },
+            "mitigations": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+              },
+              "description": "References to mitigations"
+            },
+            "examples": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Real-world examples"
+            }
+          }
+        },
+        "attackPatternReference": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "patternRef": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "description": "Reference to attack pattern"
+            },
+            "capecId": {
+              "type": "integer",
+              "description": "CAPEC ID if not referencing internal pattern"
+            },
+            "customization": {
+              "type": "string",
+              "description": "How this pattern is customized for the specific scenario"
+            }
+          }
+        },
+        "technique": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Technique ID (e.g., MITRE ATT&CK ID)"
+            },
+            "name": {
+              "type": "string",
+              "description": "Name of the technique"
+            },
+            "tactic": {
+              "type": "string",
+              "description": "Associated tactic"
+            },
+            "procedure": {
+              "type": "string",
+              "description": "Specific procedure"
+            },
+            "tools": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Tools used with this technique"
+            }
+          }
+        },
+        "weakness": {
+          "type": "object",
+          "required": [
+            "bom-ref"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            },
+            "cweId": {
+              "type": "integer",
+              "description": "CWE (Common Weakness Enumeration) ID"
+            },
+            "name": {
+              "type": "string",
+              "description": "Name of the weakness"
+            },
+            "description": {
+              "type": "string",
+              "description": "Description of the weakness"
+            },
+            "abstraction": {
+              "type": "string",
+              "enum": [
+                "pillar",
+                "class",
+                "base",
+                "variant",
+                "compound"
+              ],
+              "meta:enum": {
+                "pillar": "Most abstract type of weakness",
+                "class": "Weakness described in generic terms",
+                "base": "Weakness described in abstract terms",
+                "variant": "Weakness specific to a resource/technology",
+                "compound": "Combination of two or more weaknesses"
+              }
+            },
+            "ordinality": {
+              "type": "string",
+              "enum": [
+                "primary",
+                "resultant",
+                "indirect"
+              ],
+              "meta:enum": {
+                "primary": "Weakness exists independent of other weaknesses",
+                "resultant": "Weakness is caused by another weakness",
+                "indirect": "Weakness is indirectly caused by another weakness"
+              }
+            },
+            "affectedAssets": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+              },
+              "description": "Assets affected by this weakness"
+            },
+            "exploitationDifficulty": {
+              "type": "string",
+              "enum": [
+                "trivial",
+                "easy",
+                "moderate",
+                "difficult",
+                "impractical"
+              ],
+              "description": "Difficulty of exploiting this weakness"
+            },
+            "detectionMethods": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-threat-2.0/$defs/detectionMethod"
+              },
+              "description": "Methods for detecting this weakness"
+            }
+          }
+        },
+        "weaknessReference": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "weaknessRef": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "description": "Reference to weakness"
+            },
+            "cweId": {
+              "type": "integer",
+              "description": "CWE ID if not referencing internal weakness"
+            },
+            "instance": {
+              "type": "string",
+              "description": "Specific instance or manifestation of the weakness"
+            }
+          }
+        },
+        "exploitability": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "level": {
+              "type": "string",
+              "enum": [
+                "theoretical",
+                "proof-of-concept",
+                "functional",
+                "weaponized"
+              ],
+              "meta:enum": {
+                "theoretical": "Theoretically possible but not demonstrated",
+                "proof-of-concept": "Proof of concept exists",
+                "functional": "Functional exploit exists",
+                "weaponized": "Weaponized exploit in the wild"
+              }
+            },
+            "complexity": {
+              "type": "string",
+              "enum": [
+                "trivial",
+                "low",
+                "medium",
+                "high",
+                "very-high"
+              ],
+              "description": "Complexity to exploit"
+            },
+            "skillRequired": {
+              "type": "string",
+              "enum": [
+                "none",
+                "basic",
+                "intermediate",
+                "advanced",
+                "expert"
+              ],
+              "description": "Skill level required"
+            },
+            "toolsRequired": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Tools required for exploitation"
+            },
+            "timeRequired": {
+              "type": "string",
+              "description": "Estimated time to develop exploit"
+            },
+            "reliability": {
+              "type": "string",
+              "enum": [
+                "unreliable",
+                "occasional",
+                "reliable",
+                "highly-reliable"
+              ],
+              "description": "Reliability of exploitation"
+            },
+            "automatable": {
+              "type": "boolean",
+              "description": "Whether exploitation can be automated"
+            }
+          }
+        },
+        "indicators": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "compromise": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Indicators of compromise"
+            },
+            "attack": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Indicators of attack"
+            },
+            "behavioral": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Behavioral indicators"
+            },
+            "signatures": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-threat-2.0/$defs/signature"
+              },
+              "description": "Detection signatures"
+            }
+          }
+        },
+        "signature": {
+          "type": "object",
+          "required": [
+            "type",
+            "value"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "yara",
+                "snort",
+                "regex",
+                "hash",
+                "behavior"
+              ],
+              "description": "Type of signature"
+            },
+            "value": {
+              "type": "string",
+              "description": "Signature value or pattern"
+            },
+            "description": {
+              "type": "string",
+              "description": "Description of what the signature detects"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high"
+              ],
+              "description": "Confidence level of detection"
+            }
+          }
+        },
+        "ttp": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "tactic": {
+              "type": "string",
+              "description": "High-level tactic"
+            },
+            "technique": {
+              "$ref": "#/$defs/cyclonedx-threat-2.0/$defs/technique"
+            },
+            "procedure": {
+              "type": "string",
+              "description": "Specific implementation"
+            },
+            "tools": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-threat-2.0/$defs/tool"
+              },
+              "description": "Tools used"
+            },
+            "infrastructure": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Infrastructure used"
+            }
+          }
+        },
+        "tool": {
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Tool name"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "exploit",
+                "scanner",
+                "fuzzer",
+                "proxy",
+                "framework",
+                "custom"
+              ],
+              "description": "Type of tool"
+            },
+            "version": {
+              "type": "string",
+              "description": "Tool version"
+            },
+            "capabilities": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Tool capabilities"
+            }
+          }
+        },
+        "targeting": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "sectors": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Targeted sectors or industries"
+            },
+            "regions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Targeted geographic regions"
+            },
+            "technologies": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Targeted technologies or platforms"
+            },
+            "dataTypes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Types of data targeted"
+            }
+          }
+        },
+        "detectionMethod": {
+          "type": "object",
+          "required": [
+            "method"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "method": {
+              "type": "string",
+              "enum": [
+                "static-analysis",
+                "dynamic-analysis",
+                "penetration-test",
+                "code-review",
+                "architecture-review",
+                "automated-scan"
+              ],
+              "description": "Detection method type"
+            },
+            "description": {
+              "type": "string",
+              "description": "Description of the detection method"
+            },
+            "effectiveness": {
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high"
+              ],
+              "description": "Effectiveness of the method"
+            },
+            "tools": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Tools that implement this method"
+            }
+          }
+        },
+        "securityPolicy": {
+          "type": "object",
+          "required": [
+            "bom-ref",
+            "name",
+            "type"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            },
+            "name": {
+              "type": "string",
+              "description": "Policy name"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "access-control",
+                "data-protection",
+                "network-security",
+                "application-security",
+                "operational-security",
+                "compliance"
+              ],
+              "description": "Type of security policy"
+            },
+            "description": {
+              "type": "string",
+              "description": "Policy description"
+            },
+            "requirements": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Policy requirements"
+            },
+            "enforcement": {
+              "type": "string",
+              "enum": [
+                "mandatory",
+                "recommended",
+                "optional"
+              ],
+              "description": "Enforcement level"
+            },
+            "appliesTo": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+              },
+              "description": "Assets this policy applies to"
+            },
+            "exceptions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Policy exceptions"
+            }
+          }
+        },
+        "trustBoundary": {
+          "type": "object",
+          "allOf": [
+            {
+              "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/boundary"
+            },
+            {
+              "properties": {
+                "trustLevel": {
+                  "type": "string",
+                  "enum": [
+                    "untrusted",
+                    "semi-trusted",
+                    "trusted",
+                    "highly-trusted"
+                  ],
+                  "description": "Trust level differential"
+                },
+                "securityRequirements": {
+                  "$ref": "#/$defs/cyclonedx-threat-2.0/$defs/boundarySecurityRequirements"
+                },
+                "threatsAtBoundary": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+                  },
+                  "description": "Threats that could exploit this boundary"
+                },
+                "controlsAtBoundary": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+                  },
+                  "description": "Controls implemented at this boundary"
+                }
+              }
+            }
+          ]
+        },
+        "boundarySecurityRequirements": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "authenticationStrength": {
+              "type": "string",
+              "enum": [
+                "none",
+                "weak",
+                "moderate",
+                "strong",
+                "very-strong"
+              ],
+              "description": "Required authentication strength"
+            },
+            "authorizationGranularity": {
+              "type": "string",
+              "enum": [
+                "coarse",
+                "medium",
+                "fine",
+                "very-fine"
+              ],
+              "description": "Authorization granularity required"
+            },
+            "integrityVerification": {
+              "type": "boolean",
+              "description": "Whether integrity verification is required"
+            },
+            "confidentialityProtection": {
+              "type": "boolean",
+              "description": "Whether confidentiality protection is required"
+            },
+            "auditingLevel": {
+              "type": "string",
+              "enum": [
+                "none",
+                "basic",
+                "detailed",
+                "comprehensive"
+              ],
+              "description": "Level of auditing required"
+            },
+            "dataValidationRules": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Data validation rules at boundary"
+            }
+          }
+        }
+      }
+    },
+    "cyclonedx-usecase-2.0": {
+      "type": "null",
+      "title": "CycloneDX Use Case Model",
+      "properties": {
+        "bom-ref": {
+          "type": "string",
+          "title": "BOM Reference",
+          "description": "An optional identifier which can be used to reference the use case elsewhere in the BOM. Every bom-ref must be unique within the BOM."
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name or title of the use case."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A detailed description of the use case."
+        },
+        "actors": {
+          "type": "array",
+          "title": "Actors",
+          "description": "The stakeholders or users who interact with the system in this use case.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "preconditions": {
+          "type": "array",
+          "title": "Preconditions",
+          "description": "Conditions that must be true before the use case can be executed.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "postconditions": {
+          "type": "array",
+          "title": "Postconditions",
+          "description": "Conditions that will be true after the use case has been successfully executed.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "mainFlow": {
+          "type": "array",
+          "title": "Main Flow",
+          "description": "The primary sequence of steps that describe the use case.",
+          "items": {
+            "$ref": "#/$defs/cyclonedx-usecase-2.0/$defs/step"
+          }
+        },
+        "alternativeFlows": {
+          "type": "array",
+          "title": "Alternative Flows",
+          "description": "Alternative sequences of steps that may occur in the use case.",
+          "items": {
+            "$ref": "#/$defs/cyclonedx-usecase-2.0/$defs/flow"
+          }
+        },
+        "exceptions": {
+          "type": "array",
+          "title": "Exceptions",
+          "description": "Error scenarios that may occur during the execution of the use case.",
+          "items": {
+            "$ref": "#/$defs/cyclonedx-usecase-2.0/$defs/exception"
+          }
+        },
+        "successCriteria": {
+          "type": "array",
+          "title": "Success Criteria",
+          "description": "Criteria that determine whether the use case has been successfully executed.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notes": {
+          "type": "array",
+          "title": "Notes",
+          "description": "Additional information or comments about the use case.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "properties": {
+          "type": "array",
+          "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard.",
+          "items": {
+            "$ref": "#/$defs/cyclonedx-usecase-2.0/$defs/property"
+          }
+        }
+      },
+      "$defs": {
+        "step": {
+          "type": "object",
+          "title": "Step",
+          "description": "A single step in a use case flow.",
+          "additionalProperties": false,
+          "properties": {
+            "number": {
+              "type": "integer",
+              "title": "Number",
+              "description": "The sequence number of the step."
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the step."
+            },
+            "actor": {
+              "type": "string",
+              "title": "Actor",
+              "description": "The actor who performs this step."
+            }
+          }
+        },
+        "flow": {
+          "type": "object",
+          "title": "Flow",
+          "description": "A sequence of steps in a use case.",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Name",
+              "description": "The name of the flow."
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the flow."
+            },
+            "condition": {
+              "type": "string",
+              "title": "Condition",
+              "description": "The condition under which this alternative flow is executed."
+            },
+            "steps": {
+              "type": "array",
+              "title": "Steps",
+              "description": "The sequence of steps in the flow.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-usecase-2.0/$defs/step"
+              }
+            }
+          }
+        },
+        "exception": {
+          "type": "object",
+          "title": "Exception",
+          "description": "An error scenario in a use case.",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Name",
+              "description": "The name of the exception."
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the exception."
+            },
+            "condition": {
+              "type": "string",
+              "title": "Condition",
+              "description": "The condition under which this exception occurs."
+            },
+            "handling": {
+              "type": "string",
+              "title": "Handling",
+              "description": "How the exception is handled."
+            }
+          }
+        },
+        "property": {
+          "type": "object",
+          "title": "Property",
+          "description": "A name-value property.",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "value"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Name",
+              "description": "The name of the property."
+            },
+            "value": {
+              "type": "string",
+              "title": "Value",
+              "description": "The value of the property."
             }
           }
         }

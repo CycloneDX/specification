@@ -1,0 +1,280 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-requirement-2.0.schema.json",
+  "type": "null",
+  "title": "CycloneDX Engineering Requirement Model",
+  "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
+  "$defs": {
+    "requirement": {
+      "type": "object",
+      "title": "Requirement",
+      "description": "A requirement represents a specific need, constraint, or capability that must be met.",
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "id": {
+          "type": "string",
+          "title": "Identifier",
+          "description": "A unique identifier for the requirement, often used in requirement management systems (e.g., REQ-001)."
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "A short name or title for the requirement."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A detailed description of the requirement."
+        },
+        "type": {
+          "type": "array",
+          "title": "Requirement Types",
+          "description": "The categories or classifications applicable to the requirement.",
+          "items": {
+            "$ref": "#/$defs/requirementType"
+          },
+          "uniqueItems": true
+        },
+        "priority": {
+          "type": "string",
+          "title": "Priority",
+          "description": "The priority level of the requirement.",
+          "enum": [
+            "critical",
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "status": {
+          "$ref": "#/$defs/requirementStatus"
+        },
+        "version": {
+          "type": "string",
+          "title": "Version",
+          "description": "The version of the requirement."
+        },
+        "stakeholders": {
+          "type": "array",
+          "title": "Stakeholders",
+          "description": "The individuals or groups who have an interest in the requirement.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "acceptanceCriteria": {
+          "type": "array",
+          "title": "Acceptance Criteria",
+          "description": "Criteria that must be met for the requirement to be considered satisfied.",
+          "items": {
+            "$ref": "#/$defs/acceptanceCriterion"
+          }
+        },
+        "dependencies": {
+          "type": "array",
+          "title": "Dependencies",
+          "description": "Other requirements that this requirement depends on.",
+          "items": {
+            "$ref": "#/$defs/dependency"
+          }
+        },
+        "parent": {
+          "type": "string",
+          "title": "Parent BOM Reference",
+          "description": "The optional `bom-ref` to a parent requirement. This establishes a hierarchy of requirements."
+        },
+        "rationale": {
+          "type": "string",
+          "title": "Rationale",
+          "description": "The reasoning or justification for the requirement."
+        },
+        "fitCriterion": {
+          "type": "string",
+          "title": "Fit Criterion",
+          "description": "A measurable test that the solution must pass to be acceptable to the stakeholders."
+        },
+        "effort": {
+          "type": "string",
+          "title": "Effort Estimation",
+          "description": "An estimation of the effort required to implement the requirement."
+        },
+        "risk": {
+          "type": "string",
+          "title": "Risk",
+          "description": "The risk level associated with implementing or not implementing the requirement.",
+          "enum": [
+            "critical",
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "attachments": {
+          "type": "array",
+          "title": "Attachments",
+          "description": "Files or documents attached to the requirement.",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/attachment"
+          }
+        },
+        "properties": {
+          "type": "array",
+          "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard.",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/property"
+          }
+        },
+        "externalReferences": {
+          "type": "array",
+          "title": "External References",
+          "description": "External references provide a way to document systems, sites, and information that may be relevant to the requirement.",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference"
+          }
+        }
+      }
+    },
+    "requirementType": {
+      "type": "string",
+      "title": "Requirement Type",
+      "description": "The category or classification applicable to the requirement.",
+      "enum": [
+        "accessibility",
+        "auditability",
+        "availability",
+        "business",
+        "compatibility",
+        "compliance",
+        "deployment",
+        "functional",
+        "interoperability",
+        "localization",
+        "maintainability",
+        "non-functional",
+        "other",
+        "performance",
+        "portability",
+        "privacy",
+        "regulatory",
+        "reliability",
+        "scalability",
+        "security",
+        "system",
+        "testability",
+        "usability",
+        "user"
+      ],
+      "meta:enum": {
+        "accessibility": "Requirements ensuring inclusive access for people with disabilities or impairments.",
+        "auditability": "Requirements defining the capability of a system to record activities for review and compliance purposes.",
+        "availability": "Requirements describing the uptime and operational availability of systems or services.",
+        "business": "Requirements derived from organizational goals, strategies, or business processes.",
+        "compatibility": "Requirements ensuring the software or system functions correctly with other systems or legacy components.",
+        "compliance": "Requirements ensuring adherence to internal policies, industry standards, or external agreements beyond regulatory mandates.",
+        "deployment": "Requirements related to deploying, configuring, and operating the system in production environments.",
+        "functional": "Requirements specifying the fundamental behaviors and capabilities of the system or application.",
+        "interoperability": "Requirements addressing the ability of the system to interact seamlessly with external systems or products.",
+        "localization": "Requirements specifying adaptations for specific languages, cultures, or regional needs.",
+        "maintainability": "Requirements aimed at ensuring the ease of performing maintenance, enhancements, or repairs.",
+        "non-functional": "Requirements that define constraints or qualities such as performance, usability, reliability, etc., rather than specific functionality.",
+        "other": "Requirements that do not clearly fit into other specified categories.",
+        "performance": "Requirements specifying response times, throughput, or other efficiency-related aspects.",
+        "portability": "Requirements enabling the system or components to be transferred easily across various environments or platforms.",
+        "privacy": "Requirements specifically addressing the handling and protection of personal and sensitive data.",
+        "regulatory": "Requirements necessary for legal compliance, dictated by laws, regulations, or standards.",
+        "reliability": "Requirements ensuring the system consistently performs under specified conditions and duration.",
+        "scalability": "Requirements focused on the ability of the system to grow and manage increased demand effectively.",
+        "security": "Requirements intended to protect systems, data, and users from malicious actions or threats.",
+        "system": "Technical requirements defining infrastructure, architecture, or underlying technologies.",
+        "testability": "Requirements ensuring the system can be effectively validated and tested.",
+        "usability": "Requirements addressing the ease of use, intuitiveness, and overall user experience.",
+        "user": "Requirements captured directly from user needs, tasks, and expectations."
+      }
+    },
+    "requirementStatus": {
+      "type": "string",
+      "title": "Status",
+      "description": "The current status of the requirement in the development lifecycle.",
+      "enum": [
+        "draft",
+        "proposed",
+        "approved",
+        "implemented",
+        "verified",
+        "deferred",
+        "rejected",
+        "replaced",
+        "obsolete"
+      ]
+    },
+    "acceptanceCriterion": {
+      "type": "object",
+      "title": "Acceptance Criterion",
+      "description": "A specific condition that must be met for the requirement to be considered satisfied.",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Identifier",
+          "description": "A unique identifier for the acceptance criterion."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the acceptance criterion."
+        },
+        "status": {
+          "type": "string",
+          "title": "Status",
+          "description": "The current status of the acceptance criterion.",
+          "enum": [
+            "pending",
+            "passed",
+            "failed"
+          ]
+        }
+      }
+    },
+    "dependency": {
+      "type": "object",
+      "title": "Dependency",
+      "description": "A dependency on another requirement.",
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "oneOf": [
+            {
+              "title": "Ref",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+            },
+            {
+              "title": "BOM-Link Element",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+            }
+          ]
+        },
+        "type": {
+          "type": "string",
+          "title": "Dependency Type",
+          "description": "The type of dependency relationship.",
+          "enum": [
+            "requires",
+            "conflicts-with",
+            "enhances",
+            "implements",
+            "other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the dependency relationship."
+        }
+      }
+    }
+  }
+}
