@@ -52,7 +52,7 @@
         "mappings": {
           "type": "array",
           "title": "Data Type Mappings",
-          "description": "An array of mappings that identify the types of data relevant to this perspective using path expressions. Each mapping may include domain-specific terminology.",
+          "description": "An array of mappings that identify the types of data relevant to this perspective using JSON path expressions. Each mapping may include domain-specific terminology.",
           "minItems": 1,
           "items": {
             "$ref": "#/$defs/perspectiveMapping"
@@ -69,7 +69,7 @@
     "perspectiveMapping": {
       "type": "object",
       "title": "Perspective Mapping",
-      "description": "Maps a path expression to domain-specific terminology, enabling audiences to interpret CycloneDX data using familiar nomenclature. Each mapping identifies a data type within the document structure and may provide alternative names and descriptions used by the target audience.",
+      "description": "Maps a JSON path expression to domain-specific terminology, enabling audiences to interpret CycloneDX data using familiar nomenclature. Each mapping identifies a data type within the document structure and may provide alternative names and descriptions used by the target audience.",
       "additionalProperties": false,
       "required": [
         "expression"
@@ -78,7 +78,7 @@
         "expression": {
           "type": "string",
           "title": "Path Expression",
-          "description": "A path expression that identifies the types of data relevant to this perspective. The expression syntax shall conform to the format of the document's serialisation.\nUse [JSONPath](https://datatracker.ietf.org/doc/html/rfc9535) for JSON, [XPath](https://www.w3.org/TR/xpath/) for XML, and default to JSONPath for Protocol Buffers unless otherwise specified.\nExpressions select data types within the document structure, not specific field values.",
+          "description": "A [JSONPath](https://datatracker.ietf.org/doc/html/rfc9535) expression that identifies the types of data relevant to this perspective.",
           "examples": [
             "$.components[*].pedigree",
             "$.components[?(@.type=='machine-learning-model')].modelCard",
@@ -103,9 +103,7 @@
           "description": "A domain-specific description of the data type, explaining its significance within the context of the perspective."
         },
         "relevance": {
-          "$ref": "#/$defs/perspectiveRelevance",
-          "title": "Relevance",
-          "description": "Indicates the importance of this data type to the perspective."
+          "$ref": "#/$defs/perspectiveRelevance"
         },
         "weight": {
           "type": "number",
@@ -119,6 +117,23 @@
           "title": "Rationale",
           "description": "Explains why this data type is relevant to the perspective and how it should be interpreted or used."
         }
+      }
+    },
+    "perspectiveRelevance": {
+      "type": "string",
+      "title": "Perspective Relevance",
+      "description": "Indicates the importance of a data type to a perspective.",
+      "enum": [
+        "required",
+        "recommended",
+        "optional",
+        "informative"
+      ],
+      "meta:enum": {
+        "required": "This data type is essential for the perspective and should always be present.",
+        "recommended": "This data type is highly relevant and should be included when available.",
+        "optional": "This data type provides supplementary information that may be useful.",
+        "informative": "This data type provides background context but is not directly actionable."
       }
     },
     "perspectiveDomainChoice": {
@@ -321,23 +336,6 @@
         "resilience": "Concerns related to system resilience, business continuity, disaster recovery, and graceful degradation.",
         "sustainability": "Concerns related to environmental sustainability, energy efficiency, and responsible resource consumption.",
         "transparency": "Concerns related to openness, auditability, and the ability for stakeholders to understand system behaviour and composition."
-      }
-    },
-    "perspectiveRelevance": {
-      "type": "string",
-      "title": "Perspective Relevance",
-      "description": "Indicates the importance of a data type to a perspective.",
-      "enum": [
-        "required",
-        "recommended",
-        "optional",
-        "informative"
-      ],
-      "meta:enum": {
-        "required": "This data type is essential for the perspective and should always be present.",
-        "recommended": "This data type is highly relevant and should be included when available.",
-        "optional": "This data type provides supplementary information that may be useful.",
-        "informative": "This data type provides background context but is not directly actionable."
       }
     }
   }
