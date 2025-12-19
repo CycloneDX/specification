@@ -1,0 +1,356 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-perspective-2.0.schema.json",
+  "type": "null",
+  "title": "CycloneDX Perspective Model",
+  "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
+  "$defs": {
+    "perspectives": {
+      "type": "array",
+      "title": "Perspectives",
+      "description": "Defines domain-specific views into the document, enabling different audiences to interpret and navigate the data through their own conceptual lens. Each perspective identifies relevant data types and may provide domain-specific terminology mappings.",
+      "items": {
+        "$ref": "#/$defs/perspective"
+      }
+    },
+    "perspective": {
+      "type": "object",
+      "title": "Perspective",
+      "description": "A domain-specific view that identifies the types of data relevant to a particular audience and provides optional terminology mappings to facilitate interpretation. Perspectives enable tooling to generate filtered views, translate terminology, and validate document completeness against audience-specific requirements.",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "mappings"
+      ],
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "BOM Reference",
+          "description": "An identifier that can be used to reference this perspective elsewhere in the document. Every `bom-ref` shall be unique within the document.\nValue SHOULD NOT start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        },
+        "name": {
+          "type": "string",
+          "title": "Perspective Name",
+          "description": "The name of the perspective, typically indicating the target audience or domain.",
+          "examples": [
+            "AI/ML Transparency",
+            "Device Manufacturing Regulatory Compliance",
+            "Minimum Elements of an SBOM"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the perspective, its intended audience, and the use cases it supports."
+        },
+        "domains": {
+          "type": "array",
+          "title": "Domains",
+          "description": "The domains or disciplines to which this perspective applies. Allows selection of multiple pre-defined domains, custom domains, or a combination of both.",
+          "items": {
+            "$ref": "#/$defs/perspectiveDomainChoice"
+          }
+        },
+        "mappings": {
+          "type": "array",
+          "title": "Data Type Mappings",
+          "description": "An array of mappings that identify the types of data relevant to this perspective using path expressions. Each mapping may include domain-specific terminology.",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/perspectiveMapping"
+          }
+        },
+        "externalReferences": {
+          "type": "array",
+          "title": "External References",
+          "description": "References to external resources that provide additional context for the perspective, such as domain-specific standards, guidelines, or documentation.",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference"
+          }
+        },
+        "properties": {
+          "type": "array",
+          "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without needing to use additional namespaces or create extensions.",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/property"
+          }
+        }
+      }
+    },
+    "perspectiveMapping": {
+      "type": "object",
+      "title": "Perspective Mapping",
+      "description": "Maps a path expression to domain-specific terminology, enabling audiences to interpret CycloneDX data using familiar nomenclature. Each mapping identifies a data type within the document structure and may provide alternative names and descriptions used by the target audience.",
+      "additionalProperties": false,
+      "required": [
+        "expression"
+      ],
+      "properties": {
+        "expression": {
+          "type": "string",
+          "title": "Path Expression",
+          "description": "A path expression that identifies the types of data relevant to this perspective. The expression syntax shall conform to the format of the document's serialisation.\nUse [JSONPath](https://datatracker.ietf.org/doc/html/rfc9535) for JSON, [XPath](https://www.w3.org/TR/xpath/) for XML, and default to JSONPath for Protocol Buffers unless otherwise specified.\nExpressions select data types within the document structure, not specific field values.",
+          "examples": [
+            "$.components[*].pedigree",
+            "$.components[?(@.type=='machine-learning-model')].modelCard",
+            "$.components[?(@.type=='cryptographic-asset')]",
+            "$.vulnerabilities"
+          ]
+        },
+        "nativeName": {
+          "type": "string",
+          "title": "Native Name",
+          "description": "The domain-specific term used by the target audience to describe the data identified by the expression.",
+          "examples": [
+            "Foundation Models",
+            "Training Corpus",
+            "Cryptographic Inventory",
+            "Component Provenance"
+          ]
+        },
+        "nativeDescription": {
+          "type": "string",
+          "title": "Native Description",
+          "description": "A domain-specific description of the data type, explaining its significance within the context of the perspective."
+        },
+        "relevance": {
+          "$ref": "#/$defs/perspectiveRelevance",
+          "title": "Relevance",
+          "description": "Indicates the importance of this data type to the perspective."
+        },
+        "weight": {
+          "type": "number",
+          "title": "Weight",
+          "description": "Describes the importance of a field in relation to other fields. Values shall be between 0.0 and 1.0. This allows for relative ranking of mappings, where higher values indicate greater importance.",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "rationale": {
+          "type": "string",
+          "title": "Rationale",
+          "description": "Explains why this data type is relevant to the perspective and how it should be interpreted or used."
+        }
+      }
+    },
+    "perspectiveDomainChoice": {
+      "title": "Perspective Domain Choice",
+      "description": "Allows selection of a pre-defined domain or specification of a custom domain.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/preDefinedPerspectiveDomain"
+        },
+        {
+          "type": "object",
+          "title": "Custom Domain",
+          "required": [
+            "name"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Domain Name",
+              "description": "The name of the custom domain."
+            },
+            "description": {
+              "type": "string",
+              "title": "Domain Description",
+              "description": "A description of the custom domain, its scope, and the concerns it addresses."
+            }
+          }
+        }
+      ]
+    },
+    "preDefinedPerspectiveDomain": {
+      "type": "string",
+      "title": "Pre-Defined Perspective Domain",
+      "description": "A pre-defined domain or discipline to which a perspective applies. Domains span security disciplines, safety engineering, industry verticals, technology areas, compliance frameworks, and cross-cutting concerns.",
+      "enum": [
+        "application-security",
+        "cloud-security",
+        "container-security",
+        "cryptographic-security",
+        "cyber-security",
+        "data-security",
+        "endpoint-security",
+        "firmware-security",
+        "hardware-security",
+        "identity-access-management",
+        "network-security",
+        "operational-security",
+        "physical-security",
+        "supply-chain-security",
+        "web-security",
+        "automotive-safety",
+        "aviation-safety",
+        "environmental-safety",
+        "functional-safety",
+        "machinery-safety",
+        "maritime-safety",
+        "nuclear-safety",
+        "patient-safety",
+        "process-safety",
+        "railway-safety",
+        "aerospace-defense",
+        "automotive",
+        "building-automation",
+        "consumer-electronics",
+        "critical-infrastructure",
+        "education",
+        "energy-utilities",
+        "financial-services",
+        "government",
+        "healthcare",
+        "insurance",
+        "legal",
+        "manufacturing",
+        "media-entertainment",
+        "pharmaceuticals",
+        "retail",
+        "telecommunications",
+        "transportation",
+        "artificial-intelligence",
+        "edge-computing",
+        "embedded-systems",
+        "industrial-control-systems",
+        "industrial-iot",
+        "internet-of-things",
+        "machine-learning",
+        "medical-devices",
+        "mobile",
+        "operational-technology",
+        "robotics",
+        "scada",
+        "smart-grid",
+        "data-protection",
+        "export-control",
+        "intellectual-property",
+        "legal-compliance",
+        "licensing",
+        "privacy",
+        "regulatory-compliance",
+        "maintainability",
+        "performance",
+        "quality-assurance",
+        "reliability",
+        "testability",
+        "incident-response",
+        "penetration-testing",
+        "red-team",
+        "risk-management",
+        "threat-intelligence",
+        "threat-modeling",
+        "vulnerability-management",
+        "accessibility",
+        "ethics",
+        "human-factors",
+        "interoperability",
+        "resilience",
+        "sustainability",
+        "transparency"
+      ],
+      "meta:enum": {
+        "application-security": "Security concerns related to software applications, including vulnerabilities, secure coding practices, input validation, and dependency management.",
+        "cloud-security": "Security concerns specific to cloud computing environments, including configuration, identity management, data protection, and shared responsibility models.",
+        "container-security": "Security concerns related to containerised applications, including image provenance, runtime protection, orchestration security, and supply chain integrity.",
+        "cryptographic-security": "Concerns related to cryptographic implementations, algorithm selection, key management, certificate handling, and post-quantum cryptography readiness.",
+        "cyber-security": "Broad security concerns encompassing threat detection, incident response, security operations, and defence-in-depth strategies.",
+        "data-security": "Concerns related to protecting data at rest, in transit, and in use, including encryption, access controls, and data loss prevention.",
+        "endpoint-security": "Security concerns for end-user devices including workstations, mobile devices, and peripherals, encompassing malware protection and device management.",
+        "firmware-security": "Security concerns specific to firmware, including secure boot, firmware updates, integrity verification, and protection against persistent threats.",
+        "hardware-security": "Security concerns related to physical hardware, including trusted platform modules, hardware security modules, side-channel attacks, and tamper resistance.",
+        "identity-access-management": "Concerns related to authentication, authorisation, identity lifecycle management, privileged access, and zero-trust architectures.",
+        "network-security": "Security concerns related to network infrastructure, including firewalls, intrusion detection, segmentation, and secure communications.",
+        "operational-security": "Security concerns related to the deployment, configuration, and day-to-day operation of systems in production environments.",
+        "physical-security": "Security concerns related to physical access controls, environmental protections, surveillance, and tamper evidence.",
+        "supply-chain-security": "Concerns related to the security, integrity, and trustworthiness of components, vendors, and processes throughout the supply chain.",
+        "web-security": "Security concerns specific to web applications and services, including OWASP Top 10 vulnerabilities, API security, and client-side protections.",
+        "automotive-safety": "Safety concerns for automotive systems aligned with ISO 26262, including hazard analysis, functional safety requirements, and ASIL classifications.",
+        "aviation-safety": "Safety concerns for aviation systems aligned with DO-178C, DO-254, and DO-326A, including design assurance levels and airworthiness requirements.",
+        "environmental-safety": "Concerns related to environmental protection, hazardous materials handling, emissions, and ecological impact assessment.",
+        "functional-safety": "Safety concerns aligned with IEC 61508 and derivative standards, focusing on systematic failures, safety integrity levels, and risk reduction.",
+        "machinery-safety": "Safety concerns for industrial machinery aligned with ISO 12100 and IEC 62443, including safeguarding, emergency stops, and risk assessment.",
+        "maritime-safety": "Safety concerns for maritime and offshore systems, including vessel automation, navigation systems, and compliance with maritime regulations.",
+        "nuclear-safety": "Safety concerns for nuclear facilities and systems, including defence-in-depth, safety classification, and regulatory compliance with nuclear standards.",
+        "patient-safety": "Safety concerns for medical devices and healthcare systems focusing on preventing harm to patients, including adverse event prevention and clinical risk management.",
+        "process-safety": "Safety concerns for industrial processes involving hazardous materials, including process hazard analysis, safety instrumented systems, and layers of protection.",
+        "railway-safety": "Safety concerns for railway systems aligned with EN 50126, EN 50128, and EN 50129, including signalling, train control, and safety cases.",
+        "aerospace-defense": "Concerns specific to aerospace and defence industries, including mission-critical systems, military standards, and classified information handling.",
+        "automotive": "Industry-specific concerns for automotive manufacturers and suppliers, including ISO/SAE 21434 cyber security and vehicle type approval.",
+        "building-automation": "Concerns related to building management systems, HVAC controls, access systems, and smart building infrastructure.",
+        "consumer-electronics": "Concerns specific to consumer electronic devices, including product safety, electromagnetic compatibility, and consumer protection regulations.",
+        "critical-infrastructure": "Concerns related to systems designated as critical infrastructure, including sector-specific requirements and national security considerations.",
+        "education": "Concerns specific to educational institutions and EdTech, including student data protection, FERPA compliance, and academic integrity.",
+        "energy-utilities": "Concerns specific to energy and utility sectors, including NERC CIP compliance, grid security, and operational continuity.",
+        "financial-services": "Concerns specific to financial institutions, including PCI DSS, SOX compliance, fraud prevention, and transaction integrity.",
+        "government": "Concerns specific to government agencies and contractors, including FedRAMP, FISMA, and public sector procurement requirements.",
+        "healthcare": "Concerns specific to healthcare organisations, including HIPAA compliance, electronic health records, and healthcare interoperability.",
+        "insurance": "Concerns specific to insurance industry, including actuarial data integrity, claims processing security, and regulatory compliance.",
+        "legal": "Concerns specific to legal industry, including attorney-client privilege, e-discovery, and legal hold requirements.",
+        "manufacturing": "Concerns specific to manufacturing environments, including production systems, quality management, and shop floor security.",
+        "media-entertainment": "Concerns specific to media and entertainment, including digital rights management, content protection, and broadcast systems.",
+        "pharmaceuticals": "Concerns specific to pharmaceutical industry, including FDA 21 CFR Part 11, GxP compliance, and drug safety systems.",
+        "retail": "Concerns specific to retail industry, including point-of-sale security, e-commerce platforms, and customer data protection.",
+        "telecommunications": "Concerns specific to telecommunications providers, including network infrastructure, subscriber data, and regulatory compliance.",
+        "transportation": "Concerns related to transportation systems beyond automotive and rail, including logistics, fleet management, and traffic control systems.",
+        "artificial-intelligence": "Concerns related to AI systems, including model transparency, algorithmic bias, explainability, and ethical considerations.",
+        "edge-computing": "Concerns specific to edge computing deployments, including distributed processing, local data handling, and remote device management.",
+        "embedded-systems": "Concerns specific to embedded systems development, including real-time constraints, resource limitations, and hardware-software integration.",
+        "industrial-control-systems": "Concerns specific to ICS environments, including PLCs, DCS, and industrial automation security aligned with IEC 62443.",
+        "industrial-iot": "Concerns specific to Industrial Internet of Things deployments, combining IT security with OT requirements and industrial protocols.",
+        "internet-of-things": "Concerns related to IoT devices and ecosystems, including device security, communication protocols, and fleet management.",
+        "machine-learning": "Concerns specific to ML models, including training data provenance, model lineage, performance metrics, and reproducibility.",
+        "medical-devices": "Concerns specific to medical device development aligned with IEC 62304, FDA guidance, and MDR/IVDR requirements.",
+        "mobile": "Concerns specific to mobile applications and devices, including app store requirements, mobile-specific vulnerabilities, and device management.",
+        "operational-technology": "Concerns specific to OT environments, bridging IT and industrial systems with focus on availability, safety, and legacy system integration.",
+        "robotics": "Concerns specific to robotic systems, including autonomous operation, human-robot interaction safety, and motion control security.",
+        "scada": "Concerns specific to Supervisory Control and Data Acquisition systems, including remote monitoring, control system security, and protocol vulnerabilities.",
+        "smart-grid": "Concerns specific to smart grid infrastructure, including advanced metering, grid automation, and distributed energy resource management.",
+        "data-protection": "Concerns related to data protection regulations such as GDPR, CCPA, and cross-border data transfer requirements.",
+        "export-control": "Concerns related to export control regulations, including EAR, ITAR, and dual-use technology restrictions.",
+        "intellectual-property": "Concerns related to patents, trade secrets, copyright, and other intellectual property rights and protections.",
+        "legal-compliance": "Regulatory and legal requirements, including contractual obligations, liability considerations, and legal holds.",
+        "licensing": "Concerns related to software licensing, licence compatibility, open source obligations, and commercial licensing terms.",
+        "privacy": "Concerns related to personal data protection, privacy by design, consent management, and individual rights.",
+        "regulatory-compliance": "Concerns related to compliance with industry-specific regulations, standards, and certification requirements.",
+        "maintainability": "Concerns related to the ease of maintaining, updating, and supporting software and systems over their lifecycle.",
+        "performance": "Concerns related to system performance, scalability, response times, and resource utilisation.",
+        "quality-assurance": "Concerns related to testing, validation, verification, and overall quality metrics and processes.",
+        "reliability": "Concerns related to system reliability, fault tolerance, mean time between failures, and degradation modes.",
+        "testability": "Concerns related to the ability to test components and systems, including test coverage, test automation, and test data management.",
+        "incident-response": "Concerns related to detecting, responding to, and recovering from security incidents and breaches.",
+        "penetration-testing": "Concerns related to authorised security testing, vulnerability assessment, and security validation activities.",
+        "red-team": "Concerns related to adversarial simulation, attack path analysis, and security control effectiveness testing.",
+        "risk-management": "Concerns related to risk identification, assessment, treatment, and ongoing risk monitoring.",
+        "threat-intelligence": "Concerns related to threat actor analysis, indicators of compromise, and proactive threat hunting.",
+        "threat-modeling": "Concerns related to identifying weaknesses, threats, countermeasures, attack surfaces, and trust boundaries.",
+        "vulnerability-management": "Concerns related to vulnerability identification, prioritisation, remediation tracking, and disclosure processes.",
+        "accessibility": "Concerns related to ensuring systems are usable by people with disabilities, including WCAG compliance.",
+        "ethics": "Concerns related to ethical considerations in technology development, including algorithmic fairness and responsible innovation.",
+        "human-factors": "Concerns related to human-system interaction, usability, operator error prevention, and ergonomic design.",
+        "interoperability": "Concerns related to the ability of systems to exchange and use information effectively across boundaries.",
+        "resilience": "Concerns related to system resilience, business continuity, disaster recovery, and graceful degradation.",
+        "sustainability": "Concerns related to environmental sustainability, energy efficiency, and responsible resource consumption.",
+        "transparency": "Concerns related to openness, auditability, and the ability for stakeholders to understand system behaviour and composition."
+      }
+    },
+    "perspectiveRelevance": {
+      "type": "string",
+      "title": "Perspective Relevance",
+      "description": "Indicates the importance of a data type to a perspective.",
+      "enum": [
+        "required",
+        "recommended",
+        "optional",
+        "informative"
+      ],
+      "meta:enum": {
+        "required": "This data type is essential for the perspective and should always be present.",
+        "recommended": "This data type is highly relevant and should be included when available.",
+        "optional": "This data type provides supplementary information that may be useful.",
+        "informative": "This data type provides background context but is not directly actionable."
+      }
+    }
+  }
+}
