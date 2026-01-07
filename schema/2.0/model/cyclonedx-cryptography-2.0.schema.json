@@ -120,25 +120,30 @@
               }
             },
             "implementationPlatform": {
-              "type": "string",
-              "title": "Implementation platform",
-              "description": "The target platform for which the algorithm is implemented. The implementation can be 'generic', running on any platform or for a specific platform.",
-              "enum": [
-                "generic",
-                "x86_32",
-                "x86_64",
-                "armv7-a",
-                "armv7-m",
-                "armv8-a",
-                "armv8-m",
-                "armv9-a",
-                "armv9-m",
-                "s390x",
-                "ppc64",
-                "ppc64le",
-                "other",
-                "unknown"
-              ]
+              "type": "array",
+              "title": "Implementation platforms",
+              "description": "The target platforms for which the algorithm is implemented. The implementation can be 'generic', running on any platform or for a specific platform.",
+              "items": {
+                "type": "string",
+                "title": "Platform",
+                "description": "The target platform for the implementation.",
+                "enum": [
+                  "generic",
+                  "x86_32",
+                  "x86_64",
+                  "armv7-a",
+                  "armv7-m",
+                  "armv8-a",
+                  "armv8-m",
+                  "armv9-a",
+                  "armv9-m",
+                  "s390x",
+                  "ppc64",
+                  "ppc64le",
+                  "other",
+                  "unknown"
+                ]
+              }
             },
             "certificationLevel": {
               "type": "array",
@@ -222,6 +227,14 @@
                 "cfb",
                 "ofb",
                 "ctr",
+                "siv",
+                "gcm-siv",
+                "ocb",
+                "eax",
+                "kw",
+                "kwp",
+                "cts",
+                "xts",
                 "other",
                 "unknown"
               ],
@@ -247,6 +260,7 @@
                 "pkcs1v15",
                 "oaep",
                 "raw",
+                "pss",
                 "other",
                 "unknown"
               ],
@@ -278,6 +292,7 @@
                   "verify",
                   "encapsulate",
                   "decapsulate",
+                  "keyagree",
                   "other",
                   "unknown"
                 ]
@@ -295,6 +310,26 @@
               "description": "The NIST security strength category as defined in https://csrc.nist.gov/projects/post-quantum-cryptography/post-quantum-cryptography-standardization/evaluation-criteria/security-(evaluation-criteria). A value of 0 indicates that none of the categories are met.",
               "minimum": 0,
               "maximum": 6
+            },
+            "secProperties": {
+              "type": "array",
+              "title": "Security Properties",
+              "description": "The security properties of the cryptographic algorithm.",
+              "items": {
+                "type": "string",
+                "title": "Security Property",
+                "description": "A security property of the cryptographic algorithm.",
+                "examples": [
+                  "IND-CPA",
+                  "IND-CCA",
+                  "IND-CCA2",
+                  "SUF-CMA",
+                  "EUF-CMA",
+                  "collision-resistant",
+                  "preimage-resistant",
+                  "second-preimage-resistant"
+                ]
+              }
             }
           }
         },
@@ -663,6 +698,29 @@
             },
             "relatedCryptographicAssets": {
               "$ref": "#/$defs/relatedCryptographicAssets"
+            },
+            "keyUsage": {
+              "type": "array",
+              "title": "Key Usage",
+              "description": "Defines the permitted cryptographic usage for the asset.",
+              "items": {
+                "type": "string",
+                "title": "Usage",
+                "description": "A permitted cryptographic usage.",
+                "examples": [
+                  "CIPHER",
+                  "DECIPHER",
+                  "DERIVE",
+                  "GENERATE",
+                  "SIGN",
+                  "VERIFY",
+                  "WRAP",
+                  "UNWRAP",
+                  "ENCRYPT",
+                  "DECRYPT",
+                  "MAC"
+                ]
+              }
             }
           }
         },
@@ -1020,9 +1078,12 @@
           ]
         },
         "algorithmRef": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "Algorithm Reference",
-          "description": "The bom-ref to the algorithm."
+          "type": "array",
+          "title": "References",
+          "description": "The bom-refs to the assets securing this asset (e.g., algorithms, hardware, keys).",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          }
         }
       }
     }
