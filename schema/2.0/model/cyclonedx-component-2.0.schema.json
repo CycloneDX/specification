@@ -250,20 +250,6 @@
           "title": "Release notes",
           "description": "Specifies release notes."
         },
-        "modelCard": {
-          "$ref": "cyclonedx-ai-modelcard-2.0.schema.json#/$defs/modelCard",
-          "title": "AI/ML Model Card"
-        },
-        "data": {
-          "type": "array",
-          "items": {"$ref": "#/$defs/componentData"},
-          "title": "Data",
-          "description": "This object SHOULD be specified for any component of type `data` and must not be specified for other component types."
-        },
-        "cryptoProperties": {
-          "$ref": "cyclonedx-cryptography-2.0.schema.json#/$defs/cryptoProperties",
-          "title": "Cryptographic Properties"
-        },
         "tags": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/tags",
           "title": "Tags"
@@ -282,20 +268,91 @@
       },
       "allOf": [
         {
+          "title": "Versioning Requirement",
           "description": "Requirement: ensure that `version` and `versionRange` are not present simultaneously.",
           "not": {
             "required": ["version", "versionRange"]
           }
         },
         {
+          "title": "Version Range Requirement",
           "description": "Requirement: 'versionRange' must not be present when 'isExternal' is `false`.",
           "if": {
-            "properties": { "isExternal": { "const": false } }
+            "required": ["versionRange"]
           },
           "then": {
-            "not": { "required": ["versionRange"] }
+            "properties": { "isExternal": { "enum": [true] } }
+          }
+        },
+        {
+          "title": "Hardware Requirement",
+          "description": "Requirement: Hardware components MUST NOT specify a swid or purl.",
+          "if": {
+            "properties": { "type": { "enum": ["device"] } }
           },
-          "else": true
+          "then": {
+            "not": {
+              "anyOf": [
+                { "required": ["swid"] },
+                { "required": ["purl"] }
+              ]
+            }
+          }
+        },
+        {
+          "title": "Cryptography Requirement",
+          "description": "Requirement: cryptoProperties may only be used for cryptographic-asset.",
+          "if": {
+            "properties": { "type": { "enum": ["cryptographic-asset"] } }
+          },
+          "then": {
+            "properties": {
+              "cryptoProperties": {
+                "$ref": "cyclonedx-cryptography-2.0.schema.json#/$defs/cryptoProperties",
+                "title": "Cryptographic Properties"
+              }
+            }
+          },
+          "else": {
+            "not": { "required": ["cryptoProperties"] }
+          }
+        },
+        {
+          "title": "AI/ML Requirement",
+          "description": "Requirement: modelCard may only be used for machine-learning-model.",
+          "if": {
+            "properties": { "type": { "enum": ["machine-learning-model"] } }
+          },
+          "then": {
+            "properties": {
+              "modelCard": {
+                "$ref": "cyclonedx-ai-modelcard-2.0.schema.json#/$defs/modelCard",
+                "title": "AI/ML Model Card"
+              }
+            }
+          },
+          "else": {
+            "not": { "required": ["modelCard"] }
+          }
+        },
+        {
+          "title": "Data Requirement",
+          "description": "Requirement: data may only be used for components of type data.",
+          "if": {
+            "properties": { "type": { "enum": ["data"] } }
+          },
+          "then": {
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {"$ref": "#/$defs/componentData"},
+                "title": "Data Properties"
+              }
+            }
+          },
+          "else": {
+            "not": { "required": ["data"] }
+          }
         }
       ]
     },
