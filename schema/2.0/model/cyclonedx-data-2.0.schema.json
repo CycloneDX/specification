@@ -6,9 +6,333 @@
   "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
     "dataClassification": {
-      "type": "string",
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "public",
+            "internal",
+            "confidential",
+            "restricted"
+          ],
+          "description": "Data classification level",
+          "meta:enum": {
+            "public": "Public information that can be freely shared",
+            "internal": "Internal use only within the organization",
+            "confidential": "Confidential information requiring protection",
+            "restricted": "Highly restricted information with limited access and special protection measures"
+          }
+        },
+        {
+          "type": "string",
+          "description": "Custom data classification label",
+          "not": {
+            "enum": [
+              "public",
+              "internal",
+              "confidential",
+              "restricted"
+            ]
+          }
+        },
+        {
+          "type": "object",
+          "description": "Detailed data classification metadata.",
+          "additionalProperties": false,
+          "properties": {
+            "level": {
+              "type": "string",
+              "enum": [
+                "public",
+                "internal",
+                "confidential",
+                "restricted"
+              ],
+              "description": "Data classification level",
+              "meta:enum": {
+                "public": "Public information that can be freely shared",
+                "internal": "Internal use only within the organization",
+                "confidential": "Confidential information requiring protection",
+                "restricted": "Highly restricted information with limited access and special protection measures"
+              }
+            },
+            "dataTypes": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/dataCategory"
+              },
+              "description": "Specific categories of data"
+            },
+            "handling": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "none",
+                    "encrypt",
+                    "pseudonymize",
+                    "mask",
+                    "tokenize",
+                    "minimize",
+                    "segregate",
+                    "audit",
+                    "custom"
+                  ],
+                  "description": "Data handling requirements",
+                  "meta:enum": {
+                    "none": "No special handling requirements",
+                    "encrypt": "Encrypt data at rest and in transit",
+                    "pseudonymize": "Pseudonymize identifiers and keep mapping separately",
+                    "mask": "Mask or obfuscate sensitive fields",
+                    "tokenize": "Replace sensitive values with tokens",
+                    "minimize": "Collect and retain only necessary data",
+                    "segregate": "Segregate or isolate sensitive data",
+                    "audit": "Enable audit logging for access/use",
+                    "custom": "Custom handling requirement"
+                  }
+                },
+                {
+                  "type": "string",
+                  "description": "Custom data handling requirement",
+                  "not": {
+                    "enum": [
+                      "none",
+                      "encrypt",
+                      "pseudonymize",
+                      "mask",
+                      "tokenize",
+                      "minimize",
+                      "segregate",
+                      "audit",
+                      "custom"
+                    ]
+                  }
+                }
+              ]
+            },
+            "retention": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "1",
+                    "3",
+                    "6",
+                    "12",
+                    "24",
+                    "36",
+                    "60",
+                    "84",
+                    "120"
+                  ],
+                  "description": "Retention period in months",
+                  "meta:enum": {
+                    "1": "1 month",
+                    "3": "3 months",
+                    "6": "6 months",
+                    "12": "12 months",
+                    "24": "24 months",
+                    "36": "36 months",
+                    "60": "60 months",
+                    "84": "84 months",
+                    "120": "120 months"
+                  }
+                },
+                {
+                  "type": "string",
+                  "pattern": "^[0-9]+$",
+                  "description": "Retention period in months (numeric string)"
+                }
+              ]
+            },
+            "disposal": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "none",
+                    "delete",
+                    "secureDelete",
+                    "cryptoErase",
+                    "archive",
+                    "anonymize",
+                    "custom"
+                  ],
+                  "description": "Data disposal requirements",
+                  "meta:enum": {
+                    "none": "No specific disposal requirements",
+                    "delete": "Standard deletion procedures",
+                    "secureDelete": "Secure deletion/wiping procedures",
+                    "cryptoErase": "Cryptographic erasure of keys",
+                    "archive": "Archive data instead of deletion",
+                    "anonymize": "Anonymize data prior to disposal",
+                    "custom": "Custom disposal requirement"
+                  }
+                },
+                {
+                  "type": "string",
+                  "description": "Custom data disposal requirement",
+                  "not": {
+                    "enum": [
+                      "none",
+                      "delete",
+                      "secureDelete",
+                      "cryptoErase",
+                      "archive",
+                      "anonymize",
+                      "custom"
+                    ]
+                  }
+                }
+              ]
+            },
+            "regulations": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "gdpr",
+                      "ccpa",
+                      "hipaa",
+                      "pciDss",
+                      "glba",
+                      "sox",
+                      "ferpa",
+                      "coppa",
+                      "iso27001",
+                      "nist",
+                      "custom"
+                    ],
+                    "meta:enum": {
+                      "gdpr": "EU General Data Protection Regulation",
+                      "ccpa": "California Consumer Privacy Act",
+                      "hipaa": "Health Insurance Portability and Accountability Act",
+                      "pciDss": "Payment Card Industry Data Security Standard",
+                      "glba": "Gramm-Leach-Bliley Act",
+                      "sox": "Sarbanes-Oxley Act",
+                      "ferpa": "Family Educational Rights and Privacy Act",
+                      "coppa": "Children's Online Privacy Protection Act",
+                      "iso27001": "ISO/IEC 27001",
+                      "nist": "NIST frameworks and standards",
+                      "custom": "Custom regulation"
+                    }
+                  },
+                  {
+                    "type": "string",
+                    "description": "Custom regulation identifier",
+                    "not": {
+                      "enum": [
+                        "gdpr",
+                        "ccpa",
+                        "hipaa",
+                        "pciDss",
+                        "glba",
+                        "sox",
+                        "ferpa",
+                        "coppa",
+                        "iso27001",
+                        "nist",
+                        "custom"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "description": "Applicable regulations"
+            }
+          }
+        }
+      ],
       "title": "Data Classification",
-      "description": "Data classification tags data according to its type, sensitivity, and value if altered, stolen, or destroyed."
+      "description": "Data classification tags data according to its level or a custom classification label."
+    },
+    "dataCategory": {
+      "type": "string",
+      "enum": [
+        "pii",
+        "phi",
+        "pci",
+        "financial",
+        "intellectualProperty",
+        "telemetry",
+        "logs",
+        "credentials",
+        "safety",
+        "operational",
+        "custom"
+      ],
+      "description": "Common data categories",
+      "meta:enum": {
+        "pii": "Personally identifiable information",
+        "phi": "Protected health information",
+        "pci": "Payment card industry data",
+        "financial": "Financial statements or transaction data",
+        "intellectualProperty": "Intellectual property or trade secrets",
+        "telemetry": "System or product telemetry data",
+        "logs": "Operational or security log data",
+        "credentials": "Secrets, tokens, or credentials",
+        "safety": "Safety critical data or signals",
+        "operational": "Operational or process data",
+        "custom": "Other data categories not covered by the enumerated values"
+      }
+    },
+    "dataObject": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "oneOf": [
+        { "required": ["classification"] },
+        { "required": ["classificationRef"] }
+      ],
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "Unique identifier for this data object"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the transported data object"
+        },
+        "description": {
+          "type": "string",
+          "description": "Additional details about the data contents"
+        },
+        "classification": {
+          "$ref": "#/$defs/dataClassification",
+          "description": "Inline classification details for this data object"
+        },
+        "classificationRef": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "Reference to a shared classification definition elsewhere in the model"
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dataCategory"
+          },
+          "description": "Categories of data (PII, PHI, PCI, etc.)"
+        },
+        "schema": {
+          "type": "string",
+          "description": "Reference to a schema contract or document describing the data structure"
+        },
+        "format": {
+          "type": "string",
+          "description": "Serialization or encoding format (JSON, HL7, CSV, etc.)"
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Key attributes or fields transported"
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
     },
     "dataSensitivity": {
       "type": "string",

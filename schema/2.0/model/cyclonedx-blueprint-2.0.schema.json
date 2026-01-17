@@ -58,7 +58,7 @@
       "items": {
         "$ref": "#/$defs/dataSet"
       },
-      "description": "Datasets handled by the system, including placements and sensitivity"
+      "description": "Datasets handled by the system, including placements and classification"
     },
     "zones": {
       "type": "array",
@@ -94,49 +94,6 @@
         "$ref": "#/$defs/assumption"
       },
       "description": "Assumptions made during the modeling process"
-    },
-    "actor": {
-      "type": "object",
-      "required": ["bom-ref", "name", "type"],
-      "additionalProperties": false,
-      "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "description": "Unique identifier for the actor"
-        },
-        "name": {
-          "type": "string",
-          "description": "Name or title of the actor"
-        },
-        "description": {
-          "type": "string",
-          "description": "Narrative describing the actor's role and context"
-        },
-        "type": {
-          "type": "string",
-          "enum": ["user", "engineer", "administrator", "operator", "system", "external"],
-          "description": "Classification of the actor",
-          "meta:enum": {
-            "user": "End user of a client application or service",
-            "engineer": "Developer or platform/DevOps engineer",
-            "administrator": "Administrative or privileged operator",
-            "operator": "Operational staff running the system",
-            "system": "Automated system actor or service account",
-            "external": "Third-party or external entity"
-          }
-        },
-        "permissions": {
-          "type": "string",
-          "description": "Key permissions, capabilities, or duties the actor holds"
-        },
-        "trustZone": {
-          "$ref": "#/$defs/trustZoneRef",
-          "description": "Reference to the trust zone where the actor resides"
-        },
-        "properties": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
-        }
-      }
     },
     "visualizations": {
       "type": "array",
@@ -806,18 +763,25 @@
           "description": "What information is contained and why it exists"
         },
         "classification": {
-          "$ref": "#/$defs/dataClassification"
+          "$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataClassification"
         },
         "dataTypes": {
           "type": "array",
           "items": {
-            "$ref": "#/$defs/dataObjectType"
+            "$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataCategory"
           },
           "description": "Categories of data stored (PII, PHI, etc.)"
         },
         "recordCount": {
           "type": "integer",
           "description": "Approximate number of records"
+        },
+        "dataObjects": {
+          "type": "array",
+          "items": {
+            "$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataObject"
+          },
+          "description": "Data objects contained in this dataset"
         },
         "owners": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntityOrContact"
@@ -1109,17 +1073,10 @@
           "type": "string",
           "description": "Communication protocol used"
         },
-        "dataFormat": {
-          "type": "string",
-          "description": "Format of data in the flow"
-        },
-        "classification": {
-          "$ref": "#/$defs/dataClassification"
-        },
         "dataObjects": {
           "type": "array",
           "items": {
-            "$ref": "#/$defs/dataObject"
+            "$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataObject"
           },
           "description": "The data object(s) transported in this flow"
         },
@@ -1304,6 +1261,49 @@
         }
       }
     },
+    "actor": {
+      "type": "object",
+      "required": ["bom-ref", "name", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "Unique identifier for the actor"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name or title of the actor"
+        },
+        "description": {
+          "type": "string",
+          "description": "Narrative describing the actor's role and context"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["user", "engineer", "administrator", "operator", "system", "external"],
+          "description": "Classification of the actor",
+          "meta:enum": {
+            "user": "End user of a client application or service",
+            "engineer": "Developer or platform/DevOps engineer",
+            "administrator": "Administrative or privileged operator",
+            "operator": "Operational staff running the system",
+            "system": "Automated system actor or service account",
+            "external": "Third-party or external entity"
+          }
+        },
+        "permissions": {
+          "type": "string",
+          "description": "Key permissions, capabilities, or duties the actor holds"
+        },
+        "trustZone": {
+          "$ref": "#/$defs/trustZoneRef",
+          "description": "Reference to the trust zone where the actor resides"
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
     "assetClassification": {
       "type": "object",
       "additionalProperties": false,
@@ -1311,11 +1311,8 @@
         "criticality": {
           "$ref": "cyclonedx-risk-2.0.schema.json#/$defs/criticality"
         },
-        "sensitivity": {
-          "$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataSensitivity"
-        },
-        "dataClassification": {
-          "$ref": "#/$defs/dataClassification"
+        "classification": {
+          "$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataClassification"
         },
         "tier": {
           "type": "string",
@@ -1342,136 +1339,6 @@
           },
           "description": "Tags for classification and search"
         }
-      }
-    },
-    "dataClassification": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "level": {
-          "type": "string",
-          "enum": [
-            "public",
-            "internal",
-            "confidential",
-            "restricted"
-          ],
-          "description": "Data sensitivity classification",
-          "meta:enum": {
-            "public": "Public information that can be freely shared",
-            "internal": "Internal use only within the organization",
-            "confidential": "Confidential information requiring protection",
-            "restricted": "Highly restricted information with limited access and special protection measures"
-          }
-        },
-        "sensitivity": {
-          "$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataSensitivity"
-        },
-        "dataTypes": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Specific types of data"
-        },
-        "handling": {
-          "type": "string",
-          "description": "Data handling requirements"
-        },
-        "retention": {
-          "type": "string",
-          "description": "Data retention requirements"
-        },
-        "disposal": {
-          "type": "string",
-          "description": "Data disposal requirements"
-        },
-        "regulations": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Applicable regulations"
-        }
-      }
-    },
-    "dataObject": {
-      "type": "object",
-      "required": ["name"],
-      "additionalProperties": false,
-      "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "description": "Unique identifier for this data object"
-        },
-        "name": {
-          "type": "string",
-          "description": "Name of the transported data object"
-        },
-        "description": {
-          "type": "string",
-          "description": "Additional details about the data contents"
-        },
-        "classification": {
-          "$ref": "#/$defs/dataClassification",
-          "description": "Inline classification details for this data object"
-        },
-        "classificationRef": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "description": "Reference to a shared classification definition elsewhere in the model"
-        },
-        "type": {
-          "$ref": "#/$defs/dataObjectType",
-          "description": "Type of data (PII, PHI, PCI, etc.)"
-        },
-        "schema": {
-          "type": "string",
-          "description": "Reference to a schema contract or document describing the data structure"
-        },
-        "format": {
-          "type": "string",
-          "description": "Serialization or encoding format (JSON, HL7, CSV, etc.)"
-        },
-        "attributes": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Key attributes or fields transported"
-        },
-        "properties": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
-        }
-      }
-    },
-    "dataObjectType": {
-      "type": "string",
-      "enum": [
-        "pii",
-        "phi",
-        "pci",
-        "financial",
-        "intellectualProperty",
-        "telemetry",
-        "logs",
-        "credentials",
-        "safety",
-        "operational",
-        "custom"
-      ],
-      "description": "Common data object classifications",
-      "meta:enum": {
-        "pii": "Personally identifiable information",
-        "phi": "Protected health information",
-        "pci": "Payment card industry data",
-        "financial": "Financial statements or transaction data",
-        "intellectualProperty": "Intellectual property or trade secrets",
-        "telemetry": "System or product telemetry data",
-        "logs": "Operational or security log data",
-        "credentials": "Secrets, tokens, or credentials",
-        "safety": "Safety critical data or signals",
-        "operational": "Operational or process data",
-        "custom": "Other data types not covered by the enumerated values"
       }
     },
     "ownership": {
@@ -1531,6 +1398,9 @@
         "jwt": "JSON Web Token authentication",
         "custom": "Custom authentication method"
       }
+    },
+    "accessControlType": {
+      "$ref": "#/$defs/authorizationType"
     },
     "authorizationType": {
       "type": "string",
