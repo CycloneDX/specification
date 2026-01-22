@@ -2208,6 +2208,34 @@
                     "type": "string",
                     "title": "Additional Context",
                     "description": "Any additional context of the detected component (e.g. a code snippet)."
+                  },
+                  "accountInfo": {
+                    "type": "string",
+                    "title": "Account Information",
+                    "description": "The account or user information associated with the occurrence."
+                  },
+                  "systemOwner": {
+                    "type": "string",
+                    "title": "System Owner",
+                    "description": "The owner of the system where the component was found."
+                  },
+                  "startTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "title": "Start Time",
+                    "description": "The date and time when the process detecting the occurrence started."
+                  },
+                  "endTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "title": "End Time",
+                    "description": "The date and time when the process detecting the occurrence ended."
+                  },
+                  "usageCount": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "title": "Usage Count",
+                    "description": "The number of times the component occurred in the detecting process."
                   }
                 }
               }
@@ -2695,25 +2723,50 @@
                   }
                 },
                 "implementationPlatform": {
-                  "type": "string",
-                  "title": "Implementation platform",
-                  "description": "The target platform for which the algorithm is implemented. The implementation can be 'generic', running on any platform or for a specific platform.",
-                  "enum": [
-                    "generic",
-                    "x86_32",
-                    "x86_64",
-                    "armv7-a",
-                    "armv7-m",
-                    "armv8-a",
-                    "armv8-m",
-                    "armv9-a",
-                    "armv9-m",
-                    "s390x",
-                    "ppc64",
-                    "ppc64le",
-                    "other",
-                    "unknown"
-                  ]
+                  "type": "array",
+                  "title": "Implementation platforms",
+                  "description": "The target platforms for which the algorithm is implemented. The implementation can be 'generic', running on any platform or for a specific platform.",
+                  "items": {
+                    "type": "string",
+                    "title": "Platform",
+                    "description": "The target platform for the implementation.",
+                    "enum": [
+                      "generic",
+                      "x86_32",
+                      "x86_64",
+                      "armv7-a",
+                      "armv7-m",
+                      "armv8-a",
+                      "armv8-m",
+                      "armv9-a",
+                      "armv9-m",
+                      "s390x",
+                      "ppc64",
+                      "ppc64le",
+                      "riscv32",
+                      "riscv64",
+                      "other",
+                      "unknown"
+                    ],
+                    "meta:enum": {
+                      "generic": "Platform-independent implementation.",
+                      "x86_32": "Intel/AMD 32-bit x86 architecture.",
+                      "x86_64": "Intel/AMD 64-bit x86-64 architecture.",
+                      "armv7-a": "ARM 32-bit application profile (Cortex-A).",
+                      "armv7-m": "ARM 32-bit microcontroller profile (Cortex-M).",
+                      "armv8-a": "ARM 64-bit application profile (AArch64).",
+                      "armv8-m": "ARM 32-bit microcontroller with TrustZone.",
+                      "armv9-a": "ARM 64-bit with enhanced security features.",
+                      "armv9-m": "ARM microcontroller with advanced security.",
+                      "s390x": "IBM Z series mainframe 64-bit.",
+                      "ppc64": "IBM PowerPC 64-bit big-endian.",
+                      "ppc64le": "IBM PowerPC 64-bit little-endian.",
+                      "riscv32": "RISC-V 32-bit open standard architecture.",
+                      "riscv64": "RISC-V 64-bit open standard architecture.",
+                      "other": "Another platform.",
+                      "unknown": "The platform is not known."
+                    }
+                  }
                 },
                 "certificationLevel": {
                   "type": "array",
@@ -2797,19 +2850,35 @@
                     "cfb",
                     "ofb",
                     "ctr",
+                    "siv",
+                    "gcm-siv",
+                    "ocb",
+                    "eax",
+                    "kw",
+                    "kwp",
+                    "cts",
+                    "xts",
                     "other",
                     "unknown"
                   ],
                   "meta:enum": {
-                    "cbc": "Cipher block chaining",
-                    "ecb": "Electronic codebook",
-                    "ccm": "Counter with cipher block chaining message authentication code",
-                    "gcm": "Galois/counter",
-                    "cfb": "Cipher feedback",
-                    "ofb": "Output feedback",
-                    "ctr": "Counter",
-                    "other": "Another mode of operation",
-                    "unknown": "The mode of operation is not known"
+                    "cbc": "Cipher Block Chaining mode.",
+                    "ecb": "Electronic Codebook mode.",
+                    "ccm": "Counter with CBC-MAC (AEAD).",
+                    "gcm": "Galois/Counter Mode (AEAD).",
+                    "cfb": "Cipher Feedback mode.",
+                    "ofb": "Output Feedback mode.",
+                    "ctr": "Counter mode.",
+                    "siv": "Synthetic Initialization Vector mode.",
+                    "gcm-siv": "GCM with Synthetic IV (nonce-misuse resistant).",
+                    "ocb": "Offset Codebook Mode (AEAD).",
+                    "eax": "Encrypt-then-Authenticate-then-Translate mode.",
+                    "kw": "AES Key Wrap (RFC 3394).",
+                    "kwp": "AES Key Wrap with Padding (RFC 5649).",
+                    "cts": "Ciphertext Stealing mode.",
+                    "xts": "XEX Tweaked-codebook with Stealing (disk encryption).",
+                    "other": "Another mode of operation.",
+                    "unknown": "The mode is not known."
                   }
                 },
                 "padding": {
@@ -2822,17 +2891,19 @@
                     "pkcs1v15",
                     "oaep",
                     "raw",
+                    "pss",
                     "other",
                     "unknown"
                   ],
                   "meta:enum": {
-                    "pkcs5": "Public Key Cryptography Standard: Password-Based Cryptography",
-                    "pkcs7": "Public Key Cryptography Standard: Cryptographic Message Syntax",
-                    "pkcs1v15": "Public Key Cryptography Standard: RSA Cryptography v1.5",
-                    "oaep": "Optimal asymmetric encryption padding",
-                    "raw": "Raw",
-                    "other": "Another padding scheme",
-                    "unknown": "The padding scheme is not known"
+                    "pkcs5": "PKCS#5 padding for password-based cryptography.",
+                    "pkcs7": "PKCS#7 padding with length-indicating bytes.",
+                    "pkcs1v15": "PKCS#1 v1.5 padding for RSA.",
+                    "oaep": "Optimal Asymmetric Encryption Padding for RSA.",
+                    "raw": "No padding applied.",
+                    "pss": "Probabilistic Signature Scheme for RSA signatures.",
+                    "other": "Another padding scheme.",
+                    "unknown": "The padding scheme is not known."
                   }
                 },
                 "cryptoFunctions": {
@@ -2840,22 +2911,7 @@
                   "title": "Cryptographic functions",
                   "description": "The cryptographic functions implemented by the cryptographic algorithm.",
                   "items": {
-                    "type": "string",
-                    "enum": [
-                      "generate",
-                      "keygen",
-                      "encrypt",
-                      "decrypt",
-                      "digest",
-                      "tag",
-                      "keyderive",
-                      "sign",
-                      "verify",
-                      "encapsulate",
-                      "decapsulate",
-                      "other",
-                      "unknown"
-                    ]
+                    "$ref": "#/$defs/cyclonedx-cryptography-2.0/$defs/cryptographicFunction"
                   }
                 },
                 "classicalSecurityLevel": {
@@ -2870,6 +2926,25 @@
                   "description": "The NIST security strength category as defined in https://csrc.nist.gov/projects/post-quantum-cryptography/post-quantum-cryptography-standardization/evaluation-criteria/security-(evaluation-criteria). A value of 0 indicates that none of the categories are met.",
                   "minimum": 0,
                   "maximum": 6
+                },
+                "secProperties": {
+                  "type": "array",
+                  "title": "Security Properties",
+                  "description": "Formal guarantees about an algorithm's resistance to specific adversarial capabilities under a defined threat model. Example: Key Encapsulation Mechanisms (KEMs) may target IND-CPA or IND-CCA security; choosing IND-CCA impacts safe use in settings with active/chosen-ciphertext attacks.",
+                  "items": {
+                    "type": "string",
+                    "title": "Security Property",
+                    "examples": [
+                      "IND-CPA",
+                      "IND-CCA",
+                      "IND-CCA2",
+                      "SUF-CMA",
+                      "EUF-CMA",
+                      "collision-resistant",
+                      "preimage-resistant",
+                      "second-preimage-resistant"
+                    ]
+                  }
                 }
               }
             },
@@ -3238,6 +3313,16 @@
                 },
                 "relatedCryptographicAssets": {
                   "$ref": "#/$defs/cyclonedx-cryptography-2.0/$defs/relatedCryptographicAssets"
+                },
+                "keyUsage": {
+                  "type": "array",
+                  "title": "Key Usage",
+                  "description": "Defines the permitted cryptographic usage for the asset.",
+                  "items": {
+                    "$ref": "#/$defs/cyclonedx-cryptography-2.0/$defs/cryptographicFunction",
+                    "title": "Usage",
+                    "description": "A permitted cryptographic usage."
+                  }
                 }
               }
             },
@@ -3545,6 +3630,45 @@
             }
           }
         },
+        "cryptographicFunction": {
+          "type": "string",
+          "title": "Cryptographic Function",
+          "description": "A cryptographic function or usage.",
+          "enum": [
+            "generate",
+            "keygen",
+            "encrypt",
+            "decrypt",
+            "digest",
+            "tag",
+            "keyderive",
+            "sign",
+            "verify",
+            "encapsulate",
+            "decapsulate",
+            "keyagree",
+            "wrap",
+            "other",
+            "unknown"
+          ],
+          "meta:enum": {
+            "generate": "Generates random data, IVs, or nonces.",
+            "keygen": "Generates cryptographic keys.",
+            "encrypt": "Transforms plaintext into ciphertext.",
+            "decrypt": "Transforms ciphertext into plaintext.",
+            "digest": "Computes a hash value from input data.",
+            "tag": "Generates an authentication tag for data integrity.",
+            "keyderive": "Derives keys from another key or shared secret.",
+            "sign": "Creates a digital signature using a private key.",
+            "verify": "Verifies a digital signature using a public key.",
+            "encapsulate": "Encapsulates a secret using a public key (KEM).",
+            "decapsulate": "Decapsulates a secret using a private key (KEM).",
+            "keyagree": "Derives a shared secret between parties.",
+            "wrap": "Encrypts a key for secure storage or transport.",
+            "other": "Another cryptographic function.",
+            "unknown": "The cryptographic function is not known."
+          }
+        },
         "relatedCryptographicAssets": {
           "type": "array",
           "title": "Related Cryptographic Assets",
@@ -3595,9 +3719,12 @@
               ]
             },
             "algorithmRef": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "title": "Algorithm Reference",
-              "description": "The bom-ref to the algorithm."
+              "type": "array",
+              "title": "References",
+              "description": "The bom-refs to the assets securing this asset (e.g., algorithms, hardware, keys).",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+              }
             }
           }
         }
