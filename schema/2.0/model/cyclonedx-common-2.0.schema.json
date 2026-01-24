@@ -408,6 +408,164 @@
     "organizationalEntityOrContact": {
 
     },
+    "entity": {
+      "type": "object",
+      "title": "Entity",
+      "description": "Represents a person or organization with one or more roles in relation to the subject. Entities provide a unified mechanism for expressing the various parties involved in the creation, distribution, governance, and lifecycle management of components, services, data, and other objects within the BOM.",
+      "required": ["roles"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "#/$defs/refType"
+        },
+        "person": {
+          "title": "Person",
+          "description": "An individual acting in the specified role(s). Use this property when the entity is a natural person rather than an organization.",
+          "$ref": "#/$defs/organizationalContact"
+        },
+        "organization": {
+          "title": "Organization",
+          "description": "An organizational entity acting in the specified role(s). Use this property when the entity is an organization, company, department, or other collective body.",
+          "$ref": "#/$defs/organizationalEntity"
+        },
+        "roles": {
+          "type": "array",
+          "title": "Roles",
+          "description": "The role(s) that the entity fulfils. At least one role shall be specified. Multiple roles may be assigned to represent the various capacities in which the entity operates.",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/role"
+          }
+        },
+        "priority": {
+          "type": "integer",
+          "title": "Priority",
+          "description": "The priority order of this entity relative to other entities with the same role(s). Lower values indicate higher priority. When multiple entities share the same role, priority establishes the preference order. For example, in hardware supply chains, a priority of 1 may indicate the primary supplier, whilst 2 and 3 may indicate first and second alternates respectively. If not specified, no priority order is implied.",
+          "minimum": 1,
+          "examples": [1, 2, 3]
+        }
+      },
+      "oneOf": [
+        {
+          "required": ["person"]
+        },
+        {
+          "required": ["organization"]
+        }
+      ]
+    },
+    "role": {
+      "title": "Role",
+      "description": "A role that an entity fulfils. May be a predefined role from the CycloneDX taxonomy or a custom role definition.",
+      "oneOf": [
+        {
+          "type": "string",
+          "title": "Predefined Role",
+          "description": "A predefined role from the CycloneDX role taxonomy.",
+          "enum": [
+            "assembler",
+            "author",
+            "manufacturer",
+            "supplier",
+            "distributor",
+            "repackager",
+            "publisher",
+            "maintainer",
+            "contributor",
+            "licensor",
+            "licensee",
+            "purchaser",
+            "owner",
+            "custodian",
+            "steward",
+            "asserter",
+            "reviewer",
+            "annotator",
+            "signatory",
+            "committer",
+            "auditor",
+            "integrator",
+            "operator",
+            "qualityControl",
+            "securityContact",
+            "supportContact",
+            "legalContact"
+          ],
+          "meta:enum": {
+            "assembler": "The entity that assembles or integrates constituent parts into the subject. Assemblers are common in hardware manufacturing but may also apply to software build and packaging processes.",
+            "author": "The entity that created the subject. Authors are common in entities created through manual processes.",
+            "manufacturer": "The entity that manufactured or produced the subject. Manufacturers are common in entities created through automated processes.",
+            "supplier": "The entity that supplied the subject. The supplier may often be the manufacturer, but may also be a distributor or repackager.",
+            "distributor": "The entity that distributes the subject to downstream consumers or customers.",
+            "repackager": "The entity that repackages the subject, potentially combining it with other components or modifying its packaging for redistribution.",
+            "publisher": "The entity that published the subject, making it available for public or private consumption.",
+            "maintainer": "The entity responsible for ongoing maintenance, including updates, patches, and security fixes.",
+            "contributor": "An entity that contributed to the development of the subject without being the primary author.",
+            "licensor": "The entity that grants a licence for the subject.",
+            "licensee": "The entity to which a licence for the subject has been granted.",
+            "purchaser": "The entity that purchased the subject or a licence for its use.",
+            "owner": "The entity that holds ownership rights over the subject, including responsibility for risk management and access control.",
+            "custodian": "The entity responsible for the safe custody, transport, and storage of the subject.",
+            "steward": "The entity responsible for the content, context, and associated business rules of the subject.",
+            "asserter": "The entity making assertions about the subject, such as patent ownership or compliance claims.",
+            "reviewer": "The entity that reviewed the subject or its associated evidence.",
+            "annotator": "The entity, component, or service that created annotations or supplementary information about the subject.",
+            "signatory": "The entity authorised to sign on behalf of an organization, affirming the validity or accuracy of documentation.",
+            "committer": "The entity who committed or pushed changes to a version control system.",
+            "auditor": "The entity that conducted an audit or assessment of the subject.",
+            "integrator": "The entity that integrates the subject into a larger system or product.",
+            "operator": "The entity responsible for operating or running the subject in a production environment.",
+            "qualityControl": "The entity responsible for quality control activities, including inspection, testing, and verification to ensure the subject meets specified requirements and standards. Quality control is common in hardware manufacturing but may also apply to software testing and release processes.",
+            "securityContact": "The designated entity to contact in the event of a security incident.",
+            "supportContact": "The designated entity to contact for technical support.",
+            "legalContact": "The designated entity to contact for legal matters."
+          }
+        },
+        {
+          "type": "object",
+          "title": "Custom Role",
+          "description": "A custom role not covered by the predefined taxonomy. Use this structure to define domain-specific or organization-specific roles.",
+          "required": ["name"],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Role Name",
+              "description": "The name of the custom role. Use a concise, descriptive identifier.",
+              "examples": ["Chief Executive Officer", "Data Protection Officer", "Release Manager"]
+            },
+            "description": {
+              "type": "string",
+              "title": "Role Description",
+              "description": "A description of the custom role, including its responsibilities and scope."
+            }
+          }
+        }
+      ]
+    },
+    "entityChoice": {
+      "title": "Entity Choice",
+      "description": "An entity represented either as a complete object or as a reference to a previously defined entity or other referenceable object within the BOM.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/entity",
+          "title": "Entity"
+        },
+        {
+          "$ref": "#/$defs/refLinkType",
+          "title": "Reference",
+          "description": "A reference to a previously defined entity, `organizationalContact`, or `organizationalEntity` object in the BOM. The value shall be a valid `bom-ref` pointing to one of these objects."
+        }
+      ]
+    },
+    "entities": {
+      "type": "array",
+      "title": "Entities",
+      "description": "A collection of persons and organizations with defined roles in relation to the subject. Each item may be a complete entity object or a reference to a previously defined entity or other referenceable object within the BOM.",
+      "items": {
+        "$ref": "#/$defs/entityChoice"
+      }
+    },
     "properties": {
       "type": "array",
       "title": "Properties",
