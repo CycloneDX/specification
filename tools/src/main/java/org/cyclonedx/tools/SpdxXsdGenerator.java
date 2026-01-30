@@ -26,17 +26,39 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class SpdxXsdGenerator {
 
-    //todo : automatically obtain latest release from: https://api.github.com/repos/spdx/license-list-data/releases
-    //todo : make configurable
-    private static final String SPDX_VERSION = "3.27.0";
+    public static void main(String[] args) throws Exception {
+        String tagName = args.length == 0 || Objects.equals(args[0], "latest")
+                ? getLatestReleaseTagName()
+                : args[0];
+        new SpdxXsdGenerator(tagName)
+                .generateSchemas();
+    }
 
-    public static void main(String args[]) throws Exception {
-        String licenseUrl = "https://raw.githubusercontent.com/spdx/license-list-data/v" + SPDX_VERSION + "/json/licenses.json";
-        String exceptionsUrl = "https://raw.githubusercontent.com/spdx/license-list-data/v" + SPDX_VERSION + "/json/exceptions.json";
+    private static final String REPO = "spdx/license-list-data";
+
+    private static String getLatestReleaseTagName() throws Exception {
+        String apiReleasesLatest = "https://api.github.com/repos/" + REPO + "/releases/latest";
+        HttpResponse<JsonNode> apiResponse = Unirest.get(apiReleasesLatest).asJson();
+        final JSONObject apiResponseRoot = apiResponse.getBody().getObject();
+        return apiResponseRoot.getString("tag_name");
+    }
+
+    private final String tagName;
+
+    public SpdxXsdGenerator(String tagName) {
+        this.tagName = tagName;
+    }
+
+    public void generateSchemas() throws Exception {
+        System.out.println("Generate Schemas for " + REPO + " tagName: " + tagName);
+
+        String licenseUrl = "https://raw.githubusercontent.com/" + REPO + "/" + tagName + "/json/licenses.json";
+        String exceptionsUrl = "https://raw.githubusercontent.com/" + REPO +  "/" + tagName + "/json/exceptions.json";
 
         HttpResponse<JsonNode> licenseResponse = Unirest.get(licenseUrl).asJson();
         final JSONObject licenseRoot = licenseResponse.getBody().getObject();
@@ -62,15 +84,14 @@ public class SpdxXsdGenerator {
         createJsonSchema(licenseMap, exceptionMap);
     }
 
-
-    private static void createXmlSchema(Map<String, String> licenses, Map<String, String> exceptions) throws IOException {
+    private void createXmlSchema(Map<String, String> licenses, Map<String, String> exceptions) throws IOException {
         StringBuilder sb = new StringBuilder();
         sb
             .append("<?xml version=\"1.0\" encoding=\"utf-8\"?>").append("\n")
             .append("<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"").append("\n")
             .append(indent(11)).append("elementFormDefault=\"qualified\"").append("\n")
             .append(indent(11)).append("targetNamespace=\"http://cyclonedx.org/schema/spdx\"").append("\n")
-            .append(indent(11)).append("version=\"1.0-" + SPDX_VERSION + "\">").append("\n\n")
+            .append(indent(11)).append("version=\"1.0-" + stripLeadingV(tagName) + "\">").append("\n\n")
             .append(indent(4)).append("<xs:simpleType name=\"licenseId\">").append("\n")
             .append(indent(8)).append("<xs:restriction base=\"xs:string\">").append("\n");
 
@@ -90,13 +111,13 @@ public class SpdxXsdGenerator {
         FileUtils.writeStringToFile(file, sb.toString(), StandardCharsets.UTF_8);
     }
 
-    private static void createJsonSchema(Map<String, String> licenses, Map<String, String> exceptions) throws IOException {
+    private void createJsonSchema(Map<String, String> licenses, Map<String, String> exceptions) throws IOException {
         StringBuilder sb = new StringBuilder();
         sb
                 .append("{").append("\n")
                 .append(indent(2)).append("\"$schema\": \"http://json-schema.org/draft-07/schema#\",").append("\n")
                 .append(indent(2)).append("\"$id\": \"http://cyclonedx.org/schema/spdx.schema.json\",").append("\n")
-                .append(indent(2)).append("\"$comment\": \"v1.0-" + SPDX_VERSION + "\",").append("\n")
+                .append(indent(2)).append("\"$comment\": \"v1.0-" + stripLeadingV(tagName) + "\",").append("\n")
                 .append(indent(2)).append("\"type\": \"string\",").append("\n")
                 .append(indent(2)).append("\"enum\": [");
 
@@ -144,4 +165,10 @@ public class SpdxXsdGenerator {
         return sb.toString();
     }
 
+    public static String stripLeadingV(String input) {
+        if (input != null && input.length() > 1 && input.charAt(0) == 'v' ) {
+            return input.substring(1);
+        }
+        return input;
+    }
 }
