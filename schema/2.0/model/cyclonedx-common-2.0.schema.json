@@ -408,6 +408,198 @@
     "organizationalEntityOrContact": {
 
     },
+    "entity": {
+      "type": "object",
+      "title": "Organization or Person",
+      "description": "Represents a person or organization with one or more roles in relation to the subject. Entities provide a unified mechanism for expressing the various parties involved in the creation, distribution, governance, and lifecycle management of components, services, data, and other objects within the BOM. Exactly one of person or organization shall be present.",
+      "required": ["roles"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "#/$defs/refType"
+        },
+        "person": {
+          "title": "Person",
+          "description": "An individual acting in the specified role(s). Use this property when the entity is a natural person rather than an organization.",
+          "$ref": "#/$defs/organizationalContact"
+        },
+        "organization": {
+          "title": "Organization",
+          "description": "An organizational entity acting in the specified role(s). Use this property when the entity is an organization, company, department, or other collective body.",
+          "$ref": "#/$defs/organizationalEntity"
+        },
+        "roles": {
+          "type": "array",
+          "title": "Roles",
+          "description": "The role(s) that the entity fulfils. At least one role shall be specified. Multiple roles may be assigned to represent the various capacities in which the entity operates.",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/role"
+          }
+        },
+        "order": {
+          "type": "integer",
+          "title": "Order",
+          "description": "The order of this entity relative to other entities with the same role(s). Lower values indicate higher ordering. When multiple entities share the same role, order establishes ascending preference. For example, in hardware supply chains, an order of 1 may indicate the primary supplier, whilst 2 and 3 may indicate first and second alternates respectively. If not specified, no order is implied.",
+          "minimum": 1,
+          "examples": [1, 2, 3]
+        }
+      },
+      "oneOf": [
+        {
+          "required": ["person"]
+        },
+        {
+          "required": ["organization"]
+        }
+      ]
+    },
+    "role": {
+      "title": "Entity Role",
+      "description": "A role that an entity fulfils. May be a predefined role from the CycloneDX taxonomy or a custom role definition.",
+      "oneOf": [
+        {
+          "type": "string",
+          "title": "Predefined Role",
+          "description": "A predefined role from the CycloneDX role taxonomy.",
+          "enum": [
+            "assembler",
+            "asserter",
+            "auditor",
+            "author",
+            "broker",
+            "carrier",
+            "certificateAuthority",
+            "committer",
+            "consignee",
+            "consignor",
+            "contributor",
+            "custodian",
+            "customsBroker",
+            "distributor",
+            "exporter",
+            "freightForwarder",
+            "importer",
+            "inspector",
+            "insurer",
+            "integrator",
+            "keyEscrowAgent",
+            "legalContact",
+            "licensee",
+            "licensor",
+            "maintainer",
+            "manufacturer",
+            "operator",
+            "owner",
+            "packager",
+            "publisher",
+            "purchaser",
+            "qualityControl",
+            "repackager",
+            "reviewer",
+            "securityContact",
+            "signatory",
+            "steward",
+            "supplier",
+            "supportContact",
+            "thirdPartyLogistics",
+            "timestampAuthority",
+            "validationAuthority",
+            "warehouseOperator"
+          ],
+          "meta:enum": {
+            "assembler": "The entity that assembles or integrates constituent parts into the subject. Assemblers are common in hardware manufacturing but may also apply to software build and packaging processes.",
+            "asserter": "The entity making assertions about the subject, such as patent ownership or compliance claims.",
+            "auditor": "The entity that conducted an audit or assessment of the subject.",
+            "author": "The entity that created the subject. Authors are common in entities created through manual processes.",
+            "broker": "The entity that acts as an intermediary in commercial transactions, facilitating agreements between buyers and sellers.",
+            "carrier": "The entity that physically transports goods from one location to another, such as shipping lines, airlines, or trucking companies.",
+            "certificateAuthority": "The entity that issues, signs, and manages digital certificates, establishing trust within a public key infrastructure (PKI).",
+            "committer": "The entity who committed or pushed changes to a version control system.",
+            "consignee": "The entity designated to receive a shipment of goods.",
+            "consignor": "The entity that sends or ships goods to a consignee.",
+            "contributor": "An entity that contributed to the development of the subject without being the primary author.",
+            "custodian": "The entity responsible for the safe custody, transport, and storage of the subject.",
+            "customsBroker": "The entity that facilitates the clearance of goods through customs barriers, ensuring compliance with import and export regulations.",
+            "distributor": "The entity that distributes the subject to downstream consumers or customers.",
+            "exporter": "The entity that sends goods to another country for trade or sale.",
+            "freightForwarder": "The entity that arranges the shipment and logistics of goods on behalf of shippers, coordinating transportation, documentation, and customs clearance.",
+            "importer": "The entity that brings goods into a country from abroad for trade or sale.",
+            "inspector": "The entity that inspects goods for quality, safety, or regulatory compliance at various points in the supply chain.",
+            "insurer": "The entity that provides insurance coverage for goods, shipments, or supply chain operations against loss, damage, or liability.",
+            "integrator": "The entity that integrates the subject into a larger system or product.",
+            "keyEscrowAgent": "The entity that holds copies of cryptographic keys in escrow, enabling authorised recovery under defined conditions.",
+            "legalContact": "The designated entity to contact for legal matters.",
+            "licensee": "The entity to which a licence for the subject has been granted.",
+            "licensor": "The entity that grants a licence for the subject.",
+            "maintainer": "The entity responsible for ongoing maintenance, including updates, patches, and security fixes.",
+            "manufacturer": "The entity that manufactured or produced the subject. Manufacturers are common in entities created through automated processes.",
+            "operator": "The entity responsible for operating or running the subject in a production environment.",
+            "owner": "The entity that holds ownership rights over the subject, including responsibility for risk management and access control.",
+            "packager": "The entity that packages goods for storage, shipment, or retail sale, ensuring protection and compliance with packaging requirements.",
+            "publisher": "The entity that published the subject, making it available for public or private consumption.",
+            "purchaser": "The entity that purchased the subject or a licence for its use.",
+            "qualityControl": "The entity responsible for quality control activities, including inspection, testing, and verification to ensure the subject meets specified requirements and standards. Quality control is common in hardware manufacturing but may also apply to software testing and release processes.",
+            "repackager": "The entity that repackages the subject, potentially combining it with other components or modifying its packaging for redistribution.",
+            "reviewer": "The entity that reviewed the subject or its associated evidence.",
+            "securityContact": "The designated entity to contact in the event of a security incident.",
+            "signatory": "The entity authorised to sign on behalf of an organization, affirming the validity or accuracy of documentation.",
+            "steward": "The entity responsible for the content, context, and associated business rules of the subject.",
+            "supplier": "The entity that supplied the subject. The supplier may often be the manufacturer, but may also be a distributor or repackager.",
+            "supportContact": "The designated entity to contact for technical support.",
+            "thirdPartyLogistics": "The entity that provides outsourced logistics services, including transportation, warehousing, and fulfilment operations.",
+            "timestampAuthority": "The entity that issues trusted timestamps, providing evidence that data existed at a specific point in time.",
+            "validationAuthority": "The entity that provides certificate validation services, confirming the validity and revocation status of certificates.",
+            "warehouseOperator": "The entity responsible for storing, handling, and managing inventory within a warehouse or distribution centre."
+          }
+        },
+        {
+          "type": "object",
+          "title": "Custom Role",
+          "description": "A custom role not covered by the predefined taxonomy. Use this structure to define domain-specific or organization-specific roles.",
+          "required": ["name"],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Role Name",
+              "minLength": 1,
+              "description": "The name of the custom role. Use a concise, descriptive identifier.",
+              "examples": ["Chief Executive Officer", "Data Protection Officer", "Release Manager"]
+            },
+            "description": {
+              "type": "string",
+              "title": "Role Description",
+              "description": "A description of the custom role, including its responsibilities and scope."
+            }
+          }
+        }
+      ]
+    },
+    "entityChoice": {
+      "title": "Entity Choice",
+      "description": "An entity represented either as a complete object or as a reference to a previously defined entity or other referenceable object within the BOM.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/entity",
+          "title": "Entity"
+        },
+        {
+          "$ref": "#/$defs/refLinkType",
+          "title": "Reference",
+          "description": "A reference to a previously defined entity, `organizationalContact`, or `organizationalEntity` object in the BOM. The value shall be a valid `bom-ref` pointing to one of these objects."
+        }
+      ]
+    },
+    "entities": {
+      "type": "array",
+      "title": "Entities",
+      "description": "A collection of persons and organizations with defined roles in relation to the subject. Each item may be a complete entity object or a reference to a previously defined entity or other referenceable object within the BOM.",
+      "items": {
+        "$ref": "#/$defs/entityChoice"
+      }
+    },
     "properties": {
       "type": "array",
       "title": "Properties",
