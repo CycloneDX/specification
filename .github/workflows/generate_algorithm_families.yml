@@ -13,6 +13,7 @@ jobs:
 
     permissions:
       contents: write
+      pull-requests: write
 
     steps:
       - name: Checkout repository
@@ -29,20 +30,13 @@ jobs:
         working-directory: tools/src/main/python
         run: python3 algorithmFamilyGeneration.py
 
-      - name: Check for changes and commit
-        run: |
-          SCHEMA_FILE="schema/cryptography-defs.schema.json"
-          
-          # Add the file
-          git add "$SCHEMA_FILE"
-          
-          # Check if there are staged changes
-          if git diff --staged --quiet; then
-            echo "No changes to algorithm families"
-          else
-            echo "Committing algorithm family changes"
-            git config --local user.email "github-actions[bot]@users.noreply.github.com"
-            git config --local user.name "github-actions[bot]"
-            git commit -m "chore: update algorithm families [skip ci]"
-            git push
-          fi
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: update algorithm families [skip ci]"
+          branch: "update-algorithm-families"
+          title: "chore: update algorithm families"
+          body: "This PR updates `schema/cryptography-defs.schema.json` with the latest algorithm families generated from `schema/cryptography-defs.json`."
+          base: "master"
+          delete-branch: true
