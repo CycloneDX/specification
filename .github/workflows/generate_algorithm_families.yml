@@ -1,0 +1,47 @@
+name: Generate Algorithm Families Enum
+
+on:
+  push:
+    paths:
+      - 'schema/cryptography-defs.json'
+      - 'tools/src/main/python/algorithmFamilyGeneration.py'
+  workflow_dispatch:
+
+jobs:
+  generate-families:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Run algorithm family generator
+        run: python3 tools/src/main/python/algorithmFamilyGeneration.py
+
+      - name: Check for changes and commit
+        run: |
+          SCHEMA_FILE="schema/cryptography-defs.schema.json"
+          
+          # Add the file
+          git add "$SCHEMA_FILE"
+          
+          # Check if there are staged changes
+          if git diff --staged --quiet; then
+            echo "No changes to algorithm families"
+          else
+            echo "Committing algorithm family changes"
+            git config --local user.email "github-actions[bot]@users.noreply.github.com"
+            git config --local user.name "github-actions[bot]"
+            git commit -m "chore: update algorithm families [skip ci]"
+            git push
+          fi
