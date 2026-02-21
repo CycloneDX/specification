@@ -10,7 +10,6 @@ import {dirname, join} from 'node:path'
 import {fileURLToPath} from 'node:url'
 import {parseArgs} from 'node:util'
 
-import Ajv from "ajv"
 import addFormats from "ajv-formats"
 import addFormats2019 from "ajv-formats-draft2019"
 import {globSync} from 'glob'
@@ -22,7 +21,10 @@ const _thisDir = dirname(fileURLToPath(import.meta.url))
 
 const testschemaVersion = (parseArgs({options: {v: {type: 'string', short: 'v'}}}).values.v ?? '').trim()
 const schemaDir = join(_thisDir, '..', '..', '..', '..', 'schema')
-const schemaFile = join(schemaDir, `bom-${testschemaVersion}.schema.json`)
+// 2.0 uses bundled schema (draft 2020-12, no external $refs); 1.x uses schema/bom-<v>.schema.json
+const schemaFile = testschemaVersion === '2.0'
+    ? join(schemaDir, '2.0', 'cyclonedx-2.0-bundled.schema.json')
+    : join(schemaDir, `bom-${testschemaVersion}.schema.json`)
 const testdataDir = join(_thisDir, '..', 'resources', testschemaVersion)
 
 if (testschemaVersion.length === 0) {
@@ -44,6 +46,11 @@ console.debug('DEBUG | testdataDir = ', testdataDir);
 
 // region validator
 
+// 2.0 schema uses draft 2020-12; 1.x use draft-07. Use the matching Ajv build.
+const Ajv = testschemaVersion === '2.0'
+    ? (await import('ajv/dist/2020.js')).default
+    : (await import('ajv')).default
+
 const [spdxSchema, jsfSchema, cryptoDefsSchema, bomSchema] = await Promise.all([
     readFile(join(schemaDir, 'spdx.schema.json'), 'utf-8').then(JSON.parse),
     readFile(join(schemaDir, 'jsf-0.82.schema.json'), 'utf-8').then(JSON.parse),
@@ -51,17 +58,24 @@ const [spdxSchema, jsfSchema, cryptoDefsSchema, bomSchema] = await Promise.all([
     readFile(schemaFile, 'utf-8').then(JSON.parse)
 ])
 
+// Register each ref schema under both http and https so refs resolve regardless of base $id scheme.
+const schemasObj = {
+    'http://cyclonedx.org/schema/spdx.schema.json': spdxSchema,
+    'https://cyclonedx.org/schema/spdx.schema.json': spdxSchema,
+    'http://cyclonedx.org/schema/jsf-0.82.schema.json': jsfSchema,
+    'https://cyclonedx.org/schema/jsf-0.82.schema.json': jsfSchema,
+    'http://cyclonedx.org/schema/cryptography-defs.schema.json': cryptoDefsSchema,
+    'https://cyclonedx.org/schema/cryptography-defs.schema.json': cryptoDefsSchema,
+}
 const ajv = new Ajv({
     // not running in strict - this is done in the linter-test already
     strict: false,
     validateFormats: true,
     addUsedSchema: false,
-    schemas: {
-        'http://cyclonedx.org/schema/spdx.schema.json': spdxSchema,
-        'http://cyclonedx.org/schema/jsf-0.82.schema.json': jsfSchema,
-        'http://cyclonedx.org/schema/cryptography-defs.schema.json': cryptoDefsSchema,
-    }
-});
+    // Disable schema meta-validation for 2.0 harness to allow draft-07 referenced schemas to be registered under Ajv2020.
+    ...(testschemaVersion === '2.0' && { validateSchema: false }),
+    schemas: schemasObj
+})
 addFormats(ajv)
 addFormats2019(ajv, {formats: ['idn-email']})
 // there is just no working implementation for format "iri-reference"
