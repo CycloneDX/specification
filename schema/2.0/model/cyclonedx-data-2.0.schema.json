@@ -24,37 +24,46 @@
           }
         },
         {
-          "type": "string",
-          "description": "Custom data classification label",
-          "not": {
-            "enum": [
-              "public",
-              "internal",
-              "confidential",
-              "restricted"
-            ]
-          }
-        },
-        {
           "type": "object",
           "description": "Detailed data classification metadata.",
           "additionalProperties": false,
           "properties": {
             "level": {
-              "type": "string",
-              "enum": [
-                "public",
-                "internal",
-                "confidential",
-                "restricted"
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "public",
+                    "internal",
+                    "confidential",
+                    "restricted"
+                  ],
+                  "description": "Standard data classification level",
+                  "meta:enum": {
+                    "public": "Public information that can be freely shared",
+                    "internal": "Internal use only within the organization",
+                    "confidential": "Confidential information requiring protection",
+                    "restricted": "Highly restricted information with limited access and special protection measures"
+                  }
+                },
+                {
+                  "type": "object",
+                  "description": "Custom classification label with supporting metadata.",
+                  "required": ["name"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Name of the custom classification level"
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "Description of what this classification level means"
+                    }
+                  }
+                }
               ],
-              "description": "Data classification level",
-              "meta:enum": {
-                "public": "Public information that can be freely shared",
-                "internal": "Internal use only within the organization",
-                "confidential": "Confidential information requiring protection",
-                "restricted": "Highly restricted information with limited access and special protection measures"
-              }
+              "description": "Data classification level — either a standard value or a custom label with metadata"
             },
             "dataTypes": {
               "type": "array",
@@ -145,46 +154,14 @@
                 }
               ]
             },
+            "ttl": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Time-to-live in seconds for transient data (e.g. PHI in a short-lived JWT). Use instead of or alongside retention for ephemeral data that is not persisted."
+            },
             "disposal": {
-              "oneOf": [
-                {
-                  "type": "string",
-                  "enum": [
-                    "none",
-                    "delete",
-                    "secureDelete",
-                    "cryptoErase",
-                    "archive",
-                    "anonymize",
-                    "custom"
-                  ],
-                  "description": "Data disposal requirements",
-                  "meta:enum": {
-                    "none": "No specific disposal requirements",
-                    "delete": "Standard deletion procedures",
-                    "secureDelete": "Secure deletion/wiping procedures",
-                    "cryptoErase": "Cryptographic erasure of keys",
-                    "archive": "Archive data instead of deletion",
-                    "anonymize": "Anonymize data prior to disposal",
-                    "custom": "Custom disposal requirement"
-                  }
-                },
-                {
-                  "type": "string",
-                  "description": "Custom data disposal requirement",
-                  "not": {
-                    "enum": [
-                      "none",
-                      "delete",
-                      "secureDelete",
-                      "cryptoErase",
-                      "archive",
-                      "anonymize",
-                      "custom"
-                    ]
-                  }
-                }
-              ]
+              "$ref": "cyclonedx-behavior-2.0.schema.json#/$defs/behavior",
+              "description": "Disposal behavior from the CycloneDX behavior taxonomy (e.g. 'data:storage:deletesData', 'privacy:minimization:anonymizesData')."
             },
             "regulations": {
               "type": "array",
@@ -261,6 +238,13 @@
         "credentials",
         "safety",
         "operational",
+        "biometric",
+        "genetic",
+        "location",
+        "behavioral",
+        "communication",
+        "authentication",
+        "device",
         "custom"
       ],
       "description": "Common data categories",
@@ -275,6 +259,13 @@
         "credentials": "Secrets, tokens, or credentials",
         "safety": "Safety critical data or signals",
         "operational": "Operational or process data",
+        "biometric": "Biometric data such as fingerprints, facial recognition, or voice patterns",
+        "genetic": "Genetic or genomic data",
+        "location": "Precise or inferred geographic location data",
+        "behavioral": "Behavioral data such as browsing history, usage patterns, or profiling data",
+        "communication": "Communication content such as messages, emails, or call records",
+        "authentication": "Authentication data such as passwords, PINs, or security questions",
+        "device": "Device identifiers or hardware-level data",
         "custom": "Other data categories not covered by the enumerated values"
       }
     },
@@ -315,12 +306,44 @@
           "description": "Categories of data (PII, PHI, PCI, etc.)"
         },
         "schema": {
-          "type": "string",
-          "description": "Reference to a schema contract or document describing the data structure"
+          "type": "object",
+          "description": "Reference to a schema contract or document describing the data structure.",
+          "additionalProperties": false,
+          "properties": {
+            "url": {
+              "type": "string",
+              "format": "iri-reference",
+              "description": "URL or URN pointing to the schema document"
+            },
+            "mediaType": {
+              "type": "string",
+              "description": "Media type of the schema (e.g. application/json, application/xml)"
+            },
+            "comment": {
+              "type": "string",
+              "description": "Additional notes about the schema"
+            }
+          }
         },
         "format": {
-          "type": "string",
-          "description": "Serialization or encoding format (JSON, HL7, CSV, etc.)"
+          "type": "object",
+          "description": "Serialization or encoding format of the data.",
+          "additionalProperties": false,
+          "properties": {
+            "url": {
+              "type": "string",
+              "format": "iri-reference",
+              "description": "URL or URN pointing to the format specification"
+            },
+            "mediaType": {
+              "type": "string",
+              "description": "Media type or encoding format (e.g. application/json, text/csv, application/hl7-v2)"
+            },
+            "comment": {
+              "type": "string",
+              "description": "Additional notes about the format"
+            }
+          }
         },
         "attributes": {
           "type": "array",
