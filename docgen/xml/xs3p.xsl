@@ -491,6 +491,7 @@
                });
                </xsl:text>
             </script>
+            <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=ce3b481f-33a5-4c88-aaf1-00c8805f24d9" />
          </body>
       </html>
    </xsl:template>
