@@ -330,14 +330,16 @@
       "properties": {
         "level": {
           "type": "string",
-          "enum": ["veryLow", "low", "medium", "high", "veryHigh", "certain"],
-          "description": "Likelihood level",
+          "title": "Level",
+          "description": "The qualitative likelihood level representing the overall assessed probability of the risk or scenario being realized.",
+          "enum": ["certain", "high", "low", "medium", "veryHigh", "veryLow"],
           "meta:enum": {
-            "rare": "Very unlikely to occur (< 10%)",
-            "unlikely": "Unlikely to occur (10-30%)",
-            "possible": "Possible to occur (30-60%)",
-            "likely": "Likely to occur (60-90%)",
-            "almostCertain": "Very likely to occur (> 90%)"
+            "certain": "Almost certain to occur (> 90% probability).",
+            "high": "Likely to occur (60-90% probability).",
+            "low": "Unlikely to occur (10-30% probability).",
+            "medium": "Possible to occur (30-60% probability).",
+            "veryHigh": "Very likely to occur (75-90% probability).",
+            "veryLow": "Very unlikely to occur (< 10% probability)."
           }
         },
         "score": {
@@ -362,6 +364,111 @@
         "rationale": {
           "type": "string",
           "description": "Justification for the likelihood rating"
+        }
+      }
+    },
+    "likelihoodFactor": {
+      "type": "object",
+      "title": "Likelihood Factor",
+      "description": "An individual contributing factor used to determine the overall likelihood of a risk or scenario being realized. Likelihood is rarely a single judgment — it is typically derived from multiple independent factors such as threat actor capability, exploit maturity, attack surface exposure, and control effectiveness. Each factor captures a discrete dimension of likelihood with its own rating, enabling transparent, auditable, and methodology-aligned risk assessments.",
+      "required": ["name", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name of the likelihood factor being evaluated. Should clearly identify the dimension of likelihood being assessed, such as 'Threat Actor Capability', 'Exploit Availability', or 'Control Effectiveness'.",
+          "minLength": 1
+        },
+        "type": {
+          "title": "Type",
+          "description": "The category of likelihood factor being assessed. Predefined types align with common risk assessment methodologies including FAIR, OWASP Risk Rating, and NIST SP 800-30.",
+          "oneOf": [
+            {
+              "title": "Predefined Likelihood Factor Type",
+              "description": "A likelihood factor type defined by the CycloneDX standard, aligned with established risk assessment methodologies.",
+              "type": "string",
+              "additionalProperties": false,
+              "enum": [
+                "attackVector",
+                "controlEffectiveness",
+                "exploitMaturity",
+                "exposure",
+                "motivation",
+                "opportunity",
+                "other",
+                "threatCapability",
+                "vulnerability"
+              ],
+              "meta:enum": {
+                "attackVector": "Accessibility of the attack path to the threat actor, considering network proximity, authentication requirements, and interaction complexity.",
+                "controlEffectiveness": "Strength, reliability, and coverage of existing preventive, detective, or corrective controls that reduce the probability of successful exploitation.",
+                "exploitMaturity": "Availability, reliability, and sophistication of known exploits, attack toolkits, or proof-of-concept code targeting the identified weakness.",
+                "exposure": "Degree to which the target asset, system, or service is visible, discoverable, or reachable by potential threat actors.",
+                "motivation": "Level of incentive, intent, or determination driving the threat actor to pursue exploitation, including financial gain, ideology, or competitive advantage.",
+                "opportunity": "Availability of the conditions, timing, or circumstances required for the threat actor to act, including access windows, environmental factors, and resource availability.",
+                "other": "A likelihood factor type not defined by the CycloneDX standard. Use the custom type option for factors specific to an organization's risk methodology.",
+                "threatCapability": "Technical skill, resources, tooling, and sophistication of the threat actor relative to the complexity of the attack required.",
+                "vulnerability": "Presence, severity, and exploitability of weaknesses in the target system, application, or process that could be leveraged by a threat actor."
+              }
+            },
+            {
+              "title": "Custom Likelihood Factor Type",
+              "description": "A custom likelihood factor type not covered by predefined values, allowing organizations to extend the model with methodology-specific factors.",
+              "type": "object",
+              "required": ["name"],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "title": "Name",
+                  "description": "The name of the custom likelihood factor type.",
+                  "minLength": 1
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom likelihood factor type and how it contributes to likelihood assessment."
+                }
+              }
+            }
+          ]
+        },
+        "level": {
+          "type": "string",
+          "title": "Level",
+          "description": "The qualitative rating assigned to this factor, representing the assessed degree to which this factor contributes to the overall likelihood of the risk being realized.",
+          "enum": ["certain", "high", "low", "medium", "veryHigh", "veryLow"],
+          "meta:enum": {
+            "certain": "This factor almost certainly contributes to risk realization (> 90% influence).",
+            "high": "This factor strongly contributes to risk realization (60-90% influence).",
+            "low": "This factor has limited contribution to risk realization (10-30% influence).",
+            "medium": "This factor moderately contributes to risk realization (30-60% influence).",
+            "veryHigh": "This factor very strongly contributes to risk realization (75-90% influence).",
+            "veryLow": "This factor has minimal contribution to risk realization (< 10% influence)."
+          }
+        },
+        "score": {
+          "type": "number",
+          "title": "Score",
+          "description": "A numeric score representing the assessed value of this factor on a 0-5 scale, where 0 indicates no contribution to likelihood and 5 indicates maximum contribution.",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "weight": {
+          "type": "number",
+          "title": "Weight",
+          "description": "The relative importance or weight of this factor in the overall likelihood calculation, expressed as a decimal between 0 and 1. When multiple factors are present, weights can be used to produce a weighted average likelihood score. A weight of 1 indicates full importance; a weight of 0 indicates no importance.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A narrative explanation of how this factor was evaluated, the evidence or reasoning supporting the assigned level or score, and how it contributes to the overall likelihood assessment."
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
         }
       }
     },

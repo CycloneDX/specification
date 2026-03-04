@@ -5,6 +5,206 @@
   "title": "CycloneDX Data Model",
   "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
+    "dataProfile": {
+      "type": "object",
+      "title": "Data Profile",
+      "description": "Captures the sensitivity, classification, and lifecycle requirements associated with data, including how it may be collected, accessed, processed, shared, handled, retained, and disposed of.",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "Unique identifier for this data profile"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "minLength": 1,
+          "description": "The name or label that identifies this data profile, such as the name of the dataset, data category, or information asset it describes."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A detailed explanation of the data this profile describes, including what information is contained, its purpose, origin, and any relevant context about how it is used within the system."
+        },
+        "sensitivity": {
+          "type": "string",
+          "title": "Sensitivity",
+          "enum": [
+            "confidential",
+            "internal",
+            "public",
+            "restricted"
+          ],
+          "description": "Data sensitivity classification",
+          "meta:enum": {
+            "confidential": "Confidential information requiring protection",
+            "internal": "Internal use only within the organization",
+            "public": "Public information that can be freely shared",
+            "restricted": "Highly restricted information with limited access and special protection measures"
+          }
+        },
+        "classification": {
+          "title": "Classification",
+          "description": "Classifies data by its type, either using a predefined classification or a custom name and description for classifications not covered by the enumeration.",
+          "oneOf": [
+            {
+              "title": "Predefined Classification",
+              "description": "A predefined data classification from the enumeration.",
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["type"],
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "title": "Type",
+                  "enum": [
+                    "credentials",
+                    "financial",
+                    "intellectualProperty",
+                    "logs",
+                    "operational",
+                    "other",
+                    "pci",
+                    "phi",
+                    "pii",
+                    "safety",
+                    "telemetry"
+                  ],
+                  "meta:enum": {
+                    "credentials": "Secrets, tokens, or credentials",
+                    "financial": "Financial statements or transaction data",
+                    "intellectualProperty": "Intellectual property or trade secrets",
+                    "logs": "Operational or security log data",
+                    "operational": "Operational or process data",
+                    "other": "Other data classification not listed",
+                    "pci": "Payment card industry data",
+                    "phi": "Protected health information",
+                    "pii": "Personally identifiable information",
+                    "safety": "Safety critical data or signals",
+                    "telemetry": "System or product telemetry data"
+                  }
+                }
+              }
+            },
+            {
+              "title": "Custom Classification",
+              "description": "A custom data classification not covered by the predefined enumeration.",
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["name"],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "title": "Name",
+                  "minLength": 1,
+                  "description": "The name of a custom data classification not covered by the predefined enumeration"
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom data classification"
+                }
+              }
+            }
+          ]
+        },
+        "dataFormats": {
+          "type": "array",
+          "title": "Data Formats",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "description": "Format of data"
+        },
+        "dataTypes": {
+          "type": "array",
+          "title": "Data Types",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "description": "Specific types of data"
+        },
+        "schema": {
+          "type": "array",
+          "title": "Schema",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "description": "Reference to schema contracts or documents describing the data structure."
+        },
+        "access": {
+          "type": "array",
+          "title": "Access",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          },
+          "description": "References to requirement objects that define who may access the data and under what conditions, including need-to-know restrictions, clearance levels, audit logging, and break-glass procedures."
+        },
+        "collection": {
+          "type": "array",
+          "title": "Collection",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          },
+          "description": "References to requirement objects that govern how data is collected or acquired, including consent mechanisms, lawful basis, purpose limitation, and notice obligations."
+        },
+        "disposal": {
+          "type": "array",
+          "title": "Disposal",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          },
+          "description": "References to requirement objects that specify how this data must be destroyed or rendered unrecoverable when no longer needed, including sanitisation methods, disposal timelines, and regulatory obligations governing data destruction."
+        },
+        "handling": {
+          "type": "array",
+          "title": "Handling",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          },
+          "description": "References to requirement objects that govern how this data must be handled throughout its lifecycle, such as encryption at rest, access restrictions, anonymisation, or regulatory compliance obligations."
+        },
+        "processing": {
+          "type": "array",
+          "title": "Processing",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          },
+          "description": "References to requirement objects that govern what may be done with the data, including purpose limitation, data minimisation, aggregation rules, and prohibited uses such as AI or ML training restrictions."
+        },
+        "retention": {
+          "type": "array",
+          "title": "Retention",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          },
+          "description": "References to requirement objects that define how long this data must be retained, including minimum retention periods, maximum storage durations, and any regulatory or contractual obligations governing data preservation."
+        },
+        "sharing": {
+          "type": "array",
+          "title": "Sharing",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          },
+          "description": "References to requirement objects that govern how data may be shared with third parties, partners, or across jurisdictional boundaries, including data sharing agreements, cross-border transfer restrictions, and adequacy decisions."
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
     "dataClassification": {
       "type": "string",
       "title": "Data Classification",
@@ -12,14 +212,19 @@
     },
     "dataSensitivity": {
       "type": "string",
-      "enum": ["public", "internal", "confidential", "restricted", "secret"],
-      "description": "Data sensitivity classification",
+      "title": "Data Sensitivity",
+      "description": "Classifies the sensitivity of data to indicate the level of protection required.",
+      "enum": [
+        "confidential",
+        "internal",
+        "public",
+        "restricted"
+      ],
       "meta:enum": {
-        "public": "Public information that can be freely shared",
-        "internal": "Internal use only within the organization",
         "confidential": "Confidential information requiring protection",
-        "restricted": "Highly restricted information with limited access",
-        "secret": "Secret information requiring special handling"
+        "internal": "Internal use only within the organization",
+        "public": "Public information that can be freely shared",
+        "restricted": "Highly restricted information with limited access"
       }
     },
     "dataGovernance": {
@@ -31,18 +236,21 @@
         "custodians": {
           "type": "array",
           "title": "Data Custodians",
+          "uniqueItems": true,
           "description": "Data custodians are responsible for the safe custody, transport, and storage of data.",
           "items": { "$ref": "#/$defs/dataGovernanceResponsibleParty" }
         },
         "stewards": {
           "type": "array",
           "title": "Data Stewards",
+          "uniqueItems": true,
           "description": "Data stewards are responsible for data content, context, and associated business rules.",
           "items": { "$ref": "#/$defs/dataGovernanceResponsibleParty" }
         },
         "owners": {
           "type": "array",
           "title": "Data Owners",
+          "uniqueItems": true,
           "description": "Data owners are concerned with risk and appropriate access to data.",
           "items": { "$ref": "#/$defs/dataGovernanceResponsibleParty" }
         }
@@ -50,6 +258,8 @@
     },
     "dataGovernanceResponsibleParty": {
       "type": "object",
+      "title": "Data Governance Responsible Party",
+      "description": "An organizational entity or individual responsible for a specific data governance role.",
       "additionalProperties": false,
       "properties": {
         "organization": {
@@ -74,20 +284,20 @@
     },
     "dataFlowDirection": {
       "type": "string",
+      "title": "Data Flow Direction",
+      "description": "Specifies the flow direction of the data. Direction is relative to the service.",
       "enum": [
+        "bi-directional",
         "inbound",
         "outbound",
-        "bi-directional",
         "unknown"
       ],
       "meta:enum": {
+        "bi-directional": "Data flows in and out of the service.",
         "inbound": "Data that enters a service.",
         "outbound": "Data that exits a service.",
-        "bi-directional": "Data flows in and out of the service.",
         "unknown": "The directional flow of data is not known."
-      },
-      "title": "Data flow direction",
-      "description": "Specifies the flow direction of the data. Direction is relative to the service."
+      }
     }
   }
 }

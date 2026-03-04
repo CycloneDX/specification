@@ -4,197 +4,200 @@
   "type": "null",
   "title": "CycloneDX Use Case Model",
   "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
-  "properties": {
-    "bom-ref": {
-      "type": "string",
-      "title": "BOM Reference",
-      "description": "An optional identifier which can be used to reference the use case elsewhere in the BOM. Every bom-ref must be unique within the BOM."
-    },
-    "name": {
-      "type": "string",
-      "title": "Name",
-      "description": "The name or title of the use case."
-    },
-    "description": {
-      "type": "string",
-      "title": "Description",
-      "description": "A detailed description of the use case."
-    },
-    "actors": {
-      "type": "array",
-      "title": "Actors",
-      "description": "The stakeholders or users who interact with the system in this use case.",
-      "items": {
-        "type": "string"
-      }
-    },
-    "preconditions": {
-      "type": "array",
-      "title": "Preconditions",
-      "description": "Conditions that must be true before the use case can be executed.",
-      "items": {
-        "type": "string"
-      }
-    },
-    "postconditions": {
-      "type": "array",
-      "title": "Postconditions",
-      "description": "Conditions that will be true after the use case has been successfully executed.",
-      "items": {
-        "type": "string"
-      }
-    },
-    "mainFlow": {
-      "type": "array",
-      "title": "Main Flow",
-      "description": "The primary sequence of steps that describe the use case.",
-      "items": {
-        "$ref": "#/$defs/step"
-      }
-    },
-    "alternativeFlows": {
-      "type": "array",
-      "title": "Alternative Flows",
-      "description": "Alternative sequences of steps that may occur in the use case.",
-      "items": {
-        "$ref": "#/$defs/flow"
-      }
-    },
-    "exceptions": {
-      "type": "array",
-      "title": "Exceptions",
-      "description": "Error scenarios that may occur during the execution of the use case.",
-      "items": {
-        "$ref": "#/$defs/exception"
-      }
-    },
-    "successCriteria": {
-      "type": "array",
-      "title": "Success Criteria",
-      "description": "Criteria that determine whether the use case has been successfully executed.",
-      "items": {
-        "type": "string"
-      }
-    },
-    "notes": {
-      "type": "array",
-      "title": "Notes",
-      "description": "Additional information or comments about the use case.",
-      "items": {
-        "type": "string"
-      }
-    },
-    "properties": {
-      "type": "array",
-      "title": "Properties",
-      "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard.",
-      "items": {
-        "$ref": "#/$defs/property"
-      }
-    }
-  },
   "$defs": {
+    "useCases": {
+      "type": "array",
+      "title": "Use Cases",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/useCase"
+      },
+      "description": "A collection of use cases that describe how actors interact with the system to achieve specific goals."
+    },
+    "useCase": {
+      "type": "object",
+      "title": "Use Case",
+      "description": "A structured description of how one or more actors interact with the system to achieve a specific goal, including the primary flow, alternative paths, and exception scenarios.",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "minLength": 1,
+          "description": "The name or title of the use case, typically expressed as a verb phrase that captures the goal from the actor's perspective (e.g., 'Place Order', 'Reset Password')."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A detailed narrative of the use case, including the actor's goal, the scope of the interaction, and any relevant business rules or constraints that govern its execution."
+        },
+        "actors": {
+          "type": "array",
+          "title": "Actors",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          },
+          "description": "References to the actors that participate in this use case, representing anyone or anything that initiates or interacts with the described flow."
+        },
+        "preconditions": {
+          "type": "array",
+          "title": "Preconditions",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "description": "Conditions that must hold true before the use case can begin execution, such as required system state, authenticated sessions, available resources, or prior completed use cases."
+        },
+        "postconditions": {
+          "type": "array",
+          "title": "Postconditions",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "description": "Conditions that will be true after the use case completes successfully, describing the expected system state, data changes, notifications sent, or side effects produced."
+        },
+        "mainFlow": {
+          "type": "array",
+          "title": "Main Flow",
+          "items": {
+            "$ref": "#/$defs/step"
+          },
+          "description": "The primary sequence of steps representing the most common or expected path through the use case, from the triggering action to the successful outcome."
+        },
+        "alternativeFlows": {
+          "type": "array",
+          "title": "Alternative Flows",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/flow"
+          },
+          "description": "Variant paths that branch from the main flow under specific conditions, representing valid but less common ways to achieve the use case goal or a modified outcome."
+        },
+        "exceptions": {
+          "type": "array",
+          "title": "Exceptions",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/exception"
+          },
+          "description": "Error or failure scenarios that may interrupt the main or alternative flows, including the triggering condition and how the system responds to recover or terminate gracefully."
+        },
+        "successCriteria": {
+          "type": "array",
+          "title": "Success Criteria",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "description": "Measurable or observable criteria that determine whether the use case has been completed successfully, used for validation, acceptance testing, and stakeholder sign-off."
+        },
+        "notes": {
+          "type": "array",
+          "title": "Notes",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "description": "Supplementary information, clarifications, open questions, or implementation guidance that provides additional context beyond the formal use case structure."
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
     "step": {
       "type": "object",
       "title": "Step",
-      "description": "A single step in a use case flow.",
+      "description": "A single discrete action within a use case flow, performed by a specific actor, that advances the interaction toward the use case goal.",
+      "required": ["number", "description"],
       "additionalProperties": false,
       "properties": {
         "number": {
           "type": "integer",
           "title": "Number",
-          "description": "The sequence number of the step."
+          "minimum": 1,
+          "description": "The sequence number indicating the ordinal position of this step within its flow, starting at 1."
         },
         "description": {
           "type": "string",
           "title": "Description",
-          "description": "A description of the step."
+          "minLength": 1,
+          "description": "A clear, action-oriented statement describing what the actor does in this step and the expected system response, written in the form 'The [actor] [action]'."
         },
         "actor": {
-          "type": "string",
-          "title": "Actor",
-          "description": "The actor who performs this step."
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "Reference to the actor who initiates or performs this step, which may be a human user, an external system, or the system under design."
         }
       }
     },
     "flow": {
       "type": "object",
       "title": "Flow",
-      "description": "A sequence of steps in a use case.",
+      "description": "An alternative sequence of steps that branches from the main flow under a specific condition, representing a valid variant path through the use case.",
+      "required": ["name", "condition"],
       "additionalProperties": false,
       "properties": {
         "name": {
           "type": "string",
           "title": "Name",
-          "description": "The name of the flow."
+          "minLength": 1,
+          "description": "A short, descriptive name identifying this alternative flow (e.g., 'Payment Declined', 'Guest Checkout')."
         },
         "description": {
           "type": "string",
           "title": "Description",
-          "description": "A description of the flow."
+          "description": "A narrative explaining the purpose and context of this alternative flow, including how it differs from the main flow and under what circumstances it applies."
         },
         "condition": {
           "type": "string",
           "title": "Condition",
-          "description": "The condition under which this alternative flow is executed."
+          "minLength": 1,
+          "description": "The specific condition, decision point, or triggering event that causes execution to diverge from the main flow into this alternative path."
         },
         "steps": {
           "type": "array",
           "title": "Steps",
-          "description": "The sequence of steps in the flow.",
           "items": {
             "$ref": "#/$defs/step"
-          }
+          },
+          "description": "The ordered sequence of steps that comprise this alternative flow, following the same structure as main flow steps."
         }
       }
     },
     "exception": {
       "type": "object",
       "title": "Exception",
-      "description": "An error scenario in a use case.",
+      "description": "An error or failure scenario that may interrupt the normal execution of a use case, including the condition that triggers it and how the system responds.",
+      "required": ["name", "condition"],
       "additionalProperties": false,
       "properties": {
         "name": {
           "type": "string",
           "title": "Name",
-          "description": "The name of the exception."
+          "minLength": 1,
+          "description": "A short, descriptive name identifying this exception scenario (e.g., 'Session Timeout', 'Insufficient Funds', 'Service Unavailable')."
         },
         "description": {
           "type": "string",
           "title": "Description",
-          "description": "A description of the exception."
+          "description": "A narrative describing the nature of this exception, its potential causes, and its impact on the use case and the actors involved."
         },
         "condition": {
           "type": "string",
           "title": "Condition",
-          "description": "The condition under which this exception occurs."
+          "minLength": 1,
+          "description": "The specific error condition, system state, or external event that triggers this exception during the execution of the use case."
         },
         "handling": {
           "type": "string",
           "title": "Handling",
-          "description": "How the exception is handled."
-        }
-      }
-    },
-    "property": {
-      "type": "object",
-      "title": "Property",
-      "description": "A name-value property.",
-      "additionalProperties": false,
-      "required": [
-        "name",
-        "value"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "title": "Name",
-          "description": "The name of the property."
-        },
-        "value": {
-          "type": "string",
-          "title": "Value",
-          "description": "The value of the property."
+          "description": "The recovery strategy or response the system takes when this exception occurs, such as retrying the operation, rolling back changes, notifying the user, or escalating to support."
         }
       }
     }
