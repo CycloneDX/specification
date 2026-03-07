@@ -340,6 +340,8 @@
                         <li class="dropdown">
                            <a href="#" class="dropdown-toggle version-selector" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">v<xsl:value-of select="$cycloneDxVersion"/> (XML)<span class="caret"></span></a>
                            <ul class="dropdown-menu">
+                              <li><a class="dropdown-item" href="/docs/2.0/json/">v2.0 (JSON)</a></li>
+                              <li style="padding:0"><hr class="dropdown-divider"/></li>
                               <li><a class="dropdown-item" href="/docs/1.7/json/">v1.7 (JSON)</a></li>
                               <li><a class="dropdown-item" href="/docs/1.6/json/">v1.6 (JSON)</a></li>
                               <li><a class="dropdown-item" href="/docs/1.5/json/">v1.5 (JSON)</a></li>
