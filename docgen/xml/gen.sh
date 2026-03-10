@@ -26,6 +26,9 @@ THIS_PATH="$(realpath "$(dirname "$0")")"
 SCHEMA_PATH="$(realpath "$THIS_PATH/../../schema")"
 DOCS_PATH="$THIS_PATH/docs"
 
+# Centralized header injection
+source "$THIS_PATH/../static/inject-header.sh"
+
 SAXON_VERSION='10.9'
 
 
@@ -59,6 +62,8 @@ generate () {
     -o:"$OUT_FILE" \
     cycloneDxVersion="$version" \
     title="$title"
+
+  inject_header "$OUT_FILE" "$version" "xml"
 }
 
 

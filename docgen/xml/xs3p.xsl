@@ -158,13 +158,10 @@
         specific CSS, not the Bootstrap CSS. -->
    <xsl:param name="externalCSSURL"></xsl:param>
 
-   <!-- Link to JQuery. -->
-   <xsl:param name="jQueryURL">https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js</xsl:param>
-
    <!-- Link base to Bootstrap CSS and JS. The files
         <bootstrapURL>/css/bootstrap.min.css and
-        <bootstrapURL>/js/bootstrap.min.js must exist.-->
-   <xsl:param name="bootstrapURL">https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1</xsl:param>
+        <bootstrapURL>/js/bootstrap.bundle.min.js must exist.-->
+   <xsl:param name="bootstrapURL">https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist</xsl:param>
 
    <xsl:param name="cycloneDxVersion">0.0</xsl:param>
 
@@ -299,7 +296,8 @@
             </xsl:if>
 
             <!-- CSS included here, JS at end of body. -->
-			<link href="{$bootstrapURL}/css/bootstrap.min.css" rel="stylesheet" charset="UTF-8"/>
+			<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" charset="UTF-8"/>
+			<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" charset="UTF-8"/>
 
             <!-- Set CSS styles -->
             <style type="text/css">
@@ -319,57 +317,11 @@
 
             <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/8.3.2/markdown-it.min.js" type="text/javascript" charset="UTF-8"></script>
          </head>
-         <body data-spy="scroll" data-target=".xs3p-sidebar" data-offset="110">
+         <body data-bs-spy="scroll" data-bs-target=".xs3p-sidebar" data-bs-offset="110">
 
-            <div class="navbar navbar-fixed-top navbar-inverse" role="navigation">
-               <div class="container">
-                  <div class="navbar-header">
-                     <!-- Hamburger menu
-                      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                         <span class="sr-only">Toggle navigation</span>
-                         <span class="icon-bar"><xsl:text> </xsl:text></span>
-                         <span class="icon-bar"><xsl:text> </xsl:text></span>
-                         <span class="icon-bar"><xsl:text> </xsl:text></span>
-                      </button>
-                      -->
-                     <a href="/" class="navbar-brand site-header__logo"><img src="https://cyclonedx.org/images/logo-all-white.svg" height="48" width="276" /></a>
-
-                     <!-- Version selection dropdown -->
-                     <div style="display:flex; align-items:center; height:100%;">
-                     <ul class="nav navbar-nav navbar-right">
-                        <li class="dropdown">
-                           <a href="#" class="dropdown-toggle version-selector" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">v<xsl:value-of select="$cycloneDxVersion"/> (XML)<span class="caret"></span></a>
-                           <ul class="dropdown-menu">
-                              <li><a class="dropdown-item" href="/docs/1.7/json/">v1.7 (JSON)</a></li>
-                              <li><a class="dropdown-item" href="/docs/1.6/json/">v1.6 (JSON)</a></li>
-                              <li><a class="dropdown-item" href="/docs/1.5/json/">v1.5 (JSON)</a></li>
-                              <li><a class="dropdown-item" href="/docs/1.4/json/">v1.4 (JSON)</a></li>
-                              <li><a class="dropdown-item" href="/docs/1.3/json/">v1.3 (JSON)</a></li>
-                              <li><a class="dropdown-item" href="/docs/1.2/json/">v1.2 (JSON)</a></li>
-                              <li style="padding:0"><hr class="dropdown-divider"/></li>
-                              <li><a class="dropdown-item" href="/docs/1.7/xml/">v1.7 (XML)</a></li>
-                              <li><a class="dropdown-item" href="/docs/1.6/xml/">v1.6 (XML)</a></li>
-                              <li><a class="dropdown-item" href="/docs/1.5/xml/">v1.5 (XML)</a></li>
-                              <li><a class="dropdown-item" href="/docs/1.4/xml/">v1.4 (XML)</a></li>
-                              <li><a class="dropdown-item" href="/docs/1.3/xml/">v1.3 (XML)</a></li>
-                              <li><a class="dropdown-item" href="/docs/1.2/xml/">v1.2 (XML)</a></li>
-                              <li><a class="dropdown-item" href="/docs/1.1/xml/">v1.1 (XML)</a></li>
-                              <li><a class="dropdown-item" href="/docs/1.0/xml/">v1.0 (XML)</a></li>
-                              <li style="padding:0"><hr class="dropdown-divider"/></li>
-                              <li><a class="dropdown-item" href="/docs/1.7/proto/">v1.7 (Protobuf)</a></li>
-                              <li><a class="dropdown-item" href="/docs/1.6/proto/">v1.6 (Protobuf)</a></li>
-                              <li><a class="dropdown-item" href="/docs/1.5/proto/">v1.5 (Protobuf)</a></li>
-                              <li><a class="dropdown-item" href="/docs/1.4/proto/">v1.4 (Protobuf)</a></li>
-                              <li><a class="dropdown-item" href="/docs/1.3/proto/">v1.3 (Protobuf)</a></li>
-                           </ul>
-                        </li>
-                     </ul>
-                     </div>
-
-                  </div>
-               </div>
-            </div>
+            <xsl:comment> MEGA_MENU_HEADER </xsl:comment>
             <div class="container-fluid">
+
                <div class="row">
                   <div class="col-md-3" id="menu-cols">
                      <div class="xs3p-sidebar hidden-print" role="complementary">
@@ -378,13 +330,13 @@
                   </div>
                  <div class="col-md-9 content" role="main" id="xs3p-content">
 
+         <!-- Title -->
+         <h1><a id="top"><xsl:value-of select="$actualTitle"/></a></h1>
+
 <!-- Note: some indentation resets in order to keep a minimum diff readability. -->
 
          <!-- Hidden documentation snippets for display in the popup -->
          <xsl:apply-templates select="." mode="hiddendoc"/>
-
-         <!-- Title -->
-         <h1><a id="top"><xsl:value-of select="$actualTitle"/></a></h1>
 
          <!-- Section: Schema Document Properties -->
          <section id="SectionSchemaProperties">
@@ -454,44 +406,58 @@
                </div>
             </div>
 
-            <script src="{$jQueryURL}" type="text/javascript" charset="UTF-8"></script>
-            <script src="{$bootstrapURL}/js/bootstrap.min.js" type="text/javascript" charset="UTF-8"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous" type="text/javascript" charset="UTF-8"></script>
             <script>
                <xsl:text disable-output-escaping="yes">
 
-               $(function () { $("[data-toggle='tooltip']").tooltip(); });
-               $(function () { $("[data-toggle='popover']").popover(); });
+               // Initialize Bootstrap 5 tooltips and popovers
+               document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el) { new bootstrap.Tooltip(el); });
+               document.querySelectorAll('[data-bs-toggle="popover"]').forEach(function(el) { new bootstrap.Popover(el); });
 
+               // Markdown rendering
                var c = window.markdownit();
-               $('.xs3p-doc').each(function(i, obj) {
-                  var rawDocID = '#' + $(this).attr('id') + '-raw';
-                  var indent = $(rawDocID).html().match("^\\n[\\t ]*");
-                  if (!(indent === null)) {
-                     normalized = $(rawDocID).html().replace(new RegExp(indent[0], "gm"), "\n");
+               document.querySelectorAll('.xs3p-doc').forEach(function(obj) {
+                  var rawDocID = obj.id + '-raw';
+                  var rawEl = document.getElementById(rawDocID);
+                  if (!rawEl) return;
+                  var rawHTML = rawEl.innerHTML;
+                  var indent = rawHTML.match("^\\n[\\t ]*");
+                  var normalized;
+                  if (indent !== null) {
+                     normalized = rawHTML.replace(new RegExp(indent[0], "gm"), "\n");
                   } else {
-                     normalized = $(rawDocID).html();
+                     normalized = rawHTML;
                   }
-                  $(this).html(c.render(normalized));
-                  $(this).find('code,pre').each(function(i, block) {
-                     $(this).html($(this).text());
+                  obj.innerHTML = c.render(normalized);
+                  obj.querySelectorAll('code,pre').forEach(function(block) {
+                     block.innerHTML = block.textContent;
                   });
                });
 
-               $(window).scroll(function() {
-                  if ($(".xs3p-sidebar").css("position") == "fixed" &amp;&amp; $(window).height() &lt; $(".xs3p-sidebar").height()) {
-                     var perc = $(window).scrollTop() / $("#xs3p-content").height();
-                     var overflow = $(".xs3p-sidebar").height() + 105 - $(window).height();
-                     $(".xs3p-sidebar").css("top", (110 - Math.round(overflow * perc)) + "px");
+               // Sidebar scroll handling
+               window.addEventListener('scroll', function() {
+                  var sidebar = document.querySelector('.xs3p-sidebar');
+                  if (!sidebar) return;
+                  var style = window.getComputedStyle(sidebar);
+                  if (style.position === 'fixed') {
+                     var content = document.getElementById('xs3p-content');
+                     if (window.innerHeight &lt; sidebar.offsetHeight &amp;&amp; content) {
+                        var perc = window.scrollY / content.offsetHeight;
+                        var overflow = sidebar.offsetHeight + 105 - window.innerHeight;
+                        sidebar.style.top = (110 - Math.round(overflow * perc)) + 'px';
+                     }
                   }
                });
-               $(window).resize(function() {
-                  if ($(".xs3p-sidebar").css("position") == "fixed") {
-                     $(".xs3p-sidebar").css("top", "110px");
+               window.addEventListener('resize', function() {
+                  var sidebar = document.querySelector('.xs3p-sidebar');
+                  if (!sidebar) return;
+                  var style = window.getComputedStyle(sidebar);
+                  if (style.position === 'fixed') {
+                     sidebar.style.top = '110px';
                   }
                });
                </xsl:text>
             </script>
-            <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=ce3b481f-33a5-4c88-aaf1-00c8805f24d9" />
          </body>
       </html>
    </xsl:template>
@@ -722,7 +688,7 @@
          </xsl:choose>
          <xsl:text>: </xsl:text>
          <!-- Name -->
-         <a id="{$componentID}" class="name" data-html="true" data-placement="bottom" data-toggle="tooltip" title="Schema component name.">
+         <a id="{$componentID}" class="name" data-bs-html="true" data-bs-placement="bottom" data-bs-toggle="tooltip" title="Schema component name.">
             <xsl:value-of select="$component/@name"/>
          </a>
       </h3>
@@ -733,7 +699,7 @@
      -->
    <xsl:template name="SectionFooter">
       <!-- Link to top of page-->
-      <div style="text-align: right; clear: both;"><a href="#top" title="Go to top of page"><span class="glyphicon glyphicon-chevron-up"><xsl:text> </xsl:text></span></a></div>
+      <div style="text-align: right; clear: both;"><a href="#top" title="Go to top of page"><i class="bi bi-chevron-up"><xsl:text> </xsl:text></i></a></div>
       <hr/>
    </xsl:template>
 
@@ -754,7 +720,7 @@ body {
   color: #222;
   background-color: #FFF;
   margin: 0;
-  padding: 60px 0 0 0;
+  padding: 0;
 }
 .nav &gt; li.active {
     background-color: #FFF;
@@ -765,48 +731,38 @@ body {
 
 .navbar {
   padding: 0;
-  height: 90px;
+  min-height: 90px;
 }
-.navbar-inverse .navbar-nav>.open>a,
-.navbar-inverse .navbar-nav>.open>a:focus,
-.navbar-inverse .navbar-nav>.open>a:hover {
-         background-image: none;
-         background-color: transparent;
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
 }
-.navbar-inverse {
+.navbar-dark .navbar-nav>.open>a,
+.navbar-dark .navbar-nav>.open>a:focus,
+.navbar-dark .navbar-nav>.open>a:hover,
+.navbar-dark {
     background-image: linear-gradient(269.12deg, rgba(232, 52, 82, 1) 0%, rgba(136, 38, 125, 1) 51.26%, rgba(52, 57, 175, 1) 100%);
 }
-.navbar-brand {
-    display: inline-block;
-    margin-right: 1rem;
-    font-size: 1.25rem;
-    line-height: inherit;
-    white-space: nowrap;
+.navbar-brand, .fixed-top {
     padding: 0 30px 0 30px;
 }
-.navbar-header {
-    height: 100%;
-}
-.navbar-fixed-top {
-
-}
-.navbar-inverse .navbar-nav>li>a {
+.navbar-dark .navbar-nav>li>a {
     color: #ffffff;
 }
 .site-header__logo img {
     height: 90px;
 }
 .version-selector {
-    font-size: 1.6rem
+    font-size: 1.2rem
 }
-.table .thead-dark th {
-    background-color: #323550;
-}
-.version-selector .caret {
+.dropdown-toggle:after {
     border-left: 8px solid transparent;
     border-right: 8px solid transparent;
     border-top: 8px solid #ffffff;
     margin-left: 10px;
+    vertical-align: middle;
+}
+.table .thead-dark th {
+    background-color: #323550;
 }
 .dropdown-menu {
     font-size: 16px;
@@ -818,6 +774,9 @@ body {
 h1, h2, h3, h4, h5, h6 {
     color: rgb(52 57 175) !important;
 }
+h1 {
+    font-size: 36px;
+}
 h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
     color: rgb(52 57 175) !important;
 }
@@ -826,17 +785,24 @@ code {
 }
 
 .container {
-    height: 100%;
     margin-left: 0;
     margin-right: 0;
 }
 
 .container-fluid {
     padding: 30px 30px;
+    margin-top: 110px;
 }
 
+.nav-sub-item {
+    display: block;
+    width: 100%;
+}
 .nav-sub-item &gt; a {
+    display: block;
     padding-left: 30px !important;
+    padding-top: 3px;
+    padding-bottom: 3px;
 }
 
 a {
@@ -860,10 +826,18 @@ pre {
 }
 
 .xs3p-sidenav {
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding: 10px 15px;
     background-color: #EEE;
     border-radius: 10px;
+    display: block;
+}
+.xs3p-sidenav > li {
+    display: block;
+    width: 100%;
+}
+.xs3p-sidenav > li > a {
+    display: block;
+    padding: 3px 0;
 }
 .xs3p-navbar-title {
     color: #FFF !important;
@@ -874,29 +848,61 @@ pre {
 }
 .xs3p-sidebar {
     position: static;
+    overflow-y: auto;
+    overflow-x: hidden;
+    word-wrap: break-word;
 }
 .xs3p-collapse-button {
     font-size: 8pt;
 }
-.panel-heading .xs3p-panel-title:after {
-    font-family: 'Glyphicons Halflings';
-    content: "\e114";
-    float: left;
+.card-header {
+    padding: 6px 10px;
+}
+.card-header .card-title {
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 1.3rem;
+}
+.card-header .xs3p-panel-title {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+.card-header .xs3p-panel-title:before {
+    font-family: 'bootstrap-icons';
+    content: "\F282";
     color: grey;
     margin-right: 10px;
+    font-size: 16px;
+    display: inline-block;
+    -webkit-text-stroke: 2px;
+    transition: .3s transform ease-in-out;
+    transform: rotate(0deg);
+    flex-shrink: 0;
 }
-.panel-heading .xs3p-panel-title.collapsed:after {
-    content: "\e080";
+.card-header .xs3p-panel-title:not(.collapsed):before {
+    transform: rotate(0deg);
 }
-.panel-info > .panel-heading .xs3p-panel-title:after {
+.card-header .xs3p-panel-title.collapsed:before {
+    content: "\F285";
+}
+.card.bg-info > .card-header .xs3p-panel-title:before {
     color: white;
 }
 .xs3p-panel-help {
     color: #CCCCCC;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    float: none;
 }
 
 .panel-group {
+    margin-bottom: 20px;
+}
+.accordion {
     margin-bottom: 20px;
 }
 
@@ -936,6 +942,7 @@ pre {
         position: fixed;
         top: 110px;
         width: 22%;
+        max-height: calc(100vh - 120px);
     }
 }
 </xsl:text>
@@ -4101,7 +4108,7 @@ pre {
          </xsl:variable>
 
          <xsl:text> </xsl:text>
-         <button title="Show documentation for {$component/@name}" class="btn btn-link btn-doc" data-toggle="modal" data-target="#{$documentation}-popup"><span class="glyphicon glyphicon-info-sign"><xsl:text> </xsl:text></span></button>
+         <button title="Show documentation for {$component/@name}" class="btn btn-link btn-doc" data-bs-toggle="modal" data-bs-target="#{$documentation}-popup"><i class="bi bi-info-circle"><xsl:text> </xsl:text></i></button>
       </xsl:if>
    </xsl:template>
 
@@ -7213,10 +7220,10 @@ pre {
       <xsl:variable name="panelContentClass">
          <xsl:choose>
             <xsl:when test="normalize-space(translate($isOpened,'TRUE','true'))='true'">
-               <xsl:text>panel-collapse collapse in</xsl:text>
+               <xsl:text>collapse show</xsl:text>
             </xsl:when>
             <xsl:otherwise>
-               <xsl:text>panel-collapse collapse</xsl:text>
+               <xsl:text>collapse</xsl:text>
             </xsl:otherwise>
          </xsl:choose>
       </xsl:variable>
@@ -7231,18 +7238,18 @@ pre {
          </xsl:choose>
       </xsl:variable>
 
-      <div class="panel-group" id="{$id}-{$anchor}-panel-group">
-      <div class="panel panel-default">
-         <div class="panel-heading">
+      <div class="accordion" id="{$id}-{$anchor}-panel-group">
+      <div class="card">
+         <div class="card-header">
             <!-- Box Title -->
-            <h4 class="panel-title">
-               <a class="{$panelTitleClass}" data-toggle="collapse" data-parent="#{$id}-{$anchor}-panel-group" href="#{$id}-{$anchor}-collapse">
+            <h4 class="card-title">
+               <a class="{$panelTitleClass}" data-bs-toggle="collapse" data-bs-parent="#{$id}-{$anchor}-panel-group" href="#{$id}-{$anchor}-collapse">
                   <xsl:value-of select="$caption"/>
                </a>
                <xsl:if test="$help != ''">
-                  <span class="pull-right xs3p-panel-help">
-                     <button type="button" class="btn btn-doc" data-container="body" data-toggle="popover" data-placement="left" data-html="true" data-content="{$help}">
-                     <span class="glyphicon glyphicon-question-sign"><xsl:text> </xsl:text></span>
+                  <span class="float-end xs3p-panel-help">
+                     <button type="button" class="btn btn-doc" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="left" data-bs-html="true" data-bs-content="{$help}">
+                     <i class="bi bi-question-circle"><xsl:text> </xsl:text></i>
                      </button>
                   </span>
                </xsl:if>
@@ -7258,7 +7265,7 @@ pre {
             </xsl:when>
             <xsl:otherwise>
                <div id="{$id}-{$anchor}-collapse" class="{$panelContentClass}">
-                  <div class="panel-body">
+                  <div class="card-body">
                      <xsl:choose>
                         <xsl:when test="not(normalize-space($contents))">
                           No documentation provided.
