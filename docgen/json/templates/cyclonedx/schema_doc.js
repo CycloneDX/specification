@@ -1,15 +1,19 @@
-$(document).on('click', 'a[href^="#"]', function(event) {
-  event.preventDefault();
-  history.pushState({}, '', this.href);
+document.addEventListener('click', function(event) {
+  var anchor = event.target.closest('a[href^="#"]');
+  if (anchor) {
+    event.preventDefault();
+    history.pushState({}, '', anchor.href);
+  }
 });
 
 function flashElement(elementId) {
-    // $( "#" + elementId ).fadeOut(100).fadeIn(200).fadeOut(100).fadeIn(500);
-    myElement = document.getElementById(elementId);
-    myElement.classList.add("jsfh-animated-property");
-    setTimeout(function() {
-        myElement.classList.remove("jsfh-animated-property");
-    }, 1000);
+    var myElement = document.getElementById(elementId);
+    if (myElement) {
+        myElement.classList.add("jsfh-animated-property");
+        setTimeout(function() {
+            myElement.classList.remove("jsfh-animated-property");
+        }, 1000);
+    }
 }
 
 function setAnchor(anchorLinkDestination) {
@@ -19,7 +23,7 @@ function setAnchor(anchorLinkDestination) {
 
 function anchorOnLoad() {
     // Added to onload on body, checks if there is an anchor link and if so, expand
-    let linkTarget = decodeURIComponent(window.location.hash.split("?")[0].split("&")[0]);
+    var linkTarget = decodeURIComponent(window.location.hash.split("?")[0].split("&")[0]);
     if (linkTarget[0] === "#") {
         linkTarget = linkTarget.substr(1);
     }
@@ -30,31 +34,35 @@ function anchorOnLoad() {
 }
 
 function anchorLink(linkTarget) {
-    const target = $( "#" + linkTarget );
-    // Find the targeted element to expand and all its parents that can be expanded
-    target.parents().addBack().filter(".collapse:not(.show), .tab-pane, [role='tab']").each(
-        function(index) {
-            if($( this ).hasClass("collapse")) {
-                $( this ).collapse("show");
-            } else if ($( this ).hasClass("tab-pane")) {
-                // We have the pane and not the tab itself, find the tab
-                const tabToShow = $( "a[href='#" + $( this ).attr("id") + "']" );
-                if (tabToShow) {
-                    tabToShow.tab("show");
-                }
-            } else if ($( this ).attr("role") === "tab") {
-                // The tab is not a parent of underlying elements, the tab pane is
-                // However, it can still be linked directly
-                $( this ).tab("show");
+    var target = document.getElementById(linkTarget);
+    if (!target) return;
+
+    // Find the targeted element and all its parents that can be expanded
+    var element = target;
+    while (element) {
+        // Expand collapsed sections
+        if (element.classList.contains("collapse") && !element.classList.contains("show")) {
+            var bsCollapse = new bootstrap.Collapse(element, { toggle: true });
+        }
+        // Activate tab panes
+        if (element.classList.contains("tab-pane")) {
+            var tabTrigger = document.querySelector('a[href="#' + element.id + '"]');
+            if (tabTrigger) {
+                var bsTab = new bootstrap.Tab(tabTrigger);
+                bsTab.show();
             }
         }
-    );
+        // Handle direct tab links
+        if (element.getAttribute("role") === "tab") {
+            var bsTab = new bootstrap.Tab(element);
+            bsTab.show();
+        }
+        element = element.parentElement;
+    }
 
     // Wait a little so the user has time to see the page scroll
-    // Or maybe it is to be sure everything is expanded before scrolling and I was not able to bind to the bootstrap
-    // events in a way that works all the time, we may never know
     setTimeout(function() {
-        let targetElement = document.getElementById(linkTarget);
+        var targetElement = document.getElementById(linkTarget);
         if (targetElement) {
             targetElement.scrollIntoView({ block: "center", behavior:"smooth" });
             // Flash the element so that the user notices where the link points to

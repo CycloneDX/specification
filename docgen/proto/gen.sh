@@ -24,6 +24,9 @@ SCHEMA_PATH="$(realpath "$THIS_PATH/../../schema")"
 DOCS_PATH="$THIS_PATH/docs"
 TEMPLATES_PATH="$THIS_PATH/templates"
 
+# Centralized header injection
+source "$THIS_PATH/../static/inject-header.sh"
+
 PROTOC_GEN_DOC_VERSION='1.5.1'
 
 
@@ -63,6 +66,8 @@ generate () {
   sed -i -e "s/\${quotedTitle}/\"$title\"/g" "$OUT_DIR/$OUT_FILE"
   sed -i -e "s/\${title}/$title/g" "$OUT_DIR/$OUT_FILE"
   sed -i -e "s/\${version}/$version/g" "$OUT_DIR/$OUT_FILE"
+
+  inject_header "$OUT_DIR/$OUT_FILE" "$version" "proto"
 }
 
 
