@@ -29,7 +29,11 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 def validate_input_path(path):
     """Ensure the input file resolves to within the script's directory."""
     resolved = os.path.realpath(path)
-    if not resolved.startswith(SCRIPT_DIR + os.sep) and resolved != SCRIPT_DIR:
+    try:
+        common = os.path.commonpath([resolved, SCRIPT_DIR])
+    except ValueError:
+        common = None
+    if common != SCRIPT_DIR:
         print(f"ERROR: Input file must reside in {SCRIPT_DIR}", file=sys.stderr)
         sys.exit(1)
     return resolved
