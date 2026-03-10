@@ -1,0 +1,648 @@
+<!--
+  CycloneDX Specification — Centralized Mega Menu Header
+  ═══════════════════════════════════════════════════════
+  Single source of truth for the navbar and version selector
+  used across all three template systems (JSON, XML, Proto).
+
+  Tokens (replaced at build time by inject-header.sh):
+    ${navLabel}    — Nav toggle text, e.g. "CycloneDX 2.0" or "CycloneDX 1.7 (JSON)"
+    ${version}     — Spec version, e.g. "2.0" or "1.7"
+    ${format}      — Serialization format: "json", "xml", or "proto"
+    ${formatLabel} — Display name: "JSON", "XML", or "Protobuf"
+-->
+<style>
+/* ══════════════════════════════════════════════════════════
+   Navbar & Mega Menu — CycloneDX Specification Header
+   ══════════════════════════════════════════════════════════ */
+.navbar {
+    min-height: 90px;
+    padding: 0;
+}
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+}
+.navbar-dark .navbar-nav>.open>a,
+.navbar-dark .navbar-nav>.open>a:focus,
+.navbar-dark .navbar-nav>.open>a:hover,
+.navbar-dark {
+    background-image: linear-gradient(269.12deg, rgba(232, 52, 82, 1) 0%, rgba(136, 38, 125, 1) 51.26%, rgba(52, 57, 175, 1) 100%);
+}
+.navbar-brand, .fixed-top {
+    padding: 0 30px 0 30px;
+}
+.navbar-dark .navbar-nav>li>a {
+    color: #ffffff;
+}
+.site-header__logo img {
+    height: 90px;
+}
+
+/* ── Remove focus outline / blue box on mega menu toggle ── */
+.cdx-mega-toggle:focus,
+.cdx-mega-toggle:active,
+.cdx-mega-toggle:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* ── Chevron instead of caret arrow ── */
+.cdx-mega-toggle .bi-chevron-down {
+    font-size: 0.75rem;
+    margin-left: 0.4rem;
+    display: inline-block;
+    transition: transform 0.25s ease;
+    vertical-align: middle;
+    -webkit-text-stroke: 1px currentColor;
+    font-weight: bold;
+}
+.nav-item.cdx-mega-trigger.show .cdx-mega-toggle .bi-chevron-down {
+    transform: rotate(180deg);
+}
+
+/* ── Full-Width Mega Menu ── */
+.mega-menu {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 !important;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    background: #fff;
+    position: fixed !important;
+    top: 90px !important;
+    z-index: 1029;
+    transform: none !important;
+}
+
+/* Backdrop overlay — dims page content when mega menu is open */
+.mega-backdrop {
+    display: none;
+    position: fixed;
+    top: 90px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 1028;
+}
+
+.mega-inner {
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+    min-height: 280px;
+}
+
+/* Left sidebar */
+.mega-sidebar {
+    width: 240px;
+    min-width: 240px;
+    background: #eaeaea;
+    padding: 1.25rem 0;
+    border-right: 1px solid #ddd;
+}
+.mega-sidebar .mega-section-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #88267d;
+    padding: 0.5rem 1.25rem 0.25rem;
+}
+.mega-sidebar .mega-section-label:not(:first-child) {
+    margin-top: 0.75rem;
+}
+.mega-sidebar-item {
+    display: block;
+    padding: 0.75rem 1.25rem;
+    color: #222;
+    text-decoration: none;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: background 0.15s;
+}
+.mega-sidebar-item:hover {
+    background: #eaeaea;
+}
+.mega-sidebar-item.active {
+    border-left: 3px solid transparent;
+    border-image: linear-gradient(to bottom, rgba(52, 57, 175, 1), rgba(136, 38, 125, 1), rgba(232, 52, 82, 1)) 1;
+    background: #fff;
+}
+.mega-sidebar-item .sidebar-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #222;
+    display: block;
+    line-height: 1.3;
+}
+.mega-sidebar-item .sidebar-desc {
+    font-size: 0.72rem;
+    color: #8c8c8c;
+    display: block;
+    margin-top: 0.2rem;
+}
+.mega-sidebar-item.active .sidebar-label {
+    color: #3439af;
+}
+
+/* Main content */
+.mega-content {
+    flex: 1;
+    padding: 1.5rem 2rem 1.75rem;
+}
+
+.mega-panel {
+    display: none;
+}
+.mega-panel.active {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* ── Featured card for TEL v2.0 ── */
+.featured-card {
+    display: flex;
+    text-decoration: none;
+    color: #fff;
+    background: linear-gradient(135deg, #3439af 0%, #88267d 60%, #c23060 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.15s;
+    align-items: center;
+    gap: 1.5rem;
+}
+.featured-card:hover {
+    background: linear-gradient(135deg, #2d32a0 0%, #7a2170 60%, #b02858 100%);
+    box-shadow: 0 4px 16px rgba(136,38,125,0.2);
+    color: #fff;
+}
+.featured-card .fc-left {
+    flex-shrink: 0;
+}
+.featured-card .fc-version {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1;
+}
+.featured-card .fc-date {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.7);
+    margin-top: 0.3rem;
+}
+.featured-card .fc-ecma {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.7);
+    margin-top: 0.25rem;
+}
+.featured-card .fc-middle {
+    flex: 1;
+}
+.featured-card .fc-desc {
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.4;
+}
+.featured-card .fc-right {
+    flex-shrink: 0;
+}
+.featured-card .fc-fmt {
+    display: inline-block;
+    font-size: 0.65rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    background: transparent;
+    border: 1.5px solid #fff;
+    color: #fff;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    text-decoration: none;
+    transition: all 0.12s;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+}
+.featured-card .fc-fmt:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* ── Includes note ── */
+.tel-note {
+    font-size: 0.78rem;
+    color: #6c6c8c;
+    margin-top: auto;
+    margin-bottom: 0;
+    padding-top: 1rem;
+    line-height: 1.4;
+}
+.tel-note .bi {
+    color: #3439af;
+    margin-right: 0.3rem;
+}
+
+/* ── Version cards — uniform grid, fluid width ── */
+.version-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+}
+
+.version-card {
+    display: block;
+    text-decoration: none;
+    color: #222;
+    background: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 0.85rem 1rem;
+    min-height: 135px;
+    transition: all 0.15s;
+    position: relative;
+}
+.version-card:hover {
+    border-color: #3439af;
+    background: #f0f0ff;
+    color: #222;
+    box-shadow: 0 2px 8px rgba(52,57,175,0.08);
+}
+
+.version-card .vc-version {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #222;
+    line-height: 1.2;
+}
+.version-card .vc-date {
+    font-size: 0.75rem;
+    color: #8c8c8c;
+    margin-top: 0.25rem;
+}
+.version-card .vc-ecma {
+    font-size: 0.7rem;
+    color: #3439af;
+    font-weight: 500;
+    margin-top: 0.2rem;
+    line-height: 1.2;
+}
+/* Spacer to reserve ECMA line height even when absent */
+.version-card .vc-ecma-spacer {
+    height: 1.05rem;
+    margin-top: 0.2rem;
+}
+
+/* Pills: absolutely positioned at bottom of card */
+.version-card .vc-formats {
+    display: flex;
+    gap: 0.35rem;
+    position: absolute;
+    bottom: 0.85rem;
+    left: 1rem;
+}
+.version-card .vc-fmt {
+    display: inline-block;
+    font-size: 0.62rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+    background: #e0e0e0;
+    color: #444;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    text-decoration: none;
+    transition: all 0.12s;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+}
+.version-card .vc-fmt:hover {
+    background: #3439af;
+    color: #fff;
+}
+/* Stretched link: first pill covers entire card for default navigation */
+.version-card .vc-fmt-default::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+}
+
+/* ── Responsive: medium screens (tablets, small laptops) ── */
+@media (max-width: 991.98px) {
+    .mega-content {
+        padding: 1rem;
+    }
+    .featured-card {
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    .featured-card .fc-middle {
+        min-width: 200px;
+    }
+    .featured-card .fc-right {
+        width: 100%;
+        margin-top: 0.25rem;
+    }
+    .version-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .version-card {
+        height: auto;
+        min-height: 135px;
+    }
+    .version-card .vc-formats {
+        flex-wrap: wrap;
+    }
+}
+
+/* ── Responsive: small screens ── */
+@media (max-width: 575.98px) {
+    /* Hide the "CycloneDX x.x" dropdown toggle on mobile */
+    #navbarScroll {
+        display: none !important;
+    }
+    /* Hide JSON pill on featured card */
+    .featured-card .fc-right {
+        display: none;
+    }
+    /* Stack mega-inner vertically on mobile */
+    .mega-inner {
+        flex-direction: column;
+        min-height: auto;
+    }
+
+    /* ── Sidebar becomes horizontal tab bar ── */
+    .mega-sidebar {
+        width: 100%;
+        min-width: 100%;
+        display: flex;
+        gap: 0;
+        padding: 0;
+        border-right: none;
+        border-bottom: 1px solid #e0e0e0;
+        background: #f9f9f9;
+    }
+    .mega-sidebar .mega-section-label {
+        display: none;
+    }
+    .mega-sidebar-item {
+        flex: 1;
+        text-align: center;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+        padding: 0.65rem 0.5rem;
+    }
+    /* Hide the version range subtitle on mobile tabs */
+    .mega-sidebar-item .sidebar-desc {
+        display: none;
+    }
+    /* Shrink tab label font slightly */
+    .mega-sidebar-item .sidebar-label {
+        font-size: 0.78rem;
+    }
+    .mega-sidebar-item.active {
+        border-left: none;
+        border-bottom-color: #88267d;
+        background: #fff;
+    }
+    /* Active label: use dark color, not blue */
+    .mega-sidebar-item.active .sidebar-label {
+        color: #222;
+    }
+
+    /* ── Content area ── */
+    .mega-content {
+        padding: 0.75rem;
+    }
+
+    /* ── Featured card: stack vertically ── */
+    .featured-card {
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 1rem;
+        align-items: flex-start;
+    }
+    .featured-card .fc-version {
+        font-size: 1.4rem;
+    }
+    .featured-card .fc-desc {
+        font-size: 0.78rem;
+    }
+
+    /* ── Tel-note ── */
+    .tel-note {
+        font-size: 0.72rem;
+        padding-top: 0.5rem;
+    }
+
+    /* ── Version cards: 2 columns on mobile ── */
+    .version-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+    .version-card {
+        width: auto;
+        height: 120px;
+        padding: 0.7rem 0.75rem;
+    }
+    .version-card .vc-version {
+        font-size: 1rem;
+    }
+    .version-card .vc-date {
+        font-size: 0.68rem;
+    }
+    .version-card .vc-ecma {
+        font-size: 0.64rem;
+    }
+    .version-card .vc-formats {
+        bottom: 0.65rem;
+        left: 0.75rem;
+    }
+    .version-card .vc-fmt {
+        font-size: 0.56rem;
+        padding: 0.12rem 0.4rem;
+    }
+
+    /* ── Mega menu positioning ── */
+    .mega-menu {
+        max-height: calc(100vh - 90px);
+        overflow-y: auto;
+    }
+}
+</style>
+
+<nav class="navbar fixed-top navbar-expand-sm navbar-dark">
+    <a href="/" class="navbar-brand site-header__logo"><img src="https://cyclonedx.org/images/logo-all-white.svg" height="48" width="276" /></a>
+    <button class="navbar-toggler" type="button" id="hamburgerToggle" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarScroll">
+        <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
+            <li class="nav-item cdx-mega-trigger">
+                <a class="nav-link cdx-mega-toggle" href="#" id="navbarScrollingDropdown" role="button" aria-expanded="false">
+                    ${navLabel} <i class="bi bi-chevron-down"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Mega menu lives outside the navbar collapse so it is accessible on all screen sizes -->
+<div class="mega-menu" id="megaMenuPanel" data-cdx-version="${version}" data-cdx-format="${format}" style="display:none;">
+    <div class="mega-inner">
+${MEGA_MENU_PANELS}
+    </div>
+</div>
+<div class="mega-backdrop" id="megaBackdrop"></div>
+
+<script>
+(function() {
+    // ── Elements ──
+    var dropdownLi = document.querySelector('.nav-item.cdx-mega-trigger');
+    var dropdownToggle = dropdownLi ? dropdownLi.querySelector('.cdx-mega-toggle') : null;
+    var megaMenu = document.getElementById('megaMenuPanel');
+    var megaBackdrop = document.getElementById('megaBackdrop');
+    var megaInner = megaMenu.querySelector('.mega-inner');
+    var hamburger = document.getElementById('hamburgerToggle');
+    var closeTimer = null;
+
+    // ── Reset sidebar to first group every time the menu opens ──
+    var allSidebarItems = megaMenu.querySelectorAll('.mega-sidebar-item');
+
+    function activateFirstGroup() {
+        if (allSidebarItems.length > 0) {
+            allSidebarItems.forEach(function(item) { item.classList.remove('active'); });
+            megaMenu.querySelectorAll('.mega-panel').forEach(function(p) { p.classList.remove('active'); });
+            allSidebarItems[0].classList.add('active');
+            var firstPanel = document.getElementById(allSidebarItems[0].getAttribute('data-mega-target'));
+            if (firstPanel) firstPanel.classList.add('active');
+        }
+    }
+
+    function isOpen() {
+        return megaMenu.style.display !== 'none';
+    }
+
+    function forceShow() {
+        activateFirstGroup();
+        megaMenu.style.display = 'block';
+        if (megaBackdrop) megaBackdrop.style.display = 'block';
+        if (dropdownLi) dropdownLi.classList.add('show');
+        if (dropdownToggle) dropdownToggle.setAttribute('aria-expanded', 'true');
+    }
+
+    function forceHide() {
+        megaMenu.style.display = 'none';
+        if (megaBackdrop) megaBackdrop.style.display = 'none';
+        if (dropdownLi) dropdownLi.classList.remove('show');
+        if (dropdownToggle) dropdownToggle.setAttribute('aria-expanded', 'false');
+    }
+
+    function openMenu() {
+        clearTimeout(closeTimer);
+        if (!isOpen()) forceShow();
+    }
+
+    function scheduleClose() {
+        clearTimeout(closeTimer);
+        closeTimer = setTimeout(function() {
+            if (isOpen()) forceHide();
+        }, 180);
+    }
+
+    function isPointInside(el, x, y) {
+        var rect = el.getBoundingClientRect();
+        return x >= rect.left && x <= rect.right &&
+               y >= rect.top && y <= rect.bottom;
+    }
+
+    function isCursorInMenuZone(x, y) {
+        if (dropdownLi && isPointInside(dropdownLi, x, y)) return true;
+        var menuRect = megaMenu.getBoundingClientRect();
+        var innerRect = megaInner.getBoundingClientRect();
+        return x >= innerRect.left && x <= innerRect.right &&
+               y >= menuRect.top && y <= menuRect.bottom;
+    }
+
+    // ── Desktop: hover-to-open on the nav item ──
+    if (dropdownLi) {
+        dropdownLi.addEventListener('mouseenter', openMenu);
+        dropdownLi.addEventListener('mouseenter', function() { clearTimeout(closeTimer); });
+    }
+
+    // Track cursor globally to close when leaving the menu zone
+    document.addEventListener('mousemove', function(e) {
+        if (!isOpen()) return;
+        if (isCursorInMenuZone(e.clientX, e.clientY)) {
+            clearTimeout(closeTimer);
+        } else {
+            scheduleClose();
+        }
+    });
+
+    // Fallback mouseleave on the mega menu
+    megaMenu.addEventListener('mouseleave', function() { scheduleClose(); });
+    megaMenu.addEventListener('mouseenter', function() { clearTimeout(closeTimer); });
+
+    // ── Desktop: click toggle on "CycloneDX x.x" ──
+    if (dropdownToggle) {
+        dropdownToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (isOpen()) { forceHide(); } else { forceShow(); }
+        });
+    }
+
+    // ── Mobile: hamburger directly toggles mega menu ──
+    if (hamburger) {
+        hamburger.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (isOpen()) { forceHide(); } else { forceShow(); }
+        });
+    }
+
+    // ── Sidebar: hover (desktop) and click (touch) switching ──
+    document.querySelectorAll('.mega-sidebar-item').forEach(function(item) {
+        function activatePanel(el) {
+            el.closest('.mega-sidebar').querySelectorAll('.mega-sidebar-item').forEach(function(n) {
+                n.classList.remove('active');
+            });
+            el.closest('.mega-inner').querySelectorAll('.mega-panel').forEach(function(p) {
+                p.classList.remove('active');
+            });
+            el.classList.add('active');
+            var panel = document.getElementById(el.getAttribute('data-mega-target'));
+            if (panel) panel.classList.add('active');
+        }
+        item.addEventListener('mouseenter', function() { activatePanel(this); });
+        item.addEventListener('click', function(e) { e.preventDefault(); activatePanel(this); });
+    });
+
+    // ── Escape key closes the menu ──
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && isOpen()) forceHide();
+    });
+
+    // ── Clicking the backdrop closes the menu ──
+    if (megaBackdrop) {
+        megaBackdrop.addEventListener('click', function() { forceHide(); });
+    }
+
+    // ── Keep mega menu open when clicking non-link areas ──
+    megaMenu.addEventListener('click', function(e) {
+        if (!e.target.closest('a')) {
+            e.stopPropagation();
+        }
+    });
+})();
+</script>
