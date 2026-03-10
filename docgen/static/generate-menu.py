@@ -18,8 +18,21 @@ Groups can also have:
 """
 
 import json
+import os
 import sys
 import html
+
+# This script's directory is the only allowed location for input files
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+def validate_input_path(path):
+    """Ensure the input file resolves to within the script's directory."""
+    resolved = os.path.realpath(path)
+    if not resolved.startswith(SCRIPT_DIR + os.sep) and resolved != SCRIPT_DIR:
+        print(f"ERROR: Input file must reside in {SCRIPT_DIR}", file=sys.stderr)
+        sys.exit(1)
+    return resolved
 
 
 def fmt_label(fmt):
@@ -115,7 +128,8 @@ def main():
         print("Usage: generate-menu.py <releases.json>", file=sys.stderr)
         sys.exit(1)
 
-    with open(sys.argv[1], "r") as f:
+    input_path = validate_input_path(sys.argv[1])
+    with open(input_path, "r") as f:
         data = json.load(f)
 
     groups = [g for g in data["groups"] if not g.get("skip")]
