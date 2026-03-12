@@ -61,7 +61,7 @@ generate () {
   mkdir -p "$OUT_DIR"
 
   generate-schema-doc \
-    --config no_link_to_reused_ref \
+    --config link_to_reused_ref \
     --config no_show_breadcrumbs \
     --config no_collapse_long_descriptions \
     --deprecated-from-description \
