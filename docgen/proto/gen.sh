@@ -67,6 +67,9 @@ generate () {
   sed -i -e "s/\${title}/$title/g" "$OUT_DIR/$OUT_FILE"
   sed -i -e "s/\${version}/$version/g" "$OUT_DIR/$OUT_FILE"
 
+  sed -i -E -e "s#(<p>)buf:.+</p>##g" "$OUT_DIR/$OUT_FILE"
+  sed -i -E -e "s#^buf:[^<\n]+##g" "$OUT_DIR/$OUT_FILE"
+
   inject_header "$OUT_DIR/$OUT_FILE" "$version" "proto"
 }
 
