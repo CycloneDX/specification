@@ -715,6 +715,10 @@
    <xsl:template name="DocumentCSSStyles">
       <xsl:text disable-output-escaping="yes">
 /* XS3P specific CSS */
+html {
+    scroll-padding-top: 110px;
+}
+
 body {
   font: 16px/1.5em "Helvetica Neue",Helvetica,Arial,sans-serif;
   color: #222;
@@ -808,17 +812,9 @@ code {
 a {
     color: #2157c4;
 }
-a.name {
-    padding-top: 110px;
-}
 
 h3.xs3p-subsection-heading {
     margin-bottom: 30px;
-}
-
-section, #top {
-    margin-top: -110px;
-    padding-top: 110px;
 }
 
 pre {
