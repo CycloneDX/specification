@@ -91,7 +91,7 @@ public class SpdxXsdGenerator {
             .append("<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"").append("\n")
             .append(indent(11)).append("elementFormDefault=\"qualified\"").append("\n")
             .append(indent(11)).append("targetNamespace=\"http://cyclonedx.org/schema/spdx\"").append("\n")
-            .append(indent(11)).append("version=\"1.0-" + stripLeadingV(tagName) + "\">").append("\n\n")
+            .append(indent(11)).append("version=\"1.0-" + StringEscapeUtils.escapeXml10(stripLeadingV(tagName)) + "\">").append("\n\n")
             .append(indent(4)).append("<xs:simpleType name=\"licenseId\">").append("\n")
             .append(indent(8)).append("<xs:restriction base=\"xs:string\">").append("\n");
 
@@ -117,17 +117,22 @@ public class SpdxXsdGenerator {
                 .append("{").append("\n")
                 .append(indent(2)).append("\"$schema\": \"http://json-schema.org/draft-07/schema#\",").append("\n")
                 .append(indent(2)).append("\"$id\": \"http://cyclonedx.org/schema/spdx.schema.json\",").append("\n")
-                .append(indent(2)).append("\"$comment\": \"v1.0-" + stripLeadingV(tagName) + "\",").append("\n")
+                .append(indent(2)).append("\"$comment\": \"v1.1-" + StringEscapeUtils.escapeJson(stripLeadingV(tagName)) + "\",").append("\n")
                 .append(indent(2)).append("\"type\": \"string\",").append("\n")
                 .append(indent(2)).append("\"enum\": [");
 
         addLicenseAsJson(sb, licenses.entrySet());
         sb.append(",");
         addLicenseAsJson(sb, exceptions.entrySet());
+        sb.append("\n").append(indent(2)).append("],").append("\n");
 
-        sb
-                .append("\n").append(indent(2)).append("]").append("\n")
-                .append("}").append("\n");
+        sb.append(indent(2)).append("\"meta:enum\": {");
+        addLicenseAsJsonLabel(sb, licenses.entrySet());
+        sb.append(",");
+        addLicenseAsJsonLabel(sb, exceptions.entrySet());
+        sb.append("\n").append(indent(2)).append("}").append("\n");
+
+        sb.append("}").append("\n");
 
         String filePath = System.getProperty("cdx.schema.dir") + "/spdx.schema.json";
         System.out.println("Write SPDX json schema to: " + filePath);
@@ -137,7 +142,7 @@ public class SpdxXsdGenerator {
 
     private static void addLicenseAsXml(StringBuilder sb, Set<Map.Entry<String, String>> set) {
         for (Map.Entry<String, String> license : set) {
-            sb.append(indent(12)).append("<xs:enumeration value=\"").append(license.getKey()).append("\">").append("\n");
+            sb.append(indent(12)).append("<xs:enumeration value=\"").append(StringEscapeUtils.escapeXml10(license.getKey())).append("\">").append("\n");
             sb.append(indent(16)).append("<xs:annotation>").append("\n");
             sb.append(indent(20)).append("<xs:documentation>").append(StringEscapeUtils.escapeXml10(license.getValue())).append("</xs:documentation>").append("\n");
             sb.append(indent(16)).append("</xs:annotation>").append("\n");
@@ -149,7 +154,19 @@ public class SpdxXsdGenerator {
         int i = 0;
         for (Map.Entry<String, String> license : set) {
             sb.append("\n");
-            sb.append(indent(4)).append("\"").append(license.getKey()).append("\"");
+            sb.append(indent(4)).append("\"").append(StringEscapeUtils.escapeJson(license.getKey())).append("\"");
+            if (i < set.size()-1) {
+                sb.append(",");
+            }
+            i++;
+        }
+    }
+
+    private static void addLicenseAsJsonLabel(StringBuilder sb, Set<Map.Entry<String, String>> set) {
+        int i = 0;
+        for (Map.Entry<String, String> license : set) {
+            sb.append("\n");
+            sb.append(indent(4)).append("\"").append(StringEscapeUtils.escapeJson(license.getKey())).append("\": \"").append(StringEscapeUtils.escapeJson(license.getValue())).append("\"");
             if (i < set.size()-1) {
                 sb.append(",");
             }
