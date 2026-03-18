@@ -25,6 +25,9 @@ SCHEMA_PATH="$(realpath "$THIS_PATH/../../schema")"
 DOCS_PATH="$THIS_PATH/docs"
 TEMPLATES_PATH="$THIS_PATH/templates"
 
+# Centralized header injection
+source "$THIS_PATH/../static/inject-header.sh"
+
 
 # --
 
@@ -58,7 +61,7 @@ generate () {
   mkdir -p "$OUT_DIR"
 
   generate-schema-doc \
-    --config no_link_to_reused_ref \
+    --config link_to_reused_ref \
     --config no_show_breadcrumbs \
     --config no_collapse_long_descriptions \
     --deprecated-from-description \
@@ -71,6 +74,8 @@ generate () {
   sed -i -e "s/\${quotedTitle}/\"$title\"/g" "$OUT_FILE"
   sed -i -e "s/\${title}/$title/g" "$OUT_FILE"
   sed -i -e "s/\${version}/$version/g" "$OUT_FILE"
+
+  inject_header "$OUT_FILE" "$version" "json"
 }
 
 
