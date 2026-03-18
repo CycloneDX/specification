@@ -76,7 +76,7 @@ limitations under the License.
     <xs:simpleType name="versionRangeType">
         <xs:annotation>
             <xs:documentation xml:lang="en"><![CDATA[
-                A version range specified in Package URL Version Range syntax (vers) which is defined at https://github.com/package-url/purl-spec/blob/master/VERSION-RANGE-SPEC.rst
+                A version range specified in Package URL Version Range syntax (vers) which is defined at https://github.com/package-url/vers-spec
 
                 Example values:
                 - "vers:cargo/9.0.14"
@@ -179,7 +179,7 @@ limitations under the License.
                         <xs:sequence minOccurs="0" maxOccurs="unbounded">
                             <xs:element name="tool" minOccurs="0" type="bom:toolType">
                                 <xs:annotation>
-                                    <xs:documentation>DEPRECATED. Use tools\components or tools\services instead.</xs:documentation>
+                                    <xs:documentation>DEPRECATED. Use `../components` or `../services` instead.</xs:documentation>
                                 </xs:annotation>
                             </xs:element>
                         </xs:sequence>
@@ -257,11 +257,25 @@ limitations under the License.
                         Formal registration is optional.</xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="distribution" type="bom:tlpClassificationType" default="CLEAR" minOccurs="0" maxOccurs="1">
+            <xs:element name="distributionConstraints" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation>The Traffic Light Protocol (TLP) classification that controls the sharing and distribution
-                        of the data that the BOM describes.</xs:documentation>
+                    <xs:documentation>
+                        Conditions and constraints governing the sharing and distribution of the data or components
+                        described by this BOM.
+                    </xs:documentation>
                 </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="tlp" type="bom:tlpClassificationType" default="CLEAR" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The Traffic Light Protocol (TLP) classification that controls the sharing and
+                                    distribution of the data that the BOM describes.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
             </xs:element>
             <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
@@ -384,7 +398,7 @@ limitations under the License.
         <xs:attribute name="bom-ref" type="bom:refType">
             <xs:annotation>
                 <xs:documentation>
-                    An optional identifier which can be used to reference the object elsewhere in the BOM.
+                    An identifier which can be used to reference the object elsewhere in the BOM.
                     Uniqueness is enforced within all elements and children of the root-level bom element.
                 </xs:documentation>
             </xs:annotation>
@@ -519,7 +533,7 @@ limitations under the License.
         <xs:attribute name="bom-ref" type="bom:refType">
             <xs:annotation>
                 <xs:documentation>
-                    An optional identifier which can be used to reference the object elsewhere in the BOM.
+                    An identifier which can be used to reference the object elsewhere in the BOM.
                     Uniqueness is enforced within all elements and children of the root-level bom element.
                 </xs:documentation>
             </xs:annotation>
@@ -621,7 +635,7 @@ limitations under the License.
                     <xs:annotation>
                         <xs:documentation><![CDATA[
                         For an external component, this specifies the accepted version range.
-                        The value must adhere to the Package URL Version Range syntax (vers), as defined at https://github.com/package-url/purl-spec/blob/master/VERSION-RANGE-SPEC.rst.
+                        The value must adhere to the Package URL Version Range syntax (vers), as defined at https://github.com/package-url/vers-spec.
                         May only be used if `@isExternal` is set to `true`.
                         ]]></xs:documentation>
                     </xs:annotation>
@@ -775,7 +789,7 @@ limitations under the License.
             </xs:element>
             <xs:element name="releaseNotes" type="bom:releaseNotesType" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation>Specifies optional release notes.</xs:documentation>
+                    <xs:documentation>Specifies release notes.</xs:documentation>
                 </xs:annotation>
             </xs:element>
             <xs:element name="modelCard" type="bom:modelCardType" minOccurs="0" maxOccurs="1">
@@ -825,7 +839,7 @@ limitations under the License.
         <xs:attribute name="mime-type" type="bom:mimeType">
             <xs:annotation>
                 <xs:documentation>
-                    The optional mime-type of the component. When used on file components, the mime-type
+                    The mime-type of the component. When used on file components, the mime-type
                     can provide additional context about the kind of file being represented such as an image,
                     font, or executable. Some library or framework components may also have an associated mime-type.
                 </xs:documentation>
@@ -843,7 +857,7 @@ limitations under the License.
         <xs:attribute name="bom-ref" type="bom:refType">
             <xs:annotation>
                 <xs:documentation>
-                    An optional identifier which can be used to reference the component elsewhere in the BOM.
+                    An identifier which can be used to reference the component elsewhere in the BOM.
                     Uniqueness is enforced within all elements and children of the root-level bom element.
                 </xs:documentation>
             </xs:annotation>
@@ -868,7 +882,7 @@ limitations under the License.
         <xs:attribute name="bom-ref" type="bom:refType">
             <xs:annotation>
                 <xs:documentation>
-                    An optional identifier which can be used to reference the license elsewhere in the BOM.
+                    An identifier which can be used to reference the license elsewhere in the BOM.
                     Uniqueness is enforced within all elements and children of the root-level bom element.
                 </xs:documentation>
             </xs:annotation>
@@ -1034,7 +1048,7 @@ limitations under the License.
             </xs:choice>
             <xs:element name="text" type="bom:attachedTextType" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation>Specifies the optional full text of the attachment</xs:documentation>
+                    <xs:documentation>Specifies the full text of the attachment</xs:documentation>
                 </xs:annotation>
             </xs:element>
             <xs:element name="url" type="xs:anyURI" minOccurs="0" maxOccurs="1">
@@ -1109,7 +1123,7 @@ limitations under the License.
                     <xs:sequence>
                         <xs:element name="text" type="bom:attachedTextType" minOccurs="0" maxOccurs="1">
                             <xs:annotation>
-                                <xs:documentation>An optional way to include the textual content of the license.</xs:documentation>
+                                <xs:documentation>A way to include the textual content of the license.</xs:documentation>
                             </xs:annotation>
                         </xs:element>
                         <xs:element name="url" type="xs:anyURI" minOccurs="0" maxOccurs="1">
@@ -1142,7 +1156,7 @@ limitations under the License.
                     <xs:attribute name="bom-ref" type="bom:refType">
                         <xs:annotation>
                             <xs:documentation>
-                                An optional identifier which can be used to reference the license elsewhere in the BOM.
+                                An identifier which can be used to reference the license elsewhere in the BOM.
                                 Uniqueness is enforced within all elements and children of the root-level bom element.
                             </xs:documentation>
                         </xs:annotation>
@@ -1198,7 +1212,7 @@ limitations under the License.
                         <xs:documentation>
                             Specifies the format and nature of the data being attached, helping systems correctly
                             interpret and process the content. Common content type examples include `application/json`
-                            for JSON data and `text/plain` for plan text documents.
+                            for JSON data and `text/plain` for plain text documents.
                             RFC 2045 section 5.1 outlines the structure and use of content types. For a comprehensive
                             list of registered content types, refer to the IANA media types registry at
                             https://www.iana.org/assignments/media-types/media-types.xhtml.
@@ -1208,7 +1222,7 @@ limitations under the License.
                 <xs:attribute name="encoding" type="bom:encoding">
                     <xs:annotation>
                         <xs:documentation>
-                            Specifies the optional encoding the text is represented in
+                            Specifies the encoding the text is represented in
                         </xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
@@ -1677,7 +1691,7 @@ limitations under the License.
             </xs:enumeration>
             <xs:enumeration value="formulation">
                 <xs:annotation>
-                    <xs:documentation>Describes how a component or service was manufactured or deployed.</xs:documentation>
+                    <xs:documentation>Describes the formulation of any referencable object within the BOM, including components, services, metadata, declarations, or the BOM itself.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
             <xs:enumeration value="attestation">
@@ -1790,6 +1804,11 @@ limitations under the License.
                     <xs:documentation>References assertions made regarding patents associated with a component or service. Assertions distinguish between ownership, licensing, and other relevant interactions with patents.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
+            <xs:enumeration value="citation">
+                <xs:annotation>
+                    <xs:documentation>A reference to external citations applicable to the object identified by this BOM entry or the BOM itself. When used with a BOM-Link, this allows offloading citations into a separate CycloneDX BOM.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
             <xs:enumeration value="other">
                 <xs:annotation>
                     <xs:documentation>Use this if no other types accurately describe the purpose of the external reference</xs:documentation>
@@ -1832,7 +1851,7 @@ limitations under the License.
             </xs:element>
             <xs:element name="comment" type="xs:string" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation xml:lang="en">An optional comment describing the external reference</xs:documentation>
+                    <xs:documentation xml:lang="en">A comment describing the external reference</xs:documentation>
                 </xs:annotation>
             </xs:element>
             <xs:element name="hashes" minOccurs="0" maxOccurs="1">
@@ -2033,7 +2052,7 @@ limitations under the License.
         <xs:sequence>
             <xs:element name="text" type="bom:attachedTextType" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation xml:lang="en">Specifies the optional text of the diff</xs:documentation>
+                    <xs:documentation xml:lang="en">Specifies the text of the diff</xs:documentation>
                 </xs:annotation>
             </xs:element>
             <xs:element name="url" type="xs:anyURI" minOccurs="0" maxOccurs="1">
@@ -2366,7 +2385,7 @@ limitations under the License.
                         <xs:sequence minOccurs="0" maxOccurs="unbounded">
                             <xs:element name="classification" type="bom:dataClassificationType">
                                 <xs:annotation>
-                                    <xs:documentation>DEPRECATED: Specifies the data classification. THIS FIELD IS DEPRECATED AS OF v1.5. Use dataflow\classification instead</xs:documentation>
+                                    <xs:documentation>DEPRECATED: Specifies the data classification. THIS FIELD IS DEPRECATED AS OF v1.5. Use `./dataflow/classification` instead</xs:documentation>
                                 </xs:annotation>
                             </xs:element>
                         </xs:sequence>
@@ -2493,7 +2512,7 @@ limitations under the License.
             </xs:element>
             <xs:element name="releaseNotes" type="bom:releaseNotesType" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation>Specifies optional release notes.</xs:documentation>
+                    <xs:documentation>Specifies release notes.</xs:documentation>
                 </xs:annotation>
             </xs:element>
             <xs:element name="tags" type="bom:tagsType" minOccurs="0" maxOccurs="1" />
@@ -2508,7 +2527,7 @@ limitations under the License.
         <xs:attribute name="bom-ref" type="bom:refType">
             <xs:annotation>
                 <xs:documentation>
-                    An optional identifier which can be used to reference the service elsewhere in the BOM.
+                    An identifier which can be used to reference the service elsewhere in the BOM.
                     Uniqueness is enforced within all elements and children of the root-level bom element.
                 </xs:documentation>
             </xs:annotation>
@@ -2815,8 +2834,8 @@ limitations under the License.
                                 <xs:attribute name="bom-ref" type="bom:refType">
                                     <xs:annotation>
                                         <xs:documentation>
-                                            An optional identifier which can be used to reference the occurrence elsewhere
-                                            in the BOM. Every bom-ref must be unique within the BOM.
+                                            An identifier which can be used to reference the occurrence elsewhere
+                                            in the BOM. Every `bom-ref` must be unique within the BOM.
                                         </xs:documentation>
                                     </xs:annotation>
                                 </xs:attribute>
@@ -2859,7 +2878,7 @@ limitations under the License.
                                                 </xs:element>
                                                 <xs:element name="parameters" minOccurs="0" maxOccurs="1">
                                                     <xs:annotation>
-                                                        <xs:documentation>Optional arguments that are passed to the module or function.</xs:documentation>
+                                                        <xs:documentation>Arguments that are passed to the module or function.</xs:documentation>
                                                     </xs:annotation>
                                                     <xs:complexType>
                                                         <xs:sequence>
@@ -3028,7 +3047,7 @@ limitations under the License.
         <xs:attribute name="bom-ref" type="bom:refType">
             <xs:annotation>
                 <xs:documentation>
-                    An optional identifier which can be used to reference the composition elsewhere in the BOM.
+                    An identifier which can be used to reference the composition elsewhere in the BOM.
                     Uniqueness is enforced within all elements and children of the root-level bom element.
                 </xs:documentation>
             </xs:annotation>
@@ -3054,12 +3073,12 @@ limitations under the License.
             </xs:enumeration>
             <xs:enumeration value="incomplete_first_party_proprietary_only">
                 <xs:annotation>
-                    <xs:documentation>The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented, limited specifically to those that are proprietary.</xs:documentation>
+                    <xs:documentation>The relationship is incomplete. Only relationships for first-party components, services, or their dependencies are represented, limited specifically to those that are proprietary.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
             <xs:enumeration value="incomplete_first_party_opensource_only">
                 <xs:annotation>
-                    <xs:documentation>The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented, limited specifically to those that are opensource.</xs:documentation>
+                    <xs:documentation>The relationship is incomplete. Only relationships for first-party components, services, or their dependencies are represented, limited specifically to those that are opensource.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
             <xs:enumeration value="incomplete_third_party_only">
@@ -3636,8 +3655,8 @@ limitations under the License.
         <xs:attribute name="bom-ref" type="bom:refType">
             <xs:annotation>
                 <xs:documentation>
-                    An optional identifier which can be used to reference the model card elsewhere in the BOM.
-                    Every bom-ref must be unique within the BOM.
+                    An identifier which can be used to reference the model card elsewhere in the BOM.
+                    Every `bom-ref` must be unique within the BOM.
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
@@ -4008,7 +4027,7 @@ limitations under the License.
         <xs:attribute name="bom-ref" type="bom:refType">
             <xs:annotation>
                 <xs:documentation>
-                    An optional identifier which can be used to reference the energy provider elsewhere in the BOM.
+                    An identifier which can be used to reference the energy provider elsewhere in the BOM.
                     Uniqueness is enforced within all elements and children of the root-level bom element.
                 </xs:documentation>
             </xs:annotation>
@@ -4068,7 +4087,7 @@ limitations under the License.
         <xs:attribute name="bom-ref" type="bom:refType">
             <xs:annotation>
                 <xs:documentation>
-                    An optional identifier which can be used to reference the address elsewhere in the BOM.
+                    An identifier which can be used to reference the address elsewhere in the BOM.
                     Uniqueness is enforced within all elements and children of the root-level bom element.
                 </xs:documentation>
             </xs:annotation>
@@ -4152,7 +4171,7 @@ limitations under the License.
                     <xs:sequence>
                         <xs:element name="attachment" type="bom:attachedTextType" minOccurs="0" maxOccurs="1">
                             <xs:annotation>
-                                <xs:documentation>An optional way to include textual or encoded data.</xs:documentation>
+                                <xs:documentation>A way to include textual or encoded data.</xs:documentation>
                             </xs:annotation>
                         </xs:element>
                         <xs:element name="url" type="xs:anyURI" minOccurs="0" maxOccurs="1">
@@ -4202,8 +4221,8 @@ limitations under the License.
         <xs:attribute name="bom-ref" type="bom:refType">
             <xs:annotation>
                 <xs:documentation>
-                    An optional identifier which can be used to reference the dataset elsewhere in the BOM.
-                    Every bom-ref must be unique within the BOM.
+                    An identifier which can be used to reference the dataset elsewhere in the BOM.
+                    Every `bom-ref` must be unique within the BOM.
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
@@ -4464,7 +4483,7 @@ limitations under the License.
             </xs:element>
             <xs:element name="ratings" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation xml:lang="en">List of vulnerability ratings.</xs:documentation>
+                    <xs:documentation xml:lang="en">List of vulnerability ratings. Consumers SHOULD consider ratings in prioritization decisions; source ratings may differ and aid prioritization.</xs:documentation>
                 </xs:annotation>
                 <xs:complexType>
                     <xs:sequence>
@@ -4607,7 +4626,7 @@ limitations under the License.
                         <xs:sequence minOccurs="0" maxOccurs="unbounded">
                             <xs:element name="tool" minOccurs="0" type="bom:toolType">
                                 <xs:annotation>
-                                    <xs:documentation>DEPRECATED. Use tools\components or tools\services instead.</xs:documentation>
+                                    <xs:documentation>DEPRECATED. Use `../components` or `../services` instead.</xs:documentation>
                                 </xs:annotation>
                             </xs:element>
                         </xs:sequence>
@@ -4721,7 +4740,7 @@ limitations under the License.
                                                                 </xs:element>
                                                                 <xs:element name="range" type="bom:versionRangeType" minOccurs="1" maxOccurs="1">
                                                                     <xs:annotation>
-                                                                        <xs:documentation>A version range specified in Package URL Version Range syntax (vers) which is defined at https://github.com/package-url/purl-spec/blob/master/VERSION-RANGE-SPEC.rst</xs:documentation>
+                                                                        <xs:documentation>A version range specified in Package URL Version Range syntax (vers) which is defined at https://github.com/package-url/vers-spec</xs:documentation>
                                                                     </xs:annotation>
                                                                 </xs:element>
                                                             </xs:choice>
@@ -4758,7 +4777,7 @@ limitations under the License.
         <xs:attribute name="bom-ref" type="bom:refType">
             <xs:annotation>
                 <xs:documentation>
-                    An optional identifier which can be used to reference the vulnerability elsewhere in the BOM.
+                    An identifier which can be used to reference the vulnerability elsewhere in the BOM.
                     Uniqueness is enforced within all elements and children of the root-level bom element.
                 </xs:documentation>
             </xs:annotation>
@@ -4813,7 +4832,7 @@ limitations under the License.
             </xs:element>
             <xs:element name="justification" type="xs:string" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation>An optional reason for rating the vulnerability as it was.</xs:documentation>
+                    <xs:documentation>A reason for rating the vulnerability as it was.</xs:documentation>
                 </xs:annotation>
             </xs:element>
         </xs:sequence>
@@ -4823,7 +4842,7 @@ limitations under the License.
         <xs:sequence>
             <xs:element name="title" type="xs:normalizedString" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation>An optional name of the advisory.</xs:documentation>
+                    <xs:documentation>A name of the advisory.</xs:documentation>
                 </xs:annotation>
             </xs:element>
             <xs:element name="url" type="xs:anyURI" minOccurs="1" maxOccurs="1">
@@ -4926,7 +4945,7 @@ limitations under the License.
         <xs:attribute name="bom-ref" type="bom:refType">
             <xs:annotation>
                 <xs:documentation>
-                    An optional identifier which can be used to reference the annotation elsewhere in the BOM.
+                    An identifier which can be used to reference the annotation elsewhere in the BOM.
                     Uniqueness is enforced within all elements and children of the root-level bom element.
                 </xs:documentation>
             </xs:annotation>
@@ -5238,9 +5257,13 @@ limitations under the License.
     <xs:complexType name="formulationType">
         <xs:annotation>
             <xs:documentation>
-                Describes how a component or service was manufactured or deployed. This is achieved through the use
-                of formulas, workflows, tasks, and steps, which declare the precise steps to reproduce along with the
-                observed formulas describing the steps which transpired in the manufacturing process.
+                Describes the formulation of any referencable object within the BOM,
+                including components, services, metadata, declarations, or the BOM itself. This may
+                encompass how the object was created, assembled, deployed, tested, certified, or otherwise
+                brought into its present form. Common examples include software build pipelines,
+                deployment processes, AI/ML model training, cryptographic key generation or certification,
+                and third-party audits. Processes are modeled using declared and observed formulas,
+                composed of workflows, tasks, and individual steps.
             </xs:documentation>
         </xs:annotation>
         <xs:sequence minOccurs="0" maxOccurs="unbounded">
@@ -5301,7 +5324,7 @@ limitations under the License.
         <xs:attribute name="bom-ref" type="bom:refType">
             <xs:annotation>
                 <xs:documentation>
-                    An optional identifier which can be used to reference the formula elsewhere in the BOM.
+                    An identifier which can be used to reference the formula elsewhere in the BOM.
                     Uniqueness is enforced within all elements and children of the root-level bom element.
                 </xs:documentation>
             </xs:annotation>
@@ -5469,7 +5492,7 @@ limitations under the License.
         <xs:attribute name="bom-ref" type="bom:refType" use="required">
             <xs:annotation>
                 <xs:documentation>
-                    An optional identifier which can be used to reference the workflow elsewhere in the BOM.
+                    An identifier which can be used to reference the workflow elsewhere in the BOM.
                     Uniqueness is enforced within all elements and children of the root-level bom element.
                 </xs:documentation>
             </xs:annotation>
@@ -5691,7 +5714,7 @@ limitations under the License.
         <xs:attribute name="bom-ref" type="bom:refType" use="required">
             <xs:annotation>
                 <xs:documentation>
-                    An optional identifier which can be used to reference the task elsewhere in the BOM.
+                    An identifier which can be used to reference the task elsewhere in the BOM.
                     Uniqueness is enforced within all elements and children of the root-level bom element.
                 </xs:documentation>
             </xs:annotation>
@@ -5894,7 +5917,7 @@ limitations under the License.
         <xs:attribute name="bom-ref" type="bom:refType" use="required">
             <xs:annotation>
                 <xs:documentation>
-                    An optional identifier which can be used to reference the workflow elsewhere in the BOM.
+                    An identifier which can be used to reference the workflow elsewhere in the BOM.
                     Uniqueness is enforced within all elements and children of the root-level bom element.
                 </xs:documentation>
             </xs:annotation>
@@ -6215,7 +6238,7 @@ limitations under the License.
         <xs:attribute name="bom-ref" type="bom:refType" use="required">
             <xs:annotation>
                 <xs:documentation>
-                    An optional identifier which can be used to reference the trigger elsewhere in the BOM.
+                    An identifier which can be used to reference the trigger elsewhere in the BOM.
                     Uniqueness is enforced within all elements and children of the root-level bom element.
                 </xs:documentation>
             </xs:annotation>
@@ -6743,6 +6766,14 @@ limitations under the License.
                                             </xs:documentation>
                                         </xs:annotation>
                                     </xs:enumeration>
+                                    <xs:enumeration value="key-wrap">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Key-wrap is a cryptographic technique used to securely encrypt and
+                                                protect cryptographic keys using algorithms like AES.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
                                     <xs:enumeration value="other">
                                         <xs:annotation>
                                             <xs:documentation>
@@ -6760,6 +6791,14 @@ limitations under the License.
                                 </xs:restriction>
                             </xs:simpleType>
                         </xs:element>
+                        <xs:element name="algorithmFamily" type="xs:string" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    A valid algorithm family identifier.
+                                    If specified, this value must be one of the enumeration of valid algorithm Family identifiers defined in the `cryptography-defs.schema.json` subschema. A corresponding schema for XML is not available.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
                         <xs:element name="parameterSetIdentifier" type="xs:string" minOccurs="0" maxOccurs="1">
                             <xs:annotation>
                                 <xs:documentation>
@@ -6773,11 +6812,20 @@ limitations under the License.
                         <xs:element name="curve" type="xs:string" minOccurs="0" maxOccurs="1">
                             <xs:annotation>
                                 <xs:documentation>
+                                    DEPRECATED - DO NOT USE. This will be removed in a future version. Use `./ellipticCurve` instead.
                                     The specific underlying Elliptic Curve (EC) definition employed which is an indicator
                                     of the level of security strength, performance and complexity. Absent an
                                     authoritative source of curve names, CycloneDX recommends use of curve names as
                                     defined at https://neuromancer.sk/std/, the source from which can be found at
                                     https://github.com/J08nY/std-curves.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="ellipticCurve" type="xs:string" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The specific underlying Elliptic Curve (EC) definition employed which is an indicator of the level of security strength, performance and complexity.
+                                    If specified, this value must be one of the enumeration of valid elliptic curves identifiers defined in the `cryptography-defs.schema.json` subschema. A corresponding schema for XML is not available.
                                 </xs:documentation>
                             </xs:annotation>
                         </xs:element>
@@ -7274,6 +7322,13 @@ limitations under the License.
                 </xs:annotation>
                 <xs:complexType>
                     <xs:sequence>
+                        <xs:element name="serialNumber" type="xs:string" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The serial number is a unique identifier for the certificate issued by a CA.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
                         <xs:element name="subjectName" type="xs:string" minOccurs="0" maxOccurs="1">
                             <xs:annotation>
                                 <xs:documentation>
@@ -7305,6 +7360,7 @@ limitations under the License.
                         <xs:element name="signatureAlgorithmRef" type="bom:refType" minOccurs="0" maxOccurs="1">
                             <xs:annotation>
                                 <xs:documentation>
+                                    DEPRECATED - DO NOT USE. This will be removed in a future version. Use `./relatedCryptographicAssets` instead.
                                     The bom-ref to signature algorithm used by the certificate
                                 </xs:documentation>
                             </xs:annotation>
@@ -7312,6 +7368,7 @@ limitations under the License.
                         <xs:element name="subjectPublicKeyRef" type="bom:refType" minOccurs="0" maxOccurs="1">
                             <xs:annotation>
                                 <xs:documentation>
+                                    DEPRECATED - DO NOT USE. This will be removed in a future version. Use `./relatedCryptographicAssets` instead.
                                     The bom-ref to the public key of the subject
                                 </xs:documentation>
                             </xs:annotation>
@@ -7326,9 +7383,338 @@ limitations under the License.
                         <xs:element name="certificateExtension" type="xs:string" minOccurs="0" maxOccurs="1">
                             <xs:annotation>
                                 <xs:documentation>
+                                    DEPRECATED - DO NOT USE. This will be removed in a future version. Use `./certificateFileExtension` instead.
                                     The file extension of the certificate. Examples include crt, pem, cer, der, and p12.
                                 </xs:documentation>
                             </xs:annotation>
+                        </xs:element>
+                        <xs:element name="certificateFileExtension" type="xs:string" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The file extension of the certificate. Examples include crt, pem, cer, der, and p12.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="fingerprint" type="bom:hashType" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The fingerprint is a cryptographic hash of the certificate excluding it's signature.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="certificateState" minOccurs="0" maxOccurs="unbounded">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The certificate lifecycle is a comprehensive process that manages digital
+                                    certificates from their initial creation to eventual expiration or revocation.
+                                    It typically involves several stages.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:choice>
+                                    <!-- Pre-Defined State -->
+                                    <xs:sequence>
+                                        <xs:element name="state" minOccurs="1" maxOccurs="1">
+                                            <xs:annotation>
+                                                <xs:documentation>
+                                                    A pre-defined state in the certificate lifecycle.
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:enumeration value="pre-activation">
+                                                        <xs:annotation>
+                                                            <xs:documentation>
+                                                                The certificate has been issued by the issuing
+                                                                certificate authority (CA) but has not been authorized
+                                                                for use.
+                                                            </xs:documentation>
+                                                        </xs:annotation>
+                                                    </xs:enumeration>
+                                                    <xs:enumeration value="active">
+                                                        <xs:annotation>
+                                                            <xs:documentation>
+                                                                The certificate may be used to cryptographically protect
+                                                                information, cryptographically process previously protected
+                                                                information, or both.
+                                                            </xs:documentation>
+                                                        </xs:annotation>
+                                                    </xs:enumeration>
+                                                    <xs:enumeration value="suspended">
+                                                        <xs:annotation>
+                                                            <xs:documentation>
+                                                                Certificates in the deactivated state shall not be used
+                                                                to apply cryptographic protection but, in some cases,
+                                                                may be used to process cryptographically protected
+                                                                information.
+                                                            </xs:documentation>
+                                                        </xs:annotation>
+                                                    </xs:enumeration>
+                                                    <xs:enumeration value="deactivated">
+                                                        <xs:annotation>
+                                                            <xs:documentation>
+                                                                The use of a certificate may be suspended for several
+                                                                possible reasons.
+                                                            </xs:documentation>
+                                                        </xs:annotation>
+                                                    </xs:enumeration>
+                                                    <xs:enumeration value="revoked">
+                                                        <xs:annotation>
+                                                            <xs:documentation>
+                                                                A revoked certificate is a digital certificate that has
+                                                                been invalidated by the issuing certificate authority (CA)
+                                                                before its scheduled expiration date.
+                                                            </xs:documentation>
+                                                        </xs:annotation>
+                                                    </xs:enumeration>
+                                                    <xs:enumeration value="destroyed">
+                                                        <xs:annotation>
+                                                            <xs:documentation>
+                                                                The certificate has been destroyed.
+                                                            </xs:documentation>
+                                                        </xs:annotation>
+                                                    </xs:enumeration>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="reason" type="xs:string" minOccurs="0" maxOccurs="1">
+                                            <xs:annotation>
+                                                <xs:documentation>
+                                                    A reason for the certificate being in this state.
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                    </xs:sequence>
+                                    <!-- Custom State -->
+                                    <xs:sequence>
+                                        <xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1">
+                                            <xs:annotation>
+                                                <xs:documentation>
+                                                    The name of the certificate lifecycle state.
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1">
+                                            <xs:annotation>
+                                                <xs:documentation>
+                                                    The description of the certificate lifecycle state.
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element name="reason" type="xs:string" minOccurs="0" maxOccurs="1">
+                                            <xs:annotation>
+                                                <xs:documentation>
+                                                    A reason for the certificate being in this state.
+                                                </xs:documentation>
+                                            </xs:annotation>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:choice>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="creationDate" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The date and time (timestamp) when the certificate was created or pre-activated.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="activationDate" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The date and time (timestamp) when the certificate was activated.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="deactivationDate" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The date and time (timestamp) when the related certificate was deactivated.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="revocationDate" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The date and time (timestamp) when the certificate was revoked.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="destructionDate" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The date and time (timestamp) when the certificate was destroyed.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="certificateExtensions" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    A certificate extension is a field that provides additional information about the certificate or its use. Extensions are used to convey additional information beyond the standard fields.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="certificateExtension" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Extension: This can be either a common extension
+                                                (with a well-known name and value) or a custom extension
+                                                (for application or vendor-specific data).
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                        <xs:complexType>
+                                            <xs:choice>
+                                                <!-- Common Extensions -->
+                                                <xs:sequence>
+                                                    <xs:element name="commonExtensionName" minOccurs="1" maxOccurs="1">
+                                                        <xs:annotation>
+                                                            <xs:documentation>
+                                                                The name of the extension.
+                                                            </xs:documentation>
+                                                        </xs:annotation>
+                                                        <xs:simpleType>
+                                                            <xs:restriction base="xs:string">
+                                                                <xs:enumeration value="basicConstraints">
+                                                                    <xs:annotation>
+                                                                        <xs:documentation>
+                                                                            Specifies whether a certificate can be used as a CA certificate or not.
+                                                                        </xs:documentation>
+                                                                    </xs:annotation>
+                                                                </xs:enumeration>
+                                                                <xs:enumeration value="keyUsage">
+                                                                    <xs:annotation>
+                                                                        <xs:documentation>
+                                                                            Specifies the allowed uses of the public key in the certificate.
+                                                                        </xs:documentation>
+                                                                    </xs:annotation>
+                                                                </xs:enumeration>
+                                                                <xs:enumeration value="extendedKeyUsage">
+                                                                    <xs:annotation>
+                                                                        <xs:documentation>
+                                                                            Specifies additional purposes for which the public key can be used.
+                                                                        </xs:documentation>
+                                                                    </xs:annotation>
+                                                                </xs:enumeration>
+                                                                <xs:enumeration value="subjectAlternativeName">
+                                                                    <xs:annotation>
+                                                                        <xs:documentation>
+                                                                            Allows inclusion of additional names to identify the entity associated with the certificate.
+                                                                        </xs:documentation>
+                                                                    </xs:annotation>
+                                                                </xs:enumeration>
+                                                                <xs:enumeration value="authorityKeyIdentifier">
+                                                                    <xs:annotation>
+                                                                        <xs:documentation>
+                                                                            Identifies the public key of the CA that issued the certificate.
+                                                                        </xs:documentation>
+                                                                    </xs:annotation>
+                                                                </xs:enumeration>
+                                                                <xs:enumeration value="subjectKeyIdentifier">
+                                                                    <xs:annotation>
+                                                                        <xs:documentation>
+                                                                            Identifies the public key associated with the entity the certificate was issued to.
+                                                                        </xs:documentation>
+                                                                    </xs:annotation>
+                                                                </xs:enumeration>
+                                                                <xs:enumeration value="authorityInformationAccess">
+                                                                    <xs:annotation>
+                                                                        <xs:documentation>
+                                                                            Contains CA issuers and OCSP information.
+                                                                        </xs:documentation>
+                                                                    </xs:annotation>
+                                                                </xs:enumeration>
+                                                                <xs:enumeration value="certificatePolicies">
+                                                                    <xs:annotation>
+                                                                        <xs:documentation>
+                                                                            Defines the policies under which the certificate was issued and can be used.
+                                                                        </xs:documentation>
+                                                                    </xs:annotation>
+                                                                </xs:enumeration>
+                                                                <xs:enumeration value="crlDistributionPoints">
+                                                                    <xs:annotation>
+                                                                        <xs:documentation>
+                                                                            Contains one or more URLs where a Certificate Revocation List (CRL) can be obtained.
+                                                                        </xs:documentation>
+                                                                    </xs:annotation>
+                                                                </xs:enumeration>
+                                                                <xs:enumeration value="signedCertificateTimestamp">
+                                                                    <xs:annotation>
+                                                                        <xs:documentation>
+                                                                            Shows that the certificate has been publicly logged, which helps prevent the issuance of rogue certificates by a CA. Log ID, timestamp and signature as proof.
+                                                                        </xs:documentation>
+                                                                    </xs:annotation>
+                                                                </xs:enumeration>
+                                                            </xs:restriction>
+                                                        </xs:simpleType>
+                                                    </xs:element>
+                                                    <xs:element name="commonExtensionValue" type="xs:string" minOccurs="1" maxOccurs="1">
+                                                        <xs:annotation>
+                                                            <xs:documentation>
+                                                                The value of the certificate extension.
+                                                            </xs:documentation>
+                                                        </xs:annotation>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                                <!-- Custom Extensions -->
+                                                <xs:sequence>
+                                                    <xs:element name="customExtensionName" type="xs:string" minOccurs="1" maxOccurs="1">
+                                                        <xs:annotation>
+                                                            <xs:documentation>
+                                                                The name for the custom certificate extension.
+                                                            </xs:documentation>
+                                                        </xs:annotation>
+                                                    </xs:element>
+                                                    <xs:element name="customExtensionValue" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                        <xs:annotation>
+                                                            <xs:documentation>
+                                                                The description of the custom certificate extension.
+                                                            </xs:documentation>
+                                                        </xs:annotation>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                            </xs:choice>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="relatedCryptographicAssets" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    A list of cryptographic assets related to this component.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="relatedCryptographicAsset" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                A cryptographic asset related to this component.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="type" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            Specifies the mechanism by which the cryptographic asset is secured by.
+                                                            Examples: "publicKey", "privateKey", "algorithm"
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="ref" type="bom:refType" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The bom-ref to cryptographic asset.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
                         </xs:element>
                     </xs:sequence>
                 </xs:complexType>
@@ -7374,7 +7760,7 @@ limitations under the License.
                         <xs:element name="id" type="xs:string" minOccurs="0" maxOccurs="1">
                             <xs:annotation>
                                 <xs:documentation>
-                                    The optional unique identifier for the related cryptographic material.
+                                    The unique identifier for the related cryptographic material.
                                 </xs:documentation>
                             </xs:annotation>
                         </xs:element>
@@ -7477,6 +7863,50 @@ limitations under the License.
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
+                        <xs:element name="fingerprint" type="bom:hashType" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    The fingerprint is a cryptographic hash of the related cryptographic material, excluding it's signature.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="relatedCryptographicAssets" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    A list of cryptographic assets related to this component.
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="relatedCryptographicAsset" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                A cryptographic asset related to this component.
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="type" type="xs:string" minOccurs="0" maxOccurs="1">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            Specifies the mechanism by which the cryptographic asset is secured by.
+                                                            Examples: "publicKey", "privateKey", "algorithm"
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="ref" type="bom:refType" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The bom-ref to cryptographic asset.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -7535,6 +7965,48 @@ limitations under the License.
                                         <xs:annotation>
                                             <xs:documentation>
                                                 Wi-Fi Protected Access
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="dtls">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Datagram Transport Layer Security
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="quic">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Quick UDP Internet Connections
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="eap-aka">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Extensible Authentication Protocol variant
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="eap-aka-prime">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Enhanced version of EAP-AKA
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="prins">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Protection of Inter-Network Signaling
+                                            </xs:documentation>
+                                        </xs:annotation>
+                                    </xs:enumeration>
+                                    <xs:enumeration value="5g-aka">
+                                        <xs:annotation>
+                                            <xs:documentation>
+                                                Authentication and Key Agreement for 5G
                                             </xs:documentation>
                                         </xs:annotation>
                                     </xs:enumeration>
@@ -7616,6 +8088,48 @@ limitations under the License.
                                                         </xs:sequence>
                                                     </xs:complexType>
                                                 </xs:element>
+                                                <xs:element name="tlsGroups" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            A list of TLS named groups (formerly known as curves) for
+                                                            this cipher suite. These groups define the parameters for
+                                                            key exchange algorithms like ECDHE.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                    <xs:complexType>
+                                                        <xs:sequence>
+                                                            <xs:element name="group" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>
+                                                                        The name of the TLS group.
+                                                                        Example values: x25519, ffdhe2048
+                                                                    </xs:documentation>
+                                                                </xs:annotation>
+                                                            </xs:element>
+                                                        </xs:sequence>
+                                                    </xs:complexType>
+                                                </xs:element>
+                                                <xs:element name="tlsSignatureSchemes" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            A list of signature schemes supported for cipher suite.
+                                                            These schemes specify the algorithms used for digital
+                                                            signatures in TLS handshakes and certificate verification.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                    <xs:complexType>
+                                                        <xs:sequence>
+                                                            <xs:element name="signatureScheme" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>
+                                                                        The name of the TLS signature scheme.
+                                                                        Example values: ecdsa_secp256r1_sha256, rsa_pss_rsae_sha256, ed25519
+                                                                    </xs:documentation>
+                                                                </xs:annotation>
+                                                            </xs:element>
+                                                        </xs:sequence>
+                                                    </xs:complexType>
+                                                </xs:element>
                                             </xs:sequence>
                                         </xs:complexType>
                                     </xs:element>
@@ -7631,33 +8145,127 @@ limitations under the License.
                             </xs:annotation>
                             <xs:complexType>
                                 <xs:sequence>
-                                    <xs:element name="encr" type="bom:refType" minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element name="encr" minOccurs="0" maxOccurs="unbounded">
                                         <xs:annotation>
                                             <xs:documentation>
                                                 Transform Type 1: encryption algorithms
+
+                                                EITHER a detailed description (PREFERRED)
+                                                OR a single string representing a "bom:refType" (DEPRECATED This will be removed in a future version.)
                                             </xs:documentation>
                                         </xs:annotation>
+                                        <xs:complexType mixed="true">
+                                            <xs:sequence>
+                                                <xs:element name="name" type="xs:string" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            A name for the encryption method.
+                                                            Example: ENCR_AES_GCM_16
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="keyLength" type="xs:integer" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The key length of the encryption algorithm.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="algorithm" type="bom:refType" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The bom-ref to algorithm cryptographic asset.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                            </xs:sequence>
+                                        </xs:complexType>
                                     </xs:element>
-                                    <xs:element name="prf" type="bom:refType" minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element name="prf" minOccurs="0" maxOccurs="unbounded">
                                         <xs:annotation>
                                             <xs:documentation>
                                                 Transform Type 2: pseudorandom functions
+
+                                                EITHER a detailed description (PREFERRED)
+                                                OR a single string representing a "bom:refType" (DEPRECATED This will be removed in a future version.)
                                             </xs:documentation>
                                         </xs:annotation>
+                                        <xs:complexType mixed="true">
+                                            <xs:sequence>
+                                                <xs:element name="name" type="xs:string" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            A name for the pseudorandom function.
+                                                            Example: PRF_HMAC_SHA2_256
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="algorithm" type="bom:refType" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The bom-ref to algorithm cryptographic asset.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                            </xs:sequence>
+                                        </xs:complexType>
                                     </xs:element>
-                                    <xs:element name="integ" type="bom:refType" minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element name="integ" minOccurs="0" maxOccurs="unbounded">
                                         <xs:annotation>
                                             <xs:documentation>
                                                 Transform Type 3: integrity algorithms
+
+                                                EITHER a detailed description (PREFERRED)
+                                                OR a single string representing a "bom:refType" (DEPRECATED This will be removed in a future version.)
                                             </xs:documentation>
                                         </xs:annotation>
+                                        <xs:complexType mixed="true">
+                                            <xs:sequence>
+                                                <xs:element name="name" type="xs:string" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            A name for the integrity algorithm.
+                                                            Example: AUTH_HMAC_SHA2_256_128
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="algorithm" type="bom:refType" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The bom-ref to algorithm cryptographic asset.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                            </xs:sequence>
+                                        </xs:complexType>
                                     </xs:element>
-                                    <xs:element name="ke" type="bom:refType" minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element name="ke" minOccurs="0" maxOccurs="unbounded">
                                         <xs:annotation>
                                             <xs:documentation>
                                                 Transform Type 4: Key Exchange Method (KE) per RFC9370, formerly called Diffie-Hellman Group (D-H)
+
+                                                EITHER a detailed description (PREFERRED)
+                                                OR a single string representing a "bom:refType" (DEPRECATED This will be removed in a future version.)
                                             </xs:documentation>
                                         </xs:annotation>
+                                        <xs:complexType mixed="true">
+                                            <xs:sequence>
+                                                <xs:element name="group" type="xs:integer" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            A group identifier for the key exchange algorithm.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="algorithm" type="bom:refType" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The bom-ref to algorithm cryptographic asset.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                            </xs:sequence>
+                                        </xs:complexType>
                                     </xs:element>
                                     <xs:element name="esn" type="xs:boolean" minOccurs="0" maxOccurs="1">
                                         <xs:annotation>
@@ -7666,12 +8274,33 @@ limitations under the License.
                                             </xs:documentation>
                                         </xs:annotation>
                                     </xs:element>
-                                    <xs:element name="auth" type="bom:refType" minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element name="auth" minOccurs="0" maxOccurs="unbounded">
                                         <xs:annotation>
                                             <xs:documentation>
                                                 IKEv2 Authentication method
+
+                                                EITHER a detailed description (PREFERRED)
+                                                OR a single string representing a "bom:refType" (DEPRECATED This will be removed in a future version.)
                                             </xs:documentation>
                                         </xs:annotation>
+                                        <xs:complexType mixed="true">
+                                            <xs:sequence>
+                                                <xs:element name="name" type="xs:string" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            A name for the authentication method.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="algorithm" type="bom:refType" minOccurs="0">
+                                                    <xs:annotation>
+                                                        <xs:documentation>
+                                                            The bom-ref to algorithm cryptographic asset.
+                                                        </xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                            </xs:sequence>
+                                        </xs:complexType>
                                     </xs:element>
                                 </xs:sequence>
                             </xs:complexType>
@@ -7730,8 +8359,8 @@ limitations under the License.
                                 <xs:attribute name="bom-ref" type="bom:refType">
                                     <xs:annotation>
                                         <xs:documentation>
-                                            An optional identifier which can be used to reference the object elsewhere in the BOM.
-                                            Every bom-ref must be unique within the BOM.
+                                            An identifier which can be used to reference the object elsewhere in the BOM.
+                                            Every `bom-ref` must be unique within the BOM.
                                         </xs:documentation>
                                     </xs:annotation>
                                 </xs:attribute>
@@ -7997,8 +8626,8 @@ limitations under the License.
                                 <xs:attribute name="bom-ref" type="bom:refType">
                                     <xs:annotation>
                                         <xs:documentation>
-                                            An optional identifier which can be used to reference the object elsewhere
-                                            in the BOM. Every bom-ref must be unique within the BOM.
+                                            An identifier which can be used to reference the object elsewhere
+                                            in the BOM. Every `bom-ref` must be unique within the BOM.
                                         </xs:documentation>
                                     </xs:annotation>
                                 </xs:attribute>
@@ -8068,7 +8697,7 @@ limitations under the License.
                                                         <xs:sequence>
                                                             <xs:element name="attachment" type="bom:attachedTextType" minOccurs="0" maxOccurs="1">
                                                                 <xs:annotation>
-                                                                    <xs:documentation>An optional way to include textual or encoded data.</xs:documentation>
+                                                                    <xs:documentation>A way to include textual or encoded data.</xs:documentation>
                                                                 </xs:annotation>
                                                             </xs:element>
                                                             <xs:element name="url" type="xs:anyURI" minOccurs="0" maxOccurs="1">
@@ -8104,7 +8733,7 @@ limitations under the License.
                                     </xs:element>
                                     <xs:element name="expires" type="xs:dateTime" minOccurs="0">
                                         <xs:annotation>
-                                            <xs:documentation>The optional date and time (timestamp) when the evidence is no longer valid.</xs:documentation>
+                                            <xs:documentation>The date and time (timestamp) when the evidence is no longer valid.</xs:documentation>
                                         </xs:annotation>
                                     </xs:element>
                                     <xs:element name="author" type="bom:organizationalContact" minOccurs="0" maxOccurs="1">
@@ -8128,8 +8757,8 @@ limitations under the License.
                                 <xs:attribute name="bom-ref" type="bom:refType">
                                     <xs:annotation>
                                         <xs:documentation>
-                                            An optional identifier which can be used to reference the object elsewhere
-                                            in the BOM. Every bom-ref must be unique within the BOM.
+                                            A identifier which can be used to reference the object elsewhere
+                                            in the BOM. Every `bom-ref` must be unique within the BOM.
                                         </xs:documentation>
                                     </xs:annotation>
                                 </xs:attribute>
@@ -8420,7 +9049,7 @@ limitations under the License.
                                     <xs:element name="parent" type="bom:refLinkType" minOccurs="0" maxOccurs="1">
                                         <xs:annotation>
                                             <xs:documentation>
-                                                The optional `bom-ref` to a parent requirement. This establishes a hierarchy of requirements. Top-level requirements must not define a parent. Only child requirements should define parents.
+                                                The `bom-ref` to a parent requirement. This establishes a hierarchy of requirements. Top-level requirements must not define a parent. Only child requirements should define parents.
                                             </xs:documentation>
                                         </xs:annotation>
                                     </xs:element>
@@ -8444,8 +9073,8 @@ limitations under the License.
                                 <xs:attribute name="bom-ref" type="bom:refType">
                                     <xs:annotation>
                                         <xs:documentation>
-                                            An optional identifier which can be used to reference the object elsewhere
-                                            in the BOM. Every bom-ref must be unique within the BOM.
+                                            An identifier which can be used to reference the object elsewhere
+                                            in the BOM. Every `bom-ref` must be unique within the BOM.
                                         </xs:documentation>
                                     </xs:annotation>
                                 </xs:attribute>
@@ -8508,8 +9137,8 @@ limitations under the License.
                                 <xs:attribute name="bom-ref" type="bom:refType">
                                     <xs:annotation>
                                         <xs:documentation>
-                                            An optional identifier which can be used to reference the object elsewhere
-                                            in the BOM. Every bom-ref must be unique within the BOM.
+                                            An identifier which can be used to reference the object elsewhere
+                                            in the BOM. Every `bom-ref` must be unique within the BOM.
                                         </xs:documentation>
                                     </xs:annotation>
                                 </xs:attribute>
@@ -8541,8 +9170,8 @@ limitations under the License.
         <xs:attribute name="bom-ref" type="bom:refType">
             <xs:annotation>
                 <xs:documentation>
-                    An optional identifier which can be used to reference the object elsewhere
-                    in the BOM. Every bom-ref must be unique within the BOM.
+                    An identifier which can be used to reference the object elsewhere
+                    in the BOM. Every `bom-ref` must be unique within the BOM.
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
@@ -8602,7 +9231,7 @@ limitations under the License.
         <xs:attribute name="bom-ref" type="bom:refType">
             <xs:annotation>
                 <xs:documentation>
-                    An optional identifier which can be used to reference the object elsewhere in the BOM.
+                    An identifier which can be used to reference the object elsewhere in the BOM.
                     Uniqueness is enforced within all elements and children of the root-level bom element.
                 </xs:documentation>
             </xs:annotation>
@@ -8690,7 +9319,7 @@ limitations under the License.
         <xs:attribute name="bom-ref" type="bom:refType">
             <xs:annotation>
                 <xs:documentation>
-                    An optional identifier which can be used to reference the object elsewhere in the BOM.
+                    An identifier which can be used to reference the object elsewhere in the BOM.
                     Uniqueness is enforced within all elements and children of the root-level bom element.
                 </xs:documentation>
             </xs:annotation>
@@ -8746,7 +9375,7 @@ limitations under the License.
         <xs:attribute name="bom-ref" type="bom:refType">
             <xs:annotation>
                 <xs:documentation>
-                    An optional identifier which can be used to reference the object elsewhere in the BOM.
+                    An identifier which can be used to reference the object elsewhere in the BOM.
                     Uniqueness is enforced within all elements and children of the root-level bom element.
                 </xs:documentation>
             </xs:annotation>
@@ -8881,6 +9510,133 @@ limitations under the License.
         </xs:sequence>
     </xs:complexType>
 
+    <xs:complexType name="citationsType">
+        <xs:sequence>
+            <xs:element name="citation" type="bom:citationType" minOccurs="1" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Details a specific attribution of data within the BOM to a contributing entity or process.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="citationType">
+        <xs:annotation>
+            <xs:documentation>
+                Details a specific attribution of data within the BOM to a contributing entity or process.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:annotation>
+                <xs:documentation>
+                    Exactly one of the "pointers" or "expressions" elements must be present.
+                </xs:documentation>
+            </xs:annotation>
+            <xs:choice>
+                <xs:element name="pointers" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>
+                            One or more JSON Pointers(https://datatracker.ietf.org/doc/html/rfc6901) identifying the BOM fields to which the attribution applies.
+                        </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="pointer" type="xs:string" minOccurs="1" maxOccurs="unbounded">
+                                <xs:annotation>
+                                    <xs:documentation>
+                                        A JSON Pointer(https://datatracker.ietf.org/doc/html/rfc6901) identifying the BOM field to which the attribution applies.
+                                        Users of other serialisation formats (e.g. XML) shall use the JSON Pointer format to ensure consistent field referencing across representations.
+                                    </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="expressions" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>
+                            One or more path expressions used to locate values within a BOM.
+                        </xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="expression" type="xs:string" minOccurs="1" maxOccurs="unbounded">
+                                <xs:annotation>
+                                    <xs:documentation>
+                                        Specifies a path expression used to locate a value within a BOM. The expression syntax shall conform to the format of the BOM's serialisation.
+                                        Use [JSONPath](https://datatracker.ietf.org/doc/html/rfc9535) for JSON, [XPath](https://www.w3.org/TR/xpath/) for XML, and default to JSONPath for Protocol Buffers unless otherwise specified.
+                                        Implementers shall ensure the expression is valid within the context of the applicable serialisation format.
+                                    </xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:choice>
+            <xs:element name="timestamp" type="xs:dateTime" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The date and time when the attribution was made or the information was supplied.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="attributedTo" type="bom:refLinkType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The `bom-ref` of an object, such as a component, service, tool, organisational entity, or person that supplied the cited information.
+                        At least one of the "attributedTo" or "process" elements must be present.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="process" type="bom:refLinkType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The `bom-ref` to a process (such as a formula, workflow, task, or step) defined in the `formulation` section that executed or generated the attributed data.
+                        At least one of the "attributedTo" or "process" elements must be present.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="note" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        An description or comment about the context or quality of the data attribution.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Allows any undeclared elements as long as the elements are placed in a different namespace.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:any>
+        </xs:sequence>
+        <!-- Attention:
+        This would be formal, if the support for XSD1.1's `assert` was properly implemented in validators and tools digesting XML.
+        <xs:assert vc:minVersion="1.1"
+                   id="requires_attributedTo_or_process"
+                   test="attributedTo or process">
+           At least one of the "attributedTo" or "process" elements must be present.
+        </xs:assert>
+        /-->
+        <xs:attribute name="bom-ref" type="bom:refType" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                    An identifier which can be used to reference the object elsewhere in the BOM.
+                    Uniqueness is enforced within all elements and children of the root-level bom element.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:anyAttribute namespace="##other" processContents="lax">
+            <xs:annotation>
+                <xs:documentation>User-defined attributes may be used on this element as long as they
+                    do not have the same name as an existing attribute used by the schema.</xs:documentation>
+            </xs:annotation>
+        </xs:anyAttribute>
+    </xs:complexType>
+
     <xs:element name="bom">
         <xs:complexType>
             <xs:sequence>
@@ -8941,10 +9697,13 @@ limitations under the License.
                 </xs:element>
                 <xs:element name="formulation" type="bom:formulationType" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
-                        <xs:documentation>Describes how a component or service was manufactured or deployed. This is
-                            achieved through the use of formulas, workflows, tasks, and steps, which declare the precise
-                            steps to reproduce along with the observed formulas describing the steps which transpired
-                            in the manufacturing process.</xs:documentation>
+                        <xs:documentation>Describes the formulation of any referencable object within the BOM,
+                            including components, services, metadata, declarations, or the BOM itself. This may
+                            encompass how the object was created, assembled, deployed, tested, certified, or otherwise
+                            brought into its present form. Common examples include software build pipelines,
+                            deployment processes, AI/ML model training, cryptographic key generation or certification,
+                            and third-party audits. Processes are modeled using declared and observed formulas,
+                            composed of workflows, tasks, and individual steps.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
                 <xs:element name="declarations" type="bom:declarationsType" minOccurs="0" maxOccurs="1">
@@ -8960,6 +9719,11 @@ limitations under the License.
                         <xs:documentation>
                             A collection of reusable objects that are defined and may be used elsewhere in the BOM.
                         </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="citations" type="bom:citationsType" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>A collection of attributions indicating which entity supplied information for specific fields within the BOM.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
                 <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">

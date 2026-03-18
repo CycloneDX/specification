@@ -1,0 +1,63 @@
+name: Generate Algorithm Families Enum
+
+on:
+  push:
+    paths:
+      - 'schema/cryptography-defs.json'
+      - 'tools/src/main/python/algorithmFamilyGeneration.py'
+  workflow_dispatch:
+
+jobs:
+  generate-families:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Run algorithm family generator
+        working-directory: tools/src/main/python
+        run: python3 algorithmFamilyGeneration.py
+
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH_NAME="update-algorithm-families"
+          
+          # Configure Git
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          # Check for changes
+          if git diff --quiet schema/cryptography-defs.schema.json; then
+            echo "No changes to algorithm families"
+            exit 0
+          fi
+          
+          # Create branch and commit
+          git checkout -b "$BRANCH_NAME"
+          git add schema/cryptography-defs.schema.json
+          git commit -m "chore: update algorithm families [skip ci]"
+          
+          # Push to the branch (use GH_TOKEN for authentication)
+          git push -u "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" "$BRANCH_NAME" --force
+          
+          # Create Pull Request using GitHub CLI (gh)
+          gh pr create \
+            --title "chore: update algorithm families" \
+            --body "This PR updates \`schema/cryptography-defs.schema.json\` with the latest algorithm families generated from \`schema/cryptography-defs.json\`." \
+            --base "master" \
+            --head "$BRANCH_NAME" || echo "Pull request already exists"

@@ -47,6 +47,7 @@ class JsonSchemaVerificationTest extends BaseSchemaVerificationTest {
 
     private static final String JSF_NAMESPACE = "http://cyclonedx.org/schema/jsf-0.82.schema.json";
     private static final String SPDX_NAMESPACE = "http://cyclonedx.org/schema/spdx.schema.json";
+    private static final String CRYPTO_DEF_NAMESPACE = "http://cyclonedx.org/schema/cryptography-defs.schema.json";
 
     private static final JsonSchema VERSION_12;
     private static final JsonSchema VERSION_13;
@@ -69,8 +70,9 @@ class JsonSchemaVerificationTest extends BaseSchemaVerificationTest {
                 .metaSchemaFactory(metaSchemaFactory)
                 .schemaLoaders(b -> b.add(new ClasspathSchemaLoader()).add(DisallowSchemaLoader.getInstance()))
                 .schemaMappers(b -> b.mapPrefix(SPDX_NAMESPACE, "classpath:spdx.schema.json")
-                        .mapPrefix(JSF_NAMESPACE, "classpath:jsf-0.82.schema.json"))
-                .build();
+                        .mapPrefix(JSF_NAMESPACE, "classpath:jsf-0.82.schema.json")
+                        .mapPrefix(CRYPTO_DEF_NAMESPACE, "classpath:cryptography-defs.schema.json")
+                ).build();
         VERSION_12 = factory.getSchema(SchemaLocation.of("classpath:bom-1.2-strict.schema.json"));
         VERSION_13 = factory.getSchema(SchemaLocation.of("classpath:bom-1.3-strict.schema.json"));
         VERSION_14 = factory.getSchema(SchemaLocation.of("classpath:bom-1.4.schema.json"));

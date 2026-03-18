@@ -17,9 +17,10 @@ const schemaDir = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..'
 
 // endregion config
 
-const [spdxSchema, jsfSchema, bomSchemas] = await Promise.all([
+const [spdxSchema, jsfSchema, cryptoDefsSchema, bomSchemas] = await Promise.all([
     readFile(join(schemaDir, 'spdx.schema.json'), 'utf-8').then(JSON.parse),
     readFile(join(schemaDir, 'jsf-0.82.schema.json'), 'utf-8').then(JSON.parse),
+    readFile(join(schemaDir, 'cryptography-defs.schema.json'), 'utf-8').then(JSON.parse),
     glob(join(schemaDir, bomSchemasGlob)).then(l => l.sort())
 ])
 assert.notStrictEqual(bomSchemas.length, 0)
@@ -51,9 +52,11 @@ function getAjv(strict) {
         addUsedSchema: false,
         allowUnionTypes: false,
         keywords: ["meta:enum"],
+        loadSchema: (uri) => { throw new Error(`Remote schemas are disabled: ${uri}`) },
         schemas: {
             'http://cyclonedx.org/schema/spdx.schema.json': spdxSchema,
-            'http://cyclonedx.org/schema/jsf-0.82.schema.json': jsfSchema
+            'http://cyclonedx.org/schema/jsf-0.82.schema.json': jsfSchema,
+            'http://cyclonedx.org/schema/cryptography-defs.schema.json': cryptoDefsSchema,
         }
     });
     addFormats(ajv)
