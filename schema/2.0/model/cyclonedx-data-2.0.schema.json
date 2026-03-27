@@ -20,7 +20,8 @@
           "type": "string",
           "title": "Name",
           "minLength": 1,
-          "description": "The name or label that identifies this data profile, such as the name of the dataset, data category, or information asset it describes."
+          "description": "The name or label that identifies this data profile, such as the name of the dataset, data category, or information asset it describes.",
+          "examples": ["Customer PII Dataset", "Transaction Logs", "Employee Health Records"]
         },
         "description": {
           "type": "string",
@@ -34,14 +35,16 @@
             "confidential",
             "internal",
             "public",
-            "restricted"
+            "restricted",
+            "classified"
           ],
-          "description": "Data sensitivity classification",
+          "description": "Data sensitivity classification.",
           "meta:enum": {
             "confidential": "Confidential information requiring protection",
             "internal": "Internal use only within the organization",
             "public": "Public information that can be freely shared",
-            "restricted": "Highly restricted information with limited access and special protection measures"
+            "restricted": "Highly restricted information with limited access and special protection measures",
+            "classified": "Government or defence classified information subject to national security controls, clearance requirements, and statutory handling obligations"
           }
         },
         "classification": {
@@ -109,6 +112,44 @@
             }
           ]
         },
+        "subjects": {
+          "type": "array",
+          "title": "Subjects",
+          "description": "The entities, groups, categories, or things that the data is about or pertains to. Identifying data subjects is essential for determining applicable privacy regulations, handling requirements, and protected class obligations.",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/subject"
+          },
+          "examples": [
+            [
+              {"name": "EU Residents", "type": "group", "protectedClass": false, "jurisdictions": ["DE", "FR", "IT"], "regulations": ["GDPR"]},
+              {"name": "Pediatric Patients", "type": "group", "protectedClass": true, "jurisdictions": ["US"], "regulations": ["HIPAA", "COPPA"]}
+            ]
+          ]
+        },
+        "purposes": {
+          "type": "array",
+          "title": "Purposes",
+          "description": "The stated purposes for which this data is collected, processed, or retained. Under the principle of purpose limitation, data must only be used for purposes compatible with those originally specified. Capturing purposes explicitly enables automated compliance checking and compatibility analysis across the data lifecycle.",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/purpose"
+          },
+          "examples": [
+            [
+              {"name": "Service Delivery", "legalBasis": "contract"},
+              {"name": "Fraud Prevention", "legalBasis": "legitimate interest"}
+            ]
+          ]
+        },
+        "jurisdictions": {
+          "$ref": "#/$defs/jurisdictions",
+          "description": "The jurisdictions whose laws and regulations apply to this data based on its nature, classification, or how it is processed and stored. See also subject.jurisdictions for jurisdictions that apply because of who the data is about."
+        },
+        "regulations": {
+          "$ref": "#/$defs/regulations",
+          "description": "The regulations that apply to this data based on its nature, classification, or processing context. See also subject.regulations for regulations that apply because of who the data is about."
+        },
         "dataFormats": {
           "type": "array",
           "title": "Data Formats",
@@ -116,7 +157,8 @@
           "items": {
             "type": "string"
           },
-          "description": "Format of data"
+          "description": "The formats in which the data is stored or transmitted.",
+          "examples": [["JSON", "CSV", "Parquet"]]
         },
         "dataTypes": {
           "type": "array",
@@ -125,7 +167,8 @@
           "items": {
             "type": "string"
           },
-          "description": "Specific types of data"
+          "description": "The specific types of data elements contained within this dataset.",
+          "examples": [["email address", "date of birth", "IP address"]]
         },
         "schema": {
           "type": "array",
@@ -135,7 +178,8 @@
             "type": "string",
             "format": "uri"
           },
-          "description": "Reference to schema contracts or documents describing the data structure."
+          "description": "References to schema contracts or documents describing the data structure.",
+          "examples": [["https://example.com/schemas/customer-v2.json"]]
         },
         "access": {
           "type": "array",
@@ -199,6 +243,115 @@
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
           },
           "description": "References to requirement objects that govern how data may be shared with third parties, partners, or across jurisdictional boundaries, including data sharing agreements, cross-border transfer restrictions, and adequacy decisions."
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "subject": {
+      "type": "object",
+      "title": "Subject",
+      "description": "An entity, group, category, or thing that the data is about or pertains to. Subjects identify who or what the data describes, which is critical for determining applicable regulations, privacy obligations, and handling requirements. Subjects may include named individuals, organizations, demographic groups, protected classes, technologies, devices, locations, or any other identifiable topic of the data.",
+      "required": ["name", "type"],
+      "additionalProperties": false,
+      "examples": [
+        {"name": "EU Residents", "type": "group", "protectedClass": false, "jurisdictions": ["DE", "FR"], "regulations": ["GDPR"]},
+        {"name": "Pediatric Patients", "type": "group", "protectedClass": true, "jurisdictions": ["US"], "regulations": ["HIPAA", "COPPA"]},
+        {"name": "GPT-4 Model", "type": "technology", "protectedClass": false}
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name identifying the subject of the data, such as a specific entity name, group label, or category descriptor.",
+          "minLength": 1,
+          "examples": ["EU Residents", "Pediatric Patients", "Fleet Vehicles"]
+        },
+        "type": {
+          "type": "string",
+          "title": "Type",
+          "description": "A free-form category describing the kind of subject. Organizations should establish consistent terminology within their data governance practices.",
+          "minLength": 1,
+          "examples": ["individual", "group", "technology"]
+        },
+        "protectedClass": {
+          "type": "boolean",
+          "title": "Protected Class",
+          "description": "Indicates whether this subject represents or includes a legally protected class under applicable regulations. Protected classes are groups defined by characteristics such as race, ethnicity, religion, gender, age, disability, sexual orientation, national origin, or genetic information. When true, additional regulatory obligations may apply to the collection, processing, and sharing of data about this subject, including GDPR special category data provisions, US civil rights protections, COPPA requirements for children, and HIPAA protections for health information."
+        },
+        "jurisdictions": {
+          "$ref": "#/$defs/jurisdictions",
+          "description": "The jurisdictions whose laws and regulations apply specifically because of this subject. See also dataProfile.jurisdictions for jurisdictions that apply to the data itself."
+        },
+        "regulations": {
+          "$ref": "#/$defs/regulations",
+          "description": "The regulations that apply specifically because of this subject. See also dataProfile.regulations for regulations that apply to the data itself."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A narrative explanation of the subject, its relationship to the data, and any special handling considerations. This may include why the subject is relevant, what aspects of the subject the data captures, and any known sensitivities or regulatory implications."
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "jurisdictions": {
+      "type": "array",
+      "title": "Jurisdictions",
+      "description": "The geographic or political jurisdictions whose laws and regulations apply. Values should use ISO 3166-1 alpha-2 country codes or ISO 3166-2 subdivision codes for subnational jurisdictions.",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 2,
+        "examples": ["US", "GB", "US-CA"]
+      },
+      "examples": [["US", "GB", "DE"]]
+    },
+    "regulations": {
+      "type": "array",
+      "title": "Regulations",
+      "description": "The specific laws, regulations, or compliance frameworks that apply.",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "examples": ["GDPR", "HIPAA", "PCI-DSS"]
+      },
+      "examples": [["GDPR", "CCPA", "PCI-DSS"]]
+    },
+    "purpose": {
+      "type": "object",
+      "title": "Purpose",
+      "description": "The stated reason for collecting, processing, or retaining data. Purpose is a foundational principle in data protection law — under GDPR Article 5(1)(b), CCPA, PIPEDA, and virtually every modern privacy framework, data must be collected for specified, explicit, and legitimate purposes, and must not be further processed in a manner incompatible with those original purposes (purpose limitation). Capturing purposes explicitly enables automated compliance checking and purpose-compatibility analysis.",
+      "required": ["name"],
+      "additionalProperties": false,
+      "examples": [
+        {"name": "Service Delivery", "legalBasis": "contract"},
+        {"name": "Fraud Prevention", "legalBasis": "legitimate interest"},
+        {"name": "Marketing Analytics", "legalBasis": "consent"}
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name of the purpose for which data is collected or processed.",
+          "minLength": 1,
+          "examples": ["Service Delivery", "Fraud Prevention", "Marketing Analytics"]
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A detailed explanation of the purpose, how the data serves it, and any constraints on use. This narrative should be specific enough to evaluate whether subsequent processing activities are compatible with the original stated purpose."
+        },
+        "legalBasis": {
+          "type": "string",
+          "title": "Legal Basis",
+          "description": "The legal basis under applicable law that authorises data collection or processing for this purpose. Use terminology consistent with the applicable jurisdiction and regulation.",
+          "minLength": 1,
+          "examples": ["consent", "contract", "legitimate interest"]
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"

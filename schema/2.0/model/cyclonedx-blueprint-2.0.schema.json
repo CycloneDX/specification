@@ -12,20 +12,31 @@
       "items": {
         "$ref": "#/$defs/blueprint"
       },
-      "description": "A collection of blueprints representing system models that capture the assets, flows, zones, boundaries, and relationships necessary for architectural, threat, risk, privacy, and other forms of modelling and analysis."
+      "description": "A collection of blueprints, each supporting a wide range of analytical activities, from use case documentation and behavioural analysis to comprehensive system-level threat and risk modelling."
     },
     "blueprint": {
       "type": "object",
       "title": "Blueprint",
-      "description": "A structured representation of a system model that captures the assets, flows, zones, boundaries, and relationships necessary to support architectural, threat, risk, privacy, and other forms of modelling and analysis.",
-      "required": ["modelTypes", "methodologies"],
+      "description": "A versatile, machine-readable model designed to support a wide range of analytical activities, from use case documentation and behavioural analysis to comprehensive system-level threat and risk modelling.",
+      "required": ["name", "modelTypes", "methodologies"],
       "additionalProperties": false,
       "properties": {
         "bom-ref": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
         },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name of the blueprint, used to identify this model within the BOM and distinguish it from other blueprints.",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A detailed explanation of the blueprint, including its scope, the system or subsystem it represents, and any relevant context about the modelling objectives or intended audience."
+        },
         "metadata": {
-          "$ref": "#/$defs/blueprintMetadata"
+          "$ref": "#/$defs/metadata"
         },
         "modelTypes": {
           "type": "array",
@@ -40,7 +51,6 @@
         "methodologies": {
           "type": "array",
           "title": "Methodologies",
-          "minItems": 1,
           "uniqueItems": true,
           "description": "The modeling methodologies used",
           "items": {
@@ -58,6 +68,9 @@
             "$ref": "#/$defs/asset"
           },
           "description": "The assets (components, services, data, actors) included in the model"
+        },
+        "behaviors": {
+          "$ref": "cyclonedx-behavior-2.0.schema.json#/$defs/behaviors"
         },
         "dataStores": {
           "type": "array",
@@ -371,7 +384,7 @@
         }
       ]
     },
-    "blueprintMetadata": {
+    "metadata": {
       "type": "object",
       "title": "Blueprint Metadata",
       "description": "Metadata about the creation, review, and approval of the blueprint.",
