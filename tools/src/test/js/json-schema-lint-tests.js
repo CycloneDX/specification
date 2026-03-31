@@ -1,7 +1,7 @@
 "use strict";
 
 import assert from 'node:assert'
-import {readFile} from 'node:fs/promises'
+import {readFile, access} from 'node:fs/promises'
 import {dirname, basename, join} from 'node:path'
 import {fileURLToPath} from 'node:url'
 
@@ -14,6 +14,7 @@ import {glob} from 'glob'
 
 const bomSchemasGlob = 'bom-*.schema.json'
 const schemaDir = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..', 'schema')
+const schema20BundledPath = join(schemaDir, '2.0', 'cyclonedx-2.0-bundled.schema.json')
 
 // endregion config
 
@@ -66,25 +67,71 @@ function getAjv(strict) {
     return ajv
 }
 
+/**
+ * Ajv for draft 2020-12 (CycloneDX 2.0). Registers ref schemas (spdx, jsf, crypto) under http and https
+ * so the 2.0 bundled schema's relative refs resolve. validateSchema: false for draft-07 refs.
+ * @param {typeof import('ajv').default} Ajv2020Class - dynamically imported ajv/dist/2020.js
+ * @param {boolean|"log"} strict
+ * @param {{ spdx: object, jsf: object, crypto: object }} refSchemas
+ * @returns {import('ajv').default}
+ */
+function getAjv2020(Ajv2020Class, strict, refSchemas) {
+    const ids = [
+        'http://cyclonedx.org/schema/spdx.schema.json',
+        'https://cyclonedx.org/schema/spdx.schema.json',
+        'http://cyclonedx.org/schema/jsf-0.82.schema.json',
+        'https://cyclonedx.org/schema/jsf-0.82.schema.json',
+        'http://cyclonedx.org/schema/cryptography-defs.schema.json',
+        'https://cyclonedx.org/schema/cryptography-defs.schema.json',
+    ]
+    const schemas = {
+        [ids[0]]: refSchemas.spdx,
+        [ids[1]]: refSchemas.spdx,
+        [ids[2]]: refSchemas.jsf,
+        [ids[3]]: refSchemas.jsf,
+        [ids[4]]: refSchemas.crypto,
+        [ids[5]]: refSchemas.crypto,
+    }
+    const ajv = new Ajv2020Class({
+        strict,
+        strictSchema: strict,
+        strictNumbers: strict,
+        strictTypes: strict,
+        strictTuples: strict,
+        strictRequired: false,
+        validateFormats: true,
+        allowMatchingProperties: true,
+        addUsedSchema: false,
+        allowUnionTypes: true,
+        validateSchema: false, // ref schemas are draft-07
+        keywords: ['meta:enum'],
+        schemas,
+    })
+    addFormats(ajv)
+    addFormats2019(ajv, { formats: ['idn-email'] })
+    ajv.addFormat('iri-reference', true)
+    return ajv
+}
+
 let errCnt = 0
 
 for (const bomSchemaFile of bomSchemas) {
     console.log('\n> SchemaFile: ', bomSchemaFile);
-    const v = /^bom-(\d)\.(\d)/.exec(basename(bomSchemaFile)) ?? []
+    const v = /^bom-(\d+)\.(\d+)/.exec(basename(bomSchemaFile)) ?? []
     if (!v[0]) {
         // test match failed
         console.log('> Skipped.')
         continue
     }
 
-    const cdxVersion = [Number(v[1]), Number(v[2])]
-    const strict = cdxVersion >= [1, 5]
-        ? true
-        : 'log'
+    const major = Number(v[1])
+    const minor = Number(v[2])
+    // strict mode for CycloneDX >= 1.5 (numeric comparison, not array string coercion)
+    const strict = (major > 1) || (major === 1 && minor >= 5) ? true : 'log'
     console.debug('> strict: ', strict)
     const ajv = getAjv(strict)
 
-    if (cdxVersion[0] === 1 &&  cdxVersion[1] === 2) {
+    if (major === 1 && minor === 2) {
         // CycloneDX 1.2 had a wrong undefined format `string`.
         // Let's ignore this format only for this special version.
         ajv.addFormat('string', true)
@@ -110,6 +157,35 @@ for (const bomSchemaFile of bomSchemas) {
     }
     console.groupEnd()
     console.log('> SCHEMA OK.')
+}
+
+// CycloneDX 2.0 (draft 2020-12): compile bundled schema with Ajv2020 (non-strict for compilability only)
+const has20Schema = await access(schema20BundledPath).then(() => true).catch(() => false)
+if (has20Schema) {
+    const Ajv2020 = (await import('ajv/dist/2020.js')).default
+    console.log('\n> SchemaFile: ', schema20BundledPath)
+    const ajv20 = getAjv2020(Ajv2020, false, { spdx: spdxSchema, jsf: jsfSchema, crypto: cryptoDefsSchema })
+    let bomSchema20
+    try {
+        bomSchema20 = await readFile(schema20BundledPath, 'utf-8').then(JSON.parse)
+    } catch (err) {
+        errCnt++
+        console.error('!!! JSON DECODE ERROR:', err)
+    }
+    if (bomSchema20) {
+        console.group('> compile schema (2.0 draft 2020-12), log warnings ...')
+        try {
+            ajv20.compile(bomSchema20)
+            console.groupEnd()
+            console.log('> SCHEMA OK.')
+        } catch (err) {
+            errCnt++
+            console.groupEnd()
+            console.error(`!!! SCHEMA ERROR: ${err}`)
+        }
+    }
+} else {
+    console.log('\n> 2.0 schema not found (skipped):', schema20BundledPath)
 }
 
 // Exit statuses should be in the range 0 to 254.
