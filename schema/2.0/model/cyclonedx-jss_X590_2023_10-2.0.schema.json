@@ -1,0 +1,259 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-jss_X590_2023_10-2.0.schema.json",
+  "type": "null",
+  "title": "CycloneDX Model for JSON Signature Scheme (JSS)",
+  "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
+  "description": "JSON Schema implementing ITU-T X.590 (10/2023) – JSON Signature Scheme (JSS). Defines the structure for digitally signing JSON objects while keeping the payload in JSON format. Supports single signatures, multiple independent signatures, and chained counter-signatures. Intended for use as a $defs import in CycloneDX 2.0.",
+  "$defs": {
+    "timestamp": {
+      "title": "Timestamp",
+      "description": "An RFC 3339 timestamp in the UTC+0 time zone. Must use the 'Z' suffix. Sub-second precision, when present, MUST be exactly three digits (millisecond precision). If no sub-second digits are included, the decimal point MUST NOT be present. Matches the pattern: yyyy-mm-ddThh:mm:ss[.sss]Z",
+      "$comment": "Normative source: ITU-T X.590 clause 6.1",
+      "type": "string",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\\.[0-9]{3})?Z$",
+      "examples": [
+        "2023-10-29T13:56:08Z",
+        "2023-10-29T13:56:08.000Z",
+        "2023-11-15T08:30:00.123Z"
+      ]
+    },
+    "identifier": {
+      "title": "Identifier",
+      "description": "A Universally Unique Identifier (UUID) conformant with RFC 4122. Used to uniquely identify a signature object. Signatures sharing the same 'id' are treated as versions of the same logical signature, differentiated by their 'modified' timestamp.",
+      "$comment": "Normative source: ITU-T X.590 clause 6.1",
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+      "examples": [
+        "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+      ]
+    },
+    "hashAlgorithm": {
+      "title": "Hash Algorithm",
+      "description": "This property identifies the hashing algorithm, as defined by the Internet Assigned Numbers Authority (IANA)…, that was used to hash the JCS version of the full JSON object (JSON Object + JSS Signature) and is a case-sensitive ASCII string. Implementations MAY use any current and widely accepted hashing algorithm (e.g., sha-256, sha-512) that is defined in the IANA registry. The actual signing process, defined in the algorithm property, sometimes uses an internal hashing algorithm inside the signing process itself, this property MAY identify the same hashing algorithm as the signing process or MAY identify a different hashing algorithm.",
+      "$comment": "Normative source: ITU-T X.590 clause 6.2.1",
+      "type": "string",
+      "examples": [
+        "sha-256",
+        "sha-384",
+        "sha-512",
+        "sha3-256",
+        "sha3-512"
+      ]
+    },
+    "algorithmVocabulary": {
+      "title": "Signature Algorithm Type Vocabulary (signature-algorithm-type-ov)",
+      "description": "NOTE – At the time of this writing quantum safe algorithms could come from those defined in XMSS [IETF RFC 8391] section 5.3 or LMS [IETF RFC 8554] section 5.1 and other algorithms could come from those defined in JWA [IETF RFC 7518] section 3.1 or [IETF RFC 8037] section 3.1 (see the table below for a list of values from those RFCs). While JWA [IETF RFC 7518] section 3.1 defines the following symmetric algorithms: HS256, HS384, and HS512, these algorithms SHOULD NOT be used. If one of these three symmetric algorithms is used, the sharing and transmission of those keys is out of scope for this Recommendation.",
+      "$comment": "Normative source: ITU-T X.590 clause 6.2.2 and Table 1",
+      "type": "string",
+      "enum": [
+        "XMSS-SHA2_10_256",
+        "XMSS-SHA2_16_256",
+        "XMSS-SHA2_20_256",
+        "LMS_SHA256_M32_H5",
+        "LMS_SHA256_M32_H10",
+        "LMS_SHA256_M32_H15",
+        "LMS_SHA256_M32_H20",
+        "LMS_SHA256_M32_H25",
+        "RS256",
+        "RS384",
+        "RS512",
+        "ES256",
+        "ES384",
+        "ES512",
+        "PS256",
+        "PS384",
+        "PS512",
+        "Ed25519",
+        "Ed448"
+      ]
+    },
+    "algorithm": {
+      "title": "Signing Algorithm",
+      "description": "This property identifies the algorithm that was used to sign the JSON data and is a case-sensitive ASCII string. The value for this property SHOULD come from the signature-algorithm-type-ov vocabulary (see clause 6.2.2) and SHOULD be a current and widely accepted quantum safe algorithm, but MAY use any currently accepted safe algorithm.",
+      "$comment": "Normative source: ITU-T X.590 clause 6.2.1",
+      "type": "string",
+      "examples": [
+        "Ed25519",
+        "ES256",
+        "XMSS-SHA2_10_256",
+        "LMS_SHA256_M32_H5",
+        "PS512"
+      ]
+    },
+    "publicKey": {
+      "title": "Public Key (PEM, header-stripped)",
+      "description": "This property contains a privacy enhanced mail (PEM) encoded public key without the header and footer for the algorithm selected in the algorithm property.",
+      "$comment": "Normative source: ITU-T X.590 clause 6.2.1",
+      "type": "string",
+      "examples": [
+        "MCowBQYDK2VwAyEAubMonBfU9pvIbj5RCiWQLD45Jvu6mKr+kQXjvjW8ZkU="
+      ]
+    },
+    "publicCertChain": {
+      "title": "Public Certificate Chain",
+      "description": "This property contains a public key certificate for the algorithm selected in the algorithm property and MUST follow the requirements defined in section 4.7 of [IETF RFC 7517] as quoted here. This property \"contains a chain (X.509 certificate chain) of one or more PKIX certificates [IETF RFC 5280]. The certificate chain is represented as a JSON array of certificate value strings. Each string in the array is a base64-encoded (section 4 of [IETF RFC 4648] – not base64URL.encoded) DER [b-ITU-T X.690] PKIX certificate value. The PKIX certificate containing the key value MUST be the first certificate. This MAY be followed by additional certificates, with each subsequent certificate being the one used to certify the previous one. The key in the first certificate MUST match the public key.\" This property is called \"x5c\" in section 4.7 of [IETF RFC 7517].",
+      "$comment": "Normative source: ITU-T X.590 clause 6.2.1",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "Base64-encoded (standard, not base64URL) DER-encoded PKIX certificate value (RFC 5280)."
+      },
+      "minItems": 1
+    },
+    "certUrl": {
+      "title": "Certificate URL",
+      "description": "This property contains a uniform resource identifier (URI) [IETF RFC 3986] that refers to a resource for an X.509 public key certificate or certificate chain [IETF RFC 5280] for the algorithm selected in the algorithm property and MUST follow the requirements defined in section 4.6 of [IETF RFC 7517] as quoted here. \"The identified resource MUST provide a representation of the certificate or certificate chain that conforms to RFC 5280 [IETF RFC 5280] in PEM-encoded form, with each certificate delimited as specified in section 6.1 of RFC 4945 [IETF RFC 4945]. The key in the first certificate MUST match the public key. The protocol used to acquire the resource MUST provide integrity protection; an HTTP GET request to retrieve the certificate MUST use TLS [IETF RFC 2818] [IETF RFC 5246]; the identity of the server MUST be validated, as per section 6 of RFC 6125 [IETF RFC 6125].\" This property is called \"x5u\" in section 4.6 of [IETF RFC 7517].",
+      "$comment": "Normative source: ITU-T X.590 clause 6.2.1",
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "examples": [
+        "https://pki.example.com/certs/signing-cert.pem"
+      ]
+    },
+    "thumbprint": {
+      "title": "Certificate Thumbprint",
+      "description": "This property contains a fingerprint of a public key or public key certificate for the algorithm selected in the algorithm property and MUST follow the requirements defined in section 4.9 of [IETF RFC 7517] as quoted here. This property \"is a base64URL.encoded SHA-256 thumbprint (a.k.a. digest, X.509 certificate SHA-256 thumbprint) of the DER encoding of an X.509 certificate [IETF RFC 5280]. Note that certificate thumbprints are also sometimes known as certificate fingerprints. The key in the certificate MUST match the public key.\" This property is called \"x5t#S256\" in section 4.9 of [IETF RFC 7517].",
+      "$comment": "Normative source: ITU-T X.590 clause 6.2.1",
+      "type": "string",
+      "examples": [
+        "NzbLsXh8uDCcd-6MNwXF4W_7noWXFZAfHkxZsRGC9Xs"
+      ]
+    },
+    "signatureObject": {
+      "title": "Signature Object",
+      "description": "A JSS signature object as defined in ITU-T X.590 clause 6.2. Captures the hashing algorithm, signing algorithm, public key material (in one of four forms), the base64URL-encoded digital signature value, and optional metadata. May nest a child 'signature' property to form a counter-signature chain.",
+      "$comment": "Normative source: ITU-T X.590 clauses 6.2 and 6.3",
+      "type": "object",
+      "properties": {
+        "hash_algorithm": {
+          "$ref": "#/$defs/hashAlgorithm"
+        },
+        "algorithm": {
+          "$ref": "#/$defs/algorithm"
+        },
+        "public_key": {
+          "$ref": "#/$defs/publicKey"
+        },
+        "public_cert_chain": {
+          "$ref": "#/$defs/publicCertChain"
+        },
+        "cert_url": {
+          "$ref": "#/$defs/certUrl"
+        },
+        "thumbprint": {
+          "$ref": "#/$defs/thumbprint"
+        },
+        "value": {
+          "title": "Signature Value",
+          "description": "A base64URL.encoded signature that was created using the signature algorithm defined in the algorithm property and a key. In pseudo code it is defined as: base64URL.encode(sign(algorithm, key, hash(jcs(<JSONObject with Signature Object>)))).",
+          "$comment": "Normative source: ITU-T X.590 clause 6.2.1",
+          "type": "string"
+        },
+        "signature": {
+          "$ref": "#/$defs/signatureObject",
+          "title": "Counter-Signature",
+          "description": "This property enables a signature to be countersigned, meaning a signature can be signed by another signature.",
+          "$comment": "Normative source: ITU-T X.590 clause 6.2.1"
+        },
+        "type": {
+          "title": "Type Indicator",
+          "description": "The value of this property MUST be jss.",
+          "$comment": "Normative source: ITU-T X.590 clause 6.3.1",
+          "type": "string",
+          "const": "jss"
+        },
+        "id": {
+          "$ref": "#/$defs/identifier",
+          "title": "Signature Identifier",
+          "description": "A value that uniquely identifies the signature. All signatures with the same ID are considered different versions of the same signature and the version of the signature is identified by its modified property.",
+          "$comment": "Normative source: ITU-T X.590 clause 6.3.1"
+        },
+        "related_to": {
+          "title": "Related Object Reference",
+          "description": "A value that can identify the original JSON object that was signed with this signature. If the signature is detached from the original JSON object this property SHOULD be populated.",
+          "$comment": "Normative source: ITU-T X.590 clause 6.3.1",
+          "type": "string"
+        },
+        "related_version": {
+          "title": "Related Object Version",
+          "description": "A value that can identify the version of the original JSON object that was signed with this signature. If the signature is detached from the original JSON object this property SHOULD be populated.",
+          "$comment": "Normative source: ITU-T X.590 clause 6.3.1",
+          "type": "string"
+        },
+        "created": {
+          "$ref": "#/$defs/timestamp",
+          "title": "Created Timestamp",
+          "description": "The time at which this signature was originally created. The creator can use any time it deems most appropriate as the time the signature was created, but it MUST be precise to the nearest millisecond (exactly three digits after the decimal place in seconds). The created property MUST NOT be changed when creating a new version of the signature.",
+          "$comment": "Normative source: ITU-T X.590 clause 6.3.1",
+          "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"
+        },
+        "modified": {
+          "$ref": "#/$defs/timestamp",
+          "title": "Modified Timestamp",
+          "description": "The time that this particular version of the signature was last modified. The creator can use any time it deems most appropriate as the time that this version of the signature was modified, but it MUST be precise to the nearest millisecond (exactly three digits after the decimal place in seconds). The modified property MUST be later than or equal to the value of the created property. If the created and modified properties are the same, then this is the first version of the signature.",
+          "$comment": "Normative source: ITU-T X.590 clause 6.3.1",
+          "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"
+        },
+        "revoked": {
+          "title": "Revoked Flag",
+          "description": "A boolean that identifies if the signature creator deems that this signature is no longer valid. The default value is false.",
+          "$comment": "Normative source: ITU-T X.590 clause 6.3.1",
+          "type": "boolean",
+          "default": false
+        },
+        "signee": {
+          "title": "Signee",
+          "description": "An unstructured string value for the name of the entity or organization that produced this signature.",
+          "$comment": "Normative source: ITU-T X.590 clause 6.3.1",
+          "type": "string"
+        },
+        "valid_from": {
+          "$ref": "#/$defs/timestamp",
+          "title": "Valid From",
+          "description": "The time from which this signature is considered valid. If omitted, the signature is valid at all times or until the timestamp defined by valid_until. If the revoked property is true then this property MUST be ignored.",
+          "$comment": "Normative source: ITU-T X.590 clause 6.3.1"
+        },
+        "valid_until": {
+          "$ref": "#/$defs/timestamp",
+          "title": "Valid Until",
+          "description": "The time at which this signature is no longer considered valid. If the valid_until property is omitted, then there is no constraint on the latest time for which the signature is valid. This property MUST be greater than the timestamp in the valid_from property if the valid_from property is defined. If the revoked property is true then this property MUST be ignored.",
+          "$comment": "Normative source: ITU-T X.590 clause 6.3.1"
+        }
+      },
+      "required": ["hash_algorithm", "algorithm", "value"],
+      "anyOf": [
+        {
+          "required": ["public_key"],
+          "description": "Public key material provided as PEM-encoded public key (header/footer stripped)."
+        },
+        {
+          "required": ["public_cert_chain"],
+          "description": "Public key material provided as a base64-encoded DER X.509 certificate chain."
+        },
+        {
+          "required": ["cert_url"],
+          "description": "Public key material provided by reference to a TLS-accessible certificate URI."
+        },
+        {
+          "required": ["thumbprint"],
+          "description": "Public key material referenced by a base64URL-encoded SHA-256 certificate thumbprint."
+        }
+      ],
+      "unevaluatedProperties": true,
+      "$comment": "unevaluatedProperties: true is intentional. ITU-T X.590 clause 6.2 explicitly states that implementers MAY add additional properties to satisfy meta-data requirements for their application. The clause 6.3 properties (type, id, related_to, etc.) are themselves defined as non-exhaustive examples of such extensions."
+    },
+    "signatures": {
+      "title": "Signatures Array",
+      "description": "A JSON array of one or more signature objects. MUST be located at the top-level of the signed JSON object. The property name used to hold this array SHOULD be 'signatures', but implementations MAY use a different name provided it does not conflict with any other top-level property name in the host JSON object. All signature objects in this array are independent parallel signatures over the same JSON object; for chained counter-signatures, use the nested 'signature' property within an individual signature object.",
+      "$comment": "Normative source: ITU-T X.590 clause 6 – 'The property that holds the signature MUST be a JSON list property and MUST be located at the top-level of the original JSON object.'",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/signatureObject"
+      },
+      "minItems": 1
+    }
+  }
+}
