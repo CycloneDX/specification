@@ -26,6 +26,7 @@ jobs:
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
         with:
           ref: ${{ github.ref_name }}
+          persist-credentials: false
       - name: Set up JDK
         # see https://github.com/actions/setup-java
         uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5
@@ -77,6 +78,7 @@ jobs:
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
         with:
           ref: ${{ github.ref_name }}
+          persist-credentials: false
       - name: Switch branch
         id: branch
         run: |
@@ -98,6 +100,8 @@ jobs:
           name: schema-spdx
           path: schema
       - name: Commit and push
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -eux
           if git diff --quiet -- 'schema/spdx.*'
@@ -109,7 +113,7 @@ jobs:
           git config user.email 'spdx-license-bumper@bot.local'
           git add -A schema
           git commit -s -m "feat: bump SPDX licenses $SB_VERSION"
-          git push origin "$SB_BRANCH"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$SB_BRANCH"
       - name: Pull request
         if: ${{ steps.branch.outputs.existed == 'false' }}
         run: >
