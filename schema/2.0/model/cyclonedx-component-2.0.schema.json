@@ -7,7 +7,7 @@
   "$defs": {
     "components": {
       "type": "array",
-      "items": {"$ref": "#/$defs/component"},
+      "items": {"$ref": "#/$defs/componentOrChoice"},
       "uniqueItems": true,
       "title": "Components"
     },
@@ -235,10 +235,10 @@
         },
         "components": {
           "type": "array",
-          "items": {"$ref": "#/$defs/component"},
+          "items": {"$ref": "#/$defs/componentOrChoice"},
           "uniqueItems": true,
           "title": "Components",
-          "description": "A list of software and hardware components included in the parent component. This is not a dependency tree. It provides a way to specify a hierarchical representation of component assemblies, similar to system &#8594; subsystem &#8594; parts assembly in physical supply chains."
+          "description": "A list of software and hardware components included in the parent component. Entries may be concrete components or component-choice wrappers expressing conditional or alternate relationships. This is not a dependency tree. It provides a way to specify a hierarchical representation of component assemblies, similar to system &#8594; subsystem &#8594; parts assembly in physical supply chains."
         },
         "evidence": {
           "$ref": "#/$defs/componentEvidence",
@@ -298,6 +298,79 @@
           "else": true
         }
       ]
+    },
+    "componentOrChoice": {
+      "title": "Component or Component Choice",
+      "description": "An entry in a components array. May be a concrete component, or a component-choice wrapper that expresses a conditional or alternate relationship between two or more components. The discriminator is the `type` property: when `type` is `component-choice`, the entry shall conform to the `componentChoice` schema; otherwise it shall conform to the `component` schema.",
+      "oneOf": [
+        { "$ref": "#/$defs/component" },
+        { "$ref": "#/$defs/componentChoice" }
+      ]
+    },
+    "componentChoice": {
+      "type": "object",
+      "title": "Component Choice",
+      "description": "A wrapper that expresses a conditional or alternate relationship between two or more components. Use to model approved alternates, multi-sourced parts, build variants, and required component groups in physical device bills of materials.",
+      "required": [
+        "type",
+        "name",
+        "operator",
+        "components"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "component-choice",
+          "title": "Type",
+          "description": "Discriminator for a component-choice entry. The value shall be the literal string `component-choice`."
+        },
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "BOM Reference",
+          "description": "An identifier which can be used to reference the component-choice elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "A display name for the choice. Typically corresponds to a reference designator, a design intent name, or a description of the role the chosen component fulfils.",
+          "examples": ["2N2222 or PN2222A Transistor", "U1 5V LDO Regulator"]
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the choice and the rationale behind the alternates."
+        },
+        "operator": {
+          "type": "string",
+          "enum": [
+            "OR",
+            "XOR",
+            "AND"
+          ],
+          "meta:enum": {
+            "OR":  "Any non-empty subset of the contained components may be installed. Use for approved alternates where more than one may legitimately appear in a given instance.",
+            "XOR": "Exactly one of the contained components is installed in any single instance. Use for approved alternates that are mutually exclusive per instance, while the population of units may include multiple alternates across sourcing.",
+            "AND": "All of the contained components are installed together as a group. Use for tightly coupled component sets such as a transceiver and its required matching balun."
+          },
+          "title": "Operator",
+          "description": "The logical relationship between the contained components."
+        },
+        "components": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/componentOrChoice" },
+          "title": "Components",
+          "description": "Two or more alternate or grouped entries. Each entry may itself be a component-choice to express nested alternates, such as a choice between kits."
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        },
+        "externalReferences": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReferences"
+        }
+      }
     },
     "version": {
       "description": "A single disjunctive version identifier, for a component or service.",
