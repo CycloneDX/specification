@@ -22,7 +22,7 @@ limitations under the License.
            targetNamespace="http://cyclonedx.org/schema/bom/1.5"
            vc:minVersion="1.0"
            vc:maxVersion="1.1"
-           version="1.5.0">
+           version="1.5.1">
 
     <xs:import namespace="http://cyclonedx.org/schema/spdx" schemaLocation="http://cyclonedx.org/schema/spdx"/>
 
@@ -2433,12 +2433,12 @@ limitations under the License.
             </xs:enumeration>
             <xs:enumeration value="incomplete_first_party_proprietary_only">
                 <xs:annotation>
-                    <xs:documentation>The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented, limited specifically to those that are proprietary.</xs:documentation>
+                    <xs:documentation>The relationship is incomplete. Only relationships for first-party components, services, or their dependencies are represented, limited specifically to those that are proprietary.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
             <xs:enumeration value="incomplete_first_party_opensource_only">
                 <xs:annotation>
-                    <xs:documentation>The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented, limited specifically to those that are opensource.</xs:documentation>
+                    <xs:documentation>The relationship is incomplete. Only relationships for first-party components, services, or their dependencies are represented, limited specifically to those that are opensource.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
             <xs:enumeration value="incomplete_third_party_only">
@@ -2885,7 +2885,7 @@ limitations under the License.
                             </xs:annotation>
                             <xs:complexType>
                                 <xs:sequence>
-                                    <xs:element name="user" type="xs:string" minOccurs="0" maxOccurs="1" />
+                                    <xs:element name="user" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
@@ -2897,7 +2897,7 @@ limitations under the License.
                             </xs:annotation>
                             <xs:complexType>
                                 <xs:sequence>
-                                    <xs:element name="useCase" type="xs:string" minOccurs="0" maxOccurs="1" />
+                                    <xs:element name="useCase" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
@@ -2911,7 +2911,7 @@ limitations under the License.
                             </xs:annotation>
                             <xs:complexType>
                                 <xs:sequence>
-                                    <xs:element name="technicalLimitation" type="xs:string" minOccurs="0" maxOccurs="1" />
+                                    <xs:element name="technicalLimitation" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
@@ -2923,7 +2923,7 @@ limitations under the License.
                             </xs:annotation>
                             <xs:complexType>
                                 <xs:sequence>
-                                    <xs:element name="performanceTradeoff" type="xs:string" minOccurs="0" maxOccurs="1" />
+                                    <xs:element name="performanceTradeoff" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
@@ -3007,6 +3007,16 @@ limitations under the License.
                         </xs:element>
                     </xs:sequence>
                 </xs:complexType>
+            </xs:element>
+            <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Provides the ability to document properties in a name/value store.
+                        This provides flexibility to include data not officially supported in the standard
+                        without having to use additional namespaces or create extensions. Property names
+                        of interest to the general public are encouraged to be registered in the
+                        CycloneDX Property Taxonomy - https://github.com/CycloneDX/cyclonedx-property-taxonomy.
+                        Formal registration is OPTIONAL.</xs:documentation>
+                </xs:annotation>
             </xs:element>
         </xs:sequence>
         <xs:attribute name="bom-ref" type="bom:refType">
@@ -3644,7 +3654,7 @@ limitations under the License.
                                                                 </xs:element>
                                                                 <xs:element name="range" type="xs:normalizedString" minOccurs="1" maxOccurs="1">
                                                                     <xs:annotation>
-                                                                        <xs:documentation>A version range specified in Package URL Version Range syntax (vers) which is defined at https://github.com/package-url/purl-spec/VERSION-RANGE-SPEC.rst</xs:documentation>
+                                                                        <xs:documentation>A version range specified in Package URL Version Range syntax (vers) which is defined at https://github.com/package-url/vers-spec</xs:documentation>
                                                                     </xs:annotation>
                                                                 </xs:element>
                                                             </xs:choice>
