@@ -51,9 +51,10 @@ function getAjv(strict) {
         addUsedSchema: false,
         allowUnionTypes: false,
         keywords: ["meta:enum"],
+        loadSchema: (uri) => { throw new Error(`Remote schemas are disabled: ${uri}`) },
         schemas: {
             'http://cyclonedx.org/schema/spdx.schema.json': spdxSchema,
-            'http://cyclonedx.org/schema/jsf-0.82.schema.json': jsfSchema
+            'http://cyclonedx.org/schema/jsf-0.82.schema.json': jsfSchema,
         }
     });
     addFormats(ajv)
