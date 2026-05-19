@@ -14,7 +14,8 @@
                 <url>https://example.com</url>
             </provider>
             <group>com.example</group>
-            <name>Stock ticker Service</name>
+            <name>Stock Ticker Service</name>
+            <version>2022-1</version>
             <endpoints>
                 <endpoint>https://example.com/</endpoint>
                 <endpoint>https://example.com/app</endpoint>
@@ -24,15 +25,6 @@
             <data>
                 <dataflow name="Consumer to Stock Service" description="Traffic to/from consumer to service">
                     <classification flow="bi-directional">Customer</classification>
-                    <governance>
-                        <owners>
-                            <owner>
-                                <organization>
-                                    <name>Customer Name</name>
-                                </organization>
-                            </owner>
-                        </owners>
-                    </governance>
                     <source>
                         <url>https://0.0.0.0</url>
                     </source>
@@ -81,6 +73,8 @@
                     </provider>
                     <group>com.example</group>
                     <name>Microservice 1</name>
+                    <version>2022-1</version>
+                    <description>Example Microservice</description>
                     <endpoints>
                         <endpoint>https://ms-1.example.com</endpoint>
                     </endpoints>
@@ -89,6 +83,15 @@
                     <data>
                         <dataflow name="Stock Service to MS-1" description="Traffic to/from stock service to microservice-1">
                             <classification flow="bi-directional">PII</classification>
+                            <governance>
+                                <owners>
+                                    <owner>
+                                        <organization>
+                                            <name>Customer Name</name>
+                                        </organization>
+                                    </owner>
+                                </owners>
+                            </governance>
                             <source>
                                 <url>urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#stock-ticker-service</url>
                             </source>
@@ -119,6 +122,8 @@
                     </provider>
                     <group>com.example</group>
                     <name>Microservice 2</name>
+                    <version>2022-1</version>
+                    <description>Example Microservice</description>
                     <endpoints>
                         <endpoint>https://ms-2.example.com</endpoint>
                     </endpoints>
@@ -126,7 +131,7 @@
                     <trustZone>Acme Private Zone</trustZone>
                     <data>
                         <dataflow name="Stock Service to MS-2" description="Traffic to/from stock service to microservice-2">
-                            <classification flow="bi-directional">PII</classification>
+                            <classification flow="bi-directional">PIFI</classification>
                             <source>
                                 <url>urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#stock-ticker-service</url>
                             </source>
@@ -148,6 +153,8 @@
                     </provider>
                     <group>com.example</group>
                     <name>Microservice 3</name>
+                    <version>2022-1</version>
+                    <description>Example Microservice</description>                    
                     <endpoints>
                         <endpoint>https://ms-3.example.com</endpoint>
                     </endpoints>
@@ -155,7 +162,7 @@
                     <trustZone>Acme Private Zone</trustZone>
                     <data>
                         <dataflow name="Stock Service to MS-3" description="Traffic to/from stock service to microservice-3">
-                            <classification flow="bi-directional">PII</classification>
+                            <classification flow="bi-directional">Public</classification>
                             <source>
                                 <url>urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#stock-ticker-service</url>
                             </source>
@@ -209,7 +216,7 @@
                     <trustZone>Public Internet</trustZone>
                     <data>
                         <dataflow name="MS-3 to S3" description="Data pushed from microservice-3 to S3 bucket">
-                            <classification flow="inbound">Public</classification>
+                            <classification flow="inbound">PII</classification>
                             <source>
                                 <url>urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#ms-3.example.com</url>
                             </source>

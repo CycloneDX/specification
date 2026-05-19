@@ -6,8 +6,8 @@ version: 1
 serial_number: "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79"
 metadata {
   timestamp {
-    seconds: 3173618478
-    nanos: 3
+    seconds: 1610280000
+    nanos: 0
   }
   component {
     type: CLASSIFICATION_APPLICATION
@@ -34,15 +34,6 @@ services {
     value: "Customer"
     name: "Consumer to Stock Service",
     description: "Traffic to/from consumer to service"
-    governance: {
-      owners: [
-        {
-          organization: {
-            name: "Customer Name"
-          }
-        }
-      ]
-    },
     source: "https://0.0.0.0"
     destination: "https://0.0.0.0"
   }
@@ -83,14 +74,24 @@ services {
     group: "com.example"
     name: "Microservice 1"
     version:"2022-1"
+    description: "Example Microservice"
     endpoints: "https://ms-1.example.com"
     authenticated: true
     trustZone:  "Acme Private Zone"
     data {
       flow: DATA_FLOW_BI_DIRECTIONAL
       value: "PII"
-      name: "Stock Service to MS-1"
+      name: "Stock Service to MS-1"      
       description: "Traffic to/from stock service to microservice-1"
+      governance: {
+        owners: [
+          {
+            organization: {
+              name: "Customer Name"
+            }
+          }
+        ]
+      }      
       source: "urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#stock-ticker-service"
       destination: "urn:cdx:3e671687-395b-41f5-a30f-a58921a69b79/1#stock-ticker-service"
     }
@@ -116,6 +117,7 @@ services {
     group: "com.example"
     name: "Microservice 2"
     version:"2022-1"
+    description: "Example Microservice"
     endpoints: "https://ms-2.example.com"
     authenticated: true
     trustZone:  "Acme Private Zone"
@@ -141,6 +143,7 @@ services {
     group: "com.example"
     name: "Microservice 3"
     version:"2022-1"
+    description: "Example Microservice"
     endpoints: "https://ms-3.example.com"
     authenticated: true
     trustZone:  "Acme Private Zone"
@@ -200,8 +203,35 @@ services {
   }
 }
 dependencies {
-  ref: "pkg:maven/com.acme/stock-java-client@1.0.12"
+  ref: "acme-stock-application"
   dependencies {
-    ref: "b2a46a4b-8367-4bae-9820-95557cfe03a8"
+    ref: "stock-ticker-service"
+  }
+}
+dependencies {
+  ref: "stock-ticker-service"
+  dependencies {
+    ref: "ms-1.example.com"
+  }
+  dependencies {
+    ref: "ms-2.example.com"
+  }
+  dependencies {
+    ref: "ms-3.example.com"
+  }
+}
+dependencies {
+  ref: "ms-1.example.com",
+  dependencies {
+    ref: "ms-1-pgsql.example.com"
+  }
+}
+dependencies {
+  ref: "ms-2.example.com",
+}
+dependencies {
+  ref: "ms-3.example.com",
+  dependencies {
+    ref: "s3-example.amazon.com"
   }
 }
