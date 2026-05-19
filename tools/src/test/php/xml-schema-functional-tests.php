@@ -14,6 +14,8 @@ require_once __DIR__ . '/vendor/autoload.php';
 define('TESTSCHEMA_VERSION', getopt('v:')['v']);
 define('SCHEMA_DIR', realpath(__DIR__ . '/../../../../schema'));
 define('SCHEMA_FILE', SCHEMA_DIR . '/bom-' . TESTSCHEMA_VERSION . '.xsd');
+define('SPDX_FILE', SCHEMA_DIR . '/spdx.xsd');
+
 define('TESTDATA_DIR', realpath(__DIR__ . '/../resources/' . TESTSCHEMA_VERSION));
 
 if (empty(TESTSCHEMA_VERSION)) {
@@ -58,7 +60,13 @@ function validateFile(string $file): ?LibXMLError
         throw new Exception("failed loading file: $file" . PHP_EOL . libxml_get_last_error()->message);
     }
 
-    $valid = $doc->schemaValidate(SCHEMA_FILE);
+    $xsd = str_replace(
+        'schemaLocation="http://cyclonedx.org/schema/spdx"',
+        'schemaLocation="file://'. htmlspecialchars(SPDX_FILE, ENT_XML1, 'UTF-8') .'"',
+        file_get_contents(SCHEMA_FILE)
+    );
+
+    $valid = $doc->schemaValidateSource($xsd, LIBXML_SCHEMA_CREATE);
     return $valid
         ? null
         : libxml_get_last_error();
