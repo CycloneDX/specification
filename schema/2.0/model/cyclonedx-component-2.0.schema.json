@@ -156,39 +156,8 @@
           "$ref": "cyclonedx-patent-2.0.schema.json#/$defs/patentAssertions",
           "title": "Component Patent(s)"
         },
-        "cpe": {
-          "type": "string",
-          "title": "Common Platform Enumeration (CPE)",
-          "description": "Asserts the identity of the component using CPE. The CPE must conform to the CPE 2.2 or 2.3 specification. See [https://nvd.nist.gov/products/cpe](https://nvd.nist.gov/products/cpe). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity.",
-          "examples": ["cpe:2.3:a:acme:component_framework:-:*:*:*:*:*:*:*"]
-        },
-        "purl": {
-          "type": "string",
-          "title": "Package URL (purl)",
-          "description": "Asserts the identity of the component using package-url (purl). The purl, if specified, must be valid and conform to the specification defined at: [https://github.com/package-url/purl-spec](https://github.com/package-url/purl-spec). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity.",
-          "examples": ["pkg:maven/com.acme/tomcat-catalina@9.0.14?packaging=jar"]
-        },
-        "omniborId": {
-          "type": "array",
-          "title": "OmniBOR Artifact Identifier (gitoid)",
-          "description": "Asserts the identity of the component using the OmniBOR Artifact ID. The OmniBOR, if specified, must be valid and conform to the specification defined at: [https://www.iana.org/assignments/uri-schemes/prov/gitoid](https://www.iana.org/assignments/uri-schemes/prov/gitoid). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity.",
-          "items": { "type": "string" },
-          "examples": [
-            "gitoid:blob:sha1:a94a8fe5ccb19ba61c4c0873d391e987982fbbd3",
-            "gitoid:blob:sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
-          ]
-        },
-        "swhid": {
-          "type": "array",
-          "title": "Software Heritage Identifier",
-          "description": "Asserts the identity of the component using the Software Heritage persistent identifier (SWHID). The SWHID, if specified, must be valid and conform to the specification defined at: [https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html](https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity.",
-          "items": { "type": "string" },
-          "examples": ["swh:1:cnt:94a9ed024d3859793618152ea559a168bbcbb5e2"]
-        },
-        "swid": {
-          "$ref": "#/$defs/swid",
-          "title": "SWID Tag",
-          "description": "Asserts the identity of the component using [ISO-IEC 19770-2 Software Identification (SWID) Tags](https://www.iso.org/standard/65666.html). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity."
+        "identifiers": {
+          "$ref": "#/$defs/identifiers"
         },
         "pedigree": {
           "type": "object",
@@ -353,57 +322,6 @@
         }
       }
     },
-    "swid": {
-      "type": "object",
-      "title": "SWID Tag",
-      "description": "Specifies metadata and content for ISO-IEC 19770-2 Software Identification (SWID) Tags.",
-      "required": [
-        "tagId",
-        "name"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "tagId": {
-          "type": "string",
-          "title": "Tag ID",
-          "description": "Maps to the tagId of a SoftwareIdentity."
-        },
-        "name": {
-          "type": "string",
-          "title": "Name",
-          "description": "Maps to the name of a SoftwareIdentity."
-        },
-        "version": {
-          "type": "string",
-          "title": "Version",
-          "default": "0.0",
-          "description": "Maps to the version of a SoftwareIdentity."
-        },
-        "tagVersion": {
-          "type": "integer",
-          "title": "Tag Version",
-          "default": 0,
-          "description": "Maps to the tagVersion of a SoftwareIdentity."
-        },
-        "patch": {
-          "type": "boolean",
-          "title": "Patch",
-          "default": false,
-          "description": "Maps to the patch of a SoftwareIdentity."
-        },
-        "text": {
-          "title": "Attachment text",
-          "description": "Specifies the metadata and content of the SWID tag.",
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/attachment"
-        },
-        "url": {
-          "type": "string",
-          "title": "URL",
-          "description": "The URL to the SWID file.",
-          "format": "iri-reference"
-        }
-      }
-    },
     "componentEvidence": {
       "type": "object",
       "title": "Evidence",
@@ -561,16 +479,11 @@
       "type": "object",
       "title": "Identity Evidence",
       "description": "Evidence that substantiates the identity of a component.",
-      "required": [ "field" ],
+      "required": [ "scheme" ],
       "additionalProperties": false,
       "properties": {
-        "field": {
-          "type": "string",
-          "enum": [
-            "group", "name", "version", "purl", "cpe", "omniborId", "swhid", "swid", "hash"
-          ],
-          "title": "Field",
-          "description": "The identity field of the component which the evidence describes."
+        "scheme": {
+          "$ref": "#/$defs/identityScheme"
         },
         "confidence": {
           "type": "number",
@@ -582,7 +495,7 @@
         "concludedValue": {
           "type": "string",
           "title": "Concluded Value",
-          "description": "The value of the field (cpe, purl, etc) that has been concluded based on the aggregate of all methods (if available)."
+          "description": "The value of the scheme that has been concluded based on the aggregate of all methods (if available)."
         },
         "methods": {
           "type": "array",
@@ -733,6 +646,136 @@
           "$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataGovernance"
         }
       }
+    },
+    "identifiers": {
+      "type": "array",
+      "title": "Identifiers",
+      "description": "Identifiers asserted by one or more parties to identify this component. Each entry groups one or more identity claims by the party asserting them. Identifiers carry positive claims of identity. For unverified or inferred identity data, use evidence.",
+      "items": {
+        "$ref": "#/$defs/identifier"
+      },
+      "uniqueItems": true
+    },
+    "identifier": {
+      "type": "object",
+      "title": "Identifier",
+      "description": "A set of identifiers attributed to a single asserting party.",
+      "required": [
+        "party",
+        "identities"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "party": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "title": "Asserting Party",
+          "description": "Reference using bom-link or bom-ref to the party making the identity assertion."
+        },
+        "identities": {
+          "type": "array",
+          "title": "Identities",
+          "description": "The discrete identity claims asserted by the party.",
+          "items": {
+            "$ref": "#/$defs/identity"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "title": "Identity",
+      "description": "A single identity claim, pairing a typed identifier scheme with the value asserted under that scheme.",
+      "required": [
+        "scheme",
+        "value"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "scheme": { "$ref": "#/$defs/identityScheme" },
+        "value": { "$ref": "#/$defs/identityValue" }
+      }
+    },
+    "identityScheme": {
+      "title": "Identifier Scheme",
+      "description": "The scheme under which an identifier is asserted. Either a predefined value or a custom scheme described by name and description.",
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "purl",
+            "cpe",
+            "swid",
+            "swhid",
+            "omniborid",
+            "gtin",
+            "gmn",
+            "mpn",
+            "part-number",
+            "model-number",
+            "sku",
+            "serial-number",
+            "asset-tag",
+            "udi-di",
+            "udi-pi",
+            "fcc-id",
+            "imei",
+            "mac-address"
+          ],
+          "meta:enum": {
+            "purl": "Package URL identifier, conforming to the Package URL specification.",
+            "cpe": "Common Platform Enumeration name, conforming to NIST Interagency Report 7695.",
+            "swid": "Software Identification tag identifier, conforming to ISO/IEC 19770-2.",
+            "swhid": "Software Heritage persistent identifier.",
+            "omniborid": "OmniBOR Artifact Identifier, also known as a gitoid.",
+            "gtin": "Global Trade Item Number issued under the GS1 system.",
+            "gmn": "Global Model Number issued by GS1.",
+            "mpn": "Manufacturer Part Number, assigned by the original manufacturer.",
+            "part-number": "Generic part number assigned by a distributor, integrator, or operator.",
+            "model-number": "Product model number assigned by the manufacturer.",
+            "sku": "Stock Keeping Unit, assigned by a seller or distributor.",
+            "serial-number": "Unique identifier for an individual instance of a product.",
+            "asset-tag": "Asset tag assigned by the owning or operating organisation.",
+            "udi-di": "Unique Device Identifier, Device Identifier portion, conforming to ISO/IEC 15459 and applicable regulatory frameworks.",
+            "udi-pi": "Unique Device Identifier, Production Identifier portion, conforming to ISO/IEC 15459 and applicable regulatory frameworks.",
+            "fcc-id": "United States Federal Communications Commission equipment identifier.",
+            "imei": "International Mobile Equipment Identity, conforming to 3GPP TS 23.003.",
+            "mac-address": "IEEE 802 Media Access Control address."
+          }
+        },
+        {
+          "type": "object",
+          "title": "Custom Identifier Scheme",
+          "description": "A custom identifier scheme not represented in the predefined taxonomy.",
+          "required": [
+            "name"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Name",
+              "description": "The name of the custom identifier scheme."
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the custom identifier scheme."
+            }
+          }
+        }
+      ]
+    },
+    "identityValue": {
+      "type": "string",
+      "minLength": 1,
+      "title": "Identifier Value",
+      "description": "The value of an identifier."
     }
   }
 }
