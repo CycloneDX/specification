@@ -3,7 +3,7 @@
   "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-risk-2.0.schema.json",
   "type": "null",
   "title": "CycloneDX Risk Model",
-  "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
+  "$comment": "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "properties": {
     "bom-ref": {
       "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
@@ -51,7 +51,9 @@
   "$defs": {
     "riskDomain": {
       "type": "object",
-      "required": ["type"],
+      "required": [
+        "type"
+      ],
       "additionalProperties": false,
       "properties": {
         "type": {
@@ -140,7 +142,11 @@
     },
     "scenario": {
       "type": "object",
-      "required": ["bom-ref", "name", "type"],
+      "required": [
+        "bom-ref",
+        "name",
+        "type"
+      ],
       "additionalProperties": false,
       "properties": {
         "bom-ref": {
@@ -156,7 +162,15 @@
         },
         "type": {
           "type": "string",
-          "enum": ["threat", "vulnerability", "weakness", "risk", "incident", "opportunity", "hazard"],
+          "enum": [
+            "threat",
+            "vulnerability",
+            "weakness",
+            "risk",
+            "incident",
+            "opportunity",
+            "hazard"
+          ],
           "meta:enum": {
             "threat": "Threat scenario",
             "vulnerability": "Exploitable vulnerability",
@@ -189,16 +203,16 @@
         "affectedAssets": {
           "type": "array",
           "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "References to affected assets"
+          "description": "References using bom-link or bom-ref to affected assets."
         },
         "mitigations": {
           "type": "array",
           "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "References to mitigations that address this scenario"
+          "description": "References using bom-link or bom-ref to mitigations that address this scenario."
         },
         "externalReferences": {
           "type": "array",
@@ -210,7 +224,10 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["framework", "controlId"],
+            "required": [
+              "framework",
+              "controlId"
+            ],
             "additionalProperties": false,
             "properties": {
               "framework": {
@@ -240,7 +257,11 @@
     },
     "risk": {
       "type": "object",
-      "required": ["bom-ref", "name", "statement"],
+      "required": [
+        "bom-ref",
+        "name",
+        "statement"
+      ],
       "additionalProperties": false,
       "properties": {
         "bom-ref": {
@@ -269,9 +290,9 @@
           "type": "array",
           "minItems": 1,
           "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "References to scenarios this risk addresses"
+          "description": "References using bom-link or bom-ref to scenarios this risk addresses."
         },
         "likelihood": {
           "$ref": "#/$defs/likelihood"
@@ -304,7 +325,14 @@
         },
         "status": {
           "type": "string",
-          "enum": ["identified", "assessed", "mitigated", "accepted", "transferred", "retired"],
+          "enum": [
+            "identified",
+            "assessed",
+            "mitigated",
+            "accepted",
+            "transferred",
+            "retired"
+          ],
           "meta:enum": {
             "identified": "Risk has been identified but not yet evaluated",
             "assessed": "Risk has been assessed and prioritized",
@@ -315,8 +343,8 @@
           }
         },
         "owner": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntityOrContact",
-          "description": "Owner or accountable party for this risk"
+          "$ref": "cyclonedx-party-2.0.schema.json#/$defs/partyChoice",
+          "description": "The party accountable for this risk. May be an inline party object or a reference to a previously declared party. The party's `roles` should include `owner`."
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
@@ -325,14 +353,23 @@
     },
     "likelihood": {
       "type": "object",
-      "required": ["level"],
+      "required": [
+        "level"
+      ],
       "additionalProperties": false,
       "properties": {
         "level": {
           "type": "string",
           "title": "Level",
           "description": "The qualitative likelihood level representing the overall assessed probability of the risk or scenario being realized.",
-          "enum": ["certain", "high", "low", "medium", "veryHigh", "veryLow"],
+          "enum": [
+            "certain",
+            "high",
+            "low",
+            "medium",
+            "veryHigh",
+            "veryLow"
+          ],
           "meta:enum": {
             "certain": "Almost certain to occur (> 90% probability).",
             "high": "Likely to occur (60-90% probability).",
@@ -371,7 +408,10 @@
       "type": "object",
       "title": "Likelihood Factor",
       "description": "An individual contributing factor used to determine the overall likelihood of a risk or scenario being realized. Likelihood is rarely a single judgment — it is typically derived from multiple independent factors such as threat actor capability, exploit maturity, attack surface exposure, and control effectiveness. Each factor captures a discrete dimension of likelihood with its own rating, enabling transparent, auditable, and methodology-aligned risk assessments.",
-      "required": ["name", "type"],
+      "required": [
+        "name",
+        "type"
+      ],
       "additionalProperties": false,
       "properties": {
         "name": {
@@ -416,7 +456,9 @@
               "title": "Custom Likelihood Factor Type",
               "description": "A custom likelihood factor type not covered by predefined values, allowing organizations to extend the model with methodology-specific factors.",
               "type": "object",
-              "required": ["name"],
+              "required": [
+                "name"
+              ],
               "additionalProperties": false,
               "properties": {
                 "name": {
@@ -438,7 +480,14 @@
           "type": "string",
           "title": "Level",
           "description": "The qualitative rating assigned to this factor, representing the assessed degree to which this factor contributes to the overall likelihood of the risk being realized.",
-          "enum": ["certain", "high", "low", "medium", "veryHigh", "veryLow"],
+          "enum": [
+            "certain",
+            "high",
+            "low",
+            "medium",
+            "veryHigh",
+            "veryLow"
+          ],
           "meta:enum": {
             "certain": "This factor almost certainly contributes to risk realization (> 90% influence).",
             "high": "This factor strongly contributes to risk realization (60-90% influence).",
@@ -474,12 +523,20 @@
     },
     "impact": {
       "type": "object",
-      "required": ["level"],
+      "required": [
+        "level"
+      ],
       "additionalProperties": false,
       "properties": {
         "level": {
           "type": "string",
-          "enum": ["negligible", "low", "moderate", "major", "catastrophic"],
+          "enum": [
+            "negligible",
+            "low",
+            "moderate",
+            "major",
+            "catastrophic"
+          ],
           "description": "Impact severity level",
           "meta:enum": {
             "negligible": "Minimal impact with no significant consequences",
@@ -577,12 +634,20 @@
     },
     "riskScore": {
       "type": "object",
-      "required": ["level"],
+      "required": [
+        "level"
+      ],
       "additionalProperties": false,
       "properties": {
         "level": {
           "type": "string",
-          "enum": ["info", "low", "medium", "high", "critical"],
+          "enum": [
+            "info",
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ],
           "description": "Overall risk level",
           "meta:enum": {
             "info": "Informational - no immediate action required",
@@ -609,7 +674,11 @@
     },
     "riskResponse": {
       "type": "object",
-      "required": ["bom-ref", "mitigations", "mitigationPlan"],
+      "required": [
+        "bom-ref",
+        "mitigations",
+        "mitigationPlan"
+      ],
       "additionalProperties": false,
       "properties": {
         "bom-ref": {
@@ -630,7 +699,10 @@
     },
     "mitigation": {
       "type": "object",
-      "required": ["bom-ref", "reference"],
+      "required": [
+        "bom-ref",
+        "reference"
+      ],
       "additionalProperties": false,
       "properties": {
         "bom-ref": {
@@ -638,12 +710,17 @@
           "description": "Unique identifier for this mitigation entry so it can be referenced by a plan"
         },
         "reference": {
-          "description": "Reference to a mitigation/control implementing the response.",
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+          "description": "Reference using bom-link or bom-ref to a mitigation or control implementing the response.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
         },
         "strategy": {
           "type": "string",
-          "enum": ["prevent", "detect", "respond", "recover"],
+          "enum": [
+            "prevent",
+            "detect",
+            "respond",
+            "recover"
+          ],
           "meta:enum": {
             "prevent": "Prevents the risk from occurring",
             "detect": "Detects when the risk occurs",
@@ -668,7 +745,14 @@
         },
         "status": {
           "type": "string",
-          "enum": ["proposed", "approved", "planned", "inProgress", "implemented", "verified"],
+          "enum": [
+            "proposed",
+            "approved",
+            "planned",
+            "inProgress",
+            "implemented",
+            "verified"
+          ],
           "meta:enum": {
             "proposed": "Mitigation has been proposed",
             "approved": "Mitigation has been approved",
@@ -686,7 +770,13 @@
         },
         "cost": {
           "type": "string",
-          "enum": ["trivial", "low", "medium", "high", "extreme"],
+          "enum": [
+            "trivial",
+            "low",
+            "medium",
+            "high",
+            "extreme"
+          ],
           "meta:enum": {
             "trivial": "Minimal cost and effort",
             "low": "Low cost and effort",
@@ -698,16 +788,16 @@
         "addresses": {
           "type": "array",
           "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "References to scenarios this plan addresses"
+          "description": "References using bom-link or bom-ref to scenarios this plan addresses."
         },
         "implementedBy": {
           "type": "array",
           "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "References to assets that implement this plan"
+          "description": "References using bom-link or bom-ref to assets that implement this plan."
         },
         "externalReferences": {
           "type": "array",
@@ -722,7 +812,12 @@
     },
     "mitigationPlan": {
       "type": "object",
-      "required": ["name", "type", "status", "mitigations"],
+      "required": [
+        "name",
+        "type",
+        "status",
+        "mitigations"
+      ],
       "additionalProperties": false,
       "properties": {
         "name": {
@@ -760,7 +855,14 @@
         },
         "status": {
           "type": "string",
-          "enum": ["proposed", "approved", "planned", "inProgress", "implemented", "verified"],
+          "enum": [
+            "proposed",
+            "approved",
+            "planned",
+            "inProgress",
+            "implemented",
+            "verified"
+          ],
           "meta:enum": {
             "proposed": "Mitigation has been proposed",
             "approved": "Mitigation has been approved",
@@ -783,9 +885,9 @@
           "type": "array",
           "minItems": 1,
           "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "List of mitigation bom-refs chosen for this plan"
+          "description": "References using bom-link or bom-ref to mitigations chosen for this plan."
         }
       }
     },
@@ -801,7 +903,13 @@
         },
         "rating": {
           "type": "string",
-          "enum": ["ineffective", "marginal", "adequate", "good", "excellent"],
+          "enum": [
+            "ineffective",
+            "marginal",
+            "adequate",
+            "good",
+            "excellent"
+          ],
           "meta:enum": {
             "ineffective": "Does not meaningfully reduce risk",
             "marginal": "Slightly reduces risk",
@@ -814,7 +922,11 @@
     },
     "assessment": {
       "type": "object",
-      "required": ["bom-ref", "type", "timestamp"],
+      "required": [
+        "bom-ref",
+        "type",
+        "timestamp"
+      ],
       "additionalProperties": false,
       "properties": {
         "bom-ref": {
@@ -822,7 +934,12 @@
         },
         "type": {
           "type": "string",
-          "enum": ["initial", "periodic", "continuous", "triggered"],
+          "enum": [
+            "initial",
+            "periodic",
+            "continuous",
+            "triggered"
+          ],
           "meta:enum": {
             "initial": "Initial risk assessment",
             "periodic": "Scheduled periodic assessment",
@@ -836,8 +953,8 @@
           "description": "When the assessment was performed"
         },
         "assessor": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntityOrContact",
-          "description": "Who performed the assessment"
+          "$ref": "cyclonedx-party-2.0.schema.json#/$defs/partyChoice",
+          "description": "The party that performed the assessment. May be an inline party object or a reference to a previously declared party. The party's `roles` should include `auditor` or `assessor` (custom) depending on the assessment type."
         },
         "summary": {
           "type": "string",
@@ -846,18 +963,25 @@
         "risks": {
           "type": "array",
           "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "References to risk entries evaluated in this assessment"
+          "description": "References using bom-link or bom-ref to risk entries evaluated in this assessment."
         },
         "overallRisk": {
           "type": "object",
-          "required": ["method", "score"],
+          "required": [
+            "method",
+            "score"
+          ],
           "additionalProperties": false,
           "properties": {
             "method": {
               "type": "string",
-              "enum": ["sum", "average", "custom"],
+              "enum": [
+                "sum",
+                "average",
+                "custom"
+              ],
               "description": "Aggregation method used to derive the overall risk"
             },
             "score": {
@@ -889,7 +1013,13 @@
     },
     "priority": {
       "type": "string",
-      "enum": ["none", "low", "medium", "high", "critical"],
+      "enum": [
+        "none",
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
       "description": "Priority level",
       "meta:enum": {
         "none": "No priority assigned",
@@ -901,7 +1031,13 @@
     },
     "severity": {
       "type": "string",
-      "enum": ["info", "low", "medium", "high", "critical"],
+      "enum": [
+        "info",
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
       "description": "Severity level",
       "meta:enum": {
         "info": "Informational finding",
@@ -913,7 +1049,13 @@
     },
     "criticality": {
       "type": "string",
-      "enum": ["minimal", "low", "moderate", "high", "critical"],
+      "enum": [
+        "minimal",
+        "low",
+        "moderate",
+        "high",
+        "critical"
+      ],
       "description": "Business criticality level",
       "meta:enum": {
         "minimal": "Minimal impact on business operations",

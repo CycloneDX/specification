@@ -3,113 +3,72 @@
   "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-data-2.0.schema.json",
   "type": "null",
   "title": "CycloneDX Data Model",
-  "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
+  "$comment": "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
+    "dataProfiles": {
+      "type": "array",
+      "title": "Data Profiles",
+      "description": "A catalogue of reusable data profile definitions. Each entry is a complete inline data profile carrying its own bom-ref so other objects may reference it.",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/dataProfile"
+      }
+    },
     "dataProfile": {
       "type": "object",
       "title": "Data Profile",
-      "description": "Captures the sensitivity, classification, and lifecycle requirements associated with data, including how it may be collected, accessed, processed, shared, handled, retained, and disposed of.",
-      "required": ["name"],
+      "description": "Captures the classification, information types, and lifecycle requirements associated with data, including how it may be collected, accessed, processed, shared, handled, retained, and disposed of.",
+      "required": [
+        "name"
+      ],
       "additionalProperties": false,
       "properties": {
         "bom-ref": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "description": "Unique identifier for this data profile"
+          "description": "Unique identifier for this data profile."
         },
         "name": {
           "type": "string",
           "title": "Name",
           "minLength": 1,
-          "description": "The name or label that identifies this data profile, such as the name of the dataset, data category, or information asset it describes.",
-          "examples": ["Customer PII Dataset", "Transaction Logs", "Employee Health Records"]
+          "description": "The name or label that identifies this data profile, such as the name of the dataset, information asset, or data domain it describes.",
+          "examples": [
+            "Customer PII Dataset",
+            "Transaction Logs",
+            "Employee Health Records"
+          ]
         },
         "description": {
           "type": "string",
           "title": "Description",
           "description": "A detailed explanation of the data this profile describes, including what information is contained, its purpose, origin, and any relevant context about how it is used within the system."
         },
-        "sensitivity": {
-          "type": "string",
-          "title": "Sensitivity",
-          "enum": [
-            "confidential",
-            "internal",
-            "public",
-            "restricted",
-            "classified"
-          ],
-          "description": "Data sensitivity classification.",
-          "meta:enum": {
-            "confidential": "Confidential information requiring protection",
-            "internal": "Internal use only within the organization",
-            "public": "Public information that can be freely shared",
-            "restricted": "Highly restricted information with limited access and special protection measures",
-            "classified": "Government or defence classified information subject to national security controls, clearance requirements, and statutory handling obligations"
-          }
-        },
         "classification": {
-          "title": "Classification",
-          "description": "Classifies data by its type, either using a predefined classification or a custom name and description for classifications not covered by the enumeration.",
-          "oneOf": [
-            {
-              "title": "Predefined Classification",
-              "description": "A predefined data classification from the enumeration.",
-              "type": "object",
-              "additionalProperties": false,
-              "required": ["type"],
-              "properties": {
-                "type": {
-                  "type": "string",
-                  "title": "Type",
-                  "enum": [
-                    "credentials",
-                    "financial",
-                    "intellectualProperty",
-                    "logs",
-                    "operational",
-                    "other",
-                    "pci",
-                    "phi",
-                    "pii",
-                    "safety",
-                    "telemetry"
-                  ],
-                  "meta:enum": {
-                    "credentials": "Secrets, tokens, or credentials",
-                    "financial": "Financial statements or transaction data",
-                    "intellectualProperty": "Intellectual property or trade secrets",
-                    "logs": "Operational or security log data",
-                    "operational": "Operational or process data",
-                    "other": "Other data classification not listed",
-                    "pci": "Payment card industry data",
-                    "phi": "Protected health information",
-                    "pii": "Personally identifiable information",
-                    "safety": "Safety critical data or signals",
-                    "telemetry": "System or product telemetry data"
-                  }
-                }
+          "$ref": "#/$defs/dataClassification",
+          "description": "The classification of the data, indicating the level of protection required. A data profile carries a single classification reflecting the highest applicable level for the data it describes."
+        },
+        "informationTypes": {
+          "type": "array",
+          "title": "Information Types",
+          "description": "The types of information contained in the data. A data profile may contain multiple information types, for example a profile may carry both personally identifiable information and financial data. Each entry is either a predefined value from the enumeration or a custom object describing an information type not covered by the enumeration.",
+          "uniqueItems": true,
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/informationType"
+          },
+          "examples": [
+            [
+              "pii",
+              "financial"
+            ],
+            [
+              "phi",
+              "biometric",
+              {
+                "name": "minor-health-data",
+                "description": "Health information for individuals under 18, subject to COPPA and HIPAA."
               }
-            },
-            {
-              "title": "Custom Classification",
-              "description": "A custom data classification not covered by the predefined enumeration.",
-              "type": "object",
-              "additionalProperties": false,
-              "required": ["name"],
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "title": "Name",
-                  "minLength": 1,
-                  "description": "The name of a custom data classification not covered by the predefined enumeration"
-                },
-                "description": {
-                  "type": "string",
-                  "title": "Description",
-                  "description": "A description of the custom data classification"
-                }
-              }
-            }
+            ]
           ]
         },
         "subjects": {
@@ -122,8 +81,31 @@
           },
           "examples": [
             [
-              {"name": "EU Residents", "type": "group", "protectedClass": false, "jurisdictions": ["DE", "FR", "IT"], "regulations": ["GDPR"]},
-              {"name": "Pediatric Patients", "type": "group", "protectedClass": true, "jurisdictions": ["US"], "regulations": ["HIPAA", "COPPA"]}
+              {
+                "name": "EU Residents",
+                "type": "group",
+                "protectedClass": false,
+                "jurisdictions": [
+                  "DE",
+                  "FR",
+                  "IT"
+                ],
+                "regulations": [
+                  "GDPR"
+                ]
+              },
+              {
+                "name": "Pediatric Patients",
+                "type": "group",
+                "protectedClass": true,
+                "jurisdictions": [
+                  "US"
+                ],
+                "regulations": [
+                  "HIPAA",
+                  "COPPA"
+                ]
+              }
             ]
           ]
         },
@@ -137,8 +119,14 @@
           },
           "examples": [
             [
-              {"name": "Service Delivery", "legalBasis": "contract"},
-              {"name": "Fraud Prevention", "legalBasis": "legitimate interest"}
+              {
+                "name": "Service Delivery",
+                "legalBasis": "contract"
+              },
+              {
+                "name": "Fraud Prevention",
+                "legalBasis": "legitimate interest"
+              }
             ]
           ]
         },
@@ -158,17 +146,13 @@
             "type": "string"
           },
           "description": "The formats in which the data is stored or transmitted.",
-          "examples": [["JSON", "CSV", "Parquet"]]
-        },
-        "dataTypes": {
-          "type": "array",
-          "title": "Data Types",
-          "uniqueItems": true,
-          "items": {
-            "type": "string"
-          },
-          "description": "The specific types of data elements contained within this dataset.",
-          "examples": [["email address", "date of birth", "IP address"]]
+          "examples": [
+            [
+              "JSON",
+              "CSV",
+              "Parquet"
+            ]
+          ]
         },
         "schema": {
           "type": "array",
@@ -179,14 +163,18 @@
             "format": "uri"
           },
           "description": "References to schema contracts or documents describing the data structure.",
-          "examples": [["https://example.com/schemas/customer-v2.json"]]
+          "examples": [
+            [
+              "https://example.com/schemas/customer-v2.json"
+            ]
+          ]
         },
         "access": {
           "type": "array",
           "title": "Access",
           "uniqueItems": true,
           "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
           "description": "References to requirement objects that define who may access the data and under what conditions, including need-to-know restrictions, clearance levels, audit logging, and break-glass procedures."
         },
@@ -195,7 +183,7 @@
           "title": "Collection",
           "uniqueItems": true,
           "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
           "description": "References to requirement objects that govern how data is collected or acquired, including consent mechanisms, lawful basis, purpose limitation, and notice obligations."
         },
@@ -204,7 +192,7 @@
           "title": "Disposal",
           "uniqueItems": true,
           "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
           "description": "References to requirement objects that specify how this data must be destroyed or rendered unrecoverable when no longer needed, including sanitisation methods, disposal timelines, and regulatory obligations governing data destruction."
         },
@@ -213,7 +201,7 @@
           "title": "Handling",
           "uniqueItems": true,
           "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
           "description": "References to requirement objects that govern how this data must be handled throughout its lifecycle, such as encryption at rest, access restrictions, anonymisation, or regulatory compliance obligations."
         },
@@ -222,7 +210,7 @@
           "title": "Processing",
           "uniqueItems": true,
           "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
           "description": "References to requirement objects that govern what may be done with the data, including purpose limitation, data minimisation, aggregation rules, and prohibited uses such as AI or ML training restrictions."
         },
@@ -231,18 +219,204 @@
           "title": "Retention",
           "uniqueItems": true,
           "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
           "description": "References to requirement objects that define how long this data must be retained, including minimum retention periods, maximum storage durations, and any regulatory or contractual obligations governing data preservation."
+        },
+        "ttl": {
+          "type": "integer",
+          "title": "Time to Live",
+          "minimum": 1,
+          "description": "The time-to-live in seconds for transient data that is not persisted, such as protected health information carried inside a short-lived JSON Web Token or sensitive material held in memory for the duration of a single request. Distinct from retention, which applies to persisted data and is governed by requirement objects.",
+          "examples": [
+            300,
+            3600
+          ]
         },
         "sharing": {
           "type": "array",
           "title": "Sharing",
           "uniqueItems": true,
           "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
           "description": "References to requirement objects that govern how data may be shared with third parties, partners, or across jurisdictional boundaries, including data sharing agreements, cross-border transfer restrictions, and adequacy decisions."
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "dataProfileChoice": {
+      "title": "Data Profile Choice",
+      "description": "A data profile represented either as a complete inline object or as a reference to a previously declared profile. References use bom-link or bom-ref to point at a profile declared in the root profiles catalogue or elsewhere in the document.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/dataProfile"
+        },
+        {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "title": "Reference",
+          "description": "Reference using bom-link or bom-ref to a previously declared data profile."
+        }
+      ]
+    },
+    "dataObject": {
+      "type": "object",
+      "title": "Data Object",
+      "description": "A specific data payload such as a message, record, or document. Distinct from a data profile, which is a policy template; a data object is an instance whose name, schema, format, and field-level attributes describe a concrete payload. The governing policy is supplied by an optional reference to a data profile. A single profile may govern many data objects; each data object refers to at most one profile.",
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "Unique identifier for this data object."
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "minLength": 1,
+          "description": "The name of the data object, such as the name of the message, record, document, or table row it represents.",
+          "examples": [
+            "user_registration",
+            "payment_request",
+            "audit_event"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A narrative explanation of the data object, including its purpose, origin, and any context relevant to interpreting its attributes."
+        },
+        "profile": {
+          "$ref": "#/$defs/dataProfileChoice",
+          "title": "Profile",
+          "description": "The data profile that governs this object's classification, information types, and lifecycle requirements. May be an inline profile object or a reference using bom-link or bom-ref to a previously declared profile."
+        },
+        "informationTypes": {
+          "type": "array",
+          "title": "Information Types",
+          "description": "The types of information contained in this object. May refine or extend the information types declared on the referenced profile. Each entry is either a predefined value from the enumeration or a custom object describing an information type not covered by the enumeration.",
+          "uniqueItems": true,
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/informationType"
+          }
+        },
+        "schema": {
+          "type": "object",
+          "title": "Schema",
+          "description": "The structural contract describing this object's shape, such as a JSON Schema, XSD, Avro schema, or Protobuf descriptor.",
+          "additionalProperties": false,
+          "properties": {
+            "url": {
+              "type": "string",
+              "title": "URL",
+              "format": "iri-reference",
+              "description": "URL or URN pointing to the schema document."
+            },
+            "mediaType": {
+              "type": "string",
+              "title": "Media Type",
+              "description": "Media type of the schema, for example application/schema+json, application/xml, or application/vnd.apache.avro+json.",
+              "examples": [
+                "application/schema+json",
+                "application/xml",
+                "application/vnd.apache.avro+json"
+              ]
+            },
+            "comment": {
+              "type": "string",
+              "title": "Comment",
+              "description": "Additional notes about the schema, such as its version or compatibility expectations."
+            }
+          }
+        },
+        "format": {
+          "type": "object",
+          "title": "Format",
+          "description": "The serialisation or encoding format of this object, such as application/json, text/csv, or application/hl7-v2.",
+          "additionalProperties": false,
+          "properties": {
+            "url": {
+              "type": "string",
+              "title": "URL",
+              "format": "iri-reference",
+              "description": "URL or URN pointing to the format specification."
+            },
+            "mediaType": {
+              "type": "string",
+              "title": "Media Type",
+              "description": "Media type or encoding format, for example application/json, text/csv, application/hl7-v2.",
+              "examples": [
+                "application/json",
+                "text/csv",
+                "application/hl7-v2"
+              ]
+            },
+            "comment": {
+              "type": "string",
+              "title": "Comment",
+              "description": "Additional notes about the format."
+            }
+          }
+        },
+        "attributes": {
+          "type": "array",
+          "title": "Attributes",
+          "description": "The fields, columns, or properties contained in this object. Each attribute may carry a typed information type to support field-level classification and compliance analysis.",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/dataAttribute"
+          }
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "dataAttribute": {
+      "type": "object",
+      "title": "Data Attribute",
+      "description": "A single field, column, or property within a data object. Carries an optional information type so that producers and consumers can classify and reason about data at field granularity rather than only at the object level.",
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "minLength": 1,
+          "description": "The name of the attribute as it appears in the data object, such as a field name, column name, or property key.",
+          "examples": [
+            "email",
+            "dateOfBirth",
+            "panToken",
+            "amount"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A narrative explanation of the attribute, such as its semantics, expected values, or constraints."
+        },
+        "informationType": {
+          "$ref": "#/$defs/informationType",
+          "title": "Information Type",
+          "description": "The information type carried by this attribute. Field-level typing enables compliance analysis at finer granularity than the object-level information types."
+        },
+        "required": {
+          "type": "boolean",
+          "title": "Required",
+          "description": "Indicates whether the attribute is required for the data object to be valid."
+        },
+        "sensitive": {
+          "type": "boolean",
+          "title": "Sensitive",
+          "description": "Indicates whether the attribute carries sensitive content that warrants extra protection beyond the object-level classification, such as masking in logs or stricter access controls."
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
@@ -252,28 +426,98 @@
     "subject": {
       "type": "object",
       "title": "Subject",
-      "description": "An entity, group, category, or thing that the data is about or pertains to. Subjects identify who or what the data describes, which is critical for determining applicable regulations, privacy obligations, and handling requirements. Subjects may include named individuals, organizations, demographic groups, protected classes, technologies, devices, locations, or any other identifiable topic of the data.",
-      "required": ["name", "type"],
+      "description": "An entity, group, category, or thing that the data is about or pertains to. Subjects identify who or what the data describes, which is critical for determining applicable regulations, privacy obligations, and handling requirements. A subject is identified in one of three ways: inline by `name` and `type`, by an inline `party` object, or by `ref` pointing at any bom-ref'd element declared elsewhere in the document (a party, component, service, asset, dataset, or other element). At least one of these forms shall be supplied. Subject-context attributes such as protected-class status, applicable jurisdictions, and applicable regulations are carried here regardless of which identification form is used.",
       "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "name",
+            "type"
+          ]
+        },
+        {
+          "required": [
+            "party"
+          ]
+        },
+        {
+          "required": [
+            "ref"
+          ]
+        }
+      ],
       "examples": [
-        {"name": "EU Residents", "type": "group", "protectedClass": false, "jurisdictions": ["DE", "FR"], "regulations": ["GDPR"]},
-        {"name": "Pediatric Patients", "type": "group", "protectedClass": true, "jurisdictions": ["US"], "regulations": ["HIPAA", "COPPA"]},
-        {"name": "GPT-4 Model", "type": "technology", "protectedClass": false}
+        {
+          "name": "EU Residents",
+          "type": "group",
+          "protectedClass": false,
+          "jurisdictions": [
+            "DE",
+            "FR"
+          ],
+          "regulations": [
+            "GDPR"
+          ]
+        },
+        {
+          "ref": "party-pediatric-patients",
+          "protectedClass": true,
+          "jurisdictions": [
+            "US"
+          ],
+          "regulations": [
+            "HIPAA",
+            "COPPA"
+          ]
+        },
+        {
+          "party": {
+            "roles": [
+              {
+                "role": "data-subject"
+              }
+            ],
+            "persona": {
+              "archetype": "customer",
+              "scope": "external",
+              "description": "Fleet vehicle owners enrolled in the connected-services platform."
+            }
+          },
+          "protectedClass": false
+        }
       ],
       "properties": {
         "name": {
           "type": "string",
           "title": "Name",
-          "description": "The name identifying the subject of the data, such as a specific entity name, group label, or category descriptor.",
+          "description": "The name identifying the subject of the data, such as a specific entity name, group label, or category descriptor. Optional when `party` or `ref` is supplied.",
           "minLength": 1,
-          "examples": ["EU Residents", "Pediatric Patients", "Fleet Vehicles"]
+          "examples": [
+            "EU Residents",
+            "Pediatric Patients",
+            "Fleet Vehicles"
+          ]
         },
         "type": {
           "type": "string",
           "title": "Type",
-          "description": "A free-form category describing the kind of subject. Organizations should establish consistent terminology within their data governance practices.",
+          "description": "A free-form category describing the kind of subject. Organizations should establish consistent terminology within their data governance practices. Optional when `party` or `ref` is supplied.",
           "minLength": 1,
-          "examples": ["individual", "group", "technology"]
+          "examples": [
+            "individual",
+            "group",
+            "technology"
+          ]
+        },
+        "party": {
+          "$ref": "cyclonedx-party-2.0.schema.json#/$defs/party",
+          "title": "Party",
+          "description": "An inline party object identifying the subject. Use this when the subject is best modelled as a party (organization, person, system, or persona) and has not been declared elsewhere in the document. The party's `roles` should include `data-subject`."
+        },
+        "ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "title": "Reference",
+          "description": "Reference using bom-link or bom-ref to any element declared elsewhere in the document that identifies the subject, such as a party, component, service, asset, dataset, or other bom-ref'd element. Use this when the subject is already represented elsewhere and you want to point at it rather than redeclare it."
         },
         "protectedClass": {
           "type": "boolean",
@@ -306,9 +550,19 @@
       "items": {
         "type": "string",
         "minLength": 2,
-        "examples": ["US", "GB", "US-CA"]
+        "examples": [
+          "US",
+          "GB",
+          "US-CA"
+        ]
       },
-      "examples": [["US", "GB", "DE"]]
+      "examples": [
+        [
+          "US",
+          "GB",
+          "DE"
+        ]
+      ]
     },
     "regulations": {
       "type": "array",
@@ -318,20 +572,41 @@
       "items": {
         "type": "string",
         "minLength": 1,
-        "examples": ["GDPR", "HIPAA", "PCI-DSS"]
+        "examples": [
+          "GDPR",
+          "HIPAA",
+          "PCI-DSS"
+        ]
       },
-      "examples": [["GDPR", "CCPA", "PCI-DSS"]]
+      "examples": [
+        [
+          "GDPR",
+          "CCPA",
+          "PCI-DSS"
+        ]
+      ]
     },
     "purpose": {
       "type": "object",
       "title": "Purpose",
       "description": "The stated reason for collecting, processing, or retaining data. Purpose is a foundational principle in data protection law — under GDPR Article 5(1)(b), CCPA, PIPEDA, and virtually every modern privacy framework, data must be collected for specified, explicit, and legitimate purposes, and must not be further processed in a manner incompatible with those original purposes (purpose limitation). Capturing purposes explicitly enables automated compliance checking and purpose-compatibility analysis.",
-      "required": ["name"],
+      "required": [
+        "name"
+      ],
       "additionalProperties": false,
       "examples": [
-        {"name": "Service Delivery", "legalBasis": "contract"},
-        {"name": "Fraud Prevention", "legalBasis": "legitimate interest"},
-        {"name": "Marketing Analytics", "legalBasis": "consent"}
+        {
+          "name": "Service Delivery",
+          "legalBasis": "contract"
+        },
+        {
+          "name": "Fraud Prevention",
+          "legalBasis": "legitimate interest"
+        },
+        {
+          "name": "Marketing Analytics",
+          "legalBasis": "consent"
+        }
       ],
       "properties": {
         "name": {
@@ -339,7 +614,11 @@
           "title": "Name",
           "description": "The name of the purpose for which data is collected or processed.",
           "minLength": 1,
-          "examples": ["Service Delivery", "Fraud Prevention", "Marketing Analytics"]
+          "examples": [
+            "Service Delivery",
+            "Fraud Prevention",
+            "Marketing Analytics"
+          ]
         },
         "description": {
           "type": "string",
@@ -351,7 +630,11 @@
           "title": "Legal Basis",
           "description": "The legal basis under applicable law that authorises data collection or processing for this purpose. Use terminology consistent with the applicable jurisdiction and regulation.",
           "minLength": 1,
-          "examples": ["consent", "contract", "legitimate interest"]
+          "examples": [
+            "consent",
+            "contract",
+            "legitimate interest"
+          ]
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
@@ -359,81 +642,131 @@
       }
     },
     "dataClassification": {
-      "type": "string",
       "title": "Data Classification",
-      "description": "Data classification tags data according to its type, sensitivity, and value if altered, stolen, or destroyed."
-    },
-    "dataSensitivity": {
-      "type": "string",
-      "title": "Data Sensitivity",
-      "description": "Classifies the sensitivity of data to indicate the level of protection required.",
-      "enum": [
-        "confidential",
-        "internal",
-        "public",
-        "restricted"
-      ],
-      "meta:enum": {
-        "confidential": "Confidential information requiring protection",
-        "internal": "Internal use only within the organization",
-        "public": "Public information that can be freely shared",
-        "restricted": "Highly restricted information with limited access"
-      }
-    },
-    "dataGovernance": {
-      "type": "object",
-      "title": "Data Governance",
-      "description": "Data governance captures information regarding data ownership, stewardship, and custodianship, providing insights into the individuals or entities responsible for managing, overseeing, and safeguarding the data throughout its lifecycle.",
-      "additionalProperties": false,
-      "properties": {
-        "custodians": {
-          "type": "array",
-          "title": "Data Custodians",
-          "uniqueItems": true,
-          "description": "Data custodians are responsible for the safe custody, transport, and storage of data.",
-          "items": { "$ref": "#/$defs/dataGovernanceResponsibleParty" }
-        },
-        "stewards": {
-          "type": "array",
-          "title": "Data Stewards",
-          "uniqueItems": true,
-          "description": "Data stewards are responsible for data content, context, and associated business rules.",
-          "items": { "$ref": "#/$defs/dataGovernanceResponsibleParty" }
-        },
-        "owners": {
-          "type": "array",
-          "title": "Data Owners",
-          "uniqueItems": true,
-          "description": "Data owners are concerned with risk and appropriate access to data.",
-          "items": { "$ref": "#/$defs/dataGovernanceResponsibleParty" }
-        }
-      }
-    },
-    "dataGovernanceResponsibleParty": {
-      "type": "object",
-      "title": "Data Governance Responsible Party",
-      "description": "An organizational entity or individual responsible for a specific data governance role.",
-      "additionalProperties": false,
-      "properties": {
-        "organization": {
-          "title": "Organization",
-          "description": "The organization that is responsible for specific data governance role(s).",
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntity"
-        },
-        "contact": {
-          "title": "Individual",
-          "description": "The individual that is responsible for specific data governance role(s).",
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalContact"
-        }
-      },
-      "oneOf":[
+      "description": "Classifies data by the level of protection it requires, either using a predefined classification level or a custom level not covered by the enumeration. Classification drives protection requirements such as access control, encryption, disclosure restrictions, and statutory handling obligations.",
+      "oneOf": [
         {
-          "required": ["organization"]
+          "type": "string",
+          "title": "Predefined Classification",
+          "description": "A predefined classification level from the enumeration.",
+          "enum": [
+            "confidential",
+            "internal",
+            "public",
+            "restricted",
+            "classified"
+          ],
+          "meta:enum": {
+            "confidential": "Confidential information requiring protection.",
+            "internal": "Internal use only within the organisation.",
+            "public": "Public information that can be freely shared.",
+            "restricted": "Highly restricted information with limited access and special protection measures.",
+            "classified": "Government or defence classified information subject to national security controls, clearance requirements, and statutory handling obligations."
+          }
         },
         {
-          "required": ["contact"]
+          "type": "object",
+          "title": "Custom Classification",
+          "description": "A custom classification level not covered by the predefined enumeration.",
+          "additionalProperties": false,
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Name",
+              "minLength": 1,
+              "description": "The name of the custom classification level."
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of what this custom classification level means and the protections it implies."
+            }
+          }
         }
       ]
+    },
+    "informationType": {
+      "title": "Information Type",
+      "description": "Identifies a type of information contained in the data, either using a predefined value from the enumeration or a custom name and description for types not covered by the enumeration. A single dataset can contain multiple information types and is captured as an array on the data profile.",
+      "oneOf": [
+        {
+          "type": "string",
+          "title": "Predefined Information Type",
+          "description": "A predefined information type from the enumeration.",
+          "enum": [
+            "authentication",
+            "behavioral",
+            "biometric",
+            "communication",
+            "credentials",
+            "device",
+            "financial",
+            "genetic",
+            "intellectual-property",
+            "location",
+            "logs",
+            "operational",
+            "pci",
+            "phi",
+            "pii",
+            "safety",
+            "telemetry"
+          ],
+          "meta:enum": {
+            "authentication": "Authentication data such as passwords, PINs, or security questions.",
+            "behavioral": "Behavioural data such as browsing history, usage patterns, or profiling data.",
+            "biometric": "Biometric data such as fingerprints, facial recognition, or voice patterns.",
+            "communication": "Communication content such as messages, emails, or call records.",
+            "credentials": "Secrets, tokens, or credentials.",
+            "device": "Device identifiers or hardware-level data.",
+            "financial": "Financial statements or transaction data.",
+            "genetic": "Genetic or genomic data.",
+            "intellectual-property": "Intellectual property or trade secrets.",
+            "location": "Precise or inferred geographic location data.",
+            "logs": "Operational or security log data.",
+            "operational": "Operational or process data.",
+            "pci": "Payment card industry data.",
+            "phi": "Protected health information.",
+            "pii": "Personally identifiable information.",
+            "safety": "Safety critical data or signals.",
+            "telemetry": "System or product telemetry data."
+          }
+        },
+        {
+          "type": "object",
+          "title": "Custom Information Type",
+          "description": "A custom information type not covered by the predefined enumeration.",
+          "additionalProperties": false,
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Name",
+              "minLength": 1,
+              "description": "The name of the custom information type."
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the custom information type and any handling implications it carries."
+            }
+          }
+        }
+      ]
+    },
+    "dataGovernance": {
+      "type": "array",
+      "title": "Data Governance",
+      "description": "Parties responsible for the data throughout its lifecycle. Each entry is either an inline party object or a reference to a previously declared party. The party's `roles` carry the governance relationship (`owner` for ownership and risk accountability, `steward` for content and business rules, `custodian` for safe custody, transport, and storage, `data-controller`, `data-processor`, `data-recipient`, or a custom role). Multiple parties may share the same role; preference among them is expressed via `role.order`.",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "cyclonedx-party-2.0.schema.json#/$defs/partyChoice"
+      }
     },
     "dataFlowDirection": {
       "type": "string",

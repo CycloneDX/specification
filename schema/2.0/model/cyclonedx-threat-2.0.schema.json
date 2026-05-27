@@ -3,7 +3,7 @@
   "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-threat-2.0.schema.json",
   "type": "null",
   "title": "CycloneDX Threat Model",
-  "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
+  "$comment": "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
     "threatScenario": {
       "type": "object",
@@ -85,7 +85,11 @@
     },
     "threatActor": {
       "type": "object",
-      "required": ["bom-ref", "name", "type"],
+      "required": [
+        "bom-ref",
+        "name",
+        "type"
+      ],
       "additionalProperties": false,
       "properties": {
         "bom-ref": {
@@ -101,7 +105,13 @@
         },
         "type": {
           "type": "string",
-          "enum": ["individual", "group", "organization", "nation-state", "unknown"],
+          "enum": [
+            "individual",
+            "group",
+            "organization",
+            "nation-state",
+            "unknown"
+          ],
           "meta:enum": {
             "individual": "Individual threat actor",
             "group": "Organized group or collective",
@@ -151,7 +161,13 @@
       "properties": {
         "sophistication": {
           "type": "string",
-          "enum": ["none", "minimal", "intermediate", "advanced", "expert"],
+          "enum": [
+            "none",
+            "minimal",
+            "intermediate",
+            "advanced",
+            "expert"
+          ],
           "meta:enum": {
             "none": "No technical sophistication",
             "minimal": "Script kiddie level",
@@ -183,17 +199,34 @@
         },
         "intent": {
           "type": "string",
-          "enum": ["accidental", "opportunistic", "targeted", "persistent"],
+          "enum": [
+            "accidental",
+            "opportunistic",
+            "targeted",
+            "persistent"
+          ],
           "description": "Intent level"
         },
         "resources": {
           "type": "string",
-          "enum": ["minimal", "limited", "moderate", "substantial", "unlimited"],
+          "enum": [
+            "minimal",
+            "limited",
+            "moderate",
+            "substantial",
+            "unlimited"
+          ],
           "description": "Resource availability"
         },
         "accessLevel": {
           "type": "string",
-          "enum": ["none", "external", "internal", "privileged", "physical"],
+          "enum": [
+            "none",
+            "external",
+            "internal",
+            "privileged",
+            "physical"
+          ],
           "description": "Level of access to target systems"
         },
         "skillSet": {
@@ -211,7 +244,12 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["network", "adjacent", "local", "physical"],
+          "enum": [
+            "network",
+            "adjacent",
+            "local",
+            "physical"
+          ],
           "meta:enum": {
             "network": "Remotely exploitable via network",
             "adjacent": "Exploitable from adjacent network",
@@ -229,24 +267,37 @@
         },
         "privileges": {
           "type": "string",
-          "enum": ["none", "low", "high"],
+          "enum": [
+            "none",
+            "low",
+            "high"
+          ],
           "description": "Privileges required"
         },
         "userInteraction": {
           "type": "string",
-          "enum": ["none", "required"],
+          "enum": [
+            "none",
+            "required"
+          ],
           "description": "User interaction requirement"
         },
         "scope": {
           "type": "string",
-          "enum": ["unchanged", "changed"],
+          "enum": [
+            "unchanged",
+            "changed"
+          ],
           "description": "Scope impact"
         }
       }
     },
     "abuseCase": {
       "type": "object",
-      "required": ["bom-ref", "name"],
+      "required": [
+        "bom-ref",
+        "name"
+      ],
       "additionalProperties": false,
       "properties": {
         "bom-ref": {
@@ -261,15 +312,15 @@
           "description": "Narrative describing how the system can be misused or abused"
         },
         "abuser": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "description": "Reference (bom-ref) to a threat actor involved in the abuse case"
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "description": "Reference using bom-link or bom-ref to a threat actor involved in the abuse case."
         },
         "targets": {
           "type": "array",
           "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "References (bom-refs) to assets or flows targeted in this abuse case"
+          "description": "References using bom-link or bom-ref to assets or flows targeted in this abuse case."
         },
         "steps": {
           "type": "array",
@@ -282,7 +333,10 @@
     },
     "attackPattern": {
       "type": "object",
-      "required": ["bom-ref", "name"],
+      "required": [
+        "bom-ref",
+        "name"
+      ],
       "additionalProperties": false,
       "properties": {
         "bom-ref": {
@@ -317,9 +371,9 @@
         "mitigations": {
           "type": "array",
           "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "References to mitigations"
+          "description": "References using bom-link or bom-ref to mitigations."
         },
         "examples": {
           "type": "array",
@@ -335,8 +389,8 @@
       "additionalProperties": false,
       "properties": {
         "patternRef": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "description": "Reference to attack pattern"
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "description": "Reference using bom-link or bom-ref to an attack pattern."
         },
         "capecId": {
           "type": "integer",
@@ -379,7 +433,9 @@
     },
     "weakness": {
       "type": "object",
-      "required": ["bom-ref"],
+      "required": [
+        "bom-ref"
+      ],
       "additionalProperties": false,
       "properties": {
         "bom-ref": {
@@ -399,7 +455,13 @@
         },
         "abstraction": {
           "type": "string",
-          "enum": ["pillar", "class", "base", "variant", "compound"],
+          "enum": [
+            "pillar",
+            "class",
+            "base",
+            "variant",
+            "compound"
+          ],
           "meta:enum": {
             "pillar": "Most abstract type of weakness",
             "class": "Weakness described in generic terms",
@@ -410,7 +472,11 @@
         },
         "ordinality": {
           "type": "string",
-          "enum": ["primary", "resultant", "indirect"],
+          "enum": [
+            "primary",
+            "resultant",
+            "indirect"
+          ],
           "meta:enum": {
             "primary": "Weakness exists independent of other weaknesses",
             "resultant": "Weakness is caused by another weakness",
@@ -420,13 +486,19 @@
         "affectedAssets": {
           "type": "array",
           "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "Assets affected by this weakness"
+          "description": "References using bom-link or bom-ref to assets affected by this weakness."
         },
         "exploitationDifficulty": {
           "type": "string",
-          "enum": ["trivial", "easy", "moderate", "difficult", "impractical"],
+          "enum": [
+            "trivial",
+            "easy",
+            "moderate",
+            "difficult",
+            "impractical"
+          ],
           "description": "Difficulty of exploiting this weakness"
         },
         "detectionMethods": {
@@ -443,8 +515,8 @@
       "additionalProperties": false,
       "properties": {
         "weaknessRef": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "description": "Reference to weakness"
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "description": "Reference using bom-link or bom-ref to a weakness."
         },
         "cweId": {
           "type": "integer",
@@ -462,7 +534,12 @@
       "properties": {
         "level": {
           "type": "string",
-          "enum": ["theoretical", "proof-of-concept", "functional", "weaponized"],
+          "enum": [
+            "theoretical",
+            "proof-of-concept",
+            "functional",
+            "weaponized"
+          ],
           "meta:enum": {
             "theoretical": "Theoretically possible but not demonstrated",
             "proof-of-concept": "Proof of concept exists",
@@ -472,12 +549,24 @@
         },
         "complexity": {
           "type": "string",
-          "enum": ["trivial", "low", "medium", "high", "very-high"],
+          "enum": [
+            "trivial",
+            "low",
+            "medium",
+            "high",
+            "very-high"
+          ],
           "description": "Complexity to exploit"
         },
         "skillRequired": {
           "type": "string",
-          "enum": ["none", "basic", "intermediate", "advanced", "expert"],
+          "enum": [
+            "none",
+            "basic",
+            "intermediate",
+            "advanced",
+            "expert"
+          ],
           "description": "Skill level required"
         },
         "toolsRequired": {
@@ -493,7 +582,12 @@
         },
         "reliability": {
           "type": "string",
-          "enum": ["unreliable", "occasional", "reliable", "highly-reliable"],
+          "enum": [
+            "unreliable",
+            "occasional",
+            "reliable",
+            "highly-reliable"
+          ],
           "description": "Reliability of exploitation"
         },
         "automatable": {
@@ -538,12 +632,21 @@
     },
     "signature": {
       "type": "object",
-      "required": ["type", "value"],
+      "required": [
+        "type",
+        "value"
+      ],
       "additionalProperties": false,
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["yara", "snort", "regex", "hash", "behavior"],
+          "enum": [
+            "yara",
+            "snort",
+            "regex",
+            "hash",
+            "behavior"
+          ],
           "description": "Type of signature"
         },
         "value": {
@@ -556,7 +659,11 @@
         },
         "confidence": {
           "type": "string",
-          "enum": ["low", "medium", "high"],
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
           "description": "Confidence level of detection"
         }
       }
@@ -594,7 +701,9 @@
     },
     "tool": {
       "type": "object",
-      "required": ["name"],
+      "required": [
+        "name"
+      ],
       "additionalProperties": false,
       "properties": {
         "name": {
@@ -603,7 +712,14 @@
         },
         "type": {
           "type": "string",
-          "enum": ["exploit", "scanner", "fuzzer", "proxy", "framework", "custom"],
+          "enum": [
+            "exploit",
+            "scanner",
+            "fuzzer",
+            "proxy",
+            "framework",
+            "custom"
+          ],
           "description": "Type of tool"
         },
         "version": {
@@ -655,12 +771,21 @@
     },
     "detectionMethod": {
       "type": "object",
-      "required": ["method"],
+      "required": [
+        "method"
+      ],
       "additionalProperties": false,
       "properties": {
         "method": {
           "type": "string",
-          "enum": ["static-analysis", "dynamic-analysis", "penetration-test", "code-review", "architecture-review", "automated-scan"],
+          "enum": [
+            "static-analysis",
+            "dynamic-analysis",
+            "penetration-test",
+            "code-review",
+            "architecture-review",
+            "automated-scan"
+          ],
           "description": "Detection method type"
         },
         "description": {
@@ -669,7 +794,11 @@
         },
         "effectiveness": {
           "type": "string",
-          "enum": ["low", "medium", "high"],
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
           "description": "Effectiveness of the method"
         },
         "tools": {
@@ -683,7 +812,11 @@
     },
     "securityPolicy": {
       "type": "object",
-      "required": ["bom-ref", "name", "type"],
+      "required": [
+        "bom-ref",
+        "name",
+        "type"
+      ],
       "additionalProperties": false,
       "properties": {
         "bom-ref": {
@@ -695,7 +828,14 @@
         },
         "type": {
           "type": "string",
-          "enum": ["access-control", "data-protection", "network-security", "application-security", "operational-security", "compliance"],
+          "enum": [
+            "access-control",
+            "data-protection",
+            "network-security",
+            "application-security",
+            "operational-security",
+            "compliance"
+          ],
           "description": "Type of security policy"
         },
         "description": {
@@ -711,15 +851,19 @@
         },
         "enforcement": {
           "type": "string",
-          "enum": ["mandatory", "recommended", "optional"],
+          "enum": [
+            "mandatory",
+            "recommended",
+            "optional"
+          ],
           "description": "Enforcement level"
         },
         "appliesTo": {
           "type": "array",
           "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "Assets this policy applies to"
+          "description": "References using bom-link or bom-ref to assets this policy applies to."
         },
         "exceptions": {
           "type": "array",
@@ -740,7 +884,12 @@
           "properties": {
             "trustLevel": {
               "type": "string",
-              "enum": ["untrusted", "semi-trusted", "trusted", "highly-trusted"],
+              "enum": [
+                "untrusted",
+                "semi-trusted",
+                "trusted",
+                "highly-trusted"
+              ],
               "description": "Trust level differential"
             },
             "securityRequirements": {
@@ -749,16 +898,16 @@
             "threatsAtBoundary": {
               "type": "array",
               "items": {
-                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
               },
-              "description": "Threats that could exploit this boundary"
+              "description": "References using bom-link or bom-ref to threats that could exploit this boundary."
             },
             "controlsAtBoundary": {
               "type": "array",
               "items": {
-                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
               },
-              "description": "Controls implemented at this boundary"
+              "description": "References using bom-link or bom-ref to controls implemented at this boundary."
             }
           }
         }
@@ -770,12 +919,23 @@
       "properties": {
         "authenticationStrength": {
           "type": "string",
-          "enum": ["none", "weak", "moderate", "strong", "very-strong"],
+          "enum": [
+            "none",
+            "weak",
+            "moderate",
+            "strong",
+            "very-strong"
+          ],
           "description": "Required authentication strength"
         },
         "authorizationGranularity": {
           "type": "string",
-          "enum": ["coarse", "medium", "fine", "very-fine"],
+          "enum": [
+            "coarse",
+            "medium",
+            "fine",
+            "very-fine"
+          ],
           "description": "Authorization granularity required"
         },
         "integrityVerification": {
@@ -788,7 +948,12 @@
         },
         "auditingLevel": {
           "type": "string",
-          "enum": ["none", "basic", "detailed", "comprehensive"],
+          "enum": [
+            "none",
+            "basic",
+            "detailed",
+            "comprehensive"
+          ],
           "description": "Level of auditing required"
         },
         "dataValidationRules": {

@@ -3,7 +3,7 @@
   "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-usecase-2.0.schema.json",
   "type": "null",
   "title": "CycloneDX Use Case Model",
-  "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
+  "$comment": "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
     "useCases": {
       "type": "array",
@@ -18,7 +18,9 @@
       "type": "object",
       "title": "Use Case",
       "description": "A structured description of how one or more actors interact with the system to achieve a specific goal, including the primary flow, alternative paths, and exception scenarios.",
-      "required": ["name"],
+      "required": [
+        "name"
+      ],
       "additionalProperties": false,
       "properties": {
         "bom-ref": {
@@ -40,9 +42,9 @@
           "title": "Actors",
           "uniqueItems": true,
           "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "References to the actors that participate in this use case, representing anyone or anything that initiates or interacts with the described flow."
+          "description": "References using bom-link or bom-ref to the actors that participate in this use case, representing anyone or anything that initiates or interacts with the described flow."
         },
         "preconditions": {
           "type": "array",
@@ -102,9 +104,9 @@
           "title": "Requirements",
           "uniqueItems": true,
           "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "References to the requirements that are implemented, validated, or addressed by this use case"
+          "description": "References using bom-link or bom-ref to the requirements that are implemented, validated, or addressed by this use case."
         },
         "notes": {
           "type": "array",
@@ -124,7 +126,10 @@
       "type": "object",
       "title": "Step",
       "description": "A single discrete action within a use case flow, performed by a specific actor, that advances the interaction toward the use case goal.",
-      "required": ["number", "description"],
+      "required": [
+        "number",
+        "description"
+      ],
       "additionalProperties": false,
       "properties": {
         "number": {
@@ -140,8 +145,8 @@
           "description": "A clear, action-oriented statement describing what the actor does in this step and the expected system response, written in the form 'The [actor] [action]'."
         },
         "actor": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "description": "Reference to the actor who initiates or performs this step, which may be a human user, an external system, or the system under design."
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "description": "Reference using bom-link or bom-ref to the actor who initiates or performs this step, which may be a human user, an external system, or the system under design."
         }
       }
     },
@@ -149,7 +154,10 @@
       "type": "object",
       "title": "Flow",
       "description": "An alternative sequence of steps that branches from the main flow under a specific condition, representing a valid variant path through the use case.",
-      "required": ["name", "condition"],
+      "required": [
+        "name",
+        "condition"
+      ],
       "additionalProperties": false,
       "properties": {
         "name": {
@@ -183,7 +191,10 @@
       "type": "object",
       "title": "Exception",
       "description": "An error or failure scenario that may interrupt the normal execution of a use case, including the condition that triggers it and how the system responds.",
-      "required": ["name", "condition"],
+      "required": [
+        "name",
+        "condition"
+      ],
       "additionalProperties": false,
       "properties": {
         "name": {
@@ -207,6 +218,72 @@
           "type": "string",
           "title": "Handling",
           "description": "The recovery strategy or response the system takes when this exception occurs, such as retrying the operation, rolling back changes, notifying the user, or escalating to support."
+        }
+      }
+    },
+    "useCaseAssertions": {
+      "type": "array",
+      "title": "Use Case Assertions",
+      "description": "A list of assertions describing how a component relates to use cases defined in the BOM.",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "title": "Use Case Assertion",
+        "description": "An assertion linking one or more use cases to a component, specifying the nature of the relationship.",
+        "required": [
+          "assertionType",
+          "useCaseRefs"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "bom-ref": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+            "title": "BOM Reference",
+            "description": "An identifier which can be used to reference the assertion elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
+          },
+          "assertionType": {
+            "type": "string",
+            "title": "Assertion Type",
+            "description": "The type of assertion being made about the relationship between the component and the use case.",
+            "enum": [
+              "extends",
+              "implements",
+              "inhibits",
+              "not-applicable",
+              "not-assessed",
+              "other",
+              "participates-in",
+              "supports",
+              "triggers",
+              "validates"
+            ],
+            "meta:enum": {
+              "extends": "The component adds optional or conditional behavior to the use case, augmenting its primary flow with additional capability.",
+              "implements": "The component implements or realises the use case, providing the primary capability that makes the use case functional.",
+              "inhibits": "The component is known to interfere with or block the correct execution of the use case.",
+              "not-applicable": "The use case does not pertain to this component. The evaluator has reviewed the use case and determined it is irrelevant.",
+              "not-assessed": "The relationship between the component and the use case has not yet been evaluated.",
+              "other": "A relationship that does not fit into the other predefined assertion types.",
+              "participates-in": "The component participates in the use case but is not solely responsible for its implementation.",
+              "supports": "The component provides enabling infrastructure for the use case without directly implementing or participating in it.",
+              "triggers": "The component initiates or kicks off the use case without being responsible for its implementation.",
+              "validates": "The component validates, tests, or verifies the correct execution of the use case."
+            }
+          },
+          "useCaseRefs": {
+            "type": "array",
+            "title": "Use Case References",
+            "description": "A list of BOM references linking to use case objects defined in the BOM.",
+            "uniqueItems": true,
+            "items": {
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+            }
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "description": "Additional context or clarification regarding the assertion."
+          }
         }
       }
     }

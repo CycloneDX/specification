@@ -3,7 +3,7 @@
   "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-requirement-2.0.schema.json",
   "type": "null",
   "title": "CycloneDX Engineering Requirement Model",
-  "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
+  "$comment": "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
     "requirements": {
       "type": "array",
@@ -91,9 +91,9 @@
           }
         },
         "parent": {
-          "type": "string",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "title": "Parent BOM Reference",
-          "description": "The optional `bom-ref` to a parent requirement. This establishes a hierarchy of requirements."
+          "description": "Optional reference using bom-link or bom-ref to a parent requirement. Establishes a hierarchy of requirements."
         },
         "rationale": {
           "type": "string",
@@ -272,6 +272,66 @@
           "type": "string",
           "title": "Description",
           "description": "A description of the dependency relationship."
+        }
+      }
+    },
+    "requirementAssertions": {
+      "type": "array",
+      "title": "Requirement Assertions",
+      "description": "A list of assertions describing how a component relates to specific requirements.",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "title": "Requirement Assertion",
+        "description": "An assertion linking one or more requirements to a component, specifying the nature of the relationship.",
+        "required": [
+          "assertionType",
+          "requirementRefs"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "bom-ref": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+            "title": "BOM Reference",
+            "description": "An identifier which can be used to reference the assertion elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
+          },
+          "assertionType": {
+            "type": "string",
+            "title": "Assertion Type",
+            "description": "The type of assertion being made about the relationship between the component and the requirement.",
+            "enum": [
+              "conflicts",
+              "not-applicable",
+              "not-assessed",
+              "other",
+              "partially-satisfies",
+              "satisfies",
+              "violates"
+            ],
+            "meta:enum": {
+              "conflicts": "The component is in tension with the requirement but a definitive determination of violation has not been made. This may indicate partial incompatibility, competing constraints, or an unresolved evaluation.",
+              "not-applicable": "The requirement does not pertain to this component. The evaluator has reviewed the requirement and determined it is irrelevant.",
+              "not-assessed": "The relationship between the component and the requirement has not yet been evaluated.",
+              "other": "A relationship that does not fit into the other predefined assertion types.",
+              "partially-satisfies": "The component partially meets the requirement but does not fully satisfy all of its conditions or acceptance criteria.",
+              "satisfies": "The component fully satisfies the requirement, meeting all of its conditions and acceptance criteria.",
+              "violates": "The component has been evaluated and conclusively determined to not meet the requirement, breaching one or more of its conditions or acceptance criteria."
+            }
+          },
+          "requirementRefs": {
+            "type": "array",
+            "title": "Requirement References",
+            "description": "A list of BOM references linking to requirement objects defined in the BOM.",
+            "uniqueItems": true,
+            "items": {
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+            }
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "description": "Additional context or clarification regarding the assertion."
+          }
         }
       }
     }
