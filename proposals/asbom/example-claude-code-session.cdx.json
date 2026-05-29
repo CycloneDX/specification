@@ -1,0 +1,368 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.7",
+  "serialNumber": "urn:uuid:6f1b9c08-7e9a-4f7a-9b6e-3ad7d6a4f1d2",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-05-25T19:42:11Z",
+    "lifecycles": [{ "phase": "operations" }],
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "name": "npx-skills",
+          "version": "0.3.0+policy-rfc",
+          "supplier": { "name": "vercel-labs (fork: mhupfauer)" }
+        }
+      ]
+    },
+    "manufacturer": {
+      "name": "Example Corp",
+      "url": ["https://example.corp"]
+    },
+    "properties": [
+      { "name": "cdx:bomType",     "value": "asbom" },
+      { "name": "cdx:asbom:version", "value": "0.1" }
+    ]
+  },
+
+  "components": [
+    {
+      "type": "machine-learning-model",
+      "bom-ref": "comp:model:claude-opus-4-7",
+      "name": "claude-opus-4-7",
+      "version": "claude-opus-4-7-2026-04-30",
+      "supplier": { "name": "Anthropic" },
+      "modelCard": {
+        "bom-ref": "modelcard:claude-opus-4-7",
+        "modelParameters": {
+          "task": "text-generation",
+          "architectureFamily": "transformer"
+        },
+        "considerations": {
+          "useCases": ["general-purpose assistant", "code generation", "agentic tool use"],
+          "ethicalConsiderations": [
+            { "name": "Usage policy", "description": "Subject to Anthropic Acceptable Use Policy." }
+          ]
+        }
+      }
+    },
+
+    {
+      "type": "application",
+      "bom-ref": "comp:harness:claude-code-1.2.0",
+      "name": "claude-code",
+      "version": "1.2.0",
+      "supplier": { "name": "Anthropic" },
+      "hashes": [
+        { "alg": "SHA-256", "content": "a1b2c3d4e5f60718293a4b5c6d7e8f9012345678901234567890abcdef012345" }
+      ],
+      "properties": [
+        { "name": "cdx:asbom:role",            "value": "harness" },
+        { "name": "cdx:asbom:harness:vendor",  "value": "anthropic" }
+      ],
+      "principal": {
+        "bom-ref": "principal:harness",
+        "mode": "agent-account-os",
+        "subject": {
+          "kind": "agent-os-account",
+          "identifier": "WIN-EXAMPLE\\agent_claude_code",
+          "ref": "comp:runtime:win11-agent-workspace"
+        },
+        "provider": { "name": "local-os" },
+        "scopes": [],
+        "credential": {
+          "storage": "none",
+          "lifetime": "session",
+          "replayProtection": "none",
+          "rotation": "none"
+        },
+        "consent": { "binding": "per-session", "mechanism": "agent-workspace-enable" },
+        "attestation": { "level": "os-attested", "notes": "Intune device-compliance posture available." }
+      }
+    },
+
+    {
+      "type": "application",
+      "bom-ref": "comp:skill:salesforce-export-1.4.2",
+      "name": "vendor.salesforce-export",
+      "version": "1.4.2",
+      "supplier": { "name": "vendor.example" },
+      "hashes": [
+        { "alg": "SHA-256", "content": "7b4f8e2c0a1d9b6e3f5c8a2d4e6f8013579bdf2468ace0123456789abcdef0123" }
+      ],
+      "externalReferences": [
+        { "type": "vcs", "url": "https://github.com/vendor-example/salesforce-export-skill" }
+      ],
+      "properties": [
+        { "name": "cdx:asbom:role",          "value": "skill" },
+        { "name": "cdx:asbom:skill:format",  "value": "agentskills.io/0.1" },
+        { "name": "cdx:asbom:skill:source",  "value": "https://skills.internal.example.corp/vendor.salesforce-export@1.4.2" },
+        { "name": "cdx:asbom:skill:digest",  "value": "sha256:7b4f8e2c0a1d9b6e3f5c8a2d4e6f8013579bdf2468ace0123456789abcdef0123" }
+      ],
+      "principal": {
+        "bom-ref": "principal:skill",
+        "mode": "delegated-ambient",
+        "subject": {
+          "kind": "agent-os-account",
+          "identifier": "WIN-EXAMPLE\\agent_claude_code",
+          "ref": "comp:harness:claude-code-1.2.0"
+        },
+        "provider": { "name": "local-os" },
+        "scopes": [],
+        "credential": { "storage": "none", "lifetime": "session" },
+        "consent": { "binding": "none" },
+        "attestation": { "level": "os-attested", "notes": "Inherits harness OS attribution; no separate identity." }
+      }
+    },
+
+    {
+      "type": "platform",
+      "bom-ref": "comp:runtime:win11-agent-workspace",
+      "name": "Windows 11 Agent Workspace",
+      "version": "10.0.26100.7344",
+      "supplier": { "name": "Microsoft" },
+      "properties": [
+        { "name": "cdx:asbom:role",                 "value": "runtime" },
+        { "name": "cdx:asbom:runtime:kind",         "value": "agent-os-account" },
+        { "name": "cdx:asbom:runtime:isolation",    "value": "os-account+acl+app-container" },
+        { "name": "cdx:asbom:runtime:hostFolders",  "value": "Documents Downloads Desktop Music Pictures Videos" }
+      ],
+      "principal": {
+        "bom-ref": "principal:runtime",
+        "mode": "agent-account-os",
+        "subject": {
+          "kind": "agent-os-account",
+          "identifier": "WIN-EXAMPLE\\agent_claude_code"
+        },
+        "provider": { "name": "local-os" },
+        "scopes": ["files:six-known-folders:per-prompt"],
+        "credential": { "storage": "none", "lifetime": "perpetual" },
+        "consent": { "binding": "per-action", "mechanism": "windows-file-access-consent" },
+        "attestation": { "level": "os-attested" }
+      }
+    }
+  ],
+
+  "services": [
+    {
+      "bom-ref": "svc:api:anthropic",
+      "name": "anthropic-messages-api",
+      "version": "2024-10-22",
+      "provider": { "name": "Anthropic" },
+      "endpoints": ["https://api.anthropic.com/v1/messages"],
+      "authenticated": true,
+      "x-trust-boundary": true,
+      "trustZone": "vendor-saas",
+      "data": [
+        { "flow": "bi-directional", "classification": "confidential" }
+      ],
+      "properties": [
+        { "name": "cdx:asbom:role", "value": "external-api" }
+      ]
+    },
+
+    {
+      "bom-ref": "svc:mcp:salesforce-mcp-0.9.1",
+      "name": "salesforce-mcp",
+      "version": "0.9.1",
+      "provider": { "name": "vendor.example" },
+      "endpoints": ["https://salesforce-mcp.internal.example.corp/mcp"],
+      "authenticated": true,
+      "x-trust-boundary": true,
+      "trustZone": "internal",
+      "data": [
+        { "flow": "bi-directional", "classification": "confidential" }
+      ],
+      "properties": [
+        { "name": "cdx:asbom:role",          "value": "mcp-server" },
+        { "name": "cdx:asbom:mcp:transport", "value": "streamable-http" }
+      ],
+      "principal": {
+        "bom-ref": "principal:mcp",
+        "mode": "delegated-obo",
+        "subject": {
+          "kind": "compound-user-and-client",
+          "identifier": "alice@example.corp + client:salesforce-mcp"
+        },
+        "provider": {
+          "name": "salesforce",
+          "issuer": "https://login.salesforce.com"
+        },
+        "scopes": ["api", "refresh_token", "id"],
+        "credential": {
+          "storage": "os-keychain",
+          "lifetime": "short-lived-oauth",
+          "replayProtection": "dpop-bound",
+          "rotation": "automatic"
+        },
+        "consent": { "binding": "per-grant", "mechanism": "oauth-authorize" },
+        "attestation": { "level": "idp-attested" }
+      }
+    },
+
+    {
+      "bom-ref": "svc:api:salesforce",
+      "name": "salesforce-api",
+      "endpoints": ["https://example.my.salesforce.com/services/data"],
+      "authenticated": true,
+      "x-trust-boundary": true,
+      "trustZone": "vendor-saas",
+      "data": [
+        { "flow": "bi-directional", "classification": "confidential" }
+      ],
+      "properties": [
+        { "name": "cdx:asbom:role", "value": "external-api" }
+      ]
+    }
+  ],
+
+  "dependencies": [
+    { "ref": "comp:harness:claude-code-1.2.0", "dependsOn": ["comp:model:claude-opus-4-7", "comp:runtime:win11-agent-workspace", "svc:api:anthropic"] },
+    { "ref": "comp:skill:salesforce-export-1.4.2", "dependsOn": ["comp:harness:claude-code-1.2.0", "svc:mcp:salesforce-mcp-0.9.1"] },
+    { "ref": "svc:mcp:salesforce-mcp-0.9.1", "dependsOn": ["svc:api:salesforce"] }
+  ],
+
+  "compositions": [
+    {
+      "bom-ref": "comp:asbom:claude-code-with-salesforce-skill",
+      "aggregate": "complete",
+      "assemblies": [
+        "comp:model:claude-opus-4-7",
+        "comp:harness:claude-code-1.2.0",
+        "comp:skill:salesforce-export-1.4.2",
+        "comp:runtime:win11-agent-workspace",
+        "svc:api:anthropic",
+        "svc:mcp:salesforce-mcp-0.9.1",
+        "svc:api:salesforce"
+      ],
+      "signature": {
+        "algorithm": "ES256",
+        "publicKey": { "kty": "EC", "crv": "P-256", "x": "...", "y": "..." },
+        "value": "<fleet-admin-signature-over-composition>"
+      }
+    }
+  ],
+
+  "formulation": [
+    {
+      "bom-ref": "formula:claude-code-session-2026-05-25",
+      "workflows": [
+        {
+          "bom-ref": "wf:session-bootstrap",
+          "uid": "session-2026-05-25-9b6e3ad7",
+          "name": "Agent session bootstrap and binding",
+          "taskTypes": ["build", "deploy"],
+          "tasks": [
+            {
+              "bom-ref": "task:install-skill",
+              "uid": "task:install-skill",
+              "name": "Install vendor.salesforce-export@1.4.2 from internal registry",
+              "resourceReferences": [
+                { "ref": "comp:skill:salesforce-export-1.4.2" }
+              ]
+            },
+            {
+              "bom-ref": "task:bind-mcp",
+              "uid": "task:bind-mcp",
+              "name": "Bind salesforce-mcp with delegated-obo flow",
+              "resourceReferences": [
+                { "ref": "svc:mcp:salesforce-mcp-0.9.1" },
+                { "ref": "principal:mcp" }
+              ]
+            },
+            {
+              "bom-ref": "task:start-session",
+              "uid": "task:start-session",
+              "name": "Start agent session in Agent Workspace",
+              "resourceReferences": [
+                { "ref": "comp:harness:claude-code-1.2.0" },
+                { "ref": "comp:runtime:win11-agent-workspace" }
+              ]
+            }
+          ],
+          "runtimeTopology": [
+            { "ref": "comp:harness:claude-code-1.2.0", "dependsOn": ["comp:runtime:win11-agent-workspace"] },
+            { "ref": "comp:skill:salesforce-export-1.4.2", "dependsOn": ["comp:harness:claude-code-1.2.0"] },
+            { "ref": "svc:mcp:salesforce-mcp-0.9.1", "dependsOn": ["comp:harness:claude-code-1.2.0"] }
+          ]
+        }
+      ]
+    }
+  ],
+
+  "declarations": {
+    "assessors": [
+      {
+        "bom-ref": "assessor:fleet-admin",
+        "thirdParty": true,
+        "organization": { "name": "Example Corp Security Engineering" }
+      },
+      {
+        "bom-ref": "assessor:registry-operator",
+        "thirdParty": true,
+        "organization": { "name": "Example Corp Skills Registry" }
+      }
+    ],
+    "attestations": [
+      {
+        "summary": "Composition conforms to Example Corp Agent Skills Policy v3.",
+        "assessor": "assessor:fleet-admin",
+        "map": [
+          {
+            "requirement": "policy:no-pat-credentials-in-env-or-file",
+            "claims": [
+              {
+                "subjects": ["comp:asbom:claude-code-with-salesforce-skill"],
+                "predicate": "no component or service in the composition has principal.mode=pat with credential.storage in (env-var, file)"
+              }
+            ],
+            "conformance": { "score": 1.0 }
+          },
+          {
+            "requirement": "policy:obo-required-for-mcp",
+            "claims": [
+              {
+                "subjects": ["svc:mcp:salesforce-mcp-0.9.1"],
+                "predicate": "principal.mode == delegated-obo"
+              }
+            ],
+            "conformance": { "score": 1.0 }
+          }
+        ],
+        "signature": {
+          "algorithm": "ES256",
+          "publicKey": { "kty": "EC", "crv": "P-256", "x": "...", "y": "..." },
+          "value": "<fleet-admin-signature>"
+        }
+      },
+      {
+        "summary": "Skill artifact was installed via the internal policy-aware registry; source and digest verified.",
+        "assessor": "assessor:registry-operator",
+        "map": [
+          {
+            "requirement": "policy:internal-mirror-only",
+            "claims": [
+              {
+                "subjects": ["comp:skill:salesforce-export-1.4.2"],
+                "predicate": "skill source = https://skills.internal.example.corp/* AND digest matches mirror record"
+              }
+            ],
+            "conformance": { "score": 1.0 }
+          }
+        ],
+        "signature": {
+          "algorithm": "ES256",
+          "publicKey": { "kty": "EC", "crv": "P-256", "x": "...", "y": "..." },
+          "value": "<registry-operator-signature>"
+        }
+      }
+    ]
+  },
+
+  "signature": {
+    "algorithm": "ES256",
+    "publicKey": { "kty": "EC", "crv": "P-256", "x": "...", "y": "..." },
+    "value": "<producer-envelope-signature>"
+  }
+}
