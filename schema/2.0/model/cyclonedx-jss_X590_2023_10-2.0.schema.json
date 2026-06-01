@@ -34,6 +34,7 @@
       "description": "This property identifies the hashing algorithm, as defined by the Internet Assigned Numbers Authority (IANA)…, that was used to hash the JCS version of the full JSON object (JSON Object + JSS Signature) and is a case-sensitive ASCII string. Implementations MAY use any current and widely accepted hashing algorithm (e.g., sha-256, sha-512) that is defined in the IANA registry. The actual signing process, defined in the algorithm property, sometimes uses an internal hashing algorithm inside the signing process itself, this property MAY identify the same hashing algorithm as the signing process or MAY identify a different hashing algorithm.",
       "$comment": "Normative source: ITU-T X.590 clause 6.2.1",
       "type": "string",
+      "pattern": "^[a-z0-9-]+$",
       "examples": [
         "sha-256",
         "sha-384",
@@ -91,6 +92,7 @@
       "description": "This property contains a privacy enhanced mail (PEM) encoded public key without the header and footer for the algorithm selected in the algorithm property.",
       "$comment": "Normative source: ITU-T X.590 clause 6.2.1",
       "type": "string",
+      "pattern": "^[A-Za-z0-9+/]+={0,2}$",
       "examples": [
         "MCowBQYDK2VwAyEAubMonBfU9pvIbj5RCiWQLD45Jvu6mKr+kQXjvjW8ZkU="
       ]
@@ -122,6 +124,7 @@
       "description": "This property contains a fingerprint of a public key or public key certificate for the algorithm selected in the algorithm property and MUST follow the requirements defined in section 4.9 of [IETF RFC 7517] as quoted here. This property \"is a base64URL.encoded SHA-256 thumbprint (a.k.a. digest, X.509 certificate SHA-256 thumbprint) of the DER encoding of an X.509 certificate [IETF RFC 5280]. Note that certificate thumbprints are also sometimes known as certificate fingerprints. The key in the certificate MUST match the public key.\" This property is called \"x5t#S256\" in section 4.9 of [IETF RFC 7517].",
       "$comment": "Normative source: ITU-T X.590 clause 6.2.1",
       "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{43}$",
       "examples": [
         "NzbLsXh8uDCcd-6MNwXF4W_7noWXFZAfHkxZsRGC9Xs"
       ]
@@ -154,7 +157,8 @@
           "title": "Signature Value",
           "description": "A base64URL.encoded signature that was created using the signature algorithm defined in the algorithm property and a key. In pseudo code it is defined as: base64URL.encode(sign(algorithm, key, hash(jcs(<JSONObject with Signature Object>)))).",
           "$comment": "Normative source: ITU-T X.590 clause 6.2.1",
-          "type": "string"
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]+={0,2}$"
         },
         "signature": {
           "$ref": "#/$defs/signatureObject",
