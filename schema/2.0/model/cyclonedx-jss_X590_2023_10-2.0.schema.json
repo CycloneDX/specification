@@ -202,7 +202,7 @@
           "$ref": "#/$defs/timestamp",
           "title": "Modified Timestamp",
           "description": "The time that this particular version of the signature was last modified. The creator can use any time it deems most appropriate as the time that this version of the signature was modified, but it MUST be precise to the nearest millisecond (exactly three digits after the decimal place in seconds). The modified property MUST be later than or equal to the value of the created property. If the created and modified properties are the same, then this is the first version of the signature.",
-          "$comment": "Normative source: ITU-T X.590 clause 6.3.1",
+          "$comment": "Normative source: ITU-T X.590 clause 6.3.1. Cross-field invariant: 'modified' MUST be greater than or equal to 'created'. JSON Schema 2020-12 cannot compare two sibling property values, so this constraint is NOT enforced by this schema and MUST be validated by the consuming tool or conformance suite.",
           "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"
         },
         "revoked": {
@@ -228,7 +228,7 @@
           "$ref": "#/$defs/timestamp",
           "title": "Valid Until",
           "description": "The time at which this signature is no longer considered valid. If the valid_until property is omitted, then there is no constraint on the latest time for which the signature is valid. This property MUST be greater than the timestamp in the valid_from property if the valid_from property is defined. If the revoked property is true then this property MUST be ignored.",
-          "$comment": "Normative source: ITU-T X.590 clause 6.3.1"
+          "$comment": "Normative source: ITU-T X.590 clause 6.3.1. Cross-field invariant: when 'valid_from' is present, 'valid_until' MUST be greater than 'valid_from'. JSON Schema 2020-12 cannot compare two sibling property values, so this constraint is NOT enforced by this schema and MUST be validated by the consuming tool or conformance suite."
         }
       },
       "required": ["hash_algorithm", "algorithm", "value"],
