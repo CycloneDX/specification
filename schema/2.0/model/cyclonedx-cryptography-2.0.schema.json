@@ -31,6 +31,67 @@
             "related-crypto-material": "Other cryptographic assets related to algorithms, certificates, and protocols such as keys and tokens."
           }
         },
+        "agility": {
+          "type": "object",
+          "title": "Cryptographic Agility",
+          "description": "Properties describing how the cryptographic configuration of this asset was determined and how a change to it can be applied. These properties support cryptographic-agility and post-quantum migration assessment.",
+          "additionalProperties": false,
+          "properties": {
+            "configurationSource": {
+              "type": "string",
+              "title": "Configuration Source",
+              "description": "Describes how the cryptographic configuration was determined for this asset, ordered from least to most agile.",
+              "enum": [
+                "hardcoded",
+                "product-default",
+                "administrator-configured",
+                "policy-managed",
+                "negotiated",
+                "other",
+                "unknown"
+              ],
+              "meta:enum": {
+                "hardcoded": "The configuration is fixed in code or firmware and is not intended to be changed.",
+                "product-default": "The configuration is inherited from product or vendor defaults and can typically be overridden.",
+                "administrator-configured": "The configuration is explicitly set by an administrator through external configuration.",
+                "policy-managed": "The configuration is determined by a policy or governance engine.",
+                "negotiated": "The configuration is agreed at runtime with a peer, such as during a protocol handshake.",
+                "other": "Another configuration source applies.",
+                "unknown": "The configuration source is not known."
+              }
+            },
+            "configurationRef": {
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+              "title": "Configuration Reference",
+              "description": "The bom-ref of the configuration that determines this cryptographic configuration. Typically points to a component of type 'data' whose data type is 'configuration'."
+            },
+            "changeMechanism": {
+              "type": "string",
+              "title": "Change Mechanism",
+              "description": "Describes how a change to this cryptographic configuration is applied, ordered from least to most agile.",
+              "enum": [
+                "not-possible",
+                "hardware-replacement",
+                "firmware-update",
+                "software-update",
+                "restart-required",
+                "runtime-config",
+                "other",
+                "unknown"
+              ],
+              "meta:enum": {
+                "not-possible": "The configuration cannot be changed through any supported means.",
+                "hardware-replacement": "The change requires replacing or adding hardware.",
+                "firmware-update": "The change requires a firmware update.",
+                "software-update": "The change requires a software or package update.",
+                "restart-required": "The change can be applied through configuration but requires restarting software or service processes.",
+                "runtime-config": "The change can be applied at runtime without a restart.",
+                "other": "Another change mechanism applies.",
+                "unknown": "The change mechanism is not known."
+              }
+            }
+          }
+        },
         "algorithmProperties": {
           "type": "object",
           "title": "Algorithm Properties",
@@ -521,6 +582,31 @@
               "title": "Destruction Date",
               "description": "The date and time (timestamp) when the certificate was destroyed."
             },
+            "renewal": {
+              "type": "object",
+              "title": "Certificate Renewal",
+              "description": "How this certificate is renewed or re-enrolled.",
+              "additionalProperties": false,
+              "properties": {
+                "automation": {
+                  "$ref": "#/$defs/lifecycleAutomation",
+                  "title": "Renewal Automation",
+                  "description": "The degree of automation with which this certificate is renewed."
+                },
+                "mechanism": {
+                  "type": "string",
+                  "title": "Renewal Mechanism",
+                  "description": "The mechanism used to renew or re-enroll this certificate, such as the ACME (RFC 8555), EST (RFC 7030), SCEP (RFC 8894), CMP (RFC 4210), or CMC (RFC 5272) protocols.",
+                  "examples": [
+                    "ACME",
+                    "EST",
+                    "SCEP",
+                    "CMP",
+                    "CMC"
+                  ]
+                }
+              }
+            },
             "certificateExtensions": {
               "type": "array",
               "title": "Certificate Extensions",
@@ -672,6 +758,32 @@
                 "compromised",
                 "destroyed"
               ]
+            },
+            "rotation": {
+              "type": "object",
+              "title": "Key Rotation",
+              "description": "How this cryptographic material is rotated under the same algorithm.",
+              "additionalProperties": false,
+              "properties": {
+                "automation": {
+                  "$ref": "#/$defs/lifecycleAutomation",
+                  "title": "Rotation Automation",
+                  "description": "The degree of automation with which this cryptographic material is rotated under the same algorithm."
+                },
+                "mechanism": {
+                  "type": "string",
+                  "title": "Rotation Mechanism",
+                  "description": "The mechanism, system, or interface used to rotate this cryptographic material, such as KMIP, PKCS#11, or a cloud key-management service.",
+                  "examples": [
+                    "KMIP",
+                    "PKCS#11",
+                    "AWS KMS",
+                    "Google Cloud KMS",
+                    "Azure Key Vault",
+                    "HashiCorp Vault Transit"
+                  ]
+                }
+              }
             },
             "creationDate": {
               "type": "string",
@@ -1086,6 +1198,27 @@
         "unwrap": "Decrypts a wrapped key to recover the original key.",
         "other": "Another cryptographic function.",
         "unknown": "The cryptographic function is not known."
+      }
+    },
+    "lifecycleAutomation": {
+      "type": "string",
+      "title": "Lifecycle Automation",
+      "description": "The degree of automation for a cryptographic lifecycle operation, ordered from least to most agile.",
+      "enum": [
+        "not-supported",
+        "manual",
+        "on-demand",
+        "automatic",
+        "other",
+        "unknown"
+      ],
+      "meta:enum": {
+        "not-supported": "The operation is not supported.",
+        "manual": "The operation is initiated and executed manually.",
+        "on-demand": "The operation can be triggered on demand, for example through an API call.",
+        "automatic": "The operation is performed automatically based on policy or schedule.",
+        "other": "Another mechanism applies.",
+        "unknown": "The mechanism is not known."
       }
     },
     "relatedCryptographicAssets": {
