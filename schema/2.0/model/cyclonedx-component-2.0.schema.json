@@ -264,6 +264,9 @@
           "$ref": "cyclonedx-cryptography-2.0.schema.json#/$defs/cryptoProperties",
           "title": "Cryptographic Properties"
         },
+        "agility": {
+          "$ref": "#/$defs/agility"
+        },
         "tags": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/tags",
           "title": "Tags"
@@ -731,6 +734,67 @@
         "governance": {
           "title": "Data Governance",
           "$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataGovernance"
+        }
+      }
+    },
+    "agility": {
+      "type": "object",
+      "title": "Agility",
+      "description": "Properties describing how this component's configuration was determined and how a change to it can be applied. These properties support change management and, for cryptographic assets, cryptographic-agility.",
+      "additionalProperties": false,
+      "properties": {
+        "configurationSource": {
+          "type": "string",
+          "title": "Configuration Source",
+          "description": "Describes how this component's configuration was determined, ordered from least to most agile.",
+          "enum": [
+            "hardcoded",
+            "product-default",
+            "administrator-configured",
+            "policy-managed",
+            "negotiated",
+            "other",
+            "unknown"
+          ],
+          "meta:enum": {
+            "hardcoded": "The configuration is fixed in code or firmware and is not intended to be changed.",
+            "product-default": "The configuration is inherited from product or vendor defaults and can typically be overridden.",
+            "administrator-configured": "The configuration is explicitly set by an administrator through external configuration.",
+            "policy-managed": "The configuration is determined by a policy or governance engine.",
+            "negotiated": "The configuration is agreed at runtime with a peer, such as during a protocol handshake.",
+            "other": "Another configuration source applies.",
+            "unknown": "The configuration source is not known."
+          }
+        },
+        "configurationRef": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "title": "Configuration Reference",
+          "description": "The bom-ref of the configuration that determines this component's configuration. Typically points to a component of type 'data' whose data type is 'configuration'."
+        },
+        "changeMechanism": {
+          "type": "string",
+          "title": "Change Mechanism",
+          "description": "Describes how a change to this component's configuration is applied, ordered from least to most agile.",
+          "enum": [
+            "not-possible",
+            "hardware-replacement",
+            "firmware-update",
+            "software-update",
+            "restart-required",
+            "runtime-config",
+            "other",
+            "unknown"
+          ],
+          "meta:enum": {
+            "not-possible": "The configuration cannot be changed through any supported means.",
+            "hardware-replacement": "The change requires replacing or adding hardware.",
+            "firmware-update": "The change requires a firmware update.",
+            "software-update": "The change requires a software or package update.",
+            "restart-required": "The change can be applied through configuration but requires restarting software or service processes.",
+            "runtime-config": "The change can be applied at runtime without a restart.",
+            "other": "Another change mechanism applies.",
+            "unknown": "The change mechanism is not known."
+          }
         }
       }
     }
