@@ -6,13 +6,33 @@
   "$comment": "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
     "risks": {
-      "type": "array",
+      "type": "object",
       "title": "Risks",
-      "uniqueItems": true,
-      "items": {
-        "$ref": "#/$defs/risk"
-      },
-      "description": "A collection of risks identified through risk analysis. The risk model is methodology-neutral and can document risk regardless of the risk rating framework used. It supports qualitative, semi-quantitative, and quantitative approaches by recording a qualitative `level`, a numeric `score`, or quantified loss, with the originating methodology identified on each score. Each risk distinguishes the risk before responses are applied (`inherentRisk`) from the risk that remains after them (`residualRisk`), with an optional `targetRisk` reflecting risk appetite, consistent with the process described in [ISO 31000](https://www.iso.org/iso-31000-risk-management.html). Specific rating techniques are not prescribed; [IEC 31010](https://www.iso.org/standard/72140.html) catalogues the available techniques."
+      "description": "A collection of risks identified through risk analysis, together with the assessments that evaluate them. The risk model is methodology-neutral and can document risk regardless of the risk rating framework used. It supports qualitative, semi-quantitative, and quantitative approaches by recording a qualitative `level`, a numeric `score`, or quantified loss, with the originating methodology identified on each score. Each risk distinguishes the risk before responses are applied (`inherentRisk`) from the risk that remains after them (`residualRisk`), with an optional `targetRisk` reflecting risk appetite, consistent with the process described in [ISO 31000](https://www.iso.org/iso-31000-risk-management.html). Specific rating techniques are not prescribed; [IEC 31010](https://www.iso.org/standard/72140.html) catalogues the available techniques.",
+      "additionalProperties": false,
+      "properties": {
+        "risks": {
+          "type": "array",
+          "title": "Risks",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/risk"
+          },
+          "description": "The documented risks identified through risk analysis."
+        },
+        "assessments": {
+          "type": "array",
+          "title": "Assessments",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/assessment"
+          },
+          "description": "Point-in-time risk assessment events, each evaluating one or more of the documented risks."
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
     },
     "riskDomain": {
       "type": "object",
@@ -170,149 +190,6 @@
         }
       ]
     },
-    "scenario": {
-      "type": "object",
-      "required": [
-        "bom-ref",
-        "name",
-        "type"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
-        },
-        "name": {
-          "type": "string",
-          "description": "The name of the scenario."
-        },
-        "description": {
-          "type": "string",
-          "description": "A description of the scenario."
-        },
-        "type": {
-          "title": "Type",
-          "description": "The kind of scenario. Use the custom option for kinds specific to an organization's methodology.",
-          "oneOf": [
-            {
-              "title": "Predefined Scenario Type",
-              "type": "string",
-              "enum": [
-                "threat",
-                "vulnerability",
-                "weakness",
-                "risk",
-                "incident",
-                "opportunity",
-                "hazard"
-              ],
-              "meta:enum": {
-                "threat": "Threat scenario.",
-                "vulnerability": "Exploitable vulnerability.",
-                "weakness": "System or design weakness.",
-                "risk": "General risk scenario.",
-                "incident": "Potential incident scenario.",
-                "opportunity": "Positive risk, an opportunity.",
-                "hazard": "Safety hazard scenario."
-              }
-            },
-            {
-              "title": "Custom Scenario Type",
-              "type": "object",
-              "required": [
-                "name"
-              ],
-              "additionalProperties": false,
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "minLength": 1,
-                  "title": "Name",
-                  "description": "The name of the custom scenario type."
-                },
-                "description": {
-                  "type": "string",
-                  "title": "Description",
-                  "description": "A description of the custom scenario type."
-                }
-              }
-            }
-          ]
-        },
-        "domain": {
-          "$ref": "#/$defs/riskDomain"
-        },
-        "likelihood": {
-          "$ref": "#/$defs/likelihood"
-        },
-        "impact": {
-          "$ref": "#/$defs/impact"
-        },
-        "riskScore": {
-          "$ref": "#/$defs/riskScore"
-        },
-        "riskAttributes": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/riskAttribute"
-          },
-          "description": "The risk attributes affected by this scenario."
-        },
-        "affectedAssets": {
-          "type": "array",
-          "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
-          },
-          "description": "References using bom-link or bom-ref to affected assets."
-        },
-        "mitigations": {
-          "type": "array",
-          "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
-          },
-          "description": "References using bom-link or bom-ref to mitigations that address this scenario."
-        },
-        "externalReferences": {
-          "type": "array",
-          "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference"
-          }
-        },
-        "compliance": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": [
-              "framework",
-              "controlId"
-            ],
-            "additionalProperties": false,
-            "properties": {
-              "framework": {
-                "type": "string",
-                "description": "The name of the compliance program or framework."
-              },
-              "controlId": {
-                "type": "string",
-                "description": "The identifier of the control within the framework."
-              },
-              "reference": {
-                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference",
-                "description": "A link or citation to the requirement or control documentation."
-              },
-              "description": {
-                "type": "string",
-                "description": "Optional notes describing the mapping."
-              }
-            }
-          },
-          "description": "Compliance frameworks and control references this scenario maps to."
-        },
-        "properties": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
-        }
-      }
-    },
     "risk": {
       "type": "object",
       "required": [
@@ -352,14 +229,6 @@
           },
           "description": "References using bom-link or bom-ref to the subjects this risk concerns. A subject may be a component, service, dataset, or model, or a party such as a person, persona, or organization, including a group at risk of being systematically disadvantaged."
         },
-        "relatedScenarios": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
-          },
-          "description": "References using bom-link or bom-ref to the risk scenarios related to this risk. A risk scenario is a scenario object in this model and may be of type vulnerability, weakness, incident, opportunity, or hazard. Threat scenarios from a threat model are referenced separately through relatedThreats."
-        },
         "relatedThreats": {
           "type": "array",
           "uniqueItems": true,
@@ -367,6 +236,22 @@
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
           "description": "References using bom-link or bom-ref to the threats or threat scenarios from a threat model that inform this risk. A reference may point to a discrete threat or to a threat scenario."
+        },
+        "relatedVulnerabilities": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the vulnerabilities that inform this risk."
+        },
+        "relatedWeaknesses": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the weaknesses that inform this risk."
         },
         "inherentRisk": {
           "$ref": "#/$defs/rating",
@@ -458,6 +343,23 @@
         "score": {
           "$ref": "#/$defs/riskScore"
         },
+        "detectability": {
+          "type": "object",
+          "title": "Detectability",
+          "additionalProperties": false,
+          "description": "The ease or likelihood of detecting the event before or as it is realized, used as a third axis by methodologies such as [FMEA](https://asq.org/quality-resources/fmea), whose risk priority number multiplies severity, occurrence, and detection.",
+          "properties": {
+            "score": {
+              "type": "number",
+              "minimum": 0,
+              "description": "The detection value on the scale defined by the methodology. For FMEA, a higher value indicates that the event is harder to detect and therefore riskier."
+            },
+            "description": {
+              "type": "string",
+              "description": "A narrative explanation of the detectability assessment."
+            }
+          }
+        },
         "confidence": {
           "type": "number",
           "minimum": 0,
@@ -510,6 +412,21 @@
           "minimum": 0,
           "maximum": 1,
           "description": "Probability as a decimal from 0 to 1."
+        },
+        "frequency": {
+          "type": "number",
+          "minimum": 0,
+          "title": "Frequency",
+          "description": "The expected number of events within the timeframe, for frequency-based methods such as the [FAIR](https://www.fairinstitute.org/) loss event frequency. Unlike a probability, a frequency may exceed 1."
+        },
+        "timeframe": {
+          "type": "string",
+          "title": "Timeframe",
+          "description": "The period over which the probability or frequency is assessed, expressed as an [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) duration, for example P1Y for one year."
+        },
+        "range": {
+          "$ref": "#/$defs/estimateRange",
+          "description": "A range for the probability or frequency, supporting quantitative methods that reason over distributions."
         },
         "factors": {
           "type": "array",
@@ -692,77 +609,21 @@
           "type": "array",
           "uniqueItems": true,
           "items": {
-            "oneOf": [
-              {
-                "title": "Predefined Impact Category",
-                "type": "string",
-                "enum": [
-                  "confidentiality",
-                  "integrity",
-                  "availability",
-                  "financial",
-                  "reputation",
-                  "regulatory",
-                  "safety",
-                  "privacy",
-                  "operational",
-                  "strategic",
-                  "bias",
-                  "discrimination",
-                  "fairness",
-                  "human-rights",
-                  "environmental",
-                  "societal",
-                  "psychological",
-                  "physical",
-                  "health"
-                ],
-                "meta:enum": {
-                  "confidentiality": "Impact on data confidentiality.",
-                  "integrity": "Impact on data or system integrity.",
-                  "availability": "Impact on service availability.",
-                  "financial": "Financial loss or impact.",
-                  "reputation": "Reputational damage.",
-                  "regulatory": "Regulatory compliance impact.",
-                  "safety": "Human safety impact.",
-                  "privacy": "Privacy violation impact.",
-                  "operational": "Operational disruption.",
-                  "strategic": "Strategic business impact.",
-                  "bias": "Systematic bias in automated outputs or decisions.",
-                  "discrimination": "Unfair treatment of individuals or groups, including on the basis of protected attributes.",
-                  "fairness": "Impact on the fair and equitable treatment of affected groups.",
-                  "human-rights": "Impact on fundamental human rights, including autonomy and dignity.",
-                  "environmental": "Environmental impact, including energy use and carbon emissions.",
-                  "societal": "Impact on society, communities, or civic processes.",
-                  "psychological": "Psychological or emotional harm.",
-                  "physical": "Physical harm to people or property.",
-                  "health": "Impact on physical or mental health."
-                }
-              },
-              {
-                "title": "Custom Impact Category",
-                "type": "object",
-                "required": [
-                  "name"
-                ],
-                "additionalProperties": false,
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "minLength": 1,
-                    "title": "Name",
-                    "description": "The name of the custom impact category."
-                  },
-                  "description": {
-                    "type": "string",
-                    "title": "Description",
-                    "description": "A description of the custom impact category."
-                  }
-                }
-              }
-            ]
+            "$ref": "#/$defs/impactCategory"
           },
           "description": "The categories of impact, including harms relevant to AI and societal risk."
+        },
+        "factors": {
+          "type": "array",
+          "title": "Factors",
+          "items": {
+            "$ref": "#/$defs/impactFactor"
+          },
+          "description": "The factors considered when determining the impact, allowing methodologies that derive impact from multiple weighted dimensions to record the breakdown."
+        },
+        "range": {
+          "$ref": "#/$defs/estimateRange",
+          "description": "A range for the impact score, supporting quantitative methods that reason over distributions."
         },
         "riskAttributes": {
           "type": "array",
@@ -777,6 +638,141 @@
         "description": {
           "type": "string",
           "description": "A description of the potential impact."
+        }
+      }
+    },
+    "impactCategory": {
+      "title": "Impact Category",
+      "description": "A category of impact, including harms relevant to AI and societal risk. Use the custom option for categories specific to an organization's risk taxonomy.",
+      "oneOf": [
+        {
+          "title": "Predefined Impact Category",
+          "type": "string",
+          "enum": [
+            "confidentiality",
+            "integrity",
+            "availability",
+            "financial",
+            "reputation",
+            "regulatory",
+            "safety",
+            "privacy",
+            "operational",
+            "strategic",
+            "bias",
+            "discrimination",
+            "fairness",
+            "human-rights",
+            "environmental",
+            "societal",
+            "psychological",
+            "physical",
+            "health"
+          ],
+          "meta:enum": {
+            "confidentiality": "Impact on data confidentiality.",
+            "integrity": "Impact on data or system integrity.",
+            "availability": "Impact on service availability.",
+            "financial": "Financial loss or impact.",
+            "reputation": "Reputational damage.",
+            "regulatory": "Regulatory compliance impact.",
+            "safety": "Human safety impact.",
+            "privacy": "Privacy violation impact.",
+            "operational": "Operational disruption.",
+            "strategic": "Strategic business impact.",
+            "bias": "Systematic bias in automated outputs or decisions.",
+            "discrimination": "Unfair treatment of individuals or groups, including on the basis of protected attributes.",
+            "fairness": "Impact on the fair and equitable treatment of affected groups.",
+            "human-rights": "Impact on fundamental human rights, including autonomy and dignity.",
+            "environmental": "Environmental impact, including energy use and carbon emissions.",
+            "societal": "Impact on society, communities, or civic processes.",
+            "psychological": "Psychological or emotional harm.",
+            "physical": "Physical harm to people or property.",
+            "health": "Impact on physical or mental health."
+          }
+        },
+        {
+          "title": "Custom Impact Category",
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Name",
+              "description": "The name of the custom impact category."
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the custom impact category."
+            }
+          }
+        }
+      ]
+    },
+    "impactFactor": {
+      "type": "object",
+      "title": "Impact Factor",
+      "description": "An individual contributing factor used to determine the overall impact of a risk or scenario. Methodologies such as OWASP Risk Rating, DREAD, and OCTAVE Allegro derive impact from several weighted dimensions, and each factor captures one dimension with its own rating.",
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Name",
+          "description": "The name of the impact factor being evaluated, such as 'Financial damage' or 'Reputation damage'."
+        },
+        "category": {
+          "$ref": "#/$defs/impactCategory",
+          "description": "The impact dimension this factor measures."
+        },
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "title": "Score",
+          "description": "A numeric score representing the assessed value of this factor on the scale defined by the methodology, where a higher value indicates a greater contribution to impact."
+        },
+        "weight": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "title": "Weight",
+          "description": "The relative importance of this factor in the overall impact calculation, expressed as a decimal from 0 to 1. OCTAVE Allegro, for example, ranks impact areas and multiplies the ranking by the factor value."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A narrative explanation of how this factor was evaluated and how it contributes to the overall impact assessment."
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "estimateRange": {
+      "type": "object",
+      "title": "Estimate Range",
+      "description": "A three-point estimate, supporting quantitative methods such as FAIR that reason over distributions rather than single values.",
+      "additionalProperties": false,
+      "properties": {
+        "minimum": {
+          "type": "number",
+          "description": "The minimum, or lower bound, estimate."
+        },
+        "mostLikely": {
+          "type": "number",
+          "description": "The most likely estimate."
+        },
+        "maximum": {
+          "type": "number",
+          "description": "The maximum, or upper bound, estimate."
         }
       }
     },
@@ -812,24 +808,8 @@
           "description": "The recovery time, as an [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) duration."
         },
         "financialLossRange": {
-          "type": "object",
-          "title": "Financial Loss Range",
-          "additionalProperties": false,
-          "description": "A distribution of estimated financial loss, supporting quantitative methods such as FAIR that reason over ranges.",
-          "properties": {
-            "minimum": {
-              "type": "number",
-              "description": "The minimum estimated financial loss."
-            },
-            "mostLikely": {
-              "type": "number",
-              "description": "The most likely estimated financial loss."
-            },
-            "maximum": {
-              "type": "number",
-              "description": "The maximum estimated financial loss."
-            }
-          }
+          "$ref": "#/$defs/estimateRange",
+          "description": "A distribution of estimated financial loss, supporting quantitative methods such as FAIR that reason over ranges."
         },
         "affectedGroups": {
           "type": "integer",
@@ -1224,24 +1204,6 @@
         "medium": "Medium priority.",
         "high": "High priority.",
         "critical": "Critical priority."
-      }
-    },
-    "severity": {
-      "type": "string",
-      "enum": [
-        "info",
-        "low",
-        "medium",
-        "high",
-        "critical"
-      ],
-      "description": "Severity level.",
-      "meta:enum": {
-        "info": "Informational finding.",
-        "low": "Low severity issue.",
-        "medium": "Medium severity issue.",
-        "high": "High severity issue.",
-        "critical": "Critical severity issue."
       }
     },
     "criticality": {
