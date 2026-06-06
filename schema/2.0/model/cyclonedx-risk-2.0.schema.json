@@ -1133,29 +1133,118 @@
         "bom-ref": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
         },
-        "type": {
+        "name": {
           "type": "string",
-          "enum": [
-            "initial",
-            "periodic",
-            "continuous",
-            "triggered"
-          ],
-          "meta:enum": {
-            "initial": "Initial risk assessment.",
-            "periodic": "Scheduled periodic assessment.",
-            "continuous": "Continuous monitoring assessment.",
-            "triggered": "Event-triggered assessment."
-          }
+          "title": "Name",
+          "description": "A human-readable name for the assessment."
+        },
+        "type": {
+          "title": "Type",
+          "description": "The kind of risk assessment. Use the custom option for kinds specific to an organization's process.",
+          "oneOf": [
+            {
+              "title": "Predefined Assessment Type",
+              "type": "string",
+              "enum": [
+                "initial",
+                "periodic",
+                "continuous",
+                "triggered",
+                "ad-hoc"
+              ],
+              "meta:enum": {
+                "initial": "Initial, baseline risk assessment.",
+                "periodic": "Scheduled, recurring assessment.",
+                "continuous": "Continuous, automated monitoring, as in a GRC engineering or continuous controls monitoring practice.",
+                "triggered": "Assessment triggered by a specific event, such as a change or an incident.",
+                "ad-hoc": "Unplanned, one-off assessment, neither scheduled nor triggered by a defined event."
+              }
+            },
+            {
+              "title": "Custom Assessment Type",
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom assessment type."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom assessment type."
+                }
+              }
+            }
+          ]
         },
         "timestamp": {
           "type": "string",
           "format": "date-time",
           "description": "When the assessment was performed."
         },
-        "assessor": {
-          "$ref": "cyclonedx-party-2.0.schema.json#/$defs/partyChoice",
-          "description": "The party that performed the assessment. May be an inline party object or a reference to a previously declared party. The party's `roles` should include `auditor` or `assessor` (custom) depending on the assessment type."
+        "scope": {
+          "type": "string",
+          "title": "Scope",
+          "description": "The scope of the assessment, including the systems, boundaries, and what is in or out of scope."
+        },
+        "status": {
+          "title": "Status",
+          "description": "The lifecycle status of the assessment. Use the custom option for a status specific to an organization's process.",
+          "oneOf": [
+            {
+              "title": "Predefined Assessment Status",
+              "type": "string",
+              "enum": [
+                "draft",
+                "in-progress",
+                "completed",
+                "approved",
+                "superseded"
+              ],
+              "meta:enum": {
+                "draft": "The assessment is being prepared.",
+                "in-progress": "The assessment is underway.",
+                "completed": "The assessment is finished.",
+                "approved": "The assessment has been reviewed and approved.",
+                "superseded": "The assessment has been replaced by a later one."
+              }
+            },
+            {
+              "title": "Custom Assessment Status",
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom status."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom status."
+                }
+              }
+            }
+          ]
+        },
+        "assessors": {
+          "type": "array",
+          "title": "Assessors",
+          "items": {
+            "$ref": "cyclonedx-party-2.0.schema.json#/$defs/partyChoice"
+          },
+          "description": "The parties that performed the assessment. Each may be an inline party or a reference to a previously declared party, and may be a person or an automated system, agent, or tool. Automated assessors support continuous and automated assessment, as in a GRC engineering practice. A party's `roles` should include `auditor` or `assessor`."
         },
         "summary": {
           "type": "string",
@@ -1177,13 +1266,47 @@
           "additionalProperties": false,
           "properties": {
             "method": {
-              "type": "string",
-              "enum": [
-                "sum",
-                "average",
-                "custom"
-              ],
-              "description": "The aggregation method used to derive the overall risk."
+              "title": "Method",
+              "description": "The aggregation method used to derive the overall risk from the assessed risks. Use the custom option for methods not listed, such as a quantitative roll-up of loss distributions under FAIR.",
+              "oneOf": [
+                {
+                  "title": "Predefined Aggregation Method",
+                  "type": "string",
+                  "enum": [
+                    "maximum",
+                    "sum",
+                    "average",
+                    "weighted-average"
+                  ],
+                  "meta:enum": {
+                    "maximum": "The overall risk equals the highest individual risk.",
+                    "sum": "The overall risk is the sum of the individual risks, representing total exposure.",
+                    "average": "The overall risk is the mean of the individual risks.",
+                    "weighted-average": "The overall risk is a weighted mean of the individual risks."
+                  }
+                },
+                {
+                  "title": "Custom Aggregation Method",
+                  "type": "object",
+                  "required": [
+                    "name"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "title": "Name",
+                      "description": "The name of the custom aggregation method."
+                    },
+                    "description": {
+                      "type": "string",
+                      "title": "Description",
+                      "description": "A description of the custom aggregation method."
+                    }
+                  }
+                }
+              ]
             },
             "score": {
               "$ref": "#/$defs/riskScore"
@@ -1194,6 +1317,14 @@
             }
           },
           "description": "The aggregated risk result for this assessment."
+        },
+        "assumptions": {
+          "type": "array",
+          "title": "Assumptions",
+          "items": {
+            "type": "string"
+          },
+          "description": "The assumptions, constraints, and limitations under which the assessment was made, to be re-evaluated when they change."
         },
         "recommendations": {
           "type": "array",
@@ -1206,6 +1337,12 @@
           "type": "string",
           "format": "date-time",
           "description": "When the next review should occur."
+        },
+        "externalReferences": {
+          "type": "array",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference"
+          }
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
