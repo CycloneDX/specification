@@ -12,7 +12,7 @@
       "items": {
         "$ref": "#/$defs/risk"
       },
-      "description": "The documented risks identified through risk analysis."
+      "description": "A collection of risks identified through risk analysis. The risk model is methodology-neutral and can document risk regardless of the risk rating framework used. It supports qualitative, semi-quantitative, and quantitative approaches by recording a qualitative `level`, a numeric `score`, or quantified loss, with the originating methodology identified on each score. Each risk distinguishes the risk before responses are applied (`inherentRisk`) from the risk that remains after them (`residualRisk`), with an optional `targetRisk` reflecting risk appetite, consistent with the process described in [ISO 31000](https://www.iso.org/iso-31000-risk-management.html). Specific rating techniques are not prescribed; [IEC 31010](https://www.iso.org/standard/72140.html) catalogues the available techniques."
     },
     "riskDomain": {
       "type": "object",
@@ -22,88 +22,153 @@
       "additionalProperties": false,
       "properties": {
         "type": {
-          "type": "string",
-          "enum": [
-            "security",
-            "privacy",
-            "operational",
-            "financial",
-            "compliance",
-            "strategic",
-            "reputational",
-            "safety",
-            "environmental",
-            "supply-chain",
-            "technical",
-            "project"
-          ],
-          "meta:enum": {
-            "security": "Information security and cybersecurity risks",
-            "privacy": "Data protection and privacy risks",
-            "operational": "Business operations and continuity risks",
-            "financial": "Financial loss and economic impact risks",
-            "compliance": "Regulatory and legal compliance risks",
-            "strategic": "Strategic business and market risks",
-            "reputational": "Brand and reputation damage risks",
-            "safety": "Human safety and physical security risks",
-            "environmental": "Environmental impact and sustainability risks",
-            "supply-chain": "Supply chain and third-party risks",
-            "technical": "Technical and technology risks",
-            "project": "Project delivery and execution risks"
-          }
+          "title": "Type",
+          "description": "The domain or category of risk. Use the custom option for domains specific to an organization's risk taxonomy.",
+          "oneOf": [
+            {
+              "title": "Predefined Risk Domain",
+              "type": "string",
+              "enum": [
+                "security",
+                "privacy",
+                "operational",
+                "financial",
+                "compliance",
+                "strategic",
+                "reputational",
+                "safety",
+                "environmental",
+                "supply-chain",
+                "technical",
+                "project",
+                "ethical",
+                "societal",
+                "human-rights",
+                "health",
+                "legal"
+              ],
+              "meta:enum": {
+                "security": "Information security and cybersecurity risks.",
+                "privacy": "Data protection and privacy risks.",
+                "operational": "Business operations and continuity risks.",
+                "financial": "Financial loss and economic impact risks.",
+                "compliance": "Regulatory and legal compliance risks.",
+                "strategic": "Strategic business and market risks.",
+                "reputational": "Brand and reputation damage risks.",
+                "safety": "Human safety and physical security risks.",
+                "environmental": "Environmental impact and sustainability risks.",
+                "supply-chain": "Supply chain and third-party risks.",
+                "technical": "Technical and technology risks.",
+                "project": "Project delivery and execution risks.",
+                "ethical": "Ethical risks, including the responsible use of automated decision-making and artificial intelligence.",
+                "societal": "Risks to society, communities, or democratic and civic processes.",
+                "human-rights": "Risks to fundamental human rights, including discrimination and loss of autonomy.",
+                "health": "Risks to physical or mental health and wellbeing.",
+                "legal": "Legal exposure, including liability and contractual risks."
+              }
+            },
+            {
+              "title": "Custom Risk Domain",
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom risk domain."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom risk domain."
+                }
+              }
+            }
+          ]
         },
         "priority": {
           "$ref": "#/$defs/priority"
         },
         "description": {
           "type": "string",
-          "description": "Additional context for this risk domain"
+          "description": "Additional context for this risk domain."
         }
       }
     },
     "riskAttribute": {
-      "type": "string",
-      "description": "A classification of security and privacy attributes that represent potential impact areas when a risk is realized",
-      "enum": [
-        "accountability",
-        "authentication",
-        "authorization",
-        "authenticity",
-        "availability",
-        "compliance",
-        "confidentiality",
-        "connectivity",
-        "control",
-        "data-subject-rights",
-        "integrity",
-        "minimisation",
-        "non-repudiation",
-        "possession",
-        "privacy",
-        "purpose-limitation",
-        "transparency",
-        "utility"
-      ],
-      "meta:enum": {
-        "accountability": "Assigning responsibility for actions and decisions to individuals or entities",
-        "authentication": "Verifying the identity of users, devices, or systems before granting access",
-        "authorization": "Granting permissions based on identity and roles to perform specific actions or access resources",
-        "authenticity": "Ensuring that data, communications, or entities are genuine and can be verified",
-        "availability": "Ensuring systems, data, and services are accessible and operational when needed",
-        "compliance": "Adherence to applicable laws, regulations, policies, and standards",
-        "confidentiality": "Preventing unauthorised access to or disclosure of information",
-        "connectivity": "Maintaining secure and reliable communication between systems or components",
-        "control": "Enabling individuals to manage how their personal data is used and shared",
-        "data-subject-rights": "Guaranteeing individuals' rights to access, correct, delete, or restrict their personal data",
-        "integrity": "Ensuring information is accurate, complete, and unaltered by unauthorised actors",
-        "minimisation": "Limiting data collection and retention to what is strictly necessary for the intended purpose",
-        "non-repudiation": "Providing proof of origin and delivery to prevent denial of actions or communications",
-        "possession": "Ensuring control or custody over data or assets, regardless of ownership",
-        "privacy": "Protecting individuals' personal information in accordance with legal and ethical standards",
-        "purpose-limitation": "Ensuring that personal data is only used for the purpose explicitly specified at collection",
-        "transparency": "Ensuring individuals are informed about data practices, including collection, use, and sharing",
-        "utility": "Ensuring data is usable and in a format suitable for the intended purpose"
-      }
+      "title": "Risk Attribute",
+      "description": "A security or privacy attribute representing a potential impact area when a risk is realized. Use the custom option for attributes specific to an organization's risk taxonomy.",
+      "oneOf": [
+        {
+          "title": "Predefined Risk Attribute",
+          "type": "string",
+          "enum": [
+            "accountability",
+            "authentication",
+            "authorization",
+            "authenticity",
+            "availability",
+            "compliance",
+            "confidentiality",
+            "connectivity",
+            "control",
+            "data-subject-rights",
+            "integrity",
+            "minimisation",
+            "non-repudiation",
+            "possession",
+            "privacy",
+            "purpose-limitation",
+            "transparency",
+            "utility"
+          ],
+          "meta:enum": {
+            "accountability": "Assigning responsibility for actions and decisions to individuals or entities.",
+            "authentication": "Verifying the identity of users, devices, or systems before granting access.",
+            "authorization": "Granting permissions based on identity and roles to perform specific actions or access resources.",
+            "authenticity": "Ensuring that data, communications, or entities are genuine and can be verified.",
+            "availability": "Ensuring systems, data, and services are accessible and operational when needed.",
+            "compliance": "Adherence to applicable laws, regulations, policies, and standards.",
+            "confidentiality": "Preventing unauthorised access to or disclosure of information.",
+            "connectivity": "Maintaining secure and reliable communication between systems or components.",
+            "control": "Enabling individuals to manage how their personal data is used and shared.",
+            "data-subject-rights": "Guaranteeing individuals' rights to access, correct, delete, or restrict their personal data.",
+            "integrity": "Ensuring information is accurate, complete, and unaltered by unauthorised actors.",
+            "minimisation": "Limiting data collection and retention to what is strictly necessary for the intended purpose.",
+            "non-repudiation": "Providing proof of origin and delivery to prevent denial of actions or communications.",
+            "possession": "Ensuring control or custody over data or assets, regardless of ownership.",
+            "privacy": "Protecting individuals' personal information in accordance with legal and ethical standards.",
+            "purpose-limitation": "Ensuring that personal data is only used for the purpose explicitly specified at collection.",
+            "transparency": "Ensuring individuals are informed about data practices, including collection, use, and sharing.",
+            "utility": "Ensuring data is usable and in a format suitable for the intended purpose."
+          }
+        },
+        {
+          "title": "Custom Risk Attribute",
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Name",
+              "description": "The name of the custom risk attribute."
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the custom risk attribute."
+            }
+          }
+        }
+      ]
     },
     "scenario": {
       "type": "object",
@@ -119,32 +184,60 @@
         },
         "name": {
           "type": "string",
-          "description": "Name of the risk scenario"
+          "description": "The name of the scenario."
         },
         "description": {
           "type": "string",
-          "description": "Detailed description of the scenario"
+          "description": "A description of the scenario."
         },
         "type": {
-          "type": "string",
-          "enum": [
-            "threat",
-            "vulnerability",
-            "weakness",
-            "risk",
-            "incident",
-            "opportunity",
-            "hazard"
-          ],
-          "meta:enum": {
-            "threat": "Threat scenario",
-            "vulnerability": "Exploitable vulnerability",
-            "weakness": "System or design weakness",
-            "risk": "General risk scenario",
-            "incident": "Potential incident scenario",
-            "opportunity": "Positive risk (opportunity)",
-            "hazard": "Safety hazard scenario"
-          }
+          "title": "Type",
+          "description": "The kind of scenario. Use the custom option for kinds specific to an organization's methodology.",
+          "oneOf": [
+            {
+              "title": "Predefined Scenario Type",
+              "type": "string",
+              "enum": [
+                "threat",
+                "vulnerability",
+                "weakness",
+                "risk",
+                "incident",
+                "opportunity",
+                "hazard"
+              ],
+              "meta:enum": {
+                "threat": "Threat scenario.",
+                "vulnerability": "Exploitable vulnerability.",
+                "weakness": "System or design weakness.",
+                "risk": "General risk scenario.",
+                "incident": "Potential incident scenario.",
+                "opportunity": "Positive risk, an opportunity.",
+                "hazard": "Safety hazard scenario."
+              }
+            },
+            {
+              "title": "Custom Scenario Type",
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom scenario type."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom scenario type."
+                }
+              }
+            }
+          ]
         },
         "domain": {
           "$ref": "#/$defs/riskDomain"
@@ -163,7 +256,7 @@
           "items": {
             "$ref": "#/$defs/riskAttribute"
           },
-          "description": "Risk attributes affected by this scenario"
+          "description": "The risk attributes affected by this scenario."
         },
         "affectedAssets": {
           "type": "array",
@@ -197,23 +290,23 @@
             "properties": {
               "framework": {
                 "type": "string",
-                "description": "Name of the compliance program or framework"
+                "description": "The name of the compliance program or framework."
               },
               "controlId": {
                 "type": "string",
-                "description": "Identifier of the control within the framework"
+                "description": "The identifier of the control within the framework."
               },
               "reference": {
                 "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference",
-                "description": "Link or citation to the requirement or control documentation"
+                "description": "A link or citation to the requirement or control documentation."
               },
               "description": {
                 "type": "string",
-                "description": "Optional notes describing the mapping"
+                "description": "Optional notes describing the mapping."
               }
             }
           },
-          "description": "Compliance frameworks and control references this mitigation supports"
+          "description": "Compliance frameworks and control references this scenario maps to."
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
@@ -234,78 +327,112 @@
         },
         "name": {
           "type": "string",
-          "description": "Name or identifier for the risk"
+          "description": "A human-readable name for the risk."
         },
         "statement": {
           "type": "string",
-          "description": "Structured risk statement describing source, event, and impact"
+          "description": "Structured risk statement describing source, event, and impact."
         },
         "description": {
           "type": "string",
-          "description": "Additional narrative about the risk"
+          "description": "Additional narrative about the risk."
         },
         "domains": {
           "type": "array",
           "items": {
             "$ref": "#/$defs/riskDomain"
           },
-          "description": "Risk domains impacted"
+          "description": "The risk domains this risk affects."
         },
-        "scenarios": {
+        "affects": {
           "type": "array",
-          "minItems": 1,
+          "uniqueItems": true,
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "References using bom-link or bom-ref to scenarios this risk addresses."
+          "description": "References using bom-link or bom-ref to the subjects this risk concerns. A subject may be a component, service, dataset, or model, or a party such as a person, persona, or organization, including a group at risk of being systematically disadvantaged."
         },
-        "likelihood": {
-          "$ref": "#/$defs/likelihood"
-        },
-        "impact": {
-          "$ref": "#/$defs/impact"
-        },
-        "riskScore": {
-          "$ref": "#/$defs/riskScore"
-        },
-        "riskAttributes": {
+        "relatedScenarios": {
           "type": "array",
+          "uniqueItems": true,
           "items": {
-            "$ref": "#/$defs/riskAttribute"
-          }
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the risk scenarios related to this risk. A risk scenario is a scenario object in this model and may be of type vulnerability, weakness, incident, opportunity, or hazard. Threat scenarios from a threat model are referenced separately through relatedThreats."
+        },
+        "relatedThreats": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the threats or threat scenarios from a threat model that inform this risk. A reference may point to a discrete threat or to a threat scenario."
+        },
+        "inherentRisk": {
+          "$ref": "#/$defs/rating",
+          "description": "The assessed risk before any responses are applied."
+        },
+        "residualRisk": {
+          "$ref": "#/$defs/rating",
+          "description": "The assessed risk remaining after responses are applied."
+        },
+        "targetRisk": {
+          "$ref": "#/$defs/rating",
+          "description": "The risk level the organization aims to reach, reflecting its risk appetite."
         },
         "responses": {
           "type": "array",
           "items": {
             "$ref": "#/$defs/riskResponse"
           },
-          "description": "Risk responses or mitigation plans applied to this risk"
-        },
-        "relatedThreats": {
-          "type": "array",
-          "items": {
-            "$ref": "cyclonedx-threat-2.0.schema.json#/$defs/threatScenario"
-          },
-          "description": "Related threat scenarios informing this risk"
+          "description": "The responses applied to this risk."
         },
         "status": {
-          "type": "string",
-          "enum": [
-            "identified",
-            "assessed",
-            "mitigated",
-            "accepted",
-            "transferred",
-            "retired"
-          ],
-          "meta:enum": {
-            "identified": "Risk has been identified but not yet evaluated",
-            "assessed": "Risk has been assessed and prioritized",
-            "mitigated": "Mitigations are in place reducing this risk",
-            "accepted": "Risk has been formally accepted",
-            "transferred": "Risk has been transferred to another party",
-            "retired": "Risk no longer applies"
-          }
+          "title": "Status",
+          "description": "The lifecycle status of the risk. Use the custom option for a status specific to an organization's risk process.",
+          "oneOf": [
+            {
+              "title": "Predefined Risk Status",
+              "type": "string",
+              "enum": [
+                "identified",
+                "assessed",
+                "mitigated",
+                "accepted",
+                "transferred",
+                "retired"
+              ],
+              "meta:enum": {
+                "identified": "Risk has been identified but not yet evaluated.",
+                "assessed": "Risk has been assessed and prioritized.",
+                "mitigated": "Responses are in place reducing this risk.",
+                "accepted": "Risk has been formally accepted.",
+                "transferred": "Risk has been transferred to another party.",
+                "retired": "Risk no longer applies."
+              }
+            },
+            {
+              "title": "Custom Risk Status",
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom status."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom status."
+                }
+              }
+            }
+          ]
         },
         "owner": {
           "$ref": "cyclonedx-party-2.0.schema.json#/$defs/partyChoice",
@@ -313,6 +440,35 @@
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "rating": {
+      "type": "object",
+      "title": "Rating",
+      "description": "A methodology-neutral assessment of risk along likelihood and impact, with an overall score. The same shape expresses inherent, residual, and target risk so reductions can be compared. A rating can be qualitative (a `level`), semi-quantitative (a numeric `score` on a bounded scale), or quantitative (for example a probable monetary loss under [FAIR](https://www.fairinstitute.org/)). For a catalogue of assessment techniques, see [IEC 31010](https://www.iso.org/standard/72140.html).",
+      "additionalProperties": false,
+      "properties": {
+        "likelihood": {
+          "$ref": "#/$defs/likelihood"
+        },
+        "impact": {
+          "$ref": "#/$defs/impact"
+        },
+        "score": {
+          "$ref": "#/$defs/riskScore"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "title": "Confidence",
+          "description": "Confidence in this rating, expressed as a decimal from 0 to 1, where 1 is full confidence. Supports quantitative methods that reason over uncertainty."
+        },
+        "rationale": {
+          "type": "string",
+          "title": "Rationale",
+          "description": "The justification for this rating, including the method and the evidence considered."
         }
       }
     },
@@ -328,51 +484,50 @@
           "title": "Level",
           "description": "The qualitative likelihood level representing the overall assessed probability of the risk or scenario being realized.",
           "enum": [
-            "certain",
-            "high",
+            "very-low",
             "low",
             "medium",
-            "veryHigh",
-            "veryLow"
+            "high",
+            "very-high",
+            "certain"
           ],
           "meta:enum": {
-            "certain": "Almost certain to occur (> 90% probability).",
-            "high": "Likely to occur (60-90% probability).",
-            "low": "Unlikely to occur (10-30% probability).",
-            "medium": "Possible to occur (30-60% probability).",
-            "veryHigh": "Very likely to occur (75-90% probability).",
-            "veryLow": "Very unlikely to occur (< 10% probability)."
+            "very-low": "Very unlikely to occur (less than 10% probability).",
+            "low": "Unlikely to occur (10 to 30% probability).",
+            "medium": "Possible to occur (30 to 60% probability).",
+            "high": "Likely to occur (60 to 85% probability).",
+            "very-high": "Very likely to occur (85 to 99% probability).",
+            "certain": "Almost certain to occur (greater than 99% probability)."
           }
         },
         "score": {
           "type": "number",
           "minimum": 0,
-          "maximum": 5,
-          "description": "Numeric likelihood score"
+          "description": "Numeric likelihood score on the scale defined by the methodology."
         },
         "probability": {
           "type": "number",
           "minimum": 0,
           "maximum": 1,
-          "description": "Probability as a decimal (0-1)"
+          "description": "Probability as a decimal from 0 to 1."
         },
         "factors": {
           "type": "array",
           "items": {
             "$ref": "#/$defs/likelihoodFactor"
           },
-          "description": "Factors considered when determining the likelihood level"
+          "description": "The factors considered when determining the likelihood level."
         },
         "rationale": {
           "type": "string",
-          "description": "Justification for the likelihood rating"
+          "description": "The justification for the likelihood rating."
         }
       }
     },
     "likelihoodFactor": {
       "type": "object",
       "title": "Likelihood Factor",
-      "description": "An individual contributing factor used to determine the overall likelihood of a risk or scenario being realized. Likelihood is rarely a single judgment — it is typically derived from multiple independent factors such as threat actor capability, exploit maturity, attack surface exposure, and control effectiveness. Each factor captures a discrete dimension of likelihood with its own rating, enabling transparent, auditable, and methodology-aligned risk assessments.",
+      "description": "An individual contributing factor used to determine the overall likelihood of a risk or scenario being realized. Likelihood is rarely a single judgment. It is typically derived from multiple independent factors such as threat actor capability, exploit maturity, attack surface exposure, and control effectiveness. Each factor captures a discrete dimension of likelihood with its own rating, enabling transparent, auditable, and methodology-aligned risk assessments.",
       "required": [
         "name",
         "type"
@@ -391,29 +546,34 @@
           "oneOf": [
             {
               "title": "Predefined Likelihood Factor Type",
-              "description": "A likelihood factor type defined by the CycloneDX standard, aligned with established risk assessment methodologies.",
+              "description": "A likelihood factor type defined by the CycloneDX standard, aligned with established risk assessment methodologies including FAIR, OWASP Risk Rating, and NIST SP 800-30.",
               "type": "string",
-              "additionalProperties": false,
               "enum": [
-                "attackVector",
-                "controlEffectiveness",
-                "exploitMaturity",
+                "attack-vector",
+                "contact-frequency",
+                "control-effectiveness",
+                "detectability",
+                "discoverability",
+                "exploit-maturity",
                 "exposure",
                 "motivation",
                 "opportunity",
-                "other",
-                "threatCapability",
+                "targeting",
+                "threat-capability",
                 "vulnerability"
               ],
               "meta:enum": {
-                "attackVector": "Accessibility of the attack path to the threat actor, considering network proximity, authentication requirements, and interaction complexity.",
-                "controlEffectiveness": "Strength, reliability, and coverage of existing preventive, detective, or corrective controls that reduce the probability of successful exploitation.",
-                "exploitMaturity": "Availability, reliability, and sophistication of known exploits, attack toolkits, or proof-of-concept code targeting the identified weakness.",
+                "attack-vector": "Accessibility of the attack path to the threat actor, considering network proximity, authentication requirements, and interaction complexity.",
+                "contact-frequency": "How often the threat actor comes into contact with the target asset, independent of any intent to act. Aligns with the FAIR contact frequency factor.",
+                "control-effectiveness": "Strength, reliability, and coverage of existing preventive, detective, or corrective controls that reduce the probability of successful exploitation. Corresponds to resistance strength in FAIR.",
+                "detectability": "Likelihood that the activity is detected before the risk is realized. Lower detectability increases the chance of a successful action. Aligns with the OWASP Risk Rating intrusion detection factor and the FMEA detection axis.",
+                "discoverability": "Ease with which the weakness or opportunity can be found by a potential actor. Aligns with the OWASP Risk Rating ease of discovery factor.",
+                "exploit-maturity": "Availability, reliability, and sophistication of known exploits, attack toolkits, or proof-of-concept code targeting the identified weakness.",
                 "exposure": "Degree to which the target asset, system, or service is visible, discoverable, or reachable by potential threat actors.",
                 "motivation": "Level of incentive, intent, or determination driving the threat actor to pursue exploitation, including financial gain, ideology, or competitive advantage.",
                 "opportunity": "Availability of the conditions, timing, or circumstances required for the threat actor to act, including access windows, environmental factors, and resource availability.",
-                "other": "A likelihood factor type not defined by the CycloneDX standard. Use the custom type option for factors specific to an organization's risk methodology.",
-                "threatCapability": "Technical skill, resources, tooling, and sophistication of the threat actor relative to the complexity of the attack required.",
+                "targeting": "Degree to which the threat actor specifically selects this asset or organization rather than acting opportunistically. Aligns with the NIST SP 800-30 targeting factor.",
+                "threat-capability": "Technical skill, resources, tooling, and sophistication of the threat actor relative to the complexity of the attack required.",
                 "vulnerability": "Presence, severity, and exploitability of weaknesses in the target system, application, or process that could be leveraged by a threat actor."
               }
             },
@@ -446,28 +606,27 @@
           "title": "Level",
           "description": "The qualitative rating assigned to this factor, representing the assessed degree to which this factor contributes to the overall likelihood of the risk being realized.",
           "enum": [
-            "certain",
-            "high",
+            "very-low",
             "low",
             "medium",
-            "veryHigh",
-            "veryLow"
+            "high",
+            "very-high",
+            "certain"
           ],
           "meta:enum": {
-            "certain": "This factor almost certainly contributes to risk realization (> 90% influence).",
-            "high": "This factor strongly contributes to risk realization (60-90% influence).",
-            "low": "This factor has limited contribution to risk realization (10-30% influence).",
-            "medium": "This factor moderately contributes to risk realization (30-60% influence).",
-            "veryHigh": "This factor very strongly contributes to risk realization (75-90% influence).",
-            "veryLow": "This factor has minimal contribution to risk realization (< 10% influence)."
+            "very-low": "This factor has minimal contribution to risk realization (less than 10% influence).",
+            "low": "This factor has limited contribution to risk realization (10 to 30% influence).",
+            "medium": "This factor moderately contributes to risk realization (30 to 60% influence).",
+            "high": "This factor strongly contributes to risk realization (60 to 85% influence).",
+            "very-high": "This factor very strongly contributes to risk realization (85 to 99% influence).",
+            "certain": "This factor almost certainly contributes to risk realization (greater than 99% influence)."
           }
         },
         "score": {
           "type": "number",
           "title": "Score",
-          "description": "A numeric score representing the assessed value of this factor on a 0-5 scale, where 0 indicates no contribution to likelihood and 5 indicates maximum contribution.",
-          "minimum": 0,
-          "maximum": 5
+          "description": "A numeric score representing the assessed value of this factor on the scale defined by the methodology, where a higher value indicates a greater contribution to likelihood.",
+          "minimum": 0
         },
         "weight": {
           "type": "number",
@@ -502,65 +661,122 @@
             "major",
             "catastrophic"
           ],
-          "description": "Impact severity level",
+          "description": "The qualitative impact severity level.",
           "meta:enum": {
-            "negligible": "Minimal impact with no significant consequences",
-            "low": "Minor impact with limited consequences",
-            "moderate": "Moderate impact affecting some operations",
-            "major": "Significant impact with serious consequences",
-            "catastrophic": "Catastrophic impact with existential consequences"
+            "negligible": "Minimal impact with no significant consequences.",
+            "low": "Minor impact with limited consequences.",
+            "moderate": "Moderate impact affecting some operations.",
+            "major": "Significant impact with serious consequences.",
+            "catastrophic": "Catastrophic impact with existential consequences."
+          }
+        },
+        "polarity": {
+          "type": "string",
+          "title": "Polarity",
+          "description": "Whether the impact represents a harm or a benefit. Benefits support modeling opportunities and positive risk.",
+          "enum": [
+            "harm",
+            "benefit"
+          ],
+          "meta:enum": {
+            "harm": "A negative impact or downside.",
+            "benefit": "A positive impact or upside."
           }
         },
         "score": {
           "type": "number",
           "minimum": 0,
-          "maximum": 10,
-          "description": "Numeric impact score"
+          "description": "Numeric impact score on the scale defined by the methodology."
         },
         "categories": {
           "type": "array",
+          "uniqueItems": true,
           "items": {
-            "type": "string",
-            "enum": [
-              "confidentiality",
-              "integrity",
-              "availability",
-              "financial",
-              "reputation",
-              "regulatory",
-              "safety",
-              "privacy",
-              "operational",
-              "strategic"
-            ],
-            "meta:enum": {
-              "confidentiality": "Impact on data confidentiality",
-              "integrity": "Impact on data or system integrity",
-              "availability": "Impact on service availability",
-              "financial": "Financial loss or impact",
-              "reputation": "Reputational damage",
-              "regulatory": "Regulatory compliance impact",
-              "safety": "Human safety impact",
-              "privacy": "Privacy violation impact",
-              "operational": "Operational disruption",
-              "strategic": "Strategic business impact"
-            }
+            "oneOf": [
+              {
+                "title": "Predefined Impact Category",
+                "type": "string",
+                "enum": [
+                  "confidentiality",
+                  "integrity",
+                  "availability",
+                  "financial",
+                  "reputation",
+                  "regulatory",
+                  "safety",
+                  "privacy",
+                  "operational",
+                  "strategic",
+                  "bias",
+                  "discrimination",
+                  "fairness",
+                  "human-rights",
+                  "environmental",
+                  "societal",
+                  "psychological",
+                  "physical",
+                  "health"
+                ],
+                "meta:enum": {
+                  "confidentiality": "Impact on data confidentiality.",
+                  "integrity": "Impact on data or system integrity.",
+                  "availability": "Impact on service availability.",
+                  "financial": "Financial loss or impact.",
+                  "reputation": "Reputational damage.",
+                  "regulatory": "Regulatory compliance impact.",
+                  "safety": "Human safety impact.",
+                  "privacy": "Privacy violation impact.",
+                  "operational": "Operational disruption.",
+                  "strategic": "Strategic business impact.",
+                  "bias": "Systematic bias in automated outputs or decisions.",
+                  "discrimination": "Unfair treatment of individuals or groups, including on the basis of protected attributes.",
+                  "fairness": "Impact on the fair and equitable treatment of affected groups.",
+                  "human-rights": "Impact on fundamental human rights, including autonomy and dignity.",
+                  "environmental": "Environmental impact, including energy use and carbon emissions.",
+                  "societal": "Impact on society, communities, or civic processes.",
+                  "psychological": "Psychological or emotional harm.",
+                  "physical": "Physical harm to people or property.",
+                  "health": "Impact on physical or mental health."
+                }
+              },
+              {
+                "title": "Custom Impact Category",
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "title": "Name",
+                    "description": "The name of the custom impact category."
+                  },
+                  "description": {
+                    "type": "string",
+                    "title": "Description",
+                    "description": "A description of the custom impact category."
+                  }
+                }
+              }
+            ]
           },
-          "description": "Categories of impact"
+          "description": "The categories of impact, including harms relevant to AI and societal risk."
         },
         "riskAttributes": {
           "type": "array",
           "items": {
             "$ref": "#/$defs/riskAttribute"
           },
-          "description": "Risk attributes affected"
+          "description": "The risk attributes affected."
         },
         "quantification": {
           "$ref": "#/$defs/impactQuantification"
         },
         "description": {
           "type": "string",
-          "description": "Description of the potential impact"
+          "description": "A description of the potential impact."
         }
       }
     },
@@ -570,35 +786,62 @@
       "properties": {
         "financialLoss": {
           "type": "number",
-          "description": "Estimated financial loss in currency units"
+          "description": "The estimated financial loss, in the units given by currency."
         },
         "currency": {
           "type": "string",
           "pattern": "^[A-Z]{3}$",
-          "description": "ISO 4217 currency code"
+          "description": "The currency of the financial values, as an [ISO 4217](https://www.iso.org/iso-4217-currency-codes.html) code."
         },
         "affectedUsers": {
           "type": "integer",
-          "description": "Number of affected users"
+          "description": "The number of affected users."
         },
         "downtime": {
           "type": "string",
           "pattern": "^P(?!$)(\\d+Y)?(\\d+M)?(\\d+W)?(\\d+D)?(T(\\d+H)?(\\d+M)?(\\d+(\\.\\d+)?S)?)?$",
-          "description": "Expected downtime as ISO 8601 duration"
+          "description": "The expected downtime, as an [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) duration."
         },
         "dataRecords": {
           "type": "integer",
-          "description": "Number of data records affected"
+          "description": "The number of data records affected."
         },
         "recovery": {
           "type": "string",
           "pattern": "^P(?!$)(\\d+Y)?(\\d+M)?(\\d+W)?(\\d+D)?(T(\\d+H)?(\\d+M)?(\\d+(\\.\\d+)?S)?)?$",
-          "description": "Recovery time as ISO 8601 duration"
+          "description": "The recovery time, as an [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) duration."
+        },
+        "financialLossRange": {
+          "type": "object",
+          "title": "Financial Loss Range",
+          "additionalProperties": false,
+          "description": "A distribution of estimated financial loss, supporting quantitative methods such as FAIR that reason over ranges.",
+          "properties": {
+            "minimum": {
+              "type": "number",
+              "description": "The minimum estimated financial loss."
+            },
+            "mostLikely": {
+              "type": "number",
+              "description": "The most likely estimated financial loss."
+            },
+            "maximum": {
+              "type": "number",
+              "description": "The maximum estimated financial loss."
+            }
+          }
+        },
+        "affectedGroups": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "The number of distinct groups or populations affected."
         }
       }
     },
     "riskScore": {
       "type": "object",
+      "title": "Risk Score",
+      "description": "The overall risk score, expressed as a qualitative `level`, a numeric `score`, or both, with `vector` and `methodology` recording how it was derived. The scale of `score` is defined by the methodology, since rating systems differ. For example, [OWASP Risk Rating](https://owasp.org/www-community/OWASP_Risk_Rating_Methodology) averages factors from 0 to 9, [DREAD](https://en.wikipedia.org/wiki/DREAD_%28risk_assessment_model%29) averages five 1 to 10 ratings, [FMEA](https://asq.org/quality-resources/fmea) multiplies three 1 to 10 axes into a 1 to 1000 risk priority number, and [FAIR](https://www.fairinstitute.org/) expresses probable loss in monetary terms.",
       "required": [
         "level"
       ],
@@ -613,73 +856,125 @@
             "high",
             "critical"
           ],
-          "description": "Overall risk level",
+          "description": "The overall qualitative risk level.",
           "meta:enum": {
-            "info": "Informational - no immediate action required",
-            "low": "Low risk - monitor and address in normal cycle",
-            "medium": "Medium risk - plan mitigation activities",
-            "high": "High risk - prioritize mitigation efforts",
-            "critical": "Critical risk - immediate action required"
+            "info": "Informational.",
+            "low": "Low risk.",
+            "medium": "Medium risk.",
+            "high": "High risk.",
+            "critical": "Critical risk."
           }
         },
         "score": {
           "type": "number",
-          "minimum": 1,
-          "description": "Numeric risk score"
+          "minimum": 0,
+          "description": "Numeric risk score on the scale defined by the methodology."
         },
         "vector": {
           "type": "string",
-          "description": "Risk scoring vector (e.g., L:H/I:M)"
+          "description": "A textual representation of the metric values used to derive the score, in the format defined by the methodology."
         },
         "methodology": {
-          "type": "string",
-          "description": "Risk scoring methodology used"
+          "title": "Methodology",
+          "description": "The risk rating methodology used to derive this score. Only methodologies that define a scoring calculation are listed; governance frameworks such as [ISO 31000](https://www.iso.org/iso-31000-risk-management.html) are recorded as standards rather than as a score methodology. Use the custom option for methodologies not listed.",
+          "oneOf": [
+            {
+              "title": "Predefined Risk Methodology",
+              "type": "string",
+              "enum": [
+                "dread",
+                "fair",
+                "fmea",
+                "nist-sp-800-30",
+                "octave",
+                "owasp-risk-rating"
+              ],
+              "meta:enum": {
+                "dread": "[DREAD](https://en.wikipedia.org/wiki/DREAD_%28risk_assessment_model%29) risk rating model, the average of five ratings (damage, reproducibility, exploitability, affected users, discoverability) each scored 1 to 10.",
+                "fair": "[Factor Analysis of Information Risk (FAIR)](https://www.fairinstitute.org/), a quantitative methodology expressing risk as loss event frequency multiplied by loss magnitude.",
+                "fmea": "[Failure Mode and Effects Analysis (FMEA)](https://asq.org/quality-resources/fmea), using a risk priority number of severity multiplied by occurrence multiplied by detection.",
+                "nist-sp-800-30": "[NIST SP 800-30](https://csrc.nist.gov/pubs/sp/800/30/r1/final) guide for conducting risk assessments, using its exemplary likelihood and impact scales.",
+                "octave": "[OCTAVE Allegro](https://www.sei.cmu.edu/documents/786/2007_005_001_14885.pdf), using its relative risk score.",
+                "owasp-risk-rating": "[OWASP Risk Rating](https://owasp.org/www-community/OWASP_Risk_Rating_Methodology), averaging likelihood and impact factors each scored 0 to 9."
+              }
+            },
+            {
+              "title": "Custom Risk Methodology",
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom risk methodology."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom risk methodology."
+                }
+              }
+            }
+          ]
         }
       }
     },
     "riskResponse": {
       "type": "object",
+      "title": "Risk Response",
+      "description": "An action taken to modify a risk, pairing the chosen strategy with the controls that implement it. Covers the full set of dispositions, from avoiding or reducing a risk to accepting it or, for a positive risk, pursuing it.",
       "required": [
         "bom-ref",
-        "mitigations",
-        "mitigationPlan"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
-        },
-        "mitigations": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "$ref": "#/$defs/mitigation"
-          },
-          "description": "Mitigations applied to this risk response"
-        },
-        "mitigationPlan": {
-          "$ref": "#/$defs/mitigationPlan"
-        }
-      }
-    },
-    "mitigation": {
-      "type": "object",
-      "required": [
-        "bom-ref",
-        "reference"
+        "strategy"
       ],
       "additionalProperties": false,
       "properties": {
         "bom-ref": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "description": "Unique identifier for this mitigation entry so it can be referenced by a plan"
-        },
-        "reference": {
-          "description": "Reference using bom-link or bom-ref to a mitigation or control implementing the response.",
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          "description": "An identifier which can be used to reference this response elsewhere using a bom-ref or bom-link."
         },
         "strategy": {
           "type": "string",
+          "title": "Strategy",
+          "description": "The disposition chosen for the risk.",
+          "enum": [
+            "avoid",
+            "reduce",
+            "transfer",
+            "accept",
+            "exploit",
+            "enhance"
+          ],
+          "meta:enum": {
+            "avoid": "Eliminate the risk by removing its source or not proceeding with the activity.",
+            "reduce": "Lower the likelihood or impact of the risk through controls.",
+            "transfer": "Shift the risk to another party, for example through insurance or contract.",
+            "accept": "Take no further action and retain the risk.",
+            "exploit": "Pursue an opportunity so that a positive risk occurs.",
+            "enhance": "Increase the likelihood or benefit of a positive risk."
+          }
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the response."
+        },
+        "controls": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the controls, requirements, or components that implement this response."
+        },
+        "function": {
+          "type": "string",
+          "title": "Function",
+          "description": "The control function this response performs, following a prevent, detect, respond, and recover model.",
           "enum": [
             "prevent",
             "detect",
@@ -687,54 +982,65 @@
             "recover"
           ],
           "meta:enum": {
-            "prevent": "Prevents the risk from occurring",
-            "detect": "Detects when the risk occurs",
-            "respond": "Responds to the risk when detected",
-            "recover": "Recovers from the impact"
-          }
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "control",
-            "countermeasure",
-            "procedure",
-            "removal"
-          ],
-          "meta:enum": {
-            "control": "Protective, preventive or detective control",
-            "countermeasure": "Reactive measure to counter risks",
-            "procedure": "Documented procedure",
-            "removal": "Removing a risky component or asset"
+            "prevent": "Prevents the risk from occurring.",
+            "detect": "Detects when the risk occurs.",
+            "respond": "Responds to the risk when detected.",
+            "recover": "Recovers from the impact."
           }
         },
         "status": {
-          "type": "string",
-          "enum": [
-            "proposed",
-            "approved",
-            "planned",
-            "inProgress",
-            "implemented",
-            "verified"
-          ],
-          "meta:enum": {
-            "proposed": "Mitigation has been proposed",
-            "approved": "Mitigation has been approved",
-            "planned": "Implementation is planned",
-            "inProgress": "Implementation is in progress",
-            "implemented": "Mitigation has been implemented",
-            "verified": "Effectiveness has been verified"
-          }
-        },
-        "priority": {
-          "$ref": "#/$defs/priority"
+          "title": "Status",
+          "description": "The implementation status of the response. Use the custom option for a status specific to an organization's process.",
+          "oneOf": [
+            {
+              "title": "Predefined Response Status",
+              "type": "string",
+              "enum": [
+                "proposed",
+                "approved",
+                "planned",
+                "in-progress",
+                "implemented",
+                "verified"
+              ],
+              "meta:enum": {
+                "proposed": "The response has been proposed.",
+                "approved": "The response has been approved.",
+                "planned": "Implementation is planned.",
+                "in-progress": "Implementation is in progress.",
+                "implemented": "The response has been implemented.",
+                "verified": "Effectiveness has been verified."
+              }
+            },
+            {
+              "title": "Custom Response Status",
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom status."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom status."
+                }
+              }
+            }
+          ]
         },
         "effectiveness": {
           "$ref": "#/$defs/effectiveness"
         },
         "cost": {
           "type": "string",
+          "title": "Cost",
           "enum": [
             "trivial",
             "low",
@@ -743,26 +1049,33 @@
             "extreme"
           ],
           "meta:enum": {
-            "trivial": "Minimal cost and effort",
-            "low": "Low cost and effort",
-            "medium": "Moderate cost and effort",
-            "high": "High cost and significant effort",
-            "extreme": "Extreme cost and major effort"
+            "trivial": "Minimal cost and effort.",
+            "low": "Low cost and effort.",
+            "medium": "Moderate cost and effort.",
+            "high": "High cost and significant effort.",
+            "extreme": "Extreme cost and major effort."
           }
+        },
+        "priority": {
+          "$ref": "#/$defs/priority"
+        },
+        "owner": {
+          "$ref": "cyclonedx-party-2.0.schema.json#/$defs/partyChoice",
+          "description": "The party accountable for this response. May be an inline party object or a reference to a previously declared party."
+        },
+        "targetDate": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Target Date",
+          "description": "The date by which this response is targeted to be implemented."
         },
         "addresses": {
           "type": "array",
+          "uniqueItems": true,
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "References using bom-link or bom-ref to scenarios this plan addresses."
-        },
-        "implementedBy": {
-          "type": "array",
-          "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
-          },
-          "description": "References using bom-link or bom-ref to assets that implement this plan."
+          "description": "References using bom-link or bom-ref to the items this response addresses, such as a threat, vulnerability, weakness, or another risk."
         },
         "externalReferences": {
           "type": "array",
@@ -772,87 +1085,6 @@
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
-        }
-      }
-    },
-    "mitigationPlan": {
-      "type": "object",
-      "required": [
-        "name",
-        "type",
-        "status",
-        "mitigations"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "Name of the mitigation plan"
-        },
-        "description": {
-          "type": "string",
-          "description": "Description of what the plan covers"
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "avoid",
-            "reduce",
-            "transfer",
-            "accept",
-            "control",
-            "countermeasure",
-            "safeguard",
-            "practice",
-            "procedure"
-          ],
-          "meta:enum": {
-            "avoid": "Avoid the risk entirely",
-            "reduce": "Reduce likelihood or impact",
-            "transfer": "Transfer risk to another party",
-            "accept": "Accept the risk",
-            "control": "Protective, preventive or detective control",
-            "countermeasure": "Reactive measure to counter risks",
-            "safeguard": "Safeguards mitigating adverse events",
-            "practice": "Operational or governance practice",
-            "procedure": "Documented procedure"
-          }
-        },
-        "status": {
-          "type": "string",
-          "enum": [
-            "proposed",
-            "approved",
-            "planned",
-            "inProgress",
-            "implemented",
-            "verified"
-          ],
-          "meta:enum": {
-            "proposed": "Mitigation has been proposed",
-            "approved": "Mitigation has been approved",
-            "planned": "Implementation is planned",
-            "inProgress": "Implementation is in progress",
-            "implemented": "Mitigation has been implemented",
-            "verified": "Effectiveness has been verified"
-          }
-        },
-        "externalReferences": {
-          "type": "array",
-          "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference"
-          }
-        },
-        "properties": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
-        },
-        "mitigations": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
-          },
-          "description": "References using bom-link or bom-ref to mitigations chosen for this plan."
         }
       }
     },
@@ -864,7 +1096,7 @@
           "type": "number",
           "minimum": 0,
           "maximum": 1,
-          "description": "Effectiveness as decimal"
+          "description": "Effectiveness as a decimal from 0 to 1."
         },
         "rating": {
           "type": "string",
@@ -876,11 +1108,11 @@
             "excellent"
           ],
           "meta:enum": {
-            "ineffective": "Does not meaningfully reduce risk",
-            "marginal": "Slightly reduces risk",
-            "adequate": "Adequately reduces risk",
-            "good": "Significantly reduces risk",
-            "excellent": "Nearly eliminates risk"
+            "ineffective": "Does not meaningfully reduce risk.",
+            "marginal": "Slightly reduces risk.",
+            "adequate": "Adequately reduces risk.",
+            "good": "Significantly reduces risk.",
+            "excellent": "Nearly eliminates risk."
           }
         }
       }
@@ -906,16 +1138,16 @@
             "triggered"
           ],
           "meta:enum": {
-            "initial": "Initial risk assessment",
-            "periodic": "Scheduled periodic assessment",
-            "continuous": "Continuous monitoring assessment",
-            "triggered": "Event-triggered assessment"
+            "initial": "Initial risk assessment.",
+            "periodic": "Scheduled periodic assessment.",
+            "continuous": "Continuous monitoring assessment.",
+            "triggered": "Event-triggered assessment."
           }
         },
         "timestamp": {
           "type": "string",
           "format": "date-time",
-          "description": "When the assessment was performed"
+          "description": "When the assessment was performed."
         },
         "assessor": {
           "$ref": "cyclonedx-party-2.0.schema.json#/$defs/partyChoice",
@@ -923,7 +1155,7 @@
         },
         "summary": {
           "type": "string",
-          "description": "Executive summary of the assessment"
+          "description": "An executive summary of the assessment."
         },
         "risks": {
           "type": "array",
@@ -947,29 +1179,29 @@
                 "average",
                 "custom"
               ],
-              "description": "Aggregation method used to derive the overall risk"
+              "description": "The aggregation method used to derive the overall risk."
             },
             "score": {
               "$ref": "#/$defs/riskScore"
             },
             "description": {
               "type": "string",
-              "description": "Optional explanation for custom aggregation approaches"
+              "description": "An optional explanation for custom aggregation approaches."
             }
           },
-          "description": "Aggregated risk result for this assessment"
+          "description": "The aggregated risk result for this assessment."
         },
         "recommendations": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Recommendations from the assessment"
+          "description": "Recommendations from the assessment."
         },
         "nextReview": {
           "type": "string",
           "format": "date-time",
-          "description": "When the next review should occur"
+          "description": "When the next review should occur."
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
@@ -985,13 +1217,13 @@
         "high",
         "critical"
       ],
-      "description": "Priority level",
+      "description": "Priority level.",
       "meta:enum": {
-        "none": "No priority assigned",
-        "low": "Low priority - address when convenient",
-        "medium": "Medium priority - address in normal cycle",
-        "high": "High priority - address soon",
-        "critical": "Critical priority - address immediately"
+        "none": "No priority.",
+        "low": "Low priority.",
+        "medium": "Medium priority.",
+        "high": "High priority.",
+        "critical": "Critical priority."
       }
     },
     "severity": {
@@ -1003,13 +1235,13 @@
         "high",
         "critical"
       ],
-      "description": "Severity level",
+      "description": "Severity level.",
       "meta:enum": {
-        "info": "Informational finding",
-        "low": "Low severity issue",
-        "medium": "Medium severity issue",
-        "high": "High severity issue",
-        "critical": "Critical severity issue"
+        "info": "Informational finding.",
+        "low": "Low severity issue.",
+        "medium": "Medium severity issue.",
+        "high": "High severity issue.",
+        "critical": "Critical severity issue."
       }
     },
     "criticality": {
@@ -1021,13 +1253,13 @@
         "high",
         "critical"
       ],
-      "description": "Business criticality level",
+      "description": "Business criticality level.",
       "meta:enum": {
-        "minimal": "Minimal impact on business operations",
-        "low": "Low impact with minor inconvenience",
-        "moderate": "Moderate impact affecting some operations",
-        "high": "High impact affecting critical operations",
-        "critical": "Critical impact with severe business consequences"
+        "minimal": "Minimal impact on business operations.",
+        "low": "Low impact with minor inconvenience.",
+        "moderate": "Moderate impact affecting some operations.",
+        "high": "High impact affecting critical operations.",
+        "critical": "Critical impact with severe business consequences."
       }
     }
   }
