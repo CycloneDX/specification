@@ -65,10 +65,72 @@
           },
           "description": "The trust boundaries of the system, extending the architectural boundaries defined in a blueprint with trust semantics."
         },
+        "methodologies": {
+          "type": "array",
+          "title": "Methodologies",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/methodology"
+          },
+          "description": "The threat modeling methodologies applied to produce this threat model, such as STRIDE, LINDDUN, PASTA, or attack trees."
+        },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
         }
       }
+    },
+    "methodology": {
+      "title": "Threat Modeling Methodology",
+      "description": "A threat modeling methodology applied to produce this threat model. Use the custom option for methodologies not covered by the enumeration.",
+      "oneOf": [
+        {
+          "type": "string",
+          "title": "Predefined Threat Modeling Methodology",
+          "enum": [
+            "STRIDE",
+            "LINDDUN",
+            "PASTA",
+            "MAESTRO",
+            "OWASP",
+            "TRIKE",
+            "VAST",
+            "ATFAA",
+            "attack-tree"
+          ],
+          "meta:enum": {
+            "STRIDE": "Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege.",
+            "LINDDUN": "Linkability, Identifiability, Non-repudiation, Detectability, Disclosure of information, Unawareness, Non-compliance.",
+            "PASTA": "Process for Attack Simulation and Threat Analysis.",
+            "MAESTRO": "Multi-Agent Environment, Security, Threat, Risk, and Outcome.",
+            "OWASP": "OWASP threat modelling methodology.",
+            "TRIKE": "Risk-based threat modelling methodology.",
+            "VAST": "Visual, Agile, and Simple Threat modelling.",
+            "ATFAA": "Advanced Threat Framework for Autonomous AI Agents.",
+            "attack-tree": "Attack tree methodology, decomposing attacker goals into sub-goals and techniques."
+          }
+        },
+        {
+          "type": "object",
+          "title": "Custom Threat Modeling Methodology",
+          "required": [
+            "name"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Name",
+              "description": "The name of the custom threat modeling methodology."
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the custom threat modeling methodology."
+            }
+          }
+        }
+      ]
     },
     "threat": {
       "type": "object",
@@ -108,14 +170,14 @@
           "items": {
             "type": "object",
             "title": "Threat Category",
-            "description": "A threat category. The methodology determines the permitted category values.",
+            "description": "A threat category. The taxonomy determines the permitted category values.",
             "additionalProperties": false,
-            "required": ["methodology", "category"],
+            "required": ["taxonomy", "category"],
             "properties": {
-              "methodology": {
+              "taxonomy": {
                 "type": "string",
-                "title": "Methodology",
-                "description": "The threat-modelling methodology that the category is drawn from.",
+                "title": "Taxonomy",
+                "description": "The threat classification taxonomy that the category is drawn from.",
                 "enum": ["STRIDE", "LINDDUN", "MAESTRO", "MITRE-ATTACK"],
                 "meta:enum": {
                   "STRIDE": "Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, and Elevation of Privilege.",
@@ -128,14 +190,14 @@
                 "type": "string",
                 "minLength": 1,
                 "title": "Category",
-                "description": "The category within the methodology. The permitted values are determined by the methodology."
+                "description": "The category within the taxonomy. The permitted values are determined by the taxonomy."
               }
             },
             "allOf": [
               {
                 "if": {
-                  "required": ["methodology"],
-                  "properties": { "methodology": { "const": "STRIDE" } }
+                  "required": ["taxonomy"],
+                  "properties": { "taxonomy": { "const": "STRIDE" } }
                 },
                 "then": {
                   "properties": {
@@ -155,8 +217,8 @@
               },
               {
                 "if": {
-                  "required": ["methodology"],
-                  "properties": { "methodology": { "const": "LINDDUN" } }
+                  "required": ["taxonomy"],
+                  "properties": { "taxonomy": { "const": "LINDDUN" } }
                 },
                 "then": {
                   "properties": {
@@ -177,8 +239,8 @@
               },
               {
                 "if": {
-                  "required": ["methodology"],
-                  "properties": { "methodology": { "const": "MAESTRO" } }
+                  "required": ["taxonomy"],
+                  "properties": { "taxonomy": { "const": "MAESTRO" } }
                 },
                 "then": {
                   "properties": {
@@ -199,8 +261,8 @@
               },
               {
                 "if": {
-                  "required": ["methodology"],
-                  "properties": { "methodology": { "const": "MITRE-ATTACK" } }
+                  "required": ["taxonomy"],
+                  "properties": { "taxonomy": { "const": "MITRE-ATTACK" } }
                 },
                 "then": {
                   "properties": {

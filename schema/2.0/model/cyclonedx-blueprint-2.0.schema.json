@@ -47,7 +47,7 @@
           "title": "Model Types",
           "minItems": 1,
           "uniqueItems": true,
-          "description": "The types of models being represented",
+          "description": "The types of models being represented.",
           "items": {
             "$ref": "#/$defs/modelType"
           }
@@ -56,7 +56,7 @@
           "type": "array",
           "title": "Methodologies",
           "uniqueItems": true,
-          "description": "The modeling methodologies used",
+          "description": "The modeling methodologies used.",
           "items": {
             "$ref": "#/$defs/methodology"
           }
@@ -71,7 +71,7 @@
           "items": {
             "$ref": "#/$defs/asset"
           },
-          "description": "The assets (components, services, data, actors) included in the model"
+          "description": "The assets (components, services, data, actors) included in the model."
         },
         "behaviors": {
           "$ref": "cyclonedx-behavior-2.0.schema.json#/$defs/behaviors"
@@ -83,7 +83,7 @@
           "items": {
             "$ref": "#/$defs/dataStore"
           },
-          "description": "Structured description of data stores used in the model"
+          "description": "Structured description of data stores used in the model."
         },
         "dataSets": {
           "type": "array",
@@ -92,7 +92,7 @@
           "items": {
             "$ref": "#/$defs/dataSet"
           },
-          "description": "Datasets handled by the system, including placements and sensitivity"
+          "description": "Datasets handled by the system, including placements and sensitivity."
         },
         "zones": {
           "type": "array",
@@ -101,7 +101,7 @@
           "items": {
             "$ref": "#/$defs/zone"
           },
-          "description": "Logical, physical, or trust zones that group assets with similar characteristics"
+          "description": "Logical, physical, or trust zones that group assets with similar characteristics."
         },
         "boundaries": {
           "type": "array",
@@ -110,7 +110,7 @@
           "items": {
             "$ref": "#/$defs/boundary"
           },
-          "description": "Boundaries between zones"
+          "description": "Boundaries between zones."
         },
         "flows": {
           "type": "array",
@@ -119,7 +119,7 @@
           "items": {
             "$ref": "#/$defs/flow"
           },
-          "description": "Data, control, or process flows between assets"
+          "description": "Data, control, or process flows between assets."
         },
         "actors": {
           "type": "array",
@@ -128,7 +128,7 @@
           "items": {
             "$ref": "#/$defs/actor"
           },
-          "description": "Human or system actors involved in the model, distinct from assets"
+          "description": "Human or system actors involved in the model, distinct from assets."
         },
         "assumptions": {
           "type": "array",
@@ -137,7 +137,7 @@
           "items": {
             "$ref": "#/$defs/assumption"
           },
-          "description": "Assumptions made during the modeling process"
+          "description": "Assumptions made during the modeling process."
         },
         "visualizations": {
           "type": "array",
@@ -146,7 +146,7 @@
           "items": {
             "$ref": "#/$defs/visualization"
           },
-          "description": "Visual representations of the model"
+          "description": "Visual representations of the model."
         },
         "useCases": {
           "type": "array",
@@ -193,10 +193,11 @@
         },
         "requirements": {
           "type": "array",
+          "uniqueItems": true,
           "items": {
-            "$ref": "cyclonedx-requirement-2.0.schema.json#/$defs/requirement"
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "Requirements derived from or related to the model"
+          "description": "References using bom-link or bom-ref to the requirements, declared in definitions, that are derived from or related to this model."
         },
         "externalReferences": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReferences"
@@ -208,7 +209,7 @@
     },
     "modelType": {
       "title": "Model Type",
-      "description": "The type of model being represented, either a predefined value from the enumeration or a custom name and description for types not covered by the enumeration.",
+      "description": "The type of model being represented, either a predefined value from the enumeration or a custom name and description for types not covered by the enumeration. Threat, risk, and privacy analyses are represented in their own models, which reference the blueprint, rather than as blueprint model types.",
       "oneOf": [
         {
           "type": "string",
@@ -218,33 +219,25 @@
             "architecture",
             "behavioral",
             "conceptual",
-            "dataFlow",
+            "data-flow",
             "deployment",
             "logical",
             "network",
             "operational",
             "physical",
-            "privacy",
-            "process",
-            "risk",
-            "structural",
-            "threat"
+            "process"
           ],
           "meta:enum": {
-            "architecture": "System or software architecture model.",
-            "behavioral": "System behaviour model.",
-            "conceptual": "High-level conceptual model.",
-            "dataFlow": "Data flow model showing how data moves through the system.",
-            "deployment": "Deployment or infrastructure model.",
-            "logical": "Logical system model.",
-            "network": "Network topology or connectivity model.",
-            "operational": "Operational model.",
-            "physical": "Physical infrastructure model.",
-            "privacy": "Privacy impact assessment model.",
-            "process": "Business or system process model.",
-            "risk": "Risk assessment model.",
-            "structural": "System structure model.",
-            "threat": "Security threat model."
+            "architecture": "An architecture model of the system or software, capturing its major components, their responsibilities, and the interfaces and relationships between them. Broader than a single view, it frames the overall design.",
+            "behavioral": "A behavioural model, capturing how the system acts over time through its processes, state changes, interactions, and control flow, as opposed to its static structure.",
+            "conceptual": "A conceptual model at the highest level of abstraction, capturing the key entities, concepts, and relationships in technology-neutral terms without implementation detail. The first level of the conceptual, logical, and physical progression.",
+            "data-flow": "A data flow model showing how data moves between processes, data stores, and external entities. This is the substrate most commonly used for STRIDE per-element threat analysis.",
+            "deployment": "A deployment model showing how software is allocated to runtime and infrastructure, including nodes, containers, environments, and the artifacts placed on them.",
+            "logical": "A logical model detailing the structure and behaviour of the system independent of any specific implementation technology. The middle level of the conceptual, logical, and physical progression.",
+            "network": "A network model showing topology and connectivity, including segments, links, and the paths over which components communicate.",
+            "operational": "An operational model describing how the system is run and supported in production, including procedures, responsibilities, and operational dependencies.",
+            "physical": "A physical model at the implementation level, capturing the tangible realization of the system such as hardware, devices, infrastructure, topology, and physical locations. The most concrete level of the conceptual, logical, and physical progression.",
+            "process": "A process model describing a business or system process as an ordered set of activities and decisions and the actors that carry them out."
           }
         },
         {
@@ -273,7 +266,7 @@
     },
     "methodology": {
       "title": "Methodology",
-      "description": "The modelling methodology used, either a predefined value from the enumeration or a custom object for methodologies not covered. The object form may also be used to annotate a predefined methodology with a version or external references.",
+      "description": "The system or architecture modelling notation used to produce the blueprint, either a predefined value from the enumeration or a custom object. The object form may also annotate a predefined methodology with a version or external references. Threat modelling methodologies such as STRIDE and PASTA are recorded in the threat model, not here.",
       "oneOf": [
         {
           "type": "string",
@@ -282,56 +275,36 @@
           "enum": [
             "4+1",
             "Archimate",
-            "ATFAA",
             "BPMN",
             "C4",
             "DFD",
             "DODAF",
             "ERD",
             "IDEF",
-            "LINDDUN",
-            "MAESTRO",
-            "MITRE-ATTACK",
             "MODAF",
             "NAF",
-            "OWASP",
-            "PASTA",
             "SABSA",
-            "STRIDE",
             "SysML",
             "TOGAF",
-            "TRIKE",
             "UML",
-            "VAST",
-            "Zachman",
-            "attackTree"
+            "Zachman"
           ],
           "meta:enum": {
             "4+1": "4+1 Architectural View Model.",
             "Archimate": "Enterprise architecture modelling language.",
-            "ATFAA": "Advanced Threat Framework for Autonomous AI Agents.",
             "BPMN": "Business Process Model and Notation.",
             "C4": "C4 Model for software architecture.",
             "DFD": "Data Flow Diagrams.",
             "DODAF": "Department of Defense Architecture Framework.",
             "ERD": "Entity Relationship Diagrams.",
             "IDEF": "Integration Definition Methods.",
-            "LINDDUN": "Linkability, Identifiability, Non-repudiation, Detectability, Disclosure of information, Unawareness, Non-compliance.",
-            "MAESTRO": "Multi-Agent Environment, Security, Threat, Risk, and Outcome.",
-            "MITRE-ATTACK": "MITRE ATT&CK adversarial tactics, techniques, and procedures framework.",
             "MODAF": "Ministry of Defence Architecture Framework.",
             "NAF": "NATO Architecture Framework.",
-            "OWASP": "OWASP threat modelling methodology.",
-            "PASTA": "Process for Attack Simulation and Threat Analysis.",
             "SABSA": "Sherwood Applied Business Security Architecture.",
-            "STRIDE": "Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege.",
             "SysML": "Systems Modeling Language.",
             "TOGAF": "The Open Group Architecture Framework.",
-            "TRIKE": "Risk-based threat modelling methodology.",
             "UML": "Unified Modeling Language.",
-            "VAST": "Visual, Agile, and Simple Threat modelling.",
-            "Zachman": "Zachman Framework.",
-            "attackTree": "Attack tree methodology for structured threat analysis."
+            "Zachman": "Zachman Framework."
           }
         },
         {
@@ -381,7 +354,7 @@
           "type": "string",
           "title": "Timestamp",
           "format": "date-time",
-          "description": "When the blueprint was created or last updated"
+          "description": "When the blueprint was created or last updated."
         },
         "authors": {
           "type": "array",
@@ -400,7 +373,7 @@
           "type": "string",
           "title": "Review Date",
           "format": "date-time",
-          "description": "When the blueprint was reviewed"
+          "description": "When the blueprint was reviewed."
         },
         "approver": {
           "$ref": "cyclonedx-party-2.0.schema.json#/$defs/partyChoice",
@@ -410,7 +383,7 @@
           "type": "string",
           "title": "Approval Date",
           "format": "date-time",
-          "description": "When the blueprint was approved"
+          "description": "When the blueprint was approved."
         },
         "ordinalVersion": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/ordinalVersion"
@@ -433,19 +406,19 @@
           "type": "string",
           "title": "Start",
           "format": "date-time",
-          "description": "When the blueprint becomes valid"
+          "description": "When the blueprint becomes valid."
         },
         "end": {
           "type": "string",
           "title": "End",
           "format": "date-time",
-          "description": "When the blueprint expires"
+          "description": "When the blueprint expires."
         },
         "reviewFrequency": {
           "type": "string",
           "title": "Review Frequency",
           "pattern": "^P(?!$)(\\d+Y)?(\\d+M)?(\\d+W)?(\\d+D)?$",
-          "description": "ISO 8601 duration for review frequency (e.g., P3M for quarterly)"
+          "description": "ISO 8601 duration for review frequency (e.g., P3M for quarterly)."
         }
       }
     },
@@ -465,12 +438,12 @@
           "type": "string",
           "title": "Name",
           "minLength": 1,
-          "description": "Name of the scope"
+          "description": "Name of the scope."
         },
         "description": {
           "type": "string",
           "title": "Description",
-          "description": "Description of what is included and excluded from the model"
+          "description": "Description of what is included and excluded from the model."
         },
         "boundaries": {
           "type": "array",
@@ -480,7 +453,7 @@
             "type": "string",
             "minLength": 1
           },
-          "description": "Explicit boundaries of the model"
+          "description": "Explicit boundaries of the model."
         },
         "includedComponents": {
           "type": "array",
@@ -508,12 +481,12 @@
     "asset": {
       "type": "object",
       "title": "Asset",
-      "description": "A component, service, data store, or other element included in the blueprint model.",
+      "description": "A component, service, data store, actor, or other element included in the blueprint model. An actor asset references a party, since a party such as a person, persona, system, or organization may itself be an asset, including a person in the intelligence sense of a human source.",
       "additionalProperties": false,
       "properties": {
         "bom-ref": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "description": "Unique identifier for the asset"
+          "description": "Unique identifier for the asset."
         },
         "componentRef": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
@@ -523,76 +496,107 @@
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "description": "Reference using bom-link or bom-ref to the service this asset represents."
         },
+        "partyRef": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "description": "Reference using bom-link or bom-ref to the party this asset represents, such as a person, persona, system, or organization. Used when the asset is an actor."
+        },
         "type": {
-          "type": "string",
           "title": "Asset Type",
-          "enum": [
-            "actor",
-            "agent",
-            "api",
-            "broker",
-            "cache",
-            "component",
-            "container",
-            "data",
-            "dataStore",
-            "device",
-            "endpoint",
-            "function",
-            "gateway",
-            "infrastructure",
-            "interface",
-            "model",
-            "module",
-            "network",
-            "other",
-            "process",
-            "queue",
-            "resource",
-            "service",
-            "stream",
-            "subsystem",
-            "system"
-          ],
-          "meta:enum": {
-            "actor": "User, system, or external entity",
-            "agent": "Autonomous AI or software agent",
-            "api": "API endpoint or interface",
-            "broker": "Message broker or event bus infrastructure",
-            "cache": "Caching layer or in-memory data store",
-            "component": "Software component or application",
-            "container": "Container or orchestration unit",
-            "data": "Dataset",
-            "dataStore": "Database, file system, or data repository",
-            "device": "Physical or IoT device",
-            "endpoint": "Service endpoint or URL",
-            "function": "Serverless function or lambda",
-            "gateway": "API gateway, load balancer, or proxy",
-            "infrastructure": "Infrastructure component",
-            "interface": "System interface or contract",
-            "model": "AI or machine learning model",
-            "module": "Software module or package",
-            "network": "Network segment or resource",
-            "other": "Asset type not covered by predefined values",
-            "process": "Business or system process",
-            "queue": "Message queue or task queue",
-            "resource": "Generic resource or artifact",
-            "service": "Service or microservice",
-            "stream": "Data stream or event stream",
-            "subsystem": "Part of a larger system",
-            "system": "Complete system or application"
-          }
+          "description": "The kind of asset. Use the custom option for kinds not covered by the enumeration.",
+          "oneOf": [
+            {
+              "type": "string",
+              "title": "Predefined Asset Type",
+              "enum": [
+                "actor",
+                "agent",
+                "api",
+                "broker",
+                "cache",
+                "component",
+                "container",
+                "data",
+                "data-store",
+                "device",
+                "endpoint",
+                "function",
+                "gateway",
+                "infrastructure",
+                "interface",
+                "model",
+                "module",
+                "network",
+                "process",
+                "queue",
+                "resource",
+                "service",
+                "stream",
+                "subsystem",
+                "system",
+                "tool"
+              ],
+              "meta:enum": {
+                "actor": "An actor that is an asset in its own right, referencing a party via partyRef. A party such as a system or organization is commonly an asset, and a person may be an asset in the intelligence sense of a human source.",
+                "agent": "Autonomous AI or software agent.",
+                "api": "API endpoint or interface.",
+                "broker": "Message broker or event bus infrastructure.",
+                "cache": "Caching layer or in-memory data store.",
+                "component": "Software component or application.",
+                "container": "Container or orchestration unit.",
+                "data": "Dataset.",
+                "data-store": "Database, file system, or data repository.",
+                "device": "Physical or IoT device.",
+                "endpoint": "Service endpoint or URL.",
+                "function": "Serverless function or lambda.",
+                "gateway": "API gateway, load balancer, or proxy.",
+                "infrastructure": "Infrastructure component.",
+                "interface": "System interface or contract.",
+                "model": "AI or machine learning model.",
+                "module": "Software module or package.",
+                "network": "Network segment or resource.",
+                "process": "Business or system process.",
+                "queue": "Message queue or task queue.",
+                "resource": "Generic resource or artifact.",
+                "service": "Service or microservice.",
+                "stream": "Data stream or event stream.",
+                "subsystem": "Part of a larger system.",
+                "system": "Complete system or application.",
+                "tool": "A tool or capability invoked by an agent, such as a function, API, or service exposed to an AI agent."
+              }
+            },
+            {
+              "type": "object",
+              "title": "Custom Asset Type",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom asset type."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom asset type."
+                }
+              }
+            }
+          ]
         },
         "name": {
           "type": "string",
           "title": "Name",
           "minLength": 1,
-          "description": "Name of the asset"
+          "description": "Name of the asset."
         },
         "description": {
           "type": "string",
           "title": "Description",
-          "description": "Description of the asset's role and purpose"
+          "description": "Description of the asset's role and purpose."
         },
         "zone": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
@@ -616,7 +620,7 @@
             "type": "string",
             "minLength": 1
           },
-          "description": "Responsibilities or functions of this asset"
+          "description": "Responsibilities or functions of this asset."
         },
         "interfaces": {
           "type": "array",
@@ -625,7 +629,7 @@
           "items": {
             "$ref": "#/$defs/interface"
           },
-          "description": "Interfaces exposed by this asset"
+          "description": "Interfaces exposed by this asset."
         },
         "dependencies": {
           "type": "array",
@@ -652,7 +656,7 @@
           "items": {
             "$ref": "#/$defs/authenticationType"
           },
-          "description": "Authentication methods supported/required"
+          "description": "Authentication methods supported/required."
         },
         "authorization": {
           "type": "array",
@@ -661,7 +665,7 @@
           "items": {
             "$ref": "#/$defs/authorizationType"
           },
-          "description": "Authorization models supported/required"
+          "description": "Authorization models supported/required."
         },
         "ownership": {
           "$ref": "#/$defs/ownership"
@@ -688,6 +692,14 @@
           "required": [
             "bom-ref",
             "serviceRef"
+          ]
+        },
+        {
+          "title": "Party Reference Asset",
+          "description": "An asset defined by reference to a party declared elsewhere in the BOM, such as a person, persona, system, or organization that is itself an asset.",
+          "required": [
+            "bom-ref",
+            "partyRef"
           ]
         },
         {
@@ -719,84 +731,113 @@
           "type": "string",
           "title": "Name",
           "minLength": 1,
-          "description": "Name of the data store"
+          "description": "Name of the data store."
         },
         "description": {
           "type": "string",
           "title": "Description",
-          "description": "Purpose and contents of the store"
+          "description": "Purpose and contents of the store."
         },
         "type": {
-          "type": "string",
           "title": "Type",
-          "enum": [
-            "blob",
-            "blockchain",
-            "cache",
-            "columnFamily",
-            "custom",
-            "dataLake",
-            "dataWarehouse",
-            "document",
-            "eventLog",
-            "file",
-            "graph",
-            "inMemory",
-            "keyValue",
-            "messageQueue",
-            "object",
-            "other",
-            "registry",
-            "search",
-            "spatial",
-            "sql",
-            "timeSeries",
-            "vector"
-          ],
-          "meta:enum": {
-            "blob": "Binary/blob storage",
-            "blockchain": "Distributed ledger or blockchain storage",
-            "cache": "Caching tier",
-            "columnFamily": "Wide-column or column-family store (e.g., Cassandra, HBase)",
-            "custom": "Custom or mixed storage technology",
-            "dataLake": "Data lake or lakehouse for raw and semi-structured data",
-            "dataWarehouse": "Analytical data warehouse optimised for OLAP workloads",
-            "document": "Document database (e.g., MongoDB)",
-            "eventLog": "Event log or append-only streaming store (e.g., Kafka)",
-            "file": "File system or NAS",
-            "graph": "Graph database",
-            "inMemory": "In-memory data store used as a primary store",
-            "keyValue": "Key-value store",
-            "messageQueue": "Message queue or broker with persistent storage",
-            "object": "Object storage",
-            "other": "Other storage technology not listed",
-            "registry": "Configuration or service registry (e.g., etcd, Consul)",
-            "search": "Search index or full-text search engine (e.g., Elasticsearch)",
-            "spatial": "Spatial or geospatial database",
-            "sql": "Relational database",
-            "timeSeries": "Time-series database",
-            "vector": "Vector database for embeddings and similarity search"
-          }
+          "description": "The type of data store. Use the custom option for technologies not covered by the enumeration.",
+          "oneOf": [
+            {
+              "type": "string",
+              "title": "Predefined Data Store Type",
+              "enum": [
+                "block",
+                "blockchain",
+                "cache",
+                "column-family",
+                "data-lake",
+                "data-warehouse",
+                "document",
+                "event-log",
+                "file",
+                "graph",
+                "hierarchical",
+                "in-memory",
+                "key-value",
+                "ledger",
+                "message-queue",
+                "multi-model",
+                "object",
+                "registry",
+                "relational",
+                "search",
+                "spatial",
+                "time-series",
+                "vector"
+              ],
+              "meta:enum": {
+                "block": "Block storage exposing raw volumes.",
+                "blockchain": "Distributed ledger or blockchain storage.",
+                "cache": "Caching tier.",
+                "column-family": "Wide-column or column-family store.",
+                "data-lake": "Data lake or lakehouse for raw and semi-structured data.",
+                "data-warehouse": "Analytical data warehouse optimised for OLAP workloads.",
+                "document": "Document database.",
+                "event-log": "Event log or append-only streaming store.",
+                "file": "File system or network-attached storage.",
+                "graph": "Graph database.",
+                "hierarchical": "Hierarchical or tree-structured database, such as a directory store.",
+                "in-memory": "In-memory data store used as a primary store.",
+                "key-value": "Key-value store.",
+                "ledger": "Immutable, append-only ledger database.",
+                "message-queue": "Message queue or broker with persistent storage.",
+                "multi-model": "A store supporting multiple data models.",
+                "object": "Object storage.",
+                "registry": "Configuration or service registry.",
+                "relational": "Relational database.",
+                "search": "Search index or full-text search engine.",
+                "spatial": "Spatial or geospatial database.",
+                "time-series": "Time-series database.",
+                "vector": "Vector database for embeddings and similarity search."
+              }
+            },
+            {
+              "type": "object",
+              "title": "Custom Data Store Type",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom data store type."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom data store type."
+                }
+              }
+            }
+          ]
         },
         "vendor": {
           "type": "string",
           "title": "Vendor",
-          "description": "The vendor or publisher of the data store product"
+          "description": "The vendor or publisher of the data store product."
         },
         "product": {
           "type": "string",
           "title": "Product",
-          "description": "The name of the data store product"
+          "description": "The name of the data store product."
         },
         "version": {
           "type": "string",
           "title": "Version",
-          "description": "The version of the data store product"
+          "description": "The version of the data store product."
         },
         "environment": {
           "type": "string",
           "title": "Environment",
-          "description": "Deployment environment (prod, test, etc.)"
+          "description": "Deployment environment (prod, test, etc.)."
         },
         "zone": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
@@ -805,7 +846,7 @@
         "location": {
           "type": "string",
           "title": "Location",
-          "description": "Physical or logical hosting location"
+          "description": "Physical or logical hosting location."
         },
         "technologies": {
           "type": "array",
@@ -814,7 +855,7 @@
           "items": {
             "type": "string"
           },
-          "description": "Supporting technologies or services"
+          "description": "Supporting technologies or services."
         },
         "dataSets": {
           "type": "array",
@@ -832,7 +873,7 @@
           "items": {
             "$ref": "#/$defs/authorizationType"
           },
-          "description": "Authorization models supported/required"
+          "description": "Authorization models supported/required."
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
@@ -857,13 +898,13 @@
           "type": "string",
           "title": "Name",
           "minLength": 1,
-          "description": "Name of the dataset"
+          "description": "Name of the dataset."
         },
         "description": {
           "type": "string",
           "title": "Description",
           "minLength": 1,
-          "description": "What information is contained and why it exists"
+          "description": "What information is contained and why it exists."
         },
         "dataProfiles": {
           "type": "array",
@@ -904,7 +945,7 @@
           "items": {
             "$ref": "#/$defs/authorizationType"
           },
-          "description": "Authorization models supported/required"
+          "description": "Authorization models supported/required."
         },
         "placements": {
           "type": "array",
@@ -926,21 +967,21 @@
               "encrypted": {
                 "type": "boolean",
                 "title": "Encrypted",
-                "description": "Whether the dataset is encrypted at this location"
+                "description": "Whether the dataset is encrypted at this location."
               },
               "retention": {
                 "type": "string",
                 "title": "Retention",
-                "description": "Retention policy for this placement"
+                "description": "Retention policy for this placement."
               },
               "replicated": {
                 "type": "boolean",
                 "title": "Replicated",
-                "description": "Indicates if this placement is a replica"
+                "description": "Indicates if this placement is a replica."
               }
             }
           },
-          "description": "Where the dataset resides"
+          "description": "Where the dataset resides."
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
@@ -957,41 +998,68 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "Name of the interface"
+          "description": "Name of the interface."
         },
         "type": {
-          "type": "string",
-          "enum": [
-            "rest",
-            "graphql",
-            "grpc",
-            "soap",
-            "messaging",
-            "file",
-            "database",
-            "cli",
-            "gui",
-            "api",
-            "event",
-            "stream"
-          ],
-          "description": "Type of interface"
+          "title": "Type",
+          "description": "The type of interface. Use the custom option for types not covered by the enumeration.",
+          "oneOf": [
+            {
+              "type": "string",
+              "title": "Predefined Interface Type",
+              "enum": [
+                "rest",
+                "graphql",
+                "grpc",
+                "soap",
+                "messaging",
+                "file",
+                "database",
+                "cli",
+                "gui",
+                "api",
+                "event",
+                "stream"
+              ]
+            },
+            {
+              "type": "object",
+              "title": "Custom Interface Type",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom interface type."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom interface type."
+                }
+              }
+            }
+          ]
         },
         "description": {
           "type": "string",
-          "description": "Description of the interface"
+          "description": "Description of the interface."
         },
         "specification": {
           "type": "string",
-          "description": "Link or reference to interface specification"
+          "description": "Link or reference to interface specification."
         },
         "protocol": {
           "type": "string",
-          "description": "Communication protocol used"
+          "description": "Communication protocol used."
         },
         "dataFormat": {
           "type": "string",
-          "description": "Data format (e.g., JSON, XML, Protocol Buffers)"
+          "description": "Data format (e.g., JSON, XML, Protocol Buffers)."
         },
         "authentication": {
           "type": "array",
@@ -1004,14 +1072,14 @@
           "items": {
             "type": "string"
           },
-          "description": "Operations or methods exposed"
+          "description": "Operations or methods exposed."
         }
       }
     },
     "zone": {
       "type": "object",
       "title": "Zone",
-      "description": "A logical, physical, or trust zone that groups assets sharing common characteristics, security posture, or administrative control within the modelled system.",
+      "description": "A grouping of assets that share a common characteristic, security posture, or administrative control, so they can be reasoned about as a unit. A zone may be logical, physical, network, trust, or another kind, may nest within a parent zone, and is connected to or separated from other zones by boundaries.",
       "required": [
         "bom-ref",
         "name",
@@ -1026,36 +1094,73 @@
           "type": "string",
           "title": "Name",
           "minLength": 1,
-          "description": "Name of the zone"
+          "description": "Name of the zone."
         },
         "description": {
           "type": "string",
           "title": "Description",
-          "description": "Description of the zone's characteristics"
+          "description": "Description of the zone's characteristics."
         },
         "type": {
-          "type": "string",
           "title": "Type",
-          "enum": [
-            "deployment",
-            "functional",
-            "logical",
-            "network",
-            "organizational",
-            "other",
-            "physical",
-            "trust"
-          ],
-          "meta:enum": {
-            "deployment": "Deployment environment (e.g., dev, staging, prod)",
-            "functional": "Functional grouping",
-            "logical": "Logical grouping or boundary",
-            "network": "Network segmentation zone",
-            "organizational": "Organizational or administrative boundary",
-            "other": "Other zone type not listed",
-            "physical": "Physical location or boundary",
-            "trust": "Security trust zone"
-          }
+          "description": "The type of zone. Use the custom option for types not covered by the enumeration.",
+          "oneOf": [
+            {
+              "type": "string",
+              "title": "Predefined Zone Type",
+              "enum": [
+                "availability",
+                "compliance",
+                "data",
+                "deployment",
+                "functional",
+                "geographic",
+                "logical",
+                "network",
+                "organizational",
+                "physical",
+                "process",
+                "tenant",
+                "trust"
+              ],
+              "meta:enum": {
+                "availability": "An availability or fault-isolation zone, such as a cloud availability zone, used to bound the blast radius of failures and reason about redundancy and resilience.",
+                "compliance": "A compliance scope zone whose assets fall under a specific regulatory regime, such as PCI DSS, HIPAA, or FedRAMP, delineating what is in scope and the controls applied.",
+                "data": "A data classification zone grouping assets by the sensitivity of the data they hold or process, such as public, internal, confidential, or restricted.",
+                "deployment": "A deployment environment grouping assets by lifecycle stage, such as development, staging, or production.",
+                "functional": "A functional grouping of assets that serve a common purpose or capability, independent of where or how they are deployed.",
+                "geographic": "A geographic or data-residency zone bounding assets to a region, country, or jurisdiction, used to reason about sovereignty and cross-border data flows.",
+                "logical": "A logical grouping of assets defined by architecture or design rather than physical placement.",
+                "network": "A network segmentation zone, such as a subnet, VLAN, or security group, within which assets share network-level reachability and controls.",
+                "organizational": "An organizational or administrative zone grouping assets under a common owner, team, or authority.",
+                "physical": "A physical zone bounding assets to a tangible location, such as a data centre, building, or device enclosure.",
+                "process": "A process or execution isolation zone, such as a sandbox, container runtime, or trusted execution environment, within which code runs with a defined level of isolation.",
+                "tenant": "A tenancy isolation zone separating the assets and data of one tenant from another in a multi-tenant system.",
+                "trust": "A security trust zone whose assets share a common level of trust, so that movement between trust zones is where authentication, authorization, and validation are enforced."
+              }
+            },
+            {
+              "type": "object",
+              "title": "Custom Zone Type",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom zone type."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom zone type."
+                }
+              }
+            }
+          ]
         },
         "parent": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
@@ -1068,7 +1173,7 @@
           "items": {
             "type": "string"
           },
-          "description": "Key characteristics of this zone"
+          "description": "Key characteristics of this zone."
         },
         "constraints": {
           "type": "array",
@@ -1077,7 +1182,7 @@
           "items": {
             "type": "string"
           },
-          "description": "Constraints or limitations of this zone"
+          "description": "Constraints or limitations of this zone."
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
@@ -1087,7 +1192,7 @@
     "boundary": {
       "type": "object",
       "title": "Boundary",
-      "description": "Defines a boundary that separates or connects two or more zones, representing a point where security controls, policies, or trust levels change.",
+      "description": "An edge that separates or connects two or more zones, marking a point where security controls, policies, or trust levels change. The controls expected when data or actors cross it are captured in crossingRequirements, and the threat model's trust boundary extends a boundary with trust semantics.",
       "required": [
         "bom-ref",
         "zones"
@@ -1101,31 +1206,56 @@
           "type": "string",
           "title": "Name",
           "minLength": 1,
-          "description": "Name of the boundary"
+          "description": "Name of the boundary."
         },
         "type": {
-          "type": "string",
           "title": "Type",
-          "enum": [
-            "data",
-            "functional",
-            "network",
-            "organizational",
-            "other",
-            "physical",
-            "process",
-            "trust"
-          ],
-          "meta:enum": {
-            "data": "Data classification boundary",
-            "functional": "Functional boundary",
-            "network": "Network boundary or firewall",
-            "organizational": "Organizational boundary",
-            "other": "A boundary type not covered by the predefined enumeration",
-            "physical": "Physical security boundary",
-            "process": "Process or execution boundary",
-            "trust": "Trust boundary between different security zones"
-          }
+          "description": "The type of boundary. Use the custom option for types not covered by the enumeration.",
+          "oneOf": [
+            {
+              "type": "string",
+              "title": "Predefined Boundary Type",
+              "enum": [
+                "data",
+                "functional",
+                "network",
+                "organizational",
+                "physical",
+                "process",
+                "trust"
+              ],
+              "meta:enum": {
+                "data": "A data classification boundary, crossed when data moves between zones of differing sensitivity, where reclassification, masking, or validation may apply.",
+                "functional": "A functional boundary between areas of differing responsibility or capability.",
+                "network": "A network boundary, such as a firewall, gateway, or security group, controlling reachability between network zones.",
+                "organizational": "An organizational or administrative boundary between assets under different ownership or authority.",
+                "physical": "A physical security boundary, such as a facility perimeter or device enclosure, between physical zones.",
+                "process": "A process or execution boundary between isolation contexts, such as between a sandbox and its host.",
+                "trust": "A trust boundary between zones of differing trust, the primary point at which authentication, authorization, and input validation are enforced and a key trigger for threat analysis."
+              }
+            },
+            {
+              "type": "object",
+              "title": "Custom Boundary Type",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom boundary type."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom boundary type."
+                }
+              }
+            }
+          ]
         },
         "zones": {
           "type": "array",
@@ -1158,7 +1288,7 @@
           "items": {
             "$ref": "#/$defs/authenticationType"
           },
-          "description": "Authentication required to cross this boundary"
+          "description": "Authentication required to cross this boundary."
         },
         "authorization": {
           "type": "array",
@@ -1167,32 +1297,32 @@
           "items": {
             "$ref": "#/$defs/authorizationType"
           },
-          "description": "Authorization models enforced at this boundary"
+          "description": "Authorization models enforced at this boundary."
         },
         "dataValidation": {
           "type": "boolean",
           "title": "Data Validation",
-          "description": "Whether data is validated when crossing this boundary"
+          "description": "Whether data is validated when crossing this boundary."
         },
         "dataTransformation": {
           "type": "boolean",
           "title": "Data Transformation",
-          "description": "Whether data is transformed when crossing this boundary"
+          "description": "Whether data is transformed when crossing this boundary."
         },
         "logging": {
           "type": "boolean",
           "title": "Logging",
-          "description": "Whether crossings are logged"
+          "description": "Whether crossings are logged."
         },
         "monitoring": {
           "type": "boolean",
           "title": "Monitoring",
-          "description": "Whether crossings are monitored"
+          "description": "Whether crossings are monitored."
         },
         "rateLimit": {
           "type": "string",
           "title": "Rate Limit",
-          "description": "Rate limiting policy"
+          "description": "Rate limiting policy."
         },
         "protocols": {
           "type": "array",
@@ -1201,7 +1331,7 @@
           "items": {
             "type": "string"
           },
-          "description": "Allowed protocols for crossing"
+          "description": "Allowed protocols for crossing."
         }
       }
     },
@@ -1225,40 +1355,65 @@
           "type": "string",
           "title": "Name",
           "minLength": 1,
-          "description": "Name or description of the flow"
+          "description": "Name or description of the flow."
         },
         "description": {
           "type": "string",
           "title": "Description",
-          "description": "Detailed description of what flows and why"
+          "description": "Detailed description of what flows and why."
         },
         "type": {
-          "type": "string",
           "title": "Type",
-          "enum": [
-            "control",
-            "data",
-            "dependency",
-            "event",
-            "interaction",
-            "message",
-            "other",
-            "physical",
-            "process",
-            "signal"
-          ],
-          "meta:enum": {
-            "control": "Control or command flow",
-            "data": "Data or information flow",
-            "dependency": "Dependency relationship",
-            "event": "Event or notification flow",
-            "interaction": "User or system interaction",
-            "message": "Message or communication flow",
-            "other": "A flow type not covered by the predefined enumeration",
-            "physical": "Physical movement of goods or materials",
-            "process": "Business process flow",
-            "signal": "Hardware or system signal"
-          }
+          "description": "The type of flow. Use the custom option for types not covered by the enumeration.",
+          "oneOf": [
+            {
+              "type": "string",
+              "title": "Predefined Flow Type",
+              "enum": [
+                "control",
+                "data",
+                "energy",
+                "event",
+                "financial",
+                "message",
+                "physical",
+                "process",
+                "signal"
+              ],
+              "meta:enum": {
+                "control": "Control or command flow.",
+                "data": "Data or information flow.",
+                "energy": "Power or energy flow.",
+                "event": "Event or notification flow.",
+                "financial": "Financial, value, or payment flow.",
+                "message": "Message or communication flow.",
+                "physical": "Physical movement of goods or materials.",
+                "process": "Business process flow.",
+                "signal": "Hardware or system signal."
+              }
+            },
+            {
+              "type": "object",
+              "title": "Custom Flow Type",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom flow type."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom flow type."
+                }
+              }
+            }
+          ]
         },
         "source": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
@@ -1272,22 +1427,22 @@
           "type": "boolean",
           "title": "Bidirectional",
           "default": false,
-          "description": "Whether flow occurs in both directions"
+          "description": "Whether flow occurs in both directions."
         },
         "synchronous": {
           "type": "boolean",
           "title": "Synchronous",
-          "description": "Whether the flow is synchronous or asynchronous"
+          "description": "Whether the flow is synchronous or asynchronous."
         },
         "volume": {
           "type": "string",
           "title": "Volume",
-          "description": "Expected volume or frequency of flow"
+          "description": "Expected volume or frequency of flow."
         },
         "timing": {
           "type": "string",
           "title": "Timing",
-          "description": "Timing characteristics (real-time, batch, scheduled)"
+          "description": "Timing characteristics (real-time, batch, scheduled)."
         },
         "protocols": {
           "type": "array",
@@ -1296,7 +1451,7 @@
           "items": {
             "type": "string"
           },
-          "description": "Communication protocols used by this flow"
+          "description": "Communication protocols used by this flow."
         },
         "dataProfiles": {
           "type": "array",
@@ -1323,7 +1478,7 @@
           "items": {
             "$ref": "#/$defs/authenticationType"
           },
-          "description": "Authentication required for this flow"
+          "description": "Authentication required for this flow."
         },
         "authorization": {
           "type": "array",
@@ -1332,13 +1487,13 @@
           "items": {
             "$ref": "#/$defs/authorizationType"
           },
-          "description": "Authorization models enforced on this flow"
+          "description": "Authorization models enforced on this flow."
         },
         "sequence": {
           "type": "integer",
           "title": "Sequence",
           "minimum": 0,
-          "description": "Ordering hint so flows can be assembled into sequence diagrams"
+          "description": "Ordering hint so flows can be assembled into sequence diagrams."
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
@@ -1404,31 +1559,56 @@
           "type": "string",
           "title": "Description",
           "minLength": 1,
-          "description": "A clear statement of the assumption being made, including the believed condition, the reasoning or evidence behind it, and any constraints or scope under which it applies"
+          "description": "A clear statement of the assumption being made, including the believed condition, the reasoning or evidence behind it, and any constraints or scope under which it applies."
         },
         "topic": {
-          "type": "string",
           "title": "Topic",
-          "enum": [
-            "availability",
-            "business",
-            "compliance",
-            "operational",
-            "other",
-            "performance",
-            "security",
-            "technical"
-          ],
-          "meta:enum": {
-            "availability": "Assumption about system uptime, redundancy, or failover capabilities",
-            "business": "Assumption about business requirements, constraints, or organizational context",
-            "compliance": "Assumption about regulatory, legal, or policy compliance obligations",
-            "operational": "Assumption about operational procedures, staffing, or maintenance practices",
-            "other": "An assumption topic not covered by the predefined enumeration",
-            "performance": "Assumption about throughput, latency, capacity, or scalability characteristics",
-            "security": "Assumption about threat landscape, trust boundaries, or security controls",
-            "technical": "Assumption about technology choices, capabilities, or technical constraints"
-          }
+          "description": "The topic of the assumption. Use the custom option for topics not covered by the enumeration.",
+          "oneOf": [
+            {
+              "type": "string",
+              "title": "Predefined Assumption Topic",
+              "enum": [
+                "availability",
+                "business",
+                "compliance",
+                "operational",
+                "performance",
+                "security",
+                "technical"
+              ],
+              "meta:enum": {
+                "availability": "Assumption about system uptime, redundancy, or failover capabilities.",
+                "business": "Assumption about business requirements, constraints, or organizational context.",
+                "compliance": "Assumption about regulatory, legal, or policy compliance obligations.",
+                "operational": "Assumption about operational procedures, staffing, or maintenance practices.",
+                "performance": "Assumption about throughput, latency, capacity, or scalability characteristics.",
+                "security": "Assumption about threat landscape, trust boundaries, or security controls.",
+                "technical": "Assumption about technology choices, capabilities, or technical constraints."
+              }
+            },
+            {
+              "type": "object",
+              "title": "Custom Assumption Topic",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom assumption topic."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom assumption topic."
+                }
+              }
+            }
+          ]
         },
         "relatedAssets": {
           "type": "array",
@@ -1449,18 +1629,18 @@
             "verified"
           ],
           "meta:enum": {
-            "invalid": "The assumption has been disproven or is no longer applicable",
-            "unknown": "The validity of the assumption has not yet been assessed",
-            "unverified": "The assumption has been identified but not yet validated",
-            "verified": "The assumption has been confirmed as true through validation"
+            "invalid": "The assumption has been disproven or is no longer applicable.",
+            "unknown": "The validity of the assumption has not yet been assessed.",
+            "unverified": "The assumption has been identified but not yet validated.",
+            "verified": "The assumption has been confirmed as true through validation."
           },
           "default": "unknown",
-          "description": "The current validation state of the assumption, tracked over time to ensure that modelling decisions built on this assumption remain sound"
+          "description": "The current validation state of the assumption, tracked over time to ensure that modelling decisions built on this assumption remain sound."
         },
         "impact": {
           "type": "string",
           "title": "Impact",
-          "description": "A narrative describing the consequences to the model, its assets, or the broader system if this assumption proves false, including the severity and scope of affected components"
+          "description": "A narrative describing the consequences to the model, its assets, or the broader system if this assumption proves false, including the severity and scope of affected components."
         },
         "owner": {
           "$ref": "cyclonedx-party-2.0.schema.json#/$defs/partyChoice",
@@ -1469,20 +1649,20 @@
         "validationMethod": {
           "type": "string",
           "title": "Validation Method",
-          "description": "The approach, test, or evidence that can be used to confirm or disprove this assumption, such as a review, audit, penetration test, or empirical measurement"
+          "description": "The approach, test, or evidence that can be used to confirm or disprove this assumption, such as a review, audit, penetration test, or empirical measurement."
         },
         "validationDate": {
           "type": "string",
           "title": "Validation Date",
           "format": "date-time",
-          "description": "The date and time when the assumption was last validated or reviewed, used to track staleness and trigger re-evaluation"
+          "description": "The date and time when the assumption was last validated or reviewed, used to track staleness and trigger re-evaluation."
         }
       }
     },
     "visualization": {
       "type": "object",
       "title": "Visualization",
-      "description": "A visual representation of the model or a subset of its elements, capturing diagram type, rendering format, and the elements depicted.",
+      "description": "A visual representation of the model or a subset of its elements, capturing the diagram type, its content, and the elements depicted.",
       "required": [
         "name",
         "type"
@@ -1496,29 +1676,24 @@
           "type": "string",
           "title": "Name",
           "minLength": 1,
-          "description": "Name or title of the visualization"
+          "description": "Name or title of the visualization."
         },
         "description": {
           "type": "string",
           "title": "Description",
-          "description": "Description of what the visualization shows"
+          "description": "Description of what the visualization shows."
         },
         "type": {
           "$ref": "#/$defs/visualizationType"
         },
-        "format": {
-          "$ref": "#/$defs/visualizationFormat"
-        },
-        "content": {
-          "type": "string",
-          "title": "Content",
-          "description": "The diagram content (source code or base64 encoded image)"
+        "attachment": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/attachment"
         },
         "url": {
           "type": "string",
           "title": "URL",
           "format": "iri-reference",
-          "description": "URL to the diagram if stored externally"
+          "description": "URL to the diagram if stored externally."
         },
         "level": {
           "type": "string",
@@ -1530,12 +1705,12 @@
             "overview"
           ],
           "meta:enum": {
-            "detailed": "Fine-grained view showing implementation-level specifics",
-            "high": "High-level view showing major components and relationships",
-            "medium": "Intermediate view balancing breadth and depth",
-            "overview": "Top-level summary providing a broad perspective of the system"
+            "detailed": "Fine-grained view showing implementation-level specifics.",
+            "high": "High-level view showing major components and relationships.",
+            "medium": "Intermediate view balancing breadth and depth.",
+            "overview": "Top-level summary providing a broad perspective of the system."
           },
-          "description": "Level of detail in the visualization"
+          "description": "Level of detail in the visualization."
         },
         "elements": {
           "type": "array",
@@ -1549,7 +1724,7 @@
         "interactive": {
           "type": "boolean",
           "title": "Interactive",
-          "description": "Whether the visualization is interactive"
+          "description": "Whether the visualization is interactive."
         },
         "layers": {
           "type": "array",
@@ -1558,7 +1733,7 @@
           "items": {
             "type": "string"
           },
-          "description": "Layers or views available in the visualization"
+          "description": "Layers or views available in the visualization."
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
@@ -1584,38 +1759,50 @@
               "enum": [
                 "activity",
                 "architecture",
+                "attack-tree",
+                "block",
                 "class",
                 "code",
-                "collaboration",
+                "communication",
                 "component",
                 "container",
                 "context",
-                "dataFlow",
+                "data-flow",
                 "deployment",
                 "entity",
+                "flowchart",
+                "matrix",
+                "mind-map",
                 "network",
                 "process",
                 "sequence",
                 "state",
-                "useCase"
+                "timing",
+                "use-case"
               ],
               "meta:enum": {
-                "activity": "Activity or workflow diagram",
-                "architecture": "System architecture diagram",
-                "class": "Class or object diagram",
-                "code": "Code structure diagram",
-                "collaboration": "Collaboration diagram",
-                "component": "Component diagram",
-                "container": "Container diagram (C4)",
-                "context": "Context diagram",
-                "dataFlow": "Data flow diagram (DFD)",
-                "deployment": "Deployment or infrastructure diagram",
-                "entity": "Entity relationship diagram",
-                "network": "Network topology diagram",
-                "process": "Business process diagram",
-                "sequence": "Sequence or interaction diagram",
-                "state": "State machine diagram",
-                "useCase": "Use case diagram"
+                "activity": "Activity or workflow diagram.",
+                "architecture": "System architecture diagram.",
+                "attack-tree": "Attack tree diagram showing alternative paths to a goal.",
+                "block": "Block diagram, including SysML block definition and internal block diagrams.",
+                "class": "Class or object diagram.",
+                "code": "Code structure diagram.",
+                "communication": "Communication diagram, formerly known as the collaboration diagram.",
+                "component": "Component diagram.",
+                "container": "Container diagram, as in C4.",
+                "context": "Context diagram.",
+                "data-flow": "Data flow diagram, or DFD.",
+                "deployment": "Deployment or infrastructure diagram.",
+                "entity": "Entity relationship diagram.",
+                "flowchart": "Flowchart depicting steps or decision logic.",
+                "matrix": "Matrix diagram, such as a dependency structure or traceability matrix.",
+                "mind-map": "Mind map diagram for decomposition or brainstorming.",
+                "network": "Network topology diagram.",
+                "process": "Business process diagram.",
+                "sequence": "Sequence or interaction diagram.",
+                "state": "State machine diagram.",
+                "timing": "Timing diagram showing state changes over time.",
+                "use-case": "Use case diagram."
               }
             }
           }
@@ -1632,80 +1819,12 @@
               "type": "string",
               "title": "Name",
               "minLength": 1,
-              "description": "The name of the custom visualization type"
+              "description": "The name of the custom visualization type."
             },
             "description": {
               "type": "string",
               "title": "Description",
-              "description": "A description of the custom visualization type"
-            }
-          }
-        }
-      ]
-    },
-    "visualizationFormat": {
-      "type": "object",
-      "title": "Visualization Format",
-      "description": "The rendering format or toolchain used to produce the visualization.",
-      "oneOf": [
-        {
-          "title": "Predefined Visualization Format",
-          "description": "A visualization format selected from a predefined set of well-known diagram formats and tools.",
-          "required": [
-            "format"
-          ],
-          "additionalProperties": false,
-          "properties": {
-            "format": {
-              "type": "string",
-              "title": "Format",
-              "enum": [
-                "archimate",
-                "cytoscape",
-                "d3",
-                "drawio",
-                "graphviz",
-                "jpeg",
-                "mermaid",
-                "plantuml",
-                "png",
-                "svg",
-                "visio"
-              ],
-              "meta:enum": {
-                "archimate": "ArchiMate model format",
-                "cytoscape": "Cytoscape graph format",
-                "d3": "D3.js visualization",
-                "drawio": "Draw.io/diagrams.net format",
-                "graphviz": "GraphViz DOT language",
-                "jpeg": "JPEG image format",
-                "mermaid": "Mermaid diagram language",
-                "plantuml": "PlantUML diagram language",
-                "png": "Portable Network Graphics",
-                "svg": "Scalable Vector Graphics",
-                "visio": "Microsoft Visio format"
-              }
-            }
-          }
-        },
-        {
-          "title": "Custom Visualization Format",
-          "description": "A custom visualization format not covered by the predefined enumeration.",
-          "required": [
-            "name"
-          ],
-          "additionalProperties": false,
-          "properties": {
-            "name": {
-              "type": "string",
-              "title": "Name",
-              "minLength": 1,
-              "description": "The name of the custom visualization format"
-            },
-            "description": {
-              "type": "string",
-              "title": "Description",
-              "description": "A description of the custom visualization format"
+              "description": "A description of the custom visualization type."
             }
           }
         }
@@ -1721,36 +1840,19 @@
         "classification": {
           "$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataClassification"
         },
-        "tier": {
-          "type": "string",
-          "enum": [
-            "tier0",
-            "tier1",
-            "tier2",
-            "tier3",
-            "tier4"
-          ],
-          "meta:enum": {
-            "tier0": "Mission critical - highest priority",
-            "tier1": "Business critical - high priority",
-            "tier2": "Business important - medium priority",
-            "tier3": "Business supporting - low priority",
-            "tier4": "Non-critical - minimal priority"
-          }
-        },
         "categories": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Business or technical categories"
+          "description": "Business or technical categories."
         },
         "tags": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Tags for classification and search"
+          "description": "Tags for classification and search."
         }
       }
     },
@@ -1772,44 +1874,66 @@
           "title": "Predefined Authentication Type",
           "description": "A predefined authentication method from the enumeration.",
           "enum": [
-            "apiKey",
+            "api-key",
             "basic",
             "bearer",
+            "biometric",
             "certificate",
             "digest",
+            "eap",
             "fido2",
+            "form",
+            "hmac",
             "jwt",
             "kerberos",
             "ldap",
-            "mfa",
-            "mTLS",
+            "magic-link",
+            "mtls",
             "none",
             "ntlm",
             "oauth1",
             "oauth2",
             "oidc",
+            "pin",
+            "psk",
+            "push",
+            "radius",
             "saml",
-            "ssh"
+            "scram",
+            "session",
+            "ssh",
+            "totp"
           ],
           "meta:enum": {
-            "apiKey": "API key authentication.",
-            "basic": "Basic authentication (username and password).",
+            "api-key": "API key authentication.",
+            "basic": "HTTP Basic authentication (RFC 7617), where the browser presents a native credential dialog and the username and password are sent on each request.",
             "bearer": "Bearer token authentication.",
+            "biometric": "Biometric authentication, such as fingerprint or face recognition.",
             "certificate": "Certificate-based authentication.",
             "digest": "Digest authentication.",
+            "eap": "Extensible Authentication Protocol, commonly used with IEEE 802.1X.",
             "fido2": "FIDO2 or WebAuthn passwordless authentication.",
+            "form": "Form-based authentication, where credentials such as a username and password are submitted through an application login form rather than the browser-native HTTP Basic dialog.",
+            "hmac": "HMAC request signing using a shared secret key.",
             "jwt": "JSON Web Token authentication.",
             "kerberos": "Kerberos authentication.",
             "ldap": "LDAP directory authentication.",
-            "mfa": "Multi-factor authentication.",
-            "mTLS": "Mutual TLS authentication.",
+            "magic-link": "Passwordless authentication using a single-use link.",
+            "mtls": "Mutual TLS authentication.",
             "none": "No authentication required.",
             "ntlm": "NTLM authentication.",
             "oauth1": "OAuth 1.0 authentication.",
             "oauth2": "OAuth 2.0 authentication.",
             "oidc": "OpenID Connect authentication.",
+            "pin": "Personal identification number, a short secret used as a knowledge factor, such as a device or application unlock PIN.",
+            "psk": "Pre-shared key authentication.",
+            "push": "Out-of-band push approval, where a prompt is sent to a registered device or application for the user to approve or deny, optionally confirmed by matching a displayed number.",
+            "radius": "RADIUS authentication.",
             "saml": "SAML authentication.",
-            "ssh": "SSH key authentication."
+            "scram": "Salted Challenge Response Authentication Mechanism.",
+            "session": "Session authentication, typically using a server-side session and cookie.",
+            "ssh": "SSH key authentication.",
+            "totp": "Time-based one-time password authentication."
           }
         },
         {
@@ -1847,22 +1971,24 @@
           "enum": [
             "abac",
             "acl",
-            "cbac",
+            "capability",
             "dac",
             "mac",
             "none",
             "pbac",
+            "radac",
             "rbac",
             "rebac"
           ],
           "meta:enum": {
             "abac": "Attribute-Based Access Control.",
             "acl": "Access Control Lists.",
-            "cbac": "Claims-Based Access Control.",
+            "capability": "Capability-Based Access Control.",
             "dac": "Discretionary Access Control.",
             "mac": "Mandatory Access Control.",
             "none": "No authorization controls.",
             "pbac": "Policy-Based Access Control.",
+            "radac": "Risk-Adaptive Access Control.",
             "rbac": "Role-Based Access Control.",
             "rebac": "Relationship-Based Access Control."
           }
