@@ -365,6 +365,15 @@
             "$ref": "#/$defs/dataAttribute"
           }
         },
+        "relationships": {
+          "type": "array",
+          "title": "Relationships",
+          "description": "Relationships from this data object to other data objects, such as the associations between entities in a logical or conceptual data model.",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/dataRelationship"
+          }
+        },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
         }
@@ -379,6 +388,10 @@
       ],
       "additionalProperties": false,
       "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "Unique identifier for this attribute, enabling it to be referenced as a key target."
+        },
         "name": {
           "type": "string",
           "title": "Name",
@@ -410,6 +423,94 @@
           "type": "boolean",
           "title": "Sensitive",
           "description": "Indicates whether the attribute carries sensitive content that warrants extra protection beyond the object-level classification, such as masking in logs or stricter access controls."
+        },
+        "key": {
+          "type": "string",
+          "title": "Key",
+          "enum": [
+            "primary",
+            "foreign",
+            "unique"
+          ],
+          "meta:enum": {
+            "primary": "The attribute is part of the primary key that uniquely identifies the data object.",
+            "foreign": "The attribute is a foreign key referencing another data object.",
+            "unique": "The attribute carries a uniqueness constraint."
+          },
+          "description": "The key role of the attribute within the data object."
+        },
+        "references": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "title": "References",
+          "description": "For a foreign key, a reference using bom-link or bom-ref to the data object or attribute it refers to."
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "dataRelationship": {
+      "type": "object",
+      "title": "Data Relationship",
+      "description": "A relationship from one data object to another, such as an association between entities in a logical or conceptual data model, carrying its cardinality and optionally the attributes that participate.",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "cardinality"
+      ],
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name of the relationship, such as the role or verb that describes it."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the relationship."
+        },
+        "target": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "title": "Target",
+          "description": "Reference using bom-link or bom-ref to the related data object."
+        },
+        "cardinality": {
+          "type": "string",
+          "title": "Cardinality",
+          "enum": [
+            "one-to-one",
+            "one-to-many",
+            "many-to-one",
+            "many-to-many"
+          ],
+          "meta:enum": {
+            "one-to-one": "Each record of the source relates to at most one record of the target, and the reverse.",
+            "one-to-many": "Each record of the source relates to many records of the target.",
+            "many-to-one": "Many records of the source relate to one record of the target.",
+            "many-to-many": "Many records of the source relate to many records of the target."
+          },
+          "description": "The cardinality of the relationship."
+        },
+        "sourceAttributes": {
+          "type": "array",
+          "title": "Source Attributes",
+          "description": "References using bom-link or bom-ref to the attributes on this data object that participate in the relationship, such as the foreign key columns.",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          }
+        },
+        "targetAttributes": {
+          "type": "array",
+          "title": "Target Attributes",
+          "description": "References using bom-link or bom-ref to the attributes on the target data object that the relationship refers to, such as the primary key columns.",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          }
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
