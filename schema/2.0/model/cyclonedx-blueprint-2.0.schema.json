@@ -111,6 +111,15 @@
           },
           "description": "Data, control, or process flows between assets."
         },
+        "relationships": {
+          "type": "array",
+          "title": "Relationships",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/relationship"
+          },
+          "description": "Static, structural relationships between elements of the model, complementing the runtime exchanges captured by flows."
+        },
         "actors": {
           "type": "array",
           "title": "Actors",
@@ -512,10 +521,6 @@
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "description": "Reference using bom-link or bom-ref to the zone containing this asset."
         },
-        "parent": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
-          "description": "Reference using bom-link or bom-ref to the parent asset if this is a sub-component."
-        },
         "classification": {
           "$ref": "#/$defs/assetClassification"
         },
@@ -540,15 +545,6 @@
             "$ref": "#/$defs/interface"
           },
           "description": "Interfaces exposed by this asset."
-        },
-        "dependencies": {
-          "type": "array",
-          "title": "Dependencies",
-          "uniqueItems": true,
-          "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
-          },
-          "description": "References using bom-link or bom-ref to assets this asset depends on."
         },
         "useCases": {
           "type": "array",
@@ -1243,6 +1239,152 @@
           },
           "description": "Allowed protocols for crossing."
         }
+      }
+    },
+    "relationship": {
+      "type": "object",
+      "title": "Relationship",
+      "description": "A typed structural relationship from one element to one or more others, complementing the runtime exchanges captured by flows. The subject is `ref`, and the kind of relationship is expressed as a single typed property whose value lists the targets, mirroring the dependency graph for readability.",
+      "additionalProperties": false,
+      "required": [
+        "ref"
+      ],
+      "oneOf": [
+        {
+          "required": [
+            "aggregates"
+          ]
+        },
+        {
+          "required": [
+            "associates"
+          ]
+        },
+        {
+          "required": [
+            "composes"
+          ]
+        },
+        {
+          "required": [
+            "contains"
+          ]
+        },
+        {
+          "required": [
+            "dependsOn"
+          ]
+        },
+        {
+          "required": [
+            "generalizes"
+          ]
+        },
+        {
+          "required": [
+            "realizes"
+          ]
+        },
+        {
+          "required": [
+            "serves"
+          ]
+        },
+        {
+          "required": [
+            "custom"
+          ]
+        }
+      ],
+      "properties": {
+        "ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "title": "Reference",
+          "description": "Reference using bom-link or bom-ref to the subject element of the relationship."
+        },
+        "aggregates": {
+          "$ref": "#/$defs/relationshipTargets",
+          "title": "Aggregates",
+          "description": "The subject is the whole in a whole-part relationship in which each target part may exist independently of the whole."
+        },
+        "associates": {
+          "$ref": "#/$defs/relationshipTargets",
+          "title": "Associates",
+          "description": "The subject has a general association with each target."
+        },
+        "composes": {
+          "$ref": "#/$defs/relationshipTargets",
+          "title": "Composes",
+          "description": "The subject is the whole in a whole-part relationship in which each target part cannot exist without the whole."
+        },
+        "contains": {
+          "$ref": "#/$defs/relationshipTargets",
+          "title": "Contains",
+          "description": "The subject contains or nests each target."
+        },
+        "dependsOn": {
+          "$ref": "#/$defs/relationshipTargets",
+          "title": "Depends On",
+          "description": "The subject depends on each target."
+        },
+        "generalizes": {
+          "$ref": "#/$defs/relationshipTargets",
+          "title": "Generalizes",
+          "description": "The subject is a generalisation of each target, as in inheritance."
+        },
+        "realizes": {
+          "$ref": "#/$defs/relationshipTargets",
+          "title": "Realizes",
+          "description": "The subject realises or implements each target."
+        },
+        "serves": {
+          "$ref": "#/$defs/relationshipTargets",
+          "title": "Serves",
+          "description": "The subject provides a service to each target."
+        },
+        "custom": {
+          "type": "array",
+          "title": "Custom Relationships",
+          "description": "Relationships whose kind is not covered by the predefined properties. Each entry names the kind and lists its targets.",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "title": "Custom Relationship",
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "targets"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "title": "Type",
+                "minLength": 1,
+                "description": "The name of the custom relationship kind."
+              },
+              "targets": {
+                "$ref": "#/$defs/relationshipTargets",
+                "title": "Targets",
+                "description": "The targets of the custom relationship."
+              },
+              "description": {
+                "type": "string",
+                "title": "Description",
+                "description": "A description of the custom relationship kind."
+              }
+            }
+          }
+        }
+      }
+    },
+    "relationshipTargets": {
+      "type": "array",
+      "title": "Relationship Targets",
+      "description": "References using bom-link or bom-ref to the target elements of a relationship.",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
       }
     },
     "flow": {
