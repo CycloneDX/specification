@@ -20,8 +20,7 @@
       "description": "A versatile, machine-readable model designed to support a wide range of analytical activities, from use case documentation and behavioural analysis to comprehensive system-level threat and risk modelling.",
       "required": [
         "name",
-        "modelTypes",
-        "methodologies"
+        "modelTypes"
       ],
       "additionalProperties": false,
       "properties": {
@@ -50,15 +49,6 @@
           "description": "The types of models being represented.",
           "items": {
             "$ref": "#/$defs/modelType"
-          }
-        },
-        "methodologies": {
-          "type": "array",
-          "title": "Methodologies",
-          "uniqueItems": true,
-          "description": "The modeling methodologies used.",
-          "items": {
-            "$ref": "#/$defs/methodology"
           }
         },
         "scope": {
@@ -243,7 +233,7 @@
         {
           "type": "object",
           "title": "Custom Model Type",
-          "description": "A custom model type not covered by the predefined enumeration, allowing organisations to define methodology-specific or domain-specific model categories.",
+          "description": "A custom model type not covered by the predefined enumeration, allowing organisations to define domain-specific model categories.",
           "additionalProperties": false,
           "required": [
             "name"
@@ -259,86 +249,6 @@
               "type": "string",
               "title": "Description",
               "description": "A description of the custom model type."
-            }
-          }
-        }
-      ]
-    },
-    "methodology": {
-      "title": "Methodology",
-      "description": "The system or architecture modelling notation used to produce the blueprint, either a predefined value from the enumeration or a custom object. The object form may also annotate a predefined methodology with a version or external references. Threat modelling methodologies such as STRIDE and PASTA are recorded in the threat model, not here.",
-      "oneOf": [
-        {
-          "type": "string",
-          "title": "Predefined Methodology",
-          "description": "A predefined methodology from the enumeration.",
-          "enum": [
-            "4+1",
-            "Archimate",
-            "BPMN",
-            "C4",
-            "DFD",
-            "DODAF",
-            "ERD",
-            "IDEF",
-            "MODAF",
-            "NAF",
-            "SABSA",
-            "SysML",
-            "TOGAF",
-            "UML",
-            "Zachman"
-          ],
-          "meta:enum": {
-            "4+1": "4+1 Architectural View Model.",
-            "Archimate": "Enterprise architecture modelling language.",
-            "BPMN": "Business Process Model and Notation.",
-            "C4": "C4 Model for software architecture.",
-            "DFD": "Data Flow Diagrams.",
-            "DODAF": "Department of Defense Architecture Framework.",
-            "ERD": "Entity Relationship Diagrams.",
-            "IDEF": "Integration Definition Methods.",
-            "MODAF": "Ministry of Defence Architecture Framework.",
-            "NAF": "NATO Architecture Framework.",
-            "SABSA": "Sherwood Applied Business Security Architecture.",
-            "SysML": "Systems Modeling Language.",
-            "TOGAF": "The Open Group Architecture Framework.",
-            "UML": "Unified Modeling Language.",
-            "Zachman": "Zachman Framework."
-          }
-        },
-        {
-          "type": "object",
-          "title": "Custom Methodology",
-          "description": "A custom methodology not covered by the predefined enumeration, or a predefined methodology that needs to carry a version or external references.",
-          "additionalProperties": false,
-          "required": [
-            "name"
-          ],
-          "properties": {
-            "name": {
-              "type": "string",
-              "title": "Name",
-              "minLength": 1,
-              "description": "The name of the methodology. May reference a predefined methodology by its enumerated identifier or a custom methodology name."
-            },
-            "version": {
-              "type": "string",
-              "title": "Version",
-              "description": "The version of the methodology."
-            },
-            "description": {
-              "type": "string",
-              "title": "Description",
-              "description": "A description of the methodology."
-            },
-            "externalReferences": {
-              "type": "array",
-              "title": "External References",
-              "uniqueItems": true,
-              "items": {
-                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference"
-              }
             }
           }
         }
