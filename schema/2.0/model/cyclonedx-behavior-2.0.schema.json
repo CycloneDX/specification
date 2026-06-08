@@ -20,13 +20,13 @@
             "$ref": "#/$defs/behaviorInstance"
           }
         },
-        "flows": {
+        "graphs": {
           "type": "array",
-          "title": "Flows",
-          "description": "Behavior flows that organise behaviors into operational patterns.",
+          "title": "Graphs",
+          "description": "Behavior graphs that model behaviour over time as activity flows, state machines, or a mixture of the two.",
           "uniqueItems": true,
           "items": {
-            "$ref": "#/$defs/behaviorFlow"
+            "$ref": "#/$defs/behaviorGraph"
           }
         }
       }
@@ -55,19 +55,19 @@
         "actors": {
           "type": "array",
           "title": "Actors",
-          "description": "References to objects that perform this behavior.",
+          "description": "References using bom-link or bom-ref to objects that perform this behavior.",
           "uniqueItems": true,
           "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           }
         },
         "targets": {
           "type": "array",
           "title": "Targets",
-          "description": "References to objects affected by this behavior.",
+          "description": "References using bom-link or bom-ref to objects affected by this behavior.",
           "uniqueItems": true,
           "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           }
         }
       }
@@ -106,25 +106,22 @@
     "ordering": {
       "type": "string",
       "title": "Ordering",
-      "description": "Execution semantics for steps within a flow.",
-      "default": "sequential",
+      "description": "Execution semantics for the nodes of a graph when transitions do not fully specify the order.",
       "enum": [
         "sequential",
         "unordered",
-        "parallel",
-        "conditional"
+        "parallel"
       ],
       "meta:enum": {
-        "sequential": "Steps execute in ordinal order. Each completes before the next begins.",
-        "unordered": "All steps execute, but order is not guaranteed.",
-        "parallel": "Steps may execute concurrently.",
-        "conditional": "Step execution is determined by runtime conditions."
+        "sequential": "Nodes execute in ordinal order. Each completes before the next begins.",
+        "unordered": "All nodes execute, but the order is not guaranteed.",
+        "parallel": "Nodes may execute concurrently."
       }
     },
     "acknowledgment": {
       "type": "array",
       "title": "Acknowledgment",
-      "description": "Indicates how the behavior or flow was identified. Multiple values indicate the behavior was both declared and observed.",
+      "description": "Indicates how the behavior or graph was identified. Multiple values indicate the behavior was both declared and observed.",
       "uniqueItems": true,
       "items": {
         "type": "string",
@@ -138,15 +135,48 @@
         }
       }
     },
-    "behaviorFlow": {
+    "behaviorGraph": {
       "type": "object",
-      "title": "Behavior Flow",
-      "description": "An organised collection of behaviors forming a coherent process.",
+      "title": "Behavior Graph",
+      "description": "A graph of nodes joined by transitions that models behaviour over time. A node may be an activity, a state, an event, a gateway, or a start or end point, so the same construct expresses an activity or process flow (where the nodes are activities), a state machine (where the nodes are states), or a mixture of the two.",
       "additionalProperties": false,
-      "required": ["bom-ref", "steps"],
+      "required": [
+        "bom-ref",
+        "nodes"
+      ],
       "properties": {
         "bom-ref": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name of the graph."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the graph and the behaviour it models."
+        },
+        "kind": {
+          "type": "string",
+          "title": "Kind",
+          "description": "An optional hint at the intent of the graph.",
+          "enum": [
+            "activity",
+            "state-machine",
+            "mixed"
+          ],
+          "meta:enum": {
+            "activity": "The graph models a process or activity flow whose nodes are activities.",
+            "state-machine": "The graph models a state machine whose nodes are states.",
+            "mixed": "The graph mixes activity and state nodes."
+          }
+        },
+        "subject": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "title": "Subject",
+          "description": "Reference using bom-link or bom-ref to the object whose behaviour this graph describes."
         },
         "acknowledgment": {
           "$ref": "#/$defs/acknowledgment"
@@ -157,29 +187,45 @@
         "trigger": {
           "$ref": "#/$defs/trigger"
         },
-        "steps": {
+        "nodes": {
           "type": "array",
-          "title": "Steps",
-          "description": "The steps that comprise this flow.",
+          "title": "Nodes",
+          "description": "The nodes of the graph.",
           "minItems": 1,
+          "uniqueItems": true,
           "items": {
-            "$ref": "#/$defs/flowStep"
+            "$ref": "#/$defs/behaviorNode"
+          }
+        },
+        "transitions": {
+          "type": "array",
+          "title": "Transitions",
+          "description": "The transitions between nodes. Transitions express the ordering of an activity flow and the triggered, guarded moves of a state machine.",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/transition"
           }
         }
       },
       "allOf": [
         {
           "if": {
-            "anyOf": [
-              { "properties": { "ordering": { "const": "sequential" } }, "required": ["ordering"] },
-              { "not": { "required": ["ordering"] } }
+            "properties": {
+              "ordering": {
+                "const": "sequential"
+              }
+            },
+            "required": [
+              "ordering"
             ]
           },
           "then": {
             "properties": {
-              "steps": {
+              "nodes": {
                 "items": {
-                  "required": ["ordinal"]
+                  "required": [
+                    "ordinal"
+                  ]
                 }
               }
             }
@@ -187,60 +233,213 @@
         }
       ]
     },
-    "flowStep": {
+    "behaviorNode": {
       "type": "object",
-      "title": "Flow Step",
-      "description": "A single step within a behavior flow.",
+      "title": "Behavior Node",
+      "description": "A single node in a behavior graph. The kind determines what the node represents and which additional properties apply.",
       "additionalProperties": false,
+      "required": [
+        "bom-ref",
+        "kind"
+      ],
       "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "kind": {
+          "type": "string",
+          "title": "Kind",
+          "description": "The kind of node.",
+          "enum": [
+            "activity",
+            "state",
+            "event",
+            "gateway",
+            "initial",
+            "final"
+          ],
+          "meta:enum": {
+            "activity": "An action that is performed, identified by a behavior, a behavior-instance reference, or a nested graph. The activity-flow counterpart of a step.",
+            "state": "A durable condition the subject rests in until a transition fires. The state-machine counterpart of a node. A composite state references its nested region through 'graph'.",
+            "event": "An intermediate event that occurs during the graph.",
+            "gateway": "A branch or merge point whose outgoing transitions carry the guards.",
+            "initial": "The starting point of the graph or of a composite node.",
+            "final": "A completion point of the graph or of a composite node."
+          }
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name of the node."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the node."
+        },
         "ordinal": {
           "type": "integer",
           "title": "Ordinal",
-          "description": "Position within the flow. Required when ordering is 'sequential' or omitted.",
-          "minimum": 1
+          "minimum": 1,
+          "description": "Position within a sequential graph. Required when the graph ordering is 'sequential'. Ignored when transitions define the order."
         },
         "behavior": {
           "$ref": "../behavior-taxonomy.schema.json",
           "title": "Behavior",
-          "description": "The behavior performed in this step. Mutually exclusive with 'ref' and 'flow'."
-        },
-        "trigger": {
-          "$ref": "#/$defs/trigger"
+          "description": "For an activity node, the behavior performed, drawn from the taxonomy. Mutually exclusive with 'ref' and 'graph'."
         },
         "ref": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
           "title": "Behavior Reference",
-          "description": "Reference to a behavior instance. Mutually exclusive with 'behavior' and 'flow'."
+          "description": "For an activity node, a reference to a behavior instance. Mutually exclusive with 'behavior' and 'graph'."
         },
-        "flow": {
+        "graph": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "Flow Reference",
-          "description": "Reference to a nested flow. Mutually exclusive with 'behavior' and 'ref'."
+          "title": "Graph Reference",
+          "description": "A reference to a nested behavior graph. For an activity node it is the sub-process performed and is mutually exclusive with 'behavior' and 'ref'; for a composite node it is the nested region."
         },
         "actors": {
           "type": "array",
           "title": "Actors",
-          "description": "References to objects that perform this step.",
+          "description": "References using bom-link or bom-ref to objects that perform this node.",
           "uniqueItems": true,
           "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           }
         },
         "targets": {
           "type": "array",
           "title": "Targets",
-          "description": "References to objects affected by this step.",
+          "description": "References using bom-link or bom-ref to objects affected by this node.",
           "uniqueItems": true,
           "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           }
+        },
+        "eventType": {
+          "$ref": "#/$defs/trigger",
+          "title": "Event Type",
+          "description": "For an event node, the nature of the event, reusing the trigger vocabulary, such as signal, scheduled, or event-driven."
+        },
+        "gatewayKind": {
+          "type": "string",
+          "title": "Gateway Kind",
+          "description": "For a gateway node, the branching semantics applied across its outgoing transitions.",
+          "enum": [
+            "exclusive",
+            "inclusive",
+            "parallel",
+            "complex"
+          ],
+          "meta:enum": {
+            "exclusive": "Exactly one outgoing transition is taken, the first whose guard holds.",
+            "inclusive": "Every outgoing transition whose guard holds is taken.",
+            "parallel": "All outgoing transitions are taken concurrently, forking and later joining execution.",
+            "complex": "Branch selection follows a complex condition described in the transition guards."
+          }
+        },
+        "onEntry": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "On Entry",
+          "description": "For a state node, a reference to a behavior instance performed when the state is entered."
+        },
+        "onExit": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "On Exit",
+          "description": "For a state node, a reference to a behavior instance performed when the state is exited."
+        },
+        "doActivity": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "Do Activity",
+          "description": "For a state node, a reference to a behavior instance performed while the subject remains in the state."
         }
       },
-      "oneOf": [
-        { "required": ["behavior"] },
-        { "required": ["ref"] },
-        { "required": ["flow"] }
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "activity"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "oneOf": [
+              {
+                "required": [
+                  "behavior"
+                ]
+              },
+              {
+                "required": [
+                  "ref"
+                ]
+              },
+              {
+                "required": [
+                  "graph"
+                ]
+              }
+            ]
+          }
+        }
       ]
+    },
+    "transition": {
+      "type": "object",
+      "title": "Transition",
+      "description": "A directed edge from one node to another. In an activity flow it expresses ordering; in a state machine it expresses a triggered, guarded move between states.",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "target"
+      ],
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name of the transition."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the transition."
+        },
+        "source": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "Source",
+          "description": "Reference to the source node."
+        },
+        "target": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "Target",
+          "description": "Reference to the target node."
+        },
+        "trigger": {
+          "$ref": "#/$defs/trigger"
+        },
+        "guard": {
+          "type": "string",
+          "title": "Guard",
+          "description": "A guard condition; the transition fires only when it evaluates to true."
+        },
+        "default": {
+          "type": "boolean",
+          "title": "Default",
+          "description": "Whether this transition is taken when no other guard from the same source node holds."
+        },
+        "effect": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "Effect",
+          "description": "Reference to a behavior instance performed when the transition fires."
+        }
+      }
     }
   }
 }
