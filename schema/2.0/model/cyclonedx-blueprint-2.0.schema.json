@@ -1176,6 +1176,9 @@
         "crossingRequirements": {
           "$ref": "#/$defs/crossingRequirements"
         },
+        "sessionManagement": {
+          "$ref": "#/$defs/sessionManagement"
+        },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
         }
@@ -1184,7 +1187,7 @@
     "crossingRequirements": {
       "type": "object",
       "title": "Crossing Requirements",
-      "description": "Defines the security controls, policies, and constraints that must be satisfied when data or actors cross a boundary between zones.",
+      "description": "The security controls, policies, and constraints applied when data or actors cross a boundary between zones, such as the authentication and authorization enforced, the protocols permitted, and the validation, logging, and monitoring performed at the crossing.",
       "additionalProperties": false,
       "properties": {
         "authentication": {
@@ -1238,6 +1241,63 @@
             "type": "string"
           },
           "description": "Allowed protocols for crossing."
+        }
+      }
+    },
+    "sessionManagement": {
+      "type": "object",
+      "title": "Session Management",
+      "description": "The lifecycle of the authenticated session established at this boundary, covering session timeouts, access and refresh token validity, and logout behaviour. These properties characterize the session that results from authenticating, independently of the authentication method used.",
+      "additionalProperties": false,
+      "properties": {
+        "accessTokenExpires": {
+          "type": "boolean",
+          "title": "Access Token Expires",
+          "description": "Whether access tokens issued for this boundary expire."
+        },
+        "accessTokenTtl": {
+          "type": "integer",
+          "title": "Access Token Time To Live",
+          "minimum": 0,
+          "description": "Validity period of an access token, in seconds."
+        },
+        "refreshToken": {
+          "type": "boolean",
+          "title": "Refresh Token",
+          "description": "Whether refresh tokens are issued for this boundary."
+        },
+        "refreshTokenExpires": {
+          "type": "boolean",
+          "title": "Refresh Token Expires",
+          "description": "Whether refresh tokens expire."
+        },
+        "refreshTokenTtl": {
+          "type": "integer",
+          "title": "Refresh Token Time To Live",
+          "minimum": 0,
+          "description": "Validity period of a refresh token, in seconds."
+        },
+        "idleTimeout": {
+          "type": "integer",
+          "title": "Idle Timeout",
+          "minimum": 0,
+          "description": "Period of inactivity after which the session ends, in seconds."
+        },
+        "absoluteTimeout": {
+          "type": "integer",
+          "title": "Absolute Timeout",
+          "minimum": 0,
+          "description": "Period after session creation after which the session ends regardless of activity, in seconds."
+        },
+        "userLogout": {
+          "type": "boolean",
+          "title": "User Logout",
+          "description": "Whether a user can explicitly end the session."
+        },
+        "systemLogout": {
+          "type": "boolean",
+          "title": "System Logout",
+          "description": "Whether the system can end the session without user action."
         }
       }
     },
@@ -1485,6 +1545,11 @@
           "type": "boolean",
           "title": "Synchronous",
           "description": "Whether the flow is synchronous or asynchronous."
+        },
+        "encrypted": {
+          "type": "boolean",
+          "title": "Encrypted",
+          "description": "Whether the data carried by this flow is encrypted in transit."
         },
         "volume": {
           "type": "string",
@@ -1952,7 +2017,7 @@
             "radius",
             "saml",
             "scram",
-            "session",
+            "session-cookie",
             "ssh",
             "totp"
           ],
@@ -1983,7 +2048,7 @@
             "radius": "RADIUS authentication.",
             "saml": "SAML authentication.",
             "scram": "Salted Challenge Response Authentication Mechanism.",
-            "session": "Session authentication, typically using a server-side session and cookie.",
+            "session-cookie": "Session authentication using a server-side session identified by a cookie.",
             "ssh": "SSH key authentication.",
             "totp": "Time-based one-time password authentication."
           }
