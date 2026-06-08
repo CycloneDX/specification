@@ -162,6 +162,49 @@
           "title": "Source",
           "description": "The source of the threat, such as a threat intelligence feed, a threat catalogue, or an analysis activity."
         },
+        "origin": {
+          "title": "Origin",
+          "description": "The nature of the threat source that gives rise to this threat, following the threat source types of [NIST SP 800-30](https://csrc.nist.gov/pubs/sp/800/30/r1/final). Use the custom option for an origin not covered by the enumeration.",
+          "oneOf": [
+            {
+              "type": "string",
+              "title": "Predefined Origin",
+              "enum": [
+                "adversarial",
+                "accidental",
+                "structural",
+                "environmental"
+              ],
+              "meta:enum": {
+                "adversarial": "An adversary acting with intent, such as an individual, group, organization, or nation state.",
+                "accidental": "An erroneous action taken without malicious intent, such as a mistake by a privileged user or administrator.",
+                "structural": "A failure of equipment, software, or environmental controls, such as resource exhaustion or expiry of a component.",
+                "environmental": "A natural or human-made event outside the control of the organization, such as a fire, flood, or wide-area infrastructure outage."
+              }
+            },
+            {
+              "type": "object",
+              "title": "Custom Origin",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom origin."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom origin."
+                }
+              }
+            }
+          ]
+        },
         "categories": {
           "type": "array",
           "title": "Categories",
