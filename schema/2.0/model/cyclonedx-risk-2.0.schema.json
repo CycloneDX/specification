@@ -975,74 +975,15 @@
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "References using bom-link or bom-ref to the controls, requirements, or components that implement this response."
-        },
-        "function": {
-          "type": "string",
-          "title": "Function",
-          "description": "The control function this response performs, following a prevent, detect, respond, and recover model.",
-          "enum": [
-            "prevent",
-            "detect",
-            "respond",
-            "recover"
-          ],
-          "meta:enum": {
-            "prevent": "Prevents the risk from occurring.",
-            "detect": "Detects when the risk occurs.",
-            "respond": "Responds to the risk when detected.",
-            "recover": "Recovers from the impact."
-          }
+          "description": "References using bom-link or bom-ref to the controls that implement this response."
         },
         "status": {
           "title": "Status",
-          "description": "The implementation status of the response. Use the custom option for a status specific to an organization's process.",
-          "oneOf": [
-            {
-              "title": "Predefined Response Status",
-              "type": "string",
-              "enum": [
-                "proposed",
-                "approved",
-                "planned",
-                "in-progress",
-                "implemented",
-                "verified"
-              ],
-              "meta:enum": {
-                "proposed": "The response has been proposed.",
-                "approved": "The response has been approved.",
-                "planned": "Implementation is planned.",
-                "in-progress": "Implementation is in progress.",
-                "implemented": "The response has been implemented.",
-                "verified": "Effectiveness has been verified."
-              }
-            },
-            {
-              "title": "Custom Response Status",
-              "type": "object",
-              "required": [
-                "name"
-              ],
-              "additionalProperties": false,
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "minLength": 1,
-                  "title": "Name",
-                  "description": "The name of the custom status."
-                },
-                "description": {
-                  "type": "string",
-                  "title": "Description",
-                  "description": "A description of the custom status."
-                }
-              }
-            }
-          ]
+          "description": "The implementation status of the response.",
+          "$ref": "cyclonedx-control-2.0.schema.json#/$defs/implementationStatus"
         },
         "effectiveness": {
-          "$ref": "#/$defs/effectiveness"
+          "$ref": "cyclonedx-control-2.0.schema.json#/$defs/effectiveness"
         },
         "cost": {
           "type": "string",
@@ -1091,35 +1032,6 @@
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
-        }
-      }
-    },
-    "effectiveness": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "percentage": {
-          "type": "number",
-          "minimum": 0,
-          "maximum": 1,
-          "description": "Effectiveness as a decimal from 0 to 1."
-        },
-        "rating": {
-          "type": "string",
-          "enum": [
-            "ineffective",
-            "marginal",
-            "adequate",
-            "good",
-            "excellent"
-          ],
-          "meta:enum": {
-            "ineffective": "Does not meaningfully reduce risk.",
-            "marginal": "Slightly reduces risk.",
-            "adequate": "Adequately reduces risk.",
-            "good": "Significantly reduces risk.",
-            "excellent": "Nearly eliminates risk."
-          }
         }
       }
     },
