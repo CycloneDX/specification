@@ -746,13 +746,12 @@
         "configurationSource": {
           "type": "string",
           "title": "Configuration Source",
-          "description": "Describes how this component's configuration was determined, ordered from least to most agile.",
+          "description": "Describes how this component's configuration was determined. Values are roughly ordered from least to most agile, the ordering is approximate.",
           "enum": [
             "hardcoded",
             "product-default",
             "administrator-configured",
             "policy-managed",
-            "negotiated",
             "other",
             "unknown"
           ],
@@ -761,10 +760,14 @@
             "product-default": "The configuration is inherited from product or vendor defaults and can typically be overridden.",
             "administrator-configured": "The configuration is explicitly set by an administrator through external configuration.",
             "policy-managed": "The configuration is determined by a policy or governance engine.",
-            "negotiated": "The configuration is agreed at runtime with a peer, such as during a protocol handshake.",
             "other": "Another configuration source applies.",
             "unknown": "The configuration source is not known."
           }
+        },
+        "negotiated": {
+          "type": "boolean",
+          "title": "Negotiated",
+          "description": "Indicates whether the effective configuration is selected at runtime through negotiation with one or multiple peers, such as a protocol handshake, rather than being statically fixed. This is orthogonal to `configurationSource`, which describes how the permitted configuration was determined."
         },
         "configurationRef": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
@@ -772,28 +775,32 @@
           "description": "The bom-ref of the configuration that determines this component's configuration. Typically points to a component of type 'data' whose data type is 'configuration'."
         },
         "changeMechanism": {
-          "type": "string",
+          "type": "array",
           "title": "Change Mechanism",
-          "description": "Describes how a change to this component's configuration is applied, ordered from least to most agile.",
-          "enum": [
-            "not-possible",
-            "hardware-replacement",
-            "firmware-update",
-            "software-update",
-            "restart-required",
-            "runtime-config",
-            "other",
-            "unknown"
-          ],
-          "meta:enum": {
-            "not-possible": "The configuration cannot be changed through any supported means.",
-            "hardware-replacement": "The change requires replacing or adding hardware.",
-            "firmware-update": "The change requires a firmware update.",
-            "software-update": "The change requires a software or package update.",
-            "restart-required": "The change can be applied through configuration but requires restarting software or service processes.",
-            "runtime-config": "The change can be applied at runtime without a restart.",
-            "other": "Another change mechanism applies.",
-            "unknown": "The change mechanism is not known."
+          "description": "The step or steps required to apply a change to this component's configuration. When more than one value is present, all are required (for example, a software update followed by a restart). Values are roughly ordered from least to most disruptive. Use a single value of 'not-possible' when the configuration cannot be changed.",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "not-possible",
+              "hardware-replacement",
+              "firmware-update",
+              "software-update",
+              "restart-required",
+              "runtime-config",
+              "other",
+              "unknown"
+            ],
+            "meta:enum": {
+              "not-possible": "The configuration cannot be changed through any supported means.",
+              "hardware-replacement": "The change requires replacing or adding hardware.",
+              "firmware-update": "The change requires a firmware update.",
+              "software-update": "The change requires a software or package update.",
+              "restart-required": "The change requires restarting software or service processes.",
+              "runtime-config": "The change can be applied at runtime without a restart.",
+              "other": "Another change mechanism applies.",
+              "unknown": "The change mechanism is not known."
+            }
           }
         }
       }
