@@ -371,6 +371,11 @@
           "title": "Organizational Contact",
           "description": "A contact at the organization. Multiple contacts are allowed.",
           "items": {"$ref": "#/$defs/organizationalContact"}
+        },
+        "origin": {
+          "$ref": "#/$defs/origin",
+          "title": "Organization Origin",
+          "description": "The geographic origin associated with the organization, such as the country or countries where its goods or services originate."
         }
       }
     },
@@ -407,6 +412,48 @@
     },
     "organizationalEntityOrContact": {
 
+    },
+    "origin": {
+      "type": "object",
+      "title": "Origin",
+      "description": "Describes the geographic origin of the subject (for example, a component or party), expressed as a distribution across one or more countries or subdivisions.",
+      "additionalProperties": false,
+      "properties": {
+        "basis": {
+          "type": "string",
+          "title": "Origin Basis",
+          "description": "A free-form description of the methodology or unit on which the origin distribution is calculated.",
+          "examples": [ "number of parts", "manufacturing cost", "net weight" ]
+        },
+        "origins": {
+          "type": "array",
+          "title": "Origins",
+          "description": "The list of regions of origin and their respective share of the whole.",
+          "items": { "$ref": "#/$defs/originRegion" }
+        }
+      }
+    },
+    "originRegion": {
+      "type": "object",
+      "title": "Origin Region",
+      "description": "A single region of origin and its share of the whole.",
+      "additionalProperties": false,
+      "required": [ "originCode" ],
+      "properties": {
+        "originCode": {
+          "type": "string",
+          "title": "Origin Code",
+          "description": "The country or subdivision of origin, expressed as an ISO 3166-1 alpha-2 country code (for example, 'CA' for Canada) or an ISO 3166-2 subdivision code (for example, 'US-CA' for California, United States).",
+          "examples": [ "CA", "US-CA" ]
+        },
+        "percentage": {
+          "type": "number",
+          "title": "Percentage",
+          "description": "The share attributable to this region, expressed as a fraction between 0 and 1 inclusive.",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
     },
     "properties": {
       "type": "array",
