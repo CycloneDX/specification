@@ -1040,6 +1040,7 @@
       "required": [
         "bom-ref",
         "type",
+        "cadence",
         "timestamp"
       ],
       "additionalProperties": false,
@@ -1053,11 +1054,85 @@
           "description": "A human-readable name for the assessment."
         },
         "type": {
+          "type": "array",
           "title": "Type",
-          "description": "The kind of risk assessment. Use the custom option for kinds specific to an organization's process.",
+          "minItems": 1,
+          "uniqueItems": true,
+          "description": "The kinds of assessment performed, given as one or more named exercises or instruments. The type classifies the assessment exercise; the domains of risk evaluated are carried by the referenced risks rather than restated here. Use the custom option for kinds specific to an organization's process.",
+          "items": {
+            "oneOf": [
+              {
+                "title": "Predefined Assessment Type",
+                "type": "string",
+                "enum": [
+                  "security",
+                  "privacy",
+                  "operational",
+                  "safety",
+                  "financial",
+                  "environmental",
+                  "supply-chain",
+                  "compliance",
+                  "data-protection-impact",
+                  "fundamental-rights-impact",
+                  "ai-impact",
+                  "business-impact",
+                  "third-party",
+                  "threat",
+                  "vulnerability",
+                  "model-risk",
+                  "fraud"
+                ],
+                "meta:enum": {
+                  "security": "Security risk assessment, evaluating threats to the confidentiality, integrity, and availability of a subject.",
+                  "privacy": "Privacy risk assessment, evaluating risks to individuals arising from the processing of personal data.",
+                  "operational": "Operational risk assessment, evaluating risks to ongoing operations and continuity.",
+                  "safety": "Safety risk assessment, evaluating risks of harm to people or property.",
+                  "financial": "Financial risk assessment, evaluating exposure to financial loss, such as credit, market, or liquidity risk.",
+                  "environmental": "Environmental risk assessment, evaluating the effect of an activity on the natural environment, including energy use and emissions.",
+                  "supply-chain": "Supply chain risk assessment, evaluating risks across the chain that delivers a product or service, including software and hardware provenance, for example following [NIST SP 800-161](https://csrc.nist.gov/pubs/sp/800/161/r1/final).",
+                  "compliance": "Compliance assessment, evaluating conformance with applicable laws, regulations, policies, or standards.",
+                  "data-protection-impact": "Data protection impact assessment (DPIA), assessing high-risk processing of personal data, for example as described under Article 35 of the [GDPR](https://gdpr-info.eu/art-35-gdpr/).",
+                  "fundamental-rights-impact": "Fundamental rights impact assessment (FRIA), evaluating the effect of a system on fundamental rights, for example as introduced for certain high-risk AI systems by the [EU AI Act](https://artificialintelligenceact.eu/).",
+                  "ai-impact": "Artificial intelligence impact assessment, evaluating the risks and impacts of an AI system, for example following the [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework).",
+                  "business-impact": "Business impact analysis (BIA), evaluating the operational and financial consequences of disruption to a business function.",
+                  "third-party": "Third-party risk assessment, evaluating the risk arising from a specific external party relationship, such as a vendor, supplier, or service provider, as distinct from the broader supply chain.",
+                  "threat": "Threat assessment, evaluating the threats and threat actors relevant to a subject.",
+                  "vulnerability": "Vulnerability assessment, evaluating weaknesses that could be exploited.",
+                  "model-risk": "Model risk assessment, evaluating the risk that a decision or quantitative model is incorrect or misused, including model validation.",
+                  "fraud": "Fraud risk assessment, evaluating exposure to fraudulent activity and the controls that detect or prevent it."
+                }
+              },
+              {
+                "title": "Custom Assessment Type",
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "title": "Name",
+                    "description": "The name of the custom assessment type."
+                  },
+                  "description": {
+                    "type": "string",
+                    "title": "Description",
+                    "description": "A description of the custom assessment type."
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "cadence": {
+          "title": "Cadence",
+          "description": "The temporal cadence or occasion on which the assessment is performed. Use the custom option for patterns specific to an organization's process.",
           "oneOf": [
             {
-              "title": "Predefined Assessment Type",
+              "title": "Predefined Assessment Cadence",
               "type": "string",
               "enum": [
                 "initial",
@@ -1067,7 +1142,7 @@
                 "ad-hoc"
               ],
               "meta:enum": {
-                "initial": "Initial, baseline risk assessment.",
+                "initial": "Initial, baseline assessment performed once at the outset.",
                 "periodic": "Scheduled, recurring assessment.",
                 "continuous": "Continuous, automated monitoring, as in a GRC engineering or continuous controls monitoring practice.",
                 "triggered": "Assessment triggered by a specific event, such as a change or an incident.",
@@ -1075,7 +1150,7 @@
               }
             },
             {
-              "title": "Custom Assessment Type",
+              "title": "Custom Assessment Cadence",
               "type": "object",
               "required": [
                 "name"
@@ -1086,12 +1161,12 @@
                   "type": "string",
                   "minLength": 1,
                   "title": "Name",
-                  "description": "The name of the custom assessment type."
+                  "description": "The name of the custom assessment cadence."
                 },
                 "description": {
                   "type": "string",
                   "title": "Description",
-                  "description": "A description of the custom assessment type."
+                  "description": "A description of the custom assessment cadence."
                 }
               }
             }
