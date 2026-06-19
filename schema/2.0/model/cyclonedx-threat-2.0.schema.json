@@ -47,6 +47,15 @@
           },
           "description": "Attack trees that decompose attacker goals into sub-goals and techniques."
         },
+        "attackPaths": {
+          "type": "array",
+          "title": "Attack Paths",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/attackPath"
+          },
+          "description": "Attack paths that describe the ordered progression of an attack across elements and trust boundaries, including lateral movement."
+        },
         "abuseCases": {
           "type": "array",
           "title": "Abuse Cases",
@@ -322,6 +331,14 @@
           "$ref": "cyclonedx-weakness-2.0.schema.json#/$defs/weaknesses",
           "description": "The weaknesses, such as CWE classifications, that this threat exploits."
         },
+        "relatedVulnerabilities": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the vulnerabilities that this threat exploits or that inform it."
+        },
         "attackPatterns": {
           "type": "array",
           "title": "Attack Patterns",
@@ -350,27 +367,8 @@
           "description": "References using bom-link or bom-ref to the abuse cases that illustrate how this threat can be exercised."
         },
         "killChainPhase": {
-          "type": "string",
-          "title": "Kill Chain Phase",
-          "description": "The phase of the cyber kill chain at which this threat operates.",
-          "enum": [
-            "reconnaissance",
-            "weaponization",
-            "delivery",
-            "exploitation",
-            "installation",
-            "command-and-control",
-            "actions-on-objectives"
-          ],
-          "meta:enum": {
-            "reconnaissance": "Gathering information about the target.",
-            "weaponization": "Creating a malicious payload.",
-            "delivery": "Transmitting the payload to the target.",
-            "exploitation": "Exploiting a vulnerability or weakness.",
-            "installation": "Installing malicious software or establishing a foothold.",
-            "command-and-control": "Establishing a command and control channel.",
-            "actions-on-objectives": "Achieving the goals of the attack."
-          }
+          "$ref": "#/$defs/killChainPhase",
+          "description": "The phase of the cyber kill chain at which this threat operates."
         },
         "behaviors": {
           "type": "array",
@@ -392,6 +390,14 @@
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
           "description": "References using bom-link or bom-ref to the kinds of assets this threat affects."
+        },
+        "relatedBusinessObjectives": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the business objectives this threat endangers."
         },
         "mitigations": {
           "type": "array",
@@ -568,6 +574,14 @@
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
           "description": "References using bom-link or bom-ref to the risks that this scenario contributes to."
+        },
+        "relatedVulnerabilities": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the vulnerabilities exploited in this scenario."
         },
         "externalReferences": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReferences"
@@ -1294,6 +1308,164 @@
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
           "description": "References using bom-link or bom-ref to the controls in place at this boundary. Intended primarily for referencing externally defined controls. Where the control and boundary are declared together, prefer the control's appliesTo property."
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "killChainPhase": {
+      "type": "string",
+      "title": "Kill Chain Phase",
+      "description": "A phase of the cyber kill chain.",
+      "enum": [
+        "reconnaissance",
+        "weaponization",
+        "delivery",
+        "exploitation",
+        "installation",
+        "command-and-control",
+        "actions-on-objectives"
+      ],
+      "meta:enum": {
+        "reconnaissance": "Gathering information about the target.",
+        "weaponization": "Creating a malicious payload.",
+        "delivery": "Transmitting the payload to the target.",
+        "exploitation": "Exploiting a vulnerability or weakness.",
+        "installation": "Installing malicious software or establishing a foothold.",
+        "command-and-control": "Establishing a command and control channel.",
+        "actions-on-objectives": "Achieving the goals of the attack."
+      }
+    },
+    "attackPathStep": {
+      "type": "object",
+      "title": "Attack Path Step",
+      "description": "A single step in an attack path, describing one action in the progression of an attack.",
+      "required": [
+        "description"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "A short name for the step."
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Description",
+          "description": "The action the adversary performs in this step."
+        },
+        "technique": {
+          "$ref": "#/$defs/technique",
+          "description": "The technique used in this step, typically aligned with MITRE ATT&CK."
+        },
+        "attackPattern": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "description": "Reference using bom-link or bom-ref to the attack pattern applied in this step."
+        },
+        "killChainPhase": {
+          "$ref": "#/$defs/killChainPhase",
+          "description": "The phase of the cyber kill chain at which this step operates."
+        },
+        "source": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "description": "Reference using bom-link or bom-ref to the element or zone from which this step originates."
+        },
+        "destination": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "description": "Reference using bom-link or bom-ref to the element or zone this step reaches."
+        },
+        "boundaryCrossed": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "description": "Reference using bom-link or bom-ref to the trust boundary this step crosses."
+        },
+        "exploits": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the weaknesses or vulnerabilities this step exploits."
+        },
+        "mitigations": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the controls that detect or prevent this step."
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "attackPath": {
+      "type": "object",
+      "title": "Attack Path",
+      "description": "An ordered sequence of steps that an adversary follows to progress from initial access toward an objective, crossing elements and trust boundaries. An attack path complements an attack tree: the tree decomposes a goal into alternatives, whereas the path expresses the temporal progression of a single attack, including lateral movement.",
+      "required": [
+        "bom-ref",
+        "name",
+        "steps"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Name",
+          "description": "A human-readable name for the attack path."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the attack path."
+        },
+        "objective": {
+          "type": "string",
+          "title": "Objective",
+          "description": "The attacker objective that the path works toward, such as exfiltrating data or achieving code execution."
+        },
+        "actor": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "description": "Reference using bom-link or bom-ref to the adversary that follows this path."
+        },
+        "steps": {
+          "type": "array",
+          "title": "Steps",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/attackPathStep"
+          },
+          "description": "The ordered steps of the path, from the initial action to the objective. The order of the array is significant."
+        },
+        "realizes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the threats that this path realizes."
+        },
+        "relatedRisks": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the risks that this path contributes to."
+        },
+        "externalReferences": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReferences"
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"

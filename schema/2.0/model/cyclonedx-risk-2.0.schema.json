@@ -29,6 +29,15 @@
           },
           "description": "Point-in-time risk assessment events, each evaluating one or more of the documented risks."
         },
+        "riskAppetites": {
+          "type": "array",
+          "title": "Risk Appetites",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/riskAppetite"
+          },
+          "description": "The risk appetites that apply to this collection. Multiple entries support a document covering more than one party."
+        },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
         }
@@ -138,7 +147,7 @@
             "control",
             "data-subject-rights",
             "integrity",
-            "minimisation",
+            "minimization",
             "non-repudiation",
             "possession",
             "privacy",
@@ -153,12 +162,12 @@
             "authenticity": "Ensuring that data, communications, or entities are genuine and can be verified.",
             "availability": "Ensuring systems, data, and services are accessible and operational when needed.",
             "compliance": "Adherence to applicable laws, regulations, policies, and standards.",
-            "confidentiality": "Preventing unauthorised access to or disclosure of information.",
+            "confidentiality": "Preventing unauthorized access to or disclosure of information.",
             "connectivity": "Maintaining secure and reliable communication between systems or components.",
             "control": "Enabling individuals to manage how their personal data is used and shared.",
             "data-subject-rights": "Guaranteeing individuals' rights to access, correct, delete, or restrict their personal data.",
-            "integrity": "Ensuring information is accurate, complete, and unaltered by unauthorised actors.",
-            "minimisation": "Limiting data collection and retention to what is strictly necessary for the intended purpose.",
+            "integrity": "Ensuring information is accurate, complete, and unaltered by unauthorized actors.",
+            "minimization": "Limiting data collection and retention to what is strictly necessary for the intended purpose.",
             "non-repudiation": "Providing proof of origin and delivery to prevent denial of actions or communications.",
             "possession": "Ensuring control or custody over data or assets, regardless of ownership.",
             "privacy": "Protecting individuals' personal information in accordance with legal and ethical standards.",
@@ -277,6 +286,14 @@
           },
           "description": "References using bom-link or bom-ref to the conformance claims that give rise to this risk, such as a [CycloneDX Attestations](https://cyclonedx.org/capabilities/attestations/) claim recording that a requirement is unmet or only partially met. The degree of conformance is carried by the claim, not by the risk."
         },
+        "relatedBusinessObjectives": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the business objectives this risk threatens."
+        },
         "inherentRisk": {
           "$ref": "#/$defs/rating",
           "description": "The assessed risk before any responses are applied."
@@ -287,7 +304,7 @@
         },
         "targetRisk": {
           "$ref": "#/$defs/rating",
-          "description": "The risk level the organization aims to reach, reflecting its risk appetite."
+          "description": "The risk level the organization aims to reach for this risk. The overall risk appetite is recorded separately on the risks collection or assessment."
         },
         "responses": {
           "type": "array",
@@ -1327,6 +1344,14 @@
           "format": "date-time",
           "description": "When the next review should occur."
         },
+        "riskAppetites": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the risk appetites, declared under the risks collection, that applied for this assessment."
+        },
         "externalReferences": {
           "type": "array",
           "items": {
@@ -1372,6 +1397,100 @@
         "moderate": "Moderate impact affecting some operations.",
         "high": "High impact affecting critical operations.",
         "critical": "Critical impact with severe business consequences."
+      }
+    },
+    "appetiteLevel": {
+      "type": "string",
+      "description": "A qualitative risk appetite level, ranging from risk-averse to risk-seeking.",
+      "enum": [
+        "averse",
+        "minimal",
+        "cautious",
+        "open",
+        "hungry"
+      ],
+      "meta:enum": {
+        "averse": "Avoidance of risk is the priority, and only the lowest-risk options are acceptable.",
+        "minimal": "A preference for very low risk, accepting risk only where it is unavoidable.",
+        "cautious": "A preference for safe options, accepting limited and well-understood risk for reward.",
+        "open": "A willingness to accept higher risk where the potential reward justifies it.",
+        "hungry": "An active willingness to seek risk in pursuit of greater reward, within defined control limits."
+      }
+    },
+    "riskAppetite": {
+      "type": "object",
+      "title": "Risk Appetite",
+      "description": "The amount and type of risk a party is willing to pursue or retain, stated explicitly so that it is not left implicit in individual target ratings. An appetite may be attributed to a specific party through `party`, so a single document can record the appetites of more than one party, and it may be stated overall and refined per risk domain. Quantitative tolerances for a specific risk are expressed through that risk's target rating, and measurement of actual risk against the appetite is recorded through assessments.",
+      "required": [
+        "level"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "An identifier which can be used to reference this risk appetite elsewhere, such as from an assessment."
+        },
+        "party": {
+          "$ref": "cyclonedx-party-2.0.schema.json#/$defs/partyChoice",
+          "description": "The party whose risk appetite this is. Set this when a single document captures the appetites of more than one party. May be an inline party object or a reference to a previously declared party."
+        },
+        "level": {
+          "$ref": "#/$defs/appetiteLevel",
+          "description": "The overall risk appetite level."
+        },
+        "statement": {
+          "type": "string",
+          "title": "Statement",
+          "description": "A narrative statement of the overall risk appetite, including any qualifications or context."
+        },
+        "rationale": {
+          "type": "string",
+          "description": "The justification for this appetite, such as the strategic objective or regulatory obligation that informs it."
+        },
+        "owner": {
+          "$ref": "cyclonedx-party-2.0.schema.json#/$defs/partyChoice",
+          "description": "The party accountable for setting and approving this appetite, such as a board or risk committee. May be an inline party object or a reference to a previously declared party."
+        },
+        "horizon": {
+          "type": "string",
+          "description": "The time horizon over which this appetite applies, expressed as an [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) duration, for example P1Y for one year."
+        },
+        "nextReview": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When this appetite is next due for review, since appetite changes with strategy, market conditions, and the threat landscape."
+        },
+        "categories": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "required": [
+              "domain",
+              "level"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "domain": {
+                "$ref": "#/$defs/riskDomain",
+                "description": "The risk domain this appetite entry applies to."
+              },
+              "level": {
+                "$ref": "#/$defs/appetiteLevel",
+                "description": "The appetite level for this risk domain."
+              },
+              "statement": {
+                "type": "string",
+                "description": "A narrative statement of the appetite for this risk domain."
+              },
+              "rationale": {
+                "type": "string",
+                "description": "The justification for the appetite for this risk domain."
+              }
+            }
+          },
+          "description": "Per-domain appetite, refining the overall appetite for specific risk domains such as security, privacy, or financial."
+        }
       }
     }
   }
