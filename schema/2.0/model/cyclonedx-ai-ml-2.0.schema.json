@@ -29,26 +29,78 @@
           ],
           "properties": {
             "primary": {
+              "$todos": [
+                "Update AI/ML property taxonomy with primary architecture enum values.",
+                "Consider removing 'other' enum value since field is extensible via cdx pattern."
+              ],
               "type": "string",
               "description": "The core mathematical structural framework of the model backbone.",
-              "examples": [
-                "Transformer",
-                "Convolutional Neural Network (CNN)",
-                "Recurrent Neural Network (RNN)",
-                "Mamba"
+              "anyOf": [
+                {
+                  "enum": [
+                    "transformer",
+                    "cnn",
+                    "rnn",
+                    "lstm",
+                    "gru",
+                    "gan",
+                    "vae",
+                    "mamba",
+                    "ssm",
+                    "gnn",
+                    "mlp",
+                    "rwkv",
+                    "snn",
+                    "kan",
+                    "other"
+                  ],
+                  "meta:enum": {
+                    "transformer": "Architecture based on self-attention mechanisms for processing sequential or spatial data.",
+                    "cnn": "Convolutional Neural Network - architecture using convolutional layers for processing grid-like data.",
+                    "rnn": "Recurrent Neural Network - architecture with recurrent connections for sequential data processing.",
+                    "lstm": "Long Short-Term Memory - RNN variant with gating mechanisms for long-term dependencies.",
+                    "gru": "Gated Recurrent Unit - RNN variant with simplified gating compared to LSTM.",
+                    "gan": "Generative Adversarial Network - dual-network framework containing a generator and a discriminator.",
+                    "vae": "Variational Autoencoder - probabilistic encoder-decoder architecture mapping to a latent space.",
+                    "mamba": "State-space model architecture with selective mechanisms for efficient sequence modeling.",
+                    "ssm": "State Space Model - core architecture based on continuous or discrete state-space representations.",
+                    "gnn": "Graph Neural Network - architecture optimized for processing graph-structured data elements.",
+                    "mlp": "Multi-Layer Perceptron - classic feedforward architecture composed entirely of fully connected layers.",
+                    "rwkv": "Receptive Weighted Key Value - architecture combining parallelizable training with RNN-like inference.",
+                    "snn": "Spiking Neural Network - neuromorphic architecture utilizing discrete, time-dependent spiking activations.",
+                    "kan": "Kolmogorov-Arnold Network - architecture featuring learnable activation functions on edges rather than nodes.",
+                    "other": "A primary architecture type that is not explicitly listed."
+                  }
+                },
+                {
+                  "pattern": "^cdx:[a-z_]+$"
+                }
               ]
             },
             "topologyType": {
+              "$todos": [
+                "Update AI/ML property taxonomy with topologyType enum values."
+              ],
               "type": "string",
               "description": "Specifies the runtime parameter activation and connection structure of the network layers.",
-              "$todos": [
-                "Need to make enum, that is extensible..."
-              ],
-              "examples": [
-                "Dense",
-                "Sparse",
-                "Dynamic",
-                "Liquid"
+              "anyOf": [
+                {
+                  "enum": [
+                    "dense",
+                    "sparse",
+                    "dynamic",
+                    "liquid"
+                  ],
+                  "meta:enum": {
+                    "dense": "All or most parameters are active during inference with full connectivity between layers.",
+                    "sparse": "Only a subset of parameters are active during inference with selective connectivity.",
+                    "dynamic": "Parameter activation and connectivity patterns change based on input or runtime conditions.",
+                    "liquid": "Continuously adaptive network structure with time-varying connections and activations."
+                  }
+                },
+                {
+                  "pattern": "^cdx:[a-z_]+$"
+                }
               ]
             },
             "secondary": {
@@ -56,16 +108,49 @@
               "description": "A list of secondary macro-layouts or component sub-networks built into the primary structure.",
               "uniqueItems": true,
               "items": {
-                "type": "string"
+                "type": "string",
+                "anyOf": [
+                  {
+                    "enum": [
+                      "decoder_only",
+                      "encoder_only",
+                      "encoder_decoder",
+                      "mixture_of_experts",
+                      "vae_bottleneck",
+                      "u_net",
+                      "residual_connections",
+                      "dual_encoders",
+                      "cross_attention_gated",
+                      "siamese_network",
+                      "hybrid_backbone"
+                    ],
+                    "meta:enum": {
+                      "decoder_only": "Autoregressive macro-layout processing data left-to-right (e.g., GPT series).",
+                      "encoder_only": "Bidirectional macro-layout processing complete sequences simultaneously (e.g., BERT).",
+                      "encoder_decoder": "Sequence-to-sequence structure mapping an input representation to an output sequence (e.g., T5).",
+                      "mixture_of_experts": "Sparse routing layer mechanism activating specific expert subnetworks per token.",
+                      "vae_bottleneck": "Symmetric compression bottleneck utilizing mean and variance latent vectors.",
+                      "u_net": "Symmetric contracting and expanding macro-layout featuring skip connections between corresponding scales.",
+                      "residual_connections": "Explicit skip or identity shortcuts bypassing one or more structural layers.",
+                      "dual_encoders": "Parallel feature extraction pipelines mapping different modalities into a shared space.",
+                      "cross_attention_gated": "Explicit sub-component routing that conditions one feature stream using another via attention mechanisms.",
+                      "siamese_network": "Twin identical subnetworks sharing identical weights to compute similarity metrics.",
+                      "hybrid_backbone": "Direct cascading combination of distinct primary layers (e.g., a CNN feature extractor feeding a Transformer)."
+                    }
+                  },
+                  {
+                    "pattern": "^cdx:[a-z_]+$"
+                  }
+                ]
               },
               "examples": [
                 [
-                  "Decoder-Only",
-                  "Mixture-of-Experts"
+                  "decoder_only",
+                  "mixture_of_experts"
                 ],
                 [
-                  "VAE-Bottleneck",
-                  "Dual-Text-Encoders"
+                  "vae_bottleneck",
+                  "dual_encoders"
                 ]
               ]
             }
