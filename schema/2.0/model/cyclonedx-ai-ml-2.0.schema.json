@@ -15,6 +15,9 @@
         },
         "trainingProfile": {
           "$ref": "#/defs/trainingProfile"
+        },
+        "modelParameters": {
+          "$ref": "#/$defs/modelParameters"
         }
       }
     },
@@ -895,6 +898,357 @@
         },
         "graphics": { "$ref": "#/definitions/graphicsCollection" }
       }
+    },
+    "modelParameters": {
+      "type": "object",
+      "title": "Model Parameters",
+      "description": "Describes the input and output parameters of an AI model, including support for various modalities and data formats.",
+      "additionalProperties": false,
+      "properties": {
+        "inputs": {
+          "type": "array",
+          "title": "Model Inputs",
+          "description": "The input parameters accepted by the model.",
+          "items": {
+            "$ref": "#/$defs/modelParameter"
+          },
+          "uniqueItems": true
+        },
+        "outputs": {
+          "type": "array",
+          "title": "Model Outputs",
+          "description": "The output parameters produced by the model.",
+          "items": {
+            "$ref": "#/$defs/modelParameter"
+          },
+          "uniqueItems": true
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "modelParameter": {
+      "type": "object",
+      "title": "Model Parameter",
+      "description": "Describes a single input or output parameter of an AI model, supporting various modalities and encoding formats.",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name of the parameter.",
+          "examples": [
+            "prompt",
+            "image",
+            "audio",
+            "logits",
+            "embeddings"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the parameter and its purpose."
+        },
+        "modality": {
+          "type": "string",
+          "title": "Modality",
+          "description": "The type of data modality for this parameter.",
+          "anyOf": [
+            {
+              "enum": [
+                "text",
+                "image",
+                "audio",
+                "video",
+                "multimodal",
+                "embedding",
+                "logits",
+                "other"
+              ],
+              "meta:enum": {
+                "text": "Natural language text input or output.",
+                "image": "Visual image data input or output.",
+                "audio": "Audio or speech data input or output.",
+                "video": "Video data input or output.",
+                "multimodal": "Combined multiple modalities (e.g., text and image).",
+                "embedding": "Dense vector representations in a continuous space.",
+                "logits": "Raw unnormalized model outputs before activation functions.",
+                "other": "Other modality types not explicitly listed."
+              }
+            },
+            {
+              "pattern": "^cdx:[a-z0-9:-]+$"
+            }
+          ],
+          "examples": [
+            "text",
+            "image",
+            "audio",
+            "logits"
+          ]
+        },
+        "format": {
+          "type": "object",
+          "title": "Format",
+          "description": "Describes the format and encoding of the parameter data.",
+          "additionalProperties": false,
+          "properties": {
+            "dataType": {
+              "type": "string",
+              "title": "Data Type",
+              "description": "The data type of the parameter.",
+              "examples": [
+                "string",
+                "float32",
+                "int64",
+                "uint8",
+                "tensor"
+              ]
+            },
+            "encoding": {
+              "type": "string",
+              "title": "Encoding",
+              "description": "The encoding format of the parameter data.",
+              "anyOf": [
+                {
+                  "enum": [
+                    "utf-8",
+                    "ascii",
+                    "base64",
+                    "jpeg",
+                    "png",
+                    "wav",
+                    "mp3",
+                    "flac",
+                    "raw",
+                    "tokenized",
+                    "other"
+                  ],
+                  "meta:enum": {
+                    "utf-8": "UTF-8 text encoding.",
+                    "ascii": "ASCII text encoding.",
+                    "base64": "Base64 encoded binary data.",
+                    "jpeg": "JPEG image format.",
+                    "png": "PNG image format.",
+                    "wav": "WAV audio format.",
+                    "mp3": "MP3 audio format.",
+                    "flac": "FLAC lossless audio format.",
+                    "raw": "Raw binary data without specific encoding.",
+                    "tokenized": "Pre-tokenized input (token IDs).",
+                    "other": "Other encoding format not explicitly listed."
+                  }
+                },
+                {
+                  "pattern": "^cdx:[a-z0-9:-]+$"
+                }
+              ],
+              "examples": [
+                "utf-8",
+                "tokenized",
+                "jpeg",
+                "wav"
+              ]
+            },
+            "mimeType": {
+              "type": "string",
+              "title": "MIME Type",
+              "description": "The MIME type of the parameter data.",
+              "examples": [
+                "text/plain",
+                "image/jpeg",
+                "audio/wav",
+                "application/octet-stream"
+              ]
+            }
+          }
+        },
+        "shape": {
+          "type": "array",
+          "title": "Shape",
+          "description": "The dimensional shape of the parameter (e.g., tensor dimensions). Use -1 or null for dynamic dimensions.",
+          "items": {
+            "oneOf": [
+              {
+                "type": "integer",
+                "minimum": -1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "examples": [
+            [1, 512],
+            [null, 3, 224, 224],
+            [-1, 768]
+          ]
+        },
+        "processingStage": {
+          "type": "string",
+          "title": "Processing Stage",
+          "description": "Indicates the processing stage of the parameter relative to tokenization or encoding.",
+          "enum": [
+            "pre-tokenizer",
+            "post-tokenizer",
+            "pre-encoder",
+            "post-encoder",
+            "raw",
+            "processed"
+          ],
+          "meta:enum": {
+            "pre-tokenizer": "Data before tokenization (e.g., raw text string).",
+            "post-tokenizer": "Data after tokenization (e.g., token IDs).",
+            "pre-encoder": "Data before encoding transformation.",
+            "post-encoder": "Data after encoding transformation.",
+            "raw": "Raw unprocessed data.",
+            "processed": "Fully processed data ready for model consumption or output."
+          },
+          "examples": [
+            "pre-tokenizer",
+            "post-tokenizer",
+            "raw"
+          ]
+        },
+        "required": {
+          "type": "boolean",
+          "title": "Required",
+          "description": "Indicates whether this parameter is required.",
+          "default": false
+        },
+        "defaultValue": {
+          "type": "string",
+          "title": "Default Value",
+          "description": "The default value for the parameter if not provided."
+        },
+        "constraints": {
+          "type": "object",
+          "title": "Constraints",
+          "description": "Constraints on the parameter values.",
+          "additionalProperties": false,
+          "properties": {
+            "minLength": {
+              "type": "integer",
+              "title": "Minimum Length",
+              "description": "Minimum length for text or sequence parameters.",
+              "minimum": 0
+            },
+            "maxLength": {
+              "type": "integer",
+              "title": "Maximum Length",
+              "description": "Maximum length for text or sequence parameters.",
+              "minimum": 0
+            },
+            "minValue": {
+              "type": "number",
+              "title": "Minimum Value",
+              "description": "Minimum numeric value."
+            },
+            "maxValue": {
+              "type": "number",
+              "title": "Maximum Value",
+              "description": "Maximum numeric value."
+            },
+            "allowedValues": {
+              "type": "array",
+              "title": "Allowed Values",
+              "description": "List of allowed values for the parameter.",
+              "items": {
+                "type": "string"
+              }
+            },
+            "pattern": {
+              "type": "string",
+              "title": "Pattern",
+              "description": "Regular expression pattern for validating string parameters."
+            }
+          }
+        },
+        "externalReferences": {
+          "type": "array",
+          "title": "External References",
+          "description": "External references to documentation or specifications for this parameter.",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference"
+          }
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      },
+      "examples": [
+        {
+          "name": "prompt",
+          "description": "Text prompt input to the model",
+          "modality": "text",
+          "format": {
+            "dataType": "string",
+            "encoding": "utf-8"
+          },
+          "processingStage": "pre-tokenizer",
+          "required": true
+        },
+        {
+          "name": "input_ids",
+          "description": "Tokenized input IDs",
+          "modality": "text",
+          "format": {
+            "dataType": "int64",
+            "encoding": "tokenized"
+          },
+          "shape": [1, null],
+          "processingStage": "post-tokenizer",
+          "required": true
+        },
+        {
+          "name": "image",
+          "description": "Input image",
+          "modality": "image",
+          "format": {
+            "dataType": "uint8",
+            "encoding": "jpeg",
+            "mimeType": "image/jpeg"
+          },
+          "shape": [null, 3, 224, 224],
+          "required": true
+        },
+        {
+          "name": "audio",
+          "description": "Audio waveform input",
+          "modality": "audio",
+          "format": {
+            "dataType": "float32",
+            "encoding": "wav",
+            "mimeType": "audio/wav"
+          },
+          "shape": [1, null],
+          "required": true
+        },
+        {
+          "name": "logits",
+          "description": "Raw model output logits",
+          "modality": "logits",
+          "format": {
+            "dataType": "float32"
+          },
+          "shape": [1, null, 50257],
+          "processingStage": "raw"
+        },
+        {
+          "name": "generated_text",
+          "description": "Generated text output",
+          "modality": "text",
+          "format": {
+            "dataType": "string",
+            "encoding": "utf-8"
+          },
+          "processingStage": "post-tokenizer"
+        }
+      ]
     }
   }
 }
