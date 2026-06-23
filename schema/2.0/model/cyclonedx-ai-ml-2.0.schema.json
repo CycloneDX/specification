@@ -282,7 +282,7 @@
         "We always want a group name, description to qualify the type (and we may have multiples of the same type), but riskDomain uses OneOf logic for custom domains.",
         "Note: if we could extend domains using the AI/ML prop. tax., we perhaps could settle just for the type field"
       ],
-      "description": "Provides a means of expressing a design, runtime or other consideration for a specific aspect of the model.",
+      "description": "Provides a means of expressing a design, runtime or other consideration for a specific aspect of the model. The risk group can be referenced elsewhere in the BOM using its bom-ref.",
       "additionalProperties": false,
       "required": [
         "groupName"
@@ -293,6 +293,11 @@
         }
       ],
       "properties": {
+        "bom-ref": {
+          "title": "BOM Reference",
+          "description": "An identifier which can be used to reference the risk group elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
         "groupName": {
           "type": "string",
           "title": "Group Name",
@@ -301,11 +306,11 @@
         "groupDescription": {
           "type": "string",
           "title": "Group Name",
-          "description": "The name of the group at risk."
+          "description": "A description of the group at risk."
         },
         "externalReferences": {
           "type": "array",
-          "description": "references to external resources that describe the risk group.",
+          "description": "References to external resources that describe the risk group.",
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference"
           }
@@ -316,11 +321,34 @@
         }
       }
     },
+    "riskGroupReference": {
+      "type": "object",
+      "title": "Risk Group Reference Choice",
+      "description": "A reference to either a risk group object or a risk group defined elsewhere in the BOM.",
+      "additionalProperties": false,
+      "properties": {
+        "riskGroupRef": {
+          "title": "Risk Group Reference",
+          "description": "References a risk group by its bom-ref attribute or provides a full risk group object.",
+          "oneOf": [
+            {
+              "title": "Risk Group",
+              "$ref": "#/$defs/riskGroup"
+            },
+            {
+              "title": "Risk Group Reference",
+              "description": "Reference to a risk group defined elsewhere in the BOM.",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+            }
+          ]
+        }
+      }
+    },
     "riskGroups": {
       "type": "array",
       "uniqueItems": true,
       "items": {
-        "$ref": "#/$defs/riskGroup"
+        "$ref": "#/$defs/riskGroupReference"
       }
     },
     "consideration": {
