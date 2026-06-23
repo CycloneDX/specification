@@ -730,7 +730,6 @@
     },
     "graphic": {
       "$todos": [
-        "Look to remove OR where this SHOULD go",
         "Unsure if needed for 2.0. If so, is there a common object we can reuse?"
       ],
       "type": "object",
@@ -747,6 +746,154 @@
           "description": "The graphic (vector or raster). Base64 encoding must be specified for binary images.",
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/attachment"
         }
+      }
+    },
+    "performanceMetric": {
+      "type": "object",
+      "title": "Performance Metric",
+      "$comment": "Values not listed can be proposed to the CycloneDX Property Taxonomy.",
+      "$todos": [
+        "Update AI/ML property taxonomy with performance metric type enum values."
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "title": "Type",
+          "description": "The type of performance metric used for AI model evaluation.",
+          "type": "string",
+          "anyOf": [
+            {
+              "enum": [
+                "mmlu-pro",
+                "gpqa",
+                "math-500",
+                "humaneval",
+                "swe-bench",
+                "ifeval",
+                "livebench",
+                "webarena",
+                "lmsys-elo",
+                "strongreject"
+              ],
+              "meta:enum": {
+                "mmlu-pro": "Massive Multitask Language Understanding Pro - The current standard for broad, expert-level academic and professional reasoning across multiple disciplines.",
+                "gpqa": "Graduate-Level Google-Proof Q&A - A highly difficult dataset used to test advanced, PhD-level reasoning and scientific problem-solving capabilities.",
+                "math-500": "A subset of the MATH benchmark used to evaluate complex, multi-step mathematical reasoning and logic.",
+                "humaneval": "The industry standard benchmark for evaluating Python code generation and functional programming synthesis.",
+                "swe-bench": "Software Engineering Benchmark - Evaluates a model's agentic ability to resolve real-world software engineering issues and patches within complete, live code repositories.",
+                "ifeval": "Instruction Following Evaluation - Tests a model's ability to strictly adhere to verifiable formatting constraints (e.g., specific word counts, starting sentences with specific words).",
+                "livebench": "A frequently updated, contamination-free benchmark designed to test reasoning, math, and coding without the risk of models memorizing static test data.",
+                "webarena": "An agentic benchmark evaluating a model's ability to perform complex, multi-step tasks using a web browser, APIs, and OS environments.",
+                "lmsys-elo": "A crowd-sourced human preference rating derived from millions of blind A/B battle tests in the LMSYS Chatbot Arena.",
+                "strongreject": "A standardized metric for measuring safety and alignment by evaluating how reliably a model refuses harmful prompts while avoiding false positives."
+              }
+            },
+            {
+              "pattern": "^cdx:[a-z0-9:-]+$"
+            }
+          ],
+          "examples": [
+            "mmlu-pro",
+            "humaneval",
+            "swe-bench"
+          ]
+        },
+        "value": {
+          "title": "Value",
+          "description": "The value of the performance metric.",
+          "type": "string"
+        },
+        "slice": {
+          "title": "Slice",
+          "description": "The name of the slice this metric was computed on. By default, assume this metric is not sliced.",
+          "type": "string"
+        },
+        "confidenceInterval": {
+          "title": "Confidence Interval",
+          "description": "The confidence interval of the metric.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "lowerBound": {
+              "title": "Lower Bound",
+              "description": "The lower bound of the confidence interval.",
+              "type": "string"
+            },
+            "upperBound": {
+              "title": "Upper Bound",
+              "description": "The upper bound of the confidence interval.",
+              "type": "string"
+            }
+          }
+        },
+        "evaluationDatasets": {
+          "type": "array",
+          "title": "Evaluation Datasets",
+          "description": "References to the datasets or dataset subsets used to compute this performance metric.",
+          "items": {
+            "$ref": "#/$defs/datasetReference"
+          }
+        },
+        "externalReferences": {
+          "type": "array",
+          "title": "External References",
+          "description": "External references to well-known AI model evaluations, benchmarks, leaderboards, or evaluation methodologies.",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference"
+          }
+        },
+        "properties": {
+          "type": "array",
+          "title": "Properties",
+          "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/property"
+          }
+        }
+      },
+      "examples": [
+        {
+          "type": "mmlu-pro",
+          "value": "58.2",
+          "confidenceInterval": {
+            "lowerBound": "57.48",
+            "upperBound": "58.92"
+          }
+        },
+        {
+          "type": "humaneval",
+          "value": "0.87"
+        },
+        {
+          "type": "swe-bench",
+          "value": "45.3",
+          "evaluationDatasets": [
+            {
+              "dataRef": "data-ref:swe-bench-lite-dataset"
+            }
+          ],
+          "externalReferences": [
+            {
+              "type": "distribution",
+              "url": "https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite"
+            }
+          ]
+        }
+      ]
+    },
+    "quantitativeAnalysis": {
+      "type": "object",
+      "title": "Quantitative Analysis",
+      "description": "A quantitative analysis of the model",
+      "additionalProperties": false,
+      "properties": {
+        "performanceMetrics": {
+          "type": "array",
+          "title": "Performance Metrics",
+          "description": "The model performance metrics being reported. Examples may include accuracy, F1 score, precision, top-3 error rates, MSC, etc.",
+          "items": { "$ref": "#/definitions/performanceMetric" }
+        },
+        "graphics": { "$ref": "#/definitions/graphicsCollection" }
       }
     }
   }
