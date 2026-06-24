@@ -623,6 +623,71 @@
         }
       }
     },
+    "timeUnits": {
+      "enum": ["ns", "μs", "ms", "s", "min", "h"],
+      "meta:enum": {
+        "ns": "Nanoseconds - commonly used for high-precision timing measurements.",
+        "μs": "Microseconds - commonly used for fine-grained latency measurements.",
+        "ms": "Milliseconds - commonly used for latency measurements.",
+        "s": "Seconds - commonly used for latency and duration measurements.",
+        "min": "Minutes - commonly used for duration measurements.",
+        "h": "Hours - commonly used for duration measurements."
+      }
+    },
+    "throughputUnits": {
+      "enum": ["tokens/s", "requests/s", "ops/s"],
+      "meta:enum": {
+        "tokens/s": "Tokens per second - commonly used for LLM throughput measurements.",
+        "requests/s": "Requests per second - commonly used for API and service throughput measurements.",
+        "ops/s": "Operations per second - commonly used for general throughput measurements."
+      }
+    },
+    "computeUnits": {
+      "enum": ["FLOPS", "GFLOPS", "TFLOPS", "PFLOPS"],
+      "meta:enum": {
+        "FLOPS": "Floating-point operations per second.",
+        "GFLOPS": "Billion (giga) floating-point operations per second.",
+        "TFLOPS": "Trillion (tera) floating-point operations per second.",
+        "PFLOPS": "Quadrillion (peta) floating-point operations per second."
+      }
+    },
+    "memoryUnits": {
+      "enum": ["B", "KB", "MB", "GB", "TB", "PB", "KiB", "MiB", "GiB", "TiB", "PiB"],
+      "meta:enum": {
+        "B": "Bytes - base unit for memory and storage measurements.",
+        "KB": "Kilobytes (1000 bytes) - decimal unit for memory and storage measurements.",
+        "MB": "Megabytes (1000² bytes) - decimal unit for memory and storage measurements.",
+        "GB": "Gigabytes (1000³ bytes) - decimal unit for memory and storage measurements.",
+        "TB": "Terabytes (1000⁴ bytes) - decimal unit for memory and storage measurements.",
+        "PB": "Petabytes (1000⁵ bytes) - decimal unit for memory and storage measurements.",
+        "KiB": "Kibibytes (1024 bytes) - binary unit for memory measurements.",
+        "MiB": "Mebibytes (1024² bytes) - binary unit for memory measurements.",
+        "GiB": "Gibibytes (1024³ bytes) - binary unit for memory measurements.",
+        "TiB": "Tebibytes (1024⁴ bytes) - binary unit for memory measurements.",
+        "PiB": "Pebibytes (1024⁵ bytes) - binary unit for memory measurements."
+      }
+    },
+    "percentageUnits": {
+      "enum": ["%"],
+      "meta:enum": {
+        "%": "Percentage value (0-100) - commonly used for accuracy, precision, recall, and other ratio-based metrics."
+      }
+    },
+    "energyUnits": {
+      "enum": ["kWh"],
+      "meta:enum": {
+        "kWh": "Kilowatt-hour (kWh) is the energy delivered by one kilowatt (kW) of power for one hour (h)."
+      }
+    },
+    "co2Units": {
+      "enum": ["tCO2eq"],
+      "meta:enum": {
+        "tCO2eq": "Tonnes (t) of carbon dioxide (CO2) equivalent (eq)."
+      }
+    },
+    "customUnitPattern": {
+      "pattern": "^cdx:[a-z0-9:-]+$"
+    },
     "measure": {
       "type": "object",
       "title": "Measure",
@@ -643,37 +708,14 @@
           "title": "Unit",
           "description": "The unit of measurement.",
           "anyOf": [
-            {
-              "enum": [
-                "kWh",
-                "tCO2eq",
-                "ms",
-                "s",
-                "tokens/s",
-                "requests/s",
-                "FLOPS",
-                "TFLOPS",
-                "GB",
-                "MB",
-                "percentage"
-              ],
-              "meta:enum": {
-                "kWh": "Kilowatt-hour (kWh) is the energy delivered by one kilowatt (kW) of power for one hour (h).",
-                "tCO2eq": "Tonnes (t) of carbon dioxide (CO2) equivalent (eq).",
-                "ms": "Milliseconds - commonly used for latency measurements.",
-                "s": "Seconds - commonly used for latency and duration measurements.",
-                "tokens/s": "Tokens per second - commonly used for throughput measurements.",
-                "requests/s": "Requests per second - commonly used for throughput measurements.",
-                "FLOPS": "Floating-point operations per second.",
-                "TFLOPS": "Trillion (tera) floating-point operations per second.",
-                "GB": "Gigabytes - commonly used for memory measurements.",
-                "MB": "Megabytes - commonly used for memory measurements.",
-                "percentage": "Percentage value (0-100)."
-              }
-            },
-            {
-              "pattern": "^cdx:[a-z0-9:-]+$"
-            }
+            {"$ref": "#/$defs/timeUnits"},
+            {"$ref": "#/$defs/throughputUnits"},
+            {"$ref": "#/$defs/computeUnits"},
+            {"$ref": "#/$defs/memoryUnits"},
+            {"$ref": "#/$defs/percentageUnits"},
+            {"$ref": "#/$defs/energyUnits"},
+            {"$ref": "#/$defs/co2Units"},
+            {"$ref": "#/$defs/customUnitPattern"}
           ]
         }
       }
@@ -682,15 +724,14 @@
       "type": "object",
       "title": "Energy Measure",
       "description": "A measure of energy.",
+      "$comment": "The unit property is intentionally constrained to 'kWh' only (not extensible) as energy measurements require standardized units for accurate comparison and reporting.",
       "allOf": [
         {
           "$ref": "#/$defs/measure"
         },
         {
           "properties": {
-            "unit": {
-              "enum": ["kWh"]
-            }
+            "unit": {"$ref": "#/$defs/energyUnits"}
           }
         }
       ]
@@ -699,15 +740,14 @@
       "type": "object",
       "title": "CO2 Measure",
       "description": "A measure of carbon dioxide (CO2).",
+      "$comment": "The unit property is intentionally constrained to 'tCO2eq' only (not extensible) as carbon emissions require standardized units for accurate environmental impact reporting.",
       "allOf": [
         {
           "$ref": "#/$defs/measure"
         },
         {
           "properties": {
-            "unit": {
-              "enum": ["tCO2eq"]
-            }
+            "unit": {"$ref": "#/$defs/co2Units"}
           }
         }
       ]
@@ -716,6 +756,7 @@
       "type": "object",
       "title": "Performance Measure",
       "description": "A measure of performance with a value and unit.",
+      "$comment": "The unit property is extensible using the '^cdx:' pattern to accommodate diverse performance metrics across different AI/ML systems and use cases.",
       "allOf": [
         {
           "$ref": "#/$defs/measure"
@@ -724,23 +765,12 @@
           "properties": {
             "unit": {
               "anyOf": [
-                {
-                  "enum": ["ms", "s", "tokens/s", "requests/s", "FLOPS", "TFLOPS", "GB", "MB", "percentage"],
-                  "meta:enum": {
-                    "ms": "Milliseconds - commonly used for latency measurements.",
-                    "s": "Seconds - commonly used for latency and duration measurements.",
-                    "tokens/s": "Tokens per second - commonly used for throughput measurements.",
-                    "requests/s": "Requests per second - commonly used for throughput measurements.",
-                    "FLOPS": "Floating-point operations per second.",
-                    "TFLOPS": "Trillion (tera) floating-point operations per second.",
-                    "GB": "Gigabytes - commonly used for memory measurements.",
-                    "MB": "Megabytes - commonly used for memory measurements.",
-                    "percentage": "Percentage value (0-100)."
-                  }
-                },
-                {
-                  "pattern": "^cdx:[a-z0-9:-]+$"
-                }
+                {"$ref": "#/$defs/timeUnits"},
+                {"$ref": "#/$defs/throughputUnits"},
+                {"$ref": "#/$defs/computeUnits"},
+                {"$ref": "#/$defs/memoryUnits"},
+                {"$ref": "#/$defs/percentageUnits"},
+                {"$ref": "#/$defs/customUnitPattern"}
               ]
             }
           }
@@ -970,7 +1000,7 @@
           "type": "mmlu-pro",
           "measure": {
             "value": 58.2,
-            "unit": "percentage"
+            "unit": "%"
           },
           "confidenceInterval": {
             "lowerBound": "57.48",
@@ -981,14 +1011,14 @@
           "type": "humaneval",
           "measure": {
             "value": 0.87,
-            "unit": "percentage"
+            "unit": "%"
           }
         },
         {
           "type": "swe-bench",
           "measure": {
             "value": 45.3,
-            "unit": "percentage"
+            "unit": "%"
           },
           "evaluationDatasets": [
             {
