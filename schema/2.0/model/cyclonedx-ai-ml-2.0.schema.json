@@ -623,10 +623,10 @@
         }
       }
     },
-    "energyMeasure": {
+    "measure": {
       "type": "object",
-      "title": "Energy Measure",
-      "description": "A measure of energy.",
+      "title": "Measure",
+      "description": "A generic measurement with a value and unit.",
       "required": [
         "value",
         "unit"
@@ -636,48 +636,116 @@
         "value": {
           "type": "number",
           "title": "Value",
-          "description": "Quantity of energy."
+          "description": "The numeric value of the measurement."
         },
         "unit": {
           "type": "string",
-          "enum": [
-            "kWh"
-          ],
           "title": "Unit",
-          "description": "Unit of energy.",
-          "meta:enum": {
-            "kWh": "Kilowatt-hour (kWh) is the energy delivered by one kilowatt (kW) of power for one hour (h)."
-          }
+          "description": "The unit of measurement.",
+          "anyOf": [
+            {
+              "enum": [
+                "kWh",
+                "tCO2eq",
+                "ms",
+                "s",
+                "tokens/s",
+                "requests/s",
+                "FLOPS",
+                "TFLOPS",
+                "GB",
+                "MB",
+                "percentage"
+              ],
+              "meta:enum": {
+                "kWh": "Kilowatt-hour (kWh) is the energy delivered by one kilowatt (kW) of power for one hour (h).",
+                "tCO2eq": "Tonnes (t) of carbon dioxide (CO2) equivalent (eq).",
+                "ms": "Milliseconds - commonly used for latency measurements.",
+                "s": "Seconds - commonly used for latency and duration measurements.",
+                "tokens/s": "Tokens per second - commonly used for throughput measurements.",
+                "requests/s": "Requests per second - commonly used for throughput measurements.",
+                "FLOPS": "Floating-point operations per second.",
+                "TFLOPS": "Trillion (tera) floating-point operations per second.",
+                "GB": "Gigabytes - commonly used for memory measurements.",
+                "MB": "Megabytes - commonly used for memory measurements.",
+                "percentage": "Percentage value (0-100)."
+              }
+            },
+            {
+              "pattern": "^cdx:[a-z0-9:-]+$"
+            }
+          ]
         }
       }
+    },
+    "energyMeasure": {
+      "type": "object",
+      "title": "Energy Measure",
+      "description": "A measure of energy.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/measure"
+        },
+        {
+          "properties": {
+            "unit": {
+              "enum": ["kWh"]
+            }
+          }
+        }
+      ]
     },
     "co2Measure": {
       "type": "object",
       "title": "CO2 Measure",
       "description": "A measure of carbon dioxide (CO2).",
-      "required": [
-        "value",
-        "unit"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "value": {
-          "type": "number",
-          "title": "Value",
-          "description": "Quantity of carbon dioxide (CO2)."
+      "allOf": [
+        {
+          "$ref": "#/$defs/measure"
         },
-        "unit": {
-          "type": "string",
-          "enum": [
-            "tCO2eq"
-          ],
-          "title": "Unit",
-          "description": "Unit of carbon dioxide (CO2).",
-          "meta:enum": {
-            "tCO2eq": "Tonnes (t) of carbon dioxide (CO2) equivalent (eq)."
+        {
+          "properties": {
+            "unit": {
+              "enum": ["tCO2eq"]
+            }
           }
         }
-      }
+      ]
+    },
+    "performanceMeasure": {
+      "type": "object",
+      "title": "Performance Measure",
+      "description": "A measure of performance with a value and unit.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/measure"
+        },
+        {
+          "properties": {
+            "unit": {
+              "anyOf": [
+                {
+                  "enum": ["ms", "s", "tokens/s", "requests/s", "FLOPS", "TFLOPS", "GB", "MB", "percentage"],
+                  "meta:enum": {
+                    "ms": "Milliseconds - commonly used for latency measurements.",
+                    "s": "Seconds - commonly used for latency and duration measurements.",
+                    "tokens/s": "Tokens per second - commonly used for throughput measurements.",
+                    "requests/s": "Requests per second - commonly used for throughput measurements.",
+                    "FLOPS": "Floating-point operations per second.",
+                    "TFLOPS": "Trillion (tera) floating-point operations per second.",
+                    "GB": "Gigabytes - commonly used for memory measurements.",
+                    "MB": "Megabytes - commonly used for memory measurements.",
+                    "percentage": "Percentage value (0-100)."
+                  }
+                },
+                {
+                  "pattern": "^cdx:[a-z0-9:-]+$"
+                }
+              ]
+            }
+          }
+        }
+      ]
     },
     "energyProvider": {
       "type": "object",
@@ -803,7 +871,15 @@
                 "livebench",
                 "webarena",
                 "lmsys-elo",
-                "strongreject"
+                "strongreject",
+                "perplexity",
+                "bleu",
+                "rouge",
+                "latency",
+                "throughput",
+                "coco",
+                "vqa",
+                "imagenet"
               ],
               "meta:enum": {
                 "mmlu-pro": "Massive Multitask Language Understanding Pro - The current standard for broad, expert-level academic and professional reasoning across multiple disciplines.",
@@ -815,7 +891,15 @@
                 "livebench": "A frequently updated, contamination-free benchmark designed to test reasoning, math, and coding without the risk of models memorizing static test data.",
                 "webarena": "An agentic benchmark evaluating a model's ability to perform complex, multi-step tasks using a web browser, APIs, and OS environments.",
                 "lmsys-elo": "A crowd-sourced human preference rating derived from millions of blind A/B battle tests in the LMSYS Chatbot Arena.",
-                "strongreject": "A standardized metric for measuring safety and alignment by evaluating how reliably a model refuses harmful prompts while avoiding false positives."
+                "strongreject": "A standardized metric for measuring safety and alignment by evaluating how reliably a model refuses harmful prompts while avoiding false positives.",
+                "perplexity": "A fundamental language model metric measuring how well a probability model predicts a sample. Lower perplexity indicates better prediction.",
+                "bleu": "Bilingual Evaluation Understudy - A metric for evaluating machine translation quality by comparing generated text to reference translations.",
+                "rouge": "Recall-Oriented Understudy for Gisting Evaluation - A set of metrics for evaluating automatic summarization and machine translation by comparing overlap with reference texts.",
+                "latency": "The time delay between input submission and output generation, typically measured in milliseconds or seconds. Critical for real-time applications.",
+                "throughput": "The rate at which a model processes requests or tokens, typically measured in tokens per second or requests per second.",
+                "coco": "Common Objects in Context - A large-scale object detection, segmentation, and captioning dataset used to evaluate computer vision models.",
+                "vqa": "Visual Question Answering - Evaluates a model's ability to answer questions about images, testing multimodal understanding.",
+                "imagenet": "A large visual database designed for visual object recognition research, commonly used to benchmark image classification models."
               }
             },
             {
@@ -828,10 +912,10 @@
             "swe-bench"
           ]
         },
-        "value": {
-          "title": "Value",
-          "description": "The value of the performance metric.",
-          "type": "string"
+        "measure": {
+          "title": "Measure",
+          "description": "The measured value of the performance metric with its unit.",
+          "$ref": "#/$defs/performanceMeasure"
         },
         "slice": {
           "title": "Slice",
@@ -884,7 +968,10 @@
       "examples": [
         {
           "type": "mmlu-pro",
-          "value": "58.2",
+          "measure": {
+            "value": 58.2,
+            "unit": "percentage"
+          },
           "confidenceInterval": {
             "lowerBound": "57.48",
             "upperBound": "58.92"
@@ -892,11 +979,17 @@
         },
         {
           "type": "humaneval",
-          "value": "0.87"
+          "measure": {
+            "value": 0.87,
+            "unit": "percentage"
+          }
         },
         {
           "type": "swe-bench",
-          "value": "45.3",
+          "measure": {
+            "value": 45.3,
+            "unit": "percentage"
+          },
           "evaluationDatasets": [
             {
               "dataRef": "data-ref:swe-bench-lite-dataset"
@@ -906,6 +999,96 @@
             {
               "type": "distribution",
               "url": "https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite"
+            }
+          ]
+        },
+        {
+          "type": "latency",
+          "measure": {
+            "value": 127,
+            "unit": "ms"
+          },
+          "properties": [
+            {
+              "name": "percentile",
+              "value": "p95"
+            },
+            {
+              "name": "hardware",
+              "value": "NVIDIA A100 GPU"
+            }
+          ]
+        },
+        {
+          "type": "throughput",
+          "measure": {
+            "value": 2500,
+            "unit": "tokens/s"
+          },
+          "properties": [
+            {
+              "name": "batch-size",
+              "value": "32"
+            },
+            {
+              "name": "hardware",
+              "value": "NVIDIA A100 GPU"
+            }
+          ]
+        },
+        {
+          "type": "coco",
+          "measure": {
+            "value": 52.3,
+            "unit": "percentage"
+          },
+          "properties": [
+            {
+              "name": "metric",
+              "value": "mAP"
+            },
+            {
+              "name": "iou-threshold",
+              "value": "0.5"
+            }
+          ],
+          "externalReferences": [
+            {
+              "type": "distribution",
+              "url": "https://cocodataset.org/"
+            }
+          ]
+        },
+        {
+          "type": "bleu",
+          "measure": {
+            "value": 34.5,
+            "unit": "percentage"
+          },
+          "properties": [
+            {
+              "name": "variant",
+              "value": "BLEU-4"
+            },
+            {
+              "name": "per-class-precision-1",
+              "value": "0.78"
+            },
+            {
+              "name": "per-class-precision-2",
+              "value": "0.52"
+            },
+            {
+              "name": "per-class-precision-3",
+              "value": "0.38"
+            },
+            {
+              "name": "per-class-precision-4",
+              "value": "0.29"
+            },
+            {
+              "name": "brevity-penalty",
+              "value": "0.95"
             }
           ]
         }
