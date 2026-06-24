@@ -494,7 +494,19 @@
       "type": "object",
       "description": "Information about the data and datasets used for training or finetuning the associated model.",
       "properties": {
-        "dataProcessingSpec": {
+        "trainingFormula":{
+          "type":"object",
+          "title":"Training Formula",
+          "description":"The training formula for the model, with sequenced pashes (tasks) such as pre-training, supervised fine Tuning (SFT) and alignment tuning, using the declared training datasets.",
+          "properties": {
+             "formulaRef": {
+                "title": "BOM Reference",
+                "description": "A reference the formula defined elsewhere in the BOM.",
+                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+            }
+          }
+        },
+        "dataProcessingSpecs": {
           "type": "array",
           "title": "Data Processing Specifications",
           "description": "An array of data processing specifications.",
@@ -506,18 +518,6 @@
           "type": "array",
           "items": {
             "$ref": "#/$defs/datasetProcessingSpec"
-          }
-        },
-        "trainingFormula":{
-          "type":"object",
-          "title":"Training Formula",
-          "description":"The training formula for the model, with sequenced pashes (tasks) such as pre-training, supervised fine Tuning (SFT) and alignment tuning, using the declared training datasets.",
-          "properties": {
-             "formulaRef": {
-                "title": "BOM Reference",
-                "description": "A reference the formula defined elsewhere in the BOM.",
-                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
-            }
           }
         }
       }
