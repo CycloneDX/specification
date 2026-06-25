@@ -13,98 +13,13 @@
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
         },
         "tasks": {
-          "$comment": "Values not listed can be proposed to the CycloneDX Property Taxonomy.",
-          "$todos": [
-            "Update AI/ML property taxonomy with task enum values."
-          ],
           "type": "array",
           "title": "Tasks",
           "description": "The machine learning tasks that the model is designed to perform. This directly influences the model's intended use, input and output characteristics, and evaluation metrics. Models may support multiple tasks (e.g., multimodal models).",
           "minItems": 1,
           "uniqueItems": true,
           "items": {
-            "type": "string",
-            "anyOf": [
-              {
-                "enum": [
-                  "text-generation",
-                  "text-classification",
-                  "token-classification",
-                  "question-answering",
-                  "summarization",
-                  "translation",
-                  "text-to-text",
-                  "fill-mask",
-                  "sentence-similarity",
-                  "text-to-image",
-                  "text-to-video",
-                  "text-to-audio",
-                  "text-to-speech",
-                  "image-classification",
-                  "image-segmentation",
-                  "object-detection",
-                  "image-to-image",
-                  "image-to-text",
-                  "depth-estimation",
-                  "video-classification",
-                  "audio-classification",
-                  "automatic-speech-recognition",
-                  "audio-to-audio",
-                  "voice-activity-detection",
-                  "tabular-classification",
-                  "tabular-regression",
-                  "time-series-forecasting",
-                  "reinforcement-learning",
-                  "robotics",
-                  "graph-ml",
-                  "feature-extraction",
-                  "embedding",
-                  "zero-shot-classification",
-                  "few-shot-learning",
-                  "other"
-                ],
-                "meta:enum": {
-                  "text-generation": "Generate coherent text continuations from prompts (e.g., GPT models).",
-                  "text-classification": "Classify text into predefined categories (e.g., sentiment analysis, topic classification).",
-                  "token-classification": "Classify individual tokens in text (e.g., named entity recognition, part-of-speech tagging).",
-                  "question-answering": "Answer questions based on context or knowledge (e.g., extractive or generative QA).",
-                  "summarization": "Generate concise summaries of longer text documents.",
-                  "translation": "Translate text from one language to another.",
-                  "text-to-text": "Transform text from one form to another (e.g., paraphrasing, style transfer).",
-                  "fill-mask": "Predict masked tokens in text (e.g., BERT-style masked language modeling).",
-                  "sentence-similarity": "Compute semantic similarity between text sequences.",
-                  "text-to-image": "Generate images from text descriptions (e.g., DALL-E, Stable Diffusion).",
-                  "text-to-video": "Generate video content from text descriptions.",
-                  "text-to-audio": "Generate audio or music from text descriptions.",
-                  "text-to-speech": "Convert text to spoken audio (speech synthesis).",
-                  "image-classification": "Classify images into predefined categories (e.g., ResNet, ViT).",
-                  "image-segmentation": "Segment images into regions or objects (semantic or instance segmentation).",
-                  "object-detection": "Detect and localize objects in images (e.g., YOLO, R-CNN).",
-                  "image-to-image": "Transform images (e.g., style transfer, super-resolution, inpainting).",
-                  "image-to-text": "Generate text descriptions from images (e.g., image captioning).",
-                  "depth-estimation": "Estimate depth information from images.",
-                  "video-classification": "Classify video content into categories.",
-                  "audio-classification": "Classify audio into categories (e.g., sound event detection).",
-                  "automatic-speech-recognition": "Transcribe spoken audio to text (e.g., Whisper).",
-                  "audio-to-audio": "Transform audio (e.g., noise reduction, voice conversion).",
-                  "voice-activity-detection": "Detect presence of speech in audio streams.",
-                  "tabular-classification": "Classify structured tabular data.",
-                  "tabular-regression": "Predict continuous values from structured tabular data.",
-                  "time-series-forecasting": "Predict future values in time series data.",
-                  "reinforcement-learning": "Learn optimal actions through interaction with an environment.",
-                  "robotics": "Control and decision-making for robotic systems.",
-                  "graph-ml": "Machine learning tasks on graph-structured data.",
-                  "feature-extraction": "Extract meaningful features or representations from data.",
-                  "embedding": "Generate dense vector representations of data.",
-                  "zero-shot-classification": "Classify data without task-specific training examples.",
-                  "few-shot-learning": "Learn from very few examples per class.",
-                  "other": "Other machine learning tasks not covered by predefined categories."
-                }
-              },
-              {
-                "pattern": "^cdx:ai-ml:[a-z0-9:-]+$"
-              }
-            ]
+            "$ref": "#/$defs/modelTaskType"
           },
           "examples": [
             [
@@ -151,6 +66,28 @@
     "modelArchitecture": {
       "type": "object",
       "properties": {
+        "architectureName": {
+          "type": "string",
+          "title": "Architecture Name",
+          "description": "The specific name or identifier of the model architecture. This typically refers to well-known model variants or versions.",
+          "examples": [
+            "GPT-4",
+            "GPT-3.5-turbo",
+            "Llama-3.1-70B",
+            "Claude-3.5-Sonnet",
+            "Mistral-7B-v0.3",
+            "ResNet-50",
+            "YOLOv8",
+            "BERT-base-uncased",
+            "Stable-Diffusion-XL",
+            "Whisper-large-v3"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A detailed description of the model architecture, including key characteristics, design decisions, and architectural innovations."
+        },
         "structural": {
           "type": "object",
           "description": "Describes the primary architectural structure, layout constraints, and network topology.",
@@ -1620,6 +1557,102 @@
           },
           "processingStage": "post-tokenizer"
         }
+      ]
+    },
+    "modelTaskType": {
+      "$comment": "Values not listed can be proposed to the CycloneDX Property Taxonomy.",
+      "$todos": [
+        "Update AI/ML property taxonomy with task enum values."
+      ],
+      "type": "string",
+      "title": "Task Type",
+      "description": "A machine learning task that a model is designed to perform.",
+      "anyOf": [
+        {
+          "enum": [
+            "text-generation",
+            "text-classification",
+            "token-classification",
+            "question-answering",
+            "summarization",
+            "translation",
+            "text-to-text",
+            "fill-mask",
+            "sentence-similarity",
+            "text-to-image",
+            "text-to-video",
+            "text-to-audio",
+            "text-to-speech",
+            "image-classification",
+            "image-segmentation",
+            "object-detection",
+            "image-to-image",
+            "image-to-text",
+            "depth-estimation",
+            "video-classification",
+            "audio-classification",
+            "automatic-speech-recognition",
+            "audio-to-audio",
+            "voice-activity-detection",
+            "tabular-classification",
+            "tabular-regression",
+            "time-series-forecasting",
+            "reinforcement-learning",
+            "robotics",
+            "graph-ml",
+            "feature-extraction",
+            "embedding",
+            "zero-shot-classification",
+            "few-shot-learning",
+            "other"
+          ],
+          "meta:enum": {
+            "text-generation": "Generate coherent text continuations from prompts (e.g., GPT models).",
+            "text-classification": "Classify text into predefined categories (e.g., sentiment analysis, topic classification).",
+            "token-classification": "Classify individual tokens in text (e.g., named entity recognition, part-of-speech tagging).",
+            "question-answering": "Answer questions based on context or knowledge (e.g., extractive or generative QA).",
+            "summarization": "Generate concise summaries of longer text documents.",
+            "translation": "Translate text from one language to another.",
+            "text-to-text": "Transform text from one form to another (e.g., paraphrasing, style transfer).",
+            "fill-mask": "Predict masked tokens in text (e.g., BERT-style masked language modeling).",
+            "sentence-similarity": "Compute semantic similarity between text sequences.",
+            "text-to-image": "Generate images from text descriptions (e.g., DALL-E, Stable Diffusion).",
+            "text-to-video": "Generate video content from text descriptions.",
+            "text-to-audio": "Generate audio or music from text descriptions.",
+            "text-to-speech": "Convert text to spoken audio (speech synthesis).",
+            "image-classification": "Classify images into predefined categories (e.g., ResNet, ViT).",
+            "image-segmentation": "Segment images into regions or objects (semantic or instance segmentation).",
+            "object-detection": "Detect and localize objects in images (e.g., YOLO, R-CNN).",
+            "image-to-image": "Transform images (e.g., style transfer, super-resolution, inpainting).",
+            "image-to-text": "Generate text descriptions from images (e.g., image captioning).",
+            "depth-estimation": "Estimate depth information from images.",
+            "video-classification": "Classify video content into categories.",
+            "audio-classification": "Classify audio into categories (e.g., sound event detection).",
+            "automatic-speech-recognition": "Transcribe spoken audio to text (e.g., Whisper).",
+            "audio-to-audio": "Transform audio (e.g., noise reduction, voice conversion).",
+            "voice-activity-detection": "Detect presence of speech in audio streams.",
+            "tabular-classification": "Classify structured tabular data.",
+            "tabular-regression": "Predict continuous values from structured tabular data.",
+            "time-series-forecasting": "Predict future values in time series data.",
+            "reinforcement-learning": "Learn optimal actions through interaction with an environment.",
+            "robotics": "Control and decision-making for robotic systems.",
+            "graph-ml": "Machine learning tasks on graph-structured data.",
+            "feature-extraction": "Extract meaningful features or representations from data.",
+            "embedding": "Generate dense vector representations of data.",
+            "zero-shot-classification": "Classify data without task-specific training examples.",
+            "few-shot-learning": "Learn from very few examples per class.",
+            "other": "Other machine learning tasks not covered by predefined categories."
+          }
+        },
+        {
+          "pattern": "^cdx:ai-ml:[a-z0-9:-]+$"
+        }
+      ],
+      "examples": [
+        "text-generation",
+        "image-classification",
+        "object-detection",
+        "automatic-speech-recognition"
       ]
     }
   }
