@@ -1,0 +1,118 @@
+{
+  "$schema": "https://cyclonedx.org/schema/2.0/cyclonedx-2.0.schema.json",
+  "specFormat": "CycloneDX",
+  "specVersion": "2.0",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-06-03T12:00:00Z"
+  },
+  "perspectives": [
+    {
+      "bom-ref": "perspective-pqc-readiness",
+      "name": "PQC Readiness",
+      "description": "Defines the data elements needed to assess a product's readiness for the post-quantum migration, and the structural assertions that determine readiness. Organized along three dimensions inspired by the PQCA readiness-tracking working group: inventory (is the cryptography recorded and classifiable), algorithm (is the cryptography in use quantum-resistant, split into a confidentiality/HNDL facet and an authentication facet), and agility (can vulnerable cryptography be replaced without code changes). Mappings carrying an 'expectation' are hard checks; mappings without one are descriptive and feed a graded readiness score. This perspective assumes the 'expectation' field on perspective mappings (see perspective-expectation-rationale.md).",
+      "domains": [
+        "cryptographic-security",
+        {
+          "name": "post-quantum-migration",
+          "description": "Concerns related to migrating cryptography to post-quantum algorithms ahead of cryptographically relevant quantum computers."
+        }
+      ],
+      "mappings": [
+        {
+          "expression": "$.components[?(@.type=='cryptographic-asset')]",
+          "nativeName": "Cryptographic Inventory",
+          "nativeDescription": "All cryptographic assets (algorithms, certificates, protocols, and related material) used by the product.",
+          "relevance": "required",
+          "expectation": "present",
+          "weight": 1.0,
+          "rationale": "Inventory dimension. PQC readiness cannot be assessed unless the cryptography in use is inventoried."
+        },
+        {
+          "expression": "$.components[?(@.cryptoProperties.assetType=='algorithm' && !@.cryptoProperties.algorithmProperties.primitive)]",
+          "nativeName": "Unclassified algorithm",
+          "nativeDescription": "An algorithm asset that does not declare its primitive.",
+          "relevance": "required",
+          "expectation": "absent",
+          "weight": 0.8,
+          "rationale": "Inventory dimension. Every algorithm must declare its primitive so the confidentiality and authentication facets can be evaluated."
+        },
+        {
+          "expression": "$.components[?((@.cryptoProperties.algorithmProperties.primitive=='kem' || @.cryptoProperties.algorithmProperties.primitive=='key-agree' || @.cryptoProperties.algorithmProperties.primitive=='pke' || @.cryptoProperties.algorithmProperties.primitive=='signature') && !@.cryptoProperties.algorithmProperties.nistQuantumSecurityLevel)]",
+          "nativeName": "Asymmetric algorithm without a quantum security category",
+          "nativeDescription": "An asymmetric algorithm — key establishment (KEM, key agreement, or PKE) or signature — that does not declare a NIST security strength category.",
+          "relevance": "required",
+          "expectation": "absent",
+          "weight": 0.8,
+          "rationale": "Inventory dimension. Restricted to the quantum-relevant asymmetric primitives, whose NIST security category gates the confidentiality and authentication facets; symmetric algorithms are out of scope for this check. Without the category, an asymmetric algorithm's quantum resistance cannot be judged."
+        },
+        {
+          "expression": "$.components[?((@.cryptoProperties.algorithmProperties.primitive=='kem' || @.cryptoProperties.algorithmProperties.primitive=='key-agree' || @.cryptoProperties.algorithmProperties.primitive=='pke') && @.cryptoProperties.algorithmProperties.nistQuantumSecurityLevel==0)]",
+          "nativeName": "Quantum-vulnerable key establishment",
+          "nativeDescription": "Key encapsulation, key agreement, or public-key encryption that provides no post-quantum security.",
+          "relevance": "required",
+          "expectation": "absent",
+          "weight": 1.0,
+          "rationale": "Algorithm dimension, confidentiality (harvest-now-decrypt-later) facet. Highest priority, because ciphertext captured today can be decrypted once a cryptographically relevant quantum computer exists."
+        },
+        {
+          "expression": "$.components[?(@.cryptoProperties.algorithmProperties.primitive=='signature' && @.cryptoProperties.algorithmProperties.nistQuantumSecurityLevel==0)]",
+          "nativeName": "Quantum-vulnerable signatures",
+          "nativeDescription": "Signature algorithms that provide no post-quantum security.",
+          "relevance": "required",
+          "expectation": "absent",
+          "weight": 0.7,
+          "rationale": "Algorithm dimension, authentication facet. Needed for forward integrity and for long-lived signatures such as firmware and roots of trust."
+        },
+        {
+          "expression": "$.components[?(@.cryptoProperties.assetType=='certificate')]",
+          "nativeName": "Certificates",
+          "nativeDescription": "X.509 and other certificates whose quantum resistance derives from their signing algorithm.",
+          "relevance": "recommended",
+          "weight": 0.5,
+          "rationale": "Algorithm dimension, authentication facet. A certificate's quantum resistance follows from its signature algorithm, which is resolved through the certificate's related cryptographic assets rather than a single field."
+        },
+        {
+          "expression": "$.components[?(@.cryptoProperties.assetType=='protocol')]",
+          "nativeName": "Protocols",
+          "nativeDescription": "Protocols such as TLS, SSH, and IKE whose security depends on the negotiated key exchange and signatures.",
+          "relevance": "recommended",
+          "weight": 0.5,
+          "rationale": "Protocol dimension. A protocol's readiness follows from the cipher suites and key exchange it negotiates."
+        },
+        {
+          "expression": "$..cryptoProperties.agility",
+          "nativeName": "Cryptographic agility",
+          "nativeDescription": "How an asset's cryptographic configuration was determined and how a change to it can be applied.",
+          "relevance": "recommended",
+          "weight": 0.5,
+          "rationale": "Agility dimension. Informs migration effort, not the readiness verdict."
+        },
+        {
+          "expression": "$..cryptoProperties.agility.changeMechanism",
+          "nativeName": "Change mechanism",
+          "nativeDescription": "How a change to the cryptographic configuration is applied.",
+          "relevance": "recommended",
+          "weight": 0.4,
+          "rationale": "Agility dimension. A value of runtime-config or restart-required indicates low-effort migration, while firmware-update or hardware-replacement indicates higher effort."
+        },
+        {
+          "expression": "$.components[?(@.cryptoProperties.assetType=='related-crypto-material')].cryptoProperties.relatedCryptoMaterialProperties.rotation",
+          "nativeName": "Key rotation",
+          "nativeDescription": "How key material is rotated, covering both the degree of automation and the concrete rotation mechanism.",
+          "relevance": "recommended",
+          "weight": 0.3,
+          "rationale": "Agility dimension. Automated rotation and a known rotation mechanism (e.g. a cloud KMS or PKCS#11) ease re-keying during migration."
+        },
+        {
+          "expression": "$.components[?(@.cryptoProperties.assetType=='certificate')].cryptoProperties.certificateProperties.renewal",
+          "nativeName": "Certificate renewal",
+          "nativeDescription": "How certificates are renewed, covering both the degree of automation and the concrete renewal mechanism.",
+          "relevance": "recommended",
+          "weight": 0.3,
+          "rationale": "Agility dimension. Automated renewal and a known renewal mechanism (e.g. ACME or EST) ease certificate re-issuance during migration."
+        }
+      ]
+    }
+  ]
+}
