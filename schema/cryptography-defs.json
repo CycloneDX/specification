@@ -1,6 +1,6 @@
 {
   "$schema": "http://cyclonedx.org/schema/cryptography-defs.schema.json",
-  "lastUpdated": "2026-02-24T00:00:00Z",
+  "lastUpdated": "2026-08-06T00:00:00Z",
   "algorithms": [
     {
       "family": "RSASSA-PKCS1",
@@ -4219,6 +4219,114 @@
             {
               "category": "secg",
               "name": "sect571r1"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "protocols": [
+    {
+      "family": "tls",
+      "description": "Transport Layer Security (TLS) provides confidentiality, integrity, and authentication for communication over a network.",
+      "standard": [
+        {
+          "name": "IANA TLS Parameters",
+          "url": "https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml"
+        }
+      ],
+      "version": [
+        {
+          "version": "1.3",
+          "standard": [
+            {
+              "name": "RFC8446",
+              "url": "https://doi.org/10.17487/RFC8446"
+            }
+          ],
+          "composition": [
+            {
+              "role": "key-exchange",
+              "selection": "one-of",
+              "selectedBy": "negotiation",
+              "algorithmSet": [
+                "x25519",
+                "x448",
+                "ECDHE-secp256r1",
+                "ECDHE-secp384r1",
+                {
+                  "name": "X25519MLKEM768",
+                  "algorithms": [
+                    "x25519",
+                    "ML-KEM-768"
+                  ]
+                },
+                {
+                  "name": "SecP256r1MLKEM768",
+                  "algorithms": [
+                    "ECDHE-secp256r1",
+                    "ML-KEM-768"
+                  ]
+                },
+                {
+                  "name": "SecP384r1MLKEM1024",
+                  "algorithms": [
+                    "ECDHE-secp384r1",
+                    "ML-KEM-1024"
+                  ]
+                }
+              ]
+            },
+            {
+              "role": "signature",
+              "selection": "one-of",
+              "selectedBy": "negotiation",
+              "algorithmSet": [
+                "ECDSA-secp256r1-SHA-256",
+                "ECDSA-secp384r1-SHA-384",
+                "RSA-PSS-SHA-256",
+                "Ed25519",
+                "ML-DSA-65"
+              ]
+            },
+            {
+              "role": "cert-chain-signature",
+              "selection": "any-of",
+              "selectedBy": "server-selected",
+              "algorithmSet": [
+                "ECDSA-secp256r1-SHA-256",
+                "RSA-PKCS1-1.5-SHA-256",
+                "RSA-PSS-SHA-256",
+                "ML-DSA-65"
+              ]
+            },
+            {
+              "role": "encryption",
+              "selection": "one-of",
+              "selectedBy": "negotiation",
+              "algorithmSet": [
+                {
+                  "name": "TLS_AES_128_GCM_SHA256",
+                  "algorithms": [
+                    "AES-128-GCM",
+                    "HKDF-SHA-256"
+                  ]
+                },
+                {
+                  "name": "TLS_AES_256_GCM_SHA384",
+                  "algorithms": [
+                    "AES-256-GCM",
+                    "HKDF-SHA-384"
+                  ]
+                },
+                {
+                  "name": "TLS_CHACHA20_POLY1305_SHA256",
+                  "algorithms": [
+                    "ChaCha20-Poly1305",
+                    "HKDF-SHA-256"
+                  ]
+                }
+              ]
             }
           ]
         }
