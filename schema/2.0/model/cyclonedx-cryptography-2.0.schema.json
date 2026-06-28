@@ -257,6 +257,8 @@
                 "kwp",
                 "cts",
                 "xts",
+                "gmac",
+                "cmac",
                 "xpn",
                 "ff1",
                 "ff3-1",
@@ -279,6 +281,8 @@
                 "kwp": "AES Key Wrap with Padding (RFC 5649).",
                 "cts": "Ciphertext Stealing mode.",
                 "xts": "XEX Tweaked-codebook with Stealing (disk encryption).",
+                "gmac": "Galois Message Authentication Code",
+                "cmac": "Cipher-based Message Authentication Code",
                 "xpn": "Extended Packet Numbering mode.",
                 "ff1": "Format-preserving encryption mode 1.",
                 "ff3-1": "Format-preserving encryption mode 3, update 1.",
@@ -412,7 +416,7 @@
               ]
             },
             "fingerprint": {
-              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/hash",
+              "$ref": "#/$defs/fingerprint",
               "title": "Certificate Fingerprint",
               "description": "The fingerprint is a cryptographic hash of the certificate excluding it's signature."
             },
@@ -714,9 +718,7 @@
               "description": "The mechanism by which the cryptographic asset is secured by."
             },
             "fingerprint": {
-              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/hash",
-              "title": "Fingerprint",
-              "description": "The fingerprint is a cryptographic hash of the asset."
+              "$ref": "#/$defs/fingerprint"
             },
             "relatedCryptographicAssets": {
               "$ref": "#/$defs/relatedCryptographicAssets"
@@ -1058,6 +1060,7 @@
         "decapsulate",
         "keyagree",
         "wrap",
+        "unwrap",
         "other",
         "unknown"
       ],
@@ -1078,6 +1081,7 @@
         "decapsulate": "Decapsulates a secret using a private key (KEM).",
         "keyagree": "Derives a shared secret between parties.",
         "wrap": "Encrypts a key for secure storage or transport.",
+        "unwrap": "Decrypts a wrapped key to recover the original key.",
         "other": "Another cryptographic function.",
         "unknown": "The cryptographic function is not known."
       }
@@ -1112,6 +1116,45 @@
           "description": "The bom-ref to cryptographic asset."
         }
       }
+    },
+    "fingerprint": {
+      "type": "object",
+      "title": "Fingerprint",
+      "description": "The fingerprint is a cryptographic hash of the asset.",
+      "oneOf": [
+        {
+          "title": "Standard Hash",
+          "description": "A fingerprint computed using a standard, well-known hash algorithm.",
+          "required": ["alg", "content"],
+          "additionalProperties": false,
+          "properties": {
+            "alg": {
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/hashAlgorithm"
+            },
+            "content": {
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/hashValue"
+            }
+          }
+        },
+        {
+          "title": "Custom Fingerprint",
+          "description": "A fingerprint computed with a custom or non-standard algorithm not covered by the standard hash algorithms.",
+          "required": ["customAlg", "customContent"],
+          "additionalProperties": false,
+          "properties": {
+            "customAlg": {
+              "type": "string",
+              "title": "Custom Fingerprint Algorithm",
+              "description": "The name of the custom algorithm used to compute the fingerprint."
+            },
+            "customContent": {
+              "type": "string",
+              "title": "Custom Fingerprint Content",
+              "description": "The value of the fingerprint computed using the custom algorithm."
+            }
+          }
+        }
+      ]
     },
     "securedBy": {
       "type": "object",
