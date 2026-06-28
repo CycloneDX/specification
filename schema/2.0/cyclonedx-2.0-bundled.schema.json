@@ -79,6 +79,9 @@
     "citations": {
       "$ref": "#/$defs/cyclonedx-citation-2.0/$defs/citations"
     },
+    "perspectives": {
+      "$ref": "#/$defs/cyclonedx-perspective-2.0/$defs/perspectives"
+    },
     "properties": {
       "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
     },
@@ -932,10 +935,14 @@
           "additionalProperties": false,
           "properties": {
             "alg": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/hashAlgorithm"
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/hashAlgorithm",
+              "title": "Hash Algorithm",
+              "description": "The standard, well-known algorithm used to compute the hash."
             },
             "content": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/hashValue"
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/hashValue",
+              "title": "Hash Value",
+              "description": "The value of the hash computed using the standard, well-known algorithm."
             }
           }
         },
@@ -1097,6 +1104,7 @@
                 "codified-infrastructure",
                 "quality-metrics",
                 "poam",
+                "perspective",
                 "electronic-signature",
                 "digital-signature",
                 "rfc-9116",
@@ -1104,6 +1112,7 @@
                 "patent-family",
                 "patent-assertion",
                 "citation",
+                "swid-tag",
                 "other"
               ],
               "meta:enum": {
@@ -1146,6 +1155,7 @@
                 "codified-infrastructure": "Code or configuration that defines and provisions virtualized infrastructure, commonly referred to as Infrastructure as Code (IaC).",
                 "quality-metrics": "Report or system in which quality metrics can be obtained.",
                 "poam": "Plans of Action and Milestones (POA&M) complement an \"attestation\" external reference. POA&M is defined by NIST as a \"document that identifies tasks needing to be accomplished. It details resources required to accomplish the elements of the plan, any milestones in meeting the tasks and scheduled completion dates for the milestones\".",
+                "perspective": "A CycloneDX perspective defines a domain-specific view, enabling different audiences to interpret and navigate the data through their own conceptual lens.",
                 "electronic-signature": "An e-signature is commonly a scanned representation of a written signature or a stylized script of the person's name.",
                 "digital-signature": "A signature that leverages cryptography, typically public/private key pairs, which provides strong authenticity verification.",
                 "rfc-9116": "Document that complies with [RFC 9116](https://www.ietf.org/rfc/rfc9116.html) (A File Format to Aid in Security Vulnerability Disclosure)",
@@ -1153,6 +1163,7 @@
                 "patent-family": "References information about a patent family which may be defined in human-readable documents or in machine-readable formats such as CycloneDX or ST.96. A patent family is a group of related patent applications or granted patents that cover the same or similar invention. For detailed patent family information or to reference the information provided directly by patent offices, it is recommended to leverage standards from the World Intellectual Property Organization (WIPO) such as [ST.96](https://www.wipo.int/standards/en/st96).",
                 "patent-assertion": "References assertions made regarding patents associated with a component or service. Assertions distinguish between ownership, licensing, and other relevant interactions with patents.",
                 "citation": "A reference to external citations applicable to the object identified by this BOM entry or the BOM itself. When used with a BOM-Link, this allows offloading citations into a separate CycloneDX BOM.",
+                "swid-tag": "A Software Identification (SWID) tag document conforming to ISO/IEC 19770-2. The reference resolves to the XML SoftwareIdentity document itself, including all of its metadata (entities, evidence, payload, links, and meta elements). This is distinct from the `swid` identifier scheme, which carries only the tagId of a SWID tag.",
                 "other": "Use this if no other types accurately describe the purpose of the external reference."
               }
             },
@@ -1865,49 +1876,8 @@
               "$ref": "#/$defs/cyclonedx-patent-2.0/$defs/patentAssertions",
               "title": "Component Patent(s)"
             },
-            "cpe": {
-              "type": "string",
-              "title": "Common Platform Enumeration (CPE)",
-              "description": "Asserts the identity of the component using CPE. The CPE must conform to the CPE 2.2 or 2.3 specification. See [https://nvd.nist.gov/products/cpe](https://nvd.nist.gov/products/cpe). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity.",
-              "examples": [
-                "cpe:2.3:a:acme:component_framework:-:*:*:*:*:*:*:*"
-              ]
-            },
-            "purl": {
-              "type": "string",
-              "title": "Package URL (purl)",
-              "description": "Asserts the identity of the component using package-url (purl). The purl, if specified, must be valid and conform to the specification defined at: [https://github.com/package-url/purl-spec](https://github.com/package-url/purl-spec). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity.",
-              "examples": [
-                "pkg:maven/com.acme/tomcat-catalina@9.0.14?packaging=jar"
-              ]
-            },
-            "omniborId": {
-              "type": "array",
-              "title": "OmniBOR Artifact Identifier (gitoid)",
-              "description": "Asserts the identity of the component using the OmniBOR Artifact ID. The OmniBOR, if specified, must be valid and conform to the specification defined at: [https://www.iana.org/assignments/uri-schemes/prov/gitoid](https://www.iana.org/assignments/uri-schemes/prov/gitoid). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity.",
-              "items": {
-                "type": "string"
-              },
-              "examples": [
-                "gitoid:blob:sha1:a94a8fe5ccb19ba61c4c0873d391e987982fbbd3",
-                "gitoid:blob:sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
-              ]
-            },
-            "swhid": {
-              "type": "array",
-              "title": "Software Heritage Identifier",
-              "description": "Asserts the identity of the component using the Software Heritage persistent identifier (SWHID). The SWHID, if specified, must be valid and conform to the specification defined at: [https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html](https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity.",
-              "items": {
-                "type": "string"
-              },
-              "examples": [
-                "swh:1:cnt:94a9ed024d3859793618152ea559a168bbcbb5e2"
-              ]
-            },
-            "swid": {
-              "$ref": "#/$defs/cyclonedx-component-2.0/$defs/swid",
-              "title": "SWID Tag",
-              "description": "Asserts the identity of the component using [ISO-IEC 19770-2 Software Identification (SWID) Tags](https://www.iso.org/standard/65666.html). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity."
+            "identifiers": {
+              "$ref": "#/$defs/cyclonedx-component-2.0/$defs/identifiers"
             },
             "pedigree": {
               "type": "object",
@@ -2101,57 +2071,6 @@
             }
           }
         },
-        "swid": {
-          "type": "object",
-          "title": "SWID Tag",
-          "description": "Specifies metadata and content for ISO-IEC 19770-2 Software Identification (SWID) Tags.",
-          "required": [
-            "tagId",
-            "name"
-          ],
-          "additionalProperties": false,
-          "properties": {
-            "tagId": {
-              "type": "string",
-              "title": "Tag ID",
-              "description": "Maps to the tagId of a SoftwareIdentity."
-            },
-            "name": {
-              "type": "string",
-              "title": "Name",
-              "description": "Maps to the name of a SoftwareIdentity."
-            },
-            "version": {
-              "type": "string",
-              "title": "Version",
-              "default": "0.0",
-              "description": "Maps to the version of a SoftwareIdentity."
-            },
-            "tagVersion": {
-              "type": "integer",
-              "title": "Tag Version",
-              "default": 0,
-              "description": "Maps to the tagVersion of a SoftwareIdentity."
-            },
-            "patch": {
-              "type": "boolean",
-              "title": "Patch",
-              "default": false,
-              "description": "Maps to the patch of a SoftwareIdentity."
-            },
-            "text": {
-              "title": "Attachment text",
-              "description": "Specifies the metadata and content of the SWID tag.",
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/attachment"
-            },
-            "url": {
-              "type": "string",
-              "title": "URL",
-              "description": "The URL to the SWID file.",
-              "format": "iri-reference"
-            }
-          }
-        },
         "componentEvidence": {
           "type": "object",
           "title": "Evidence",
@@ -2314,25 +2233,12 @@
           "title": "Identity Evidence",
           "description": "Evidence that substantiates the identity of a component.",
           "required": [
-            "field"
+            "scheme"
           ],
           "additionalProperties": false,
           "properties": {
-            "field": {
-              "type": "string",
-              "enum": [
-                "group",
-                "name",
-                "version",
-                "purl",
-                "cpe",
-                "omniborId",
-                "swhid",
-                "swid",
-                "hash"
-              ],
-              "title": "Field",
-              "description": "The identity field of the component which the evidence describes."
+            "scheme": {
+              "$ref": "#/$defs/cyclonedx-component-2.0/$defs/identityScheme"
             },
             "confidence": {
               "type": "number",
@@ -2344,7 +2250,7 @@
             "concludedValue": {
               "type": "string",
               "title": "Concluded Value",
-              "description": "The value of the field (cpe, purl, etc) that has been concluded based on the aggregate of all methods (if available)."
+              "description": "The value of the scheme that has been concluded based on the aggregate of all methods (if available)."
             },
             "methods": {
               "type": "array",
@@ -2497,6 +2403,154 @@
               "$ref": "#/$defs/cyclonedx-data-2.0/$defs/dataGovernance"
             }
           }
+        },
+        "identifiers": {
+          "type": "array",
+          "title": "Identifiers",
+          "description": "Identifiers asserted by one or more parties to identify this component. Each entry groups one or more identity claims by the party asserting them. Identifiers carry positive claims of identity. For unverified or inferred identity data, use evidence.",
+          "items": {
+            "$ref": "#/$defs/cyclonedx-component-2.0/$defs/identifier"
+          },
+          "uniqueItems": true
+        },
+        "identifier": {
+          "type": "object",
+          "title": "Identifier",
+          "description": "A set of identifiers attributed to a single asserting party.",
+          "required": [
+            "party",
+            "identities"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            },
+            "party": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
+              "title": "Asserting Party",
+              "description": "Reference using bom-link or bom-ref to the party making the identity assertion."
+            },
+            "identities": {
+              "type": "array",
+              "title": "Identities",
+              "description": "The discrete identity claims asserted by the party.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-component-2.0/$defs/identity"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          }
+        },
+        "identity": {
+          "type": "object",
+          "title": "Identity",
+          "description": "A single identity claim, pairing a typed identifier scheme with the value asserted under that scheme.",
+          "required": [
+            "scheme",
+            "value"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scheme": {
+              "$ref": "#/$defs/cyclonedx-component-2.0/$defs/identityScheme"
+            },
+            "value": {
+              "$ref": "#/$defs/cyclonedx-component-2.0/$defs/identityValue"
+            }
+          }
+        },
+        "identityScheme": {
+          "title": "Identifier Scheme",
+          "description": "The scheme under which an identifier is asserted. Either a predefined value or a custom scheme described by name and description.",
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "purl",
+                "cpe",
+                "swid",
+                "swhid",
+                "omniborid",
+                "epc-rfid",
+                "giai",
+                "gln",
+                "gmn",
+                "gtin-8",
+                "gtin-12",
+                "gtin-13",
+                "gtin-14",
+                "mpn",
+                "part-number",
+                "model-number",
+                "sku",
+                "serial-number",
+                "asset-tag",
+                "udi-di",
+                "udi-pi",
+                "fcc-id",
+                "imei",
+                "mac-address",
+                "tei"
+              ],
+              "meta:enum": {
+                "purl": "Package-URL identifier, conforming to the Package-URL specification.",
+                "cpe": "Common Platform Enumeration name, conforming to NIST Interagency Report 7695.",
+                "swid": "Software Identification tag identifier, conforming to ISO/IEC 19770-2.",
+                "swhid": "Software Heritage persistent identifier.",
+                "omniborid": "OmniBOR Artifact Identifier, also known as a gitoid.",
+                "epc-rfid": "Electronic Product Code - RFID (EPC Tag Data Standard)",
+                "giai": "Global Individual Asset Identifier (GIAI)",
+                "gln": "Global Location Number (GLN)",
+                "gmn": "Global Model Number (GMN)",
+                "gtin-8": "Global Trade Identification Number (GTIN-8 / EAN/UCC-8)",
+                "gtin-12": "Global Trade Identification Number (GTIN-12 / UPC-A)",
+                "gtin-13": "Global Trade Identification Number (GTIN-13 / EAN/UCC-13)",
+                "gtin-14": "Global Trade Identification Number (GTIN / EAN/UCC-14 or ITF-14)",
+                "mpn": "Manufacturer Part Number, assigned by the original manufacturer.",
+                "part-number": "Part number assigned by a distributor, integrator, or operator.",
+                "model-number": "Product model number assigned by the manufacturer.",
+                "sku": "Stock Keeping Unit, assigned by a seller or distributor.",
+                "serial-number": "Unique identifier for an individual instance of a product.",
+                "asset-tag": "Asset tag assigned by the owning or operating organization.",
+                "udi-di": "Unique Device Identifier, Device Identifier portion, conforming to ISO/IEC 15459 and applicable regulatory frameworks.",
+                "udi-pi": "Unique Device Identifier, Production Identifier portion, conforming to ISO/IEC 15459 and applicable regulatory frameworks.",
+                "fcc-id": "United States Federal Communications Commission equipment identifier.",
+                "imei": "International Mobile Equipment Identity, conforming to 3GPP TS 23.003.",
+                "mac-address": "IEEE 802 Media Access Control address.",
+                "tei": "Transparency Exchange Identifier conforming to the Transparency Exchange API specification."
+              }
+            },
+            {
+              "type": "object",
+              "title": "Custom Identifier Scheme",
+              "description": "A custom identifier scheme not represented in the predefined taxonomy.",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom identifier scheme."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom identifier scheme."
+                }
+              }
+            }
+          ]
+        },
+        "identityValue": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Identifier Value",
+          "description": "The value of an identifier."
         }
       }
     },
@@ -3019,7 +3073,7 @@
                   ]
                 },
                 "fingerprint": {
-                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/hash",
+                  "$ref": "#/$defs/cyclonedx-cryptography-2.0/$defs/fingerprint",
                   "title": "Certificate Fingerprint",
                   "description": "The fingerprint is a cryptographic hash of the certificate excluding it's signature."
                 },
@@ -3321,9 +3375,7 @@
                   "description": "The mechanism by which the cryptographic asset is secured by."
                 },
                 "fingerprint": {
-                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/hash",
-                  "title": "Fingerprint",
-                  "description": "The fingerprint is a cryptographic hash of the asset."
+                  "$ref": "#/$defs/cyclonedx-cryptography-2.0/$defs/fingerprint"
                 },
                 "relatedCryptographicAssets": {
                   "$ref": "#/$defs/cyclonedx-cryptography-2.0/$defs/relatedCryptographicAssets"
@@ -3721,6 +3773,51 @@
               "description": "The bom-ref to cryptographic asset."
             }
           }
+        },
+        "fingerprint": {
+          "type": "object",
+          "title": "Fingerprint",
+          "description": "The fingerprint is a cryptographic hash of the asset.",
+          "oneOf": [
+            {
+              "title": "Standard Hash",
+              "description": "A fingerprint computed using a standard, well-known hash algorithm.",
+              "required": [
+                "alg",
+                "content"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "alg": {
+                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/hashAlgorithm"
+                },
+                "content": {
+                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/hashValue"
+                }
+              }
+            },
+            {
+              "title": "Custom Fingerprint",
+              "description": "A fingerprint computed with a custom or non-standard algorithm not covered by the standard hash algorithms.",
+              "required": [
+                "customAlg",
+                "customContent"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "customAlg": {
+                  "type": "string",
+                  "title": "Custom Fingerprint Algorithm",
+                  "description": "The name of the custom algorithm used to compute the fingerprint."
+                },
+                "customContent": {
+                  "type": "string",
+                  "title": "Custom Fingerprint Content",
+                  "description": "The value of the fingerprint computed using the custom algorithm."
+                }
+              }
+            }
+          ]
         },
         "securedBy": {
           "type": "object",
@@ -6051,6 +6148,345 @@
         }
       }
     },
+    "cyclonedx-perspective-2.0": {
+      "type": "null",
+      "title": "CycloneDX Perspective Model",
+      "$defs": {
+        "perspectives": {
+          "type": "array",
+          "title": "Perspectives",
+          "description": "Defines domain-specific views into the document, enabling different audiences to interpret and navigate the data through their own conceptual lens. Each perspective identifies relevant data types and may provide domain-specific terminology mappings.",
+          "items": {
+            "$ref": "#/$defs/cyclonedx-perspective-2.0/$defs/perspective"
+          }
+        },
+        "perspective": {
+          "type": "object",
+          "title": "Perspective",
+          "description": "A domain-specific view that identifies the types of data relevant to a particular audience and provides optional terminology mappings to facilitate interpretation. Perspectives enable tooling to generate filtered views, translate terminology, and validate document completeness against audience-specific requirements.",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "mappings"
+          ],
+          "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            },
+            "name": {
+              "type": "string",
+              "title": "Perspective Name",
+              "description": "The name of the perspective, typically indicating the target audience or domain.",
+              "examples": [
+                "AI/ML Transparency",
+                "Device Manufacturing Regulatory Compliance",
+                "Minimum Elements of an SBOM"
+              ]
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the perspective, its intended audience, and the use cases it supports."
+            },
+            "domains": {
+              "type": "array",
+              "title": "Domains",
+              "description": "The domains or disciplines to which this perspective applies. Allows selection of multiple pre-defined domains, custom domains, or a combination of both.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-perspective-2.0/$defs/perspectiveDomainChoice"
+              }
+            },
+            "mappings": {
+              "type": "array",
+              "title": "Data Type Mappings",
+              "description": "An array of mappings that identify the types of data relevant to this perspective using JSON path expressions. Each mapping may include domain-specific terminology.",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/cyclonedx-perspective-2.0/$defs/perspectiveMapping"
+              }
+            },
+            "externalReferences": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/externalReferences"
+            },
+            "properties": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
+            }
+          }
+        },
+        "perspectiveMapping": {
+          "type": "object",
+          "title": "Perspective Mapping",
+          "description": "Maps a JSON path expression to domain-specific terminology, enabling audiences to interpret CycloneDX data using familiar nomenclature. Each mapping identifies a data type within the document structure and may provide alternative names and descriptions used by the target audience.",
+          "additionalProperties": false,
+          "required": [
+            "expression"
+          ],
+          "properties": {
+            "expression": {
+              "type": "string",
+              "title": "Path Expression",
+              "description": "A [JSONPath](https://datatracker.ietf.org/doc/html/rfc9535) expression that identifies the types of data relevant to this perspective.",
+              "examples": [
+                "$.components[*].pedigree",
+                "$.components[?(@.type=='machine-learning-model')].modelCard",
+                "$.components[?(@.type=='cryptographic-asset')]",
+                "$.vulnerabilities"
+              ]
+            },
+            "nativeName": {
+              "type": "string",
+              "title": "Native Name",
+              "description": "The domain-specific term used by the target audience to describe the data identified by the expression.",
+              "examples": [
+                "Foundation Models",
+                "Training Corpus",
+                "Cryptographic Inventory",
+                "Component Provenance"
+              ]
+            },
+            "nativeDescription": {
+              "type": "string",
+              "title": "Native Description",
+              "description": "A domain-specific description of the data type, explaining its significance within the context of the perspective."
+            },
+            "relevance": {
+              "$ref": "#/$defs/cyclonedx-perspective-2.0/$defs/perspectiveRelevance"
+            },
+            "weight": {
+              "type": "number",
+              "title": "Weight",
+              "description": "Describes the importance of a field in relation to other fields. Values shall be between 0.0 and 1.0. This allows for relative ranking of mappings, where higher values indicate greater importance.",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "rationale": {
+              "type": "string",
+              "title": "Rationale",
+              "description": "Explains why this data type is relevant to the perspective and how it should be interpreted or used."
+            }
+          }
+        },
+        "perspectiveRelevance": {
+          "type": "string",
+          "title": "Perspective Relevance",
+          "description": "Indicates the importance of a data type to a perspective.",
+          "enum": [
+            "required",
+            "recommended",
+            "optional",
+            "informative"
+          ],
+          "meta:enum": {
+            "required": "This data type is essential for the perspective and should always be present.",
+            "recommended": "This data type is highly relevant and should be included when available.",
+            "optional": "This data type provides supplementary information that may be useful.",
+            "informative": "This data type provides background context but is not directly actionable."
+          }
+        },
+        "perspectiveDomainChoice": {
+          "title": "Perspective Domain Choice",
+          "description": "Allows selection of a pre-defined domain or specification of a custom domain.",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/cyclonedx-perspective-2.0/$defs/preDefinedPerspectiveDomain"
+            },
+            {
+              "type": "object",
+              "title": "Custom Domain",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "title": "Domain Name",
+                  "description": "The name of the custom domain."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Domain Description",
+                  "description": "A description of the custom domain, its scope, and the concerns it addresses."
+                }
+              }
+            }
+          ]
+        },
+        "preDefinedPerspectiveDomain": {
+          "type": "string",
+          "title": "Pre-Defined Perspective Domain",
+          "description": "A pre-defined domain or discipline to which a perspective applies. Domains span security disciplines, safety engineering, industry verticals, technology areas, compliance frameworks, and cross-cutting concerns.",
+          "enum": [
+            "application-security",
+            "cloud-security",
+            "container-security",
+            "cryptographic-security",
+            "cyber-security",
+            "data-security",
+            "endpoint-security",
+            "firmware-security",
+            "hardware-security",
+            "identity-access-management",
+            "network-security",
+            "operational-security",
+            "physical-security",
+            "supply-chain-security",
+            "web-security",
+            "automotive-safety",
+            "aviation-safety",
+            "environmental-safety",
+            "functional-safety",
+            "machinery-safety",
+            "maritime-safety",
+            "nuclear-safety",
+            "patient-safety",
+            "process-safety",
+            "railway-safety",
+            "aerospace-defense",
+            "automotive",
+            "building-automation",
+            "consumer-electronics",
+            "critical-infrastructure",
+            "education",
+            "energy-utilities",
+            "financial-services",
+            "government",
+            "healthcare",
+            "insurance",
+            "legal",
+            "manufacturing",
+            "media-entertainment",
+            "pharmaceuticals",
+            "retail",
+            "telecommunications",
+            "transportation",
+            "artificial-intelligence",
+            "edge-computing",
+            "embedded-systems",
+            "industrial-control-systems",
+            "industrial-iot",
+            "internet-of-things",
+            "machine-learning",
+            "medical-devices",
+            "mobile",
+            "operational-technology",
+            "robotics",
+            "scada",
+            "smart-grid",
+            "data-protection",
+            "export-control",
+            "intellectual-property",
+            "legal-compliance",
+            "licensing",
+            "privacy",
+            "regulatory-compliance",
+            "maintainability",
+            "performance",
+            "quality-assurance",
+            "reliability",
+            "testability",
+            "incident-response",
+            "penetration-testing",
+            "red-team",
+            "risk-management",
+            "threat-intelligence",
+            "threat-modeling",
+            "vulnerability-management",
+            "accessibility",
+            "ethics",
+            "human-factors",
+            "interoperability",
+            "resilience",
+            "sustainability",
+            "transparency"
+          ],
+          "meta:enum": {
+            "application-security": "Security concerns related to software applications, including vulnerabilities, secure coding practices, input validation, and dependency management.",
+            "cloud-security": "Security concerns specific to cloud computing environments, including configuration, identity management, data protection, and shared responsibility models.",
+            "container-security": "Security concerns related to containerised applications, including image provenance, runtime protection, orchestration security, and supply chain integrity.",
+            "cryptographic-security": "Concerns related to cryptographic implementations, algorithm selection, key management, certificate handling, and post-quantum cryptography readiness.",
+            "cyber-security": "Broad security concerns encompassing threat detection, incident response, security operations, and defence-in-depth strategies.",
+            "data-security": "Concerns related to protecting data at rest, in transit, and in use, including encryption, access controls, and data loss prevention.",
+            "endpoint-security": "Security concerns for end-user devices including workstations, mobile devices, and peripherals, encompassing malware protection and device management.",
+            "firmware-security": "Security concerns specific to firmware, including secure boot, firmware updates, integrity verification, and protection against persistent threats.",
+            "hardware-security": "Security concerns related to physical hardware, including trusted platform modules, hardware security modules, side-channel attacks, and tamper resistance.",
+            "identity-access-management": "Concerns related to authentication, authorisation, identity lifecycle management, privileged access, and zero-trust architectures.",
+            "network-security": "Security concerns related to network infrastructure, including firewalls, intrusion detection, segmentation, and secure communications.",
+            "operational-security": "Security concerns related to the deployment, configuration, and day-to-day operation of systems in production environments.",
+            "physical-security": "Security concerns related to physical access controls, environmental protections, surveillance, and tamper evidence.",
+            "supply-chain-security": "Concerns related to the security, integrity, and trustworthiness of components, vendors, and processes throughout the supply chain.",
+            "web-security": "Security concerns specific to web applications and services, including OWASP Top 10 vulnerabilities, API security, and client-side protections.",
+            "automotive-safety": "Safety concerns for automotive systems aligned with ISO 26262, including hazard analysis, functional safety requirements, and ASIL classifications.",
+            "aviation-safety": "Safety concerns for aviation systems aligned with DO-178C, DO-254, and DO-326A, including design assurance levels and airworthiness requirements.",
+            "environmental-safety": "Concerns related to environmental protection, hazardous materials handling, emissions, and ecological impact assessment.",
+            "functional-safety": "Safety concerns aligned with IEC 61508 and derivative standards, focusing on systematic failures, safety integrity levels, and risk reduction.",
+            "machinery-safety": "Safety concerns for industrial machinery aligned with ISO 12100 and IEC 62443, including safeguarding, emergency stops, and risk assessment.",
+            "maritime-safety": "Safety concerns for maritime and offshore systems, including vessel automation, navigation systems, and compliance with maritime regulations.",
+            "nuclear-safety": "Safety concerns for nuclear facilities and systems, including defence-in-depth, safety classification, and regulatory compliance with nuclear standards.",
+            "patient-safety": "Safety concerns for medical devices and healthcare systems focusing on preventing harm to patients, including adverse event prevention and clinical risk management.",
+            "process-safety": "Safety concerns for industrial processes involving hazardous materials, including process hazard analysis, safety instrumented systems, and layers of protection.",
+            "railway-safety": "Safety concerns for railway systems aligned with EN 50126, EN 50128, and EN 50129, including signalling, train control, and safety cases.",
+            "aerospace-defense": "Concerns specific to aerospace and defence industries, including mission-critical systems, military standards, and classified information handling.",
+            "automotive": "Industry-specific concerns for automotive manufacturers and suppliers, including ISO/SAE 21434 cyber security and vehicle type approval.",
+            "building-automation": "Concerns related to building management systems, HVAC controls, access systems, and smart building infrastructure.",
+            "consumer-electronics": "Concerns specific to consumer electronic devices, including product safety, electromagnetic compatibility, and consumer protection regulations.",
+            "critical-infrastructure": "Concerns related to systems designated as critical infrastructure, including sector-specific requirements and national security considerations.",
+            "education": "Concerns specific to educational institutions and EdTech, including student data protection, FERPA compliance, and academic integrity.",
+            "energy-utilities": "Concerns specific to energy and utility sectors, including NERC CIP compliance, grid security, and operational continuity.",
+            "financial-services": "Concerns specific to financial institutions, including PCI DSS, SOX compliance, fraud prevention, and transaction integrity.",
+            "government": "Concerns specific to government agencies and contractors, including FedRAMP, FISMA, and public sector procurement requirements.",
+            "healthcare": "Concerns specific to healthcare organisations, including HIPAA compliance, electronic health records, and healthcare interoperability.",
+            "insurance": "Concerns specific to insurance industry, including actuarial data integrity, claims processing security, and regulatory compliance.",
+            "legal": "Concerns specific to legal industry, including attorney-client privilege, e-discovery, and legal hold requirements.",
+            "manufacturing": "Concerns specific to manufacturing environments, including production systems, quality management, and shop floor security.",
+            "media-entertainment": "Concerns specific to media and entertainment, including digital rights management, content protection, and broadcast systems.",
+            "pharmaceuticals": "Concerns specific to pharmaceutical industry, including FDA 21 CFR Part 11, GxP compliance, and drug safety systems.",
+            "retail": "Concerns specific to retail industry, including point-of-sale security, e-commerce platforms, and customer data protection.",
+            "telecommunications": "Concerns specific to telecommunications providers, including network infrastructure, subscriber data, and regulatory compliance.",
+            "transportation": "Concerns related to transportation systems beyond automotive and rail, including logistics, fleet management, and traffic control systems.",
+            "artificial-intelligence": "Concerns related to AI systems, including model transparency, algorithmic bias, explainability, and ethical considerations.",
+            "edge-computing": "Concerns specific to edge computing deployments, including distributed processing, local data handling, and remote device management.",
+            "embedded-systems": "Concerns specific to embedded systems development, including real-time constraints, resource limitations, and hardware-software integration.",
+            "industrial-control-systems": "Concerns specific to ICS environments, including PLCs, DCS, and industrial automation security aligned with IEC 62443.",
+            "industrial-iot": "Concerns specific to Industrial Internet of Things deployments, combining IT security with OT requirements and industrial protocols.",
+            "internet-of-things": "Concerns related to IoT devices and ecosystems, including device security, communication protocols, and fleet management.",
+            "machine-learning": "Concerns specific to ML models, including training data provenance, model lineage, performance metrics, and reproducibility.",
+            "medical-devices": "Concerns specific to medical device development aligned with IEC 62304, FDA guidance, and MDR/IVDR requirements.",
+            "mobile": "Concerns specific to mobile applications and devices, including app store requirements, mobile-specific vulnerabilities, and device management.",
+            "operational-technology": "Concerns specific to OT environments, bridging IT and industrial systems with focus on availability, safety, and legacy system integration.",
+            "robotics": "Concerns specific to robotic systems, including autonomous operation, human-robot interaction safety, and motion control security.",
+            "scada": "Concerns specific to Supervisory Control and Data Acquisition systems, including remote monitoring, control system security, and protocol vulnerabilities.",
+            "smart-grid": "Concerns specific to smart grid infrastructure, including advanced metering, grid automation, and distributed energy resource management.",
+            "data-protection": "Concerns related to data protection regulations such as GDPR, CCPA, and cross-border data transfer requirements.",
+            "export-control": "Concerns related to export control regulations, including EAR, ITAR, and dual-use technology restrictions.",
+            "intellectual-property": "Concerns related to patents, trade secrets, copyright, and other intellectual property rights and protections.",
+            "legal-compliance": "Regulatory and legal requirements, including contractual obligations, liability considerations, and legal holds.",
+            "licensing": "Concerns related to software licensing, licence compatibility, open source obligations, and commercial licensing terms.",
+            "privacy": "Concerns related to personal data protection, privacy by design, consent management, and individual rights.",
+            "regulatory-compliance": "Concerns related to compliance with industry-specific regulations, standards, and certification requirements.",
+            "maintainability": "Concerns related to the ease of maintaining, updating, and supporting software and systems over their lifecycle.",
+            "performance": "Concerns related to system performance, scalability, response times, and resource utilisation.",
+            "quality-assurance": "Concerns related to testing, validation, verification, and overall quality metrics and processes.",
+            "reliability": "Concerns related to system reliability, fault tolerance, mean time between failures, and degradation modes.",
+            "testability": "Concerns related to the ability to test components and systems, including test coverage, test automation, and test data management.",
+            "incident-response": "Concerns related to detecting, responding to, and recovering from security incidents and breaches.",
+            "penetration-testing": "Concerns related to authorised security testing, vulnerability assessment, and security validation activities.",
+            "red-team": "Concerns related to adversarial simulation, attack path analysis, and security control effectiveness testing.",
+            "risk-management": "Concerns related to risk identification, assessment, treatment, and ongoing risk monitoring.",
+            "threat-intelligence": "Concerns related to threat actor analysis, indicators of compromise, and proactive threat hunting.",
+            "threat-modeling": "Concerns related to identifying weaknesses, threats, countermeasures, attack surfaces, and trust boundaries.",
+            "vulnerability-management": "Concerns related to vulnerability identification, prioritisation, remediation tracking, and disclosure processes.",
+            "accessibility": "Concerns related to ensuring systems are usable by people with disabilities, including WCAG compliance.",
+            "ethics": "Concerns related to ethical considerations in technology development, including algorithmic fairness and responsible innovation.",
+            "human-factors": "Concerns related to human-system interaction, usability, operator error prevention, and ergonomic design.",
+            "interoperability": "Concerns related to the ability of systems to exchange and use information effectively across boundaries.",
+            "resilience": "Concerns related to system resilience, business continuity, disaster recovery, and graceful degradation.",
+            "sustainability": "Concerns related to environmental sustainability, energy efficiency, and responsible resource consumption.",
+            "transparency": "Concerns related to openness, auditability, and the ability for stakeholders to understand system behaviour and composition."
+          }
+        }
+      }
+    },
     "cyclonedx-release-notes-2.0": {
       "type": "null",
       "title": "CycloneDX Release Notes Model",
@@ -7161,6 +7597,9 @@
         },
         "citations": {
           "$ref": "#/$defs/cyclonedx-citation-2.0/$defs/citations"
+        },
+        "perspectives": {
+          "$ref": "#/$defs/cyclonedx-perspective-2.0/$defs/perspectives"
         },
         "properties": {
           "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
