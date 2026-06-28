@@ -416,7 +416,7 @@
               ]
             },
             "fingerprint": {
-              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/hash",
+              "$ref": "#/$defs/fingerprint",
               "title": "Certificate Fingerprint",
               "description": "The fingerprint is a cryptographic hash of the certificate excluding it's signature."
             },
@@ -718,9 +718,7 @@
               "description": "The mechanism by which the cryptographic asset is secured by."
             },
             "fingerprint": {
-              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/hash",
-              "title": "Fingerprint",
-              "description": "The fingerprint is a cryptographic hash of the asset."
+              "$ref": "#/$defs/fingerprint"
             },
             "relatedCryptographicAssets": {
               "$ref": "#/$defs/relatedCryptographicAssets"
@@ -1118,6 +1116,45 @@
           "description": "The bom-ref to cryptographic asset."
         }
       }
+    },
+    "fingerprint": {
+      "type": "object",
+      "title": "Fingerprint",
+      "description": "The fingerprint is a cryptographic hash of the asset.",
+      "oneOf": [
+        {
+          "title": "Standard Hash",
+          "description": "A fingerprint computed using a standard, well-known hash algorithm.",
+          "required": ["alg", "content"],
+          "additionalProperties": false,
+          "properties": {
+            "alg": {
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/hashAlgorithm"
+            },
+            "content": {
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/hashValue"
+            }
+          }
+        },
+        {
+          "title": "Custom Fingerprint",
+          "description": "A fingerprint computed with a custom or non-standard algorithm not covered by the standard hash algorithms.",
+          "required": ["customAlg", "customContent"],
+          "additionalProperties": false,
+          "properties": {
+            "customAlg": {
+              "type": "string",
+              "title": "Custom Fingerprint Algorithm",
+              "description": "The name of the custom algorithm used to compute the fingerprint."
+            },
+            "customContent": {
+              "type": "string",
+              "title": "Custom Fingerprint Content",
+              "description": "The value of the fingerprint computed using the custom algorithm."
+            }
+          }
+        }
+      ]
     },
     "securedBy": {
       "type": "object",
