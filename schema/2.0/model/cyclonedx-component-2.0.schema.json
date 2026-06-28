@@ -7,7 +7,7 @@
   "$defs": {
     "components": {
       "type": "array",
-      "items": {"$ref": "#/$defs/component"},
+      "items": {"$ref": "#/$defs/componentOrChoice"},
       "uniqueItems": true,
       "title": "Components"
     },
@@ -68,27 +68,8 @@
           "title": "BOM Reference",
           "description": "An identifier which can be used to reference the component elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
-        "supplier": {
-          "title": "Component Supplier",
-          "description": " The organization that supplied the component. The supplier may often be the manufacturer, but may also be a distributor or repackager.",
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntity"
-        },
-        "manufacturer": {
-          "title": "Component Manufacturer",
-          "description": "The organization that created the component.\nManufacturer is common in components created through automated processes. Components created through manual means may have `@.authors` instead.",
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntity"
-        },
-        "authors" :{
-          "type": "array",
-          "title": "Component Authors",
-          "description": "The person(s) who created the component.\nAuthors are common in components created through manual processes. Components created through automated means may have `@.manufacturer` instead.",
-          "items": {"$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalContact"}
-        },
-        "publisher": {
-          "type": "string",
-          "title": "Component Publisher",
-          "description": "The person(s) or organization(s) that published the component",
-          "examples": ["Acme Inc"]
+        "parties": {
+          "$ref": "cyclonedx-party-2.0.schema.json#/$defs/parties"
         },
         "group": {
           "type": "string",
@@ -164,39 +145,8 @@
           "$ref": "cyclonedx-usecase-2.0.schema.json#/$defs/useCaseAssertions",
           "title": "Component Use Case(s)"
         },
-        "cpe": {
-          "type": "string",
-          "title": "Common Platform Enumeration (CPE)",
-          "description": "Asserts the identity of the component using CPE. The CPE must conform to the CPE 2.2 or 2.3 specification. See [https://nvd.nist.gov/products/cpe](https://nvd.nist.gov/products/cpe). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity.",
-          "examples": ["cpe:2.3:a:acme:component_framework:-:*:*:*:*:*:*:*"]
-        },
-        "purl": {
-          "type": "string",
-          "title": "Package URL (purl)",
-          "description": "Asserts the identity of the component using package-url (purl). The purl, if specified, must be valid and conform to the specification defined at: [https://github.com/package-url/purl-spec](https://github.com/package-url/purl-spec). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity.",
-          "examples": ["pkg:maven/com.acme/tomcat-catalina@9.0.14?packaging=jar"]
-        },
-        "omniborId": {
-          "type": "array",
-          "title": "OmniBOR Artifact Identifier (gitoid)",
-          "description": "Asserts the identity of the component using the OmniBOR Artifact ID. The OmniBOR, if specified, must be valid and conform to the specification defined at: [https://www.iana.org/assignments/uri-schemes/prov/gitoid](https://www.iana.org/assignments/uri-schemes/prov/gitoid). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity.",
-          "items": { "type": "string" },
-          "examples": [
-            "gitoid:blob:sha1:a94a8fe5ccb19ba61c4c0873d391e987982fbbd3",
-            "gitoid:blob:sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
-          ]
-        },
-        "swhid": {
-          "type": "array",
-          "title": "Software Heritage Identifier",
-          "description": "Asserts the identity of the component using the Software Heritage persistent identifier (SWHID). The SWHID, if specified, must be valid and conform to the specification defined at: [https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html](https://docs.softwareheritage.org/devel/swh-model/persistent-identifiers.html). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity.",
-          "items": { "type": "string" },
-          "examples": ["swh:1:cnt:94a9ed024d3859793618152ea559a168bbcbb5e2"]
-        },
-        "swid": {
-          "$ref": "#/$defs/swid",
-          "title": "SWID Tag",
-          "description": "Asserts the identity of the component using [ISO-IEC 19770-2 Software Identification (SWID) Tags](https://www.iso.org/standard/65666.html). Refer to `@.evidence.identity` to optionally provide evidence that substantiates the assertion of the component's identity."
+        "identifiers": {
+          "$ref": "#/$defs/identifiers"
         },
         "pedigree": {
           "type": "object",
@@ -243,10 +193,10 @@
         },
         "components": {
           "type": "array",
-          "items": {"$ref": "#/$defs/component"},
+          "items": {"$ref": "#/$defs/componentOrChoice"},
           "uniqueItems": true,
           "title": "Components",
-          "description": "A list of software and hardware components included in the parent component. This is not a dependency tree. It provides a way to specify a hierarchical representation of component assemblies, similar to system &#8594; subsystem &#8594; parts assembly in physical supply chains."
+          "description": "A list of software and hardware components included in the parent component. Entries may be concrete components or component-choice wrappers expressing conditional or alternate relationships. This is not a dependency tree. It provides a way to specify a hierarchical representation of component assemblies, similar to system &#8594; subsystem &#8594; parts assembly in physical supply chains."
         },
         "evidence": {
           "$ref": "#/$defs/componentEvidence",
@@ -282,10 +232,8 @@
         "externalReferences": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReferences"
         },
-        "signature": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/signature",
-          "title": "Signature",
-          "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
+        "signatures": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/signatures"
         }
       },
       "allOf": [
@@ -306,6 +254,78 @@
           "else": true
         }
       ]
+    },
+    "componentOrChoice": {
+      "title": "Component or Component Choice",
+      "description": "An entry in a components array. May be a concrete component, or a component-choice wrapper that expresses a conditional or alternate relationship between two or more components. The discriminator is the `type` property: when `type` is `component-choice`, the entry shall conform to the `componentChoice` schema; otherwise it shall conform to the `component` schema.",
+      "oneOf": [
+        { "$ref": "#/$defs/component" },
+        { "$ref": "#/$defs/componentChoice" }
+      ]
+    },
+    "componentChoice": {
+      "type": "object",
+      "title": "Component Choice",
+      "description": "A wrapper that expresses a conditional or alternate relationship between two or more components. Use to model approved alternates, multi-sourced parts, build variants, and required component groups in physical device bills of materials.",
+      "required": [
+        "type",
+        "operator",
+        "components"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "component-choice",
+          "title": "Type",
+          "description": "Discriminator for a component-choice entry. The value shall be the literal string `component-choice`."
+        },
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "BOM Reference",
+          "description": "An identifier which can be used to reference the component-choice elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "A display name for the choice. Typically corresponds to a reference designator, a design intent name, or a description of the role the chosen component fulfils.",
+          "examples": ["2N2222 or PN2222A Transistor", "U1 5V LDO Regulator"]
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the choice and the rationale behind the alternates."
+        },
+        "operator": {
+          "type": "string",
+          "enum": [
+            "OR",
+            "XOR",
+            "AND"
+          ],
+          "meta:enum": {
+            "OR":  "Any non-empty subset of the contained components may be installed. Use for approved alternates where more than one may legitimately appear in a given instance.",
+            "XOR": "Exactly one of the contained components is installed in any single instance. Use for approved alternates that are mutually exclusive per instance, while the population of units may include multiple alternates across sourcing.",
+            "AND": "All of the contained components are installed together as a group. Use for tightly coupled component sets such as a transceiver and its required matching balun."
+          },
+          "title": "Operator",
+          "description": "The logical relationship between the contained components."
+        },
+        "components": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/componentOrChoice" },
+          "title": "Components",
+          "description": "Two or more alternate or grouped entries. Each entry may itself be a component-choice to express nested alternates, such as a choice between kits."
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        },
+        "externalReferences": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReferences"
+        }
+      }
     },
     "version": {
       "description": "A single disjunctive version identifier, for a component or service.",
@@ -361,57 +381,6 @@
         }
       }
     },
-    "swid": {
-      "type": "object",
-      "title": "SWID Tag",
-      "description": "Specifies metadata and content for ISO-IEC 19770-2 Software Identification (SWID) Tags.",
-      "required": [
-        "tagId",
-        "name"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "tagId": {
-          "type": "string",
-          "title": "Tag ID",
-          "description": "Maps to the tagId of a SoftwareIdentity."
-        },
-        "name": {
-          "type": "string",
-          "title": "Name",
-          "description": "Maps to the name of a SoftwareIdentity."
-        },
-        "version": {
-          "type": "string",
-          "title": "Version",
-          "default": "0.0",
-          "description": "Maps to the version of a SoftwareIdentity."
-        },
-        "tagVersion": {
-          "type": "integer",
-          "title": "Tag Version",
-          "default": 0,
-          "description": "Maps to the tagVersion of a SoftwareIdentity."
-        },
-        "patch": {
-          "type": "boolean",
-          "title": "Patch",
-          "default": false,
-          "description": "Maps to the patch of a SoftwareIdentity."
-        },
-        "text": {
-          "title": "Attachment text",
-          "description": "Specifies the metadata and content of the SWID tag.",
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/attachment"
-        },
-        "url": {
-          "type": "string",
-          "title": "URL",
-          "description": "The URL to the SWID file.",
-          "format": "iri-reference"
-        }
-      }
-    },
     "componentEvidence": {
       "type": "object",
       "title": "Evidence",
@@ -464,6 +433,34 @@
                 "type": "string",
                 "title": "Additional Context",
                 "description": "Any additional context of the detected component (e.g. a code snippet)."
+              },
+              "accountInfo": {
+                "type": "string",
+                "title": "Account Information",
+                "description": "The account or user information associated with the occurrence."
+              },
+              "systemOwner": {
+                "type": "string",
+                "title": "System Owner",
+                "description": "The owner of the system where the component was found."
+              },
+              "startTime": {
+                "type": "string",
+                "format": "date-time",
+                "title": "Start Time",
+                "description": "The date and time when the process detecting the occurrence started."
+              },
+              "endTime": {
+                "type": "string",
+                "format": "date-time",
+                "title": "End Time",
+                "description": "The date and time when the process detecting the occurrence ended."
+              },
+              "usageCount": {
+                "type": "integer",
+                "minimum": 0,
+                "title": "Usage Count",
+                "description": "The number of times the component occurred in the detecting process."
               }
             }
           }
@@ -541,16 +538,11 @@
       "type": "object",
       "title": "Identity Evidence",
       "description": "Evidence that substantiates the identity of a component.",
-      "required": [ "field" ],
+      "required": [ "scheme" ],
       "additionalProperties": false,
       "properties": {
-        "field": {
-          "type": "string",
-          "enum": [
-            "group", "name", "version", "purl", "cpe", "omniborId", "swhid", "swid", "hash"
-          ],
-          "title": "Field",
-          "description": "The identity field of the component which the evidence describes."
+        "scheme": {
+          "$ref": "#/$defs/identityScheme"
         },
         "confidence": {
           "type": "number",
@@ -562,7 +554,7 @@
         "concludedValue": {
           "type": "string",
           "title": "Concluded Value",
-          "description": "The value of the field (cpe, purl, etc) that has been concluded based on the aggregate of all methods (if available)."
+          "description": "The value of the scheme that has been concluded based on the aggregate of all methods (if available)."
         },
         "methods": {
           "type": "array",
@@ -713,6 +705,150 @@
           "$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataGovernance"
         }
       }
+    },
+    "identifiers": {
+      "type": "array",
+      "title": "Identifiers",
+      "description": "Identifiers asserted by one or more parties to identify this component. Each entry groups one or more identity claims by the party asserting them. Identifiers carry positive claims of identity. For unverified or inferred identity data, use evidence.",
+      "items": {
+        "$ref": "#/$defs/identifier"
+      },
+      "uniqueItems": true
+    },
+    "identifier": {
+      "type": "object",
+      "title": "Identifier",
+      "description": "A set of identifiers attributed to a single asserting party.",
+      "required": [
+        "party",
+        "identities"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "party": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "title": "Asserting Party",
+          "description": "Reference using bom-link or bom-ref to the party making the identity assertion."
+        },
+        "identities": {
+          "type": "array",
+          "title": "Identities",
+          "description": "The discrete identity claims asserted by the party.",
+          "items": {
+            "$ref": "#/$defs/identity"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "title": "Identity",
+      "description": "A single identity claim, pairing a typed identifier scheme with the value asserted under that scheme.",
+      "required": [
+        "scheme",
+        "value"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "scheme": { "$ref": "#/$defs/identityScheme" },
+        "value": { "$ref": "#/$defs/identityValue" }
+      }
+    },
+    "identityScheme": {
+      "title": "Identifier Scheme",
+      "description": "The scheme under which an identifier is asserted. Either a predefined value or a custom scheme described by name and description.",
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "purl",
+            "cpe",
+            "swid",
+            "swhid",
+            "omniborid",
+            "epc-rfid",
+            "giai",
+            "gln",
+            "gmn",
+            "gtin-8",
+            "gtin-12",
+            "gtin-13",
+            "gtin-14",
+            "mpn",
+            "part-number",
+            "model-number",
+            "sku",
+            "serial-number",
+            "asset-tag",
+            "udi-di",
+            "udi-pi",
+            "fcc-id",
+            "imei",
+            "mac-address",
+            "tei"
+          ],
+          "meta:enum": {
+            "purl": "Package-URL identifier, conforming to the Package-URL specification.",
+            "cpe": "Common Platform Enumeration name, conforming to NIST Interagency Report 7695.",
+            "swid": "Software Identification tag identifier, conforming to ISO/IEC 19770-2.",
+            "swhid": "Software Heritage persistent identifier.",
+            "omniborid": "OmniBOR Artifact Identifier, also known as a gitoid.",
+            "epc-rfid": "Electronic Product Code - RFID (EPC Tag Data Standard)",
+            "giai": "Global Individual Asset Identifier (GIAI)",
+            "gln": "Global Location Number (GLN)",
+            "gmn": "Global Model Number (GMN)",
+            "gtin-8": "Global Trade Identification Number (GTIN-8 / EAN/UCC-8)",
+            "gtin-12": "Global Trade Identification Number (GTIN-12 / UPC-A)",
+            "gtin-13": "Global Trade Identification Number (GTIN-13 / EAN/UCC-13)",
+            "gtin-14": "Global Trade Identification Number (GTIN / EAN/UCC-14 or ITF-14)",
+            "mpn": "Manufacturer Part Number, assigned by the original manufacturer.",
+            "part-number": "Part number assigned by a distributor, integrator, or operator.",
+            "model-number": "Product model number assigned by the manufacturer.",
+            "sku": "Stock Keeping Unit, assigned by a seller or distributor.",
+            "serial-number": "Unique identifier for an individual instance of a product.",
+            "asset-tag": "Asset tag assigned by the owning or operating organization.",
+            "udi-di": "Unique Device Identifier, Device Identifier portion, conforming to ISO/IEC 15459 and applicable regulatory frameworks.",
+            "udi-pi": "Unique Device Identifier, Production Identifier portion, conforming to ISO/IEC 15459 and applicable regulatory frameworks.",
+            "fcc-id": "United States Federal Communications Commission equipment identifier.",
+            "imei": "International Mobile Equipment Identity, conforming to 3GPP TS 23.003.",
+            "mac-address": "IEEE 802 Media Access Control address.",
+            "tei": "Transparency Exchange Identifier conforming to the Transparency Exchange API specification."
+          }
+        },
+        {
+          "type": "object",
+          "title": "Custom Identifier Scheme",
+          "description": "A custom identifier scheme not represented in the predefined taxonomy.",
+          "required": [
+            "name"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Name",
+              "description": "The name of the custom identifier scheme."
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the custom identifier scheme."
+            }
+          }
+        }
+      ]
+    },
+    "identityValue": {
+      "type": "string",
+      "minLength": 1,
+      "title": "Identifier Value",
+      "description": "The value of an identifier."
     }
   }
 }

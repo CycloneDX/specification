@@ -1,0 +1,122 @@
+name: Update SPDX licenses
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token
+permissions: { }
+
+jobs:
+  update:
+    name: Update Schemas
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.diff.outputs.changed }}
+      version: ${{ steps.version.outputs.version }}
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        # see https://github.com/actions/checkout
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref_name }}
+      - name: Set up JDK
+        # see https://github.com/actions/setup-java
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'zulu'
+          java-package: jdk
+      - name: Update SPDX
+        run: tools/updateSpdx.sh
+      - name: detect version
+        id: version
+        run: |
+          value=$( jq -r '.["$comment"]' schema/spdx.schema.json )
+          echo "version=$value" >> $GITHUB_OUTPUT
+      - name: Detect changes
+        id: diff
+        run: |
+          if git diff --quiet -- 'schema/spdx.*'
+          then
+            echo "$GITHUB_REF_NAME is up-to-date"
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "$GITHUB_REF_NAME is not up-to-date"
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+      - name: Artifact changes
+        if: ${{ steps.diff.outputs.changed == 'true' }}
+        # https://github.com/actions/upload-artifact
+        uses: actions/upload-artifact@v4
+        with:
+          retention-days: 1
+          name: schema-spdx
+          path: schema/spdx.*
+          if-no-files-found: error
+  pullrequest:
+    name: Pull-request Changes
+    runs-on: ubuntu-latest
+    needs: [ 'update' ]
+    if: ${{ needs.update.outputs.changed == 'true' }}
+    permissions:
+      contents: write # push commits
+      pull-requests: write # create pullrequests
+    env:
+      SB_VERSION: ${{ needs.update.outputs.version }}
+      SB_BRANCH: ${{ github.ref_name }}_update-spdx/${{ needs.update.outputs.version }}
+    steps:
+      - name: Checkout
+        # see https://github.com/actions/checkout
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref_name }}
+      - name: Switch branch
+        id: branch
+        run: |
+          set -eux
+          git remote set-branches origin "$SB_BRANCH"
+          if git ls-remote --exit-code --heads origin "$SB_BRANCH"
+          then
+            echo "existed=true" >> $GITHUB_OUTPUT
+            git fetch --depth=1 origin "$SB_BRANCH"
+            git checkout -b "$SB_BRANCH" "origin/$SB_BRANCH"
+          else
+            echo "existed=false" >> $GITHUB_OUTPUT
+            git checkout -b "$SB_BRANCH"
+          fi
+      - name: Fetch changes
+        # https://github.com/actions/download-artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: schema-spdx
+          path: schema
+      - name: Commit and push
+        run: |
+          set -eux
+          if git diff --quiet -- 'schema/spdx.*'
+          then
+            echo "branch up-to-date"
+            exit 0
+          fi
+          git config user.name 'spdx-license-bumper[bot]'
+          git config user.email 'spdx-license-bumper@bot.local'
+          git add -A schema
+          git commit -s -m "feat: bump SPDX licenses $SB_VERSION"
+          git push origin "$SB_BRANCH"
+      - name: Pull request
+        if: ${{ steps.branch.outputs.existed == 'false' }}
+        run: >
+          gh pr create
+          --title "feat: bump SPDX Licenses $SB_VERSION"
+          --body "$SB_VERSION" 
+          --base "$GITHUB_REF_NAME"
+          --head "$SB_BRANCH"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
