@@ -86,7 +86,11 @@
         "description": {
           "type": "string",
           "title": "Description",
-          "description": "A detailed description of the model's architecture, including key characteristics, design decisions, and architectural innovations."
+          "description": "A detailed description of the model's architecture, including key characteristics, design decisions, and architectural innovations.",
+          "examples": [
+            "Decoder-only transformer with grouped-query attention and rotary positional embeddings, using a mixture-of-experts feed-forward layer.",
+            "Convolutional backbone with residual connections and a transformer head for multi-scale feature aggregation."
+          ]
         },
         "structural": {
           "type": "object",
@@ -140,6 +144,13 @@
                 {
                   "pattern": "^cdx:ai-ml:model:architecture:primary:[a-z0-9:-]+$"
                 }
+              ],
+              "examples": [
+                "transformer",
+                "cnn",
+                "mamba",
+                "gnn",
+                "cdx:ai-ml:model:architecture:primary:retnet"
               ]
             },
             "secondary": {
@@ -231,6 +242,11 @@
                 {
                   "pattern": "^cdx:ai-ml:model:architecture:topology:[a-z0-9:-]+$"
                 }
+              ],
+              "examples": [
+                "dense",
+                "sparse",
+                "cdx:ai-ml:model:architecture:topology:structured-pruned"
               ]
             }
           }
@@ -396,12 +412,23 @@
         "groupName": {
           "type": "string",
           "title": "Group Name",
-          "description": "The name of the group at risk."
+          "description": "The name of the group at risk.",
+          "examples": [
+            "Elderly users",
+            "Non-native speakers",
+            "People with visual impairments",
+            "Low-income households"
+          ]
         },
         "groupDescription": {
           "type": "string",
           "title": "Group Description",
-          "description": "A description of the group at risk."
+          "description": "A description of the group at risk.",
+          "examples": [
+            "Users aged 65 and over who may have reduced digital literacy or accessibility needs.",
+            "Users whose primary language differs from the model's primary training language.",
+            "Individuals relying on assistive technologies such as screen readers."
+          ]
         },
         "externalReferences": {
           "type": "array",
@@ -414,7 +441,19 @@
           "description": "Properties of the risk group.",
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
         }
-      }
+      },
+      "examples": [
+        {
+          "bom-ref": "risk-group-1",
+          "groupName": "Elderly users",
+          "groupDescription": "Users aged 65 and over who may have reduced digital literacy or accessibility needs."
+        },
+        {
+          "bom-ref": "risk-group-2",
+          "groupName": "Non-native speakers",
+          "groupDescription": "Users whose primary language differs from the model's training language."
+        }
+      ]
     },
     "riskGroupReference": {
       "type": "object",
@@ -461,12 +500,22 @@
         "name": {
           "type": "string",
           "title": "Name",
-          "description": "The name of the consideration."
+          "description": "The name of the consideration.",
+          "examples": [
+            "Hallucination in low-resource languages",
+            "Gender bias in occupational classification",
+            "Latency under high concurrency",
+            "Energy cost of fine-tuning"
+          ]
         },
         "description": {
           "type": "string",
           "title": "Description",
-          "description": "The general description of the consideration."
+          "description": "The general description of the consideration.",
+          "examples": [
+            "The model may produce factually incorrect outputs when prompted in languages underrepresented in the training corpus.",
+            "Classification accuracy for professional roles has been observed to vary by perceived gender of the subject."
+          ]
         },
         "groupsAtRisk": {
           "type": "array",
@@ -477,12 +526,20 @@
         "benefits": {
           "type": "string",
           "title": "Benefits",
-          "description": "Expected benefits to the identified groups at risk."
+          "description": "Expected benefits to the identified groups at risk.",
+          "examples": [
+            "Improved accessibility through multilingual support reduces language barriers for non-native speakers.",
+            "Automated screening may reduce time-to-decision for applicants in under-served regions."
+          ]
         },
         "harms": {
           "type": "string",
           "title": "Harms",
-          "description": "Expected harms to the identified groups at risk."
+          "description": "Expected harms to the identified groups at risk.",
+          "examples": [
+            "Model outputs may reinforce occupational stereotypes, leading to discriminatory hiring outcomes for women in STEM.",
+            "Reduced accuracy for accented speech may cause misrecognition for non-native English speakers."
+          ]
         },
         "risk": {
           "$ref": "cyclonedx-risk-2.0.schema.json#/$defs/risk"
@@ -526,6 +583,10 @@
               "title": "Data BOM, BOM-Link Reference",
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/bomLinkElementType"
             }
+          ],
+          "examples": [
+            "training-dataset-1",
+            "urn:cdx:f08a6ccd-4dce-4759-bd84-c626675d60a7/1#openwebtext-subset"
           ]
         }
       }
@@ -662,6 +723,11 @@
             {
               "pattern": "^cdx:[a-z0-9:-]+$"
             }
+          ],
+          "examples": [
+            "training",
+            "fine-tuning",
+            "inference"
           ]
         },
         "energyProviders": {
@@ -776,7 +842,8 @@
         "value": {
           "type": "number",
           "title": "Value",
-          "description": "The numeric value of the measurement."
+          "description": "The numeric value of the measurement.",
+          "examples": [127, 0.87, 2500, 52.3, 1.4]
         },
         "unit": {
           "type": "string",
@@ -791,6 +858,14 @@
             {"$ref": "#/$defs/energyUnits"},
             {"$ref": "#/$defs/co2Units"},
             {"$ref": "#/$defs/customUnitPattern"}
+          ],
+          "examples": [
+            "ms",
+            "%",
+            "tokens/s",
+            "GB",
+            "kWh",
+            "tCO2eq"
           ]
         }
       }
@@ -920,6 +995,12 @@
             {
               "pattern": "^cdx:[a-z0-9:-]+$"
             }
+          ],
+          "examples": [
+            "solar",
+            "wind",
+            "natural-gas",
+            "nuclear"
           ]
         },
         "energyProvided": {
@@ -1031,7 +1112,14 @@
         "slice": {
           "title": "Slice",
           "description": "The name of the slice this metric was computed on. By default, assume this metric is not sliced.",
-          "type": "string"
+          "type": "string",
+          "examples": [
+            "overall",
+            "age:18-34",
+            "language:fr",
+            "gender:female",
+            "region:sub-saharan-africa"
+          ]
         },
         "confidenceInterval": {
           "title": "Confidence Interval",
