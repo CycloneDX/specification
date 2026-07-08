@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-ai-ml-2.0.schema.json",
   "type": "null",
-  "title": "CycloneDX Threat Model",
+  "title": "CycloneDX AI/ML schema",
   "$comment": "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
     "modelCard": {
@@ -101,9 +101,6 @@
           "properties": {
             "primary": {
               "$comment": "Values not listed can be proposed to the CycloneDX Property Taxonomy.",
-              "$todos": [
-                "Update AI/ML property taxonomy with primary architecture enum values."
-              ],
               "type": "string",
               "description": "The core mathematical structural framework of the model backbone.",
               "anyOf": [
@@ -122,7 +119,13 @@
                     "mlp",
                     "rwkv",
                     "snn",
-                    "kan"
+                    "kan",
+                    "diffusion",
+                    "flow-matching",
+                    "rbm",
+                    "capsnet",
+                    "neuromorphic",
+                    "hybrid"
                   ],
                   "meta:enum": {
                     "transformer": "Architecture based on self-attention mechanisms for processing sequential or spatial data.",
@@ -138,7 +141,13 @@
                     "mlp": "Multi-Layer Perceptron - classic feedforward architecture composed entirely of fully connected layers.",
                     "rwkv": "Receptive Weighted Key Value - architecture combining parallelizable training with RNN-like inference.",
                     "snn": "Spiking Neural Network - neuromorphic architecture utilizing discrete, time-dependent spiking activations.",
-                    "kan": "Kolmogorov-Arnold Network - architecture featuring learnable activation functions on edges rather than nodes."
+                    "kan": "Kolmogorov-Arnold Network - architecture featuring learnable activation functions on edges rather than nodes.",
+                    "diffusion": "Denoising diffusion probabilistic model - iteratively refines noise into data (e.g., DDPM, Stable Diffusion).",
+                    "flow-matching": "Continuous normalizing flow trained via flow matching / rectified flow (e.g., Flux, SD3).",
+                    "rbm": "Restricted Boltzmann Machine - energy-based generative model with stochastic hidden units.",
+                    "capsnet": "Capsule Network - architecture using dynamic routing between capsule groups to preserve spatial hierarchies.",
+                    "neuromorphic": "Architecture designed for deployment on neuromorphic hardware (e.g., Intel Loihi, IBM TrueNorth).",
+                    "hybrid": "Explicit first-class combination of two or more distinct primary architectures (e.g., CNN+Transformer)."
                   }
                 },
                 {
@@ -179,6 +188,14 @@
                       "adapter-layers",
                       "projector-layers",
                       "gated-linear-units",
+                      "speculative-decoding",
+                      "rotary-position-embedding",
+                      "grouped-query-attention",
+                      "sliding-window-attention",
+                      "retrieval-augmented",
+                      "memory-augmented",
+                      "multimodal-fusion",
+                      "reranker",
                       "other"
                     ],
                     "meta:enum": {
@@ -199,6 +216,14 @@
                       "adapter-layers": "Parameter-efficient fine-tuning layers inserted into frozen models (e.g., LoRA, adapters).",
                       "projector-layers": "Cross-modal projection components bridging different modalities (e.g., Q-Former, linear projectors).",
                       "gated-linear-units": "Gated activation mechanisms using element-wise multiplication (e.g., GLU, SwiGLU, GeGLU).",
+                      "speculative-decoding": "Sub-network pairing a small draft model with a large verifier model to accelerate autoregressive generation.",
+                      "rotary-position-embedding": "Rotary Position Embedding (RoPE) sub-component encoding positional information via rotation matrices.",
+                      "grouped-query-attention": "Grouped-Query Attention (GQA) variant sharing key/value heads across groups of query heads to reduce KV-cache size.",
+                      "sliding-window-attention": "Attention mechanism restricting receptive field to a local sliding window (e.g., Mistral).",
+                      "retrieval-augmented": "Explicit retrieval sub-network prepended to or integrated into the model (e.g., RAG, RETRO).",
+                      "memory-augmented": "External or persistent memory bank integrated into the forward pass (e.g., MemGPT, Memorizing Transformers).",
+                      "multimodal-fusion": "Layer or block that fuses representations across more than one modality (e.g., cross-modal attention, FiLM conditioning).",
+                      "reranker": "Separate scoring / reranking head applied after an initial retrieval or generation step.",
                       "other": "Other secondary architectural components not covered by the predefined categories."
                     }
                   },
@@ -221,10 +246,7 @@
                 ]
               ]
             },
-             "topologyType": {
-              "$todos": [
-                "Update AI/ML property taxonomy with topologyType enum values."
-              ],
+            "topologyType": {
               "type": "string",
               "description": "Specifies the runtime parameter activation and connection structure of the network layers.",
               "anyOf": [
@@ -233,13 +255,19 @@
                     "dense",
                     "sparse",
                     "dynamic",
-                    "liquid"
+                    "liquid",
+                    "mixture-of-depths",
+                    "early-exit",
+                    "recurrent-hybrid"
                   ],
                   "meta:enum": {
                     "dense": "All or most parameters are active during inference with full connectivity between layers.",
                     "sparse": "Only a subset of parameters are active during inference with selective connectivity.",
                     "dynamic": "Parameter activation and connectivity patterns change based on input or runtime conditions.",
-                    "liquid": "Continuously adaptive network structure with time-varying connections and activations."
+                    "liquid": "Continuously adaptive network structure with time-varying connections and activations.",
+                    "mixture-of-depths": "Tokens are routed to different computational depths rather than different expert modules.",
+                    "early-exit": "Inference exits at the earliest layer that meets a confidence threshold, reducing compute for easy inputs.",
+                    "recurrent-hybrid": "Static layer layout that alternates between global attention and recurrent / SSM layers (e.g., Jamba, Zamba)."
                   }
                 },
                 {
@@ -1098,7 +1126,7 @@
               }
             },
             {
-              "pattern": "^cdx:ai-ml:model:performance:metric:[a-z0-9:-]+$"
+              "pattern": "^cdx:ai-ml:model:metric:performance:[a-z0-9:-]+$"
             }
           ],
           "examples": [
