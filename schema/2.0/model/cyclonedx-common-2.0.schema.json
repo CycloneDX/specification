@@ -376,6 +376,7 @@
           "type": "array",
           "title": "Organization Origins",
           "description": "The geographic origins associated with the organization, such as the country or countries where its goods or services originate. Multiple origins are allowed, each calculated on a different basis.",
+          "minItems": 1,
           "items": {"$ref": "#/$defs/origin"}
         }
       }
@@ -425,12 +426,13 @@
           "type": "string",
           "title": "Origin Basis",
           "description": "A free-form description of the methodology or unit on which the origin distribution is calculated. Each origin of the same subject must use a distinct basis.",
+          "minLength": 1,
           "examples": [ "number of parts", "manufacturing cost", "net weight" ]
         },
         "distribution": {
           "type": "array",
           "title": "Origin Distribution",
-          "description": "The distribution of the origin across regions. The percentages of all entries must total 100.",
+          "description": "The distribution of the origin across regions. The percentages of all entries must total 100, within rounding of the stated precision.",
           "minItems": 1,
           "items": { "$ref": "#/$defs/originRegion" }
         }
@@ -447,12 +449,13 @@
           "type": "string",
           "title": "ISO Code",
           "description": "The country or subdivision of origin, expressed as an ISO 3166-1 alpha-2 country code (for example, 'CA' for Canada) or an ISO 3166-2 subdivision code (for example, 'US-CA' for California, United States).",
+          "pattern": "^[A-Z]{2}(-[A-Z0-9]{1,3})?$",
           "examples": [ "CA", "US-CA" ]
         },
         "percentage": {
           "type": "number",
           "title": "Percentage",
-          "description": "The percentage of the whole attributable to this region. The percentages of all entries in a distribution must total 100.",
+          "description": "The percentage of the whole attributable to this region. The percentages of all entries in a distribution must total 100, within rounding of the stated precision.",
           "minimum": 0,
           "maximum": 100
         }
