@@ -35,7 +35,8 @@
             "file",
             "machine-learning-model",
             "data",
-            "cryptographic-asset"
+            "cryptographic-asset",
+            "service"
           ],
           "meta:enum": {
             "application": "A software application. Refer to [https://en.wikipedia.org/wiki/Application_software](https://en.wikipedia.org/wiki/Application_software) for information about applications.",
@@ -50,7 +51,8 @@
             "file": "A computer file. Refer to [https://en.wikipedia.org/wiki/Computer_file](https://en.wikipedia.org/wiki/Computer_file) for information about files.",
             "machine-learning-model": "A model based on training data that can make predictions or decisions without being explicitly programmed to do so.",
             "data": "A collection of discrete values that convey information.",
-            "cryptographic-asset": "A cryptographic asset including algorithms, protocols, certificates, keys, tokens, and secrets."
+            "cryptographic-asset": "A cryptographic asset including algorithms, protocols, certificates, keys, tokens, and secrets.",
+            "service": "A service, including microservices, function-as-a-service, and other types of network or intra-process services. Service-specific attributes, endpoints and the data profiles characterizing the data the service handles, apply exclusively to this component type."
           },
           "title": "Component Type",
           "description": "Specifies the type of component. For software components, classify as application if no more specific appropriate classification is available or cannot be determined for the component.",
@@ -188,7 +190,7 @@
           "items": {"$ref": "#/$defs/componentOrChoice"},
           "uniqueItems": true,
           "title": "Components",
-          "description": "A list of software and hardware components included in the parent component. Entries may be concrete components or component-choice wrappers expressing conditional or alternate relationships. This is not a dependency tree. It provides a way to specify a hierarchical representation of component assemblies, similar to system &#8594; subsystem &#8594; parts assembly in physical supply chains."
+          "description": "A list of components included in the parent component, including software, hardware, and services. Entries may be concrete components or component-choice wrappers expressing conditional or alternate relationships. This is not a dependency tree. It provides a way to specify a hierarchical representation of component assemblies, similar to system &#8594; subsystem &#8594; parts assembly in physical supply chains."
         },
         "evidence": {
           "$ref": "#/$defs/componentEvidence",
@@ -213,6 +215,23 @@
         "cryptoProperties": {
           "$ref": "cyclonedx-cryptography-2.0.schema.json#/$defs/cryptoProperties",
           "title": "Cryptographic Properties"
+        },
+        "endpoints": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "iri-reference"
+          },
+          "title": "Endpoints",
+          "description": "The endpoint URIs of the service. Multiple endpoints are allowed. May only be used for components of type `service`.",
+          "examples": ["https://example.com/api/v1/ticker"]
+        },
+        "dataProfiles": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataProfileChoice"},
+          "title": "Data Profiles",
+          "description": "The data handled by the service, characterized by data profiles. Each entry is either an inline profile object or a reference using bom-link or bom-ref to a previously declared profile, typically declared in the root profiles catalogue. May only be used for components of type `service`. Data movement is intentionally not expressed here: flow direction, sources, destinations, authentication, and boundary crossings are modelled via blueprint flows, assets, and boundaries, which reference this component by bom-ref."
         },
         "tags": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/tags",
@@ -244,6 +263,23 @@
             "not": { "required": ["versionRange"] }
           },
           "else": true
+        },
+        {
+          "title": "Service Requirement",
+          "description": "Requirement: endpoints and dataProfiles may only be used for components of type `service`.",
+          "if": {
+            "properties": { "type": { "const": "service" } },
+            "required": ["type"]
+          },
+          "then": true,
+          "else": {
+            "not": {
+              "anyOf": [
+                { "required": ["endpoints"] },
+                { "required": ["dataProfiles"] }
+              ]
+            }
+          }
         }
       ]
     },
@@ -320,7 +356,7 @@
       }
     },
     "version": {
-      "description": "A single disjunctive version identifier, for a component or service.",
+      "description": "A single disjunctive version identifier for a component.",
       "type": "string",
       "maxLength": 1024,
       "examples": [
