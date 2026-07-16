@@ -10,7 +10,7 @@
     {
       "bom-ref": "perspective-pqc-readiness",
       "name": "PQC Readiness",
-      "description": "Defines the data elements needed to assess a product's readiness for the post-quantum migration, and the structural assertions that determine readiness. Organized along three dimensions inspired by the PQCA readiness-tracking working group: inventory (is the cryptography recorded and classifiable), algorithm (is the cryptography in use quantum-resistant, split into a confidentiality/HNDL facet and an authentication facet), and agility (can vulnerable cryptography be replaced without code changes). Mappings carrying an 'expectation' are hard checks; mappings without one are descriptive and feed a graded readiness score. This perspective assumes the 'expectation' field on perspective mappings (see perspective-expectation-rationale.md).",
+      "description": "Defines the data elements needed to assess a product's readiness for the post-quantum migration, and the structural assertions that determine readiness. Organized along three dimensions inspired by the PQCA readiness-tracking working group: inventory (is the cryptography recorded and classifiable), algorithm (is the cryptography in use quantum-resistant, split into a confidentiality/HNDL facet and an authentication facet), and agility (can vulnerable cryptography be replaced without code changes). Mappings carrying an 'expectation' are hard checks; mappings without one are descriptive and feed a graded readiness score. This perspective assumes two proposed extensions: an 'expectation' field on perspective mappings, and the component-level 'agility' properties proposed in CycloneDX/specification#947, which the agility mappings reference.",
       "domains": [
         "cryptographic-security",
         {
@@ -29,13 +29,13 @@
           "rationale": "Inventory dimension. PQC readiness cannot be assessed unless the cryptography in use is inventoried."
         },
         {
-          "expression": "$.components[?(@.cryptoProperties.assetType=='algorithm' && !@.cryptoProperties.algorithmProperties.primitive)]",
+          "expression": "$.components[?(@.cryptoProperties.assetType=='algorithm' && (!@.cryptoProperties.algorithmProperties.primitive || @.cryptoProperties.algorithmProperties.primitive=='unknown'))]",
           "nativeName": "Unclassified algorithm",
-          "nativeDescription": "An algorithm asset that does not declare its primitive.",
+          "nativeDescription": "An algorithm asset that does not declare its primitive or declares it as unknown.",
           "relevance": "required",
           "expectation": "absent",
           "weight": 0.8,
-          "rationale": "Inventory dimension. Every algorithm must declare its primitive so the confidentiality and authentication facets can be evaluated."
+          "rationale": "Inventory dimension. Every algorithm must declare a known primitive so the confidentiality and authentication facets can be evaluated."
         },
         {
           "expression": "$.components[?((@.cryptoProperties.algorithmProperties.primitive=='kem' || @.cryptoProperties.algorithmProperties.primitive=='key-agree' || @.cryptoProperties.algorithmProperties.primitive=='pke' || @.cryptoProperties.algorithmProperties.primitive=='signature') && !@.cryptoProperties.algorithmProperties.nistQuantumSecurityLevel)]",
@@ -81,7 +81,7 @@
           "rationale": "Protocol dimension. A protocol's readiness follows from the cipher suites and key exchange it negotiates."
         },
         {
-          "expression": "$..cryptoProperties.agility",
+          "expression": "$.components[?(@.type=='cryptographic-asset')].agility",
           "nativeName": "Cryptographic agility",
           "nativeDescription": "How an asset's cryptographic configuration was determined and how a change to it can be applied.",
           "relevance": "recommended",
@@ -89,12 +89,12 @@
           "rationale": "Agility dimension. Informs migration effort, not the readiness verdict."
         },
         {
-          "expression": "$..cryptoProperties.agility.changeMechanism",
+          "expression": "$.components[?(@.type=='cryptographic-asset')].agility.changeMechanism",
           "nativeName": "Change mechanism",
-          "nativeDescription": "How a change to the cryptographic configuration is applied.",
+          "nativeDescription": "The step or steps required to apply a change to the cryptographic configuration.",
           "relevance": "recommended",
           "weight": 0.4,
-          "rationale": "Agility dimension. A value of runtime-config or restart-required indicates low-effort migration, while firmware-update or hardware-replacement indicates higher effort."
+          "rationale": "Agility dimension. All listed steps are required, so the most disruptive step in the set gives a rough indication of migration effort: a set containing only runtime-config typically suggests low-effort migration, while sets including firmware-update or hardware-replacement tend to involve more effort; not-possible indicates no agility."
         },
         {
           "expression": "$.components[?(@.cryptoProperties.assetType=='related-crypto-material')].cryptoProperties.relatedCryptoMaterialProperties.rotation",
