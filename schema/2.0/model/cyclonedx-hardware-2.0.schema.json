@@ -5,6 +5,222 @@
   "title": "CycloneDX Hardware Model",
   "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
+    "classification": {
+      "type": "object",
+      "title": "Classification",
+      "description": "Hierarchical classification of a physical item. The `category` and `subcategory` form a free-text hierarchy; the `codes` array carries scheme-bound classification codes drawn from external taxonomies.",
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Category",
+          "description": "High-level category, such as `semiconductor`, `passive`, `connector`, `electromechanical`, or `optoelectronic`."
+        },
+        "subcategory": {
+          "type": "string",
+          "title": "Subcategory",
+          "description": "More specific classification within the category, such as `microcontroller`, `voltage-regulator`, or `ceramic-resonator`."
+        },
+        "codes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/taxonomyCode" },
+          "title": "Codes",
+          "description": "Scheme-bound classification codes from external taxonomies."
+        }
+      }
+    },
 
+    "taxonomyCode": {
+      "type": "object",
+      "title": "Taxonomy Code",
+      "description": "A classification code assigned by an external taxonomy.",
+      "required": [ "standard", "value" ],
+      "additionalProperties": false,
+      "properties": {
+        "standard": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Standard",
+          "description": "The taxonomy or coding standard that issued the code.",
+          "examples": [ "NAICS", "HS", "UNSPSC", "JEDEC", "PNNL", "ECCN" ]
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Value",
+          "description": "The code value as defined by the standard."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "Human-readable description of the code."
+        },
+        "url": {
+          "type": "string",
+          "format": "iri-reference",
+          "title": "URL",
+          "description": "URL of the code definition or the publishing authority."
+        }
+      }
+    },
+
+    "boardLocation": {
+      "type": "object",
+      "title": "Board Location",
+      "description": "Placement of an item on a printed circuit board, panel, or assembly. A single item record may cover multiple physical placements when the items are functionally identical, in which case all reference designators are listed.",
+      "additionalProperties": false,
+      "required": [ "designators" ],
+      "properties": {
+        "designators": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true,
+          "minItems": 1,
+          "title": "Designators",
+          "description": "Reference designators identifying the placement on the assembly, such as U5, R12, C3.",
+          "examples": [ [ "U5" ], [ "C3", "C4", "C9", "C11", "C14", "C15" ] ]
+        },
+        "layer": {
+          "type": "string",
+          "enum": [ "top", "bottom", "inner" ],
+          "title": "Layer",
+          "description": "Board layer on which the item is mounted.",
+          "meta:enum": {
+            "top":    "Top side of the board.",
+            "bottom": "Bottom side of the board.",
+            "inner":  "Embedded in an inner layer of a multi-layer board."
+          }
+        },
+        "subsystem": {
+          "type": "string",
+          "title": "Subsystem",
+          "description": "Functional subsystem on the board with which the item is associated.",
+          "examples": [ "power-input", "usb-interface", "main-mcu" ]
+        }
+      }
+    },
+
+    "deviceType": {
+      "title": "Device Type",
+      "description": "Package or mounting style of the physical item. Either a predefined device type or a custom device type.",
+      "anyOf": [
+        {
+          "title": "Predefined Device Type",
+          "$ref": "#/$defs/preDefinedDeviceType"
+        },
+        {
+          "title": "Custom Device Type",
+          "$ref": "#/$defs/customDeviceType"
+        }
+      ]
+    },
+
+    "preDefinedDeviceType": {
+      "type": "string",
+      "title": "Predefined Device Type",
+      "description": "Package or mounting style of the physical item, drawn from the predefined set.",
+      "enum": [
+        "smd",
+        "pth",
+        "dip",
+        "sip",
+        "qfn",
+        "qfp",
+        "bga",
+        "csp",
+        "sot",
+        "to",
+        "wlcsp",
+        "module",
+        "die",
+        "discrete"
+      ],
+      "meta:enum": {
+        "smd":      "Generic surface-mount device, package shape not otherwise specified.",
+        "pth":      "Plated through-hole, leaded part inserted into the board.",
+        "dip":      "Dual in-line package, through-hole.",
+        "sip":      "Single in-line package, through-hole.",
+        "qfn":      "Quad flat no-leads, surface-mount.",
+        "qfp":      "Quad flat package with leads, surface-mount.",
+        "bga":      "Ball grid array, surface-mount.",
+        "csp":      "Chip-scale package, surface-mount.",
+        "sot":      "Small-outline transistor package, surface-mount.",
+        "to":       "Transistor outline package, through-hole or surface-mount variants.",
+        "wlcsp":    "Wafer-level chip-scale package.",
+        "module":   "Pre-assembled module containing multiple devices.",
+        "die":      "Bare semiconductor die, unpackaged.",
+        "discrete": "Discrete component without a standardized integrated-circuit package."
+      }
+    },
+
+    "customDeviceType": {
+      "type": "object",
+      "title": "Custom Device Type",
+      "description": "A device type that is not present in the predefined set.",
+      "required": [ "name" ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Name",
+          "description": "The name of the custom device type.",
+          "examples": [ "lga", "pga", "cob" ]
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "Description of the custom device type."
+        }
+      }
+    },
+
+    "leadTime": {
+      "type": "object",
+      "title": "Lead Time",
+      "description": "Supplier lead time for procuring the item.",
+      "required": [ "value", "unit" ],
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "type": "number",
+          "minimum": 0,
+          "title": "Value",
+          "description": "Typical lead time as a numeric value in the specified unit."
+        },
+        "unit": {
+          "type": "string",
+          "enum": [ "days", "weeks", "months" ],
+          "title": "Unit"
+        },
+        "range": {
+          "type": "object",
+          "title": "Range",
+          "description": "Observed range of lead times, useful when supply is volatile.",
+          "required": [ "min", "max" ],
+          "additionalProperties": false,
+          "properties": {
+            "min": {
+              "type": "number",
+              "minimum": 0,
+              "title": "Minimum"
+            },
+            "max": {
+              "type": "number",
+              "minimum": 0,
+              "title": "Maximum"
+            }
+          }
+        },
+        "observedDate": {
+          "type": "string",
+          "format": "date",
+          "title": "Observed Date",
+          "description": "Date on which the lead time was observed or quoted."
+        }
+      }
+    }
   }
 }
