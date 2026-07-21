@@ -71,6 +71,13 @@
         "parties": {
           "$ref": "cyclonedx-party-2.0.schema.json#/$defs/parties"
         },
+        "origins": {
+          "type": "array",
+          "title": "Component Origins",
+          "description": "The geographic origins of the component, each expressed as a distribution across one or more countries or subdivisions. Multiple origins are allowed, each calculated on a different basis.",
+          "minItems": 1,
+          "items": { "$ref": "cyclonedx-common-2.0.schema.json#/$defs/origin" }
+        },
         "group": {
           "type": "string",
           "title": "Component Group",
@@ -214,6 +221,31 @@
           "$ref": "cyclonedx-cryptography-2.0.schema.json#/$defs/cryptoProperties",
           "title": "Cryptographic Properties"
         },
+        "classification": {
+          "$ref": "cyclonedx-hardware-2.0.schema.json#/$defs/classification",
+          "title": "Classification",
+          "description": "Hierarchical classification of the item, with optional taxonomy codes from external standards. This object may only be specified for components of type `device` and must not be specified for other component types."
+        },
+        "boardLocation": {
+          "$ref": "cyclonedx-hardware-2.0.schema.json#/$defs/boardLocation",
+          "title": "Board Location",
+          "description": "Placement of the item on a printed circuit board, panel, or assembly. This object may only be specified for components of type `device` and must not be specified for other component types."
+        },
+        "deviceType": {
+          "$ref": "cyclonedx-hardware-2.0.schema.json#/$defs/deviceType",
+          "title": "Device Type",
+          "description": "Package or mounting style of the physical item, expressed as a predefined device type or a custom device type. This object may only be specified for components of type `device` and must not be specified for other component types."
+        },
+        "leadTime": {
+          "$ref": "cyclonedx-hardware-2.0.schema.json#/$defs/leadTime",
+          "title": "Lead Time",
+          "description": "Supplier lead time for procuring the item. This object may only be specified for components of type `device` and must not be specified for other component types."
+        },
+        "certifications": {
+          "$ref": "cyclonedx-certification-2.0.schema.json#/$defs/certifications",
+          "title": "Certifications",
+          "description": "Certifications held by or applicable to the component. Applicable to components of any type, hardware and software alike."
+        },
         "tags": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/tags",
           "title": "Tags"
@@ -244,6 +276,22 @@
             "not": { "required": ["versionRange"] }
           },
           "else": true
+        },
+        {
+          "description": "Requirement: `classification`, `boardLocation`, `deviceType`, and `leadTime` may only be present when `type` is `device`.",
+          "if": {
+            "properties": { "type": { "const": "device" } },
+            "required": ["type"]
+          },
+          "then": true,
+          "else": {
+            "properties": {
+              "classification": false,
+              "boardLocation": false,
+              "deviceType": false,
+              "leadTime": false
+            }
+          }
         }
       ]
     },
