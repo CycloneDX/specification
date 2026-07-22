@@ -177,6 +177,83 @@
       }
     },
 
+    "materialForm": {
+      "title": "Material Form",
+      "description": "Physical form in which the material is supplied. Either a predefined material form or a custom material form.",
+      "anyOf": [
+        {
+          "title": "Predefined Material Form",
+          "$ref": "#/$defs/preDefinedMaterialForm"
+        },
+        {
+          "title": "Custom Material Form",
+          "$ref": "#/$defs/customMaterialForm"
+        }
+      ]
+    },
+
+    "preDefinedMaterialForm": {
+      "type": "string",
+      "title": "Predefined Material Form",
+      "description": "Physical form in which the material is supplied, drawn from the predefined set.",
+      "enum": [
+        "powder",
+        "ingot",
+        "billet",
+        "bar",
+        "rod",
+        "wire",
+        "sheet",
+        "foil",
+        "plate",
+        "tube",
+        "pellet",
+        "flake",
+        "sponge",
+        "liquid",
+        "gas"
+      ],
+      "meta:enum": {
+        "powder":  "Finely divided particulate form.",
+        "ingot":   "Cast mass intended for further processing, such as rolling or remelting.",
+        "billet":  "Semi-finished cast or wrought form intended for extrusion, forging, or rolling.",
+        "bar":     "Solid elongated form of uniform cross-section.",
+        "rod":     "Solid elongated form of round cross-section, typically smaller than a bar.",
+        "wire":    "Drawn form of small round cross-section, supplied in coils or on spools.",
+        "sheet":   "Flat rolled form of uniform thickness, thinner than plate.",
+        "foil":    "Very thin flat rolled form, thinner than sheet.",
+        "plate":   "Flat rolled form of uniform thickness, thicker than sheet.",
+        "tube":    "Hollow elongated form of uniform cross-section.",
+        "pellet":  "Small agglomerated or compacted body of regular shape.",
+        "flake":   "Thin irregular particulate form.",
+        "sponge":  "Porous granular form produced by reduction processes, such as titanium sponge.",
+        "liquid":  "Liquid form, including melts, solutions, and suspensions.",
+        "gas":     "Gaseous form, including compressed and liquefied gases."
+      }
+    },
+
+    "customMaterialForm": {
+      "type": "object",
+      "title": "Custom Material Form",
+      "description": "A material form that is not present in the predefined set.",
+      "required": [ "name" ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Name",
+          "description": "The name of the custom material form.",
+          "examples": [ "slab", "coil", "briquette" ]
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "Description of the custom material form."
+        }
+      }
+    },
+
     "leadTime": {
       "type": "object",
       "title": "Lead Time",

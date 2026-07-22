@@ -777,6 +777,131 @@
         }
       }
     },
+    "cyclonedx-certification-2.0": {
+      "type": "null",
+      "title": "CycloneDX Certification Model",
+      "$defs": {
+        "certifications": {
+          "type": "array",
+          "title": "Certifications",
+          "description": "Certifications held by or applicable to the subject.",
+          "items": {
+            "$ref": "#/$defs/cyclonedx-certification-2.0/$defs/certification"
+          }
+        },
+        "certification": {
+          "type": "object",
+          "title": "Certification",
+          "description": "A certification, accreditation, or compliance mark applied to a subject. The subject may be a person, an organization, a system, a product, a service, or any other component. The certification names the standard or scheme, optionally records the certificate identifier, issuer, validity dates, scope, and jurisdiction.",
+          "required": [
+            "standard"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "title": "BOM Reference",
+              "description": "An optional identifier that can be used to reference the certification from elsewhere. Every bom-ref shall be unique within the containing instance. The value should not start with the prefix `urn:cdx:` to avoid conflicts with BOM-Link identifiers."
+            },
+            "standard": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Standard",
+              "description": "The certification standard, regulatory scheme, or compliance mark.",
+              "examples": [
+                "ISO 9001:2015",
+                "IATF 16949:2016",
+                "ISO/IEC 27001:2022",
+                "AS9100D",
+                "FCC Part 15",
+                "CE",
+                "UKCA",
+                "RCM",
+                "Common Criteria (ISO/IEC 15408)",
+                "FIPS 140-3",
+                "SOC 2 Type II"
+              ]
+            },
+            "identifier": {
+              "type": "string",
+              "title": "Identifier",
+              "description": "Certificate, registration, filing, or scheme identifier issued by the authority."
+            },
+            "issuer": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
+              "title": "Issuer",
+              "description": "Reference using bom-link or bom-ref to the party that issued the certification. Typically a certification body, accreditation organization, or regulatory authority."
+            },
+            "issuedDate": {
+              "type": "string",
+              "format": "date",
+              "title": "Issued Date",
+              "description": "Date on which the certification was issued."
+            },
+            "expirationDate": {
+              "type": "string",
+              "format": "date",
+              "title": "Expiration Date",
+              "description": "Date on which the certification expires or requires renewal."
+            },
+            "scope": {
+              "type": "string",
+              "title": "Scope",
+              "description": "Description of the activities, facilities, products, services, or operations covered by the certification."
+            },
+            "jurisdiction": {
+              "type": "string",
+              "title": "Jurisdiction",
+              "description": "ISO 3166-1 alpha-2 country code, ISO 3166-2 subdivision, or supranational identifier such as `EU`, where the certification applies.",
+              "examples": [
+                "US",
+                "EU",
+                "GB",
+                "AU",
+                "US-CA"
+              ]
+            },
+            "level": {
+              "type": "string",
+              "title": "Level",
+              "description": "The level, class, or grade achieved within the certification scheme, where the scheme defines one.",
+              "examples": [
+                "EAL4+",
+                "Level 2",
+                "Class B"
+              ]
+            },
+            "url": {
+              "type": "string",
+              "format": "iri-reference",
+              "title": "URL",
+              "description": "URL to the certificate record, filing, or supporting documentation."
+            },
+            "relatedClaims": {
+              "type": "array",
+              "uniqueItems": true,
+              "title": "Related Claims",
+              "description": "References using bom-link or bom-ref to CycloneDX Attestations (CDXA) claims that substantiate the certification, such as the claims, evidence, and counter evidence assembled during the conformity assessment.",
+              "items": {
+                "anyOf": [
+                  {
+                    "title": "Ref",
+                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
+                  },
+                  {
+                    "title": "BOM-Link Element",
+                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/bomLinkElementType"
+                  }
+                ]
+              }
+            },
+            "properties": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
+            }
+          }
+        }
+      }
+    },
     "cyclonedx-citation-2.0": {
       "type": "null",
       "title": "CycloneDX Citation Model",
@@ -1269,6 +1394,15 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/organizationalContact"
               }
+            },
+            "origins": {
+              "type": "array",
+              "title": "Organization Origins",
+              "description": "The geographic origins associated with the organization, such as the country or countries where its goods or services originate. Multiple origins are allowed, each calculated on a different basis.",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/origin"
+              }
             }
           }
         },
@@ -1310,6 +1444,152 @@
           }
         },
         "organizationalEntityOrContact": {},
+        "origin": {
+          "type": "object",
+          "title": "Origin",
+          "description": "Describes the geographic origin of the subject (for example, a component or party), expressed as a distribution across one or more countries or subdivisions, calculated on a stated basis. An origin may be scoped to a lifecycle or transformation stage, enabling stage-specific provenance such as distinguishing where a material was mined from where it was melted.",
+          "additionalProperties": false,
+          "required": [
+            "basis",
+            "distribution"
+          ],
+          "properties": {
+            "stage": {
+              "title": "Origin Stage",
+              "description": "The lifecycle or transformation stage of the subject to which this origin applies. When omitted, the origin describes the subject as a whole.",
+              "oneOf": [
+                {
+                  "type": "string",
+                  "title": "Predefined Origin Stage",
+                  "description": "An origin stage drawn from the predefined set.",
+                  "enum": [
+                    "designed",
+                    "mined",
+                    "harvested",
+                    "recycled",
+                    "refined",
+                    "separated",
+                    "smelted",
+                    "melted",
+                    "processed",
+                    "manufactured",
+                    "assembled",
+                    "developed",
+                    "built",
+                    "tested",
+                    "collected",
+                    "trained",
+                    "hosted",
+                    "operated",
+                    "maintained"
+                  ],
+                  "meta:enum": {
+                    "designed": "Creation of the design, specifications, or intellectual property of the subject, such as product design or integrated circuit design.",
+                    "mined": "Extraction of raw material from the earth, including ore mining and quarrying.",
+                    "harvested": "Collection of biologically derived raw material, such as timber, fibres, or natural rubber.",
+                    "recycled": "Recovery of material from scrap, waste, or previously used items.",
+                    "refined": "Purification of material, including chemical refining and electrorefining.",
+                    "separated": "Separation of individual elements or compounds from a mixed feedstock, such as rare earth element separation.",
+                    "smelted": "Extraction of metal from ore or concentrate by smelting.",
+                    "melted": "Melting of material into a homogeneous mass, such as an alloying melt or a remelt.",
+                    "processed": "Intermediate transformation not covered by a more specific stage, such as milling, atomization, or heat treatment.",
+                    "manufactured": "Fabrication of the item from its input materials or parts.",
+                    "assembled": "Integration of constituent parts into the finished item.",
+                    "developed": "Authoring of the source code of software or firmware.",
+                    "built": "Production of software artifacts from source, including compilation, packaging, and container image assembly.",
+                    "tested": "Verification of the subject against its requirements, such as software testing, hardware qualification, or final device test.",
+                    "collected": "Gathering of data from its sources, such as measurements, records, or user generated content.",
+                    "trained": "Training of a machine learning model, attributed to the regions where the training computation was performed.",
+                    "hosted": "Provision of the infrastructure on which a service or data resides, such as data centre regions.",
+                    "operated": "Operation and administration of the subject, attributed to the regions where operating personnel or systems are located.",
+                    "maintained": "Ongoing maintenance of the subject after release, including updates, patches, and security fixes."
+                  }
+                },
+                {
+                  "type": "object",
+                  "title": "Custom Origin Stage",
+                  "description": "An origin stage that is not present in the predefined set.",
+                  "required": [
+                    "name"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "title": "Name",
+                      "description": "The name of the custom origin stage.",
+                      "examples": [
+                        "sintered",
+                        "coated",
+                        "packaged"
+                      ]
+                    },
+                    "description": {
+                      "type": "string",
+                      "title": "Description",
+                      "description": "Description of the custom origin stage."
+                    }
+                  }
+                }
+              ]
+            },
+            "basis": {
+              "type": "string",
+              "title": "Origin Basis",
+              "description": "A free-form description of the methodology or unit on which the origin distribution is calculated. Each origin of the same subject shall use a distinct combination of stage and basis.",
+              "minLength": 1,
+              "examples": [
+                "number of parts",
+                "manufacturing cost",
+                "net weight"
+              ]
+            },
+            "distribution": {
+              "type": "array",
+              "title": "Origin Distribution",
+              "description": "The distribution of the origin across regions. The percentages of all entries must total 100, within rounding of the stated precision.",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/originRegion"
+              }
+            }
+          }
+        },
+        "originRegion": {
+          "type": "object",
+          "title": "Origin Region",
+          "description": "A single region of origin, its share of the whole, and optionally the party that performed the stage in that region.",
+          "additionalProperties": false,
+          "required": [
+            "isoCode",
+            "percentage"
+          ],
+          "properties": {
+            "isoCode": {
+              "type": "string",
+              "title": "ISO Code",
+              "description": "The country or subdivision of origin, expressed as an ISO 3166-1 alpha-2 country code (for example, 'CA' for Canada) or an ISO 3166-2 subdivision code (for example, 'US-CA' for California, United States).",
+              "pattern": "^[A-Z]{2}(-[A-Z0-9]{1,3})?$",
+              "examples": [
+                "CA",
+                "US-CA"
+              ]
+            },
+            "percentage": {
+              "type": "number",
+              "title": "Percentage",
+              "description": "The percentage of the whole attributable to this region. The percentages of all entries in a distribution must total 100, within rounding of the stated precision.",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "performedBy": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
+              "title": "Performed By",
+              "description": "Reference to the party that performed this stage of origin for this share of the distribution, such as the smelter that melted a material or the organization that developed a software component. Entries in a distribution may repeat a region in order to attribute shares to different parties."
+            }
+          }
+        },
         "properties": {
           "type": "array",
           "title": "Properties",
@@ -1730,7 +2010,8 @@
                 "file",
                 "machine-learning-model",
                 "data",
-                "cryptographic-asset"
+                "cryptographic-asset",
+                "material"
               ],
               "meta:enum": {
                 "application": "A software application. Refer to [https://en.wikipedia.org/wiki/Application_software](https://en.wikipedia.org/wiki/Application_software) for information about applications.",
@@ -1745,7 +2026,8 @@
                 "file": "A computer file. Refer to [https://en.wikipedia.org/wiki/Computer_file](https://en.wikipedia.org/wiki/Computer_file) for information about files.",
                 "machine-learning-model": "A model based on training data that can make predictions or decisions without being explicitly programmed to do so.",
                 "data": "A collection of discrete values that convey information.",
-                "cryptographic-asset": "A cryptographic asset including algorithms, protocols, certificates, keys, tokens, and secrets."
+                "cryptographic-asset": "A cryptographic asset including algorithms, protocols, certificates, keys, tokens, and secrets.",
+                "material": "A physical substance in raw or processed form that is used to make, maintain, or repair an item, such as a metal, alloy, polymer, chemical, or other matter. Materials are commonly tracked for sourcing, provenance, and regulatory compliance. A finished physical item should be classified as 'device' instead."
               },
               "title": "Component Type",
               "description": "Specifies the type of component. For software components, classify as application if no more specific appropriate classification is available or cannot be determined for the component.",
@@ -1792,6 +2074,15 @@
               "examples": [
                 "Acme Inc"
               ]
+            },
+            "origins": {
+              "type": "array",
+              "title": "Component Origins",
+              "description": "The geographic origins of the component, each expressed as a distribution across one or more countries or subdivisions. Multiple origins are allowed, each calculated on a different basis.",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/origin"
+              }
             },
             "group": {
               "type": "string",
@@ -1997,6 +2288,36 @@
               "$ref": "#/$defs/cyclonedx-cryptography-2.0/$defs/cryptoProperties",
               "title": "Cryptographic Properties"
             },
+            "classification": {
+              "$ref": "#/$defs/cyclonedx-hardware-2.0/$defs/classification",
+              "title": "Classification",
+              "description": "Hierarchical classification of the item, with optional taxonomy codes from external standards. This object may only be specified for components of type `device` or `material` and shall not be specified for other component types."
+            },
+            "boardLocation": {
+              "$ref": "#/$defs/cyclonedx-hardware-2.0/$defs/boardLocation",
+              "title": "Board Location",
+              "description": "Placement of the item on a printed circuit board, panel, or assembly. This object may only be specified for components of type `device` and shall not be specified for other component types."
+            },
+            "deviceType": {
+              "$ref": "#/$defs/cyclonedx-hardware-2.0/$defs/deviceType",
+              "title": "Device Type",
+              "description": "Package or mounting style of the physical item, expressed as a predefined device type or a custom device type. This object may only be specified for components of type `device` and shall not be specified for other component types."
+            },
+            "leadTime": {
+              "$ref": "#/$defs/cyclonedx-hardware-2.0/$defs/leadTime",
+              "title": "Lead Time",
+              "description": "Supplier lead time for procuring the item. This object may only be specified for components of type `device` or `material` and shall not be specified for other component types."
+            },
+            "materialForm": {
+              "$ref": "#/$defs/cyclonedx-hardware-2.0/$defs/materialForm",
+              "title": "Material Form",
+              "description": "Physical form in which the material is supplied, expressed as a predefined material form or a custom material form. This object may only be specified for components of type `material` and shall not be specified for other component types."
+            },
+            "certifications": {
+              "$ref": "#/$defs/cyclonedx-certification-2.0/$defs/certifications",
+              "title": "Certifications",
+              "description": "Certifications held by or applicable to the component. Applicable to components of any type, hardware and software alike."
+            },
             "tags": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/tags",
               "title": "Tags"
@@ -2040,6 +2361,68 @@
                 }
               },
               "else": true
+            },
+            {
+              "description": "Requirement: `classification` and `leadTime` may only be present when `type` is `device` or `material`.",
+              "if": {
+                "properties": {
+                  "type": {
+                    "enum": [
+                      "device",
+                      "material"
+                    ]
+                  }
+                },
+                "required": [
+                  "type"
+                ]
+              },
+              "then": true,
+              "else": {
+                "properties": {
+                  "classification": false,
+                  "leadTime": false
+                }
+              }
+            },
+            {
+              "description": "Requirement: `boardLocation` and `deviceType` may only be present when `type` is `device`.",
+              "if": {
+                "properties": {
+                  "type": {
+                    "const": "device"
+                  }
+                },
+                "required": [
+                  "type"
+                ]
+              },
+              "then": true,
+              "else": {
+                "properties": {
+                  "boardLocation": false,
+                  "deviceType": false
+                }
+              }
+            },
+            {
+              "description": "Requirement: `materialForm` may only be present when `type` is `material`.",
+              "if": {
+                "properties": {
+                  "type": {
+                    "const": "material"
+                  }
+                },
+                "required": [
+                  "type"
+                ]
+              },
+              "then": true,
+              "else": {
+                "properties": {
+                  "materialForm": false
+                }
+              }
             }
           ]
         },
@@ -5134,6 +5517,356 @@
               "title": "Data type",
               "description": "The data type of the parameter.",
               "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "cyclonedx-hardware-2.0": {
+      "type": "null",
+      "title": "CycloneDX Hardware Model",
+      "$defs": {
+        "classification": {
+          "type": "object",
+          "title": "Classification",
+          "description": "Hierarchical classification of a physical item. The `category` and `subcategory` form a free-text hierarchy; the `codes` array carries scheme-bound classification codes drawn from external taxonomies.",
+          "additionalProperties": false,
+          "properties": {
+            "category": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Category",
+              "description": "High-level category, such as `semiconductor`, `passive`, `connector`, `electromechanical`, or `optoelectronic`."
+            },
+            "subcategory": {
+              "type": "string",
+              "title": "Subcategory",
+              "description": "More specific classification within the category, such as `microcontroller`, `voltage-regulator`, or `ceramic-resonator`."
+            },
+            "codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/cyclonedx-hardware-2.0/$defs/taxonomyCode"
+              },
+              "title": "Codes",
+              "description": "Scheme-bound classification codes from external taxonomies."
+            }
+          }
+        },
+        "taxonomyCode": {
+          "type": "object",
+          "title": "Taxonomy Code",
+          "description": "A classification code assigned by an external taxonomy.",
+          "required": [
+            "standard",
+            "value"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "standard": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Standard",
+              "description": "The taxonomy or coding standard that issued the code.",
+              "examples": [
+                "NAICS",
+                "HS",
+                "UNSPSC",
+                "JEDEC",
+                "PNNL",
+                "ECCN"
+              ]
+            },
+            "value": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Value",
+              "description": "The code value as defined by the standard."
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "Human-readable description of the code."
+            },
+            "url": {
+              "type": "string",
+              "format": "iri-reference",
+              "title": "URL",
+              "description": "URL of the code definition or the publishing authority."
+            }
+          }
+        },
+        "boardLocation": {
+          "type": "object",
+          "title": "Board Location",
+          "description": "Placement of an item on a printed circuit board, panel, or assembly. A single item record may cover multiple physical placements when the items are functionally identical, in which case all reference designators are listed.",
+          "additionalProperties": false,
+          "required": [
+            "designators"
+          ],
+          "properties": {
+            "designators": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true,
+              "minItems": 1,
+              "title": "Designators",
+              "description": "Reference designators identifying the placement on the assembly, such as U5, R12, C3.",
+              "examples": [
+                [
+                  "U5"
+                ],
+                [
+                  "C3",
+                  "C4",
+                  "C9",
+                  "C11",
+                  "C14",
+                  "C15"
+                ]
+              ]
+            },
+            "layer": {
+              "type": "string",
+              "enum": [
+                "top",
+                "bottom",
+                "inner"
+              ],
+              "title": "Layer",
+              "description": "Board layer on which the item is mounted.",
+              "meta:enum": {
+                "top": "Top side of the board.",
+                "bottom": "Bottom side of the board.",
+                "inner": "Embedded in an inner layer of a multi-layer board."
+              }
+            },
+            "subsystem": {
+              "type": "string",
+              "title": "Subsystem",
+              "description": "Functional subsystem on the board with which the item is associated.",
+              "examples": [
+                "power-input",
+                "usb-interface",
+                "main-mcu"
+              ]
+            }
+          }
+        },
+        "deviceType": {
+          "title": "Device Type",
+          "description": "Package or mounting style of the physical item. Either a predefined device type or a custom device type.",
+          "anyOf": [
+            {
+              "title": "Predefined Device Type",
+              "$ref": "#/$defs/cyclonedx-hardware-2.0/$defs/preDefinedDeviceType"
+            },
+            {
+              "title": "Custom Device Type",
+              "$ref": "#/$defs/cyclonedx-hardware-2.0/$defs/customDeviceType"
+            }
+          ]
+        },
+        "preDefinedDeviceType": {
+          "type": "string",
+          "title": "Predefined Device Type",
+          "description": "Package or mounting style of the physical item, drawn from the predefined set.",
+          "enum": [
+            "smd",
+            "pth",
+            "dip",
+            "sip",
+            "qfn",
+            "qfp",
+            "bga",
+            "csp",
+            "sot",
+            "to",
+            "wlcsp",
+            "module",
+            "die",
+            "discrete"
+          ],
+          "meta:enum": {
+            "smd": "Generic surface-mount device, package shape not otherwise specified.",
+            "pth": "Plated through-hole, leaded part inserted into the board.",
+            "dip": "Dual in-line package, through-hole.",
+            "sip": "Single in-line package, through-hole.",
+            "qfn": "Quad flat no-leads, surface-mount.",
+            "qfp": "Quad flat package with leads, surface-mount.",
+            "bga": "Ball grid array, surface-mount.",
+            "csp": "Chip-scale package, surface-mount.",
+            "sot": "Small-outline transistor package, surface-mount.",
+            "to": "Transistor outline package, through-hole or surface-mount variants.",
+            "wlcsp": "Wafer-level chip-scale package.",
+            "module": "Pre-assembled module containing multiple devices.",
+            "die": "Bare semiconductor die, unpackaged.",
+            "discrete": "Discrete component without a standardized integrated-circuit package."
+          }
+        },
+        "customDeviceType": {
+          "type": "object",
+          "title": "Custom Device Type",
+          "description": "A device type that is not present in the predefined set.",
+          "required": [
+            "name"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Name",
+              "description": "The name of the custom device type.",
+              "examples": [
+                "lga",
+                "pga",
+                "cob"
+              ]
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "Description of the custom device type."
+            }
+          }
+        },
+        "materialForm": {
+          "title": "Material Form",
+          "description": "Physical form in which the material is supplied. Either a predefined material form or a custom material form.",
+          "anyOf": [
+            {
+              "title": "Predefined Material Form",
+              "$ref": "#/$defs/cyclonedx-hardware-2.0/$defs/preDefinedMaterialForm"
+            },
+            {
+              "title": "Custom Material Form",
+              "$ref": "#/$defs/cyclonedx-hardware-2.0/$defs/customMaterialForm"
+            }
+          ]
+        },
+        "preDefinedMaterialForm": {
+          "type": "string",
+          "title": "Predefined Material Form",
+          "description": "Physical form in which the material is supplied, drawn from the predefined set.",
+          "enum": [
+            "powder",
+            "ingot",
+            "billet",
+            "bar",
+            "rod",
+            "wire",
+            "sheet",
+            "foil",
+            "plate",
+            "tube",
+            "pellet",
+            "flake",
+            "sponge",
+            "liquid",
+            "gas"
+          ],
+          "meta:enum": {
+            "powder": "Finely divided particulate form.",
+            "ingot": "Cast mass intended for further processing, such as rolling or remelting.",
+            "billet": "Semi-finished cast or wrought form intended for extrusion, forging, or rolling.",
+            "bar": "Solid elongated form of uniform cross-section.",
+            "rod": "Solid elongated form of round cross-section, typically smaller than a bar.",
+            "wire": "Drawn form of small round cross-section, supplied in coils or on spools.",
+            "sheet": "Flat rolled form of uniform thickness, thinner than plate.",
+            "foil": "Very thin flat rolled form, thinner than sheet.",
+            "plate": "Flat rolled form of uniform thickness, thicker than sheet.",
+            "tube": "Hollow elongated form of uniform cross-section.",
+            "pellet": "Small agglomerated or compacted body of regular shape.",
+            "flake": "Thin irregular particulate form.",
+            "sponge": "Porous granular form produced by reduction processes, such as titanium sponge.",
+            "liquid": "Liquid form, including melts, solutions, and suspensions.",
+            "gas": "Gaseous form, including compressed and liquefied gases."
+          }
+        },
+        "customMaterialForm": {
+          "type": "object",
+          "title": "Custom Material Form",
+          "description": "A material form that is not present in the predefined set.",
+          "required": [
+            "name"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Name",
+              "description": "The name of the custom material form.",
+              "examples": [
+                "slab",
+                "coil",
+                "briquette"
+              ]
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "Description of the custom material form."
+            }
+          }
+        },
+        "leadTime": {
+          "type": "object",
+          "title": "Lead Time",
+          "description": "Supplier lead time for procuring the item.",
+          "required": [
+            "value",
+            "unit"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "title": "Value",
+              "description": "Typical lead time as a numeric value in the specified unit."
+            },
+            "unit": {
+              "type": "string",
+              "enum": [
+                "days",
+                "weeks",
+                "months"
+              ],
+              "title": "Unit"
+            },
+            "range": {
+              "type": "object",
+              "title": "Range",
+              "description": "Observed range of lead times, useful when supply is volatile.",
+              "required": [
+                "min",
+                "max"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "min": {
+                  "type": "number",
+                  "minimum": 0,
+                  "title": "Minimum"
+                },
+                "max": {
+                  "type": "number",
+                  "minimum": 0,
+                  "title": "Maximum"
+                }
+              }
+            },
+            "observedDate": {
+              "type": "string",
+              "format": "date",
+              "title": "Observed Date",
+              "description": "Date on which the lead time was observed or quoted."
             }
           }
         }
