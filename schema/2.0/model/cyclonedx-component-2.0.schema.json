@@ -298,6 +298,11 @@
           "title": "Material Form",
           "description": "Physical form in which the material is supplied, expressed as a predefined material form or a custom material form. This object may only be specified for components of type `material` and shall not be specified for other component types."
         },
+        "quantity": {
+          "$ref": "cyclonedx-hardware-2.0.schema.json#/$defs/quantity",
+          "title": "Quantity",
+          "description": "The quantity of the item in the context in which it is declared, such as the number of identical parts within the enclosing assembly or the amount of material in the described lot. This object may only be specified for components of type `device` or `material` and shall not be specified for other component types."
+        },
         "certifications": {
           "$ref": "cyclonedx-certification-2.0.schema.json#/$defs/certifications",
           "title": "Certifications",
@@ -337,7 +342,7 @@
           "else": true
         },
         {
-          "description": "Requirement: `classification` and `leadTime` may only be present when `type` is `device` or `material`.",
+          "description": "Requirement: `classification`, `leadTime`, and `quantity` may only be present when `type` is `device` or `material`.",
           "if": {
             "properties": { "type": { "enum": ["device", "material"] } },
             "required": ["type"]
@@ -346,7 +351,8 @@
           "else": {
             "properties": {
               "classification": false,
-              "leadTime": false
+              "leadTime": false,
+              "quantity": false
             }
           }
         },
