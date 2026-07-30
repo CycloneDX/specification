@@ -7,7 +7,7 @@ on:
       - 2.0-dev-threatmodeling
     paths:
       - 'schema/2.0/**/*.schema.json'
-      - 'tools/src/main/js/bundler/bundle-schemas.js'
+      - 'tools/src/main/js/bundle-schemas.js'
   workflow_dispatch:  # Allows manual trigger
 
 jobs:
@@ -19,39 +19,44 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        # see https://github.com/actions/checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        # see https://github.com/actions/setup-node
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: '20'
 
       - name: Install dependencies
-        working-directory: tools/src/main/js/bundler
+        working-directory: tools/src/main/js
         run: npm install
 
       - name: Bundle schemas
-        working-directory: tools/src/main/js/bundler
+        working-directory: tools/src/main/js
         run: |
           node bundle-schemas.js \
-            ../../../../../schema/2.0/model \
-            ../../../../../schema/2.0/cyclonedx-2.0.schema.json
+            ../../../../schema/2.0/model \
+            ../../../../schema/2.0/cyclonedx-2.0.schema.json
 
       - name: Check for changes and commit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           BUNDLED_FILE="schema/2.0/cyclonedx-2.0-bundled.schema.json"
-          MINIFIED_FILE="schema/2.0/cyclonedx-2.0-bundled.min.schema.json"
           
-          # Add both files (works for both new and modified files)
-          git add "$BUNDLED_FILE" "$MINIFIED_FILE"
+          # Add the file (works for both new and modified files)
+          git add "$BUNDLED_FILE"
           
           # Check if there are staged changes
           if git diff --staged --quiet; then
-            echo "No changes to bundled schemas"
+            echo "No changes to bundled schema"
           else
             echo "Committing bundled schema changes"
             git config --local user.email "github-actions[bot]@users.noreply.github.com"
             git config --local user.name "github-actions[bot]"
-            git commit -m "chore: update bundled schemas [skip ci]"
-            git push
+            git commit -m "chore: update bundled schema [skip ci]"
+            git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           fi

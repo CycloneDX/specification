@@ -1,0 +1,42 @@
+name: Zizmor
+
+on:
+  push:
+    branches: ['master', 'main']
+  pull_request:
+    branches: ['**']
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 6'
+
+permissions: {}
+
+concurrency:
+  group: '${{ github.workflow }}-${{ github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  zizmor:
+    name: Zizmor
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        # see https://github.com/actions/checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Run zizmor 🌈
+        # see https://github.com/zizmorcore/zizmor-action
+        uses: zizmorcore/zizmor-action@5f14fd08f7cf1cb1609c1e344975f152c7ee938d # v0.5.6
+        with:
+          # advanced-security: false => emit findings as workflow-command annotations (::error file=…) rather than
+          # uploading a SARIF report to GitHub's Security tab.
+          # Uploading SARIF requires `security-events: write` and GitHub Advanced Security (GHAS),
+          # both of which are unnecessary here and would violate the least-privilege policy.
+          # The two modes are mutually exclusive: advanced-security must be false for
+          # annotations to take effect.
+          advanced-security: false
+          annotations: true
