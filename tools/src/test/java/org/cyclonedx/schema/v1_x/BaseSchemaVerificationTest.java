@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.cyclonedx.schema;
+package org.cyclonedx.schema.v1_x;
 
 import org.apache.commons.io.IOUtils;
 import java.io.InputStream;
