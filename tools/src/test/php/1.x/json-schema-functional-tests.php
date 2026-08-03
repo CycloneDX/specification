@@ -12,9 +12,9 @@ require_once __DIR__ . '/vendor/autoload.php';
 // region config
 
 define('TESTSCHEMA_VERSION', getopt('v:')['v']);
-define('SCHEMA_DIR', realpath(__DIR__ . '/../../../../schema'));
+define('SCHEMA_DIR', realpath(__DIR__ . '/../../../../../schema'));
 define('SCHEMA_FILE', SCHEMA_DIR . '/bom-' . TESTSCHEMA_VERSION . '.schema.json');
-define('TESTDATA_DIR', realpath(__DIR__ . '/../resources/' . TESTSCHEMA_VERSION));
+define('TESTDATA_DIR', realpath(__DIR__ . '/../../resources/' . TESTSCHEMA_VERSION));
 
 if (empty(TESTSCHEMA_VERSION)) {
     throw new Exception('missing TESTSCHEMA_VERSION. expected via opt "-v"');
