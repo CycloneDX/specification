@@ -76,6 +76,37 @@
       },
       "title": "Data flow direction",
       "description": "Specifies the flow direction of the data. Direction is relative to the service."
+    },
+    "dataContents": {
+      "type": "object",
+      "title": "Data Contents",
+      "description": "The contents of the data, either embedded as an attachment or referenced by URL, optionally with integrity hashes and configuration properties.",
+      "additionalProperties": false,
+      "properties": {
+        "attachment": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/attachment",
+          "title": "Data Attachment",
+          "description": "A way to include textual or encoded data."
+        },
+        "url": {
+          "type": "string",
+          "title": "Data URL",
+          "description": "The URL to where the data can be retrieved.",
+          "format": "iri-reference"
+        },
+        "hashes": {
+          "type": "array",
+          "title": "Hashes",
+          "description": "Cryptographic hashes of the referenced or attached data, so that a consumer can verify it is the same data recorded.",
+          "items": { "$ref": "cyclonedx-common-2.0.schema.json#/$defs/hash" }
+        },
+        "properties": {
+          "type": "array",
+          "title": "Configuration Properties",
+          "description": "Name-value parameters that describe or configure the data.",
+          "items": { "$ref": "cyclonedx-common-2.0.schema.json#/$defs/property" }
+        }
+      }
     }
   }
 }
