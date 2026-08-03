@@ -154,6 +154,12 @@
             <version>5.11.4</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.11.4</version>
+            <scope>test</scope>
+        </dependency>
         <!-- Runtime-only test dependency -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -168,6 +174,13 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.2</version>
+                <configuration>
+                    <properties>
+                        <configurationParameters>
+                            junit.jupiter.tags=${surefire.includeTags}
+                        </configurationParameters>
+                    </properties>
+                </configuration>
             </plugin>
         </plugins>
         <testResources>
@@ -179,4 +192,13 @@
             </testResource>
         </testResources>
     </build>
+
+    <profiles>
+        <profile>
+            <id>schema-v1-tests</id>
+            <properties>
+                <surefire.includeTags>schema-v1</surefire.includeTags>
+            </properties>
+        </profile>
+    </profiles>
 </project>

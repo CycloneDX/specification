@@ -3,7 +3,7 @@
 // region config
 
 const SchemaFileGlob = '*.schema.json';
-const SchemaDir = __DIR__.'/../../../../schema/';
+const SchemaDir = __DIR__.'/../../../../../schema/';
 
 // endregion config
 

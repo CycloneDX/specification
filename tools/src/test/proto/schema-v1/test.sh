@@ -2,7 +2,7 @@
 set -ue
 
 THIS_PATH="$(realpath "$(dirname "$0")")"
-ROOT_PATH="$(realpath "${THIS_PATH}/../../../..")"
+ROOT_PATH="$(realpath "${THIS_PATH}/../../../../..")"
 
 # paths relative to $ROOT_PATH
 SCHEMA_DIR='schema'
@@ -118,13 +118,24 @@ function schema-functional () {
         --to /dev/null
   }
 
-  local SCHEMA_VERS
-  shopt -s globstar
-  for test_res in "$ROOT_PATH"/"$TEST_RES_DIR"/*/valid-*.textproto
+  local SCHEMA_VERS test_res
+  while IFS= read -r -d '' SCHEMA_VERS
   do
-    SCHEMA_VERS="$(basename "$(dirname "$test_res")")"
-    validate "$test_res" "$SCHEMA_VERS"
-  done
+    while IFS= read -r -d '' test_res
+    do
+      validate "$test_res" "$SCHEMA_VERS"
+    done < <(
+      find "$ROOT_PATH/$TEST_RES_DIR/$SCHEMA_VERS/" \
+      -mindepth 1 -maxdepth 1 -type f \
+      -name 'valid-*.textproto' -print0 \
+      | LC_ALL=C sort -z
+    )
+  done < <(
+    find "$ROOT_PATH/$TEST_RES_DIR" \
+    -mindepth 1 -maxdepth 1 \
+    -type d -name '1.*' -printf '%f\0' \
+    | LC_ALL=C sort -zr
+  )
 
   echo '>> OK.' >&2
 }
