@@ -2,7 +2,7 @@
 set -ue
 
 THIS_PATH="$(realpath "$(dirname "$0")")"
-ROOT_PATH="$(realpath "${THIS_PATH}/../../../..")"
+ROOT_PATH="$(realpath "${THIS_PATH}/../../../../..")"
 
 # paths relative to $ROOT_PATH
 SCHEMA_DIR='schema'
