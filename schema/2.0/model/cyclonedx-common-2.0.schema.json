@@ -6,14 +6,15 @@
   "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
     "refType": {
-      "description": "Identifier for referable and therefore interlinkable elements.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+      "description": "Identifier for referable and therefore interlinkable elements.\nValue must not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
       "type": "string",
       "minLength": 1,
-      "$comment": "TODO (breaking change): add a format constraint that prevents the value from staring with 'urn:cdx:'"
+      "pattern": "^(?!urn:cdx:)"
     },
     "refLinkType": {
       "description": "Descriptor for an element identified by the attribute 'bom-ref' in the same BOM document.\nIn contrast to `bomLinkElementType`.",
-      "$ref": "#/$defs/refType"
+      "$ref": "#/$defs/refType",
+      "$comment": "same value range as `refType`"
     },
     "bomLinkDocumentType": {
       "title": "BOM-Link Document",
