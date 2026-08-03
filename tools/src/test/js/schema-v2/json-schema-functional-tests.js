@@ -6,7 +6,7 @@
  */
 
 import {readFile, stat} from 'node:fs/promises'
-import {dirname, join} from 'node:path'
+import {dirname, basename, join} from 'node:path'
 import {fileURLToPath} from 'node:url'
 import {parseArgs} from 'node:util'
 
@@ -27,7 +27,10 @@ const testschemaVersion = (parseArgs({options: {v: {type: 'string', short: 'v'}}
 const schemaRootDir = join(_thisDir, '..', '..', '..', '..', '..', 'schema')
 const schemaDir = join(schemaRootDir, testschemaVersion)
 const schemaFile = join(schemaDir, `cyclonedx-${testschemaVersion}.schema.json`)
+const schemaModelDir = join(schemaDir, `model`)
 const testdataDir = join(_thisDir, '..', '..', 'resources', testschemaVersion)
+
+const schemaGlob = '*.schema.json'
 
 if (testschemaVersion.length === 0) {
     throw new Error('missing testschemaVersion. expected via argument')
@@ -39,41 +42,45 @@ if (!await stat(schemaFile).then(s => s.isFile()).catch(() => false)) {
 }
 console.debug('DEBUG | schemaFile = ', schemaFile);
 
+if (!await stat(schemaModelDir).then(s => s.isDirectory()).catch(() => false)) {
+    throw new Error(`missing schemaModelDir: ${schemaModelDir}`);
+}
+console.debug('DEBUG | schemaModelDir = ', schemaModelDir);
+
+
 if (!await stat(testdataDir).then(s => s.isDirectory()).catch(() => false)) {
     throw new Error(`missing testdataDir: ${testdataDir}`);
 }
 console.debug('DEBUG | testdataDir = ', testdataDir);
 
-const schemaRootDirPrefixes = [
-    'https://cyclonedx.org/schema/',
-    'http://cyclonedx.org/schema/',
-]
-
 // endregion config
 
 // region validator
 
-const bomSchema = JSON.parse(await readFile(schemaFile, 'utf-8'))
+const [spdxSchema, cryptoDefsSchema, bomSchema, bomSchemaModules] = await Promise.all([
+    readFile(join(schemaRootDir, 'spdx.schema.json'), 'utf-8').then(JSON.parse),
+    readFile(join(schemaRootDir, 'cryptography-defs.schema.json'), 'utf-8').then(JSON.parse),
+    readFile(schemaFile, 'utf-8').then(JSON.parse),
+    glob(join(schemaModelDir, schemaGlob)).then(fs => Promise.all(fs.map(
+        f => readFile(f, 'utf-8').then(JSON.parse).then(s => [basename(f), s])
+    )))
+])
 
 const ajv = new Ajv2020({
+    // not running in strict - this is done in the linter-test already
     strict: false,
     validateFormats: true,
     addUsedSchema: false,
-    loadSchema: async (uri) => {
-        for (const p of schemaRootDirPrefixes) {
-            if (uri.startsWith(p)) {
-                const u = new URL(uri)
-                u.hash = ''
-                u.search = ''
-                const schemaFile = join(schemaRootDir, u.toString().slice(p.length))
-                console.log(`DEBUG | loading schema ${uri} -> ${schemaFile}`)
-                return JSON.parse(await readFile(schemaFile, 'utf-8'))
-            }
-        }
-        throw new Error(`unknown schema: ${uri}`)
-    }
 });
 ajv.addMetaSchema(draft7MetaSchema);
+ajv.addSchema(spdxSchema)
+ajv.addSchema(spdxSchema, 'https://cyclonedx.org/schema/spdx.schema.json')
+ajv.addSchema(cryptoDefsSchema)
+ajv.addSchema(cryptoDefsSchema, 'https://cyclonedx.org/schema/cryptography-defs.schema.json')
+for (const [f, s] of bomSchemaModules) {
+    console.log('DEBUG | addSchema', f)
+    ajv.addSchema(s)
+}
 
 addFormats(ajv)
 addFormats2019(ajv, {formats: ['idn-email']})
@@ -81,7 +88,7 @@ addFormats2019(ajv, {formats: ['idn-email']})
 // see https://github.com/luzlab/ajv-formats-draft2019/issues/22
 ajv.addFormat('iri-reference', true)
 
-const _ajvValidate = await ajv.compileAsync(bomSchema)
+const _ajvValidate = ajv.compile(bomSchema)
 
 
 /**
