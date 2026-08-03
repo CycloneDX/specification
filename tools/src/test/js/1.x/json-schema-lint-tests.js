@@ -13,7 +13,7 @@ import {glob} from 'glob'
 // region config
 
 const bomSchemasGlob = 'bom-*.schema.json'
-const schemaDir = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..', 'schema')
+const schemaDir = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..', '..', 'schema')
 
 // endregion config
 

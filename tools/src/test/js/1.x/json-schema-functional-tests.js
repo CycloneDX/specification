@@ -21,9 +21,9 @@ const _thisDir = dirname(fileURLToPath(import.meta.url))
 // region config
 
 const testschemaVersion = (parseArgs({options: {v: {type: 'string', short: 'v'}}}).values.v ?? '').trim()
-const schemaDir = join(_thisDir, '..', '..', '..', '..', 'schema')
+const schemaDir = join(_thisDir, '..', '..', '..', '..', '..', 'schema')
 const schemaFile = join(schemaDir, `bom-${testschemaVersion}.schema.json`)
-const testdataDir = join(_thisDir, '..', 'resources', testschemaVersion)
+const testdataDir = join(_thisDir, '..', '..', 'resources', testschemaVersion)
 
 if (testschemaVersion.length === 0) {
     throw new Error('missing testschemaVersion. expected via argument')
