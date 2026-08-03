@@ -62,7 +62,7 @@ const [spdxSchema, cryptoDefsSchema, bomSchema, bomSchemaModules] = await Promis
     readFile(join(schemaRootDir, 'cryptography-defs.schema.json'), 'utf-8').then(JSON.parse),
     readFile(schemaFile, 'utf-8').then(JSON.parse),
     glob(join(schemaModelDir, schemaGlob)).then(fs => Promise.all(fs.map(
-        f => readFile(f, 'utf-8').then(JSON.parse).then(s => [basename(f), s])
+        f => readFile(f, 'utf-8').then(s => [basename(f), JSON.parse(s)])
     )))
 ])
 
@@ -73,13 +73,11 @@ const ajv = new Ajv2020({
     addUsedSchema: false,
 });
 ajv.addMetaSchema(draft7MetaSchema);
-ajv.addSchema(spdxSchema)
 ajv.addSchema(spdxSchema, 'https://cyclonedx.org/schema/spdx.schema.json')
-ajv.addSchema(cryptoDefsSchema)
 ajv.addSchema(cryptoDefsSchema, 'https://cyclonedx.org/schema/cryptography-defs.schema.json')
 for (const [f, s] of bomSchemaModules) {
     console.log('DEBUG | addSchema', f)
-    ajv.addSchema(s)
+    ajv.addSchema(s, `https://cyclonedx.org/schema/${testschemaVersion}/model/${f}`)
 }
 
 addFormats(ajv)
