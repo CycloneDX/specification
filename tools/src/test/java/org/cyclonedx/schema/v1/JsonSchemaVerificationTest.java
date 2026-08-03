@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.cyclonedx.schema.v1_x;
+package org.cyclonedx.schema.v1;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -42,7 +42,7 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.TestFactory;
 
-@Tag("v1x")
+@Tag("schema-v1")
 class JsonSchemaVerificationTest extends BaseSchemaVerificationTest {
 
     private static final ObjectMapper MAPPER = new JsonMapper();

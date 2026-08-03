@@ -1,4 +1,4 @@
-package org.cyclonedx.schema.v1_x;
+package org.cyclonedx.schema.v1;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
@@ -28,7 +28,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
-@Tag("v1x")
+@Tag("schema-v1")
 public class XmlCatalogVerificationTest {
 
     /**

@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.cyclonedx.schema.v1_x;
+package org.cyclonedx.schema.v1;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -32,7 +32,7 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-@Tag("v1x")
+@Tag("schema-v1")
 public class XmlSchemaVerificationTest extends BaseSchemaVerificationTest {
 
     private static final Schema VERSION_10;
