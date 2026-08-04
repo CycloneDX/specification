@@ -448,6 +448,7 @@
     "extensibleProperties": {
       "type": "object",
       "title": "Extensible Properties",
+      "additionalProperties": false,
       "patternProperties": {
         "^ext:[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}:.+$": {
           "description": "CycloneDX supports a structured and namespace-aware mechanism for extensibility through the use of extensible properties. This mechanism enables organizations, ecosystems, and tool vendors to safely introduce custom properties without conflicting with the core schema or other extensions.\n\nExtensible properties are defined as a JSON object whose keys must conform to a strict pattern that resembles a reverse domain name structure, prefixed with ext:. This pattern provides a namespacing convention that aligns with well-established practices in other structured formats (e.g., XML namespaces).",
@@ -456,7 +457,7 @@
             "ext:example.org:myExtension"
           ],
           "if": {
-            "type": ["object", "array"]
+            "type": "object"
           },
           "then": {
             "type": "object",
@@ -466,10 +467,12 @@
                 "type": "string",
                 "format": "uri"
               }
-            }
+            },
+            "additionalProperties": true,
+            "$comment": "additionalProperties explicitly allowed for extensibility reasons"
           },
           "else": {
-            "type": ["string", "number", "boolean", "null"]
+            "type": ["array", "string", "number", "boolean", "null"]
           }
         }
       }
@@ -496,7 +499,6 @@
       "description": "An RFC 3339-compliant UTC timestamp using Zulu time (i.e., ending with 'Z'). The format must be 'YYYY-MM-DDTHH:MM:SSZ' or include optional fractional seconds, e.g., 'YYYY-MM-DDTHH:MM:SS.sssZ'. Offsets such as '+00:00' are not allowed."
     },
     "lifecycle": {
-      "type": "object",
       "title": "Lifecycle",
       "description": "The product lifecycle(s) that this BOM represents.",
       "oneOf": [
@@ -504,6 +506,7 @@
           "$ref": "#/$defs/preDefinedLifecyclePhase"
         },
         {
+          "type": "object",
           "title": "Custom Lifecycle Phase",
           "required": ["name"],
           "additionalProperties": false,
