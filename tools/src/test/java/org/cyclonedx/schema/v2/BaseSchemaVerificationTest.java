@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.cyclonedx.schema;
+package org.cyclonedx.schema.v2;
 
 import org.apache.commons.io.IOUtils;
 import java.io.InputStream;
@@ -23,14 +23,7 @@ public abstract class BaseSchemaVerificationTest {
 
     List<String> getAllResources() throws Exception {
         final List<String> files = new ArrayList<>();
-        files.addAll(getResources("1.0/"));
-        files.addAll(getResources("1.1/"));
-        files.addAll(getResources("1.2/"));
-        files.addAll(getResources("1.3/"));
-        files.addAll(getResources("1.4/"));
-        files.addAll(getResources("1.5/"));
-        files.addAll(getResources("1.6/"));
-        files.addAll(getResources("1.7/"));
+        files.addAll(getResources("2.0/"));
         return files;
     }
 
