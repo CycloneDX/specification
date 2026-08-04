@@ -6,9 +6,9 @@
  */
 
 
-import {parseArgs, styleText} from "node:util";
+import {parseArgs} from 'node:util'
 import {readFile, stat} from 'node:fs/promises'
-import {dirname, basename, join, relative} from 'node:path'
+import {dirname, join, relative} from 'node:path'
 import {fileURLToPath} from 'node:url'
 
 import {glob} from 'glob'
@@ -45,7 +45,7 @@ console.debug('DEBUG | schemaModelDir = ', schemaModelDir);
 if (!await stat(expectedRefTypeFP[0]).then(s => s.isFile()).catch(() => false)) {
     throw new Error(`missing expectedRefTypeFP file: ${expectedRefTypeFP[0]}`);
 }
-console.debug('DEBUG | schemaModelDir = ', schemaModelDir);
+console.debug('DEBUG | expectedRefTypeFP = ', expectedRefTypeFP);
 
 const schemaFiles = Object.freeze([
     // test only the source schema, not the bundled for now ...
@@ -61,79 +61,66 @@ console.debug('DEBUG | schemaFiles = ', schemaFiles);
 
 // endregion config
 
-// region tests
+// region utils
 
-
-/**
- * @param node
- * @param path
- * @return {Generator<Generator<*|[string,*], void, any&any>|(string|*)[], void, *>}
- * @private
- */
-function* _findRefs(node, path = '$') {
-    if (Array.isArray(node)) {
-        for (const [i, item] of node.entries()) {
-            yield* _findRefs(item, `${path}[${i}]`);
-        }
-    } else if (node !== null && typeof node === 'object') {
-        if (typeof node['$ref'] === 'string') {
-            yield [path, node['$ref']];
-        }
-        for (const [key, value] of Object.entries(node)) {
-            if (key === 'enum' || key === 'const' || key === 'examples' || key === 'default') continue;
-            yield* _findRefs(value, `${path}.${key}`);
-        }
-    }
-}
-
+const __FINDNODES_SKIP_KEYS = Object.freeze(new Set(
+    ['enum', 'const', 'examples', 'default', 'meta:enum']))
 
 /**
+ * Walks a schema, yields [path, node] for every node the matcher accepts.
  * @param {*} node
+ * @param {function(*): boolean} matcher
  * @param {string} path
- * @return {Generator<(string|*)[]|Generator<*|[string,*], void, any&any>, void, *>}
+ * @return {Generator<[string, *], void, *>}
  * @private
  */
-function* _findObjectSchemas(node, path = '$') {
+function* _findNodes(node, matcher, path = '$') {
     if (Array.isArray(node)) {
         for (const [i, item] of node.entries()) {
-            yield* _findObjectSchemas(item, `${path}[${i}]`);
+            yield* _findNodes(item, matcher, `${path}[${i}]`);
         }
     } else if (node !== null && typeof node === 'object') {
-        const isObjectSchema = node.type === 'object'
-            || (Array.isArray(node.type) && node.type.includes('object'))
-        if (isObjectSchema) {
+        if (matcher(node)) {
             yield [path, node];
         }
         for (const [key, value] of Object.entries(node)) {
             // don't descend into keys whose values aren't schemas
-            if (key === 'enum' || key === 'const' || key === 'examples' || key === 'default') continue;
-            yield* _findObjectSchemas(value, `${path}.${key}`);
+            if (__FINDNODES_SKIP_KEYS.has(key)) continue;
+            yield* _findNodes(value, matcher, `${path}.${key}`);
         }
     }
 }
-
 
 /**
- * @param {*} node
- * @param {string} path
- * @return {Generator<Generator<*|[string,*], void, any&any>|(string|*)[], void, *>}
+ * @function
+ * @param {*} schema
+ * @return {Generator<[string, *], void, *>} every node that has a string `$ref`
  * @private
  */
-function* _findBomRefProperties(node, path = '$') {
-    if (Array.isArray(node)) {
-        for (const [i, item] of node.entries()) {
-            yield* _findBomRefProperties(item, `${path}[${i}]`);
-        }
-    } else if (node !== null && typeof node === 'object') {
-        if (node.properties?.['bom-ref'] !== undefined) {
-            yield [`${path}.properties.bom-ref`, node.properties['bom-ref']];
-        }
-        for (const [key, value] of Object.entries(node)) {
-            yield* _findBomRefProperties(value, `${path}.${key}`);
-        }
-    }
-}
+const _findRefs = (schema) => _findNodes(schema,
+    n => typeof n['$ref'] === 'string')
 
+/**
+ * @function
+ * @param {*} schema
+ * @return {Generator<[string, *], void, *>} every node that is an object schema
+ * @private
+ */
+const _findObjectSchemas = (schema) => _findNodes(schema,
+    n => n.type === 'object' || (Array.isArray(n.type) && n.type.includes('object')))
+
+/**
+ * @param {string} schemaFile
+ * @return {string} the expected `$ref` value pointing at refType, relative to schemaFile
+ * @private
+ */
+function _refTypeRefFor(schemaFile) {
+    return (
+        schemaFile === expectedRefTypeFP[0]
+            ? ''
+            : relative(dirname(schemaFile), expectedRefTypeFP[0])
+    ) + expectedRefTypeFP[1]
+}
 
 /**
  * @param {*} actual
@@ -153,15 +140,21 @@ function _printError(actual, expected, msg, schemaFile, schemaPath) {
     )
 }
 
+// endregion utils
+
+// region tests
 
 /**
+ * `$ref` must not reference its own file by name/path;
+ * self-references must use the plain `#...` fragment form.
  * @param {*} schema
  * @param {string} schemaFile
- * @return {number}
+ * @return {number} number of errors found
  */
 function testNoSelfRefByFile(schema, schemaFile) {
     let errCnt = 0
-    for (const [path, ref] of _findRefs(schema)) {
+    for (const [path, node] of _findRefs(schema)) {
+        const ref = node['$ref']
         const hashPos = ref.indexOf('#')
         const filePart = hashPos === -1
             ? ref
@@ -183,54 +176,33 @@ function testNoSelfRefByFile(schema, schemaFile) {
 }
 
 /**
- * @param {string} schema
- * @param {string} schemaFile
- * @return {number}
- */
-function testBomRefRefTypes(schema, schemaFile) {
-    const expected = (
-        schemaFile === expectedRefTypeFP[0]
-            ? ''
-            : relative(dirname(schemaFile), expectedRefTypeFP[0])
-    ) + expectedRefTypeFP[1]
-
-    let errCnt = 0
-    for (const [path, node] of _findBomRefProperties(schema)) {
-        const actual = node['$ref']
-        if (actual !== expected) {
-            ++errCnt
-            _printError(
-                actual, expected,
-                'wrong .$ref',
-                schemaFile, path)
-        }
-    }
-    return errCnt
-}
-
-
-/**
+ * `bom-ref` properties must `$ref` refType — and nothing else may.
  * @param {*} schema
  * @param {string} schemaFile
- * @return {number}
+ * @return {number} number of errors found
  */
-function testRefTypeOnlyForBomRef(schema, schemaFile) {
-    const refTypeRef = (
-        schemaFile === expectedRefTypeFP[0]
-            ? ''
-            : relative(dirname(schemaFile), expectedRefTypeFP[0])
-    ) + expectedRefTypeFP[1]
-
-    // 'refLinkType' is the only allowed exception - it inherits from `expectedRefTypeFP`
+function testRefTypeUsage(schema, schemaFile) {
+    const refTypeRef = _refTypeRefFor(schemaFile)
+    // 'refLinkType' is the only allowed exception - it inherits from 'refType'
     const exceptionPath = schemaFile === expectedRefTypeFP[0]
         ? '$.$defs.refLinkType'
         : undefined
 
     let errCnt = 0
-    for (const [path, ref] of _findRefs(schema)) {
-        if (ref !== refTypeRef) continue;
-        if (path === exceptionPath) continue;
-        if (!path.endsWith('.properties.bom-ref')) {
+    for (const [path, node] of _findRefs(schema)) {
+        const ref = node['$ref']
+        const isBomRef = path.endsWith('.properties.bom-ref')
+        if (isBomRef) {
+            if (ref !== refTypeRef) {
+                ++errCnt
+                _printError(
+                    ref, refTypeRef,
+                    'wrong .$ref',
+                    schemaFile, path)
+            }
+            continue
+        }
+        if (ref === refTypeRef && path !== exceptionPath) {
             ++errCnt
             _printError(
                 ref, `different from: ${refTypeRef}`,
@@ -242,9 +214,11 @@ function testRefTypeOnlyForBomRef(schema, schemaFile) {
 }
 
 /**
+ * object schemas must have `additionalProperties: false`,
+ * unless explicitly allowed via `$comment`.
  * @param {*} schema
  * @param {string} schemaFile
- * @return {number}
+ * @return {number} number of errors found
  */
 function testAdditionalPropertiesFalse(schema, schemaFile) {
     let errCnt = 0
@@ -264,47 +238,36 @@ function testAdditionalPropertiesFalse(schema, schemaFile) {
     return errCnt
 }
 
-
 // endregion tests
 
+// region main
+
+/** @type {ReadonlyArray<[string, function(*, string): number]>} */
+const tests = Object.freeze({
+    'no self-$ref by file': testNoSelfRefByFile,
+    'refType usage (`bom-ref` <-> refType)': testRefTypeUsage,
+    'additionalProperties is `false`': testAdditionalPropertiesFalse,
+})
 
 const schemas = await Promise.all(schemaFiles.map(
-    f => readFile(f).then(s => [f, JSON.parse(s)])
+    f => readFile(f, 'utf8').then(s => [f, JSON.parse(s)])
 ))
 
 let errCnt = 0
 for (const [schemaFile, schema] of schemas) {
-    console.log('\ntest not sefl-ref by file in', schemaFile, '...')
-    const selfRefByFileErrors = testNoSelfRefByFile(schema, schemaFile)
-    if (selfRefByFileErrors === 0) {
-        console.log('OK.')
+    for (const [name, testFn] of Object.entries(tests)) {
+        console.log(`\ntest', name, 'in`, schemaFile, '...')
+        const errors = testFn(schema, schemaFile)
+        if (errors === 0) {
+            console.log('OK.')
+        }
+        errCnt += errors
     }
-    errCnt += selfRefByFileErrors
-
-    console.log('\ntest `bom-ref` is `refType` in', schemaFile, '...')
-    const bomRefTypeErrors = testBomRefRefTypes(schema, schemaFile)
-    if (bomRefTypeErrors === 0) {
-        console.log('OK.')
-    }
-    errCnt += bomRefTypeErrors
-
-    console.log('\ntest `refType` only for `bom-ref` in', schemaFile, '...')
-    const refTypeErrors = testRefTypeOnlyForBomRef(schema, schemaFile)
-    if (refTypeErrors === 0) {
-        console.log('OK.')
-    }
-    errCnt += refTypeErrors
-
-    console.log('\ntest additionalProperties is `false` in', schemaFile, '...')
-    const additioanlPropsErrors = testAdditionalPropertiesFalse(schema, schemaFile)
-    if (additioanlPropsErrors === 0) {
-        console.log('OK.')
-    }
-    errCnt += additioanlPropsErrors
 }
-
 
 console.log('\n\n> found', errCnt, 'errors')
 // Exit statuses should be in the range 0 to 254.
 // The status 0 is used to terminate the program successfully.
 process.exitCode = Math.min(errCnt, 254)
+
+// endregion main
