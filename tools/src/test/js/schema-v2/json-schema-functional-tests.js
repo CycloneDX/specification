@@ -13,7 +13,6 @@ import {parseArgs} from 'node:util'
 
 import Ajv2020 from "ajv/dist/2020.js"
 import draft7MetaSchema from "ajv/dist/refs/json-schema-draft-07.json" with {type: "json"};
-
 import addFormats from "ajv-formats"
 import addFormats2019 from "ajv-formats-draft2019"
 import {glob} from 'glob'
@@ -72,6 +71,7 @@ const ajv = new Ajv2020({
     validateFormats: true,
     addUsedSchema: false,
 });
+// some ref'd schemas mightbe draft-07
 ajv.addMetaSchema(draft7MetaSchema);
 ajv.addSchema(spdxSchema, 'https://cyclonedx.org/schema/spdx.schema.json')
 ajv.addSchema(cryptoDefsSchema, 'https://cyclonedx.org/schema/cryptography-defs.schema.json')
