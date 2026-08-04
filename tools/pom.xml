@@ -43,6 +43,9 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <!-- Test tag filtering: empty = run all tests.
+             Overridden by profiles or via -Dsurefire.includeTags=... -->
+        <surefire.includeTags></surefire.includeTags>
         <!-- Maven Plugin Versions -->
         <maven.javadoc.plugin.version>2.10.4</maven.javadoc.plugin.version>
         <maven.source.plugin.version>3.0.1</maven.source.plugin.version>
@@ -175,11 +178,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.2</version>
                 <configuration>
-                    <properties>
-                        <configurationParameters>
-                            junit.jupiter.tags=${surefire.includeTags}
-                        </configurationParameters>
-                    </properties>
+                    <groups>${surefire.includeTags}</groups>
                 </configuration>
             </plugin>
         </plugins>
@@ -198,6 +197,12 @@
             <id>schema-v1-tests</id>
             <properties>
                 <surefire.includeTags>schema-v1</surefire.includeTags>
+            </properties>
+        </profile>
+        <profile>
+            <id>schema-v2-tests</id>
+            <properties>
+                <surefire.includeTags>schema-v2</surefire.includeTags>
             </properties>
         </profile>
     </profiles>
