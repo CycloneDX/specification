@@ -2,7 +2,7 @@
 
 /**
  * validate all test data for a given version of CycloneDX.
- * call the script via `node <this-file> -v <CDX-version>`
+ * call the script via `node -- <this-file> -v <CDX-version>`
  */
 
 import {readFile, stat} from 'node:fs/promises'
@@ -16,6 +16,8 @@ import addFormats from "ajv-formats"
 import addFormats2019 from "ajv-formats-draft2019"
 import {glob} from 'glob'
 
+import {alphaSort} from './_helpers.js'
+
 
 const _thisDir = dirname(fileURLToPath(import.meta.url))
 
@@ -24,6 +26,7 @@ const _thisDir = dirname(fileURLToPath(import.meta.url))
 const testschemaVersion = (parseArgs({options: {v: {type: 'string', short: 'v'}}}).values.v ?? '').trim()
 const schemaRootDir = join(_thisDir, '..', '..', '..', '..', '..', 'schema')
 const schemaDir = join(schemaRootDir, testschemaVersion)
+// test only the source schema, not the bundled for now ...
 const schemaFile = join(schemaDir, `cyclonedx-${testschemaVersion}.schema.json`)
 const schemaModelDir = join(schemaDir, `model`)
 const testdataDir = join(_thisDir, '..', '..', 'resources', testschemaVersion)
@@ -101,7 +104,7 @@ async function validateFile(file) {
 
 let errCnt = 0
 
-for (const file of await glob(join(testdataDir, 'valid-*.json'))) {
+for (const file of (await glob(join(testdataDir, 'valid-*.json'))).sort(alphaSort)) {
     console.log('\ntest', file, '...');
     const validationErrors = await validateFile(file)
     if (validationErrors === null) {
@@ -113,7 +116,7 @@ for (const file of await glob(join(testdataDir, 'valid-*.json'))) {
     }
 }
 
-for (const file of await glob(join(testdataDir, 'invalid-*.json'))) {
+for (const file of (await glob(join(testdataDir, 'invalid-*.json'))).sort(alphaSort)) {
     console.log('\ntest', file, '...');
     const validationErrors = await validateFile(file)
     if (validationErrors === null) {

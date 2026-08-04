@@ -2,7 +2,7 @@
 
 /**
  * validate all schemas for a given version of CycloneDX.
- * call the script via `node <this-file> -v <CDX-version>`
+ * call the script via `node -- <this-file> -v <CDX-version>`
  */
 
 import {parseArgs} from "node:util";
@@ -26,6 +26,7 @@ const schemaRootDir = join(_thisDir, '..', '..', '..', '..', '..', 'schema')
 const schemaDir = join(schemaRootDir, testschemaVersion)
 const schemaFiles = Object.freeze([
     join(schemaDir, `cyclonedx-${testschemaVersion}.schema.json`),
+    // yes, we also test those bundled schemas - to check that the bundler did produce a working schwma
     join(schemaDir, `cyclonedx-${testschemaVersion}-bundled.schema.json`),
     join(schemaDir, `cyclonedx-${testschemaVersion}-bundled.min.schema.json`),
 ])
