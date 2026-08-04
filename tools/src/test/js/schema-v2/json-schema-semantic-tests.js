@@ -256,7 +256,7 @@ const schemas = await Promise.all(schemaFiles.map(
 let errCnt = 0
 for (const [schemaFile, schema] of schemas) {
     for (const [name, testFn] of Object.entries(tests)) {
-        console.log(`\ntest', name, 'in`, schemaFile, '...')
+        console.log('\ntest', name, 'in', schemaFile, '...')
         const errors = testFn(schema, schemaFile)
         if (errors === 0) {
             console.log('OK.')
