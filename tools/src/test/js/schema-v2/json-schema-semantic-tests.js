@@ -63,23 +63,55 @@ console.debug('DEBUG | schemaFiles = ', schemaFiles);
 
 // region tests
 
+
 /**
- * @param {*} actual
- * @param {*} expected
- * @param {string} msg
- * @param {string} schemaFile
- * @param {string} schemaPath
+ * @param node
+ * @param path
+ * @return {Generator<Generator<*|[string,*], void, any&any>|(string|*)[], void, *>}
  * @private
  */
-function _printError(actual, expected, msg, schemaFile, schemaPath) {
-    console.error(
-        '!!! ERROR:', msg,
-        '\n   in file:', `file://${schemaFile}`,
-        '\n  for path:', schemaPath,
-        '\n    actual:', actual,
-        '\n  expected:', expected
-    )
+function* _findRefs(node, path = '$') {
+    if (Array.isArray(node)) {
+        for (const [i, item] of node.entries()) {
+            yield* _findRefs(item, `${path}[${i}]`);
+        }
+    } else if (node !== null && typeof node === 'object') {
+        if (typeof node['$ref'] === 'string') {
+            yield [path, node['$ref']];
+        }
+        for (const [key, value] of Object.entries(node)) {
+            if (key === 'enum' || key === 'const' || key === 'examples' || key === 'default') continue;
+            yield* _findRefs(value, `${path}.${key}`);
+        }
+    }
 }
+
+
+/**
+ * @param {*} node
+ * @param {string} path
+ * @return {Generator<(string|*)[]|Generator<*|[string,*], void, any&any>, void, *>}
+ * @private
+ */
+function* _findObjectSchemas(node, path = '$') {
+    if (Array.isArray(node)) {
+        for (const [i, item] of node.entries()) {
+            yield* _findObjectSchemas(item, `${path}[${i}]`);
+        }
+    } else if (node !== null && typeof node === 'object') {
+        const isObjectSchema = node.type === 'object'
+            || (Array.isArray(node.type) && node.type.includes('object'))
+        if (isObjectSchema) {
+            yield [path, node];
+        }
+        for (const [key, value] of Object.entries(node)) {
+            // don't descend into keys whose values aren't schemas
+            if (key === 'enum' || key === 'const' || key === 'examples' || key === 'default') continue;
+            yield* _findObjectSchemas(value, `${path}.${key}`);
+        }
+    }
+}
+
 
 /**
  * @param {*} node
@@ -100,6 +132,54 @@ function* _findBomRefProperties(node, path = '$') {
             yield* _findBomRefProperties(value, `${path}.${key}`);
         }
     }
+}
+
+
+/**
+ * @param {*} actual
+ * @param {*} expected
+ * @param {string} msg
+ * @param {string} schemaFile
+ * @param {string} schemaPath
+ * @private
+ */
+function _printError(actual, expected, msg, schemaFile, schemaPath) {
+    console.error(
+        '!!! ERROR:', msg,
+        '\n   in file:', `file://${schemaFile}`,
+        '\n  for path:', schemaPath,
+        '\n    actual:', actual,
+        '\n  expected:', expected
+    )
+}
+
+
+/**
+ * @param {*} schema
+ * @param {string} schemaFile
+ * @return {number}
+ */
+function testNoSelfRefByFile(schema, schemaFile) {
+    let errCnt = 0
+    for (const [path, ref] of _findRefs(schema)) {
+        const hashPos = ref.indexOf('#')
+        const filePart = hashPos === -1
+            ? ref
+            : ref.slice(0, hashPos)
+        if (filePart === '') continue;
+        const resolved = join(dirname(schemaFile), filePart)
+        if (resolved === schemaFile) {
+            ++errCnt
+            const fragment = hashPos === -1
+                ? '#'
+                : ref.slice(hashPos)
+            _printError(
+                ref, fragment,
+                'self-$ref must start with "#"',
+                schemaFile, path)
+        }
+    }
+    return errCnt
 }
 
 /**
@@ -128,28 +208,6 @@ function testBomRefRefTypes(schema, schemaFile) {
     return errCnt
 }
 
-
-/**
- * @param node
- * @param path
- * @return {Generator<Generator<*|[string,*], void, any&any>|(string|*)[], void, *>}
- * @private
- */
-function* _findRefs(node, path = '$') {
-    if (Array.isArray(node)) {
-        for (const [i, item] of node.entries()) {
-            yield* _findRefs(item, `${path}[${i}]`);
-        }
-    } else if (node !== null && typeof node === 'object') {
-        if (typeof node['$ref'] === 'string') {
-            yield [path, node['$ref']];
-        }
-        for (const [key, value] of Object.entries(node)) {
-            if (key === 'enum' || key === 'const' || key === 'examples' || key === 'default') continue;
-            yield* _findRefs(value, `${path}.${key}`);
-        }
-    }
-}
 
 /**
  * @param {*} schema
@@ -184,32 +242,6 @@ function testRefTypeOnlyForBomRef(schema, schemaFile) {
 }
 
 /**
- * @param {*} node
- * @param {string} path
- * @return {Generator<(string|*)[]|Generator<*|[string,*], void, any&any>, void, *>}
- * @private
- */
-function* _findObjectSchemas(node, path = '$') {
-    if (Array.isArray(node)) {
-        for (const [i, item] of node.entries()) {
-            yield* _findObjectSchemas(item, `${path}[${i}]`);
-        }
-    } else if (node !== null && typeof node === 'object') {
-        const isObjectSchema = node.type === 'object'
-            || (Array.isArray(node.type) && node.type.includes('object'))
-        if (isObjectSchema) {
-            yield [path, node];
-        }
-        for (const [key, value] of Object.entries(node)) {
-            // don't descend into keys whose values aren't schemas
-            if (key === 'enum' || key === 'const' || key === 'examples' || key === 'default') continue;
-            yield* _findObjectSchemas(value, `${path}.${key}`);
-        }
-    }
-}
-
-
-/**
  * @param {*} schema
  * @param {string} schemaFile
  * @return {number}
@@ -242,6 +274,13 @@ const schemas = await Promise.all(schemaFiles.map(
 
 let errCnt = 0
 for (const [schemaFile, schema] of schemas) {
+    console.log('\ntest not sefl-ref by file in', schemaFile, '...')
+    const selfRefByFileErrors = testNoSelfRefByFile(schema, schemaFile)
+    if (selfRefByFileErrors === 0) {
+        console.log('OK.')
+    }
+    errCnt += selfRefByFileErrors
+
     console.log('\ntest `bom-ref` is `refType` in', schemaFile, '...')
     const bomRefTypeErrors = testBomRefRefTypes(schema, schemaFile)
     if (bomRefTypeErrors === 0) {
