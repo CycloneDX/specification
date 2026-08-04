@@ -191,8 +191,7 @@ function testRefTypeUsage(schema, schemaFile) {
     let errCnt = 0
     for (const [path, node] of _findRefs(schema)) {
         const ref = node['$ref']
-        const isBomRef = path.endsWith('.properties.bom-ref')
-        if (isBomRef) {
+        if (path.endsWith('.properties.bom-ref')) {
             if (ref !== refTypeRef) {
                 ++errCnt
                 _printError(
