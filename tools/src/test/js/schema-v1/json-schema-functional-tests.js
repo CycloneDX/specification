@@ -56,6 +56,7 @@ const ajv = new Ajv({
     strict: false,
     validateFormats: true,
     addUsedSchema: false,
+    loadSchema: (uri) => { throw new Error(`Remote schemas are disabled: ${uri}`) },
     schemas: {
         'http://cyclonedx.org/schema/spdx.schema.json': spdxSchema,
         'http://cyclonedx.org/schema/jsf-0.82.schema.json': jsfSchema,
