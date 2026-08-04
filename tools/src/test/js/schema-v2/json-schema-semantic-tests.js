@@ -73,7 +73,7 @@ console.debug('DEBUG | schemaFiles = ', schemaFiles);
  */
 function _printError(actual, expected, msg, schemaFile, schemaPath) {
     console.error(
-        'ERROR:', msg,
+        '!!! ERROR:', msg,
         '\n   in file:', `file://${schemaFile}`,
         '\n  for path:', schemaPath,
         '\n    actual:', actual,
@@ -179,15 +179,23 @@ const schemas = await Promise.all(schemaFiles.map(
 
 let errCnt = 0
 for (const [schemaFile, schema] of schemas) {
-    console.log('assertBomRefRefTypes in', schemaFile)
-    errCnt += assertBomRefRefTypes(schema, schemaFile)
+    console.log('\nassertBomRefRefTypes in', schemaFile, '...')
+    const bomRefTypeErrors = assertBomRefRefTypes(schema, schemaFile)
+    if (bomRefTypeErrors === 0) {
+        console.log('OK.')
+    }
+    errCnt += bomRefTypeErrors
 
-    console.log('assertAdditionalPropertiesFalse in', schemaFile)
-    errCnt += assertAdditionalPropertiesFalse(schema, schemaFile)
+    console.log('\nassertAdditionalPropertiesFalse in', schemaFile, '...')
+    const additioanlPropsErrors = assertAdditionalPropertiesFalse(schema, schemaFile)
+    if (additioanlPropsErrors === 0) {
+        console.log('OK.')
+    }
+    errCnt += additioanlPropsErrors
 }
 
 
-console.log('> found', errCnt, 'errors')
+console.log('\n\n> found', errCnt, 'errors')
 // Exit statuses should be in the range 0 to 254.
 // The status 0 is used to terminate the program successfully.
 process.exitCode = Math.min(errCnt, 254)

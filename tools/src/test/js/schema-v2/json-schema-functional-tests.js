@@ -111,8 +111,11 @@ for (const file of (await glob(join(testdataDir, 'valid-*.json'))).sort(alphaSor
         console.log('OK.')
     } else {
         ++errCnt;
-        console.error('ERROR: Unexpected validation error for file:', file);
-        console.error(validationErrors)
+        console.error(
+            '!!! ERROR: Unexpected validation error',
+            '\n  for file:', `file://${file}`,
+            '\n     error:', validationErrors
+        );
     }
 }
 
@@ -121,14 +124,16 @@ for (const file of (await glob(join(testdataDir, 'invalid-*.json'))).sort(alphaS
     const validationErrors = await validateFile(file)
     if (validationErrors === null) {
         ++errCnt;
-        console.error('ERROR: Missing expected validation error for file:', file);
+        console.error(
+            '!!! ERROR: Missing expected validation error',
+            '\n  for file:', `file://${file}`,);
 
     } else {
         console.log('OK.')
     }
 }
 
-console.log('> found', errCnt, 'errors')
+console.log('\n\n> found', errCnt, 'errors')
 // Exit statuses should be in the range 0 to 254.
 // The status 0 is used to terminate the program successfully.
 process.exitCode = Math.min(errCnt, 254)

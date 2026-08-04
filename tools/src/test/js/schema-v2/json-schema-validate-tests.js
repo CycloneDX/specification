@@ -55,7 +55,7 @@ console.debug('DEBUG | schemaModelDir = ', schemaModelDir);
 
 // endregion config
 
-const [spdxSchema, cryptoDefsSchema, bomSchemas, bomSchemaModules] = await Promise.all([
+const [spdxSchema, cryptoDefsSchema, schemas, schemaModules] = await Promise.all([
     readFile(join(schemaRootDir, 'spdx.schema.json'), 'utf-8').then(JSON.parse),
     readFile(join(schemaRootDir, 'cryptography-defs.schema.json'), 'utf-8').then(JSON.parse),
     Promise.all(schemaFiles.map(
@@ -91,7 +91,7 @@ function getAjv(bundled) {
     ajv.addSchema(spdxSchema, 'https://cyclonedx.org/schema/spdx.schema.json')
     ajv.addSchema(cryptoDefsSchema, 'https://cyclonedx.org/schema/cryptography-defs.schema.json')
     if (!bundled) {
-        for (const [f, s] of bomSchemaModules) {
+        for (const [f, s] of schemaModules) {
             ajv.addSchema(s, `https://cyclonedx.org/schema/${testschemaVersion}/model/${f}`)
         }
     }
@@ -106,17 +106,20 @@ function getAjv(bundled) {
 
 let errCnt = 0
 
-for (const [bomSchemaFile, bomSchema] of bomSchemas) {
-    console.log('\n> SchemaFile: ', bomSchemaFile);
-    const ajv = getAjv(schemaFilesBundleMatcher.test(bomSchemaFile))
+for (const [schemaFile, schema] of schemas) {
+    console.log('\n> SchemaFile: ', schemaFile);
+    const ajv = getAjv(schemaFilesBundleMatcher.test(schemaFile))
 
     console.group(`> compile schema, log warnings ...`)
     try {
-        ajv.compile(bomSchema)
+        ajv.compile(schema)
     } catch (err) {
         ++errCnt
         console.groupEnd()
-        console.error(`!!! SCHEMA ERROR: ${err}`)
+        console.error(
+            `!!! SCHEMA ERROR:`, String(err),
+            '\n   in file:', `file://${schemaFile}`,
+        )
         continue
     }
     console.groupEnd()
@@ -124,7 +127,7 @@ for (const [bomSchemaFile, bomSchema] of bomSchemas) {
 }
 
 
-console.log('> found', errCnt, 'errors')
+console.log('\n\n> found', errCnt, 'errors')
 // Exit statuses should be in the range 0 to 254.
 // The status 0 is used to terminate the program successfully.
 process.exitCode = Math.min(errCnt, 254)
