@@ -163,9 +163,15 @@ function testRefTypeOnlyForBomRef(schema, schemaFile) {
             : relative(dirname(schemaFile), expectedRefTypeFP[0])
     ) + expectedRefTypeFP[1]
 
+    // 'refLinkType' is the only allowed exception - it inherits from `expectedRefTypeFP`
+    const exceptionPath = schemaFile === expectedRefTypeFP[0]
+        ? '$.$defs.refLinkType'
+        : undefined
+
     let errCnt = 0
     for (const [path, ref] of _findRefs(schema)) {
-        if (ref !== refTypeRef) continue
+        if (ref !== refTypeRef) continue;
+        if (path === exceptionPath) continue;
         // TODO: refLinkType itself should be allowed for inheritance
         if (!path.endsWith('.properties.bom-ref')) {
             ++errCnt
@@ -210,16 +216,17 @@ function* _findObjectSchemas(node, path = '$') {
  * @return {number}
  */
 function testAdditionalPropertiesFalse(schema, schemaFile) {
-    const expected = false
-
     let errCnt = 0
     for (const [path, node] of _findObjectSchemas(schema)) {
+        if (path.endsWith('.if') || path.endsWith('.not')) continue;
+        const expected = typeof node['$comment'] === 'string'
+            && node['$comment'].includes('additionalProperties explicitly allowed')
         const actual = node['additionalProperties']
         if (actual !== expected) {
             ++errCnt
             _printError(
-                actual, expected, 
-                'wrong .additionalProperties', 
+                actual, expected,
+                'wrong .additionalProperties',
                 schemaFile, path)
         }
     }
