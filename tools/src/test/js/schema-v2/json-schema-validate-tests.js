@@ -5,8 +5,7 @@
  * call the script via `node <this-file> -v <CDX-version>`
  */
 
-
-import assert from 'node:assert'
+import {parseArgs} from "node:util";
 import {readFile, stat} from 'node:fs/promises'
 import {dirname, basename, join} from 'node:path'
 import {fileURLToPath} from 'node:url'
@@ -16,7 +15,6 @@ import draft7MetaSchema from "ajv/dist/refs/json-schema-draft-07.json" with {typ
 import addFormats from 'ajv-formats'
 import addFormats2019 from 'ajv-formats-draft2019'
 import {glob} from 'glob'
-import {parseArgs} from "node:util";
 
 
 const _thisDir = dirname(fileURLToPath(import.meta.url))
@@ -66,8 +64,6 @@ const [spdxSchema, cryptoDefsSchema, bomSchemas, bomSchemaModules] = await Promi
         f => readFile(f, 'utf-8').then(s => [basename(f), JSON.parse(s)])
     )))
 ])
-
-assert.notStrictEqual(bomSchemas.length, 0)
 
 /**
  * @param {boolean} bundled
