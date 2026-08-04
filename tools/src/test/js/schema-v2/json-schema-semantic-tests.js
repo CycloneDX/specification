@@ -119,7 +119,60 @@ function testBomRefRefTypes(schema, schemaFile) {
         const actual = node['$ref']
         if (actual !== expected) {
             ++errCnt
-            _printError(actual, expected, 'wrong .$ref', schemaFile, path)
+            _printError(
+                actual, expected,
+                'wrong .$ref',
+                schemaFile, path)
+        }
+    }
+    return errCnt
+}
+
+
+/**
+ * @param node
+ * @param path
+ * @return {Generator<Generator<*|[string,*], void, any&any>|(string|*)[], void, *>}
+ * @private
+ */
+function* _findRefs(node, path = '$') {
+    if (Array.isArray(node)) {
+        for (const [i, item] of node.entries()) {
+            yield* _findRefs(item, `${path}[${i}]`);
+        }
+    } else if (node !== null && typeof node === 'object') {
+        if (typeof node['$ref'] === 'string') {
+            yield [path, node['$ref']];
+        }
+        for (const [key, value] of Object.entries(node)) {
+            if (key === 'enum' || key === 'const' || key === 'examples' || key === 'default') continue;
+            yield* _findRefs(value, `${path}.${key}`);
+        }
+    }
+}
+
+/**
+ * @param {*} schema
+ * @param {string} schemaFile
+ * @return {number}
+ */
+function testRefTypeOnlyForBomRef(schema, schemaFile) {
+    const refTypeRef = (
+        schemaFile === expectedRefTypeFP[0]
+            ? ''
+            : relative(dirname(schemaFile), expectedRefTypeFP[0])
+    ) + expectedRefTypeFP[1]
+
+    let errCnt = 0
+    for (const [path, ref] of _findRefs(schema)) {
+        if (ref !== refTypeRef) continue
+        // TODO: refLinkType itself should be allowed for inheritance
+        if (!path.endsWith('.properties.bom-ref')) {
+            ++errCnt
+            _printError(
+                ref, `different from: ${refTypeRef}`,
+                'wrong use of refType - did you mean refLinkType?',
+                schemaFile, path)
         }
     }
     return errCnt
@@ -164,11 +217,15 @@ function testAdditionalPropertiesFalse(schema, schemaFile) {
         const actual = node['additionalProperties']
         if (actual !== expected) {
             ++errCnt
-            _printError(actual, expected, 'wrong .additionalProperties', schemaFile, path)
+            _printError(
+                actual, expected, 
+                'wrong .additionalProperties', 
+                schemaFile, path)
         }
     }
     return errCnt
 }
+
 
 // endregion tests
 
@@ -185,6 +242,13 @@ for (const [schemaFile, schema] of schemas) {
         console.log('OK.')
     }
     errCnt += bomRefTypeErrors
+
+    console.log('\ntest `refType` only for `bom-ref` in', schemaFile, '...')
+    const refTypeErrors = testRefTypeOnlyForBomRef(schema, schemaFile)
+    if (refTypeErrors === 0) {
+        console.log('OK.')
+    }
+    errCnt += refTypeErrors
 
     console.log('\ntest additionalProperties is `false` in', schemaFile, '...')
     const additioanlPropsErrors = testAdditionalPropertiesFalse(schema, schemaFile)
