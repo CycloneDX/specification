@@ -1,0 +1,35 @@
+name: CT CDX-2.x Java
+
+on:
+  push:
+    branches: ['master', 'main']
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: tools
+
+# https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token
+permissions: {}
+
+jobs:
+  test_java:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      # see https://github.com/actions/checkout
+      uses: actions/checkout@v6
+    - name: Set up JDK
+      # see https://github.com/actions/setup-java
+      uses: actions/setup-java@v5
+      with:
+        java-version: '8'
+        distribution: 'zulu'
+        java-package: jdk
+    - name: test with Maven
+      run: mvn clean test -Pschema-v2-tests
