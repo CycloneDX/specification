@@ -242,7 +242,7 @@ function testAdditionalPropertiesFalse(schema, schemaFile) {
 
 // region main
 
-/** @type {ReadonlyArray<[string, function(*, string): number]>} */
+/** @type {Readonly<Record<string, function(*, string): number>>} */
 const tests = Object.freeze({
     'no self-$ref by file': testNoSelfRefByFile,
     'refType usage (`bom-ref` <-> refType)': testRefTypeUsage,
