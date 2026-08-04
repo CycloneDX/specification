@@ -172,7 +172,6 @@ function testRefTypeOnlyForBomRef(schema, schemaFile) {
     for (const [path, ref] of _findRefs(schema)) {
         if (ref !== refTypeRef) continue;
         if (path === exceptionPath) continue;
-        // TODO: refLinkType itself should be allowed for inheritance
         if (!path.endsWith('.properties.bom-ref')) {
             ++errCnt
             _printError(
