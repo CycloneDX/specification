@@ -134,7 +134,6 @@
       "description": "A JSS signature object as defined in ITU-T X.590 clause 6.2. Captures the hashing algorithm, signing algorithm, public key material (in one of four forms), the base64URL-encoded digital signature value, and optional metadata. May nest a child 'signature' property to form a counter-signature chain.",
       "$comment": "Normative source: ITU-T X.590 clauses 6.2 and 6.3",
       "type": "object",
-      "additionalProperties": false,
       "properties": {
         "hash_algorithm": {
           "$ref": "#/$defs/hashAlgorithm"
@@ -196,13 +195,15 @@
           "$ref": "#/$defs/timestamp",
           "title": "Created Timestamp",
           "description": "The time at which this signature was originally created. The creator can use any time it deems most appropriate as the time the signature was created, but it MUST be precise to the nearest millisecond (exactly three digits after the decimal place in seconds). The created property MUST NOT be changed when creating a new version of the signature.",
-          "$comment": "Normative source: ITU-T X.590 clause 6.3.1"
+          "$comment": "Normative source: ITU-T X.590 clause 6.3.1",
+          "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"
         },
         "modified": {
           "$ref": "#/$defs/timestamp",
           "title": "Modified Timestamp",
           "description": "The time that this particular version of the signature was last modified. The creator can use any time it deems most appropriate as the time that this version of the signature was modified, but it MUST be precise to the nearest millisecond (exactly three digits after the decimal place in seconds). The modified property MUST be later than or equal to the value of the created property. If the created and modified properties are the same, then this is the first version of the signature.",
-          "$comment": "Normative source: ITU-T X.590 clause 6.3.1. Cross-field invariant: 'modified' MUST be greater than or equal to 'created'. JSON Schema 2020-12 cannot compare two sibling property values, so this constraint is NOT enforced by this schema and MUST be validated by the consuming tool or conformance suite."
+          "$comment": "Normative source: ITU-T X.590 clause 6.3.1. Cross-field invariant: 'modified' MUST be greater than or equal to 'created'. JSON Schema 2020-12 cannot compare two sibling property values, so this constraint is NOT enforced by this schema and MUST be validated by the consuming tool or conformance suite.",
+          "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"
         },
         "revoked": {
           "title": "Revoked Flag",
@@ -233,22 +234,18 @@
       "required": ["hash_algorithm", "algorithm", "value"],
       "anyOf": [
         {
-          "properties": { "public_key": true },
           "required": ["public_key"],
           "description": "Public key material provided as PEM-encoded public key (header/footer stripped)."
         },
         {
-          "properties": { "public_cert_chain": true },
           "required": ["public_cert_chain"],
           "description": "Public key material provided as a base64-encoded DER X.509 certificate chain."
         },
         {
-          "properties": { "cert_url": true },
           "required": ["cert_url"],
           "description": "Public key material provided by reference to a TLS-accessible certificate URI."
         },
         {
-          "properties": { "thumbprint": true },
           "required": ["thumbprint"],
           "description": "Public key material referenced by a base64URL-encoded SHA-256 certificate thumbprint."
         }
