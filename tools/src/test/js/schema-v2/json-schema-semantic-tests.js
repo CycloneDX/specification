@@ -107,7 +107,7 @@ function* _findBomRefProperties(node, path = '$') {
  * @param {string} schemaFile
  * @return {number}
  */
-function assertBomRefRefTypes(schema, schemaFile) {
+function testBomRefRefTypes(schema, schemaFile) {
     const expected = (
         schemaFile === expectedRefTypeFP[0]
             ? ''
@@ -156,7 +156,7 @@ function* _findObjectSchemas(node, path = '$') {
  * @param {string} schemaFile
  * @return {number}
  */
-function assertAdditionalPropertiesFalse(schema, schemaFile) {
+function testAdditionalPropertiesFalse(schema, schemaFile) {
     const expected = false
 
     let errCnt = 0
@@ -179,15 +179,15 @@ const schemas = await Promise.all(schemaFiles.map(
 
 let errCnt = 0
 for (const [schemaFile, schema] of schemas) {
-    console.log('\nassertBomRefRefTypes in', schemaFile, '...')
-    const bomRefTypeErrors = assertBomRefRefTypes(schema, schemaFile)
+    console.log('\ntest `bom-ref` is `refType` in', schemaFile, '...')
+    const bomRefTypeErrors = testBomRefRefTypes(schema, schemaFile)
     if (bomRefTypeErrors === 0) {
         console.log('OK.')
     }
     errCnt += bomRefTypeErrors
 
-    console.log('\nassertAdditionalPropertiesFalse in', schemaFile, '...')
-    const additioanlPropsErrors = assertAdditionalPropertiesFalse(schema, schemaFile)
+    console.log('\ntest additionalProperties is `false` in', schemaFile, '...')
+    const additioanlPropsErrors = testAdditionalPropertiesFalse(schema, schemaFile)
     if (additioanlPropsErrors === 0) {
         console.log('OK.')
     }
