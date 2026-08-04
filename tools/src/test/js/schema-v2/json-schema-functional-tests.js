@@ -76,7 +76,6 @@ ajv.addMetaSchema(draft7MetaSchema);
 ajv.addSchema(spdxSchema, 'https://cyclonedx.org/schema/spdx.schema.json')
 ajv.addSchema(cryptoDefsSchema, 'https://cyclonedx.org/schema/cryptography-defs.schema.json')
 for (const [f, s] of bomSchemaModules) {
-    console.log('DEBUG | addSchema', f)
     ajv.addSchema(s, `https://cyclonedx.org/schema/${testschemaVersion}/model/${f}`)
 }
 

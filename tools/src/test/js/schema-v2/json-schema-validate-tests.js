@@ -74,14 +74,14 @@ assert.notStrictEqual(bomSchemas.length, 0)
  * @param {boolean|"log"} strict
  * @return {Ajv}
  */
-function getAjv(bundled, strict = true) {
+function getAjv(bundled) {
     // see https://ajv.js.org/options.html
     const ajv = new Ajv2020({
-        strict: strict,
-        strictSchema: strict,
-        strictNumbers: strict,
-        strictTypes: strict,
-        strictTuples: strict,
+        strict: true,
+        strictSchema: true,
+        strictNumbers: true,
+        strictTypes: true,
+        strictTuples: true,
         strictRequired: true,
         validateFormats: true,
         allowMatchingProperties: true,
@@ -95,7 +95,6 @@ function getAjv(bundled, strict = true) {
     ajv.addSchema(cryptoDefsSchema, 'https://cyclonedx.org/schema/cryptography-defs.schema.json')
     if (!bundled) {
         for (const [f, s] of bomSchemaModules) {
-            console.log('DEBUG | addSchema', f)
             ajv.addSchema(s, `https://cyclonedx.org/schema/${testschemaVersion}/model/${f}`)
         }
     }
