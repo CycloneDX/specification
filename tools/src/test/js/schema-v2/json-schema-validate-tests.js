@@ -123,6 +123,9 @@ for (const [bomSchemaFile, bomSchema] of bomSchemas) {
     console.log('> SCHEMA OK.')
 }
 
+
+console.log('> found', errCnt, 'errors')
 // Exit statuses should be in the range 0 to 254.
 // The status 0 is used to terminate the program successfully.
 process.exitCode = Math.min(errCnt, 254)
+

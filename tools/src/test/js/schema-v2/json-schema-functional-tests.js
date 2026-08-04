@@ -128,7 +128,7 @@ for (const file of (await glob(join(testdataDir, 'invalid-*.json'))).sort(alphaS
     }
 }
 
-
+console.log('> found', errCnt, 'errors')
 // Exit statuses should be in the range 0 to 254.
 // The status 0 is used to terminate the program successfully.
 process.exitCode = Math.min(errCnt, 254)
