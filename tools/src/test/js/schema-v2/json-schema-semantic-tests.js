@@ -123,6 +123,16 @@ function _refTypeRefFor(schemaFile) {
 }
 
 /**
+ * @function
+ * @param {*} schema
+ * @return {Generator<[string, *], void, *>} every node that has an `enum` or a `meta:enum`
+ * @private
+ */
+const _findObjectWithEnum = (schema) => _findNodes(schema,
+    n => 'enum' in n || 'meta:enum' in n)
+
+
+/**
  * @param {*} actual
  * @param {*} expected
  * @param {string} msg
@@ -237,6 +247,51 @@ function testAdditionalPropertiesFalse(schema, schemaFile) {
     return errCnt
 }
 
+/**
+ * `meta:enum` must be an object,
+ * and every `enum` value must exist as a key in it.
+ * @param {*} schema
+ * @param {string} schemaFile
+ * @return {number} number of errors found
+ */
+function testMetaEnum(schema, schemaFile) {
+    let errCnt = 0
+    for (const [path, node] of _findObjectWithEnum(schema)) {
+        const metaEnum = node['meta:enum']
+        if (metaEnum === undefined) {
+            // metaEnum is optional
+            continue
+        }
+        if (typeof metaEnum !== 'object' || metaEnum === null || Array.isArray(metaEnum)) {
+            ++errCnt
+            _printError(
+                metaEnum, 'an object',
+                'meta:enum must be an object',
+                schemaFile, `${path}.meta:enum`)
+            continue
+        }
+        const enumValues = node['enum']
+        if (!Array.isArray(enumValues)) {
+            ++errCnt
+            _printError(
+                enumValues, 'an array',
+                'meta:enum without a sibling enum array',
+                schemaFile, `${path}.enum`)
+            continue
+        }
+        for (const value of enumValues) {
+            if (!Object.hasOwn(metaEnum, value)) {
+                ++errCnt
+                _printError(
+                    undefined, `a key ${JSON.stringify(String(value))}`,
+                    'enum value missing in meta:enum',
+                    schemaFile, `${path}.meta:enum`)
+            }
+        }
+    }
+    return errCnt
+}
+
 // endregion tests
 
 // region main
@@ -246,6 +301,7 @@ const tests = Object.freeze({
     'no self-$ref by file': testNoSelfRefByFile,
     'refType usage (`bom-ref` <-> refType)': testRefTypeUsage,
     'additionalProperties is `false`': testAdditionalPropertiesFalse,
+    'meta:enum completeness': testMetaEnum,
 })
 
 const schemas = await Promise.all(schemaFiles.map(
