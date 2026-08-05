@@ -256,7 +256,7 @@ function testAdditionalPropertiesFalse(schema, schemaFile) {
             ++errCnt
             _printError(
                 actual, expected,
-                'wrong .additionalProperties',
+                'either .additionalProperties or .unevaluatedProperties must be set',
                 schemaFile, path)
         }
     }
