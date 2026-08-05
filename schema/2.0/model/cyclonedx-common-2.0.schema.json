@@ -451,28 +451,50 @@
       "$comment": "This is a mixin. It intentionally does NOT restrict additional/unevaluated properties itself; schemas composing it via `allOf` are expected to close themselves with `unevaluatedProperties: false` so that both their own defined properties and these patternProperties remain usable.",
       "patternProperties": {
         "^ext:[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}:.+$": {
-          "description": "CycloneDX supports a structured and namespace-aware mechanism for extensibility through the use of extensible properties. This mechanism enables organizations, ecosystems, and tool vendors to safely introduce custom properties without conflicting with the core schema or other extensions.\n\nExtensible properties are defined as a JSON object whose keys must conform to a strict pattern that resembles a reverse domain name structure, prefixed with ext:. This pattern provides a namespacing convention that aligns with well-established practices in other structured formats (e.g., XML namespaces).",
+          "description": "CycloneDX supports a structured and namespace-aware mechanism for extensibility through the use of extensible properties. This mechanism enables organizations, ecosystems, and tool vendors to safely introduce custom properties without conflicting with the core schema or other extensions.\n\nExtensible properties are defined as a JSON object whose keys must conform to a strict pattern that resembles a reverse domain name structure, prefixed with ext:. This pattern provides a namespacing convention that aligns with well-established practices in other structured formats (e.g., XML namespaces).\n\nValues that are objects must declare the schema they conform to via `$schema`. This requirement applies recursively to objects contained in arrays, at any nesting depth.",
           "examples": [
             "ext:<domain>:<name>",
             "ext:example.org:myExtension"
           ],
+          "$ref": "#/$defs/extensibleProperties/$defs/propertyValue"
+        }
+      },
+      "$defs": {
+        "propertyObject": {
+          "type": "object",
+          "title": "Extensible Property Object",
+          "$comment": "Internal helper for extensibleProperties. Not part of the public schema API — do not reference externally; may change without notice.\n\nadditionalProperties explicitly allowed for extensibility reasons.",
+          "required": ["$schema"],
+          "properties": {
+            "$schema": {
+              "type": "string",
+              "format": "uri"
+            }
+          },
+          "additionalProperties": true
+        },
+        "propertyValue": {
+          "title": "Extensible Property Value",
+          "$comment": "Internal helper for extensibleProperties. Not part of the public schema API — do not reference externally; may change without notice.\nRecursive: objects must declare a `$schema`, arrays may nest arbitrarily deep with the same rule applied to every item, all other values are plain scalars.",
           "if": {
             "type": "object"
           },
           "then": {
-            "type": "object",
-            "required": ["$schema"],
-            "properties": {
-              "$schema": {
-                "type": "string",
-                "format": "uri"
-              }
-            },
-            "additionalProperties": true,
-            "$comment": "additionalProperties explicitly allowed for extensibility reasons"
+            "$ref": "#/$defs/extensibleProperties/$defs/propertyObject"
           },
           "else": {
-            "type": ["array", "string", "number", "boolean", "null"]
+            "if": {
+              "type": "array"
+            },
+            "then": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/extensibleProperties/$defs/propertyValue"
+              }
+            },
+            "else": {
+              "type": ["string", "number", "boolean", "null"]
+            }
           }
         }
       }
