@@ -59,10 +59,10 @@ const [spdxSchema, cryptoDefsSchema, schemas, schemaModules] = await Promise.all
     readFile(join(schemaRootDir, 'spdx.schema.json'), 'utf-8').then(JSON.parse),
     readFile(join(schemaRootDir, 'cryptography-defs.schema.json'), 'utf-8').then(JSON.parse),
     Promise.all(schemaFiles.map(
-        f => readFile(f, 'utf-8').then(s => [basename(f), JSON.parse(s)])
+        f => readFile(f, 'utf-8').then(s => [f, JSON.parse(s)])
     )),
     glob(join(schemaModelDir, schemaGlob)).then(fs => Promise.all(fs.map(
-        f => readFile(f, 'utf-8').then(s => [basename(f), JSON.parse(s)])
+        f => readFile(f, 'utf-8').then(s => [f, JSON.parse(s)])
     )))
 ])
 
@@ -108,7 +108,7 @@ let errCnt = 0
 
 for (const [schemaFile, schema] of schemas) {
     console.log('\n> SchemaFile: ', schemaFile);
-    const ajv = getAjv(schemaFilesBundleMatcher.test(schemaFile))
+    const ajv = getAjv(schemaFilesBundleMatcher.test(basename(schemaFile)))
 
     console.group(`> compile schema, log warnings ...`)
     try {
