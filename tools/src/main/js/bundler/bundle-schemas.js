@@ -109,7 +109,7 @@ function rewriteRefs(obj, schemaFiles, defsKeyword, currentSchemaName, currentSc
                         const filenameRewired = path.relative(
                             targetSchemaDir,
                             path.resolve(currentSchemaDir, filename)
-                        )
+                        );
                         newObj[key] = `${filenameRewired}${fragment}`;
                     }
                 } else {
@@ -264,7 +264,7 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
         console.log('Validating external $ref targets...');
         const allowedFiles = new Set([...schemaFiles, rootSchemaFilename]);
         for (const [schemaPath, schema] of Object.entries(schemas)) {
-            const schemaDir = path.dirname(schemaPath)
+            const schemaDir = path.dirname(schemaPath);
             // Only $ref can be external; $dynamicRef/$recursiveRef are JSON Pointers by spec
             const refs = collectRefKeywords(schema, ['$ref'], (v) => /^(\.?.*\.schema\.json)(#.*)?$/.test(v));
             for (const { ref, key, path: refPath } of refs) {
@@ -278,7 +278,7 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
                         await fs.access(path.resolve(schemaDir, target));
                     } catch (err) {
                         throw new Error(`Unresolved excepted ${key} target file '${target}' referenced from schema '${schemaPath}' at '${refPath}'`,
-                            {cause: err})
+                            {cause: err});
                     }
                     continue;
                 }
