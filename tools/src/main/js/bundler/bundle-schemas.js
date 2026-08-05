@@ -100,19 +100,16 @@ function rewriteRefs(obj, schemaFiles, defsKeyword, currentSchemaName, currentSc
                 const basename = path.basename(filename);
                 const schemaName = makeSchemaName(basename);
 
-                // If the target file is in the exception list, leave the ref as-is
+                // If the target file is in the exception list, rewire the ref
                 if (refExceptionSet && refExceptionSet.has(basename.toLowerCase())) {
-                    if (value.startsWith('https://') || value.startsWith('http://')) {
-                        // remote are not rewired
-                        newObj[key] = value;
-                    } else {
-                        const filenameRewired = path.relative(
-                            targetSchemaDir,
-                            path.resolve(currentSchemaDir, filename)
-                        );
-                        newObj[key] = `${filenameRewired}${fragment}`;
-                    }
-                } else {
+                    const filenameRewired = path.relative(
+                        targetSchemaDir,
+                        path.resolve(currentSchemaDir, filename)
+                    );
+                    newObj[key] = `${filenameRewired}${fragment}`;
+                }
+                // The target file shall be bundled
+                else {
                     // Normalize fragment: drop leading '#' and optional leading '/'
                     let fragPath = '';
                     if (fragment) {
