@@ -414,7 +414,7 @@
       }
     },
     "organizationalEntityOrContact": {
-
+        "$comment": "TODO"
     },
     "properties": {
       "type": "array",
@@ -448,10 +448,9 @@
     "extensibleProperties": {
       "type": "object",
       "title": "Extensible Properties",
-      "$comment": "additionalProperties explicitly allowed for extensibility reasons",
-      "additionalProperties": true,
+      "$comment": "This is a mixin. It intentionally does NOT restrict additional/unevaluated properties itself; schemas composing it via `allOf` are expected to close themselves with `unevaluatedProperties: false` so that both their own defined properties and these patternProperties remain usable.",
       "patternProperties": {
-        "^ext:[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}:.+$": {
+        "^ext:[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}:.": {
           "description": "CycloneDX supports a structured and namespace-aware mechanism for extensibility through the use of extensible properties. This mechanism enables organizations, ecosystems, and tool vendors to safely introduce custom properties without conflicting with the core schema or other extensions.\n\nExtensible properties are defined as a JSON object whose keys must conform to a strict pattern that resembles a reverse domain name structure, prefixed with ext:. This pattern provides a namespacing convention that aligns with well-established practices in other structured formats (e.g., XML namespaces).",
           "examples": [
             "ext:<domain>:<name>",
@@ -479,7 +478,9 @@
       }
     },
     "baseObject": {
+      "type": "object",
       "description": "Base object for all CycloneDX entities. Automatically includes support for extensible properties.",
+      "$comment": "This is a mixin. It intentionally does NOT set `unevaluatedProperties: false` — that keyword cannot see properties defined by schemas composing this one via `allOf`, and would reject them. Concrete (leaf) schemas composing this mixin must close themselves with `unevaluatedProperties: false`.",
       "allOf": [
         { "$ref": "#/$defs/extensibleProperties" }
       ],
