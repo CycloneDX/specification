@@ -79,13 +79,13 @@ function makeSchemaName(file)
 /**
  * Recursively walks through an object and rewrites $ref paths
  */
-function rewriteRefs(obj, schemaFiles, defsKeyword, currentSchemaName, currentSchemaDir, targetSchemaDir, refExceptionSet) {
+function rewriteRefs(obj, defsKeyword, currentSchemaName, currentSchemaDir, targetSchemaDir, refExceptionSet) {
     if (typeof obj !== 'object' || obj === null) {
         return obj;
     }
 
     if (Array.isArray(obj)) {
-        return obj.map(item => rewriteRefs(item, schemaFiles, defsKeyword, currentSchemaName, currentSchemaDir, targetSchemaDir,  refExceptionSet));
+        return obj.map(item => rewriteRefs(item, defsKeyword, currentSchemaName, currentSchemaDir, targetSchemaDir,  refExceptionSet));
     }
 
     const newObj = {};
@@ -133,7 +133,7 @@ function rewriteRefs(obj, schemaFiles, defsKeyword, currentSchemaName, currentSc
                 newObj[key] = value;
             }
         } else {
-            newObj[key] = rewriteRefs(value, schemaFiles, defsKeyword, currentSchemaName, currentSchemaDir, targetSchemaDir,  refExceptionSet);
+            newObj[key] = rewriteRefs(value, defsKeyword, currentSchemaName, currentSchemaDir, targetSchemaDir,  refExceptionSet);
         }
     }
     return newObj;
@@ -274,7 +274,7 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
                     try {
                         await fs.access(path.resolve(schemaDir, target));
                     } catch (err) {
-                        throw new Error(`Unresolved excepted ${key} target file '${target}' referenced from schema '${schemaPath}' at '${refPath}'`,
+                        throw new Error(`Missing external ${key} target file '${target}' referenced from schema '${schemaPath}' at '${refPath}'`,
                             {cause: err});
                     }
                     continue;
@@ -291,7 +291,7 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
         const rewrittenDefinitions = {};
         for (const [schemaPath, schema] of Object.entries(schemas)) {
             console.log(`  Rewriting refs in ${schemaPath}...`);
-            rewrittenDefinitions[schemaPath] = rewriteRefs(schema, [...schemaFiles, rootSchemaFilename], defsKeyword, makeSchemaName(schemaPath), path.dirname(schemaPath), rootSchemaDir, refExceptionSet);
+            rewrittenDefinitions[schemaPath] = rewriteRefs(schema, defsKeyword, makeSchemaName(schemaPath), path.dirname(schemaPath), rootSchemaDir, refExceptionSet);
         }
 
         // Get the rewritten root schema
