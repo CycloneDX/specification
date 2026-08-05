@@ -233,8 +233,23 @@ function testAdditionalPropertiesFalse(schema, schemaFile) {
     let errCnt = 0
     for (const [path, node] of _findObjectSchemas(schema)) {
         if (path.endsWith('.if') || path.endsWith('.not')) continue;
-        const expected = typeof node['$comment'] === 'string'
-            && node['$comment'].includes('additionalProperties explicitly allowed')
+
+        if ('unevaluatedProperties' in node) {
+            // Don't need 'additionalProperties', since 'unevaluatedProperties' takes care.
+            // see https://json-schema.org/draft/2020-12/json-schema-core#section-11.3
+            continue;
+        }
+
+        const commentLC = typeof node['$comment'] === 'string'
+            ? node['$comment'].toLowerCase()
+            : ''
+
+        if (commentLC.includes('this is a mixin')) {
+            // This is a mixin. It intentionally does NOT restrict additional/unevaluated properties itself; schemas composing it via `allOf` are expected to close themselves with `unevaluatedProperties: false` so that both their own defined properties and these patternProperties remain usable.
+            continue;
+        }
+
+        const expected = commentLC.includes('additionalproperties explicitly allowed')
         const actual = node['additionalProperties']
         if (actual !== expected) {
             ++errCnt
