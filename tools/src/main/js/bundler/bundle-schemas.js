@@ -79,13 +79,13 @@ function makeSchemaName(file)
 /**
  * Recursively walks through an object and rewrites $ref paths
  */
-function rewriteRefs(obj, schemaFiles, defsKeyword, currentSchemaName, currentSchemaPath, refExceptionSet) {
+function rewriteRefs(obj, schemaFiles, defsKeyword, currentSchemaName, currentSchemaDir, targetSchemaDir, refExceptionSet) {
     if (typeof obj !== 'object' || obj === null) {
         return obj;
     }
 
     if (Array.isArray(obj)) {
-        return obj.map(item => rewriteRefs(item, schemaFiles, defsKeyword, currentSchemaName, currentSchemaPath, refExceptionSet));
+        return obj.map(item => rewriteRefs(item, schemaFiles, defsKeyword, currentSchemaName, currentSchemaDir, targetSchemaDir,  refExceptionSet));
     }
 
     const newObj = {};
@@ -102,8 +102,16 @@ function rewriteRefs(obj, schemaFiles, defsKeyword, currentSchemaName, currentSc
 
                 // If the target file is in the exception list, leave the ref as-is
                 if (refExceptionSet && refExceptionSet.has(basename.toLowerCase())) {
-                    // TODO: rewire
-                    newObj[key] = value;
+                    if (value.startsWith('https://') || value.startsWith('http://')) {
+                        // remote are not rewired
+                        newObj[key] = value;
+                    } else {
+                        const filenameRewired = path.relative(
+                            targetSchemaDir,
+                            path.resolve(currentSchemaDir, filename)
+                        )
+                        newObj[key] = `${filenameRewired}${fragment}`;
+                    }
                 } else {
                     // Normalize fragment: drop leading '#' and optional leading '/'
                     let fragPath = '';
@@ -128,7 +136,7 @@ function rewriteRefs(obj, schemaFiles, defsKeyword, currentSchemaName, currentSc
                 newObj[key] = value;
             }
         } else {
-            newObj[key] = rewriteRefs(value, schemaFiles, defsKeyword, currentSchemaName, currentSchemaPath, refExceptionSet);
+            newObj[key] = rewriteRefs(value, schemaFiles, defsKeyword, currentSchemaName, currentSchemaDir, targetSchemaDir,  refExceptionSet);
         }
     }
     return newObj;
@@ -256,6 +264,7 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
         console.log('Validating external $ref targets...');
         const allowedFiles = new Set([...schemaFiles, rootSchemaFilename]);
         for (const [schemaPath, schema] of Object.entries(schemas)) {
+            const schemaDir = path.dirname(schemaPath)
             // Only $ref can be external; $dynamicRef/$recursiveRef are JSON Pointers by spec
             const refs = collectRefKeywords(schema, ['$ref'], (v) => /^(\.?.*\.schema\.json)(#.*)?$/.test(v));
             for (const { ref, key, path: refPath } of refs) {
@@ -265,12 +274,13 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
                 const base = path.basename(target);
                 if (refExceptionSet.has(base.toLowerCase()))
                 {
-                    if (target.startsWith('https://') || target.startsWith('http://')) {
-                        // Skip validation if target file is in exceptions and absolutte
-                        continue
+                    try {
+                        await fs.access(path.resolve(schemaDir, target));
+                    } catch (err) {
+                        throw new Error(`Unresolved excepted ${key} target file '${target}' referenced from schema '${schemaPath}' at '${refPath}'`,
+                            {cause: err})
                     }
-                    // TODO: test if reachable from file
-                    continue
+                    continue;
                 }
                 if (!allowedFiles.has(base)) {
                     throw new Error(`Unresolved external ${key} target file '${target}' referenced from schema '${schemaPath}' at '${refPath}'`);
@@ -284,7 +294,7 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
         const rewrittenDefinitions = {};
         for (const [schemaPath, schema] of Object.entries(schemas)) {
             console.log(`  Rewriting refs in ${schemaPath}...`);
-            rewrittenDefinitions[schemaPath] = rewriteRefs(schema, [...schemaFiles, rootSchemaFilename], defsKeyword, makeSchemaName(schemaPath), schemaPath, refExceptionSet);
+            rewrittenDefinitions[schemaPath] = rewriteRefs(schema, [...schemaFiles, rootSchemaFilename], defsKeyword, makeSchemaName(schemaPath), path.dirname(schemaPath), rootSchemaDir, refExceptionSet);
         }
 
         // Get the rewritten root schema
