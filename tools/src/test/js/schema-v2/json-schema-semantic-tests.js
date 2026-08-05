@@ -211,7 +211,8 @@ function testRefTypeUsage(schema, schemaFile) {
             }
             continue
         }
-        if (ref === refTypeRef && path !== exceptionPath) {
+        if (ref === refTypeRef) {
+            if (exceptionPath && path.startsWith(exceptionPath)) continue;
             ++errCnt
             _printError(
                 ref, `different from: ${refTypeRef}`,
