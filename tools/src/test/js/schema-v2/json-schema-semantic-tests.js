@@ -224,13 +224,15 @@ function testRefTypeUsage(schema, schemaFile) {
 }
 
 /**
- * object schemas must have `additionalProperties: false`,
- * unless explicitly allowed via `$comment`.
+ * object schemas must have `additionalProperties` set,
+ * unless `unevaluatedProperties` is set,
+ * or `$comment` containing 'this is a mixin',
+ * or explicitly allowed via `$comment` containing 'additionalproperties explicitly allowed'.
  * @param {*} schema
  * @param {string} schemaFile
  * @return {number} number of errors found
  */
-function testAdditionalPropertiesFalse(schema, schemaFile) {
+function testAdditionalProperties(schema, schemaFile) {
     let errCnt = 0
     for (const [path, node] of _findObjectSchemas(schema)) {
         if (path.endsWith('.if') || path.endsWith('.not')) continue;
@@ -316,7 +318,7 @@ function testMetaEnum(schema, schemaFile) {
 const tests = Object.freeze({
     'no self-$ref by file': testNoSelfRefByFile,
     'refType usage (`bom-ref` <-> refType)': testRefTypeUsage,
-    'additionalProperties is `false`': testAdditionalPropertiesFalse,
+    'additionalProperties is `false`': testAdditionalProperties,
     'meta:enum completeness': testMetaEnum,
 })
 
