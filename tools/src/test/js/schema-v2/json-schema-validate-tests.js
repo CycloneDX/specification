@@ -24,12 +24,13 @@ const _thisDir = dirname(fileURLToPath(import.meta.url))
 const testschemaVersion = (parseArgs({options: {v: {type: 'string', short: 'v'}}}).values.v ?? '').trim()
 const schemaRootDir = join(_thisDir, '..', '..', '..', '..', '..', 'schema')
 const schemaDir = join(schemaRootDir, testschemaVersion)
-const schemaFiles = Object.freeze([
-    join(schemaDir, `cyclonedx-${testschemaVersion}.schema.json`),
-    // yes, we also test those bundled schemas - to check that the bundler did produce a working schwma
-    join(schemaDir, `cyclonedx-${testschemaVersion}-bundled.schema.json`),
-    join(schemaDir, `cyclonedx-${testschemaVersion}-bundled.min.schema.json`),
-])
+
+const schemaFiles = [join(schemaDir, `cyclonedx-${testschemaVersion}.schema.json`)]
+if (process.env['VALIDATE_BUNDLED'] === 'true') {
+    schemaFiles.push(join(schemaDir, `cyclonedx-${testschemaVersion}-bundled.schema.json`))
+    schemaFiles.push(join(schemaDir, `cyclonedx-${testschemaVersion}-bundled.min.schema.json`))
+}
+
 const schemaFilesBundleMatcher = /-bundled/
 const schemaModelDir = join(schemaDir, `model`)
 const testdataDir = join(_thisDir, '..', '..', 'resources', testschemaVersion)
