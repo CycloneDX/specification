@@ -1,0 +1,229 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-control-2.0.schema.json",
+  "type": "null",
+  "title": "CycloneDX Control Model",
+  "$comment": "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
+  "$defs": {
+    "controls": {
+      "type": "array",
+      "title": "Controls",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/control"
+      },
+      "description": "The safeguards and countermeasures that are recommended or in place. Controls may be declared on their own for governance, risk, and compliance use cases, or referenced from threats, trust boundaries, and risk responses."
+    },
+    "control": {
+      "type": "object",
+      "title": "Control",
+      "description": "A safeguard or countermeasure that protects systems, data, or operations. A control binds the elements that implement it to the requirements it satisfies, and records its implementation status and assessed effectiveness.",
+      "required": [
+        "bom-ref",
+        "name"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "An identifier which can be used to reference the control elsewhere using a bom-ref or bom-link."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Name",
+          "description": "The name of the control."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the control."
+        },
+        "category": {
+          "title": "Category",
+          "description": "The category of the control. Use the custom option for a category specific to an organization's taxonomy.",
+          "oneOf": [
+            {
+              "title": "Predefined Control Category",
+              "type": "string",
+              "enum": [
+                "preventive",
+                "detective",
+                "corrective",
+                "compensating",
+                "deterrent",
+                "recovery"
+              ],
+              "meta:enum": {
+                "preventive": "Prevents an unwanted event from occurring.",
+                "detective": "Identifies and records that an unwanted event has occurred or is occurring.",
+                "corrective": "Remedies the condition that allowed an unwanted event.",
+                "compensating": "Provides an alternative safeguard where a primary control is not feasible.",
+                "deterrent": "Discourages an actor from attempting an unwanted action.",
+                "recovery": "Restores operations after an unwanted event."
+              }
+            },
+            {
+              "title": "Custom Control Category",
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom category."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom category."
+                }
+              }
+            }
+          ]
+        },
+        "status": {
+          "title": "Status",
+          "description": "The implementation status of the control.",
+          "$ref": "#/$defs/implementationStatus"
+        },
+        "appliesTo": {
+          "type": "array",
+          "title": "Applies To",
+          "uniqueItems": true,
+          "minItems": 1,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the elements the control protects, such as components, services, zones, or boundaries. A control without this property applies to the organization or system as a whole."
+        },
+        "implementedBy": {
+          "type": "array",
+          "title": "Implemented By",
+          "uniqueItems": true,
+          "minItems": 1,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the components, services, formulation workflows, or parties that implement the control."
+        },
+        "satisfies": {
+          "type": "array",
+          "title": "Satisfies",
+          "uniqueItems": true,
+          "minItems": 1,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the requirements the control satisfies, including requirements defined within standards."
+        },
+        "effectiveness": {
+          "title": "Effectiveness",
+          "description": "The assessed effectiveness of the control.",
+          "$ref": "#/$defs/effectiveness"
+        },
+        "owner": {
+          "$ref": "cyclonedx-party-2.0.schema.json#/$defs/partyChoice",
+          "description": "The party accountable for the control. May be an inline party object or a reference to a previously declared party."
+        },
+        "externalReferences": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReferences"
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "implementationStatus": {
+      "title": "Implementation Status",
+      "description": "The implementation status of a control or response. Use the custom option for a status specific to an organization's process.",
+      "oneOf": [
+        {
+          "title": "Predefined Implementation Status",
+          "type": "string",
+          "enum": [
+            "recommended",
+            "proposed",
+            "approved",
+            "rejected",
+            "planned",
+            "in-progress",
+            "implemented",
+            "verified",
+            "decommissioned"
+          ],
+          "meta:enum": {
+            "recommended": "Suggested by a producer, standard, or assessor. Not yet entered into the adopting organization's decision process.",
+            "proposed": "Entered into the adopting organization's decision process but not yet approved.",
+            "approved": "Approved for implementation.",
+            "rejected": "Considered and declined, with no intent to implement.",
+            "planned": "Implementation is planned.",
+            "in-progress": "Implementation is in progress.",
+            "implemented": "Implemented and in effect.",
+            "verified": "Implemented and verified as effective.",
+            "decommissioned": "Removed from service."
+          }
+        },
+        {
+          "title": "Custom Implementation Status",
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Name",
+              "description": "The name of the custom status."
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the custom status."
+            }
+          }
+        }
+      ]
+    },
+    "effectiveness": {
+      "type": "object",
+      "title": "Effectiveness",
+      "description": "The measured or assessed effectiveness of a control or response.",
+      "additionalProperties": false,
+      "properties": {
+        "percentage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "title": "Percentage",
+          "description": "Effectiveness as a decimal from 0 to 1."
+        },
+        "rating": {
+          "type": "string",
+          "title": "Rating",
+          "enum": [
+            "ineffective",
+            "marginal",
+            "adequate",
+            "good",
+            "excellent"
+          ],
+          "meta:enum": {
+            "ineffective": "Does not meaningfully reduce risk.",
+            "marginal": "Slightly reduces risk.",
+            "adequate": "Adequately reduces risk.",
+            "good": "Significantly reduces risk.",
+            "excellent": "Nearly eliminates risk."
+          },
+          "description": "Effectiveness as a qualitative rating."
+        }
+      }
+    }
+  }
+}

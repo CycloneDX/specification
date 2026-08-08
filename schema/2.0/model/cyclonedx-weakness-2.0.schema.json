@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-weakness-2.0.schema.json",
+  "type": "null",
+  "title": "CycloneDX Weakness Model",
+  "$comment": "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
+  "$defs": {
+    "weaknesses": {
+      "type": "array",
+      "title": "Weaknesses",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/weakness"
+      },
+      "description": "A collection of weaknesses, such as CWE classifications, that classify an underlying flaw."
+    },
+    "weakness": {
+      "title": "Weakness",
+      "description": "A classification of an underlying weakness, given either by a Common Weakness Enumeration (CWE) identifier or by a free-text name with an optional description. The exploitability and the affected scope are expressed by the vulnerability or threat that references the weakness, not on the weakness itself.",
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "CWE Weakness",
+          "description": "A weakness identified by its CWE identifier.",
+          "additionalProperties": false,
+          "required": [
+            "cweId"
+          ],
+          "properties": {
+            "bom-ref": {
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+              "description": "An optional identifier which can be used to reference the weakness elsewhere using a bom-ref or bom-link."
+            },
+            "cweId": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "CWE Identifier",
+              "description": "The Common Weakness Enumeration (CWE) identifier that classifies this weakness."
+            }
+          }
+        },
+        {
+          "type": "object",
+          "title": "Named Weakness",
+          "description": "A weakness identified by a free-text name, used where no CWE classification applies.",
+          "additionalProperties": false,
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "bom-ref": {
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+              "description": "An optional identifier which can be used to reference the weakness elsewhere using a bom-ref or bom-link."
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Name",
+              "description": "The name of the weakness."
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the weakness."
+            }
+          }
+        }
+      ]
+    }
+  }
+}
