@@ -2,7 +2,6 @@
 set -eu
 
 declare -a CDX_VERSIONS=(
-  '2.0'
   '1.7'
   '1.6'
   '1.5'
@@ -22,7 +21,7 @@ Supported values for CDX_VERSION: ${CDX_VERSIONS[*]}
 
 
 THIS_PATH="$(realpath "$(dirname "$0")")"
-SCHEMA_PATH="$(realpath "$THIS_PATH/../../schema")"
+SCHEMA_PATH="$(realpath "$THIS_PATH/../../../schema")"
 DOCS_PATH="$THIS_PATH/docs"
 TEMPLATES_PATH="$THIS_PATH/templates"
 

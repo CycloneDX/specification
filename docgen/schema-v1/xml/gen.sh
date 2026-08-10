@@ -23,7 +23,7 @@ Supported values for CDX_VERSION: ${CDX_VERSIONS[*]}
 
 
 THIS_PATH="$(realpath "$(dirname "$0")")"
-SCHEMA_PATH="$(realpath "$THIS_PATH/../../schema")"
+SCHEMA_PATH="$(realpath "$THIS_PATH/../../../schema")"
 DOCS_PATH="$THIS_PATH/docs"
 
 # Centralized header injection
