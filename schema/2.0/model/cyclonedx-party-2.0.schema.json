@@ -1,0 +1,925 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-party-2.0.schema.json",
+  "type": "null",
+  "title": "CycloneDX Party Model",
+  "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
+  "$defs": {
+    "party": {
+      "type": "object",
+      "title": "Party",
+      "description": "Identifies an organization, individual, system, or abstract archetype that participates in supplying, producing, attesting, operating, owning, regulating, or otherwise relating to the subject. Each party plays one or more named roles. Roles may carry preference order (`role.order`) to express primary, alternate, and secondary rankings among parties sharing the same role.\n\nExactly one identity sub-shape (`organization`, `person`, `system`, or `persona`) shall be present. Optional sub-objects layer inter-party relationships and standard extension data.",
+      "required": [ "roles" ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "roles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/role" },
+          "title": "Roles",
+          "description": "One or more roles the party fulfils. Each role may carry an `order` indicating preference among parties sharing the same role (for example, primary versus alternate supplier)."
+        },
+        "organization": {
+          "$ref": "#/$defs/organization",
+          "description": "Identity attributes valid when the party is an organization, company, government body, or other collective."
+        },
+        "person": {
+          "$ref": "#/$defs/person",
+          "description": "Identity attributes valid when the party is an individual person."
+        },
+        "system": {
+          "$ref": "#/$defs/system",
+          "title": "System",
+          "description": "Identity attributes valid when the party is a software system, hardware system, service account, automation, or autonomous agent."
+        },
+        "persona": {
+          "$ref": "#/$defs/persona",
+          "title": "Persona",
+          "description": "Identity attributes valid when the party is an abstract archetype rather than a specific named instance."
+        },
+        "relations": {
+          "$ref": "#/$defs/partyRelations",
+          "title": "Relations",
+          "description": "Links from this party to other parties."
+        },
+        "tags": { "$ref": "cyclonedx-common-2.0.schema.json#/$defs/tags" },
+        "properties": { "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties" },
+        "externalReferences": { "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReferences" }
+      },
+      "oneOf": [
+        { "required": [ "organization" ] },
+        { "required": [ "person" ] },
+        { "required": [ "system" ] },
+        { "required": [ "persona" ] }
+      ]
+    },
+    "parties": {
+      "type": "array",
+      "title": "Parties",
+      "description": "Parties associated with the subject. Each item identifies an organization, individual, system, or abstract archetype playing one or more named roles such as manufacturer, supplier, author, integrator, quality-control, or any custom role. The same party can hold multiple roles, each independently ranked via `role.order` to express preference (for example, primary supplier with order 1 and alternate supplier with order 2). Items may be inline party objects or references to parties declared elsewhere.",
+      "items": { "$ref": "#/$defs/partyChoice" }
+    },
+    "partyChoice": {
+      "title": "Party Choice",
+      "description": "A party represented either as a complete object or as a reference to a previously declared party.",
+      "oneOf": [
+        { "$ref": "#/$defs/party" },
+        {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "title": "Reference",
+          "description": "A refLinkType pointing to a previously declared party."
+        }
+      ]
+    },
+    "role": {
+      "title": "Role",
+      "description": "A role that a party fulfils. May be a predefined role from the CycloneDX role taxonomy or a custom role definition. The optional `order` property ranks parties that share the same role, supporting use cases such as primary versus alternate suppliers in hardware manufacturing supply chains.",
+      "oneOf": [
+        { "$ref": "#/$defs/preDefinedRole" },
+        {
+          "title": "Custom Role",
+          "type": "object",
+          "required": [ "name" ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Name",
+              "description": "The name of the custom role.",
+              "examples": [ "Chief Executive Officer", "Data Protection Officer", "Release Manager" ]
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the custom role, including its responsibilities and scope."
+            },
+            "order": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Order",
+              "description": "Preference order among parties sharing this role. Lower values indicate higher preference. Ties are permitted. Absence means unranked."
+            }
+          }
+        }
+      ]
+    },
+    "preDefinedRole": {
+      "title": "Pre-Defined Role",
+      "type": "object",
+      "required": [ "role" ],
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "type": "string",
+          "title": "Role",
+          "description": "A predefined role from the CycloneDX role taxonomy.",
+          "enum": [
+            "agent",
+            "assembler",
+            "asserter",
+            "attacker",
+            "auditor",
+            "author",
+            "broker",
+            "carrier",
+            "certificate-authority",
+            "committer",
+            "competitor",
+            "consignee",
+            "consignor",
+            "contributor",
+            "customer",
+            "custodian",
+            "customs-broker",
+            "data-controller",
+            "data-processor",
+            "data-recipient",
+            "data-subject",
+            "delegate",
+            "developer",
+            "distributor",
+            "end-user",
+            "engineer",
+            "exporter",
+            "freight-forwarder",
+            "holder",
+            "importer",
+            "insider-threat",
+            "inspector",
+            "insurer",
+            "integrator",
+            "issuer",
+            "key-escrow-agent",
+            "legal-contact",
+            "licensee",
+            "licensor",
+            "maintainer",
+            "manufacturer",
+            "operator",
+            "owner",
+            "packager",
+            "partner",
+            "principal",
+            "publisher",
+            "purchaser",
+            "quality-control",
+            "regulator",
+            "relying-party",
+            "repackager",
+            "researcher",
+            "reviewer",
+            "security-contact",
+            "signatory",
+            "steward",
+            "subject",
+            "supplier",
+            "support-contact",
+            "third-party-logistics",
+            "timestamp-authority",
+            "validation-authority",
+            "verifier",
+            "warehouse-operator"
+          ],
+          "meta:enum": {
+            "agent":                 "Software or AI agent acting autonomously or semi-autonomously, typically on behalf of a principal.",
+            "assembler":             "The party that assembles or integrates constituent parts into the subject. Common in hardware manufacturing and software build pipelines.",
+            "asserter":              "The party making assertions about the subject, such as patent ownership or compliance claims.",
+            "attacker":              "A hostile party targeting the subject.",
+            "auditor":               "The party that conducted an audit or assessment of the subject.",
+            "author":                "The party that created the subject. Common when the subject is created through manual processes.",
+            "broker":                "The party that acts as an intermediary in commercial transactions.",
+            "carrier":               "The party that physically transports goods, such as shipping lines, airlines, or trucking companies.",
+            "certificate-authority": "The party that issues, signs, and manages digital certificates within a public key infrastructure.",
+            "committer":             "The party who committed or pushed changes to a version control system.",
+            "competitor":            "A competing party in the same market or domain as the subject's organization.",
+            "consignee":             "The party designated to receive a shipment of goods.",
+            "consignor":             "The party that sends or ships goods to a consignee.",
+            "contributor":           "A party that contributed to the development of the subject without being the primary author.",
+            "customer":              "Customer of the organization that owns the subject.",
+            "custodian":             "The party responsible for the safe custody, transport, and storage of the subject.",
+            "customs-broker":        "The party that facilitates the clearance of goods through customs barriers.",
+            "data-controller":       "The party that determines the purposes and means of processing personal data.",
+            "data-processor":        "The party that processes personal data on behalf of a data controller.",
+            "data-recipient":        "The party to which personal data is disclosed.",
+            "data-subject":          "The natural person whose personal data is processed.",
+            "delegate":              "A party exercising authority on behalf of another party identified via relations.delegatedBy.",
+            "developer":             "Software developer or platform engineer.",
+            "distributor":           "The party that distributes the subject to downstream consumers or customers.",
+            "end-user":              "The end user of a system, service, or product.",
+            "engineer":              "Engineer responsible for designing, implementing, or operating a system.",
+            "exporter":              "The party that sends goods to another country for trade or sale.",
+            "freight-forwarder":     "The party that arranges the shipment and logistics of goods on behalf of shippers.",
+            "holder":                "The party that holds a verifiable credential, claim, or asset.",
+            "importer":              "The party that brings goods into a country from abroad for trade or sale.",
+            "insider-threat":        "A hostile or negligent party with legitimate access.",
+            "inspector":             "The party that inspects goods for quality, safety, or regulatory compliance.",
+            "insurer":               "The party that provides insurance coverage.",
+            "integrator":            "The party that integrates the subject into a larger system or product.",
+            "issuer":                "The party that issues a credential, claim, identifier, or asset.",
+            "key-escrow-agent":      "The party that holds copies of cryptographic keys in escrow.",
+            "legal-contact":         "The designated party to contact for legal matters.",
+            "licensee":              "The party to which a license for the subject has been granted.",
+            "licensor":              "The party that grants a license for the subject.",
+            "maintainer":            "The party responsible for ongoing maintenance, including updates, patches, and security fixes.",
+            "manufacturer":          "The party that manufactured or produced the subject. Common when the subject is produced through automated processes.",
+            "operator":              "The party responsible for operating or running the subject in a production environment.",
+            "owner":                 "The party that holds ownership rights over the subject.",
+            "packager":              "The party that packages goods for storage, shipment, or retail sale.",
+            "partner":               "Business partner with a defined relationship.",
+            "principal":             "The party on whose behalf another party acts, paired with delegate.",
+            "publisher":             "The party that published the subject, making it available for consumption.",
+            "purchaser":             "The party that purchased the subject or a license for its use.",
+            "quality-control":       "The party responsible for quality control activities, including inspection, testing, and verification.",
+            "regulator":             "Government or industry regulator with administrative authority over the subject.",
+            "relying-party":         "The party that relies on credentials, claims, or attestations issued by another party.",
+            "repackager":            "The party that repackages the subject, potentially combining it with other components.",
+            "researcher":            "Security researcher, bug bounty hunter, or academic conducting authorized study.",
+            "reviewer":              "The party that reviewed the subject or its associated evidence.",
+            "security-contact":     "The designated party to contact in the event of a security incident.",
+            "signatory":             "The party authorized to sign on behalf of an organization, affirming the validity or accuracy of statements or attestations.",
+            "steward":               "The party responsible for the content, context, and associated business rules of the subject.",
+            "subject":               "The party to whom an issued credential, claim, or identifier is bound.",
+            "supplier":              "The party that supplied the subject. The supplier may often be the manufacturer, but may also be a distributor or repackager.",
+            "support-contact":      "The designated party to contact for technical support.",
+            "third-party-logistics": "The party that provides outsourced logistics services.",
+            "timestamp-authority":   "The party that issues trusted timestamps.",
+            "validation-authority":  "The party that provides certificate validation services.",
+            "verifier":              "The party that verifies credentials, claims, or attestations.",
+            "warehouse-operator":    "The party responsible for storing, handling, and managing inventory within a warehouse or distribution centre."
+          }
+        },
+        "order": {
+          "type": "integer",
+          "minimum": 1,
+          "title": "Order",
+          "description": "Preference order among parties sharing this role. Lower values indicate higher preference. Ties are permitted. Absence means unranked. For example, a primary supplier may have `order: 1` while an alternate supplier has `order: 2`.",
+          "examples": [ 1, 2, 3 ]
+        }
+      }
+    },
+    "organization": {
+      "type": "object",
+      "title": "Organization Identity",
+      "description": "Identity attributes for a party that is an organization, company, government body, or other collective.",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The common display or trading name of the organization. Use when the registered legal name is unknown or when the everyday name differs from the legal one.",
+          "examples": [ "Acme", "Globex" ]
+        },
+        "legalName": {
+          "type": "string",
+          "title": "Legal Name",
+          "description": "The registered legal name of the organization, including any suffix such as Inc., S.r.l., GmbH, or LLC.",
+          "examples": [ "Acme Microcontrollers S.r.l.", "Acme Holdings, Inc." ]
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the organization itself, distinct from any role-specific or contextual description applied at the party wrapper level."
+        },
+        "logo": {
+          "type": "string",
+          "format": "iri-reference",
+          "title": "Logo",
+          "description": "URL to an image representing the organization. Useful for catalog, datasheet, and user interface views."
+        },
+        "foundingDate": {
+          "type": "string",
+          "format": "date",
+          "title": "Founding Date",
+          "description": "The date the organization was founded. Supports supplier due diligence and age-of-organization signals."
+        },
+        "dissolutionDate": {
+          "type": "string",
+          "format": "date",
+          "title": "Dissolution Date",
+          "description": "The date the organization was dissolved or wound down. When present, the organization is no longer active."
+        },
+        "jurisdiction": {
+          "type": "string",
+          "title": "Jurisdiction",
+          "description": "Country of registration as an ISO 3166-1 alpha-2 or alpha-3 code, optionally followed by an ISO 3166-2 subdivision separated by a hyphen.",
+          "examples": [ "US-DE", "IT-BO", "CHE" ]
+        },
+        "identifiers": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/identifier" },
+          "title": "Identifiers",
+          "description": "Identifiers issued to or associated with the organization. May include legal and registration identifiers (LEI, DUNS, CAGE, NCAGE, EORI, VAT, tax identifiers) and non-legal identifiers such as workload or machine identities."
+        },
+        "formerNames": {
+          "type": "array",
+          "items": { "type": "string" },
+          "title": "Former Names",
+          "description": "Prior names of the organization. Use when the entity has been renamed, merged, or acquired. Distinct from `aliases`, which captures concurrent alternate designations.",
+          "examples": [ [ "Atmel Corporation" ] ]
+        },
+        "aliases": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true,
+          "title": "Aliases",
+          "description": "Concurrent alternate designations for the organization. Distinct from `formerNames`, which captures historical names. Common when modeling tracked threat-actor groups that are known by different designations across threat-intelligence vendors.",
+          "examples": [ [ "Fancy Bear", "STRONTIUM", "Sofacy", "Sednit", "Pawn Storm" ] ]
+        },
+        "url": {
+          "type": "array",
+          "title": "URLs",
+          "description": "URLs associated with the organization. Each entry carries a `name` label and a `url` value so producers can describe homepage, support portal, press, status, code repository, and similar without ambiguity.",
+          "items": {
+            "type": "object",
+            "required": [ "url" ],
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "title": "Name",
+                "description": "Label describing the URL, such as `homepage`, `support`, `press`, `status`, or `repository`.",
+                "examples": [ "homepage", "support", "press", "status", "repository" ]
+              },
+              "url": {
+                "type": "string",
+                "format": "iri-reference",
+                "title": "URL"
+              }
+            }
+          }
+        },
+        "addresses": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/postalAddress" },
+          "title": "Addresses",
+          "description": "Physical addresses associated with the organization."
+        }
+      }
+    },
+    "person": {
+      "type": "object",
+      "title": "Person Identity",
+      "description": "Identity attributes for a party that is an individual person. The name model is intentionally unstructured: a single freeform `name` captures the full name as the person wishes to be known, accommodating the wide variation of naming conventions across cultures. See https://www.w3.org/International/questions/qa-personal-names for background.",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Name",
+          "description": "The person's full name as they wish to be known. A single freeform string. No assumption is made about given-versus-family ordering, mononym versus multi-component names, patronymics, or honorific embedding. Producers should use the form the person uses themselves.",
+          "examples": [ "Ada Lovelace", "Suharto", "Maria del Carmen García López", "Nguyễn Văn An" ]
+        },
+        "sortName": {
+          "type": "string",
+          "title": "Sort Name",
+          "description": "Optional sortable form of the name for catalog and index views. Use when the natural form of `name` does not sort intuitively, for example a comma-separated last-name-first form.",
+          "examples": [ "Lovelace, Ada", "García López, Maria del Carmen" ]
+        },
+        "honorificPrefix": {
+          "type": "string",
+          "title": "Honorific Prefix",
+          "description": "Honorific or title preceding the name, used in forms of address. Distinct from the name itself.",
+          "examples": [ "Dr.", "Prof." ]
+        },
+        "honorificSuffix": {
+          "type": "string",
+          "title": "Honorific Suffix",
+          "description": "Honorific or post-nominal letters following the name, used in forms of address. Distinct from the name itself.",
+          "examples": [ "PhD", "Esq." ]
+        },
+        "jobTitle": {
+          "type": "string",
+          "title": "Job Title",
+          "description": "The person's job title. Useful for credit lines and attribution.",
+          "examples": [ "Chief Information Security Officer", "Data Protection Officer", "Senior Software Engineer" ]
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the person, distinct from any role-specific or contextual description applied at the party wrapper level."
+        },
+        "email": {
+          "type": "array",
+          "title": "Email",
+          "description": "Email addresses associated with the person. Each entry carries a `name` label and an `address` value so producers can describe work, personal, support, and similar contexts without ambiguity.",
+          "items": {
+            "type": "object",
+            "required": [ "address" ],
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "title": "Name",
+                "description": "Label describing the email, such as `work`, `personal`, `support`, or `security`.",
+                "examples": [ "work", "personal", "support", "security" ]
+              },
+              "address": {
+                "type": "string",
+                "format": "idn-email",
+                "title": "Address"
+              }
+            }
+          }
+        },
+        "phone": {
+          "type": "array",
+          "title": "Phone",
+          "description": "Phone numbers associated with the person. Each entry carries a `name` label and a `number` value. Numbers should be expressed in E.164 form where possible.",
+          "items": {
+            "type": "object",
+            "required": [ "number" ],
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "title": "Name",
+                "description": "Label describing the phone, such as `office`, `mobile`, `fax`, or `pager`.",
+                "examples": [ "office", "mobile", "fax", "pager" ]
+              },
+              "number": {
+                "type": "string",
+                "title": "Number",
+                "examples": [ "+1-555-0100", "+44 20 7946 0958" ]
+              }
+            }
+          }
+        },
+        "url": {
+          "type": "array",
+          "title": "URLs",
+          "description": "URLs associated with the person. Each entry carries a `name` label and a `url` value so producers can describe homepage, social profiles, code repositories, and similar without ambiguity.",
+          "items": {
+            "type": "object",
+            "required": [ "url" ],
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "title": "Name",
+                "description": "Label describing the URL, such as `homepage`, `github`, `linkedin`, `mastodon`, or `orcid`.",
+                "examples": [ "homepage", "github", "linkedin", "orcid" ]
+              },
+              "url": {
+                "type": "string",
+                "format": "iri-reference",
+                "title": "URL"
+              }
+            }
+          }
+        },
+        "address": {
+          "$ref": "#/$defs/postalAddress",
+          "title": "Address"
+        },
+        "affiliation": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "title": "Affiliation",
+          "description": "Reference using bom-link or bom-ref to an organization party with which the person is affiliated."
+        }
+      }
+    },
+    "system": {
+      "type": "object",
+      "title": "System Identity",
+      "description": "Identity attributes for a party that is a software system, hardware system, service account, automation, or autonomous agent.",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "title": "Kind",
+          "description": "The kind of system the party represents. May be a predefined kind from the CycloneDX system-kind taxonomy expressed as a plain string, or a custom kind expressed as an object with `name` and optional `description`.",
+          "oneOf": [
+            {
+              "title": "Pre-Defined Kind",
+              "type": "string",
+              "enum": [
+                "software-system",
+                "hardware-system",
+                "service-account",
+                "machine-identity",
+                "automation",
+                "agent",
+                "bot",
+                "oracle",
+                "smart-contract",
+                "device",
+                "robot"
+              ],
+              "meta:enum": {
+                "software-system":  "Application, service, or platform that performs actions as itself.",
+                "hardware-system":  "Physical device or appliance that performs actions. Includes vehicles, drones, satellites, medical devices, network equipment, and industrial controllers unless a more specific kind applies.",
+                "service-account":  "Non-human identity used by automation to authenticate.",
+                "machine-identity": "Cryptographic identity such as a certificate principal or workload identity.",
+                "automation":       "Pipeline, job, or scheduled task that performs actions deterministically.",
+                "agent":            "Autonomous or semi-autonomous agent that can plan and execute. Includes AI agents.",
+                "bot":              "Scripted automation that interacts with an interface. Includes chatbots, robotic process automation bots, and scraping bots.",
+                "oracle":           "External data feed or oracle, including blockchain oracles that bridge off-chain data into on-chain systems.",
+                "smart-contract":   "On-chain program that executes deterministically.",
+                "device":           "Physical end user device such as a phone or IoT device acting as a party in its own right.",
+                "robot":            "Physical robot or autonomous mechanical system. For software-only counterparts, see `bot`, `agent`, or `automation`."
+              }
+            },
+            {
+              "title": "Custom Kind",
+              "type": "object",
+              "required": [ "name" ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom kind."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom kind."
+                }
+              }
+            }
+          ]
+        },
+        "ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "title": "Reference",
+          "description": "Reference to any bom-ref'd object that represents this system. The referenced object provides the underlying identity (component, service, blueprint asset, or other object type). Use to associate the party with its concrete representation declared elsewhere."
+        },
+        "identifiers": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/identifier" },
+          "title": "Identifiers",
+          "description": "Machine identifiers for the system, such as service principal, workload identity, certificate subject, or device serial."
+        },
+        "permissions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true,
+          "title": "Permissions",
+          "description": "Capabilities or duties the system possesses."
+        }
+      }
+    },
+    "persona": {
+      "type": "object",
+      "title": "Persona Identity",
+      "description": "Identity attributes for a party that is an abstract archetype rather than a specific named instance. Use for generic users, generic suppliers, or hypothesized attackers when a specific party is intentionally not named. When the specific instance is known (for example a tracked APT group), use `organization` instead.",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "Free-text description of the persona instance. Use to refine the archetype with details relevant to the threat model, such as the persona's assumed context, history, or behavioral pattern.",
+          "examples": [ "Disgruntled administrator with elevated access to the payment gateway and motive driven by recent performance review." ]
+        },
+        "archetype": {
+          "title": "Archetype",
+          "description": "The persona archetype. May be a predefined archetype from the CycloneDX persona-archetype taxonomy expressed as a plain string, or a custom archetype expressed as an object with `name` and optional `description`.",
+          "oneOf": [
+            {
+              "title": "Pre-Defined Archetype",
+              "type": "string",
+              "enum": [
+                "end-user",
+                "power-user",
+                "administrator",
+                "developer",
+                "operator",
+                "internal",
+                "external",
+                "anonymous",
+                "guest",
+                "customer",
+                "partner",
+                "supplier",
+                "vendor",
+                "contractor",
+                "third-party",
+                "auditor",
+                "researcher",
+                "regulator",
+                "law-enforcement",
+                "attacker",
+                "insider-threat",
+                "hacktivist",
+                "nation-state",
+                "organized-crime",
+                "competitor",
+                "public"
+              ],
+              "meta:enum": {
+                "end-user":         "Typical end user of the system.",
+                "power-user":       "Advanced user with higher than average privileges.",
+                "administrator":    "Administrative or privileged user.",
+                "developer":        "Application developer or platform engineer.",
+                "operator":         "Operational staff running the system.",
+                "internal":         "Generic internal party.",
+                "external":         "Generic external party without an account or operational relationship.",
+                "anonymous":        "Unauthenticated visitor interacting with the system.",
+                "guest":            "Semi-authenticated user with restricted privileges.",
+                "customer":         "Customer of the organization that owns the subject.",
+                "partner":          "Business partner with a defined relationship.",
+                "supplier":         "Generic supplier providing goods or services on a transactional basis.",
+                "vendor":           "Vendor delivering and operating goods or services with operational access to the subject.",
+                "contractor":       "Third party with operational access under contract.",
+                "third-party":      "Generic third party that does not fit partner, supplier, vendor, or contractor.",
+                "auditor":          "External auditor or assessor.",
+                "researcher":       "Security researcher, bug bounty hunter, or academic. Authorized probing party.",
+                "regulator":        "Government or industry regulator with administrative authority over the subject.",
+                "law-enforcement":  "Law enforcement entity with investigative authority.",
+                "attacker":         "Generic hostile external party.",
+                "insider-threat":   "Hostile or negligent party with legitimate access.",
+                "hacktivist":       "Hostile party motivated by ideology or activism.",
+                "nation-state":     "Hostile party sponsored or directed by a national government.",
+                "organized-crime":  "Hostile party operating as part of an organized criminal enterprise.",
+                "competitor":       "Generic competitor.",
+                "public":           "General public not in direct interaction with the subject."
+              }
+            },
+            {
+              "title": "Custom Archetype",
+              "type": "object",
+              "required": [ "name" ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name"
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description"
+                }
+              }
+            }
+          ]
+        },
+        "scope": {
+          "type": "string",
+          "title": "Scope",
+          "enum": [
+            "internal",
+            "external",
+            "mixed"
+          ],
+          "meta:enum": {
+            "internal": "Persona is internal to the organization that owns the subject.",
+            "external": "Persona is external to the organization that owns the subject.",
+            "mixed":    "Persona may appear in either internal or external contexts."
+          }
+        },
+        "permissions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true,
+          "title": "Permissions",
+          "description": "Capabilities the persona is assumed to hold."
+        },
+        "assumedPosture": {
+          "type": "string",
+          "title": "Assumed Security Posture",
+          "description": "Assumed security posture of the persona in this context.",
+          "examples": [ "authenticated", "unauthenticated", "authorized", "privileged" ]
+        }
+      }
+    },
+    "partyRelations": {
+      "type": "object",
+      "title": "Party Relations",
+      "description": "Links from this party to other parties. Captures hierarchical, organizational, and delegation relationships. Order ranking is on the role itself (`role.order`), not here.",
+      "additionalProperties": false,
+      "properties": {
+        "parent": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "title": "Parent",
+          "description": "Reference to a parent party. Models organizational hierarchy, group membership, and corporate parent or subsidiary relationships."
+        },
+        "delegatedBy": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "title": "Delegated By",
+          "description": "Reference to another party that delegated authority to this one. Models situations such as an autonomous agent acting on behalf of a human user, a contractor acting on behalf of a principal, or a service account assuming a role."
+        }
+      }
+    },
+    "identifier": {
+      "type": "object",
+      "title": "Identifier",
+      "description": "An identifier issued by a recognized authority. Includes legal and registration identifiers as well as machine and workload identities.",
+      "required": [ "scheme", "value" ],
+      "additionalProperties": false,
+      "properties": {
+        "scheme": {
+          "title": "Scheme",
+          "description": "The identifier scheme. May be a predefined scheme from the CycloneDX identifier-scheme taxonomy expressed as a plain string, or a custom scheme expressed as an object with `name` and optional `description` and `url`.",
+          "oneOf": [
+            {
+              "title": "Pre-Defined Scheme",
+              "type": "string",
+              "enum": [
+                "lei",
+                "duns",
+                "ncage",
+                "cage",
+                "eori",
+                "vat",
+                "gst",
+                "ein",
+                "tin",
+                "ruc",
+                "bvd",
+                "swift-bic",
+                "sec-cik",
+                "isin",
+                "figi",
+                "opencorporates",
+                "gln",
+                "gtin",
+                "iso6523",
+                "ofac-sdn",
+                "un-lm",
+                "oidc-sub",
+                "spiffe",
+                "did",
+                "vc-id"
+              ],
+              "meta:enum": {
+                "lei":            "Legal Entity Identifier per ISO 17442.",
+                "duns":           "Dun and Bradstreet D-U-N-S Number.",
+                "ncage":          "NATO Commercial and Government Entity code.",
+                "cage":           "United States Commercial and Government Entity code.",
+                "eori":           "Economic Operator Registration and Identification number used in European Union customs.",
+                "vat":            "Value Added Tax registration number.",
+                "gst":            "Goods and Services Tax registration number.",
+                "ein":            "United States Employer Identification Number.",
+                "tin":            "Generic Taxpayer Identification Number.",
+                "ruc":            "Registro Unico de Contribuyentes used in several Latin American countries.",
+                "bvd":            "Bureau van Dijk identifier.",
+                "swift-bic":      "Business Identifier Code per ISO 9362.",
+                "sec-cik":        "United States Securities and Exchange Commission Central Index Key.",
+                "isin":           "International Securities Identification Number per ISO 6166.",
+                "figi":           "Financial Instrument Global Identifier.",
+                "opencorporates": "OpenCorporates company identifier.",
+                "gln":            "GS1 Global Location Number.",
+                "gtin":           "GS1 Global Trade Item Number when the party is also a registered trade entity.",
+                "iso6523":        "ISO 6523 organization identifier. The value should encode the four-digit International Code Designator (ICD) followed by the organization identifier per the registry referenced by the ICD.",
+                "ofac-sdn":       "United States Office of Foreign Assets Control Specially Designated Nationals list identifier.",
+                "un-lm":          "United Nations Locode for a specific facility or jurisdiction.",
+                "oidc-sub":       "OpenID Connect subject identifier for a machine or service identity.",
+                "spiffe":         "SPIFFE ID for a workload identity.",
+                "did":            "W3C Decentralized Identifier (DID) per https://www.w3.org/TR/did-core/. Common for autonomous agents, federated services, and verifiable-credential subjects.",
+                "vc-id":          "W3C Verifiable Credential identifier per https://www.w3.org/TR/vc-data-model/."
+              }
+            },
+            {
+              "title": "Custom Scheme",
+              "type": "object",
+              "required": [ "name" ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name"
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description"
+                },
+                "url": {
+                  "type": "string",
+                  "format": "iri-reference",
+                  "title": "URL",
+                  "description": "URL of the scheme registry or specification."
+                }
+              }
+            }
+          ]
+        },
+        "schemeVersion": {
+          "type": "string",
+          "title": "Scheme Version",
+          "description": "The version of the scheme that issued this identifier, if applicable."
+        },
+        "value": {
+          "type": "string",
+          "title": "Value",
+          "description": "The value of the identifier."
+        },
+        "issuedDate": {
+          "type": "string",
+          "format": "date",
+          "title": "Issued Date"
+        },
+        "expirationDate": {
+          "type": "string",
+          "format": "date",
+          "title": "Expiration Date"
+        },
+        "issuer": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "title": "Issuer",
+          "description": "Reference using bom-link or bom-ref to the party that issued the identifier."
+        }
+      }
+    },
+    "postalAddress": {
+      "type": "object",
+      "title": "Postal Address",
+      "description": "An address used to identify a contactable or operational location.",
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "Reference Identifier",
+          "description": "An optional identifier that can be used to reference the address from elsewhere. Every bom-ref shall be unique within the containing instance. The value should not start with the prefix 'urn:cdx:' to avoid conflicts with BOM-Link identifiers."
+        },
+        "country": {
+          "type": "string",
+          "title": "Country",
+          "description": "The country name or the two-letter ISO 3166-1 country code. When the isoCode property is present, the value of isoCode is authoritative."
+        },
+        "region": {
+          "type": "string",
+          "title": "Region",
+          "description": "The region or state in the country. When the isoCode property carries an ISO 3166-2 subdivision, the value of isoCode is authoritative.",
+          "examples": [ "Texas" ]
+        },
+        "isoCode": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}(-[A-Z0-9]{1,3})?$",
+          "title": "ISO Code",
+          "description": "An ISO 3166-1 alpha-2 country code, optionally followed by an ISO 3166-2 subdivision code separated by a hyphen. When present, this property is authoritative over the free-text country and region properties.",
+          "examples": [ "IT-BO", "US-CA", "DE-BY" ]
+        },
+        "locality": {
+          "type": "string",
+          "title": "Locality",
+          "description": "The locality or city within the country.",
+          "examples": [ "Austin" ]
+        },
+        "postOfficeBoxNumber": {
+          "type": "string",
+          "title": "Post Office Box Number",
+          "description": "The post office box number.",
+          "examples": [ "901" ]
+        },
+        "postalCode": {
+          "type": "string",
+          "title": "Postal Code",
+          "description": "The postal code.",
+          "examples": [ "78758" ]
+        },
+        "streetAddress": {
+          "type": "string",
+          "title": "Street Address",
+          "description": "The street address. Multi-line addresses are expressed as a single string with line breaks (`\\n`) between lines. Implementations and serialization formats are not required to preserve the order of elements in an array, so a multi-line address shall not be modeled as an array.",
+          "examples": [
+            "100 Main Street",
+            "Acme Tower\nSuite 1200\n100 Main Street"
+          ]
+        },
+        "coordinates": {
+          "type": "object",
+          "title": "Geographic Coordinates",
+          "description": "Geographic coordinates of the address.",
+          "additionalProperties": false,
+          "required": [ "latitude", "longitude" ],
+          "properties": {
+            "latitude": {
+              "type": "number",
+              "minimum": -90,
+              "maximum": 90,
+              "title": "Latitude",
+              "description": "Latitude in decimal degrees. Four or more decimal places are recommended for facility-level precision."
+            },
+            "longitude": {
+              "type": "number",
+              "minimum": -180,
+              "maximum": 180,
+              "title": "Longitude",
+              "description": "Longitude in decimal degrees. Four or more decimal places are recommended for facility-level precision."
+            },
+            "altitude": {
+              "type": "number",
+              "title": "Altitude",
+              "description": "Altitude in meters above the reference ellipsoid identified by the datum property."
+            },
+            "datum": {
+              "type": "string",
+              "title": "Datum",
+              "description": "The geodetic datum used for the coordinates. WGS84 is assumed when omitted.",
+              "default": "WGS84",
+              "examples": [ "WGS84", "NAD83", "ETRS89" ]
+            }
+          }
+        }
+      }
+    }
+  }
+}
