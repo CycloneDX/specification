@@ -342,7 +342,9 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
             }
         }
 
+
         // Write bundled (pretty) version
+        // TODO: set schema name
         console.log('\nWriting bundled schema...');
         const prettyJson = JSON.stringify(finalSchema, null, 2);
         await fs.writeFile(bundledPath, prettyJson);
@@ -351,6 +353,7 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
         console.log(`✓ Bundled schema: ${bundledFilename} (${bundledSizeKB} KB)`);
 
         // Write minified version
+        // TODO: set schema name
         console.log('Writing minified schema...');
         const minifiedSchema = removeComments(finalSchema, true);
         const minifiedJson = JSON.stringify(minifiedSchema);
