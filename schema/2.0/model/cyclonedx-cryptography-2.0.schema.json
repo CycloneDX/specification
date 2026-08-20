@@ -521,6 +521,11 @@
               "title": "Destruction Date",
               "description": "The date and time (timestamp) when the certificate was destroyed."
             },
+            "renewal": {
+              "$ref": "#/$defs/lifecycleControl",
+              "title": "Certificate Renewal",
+              "description": "How this certificate is renewed or re-enrolled."
+            },
             "certificateExtensions": {
               "type": "array",
               "title": "Certificate Extensions",
@@ -672,6 +677,11 @@
                 "compromised",
                 "destroyed"
               ]
+            },
+            "rotation": {
+              "$ref": "#/$defs/lifecycleControl",
+              "title": "Key Rotation",
+              "description": "How this cryptographic material is rotated under the same algorithm."
             },
             "creationDate": {
               "type": "string",
@@ -1084,6 +1094,51 @@
         "unwrap": "Decrypts a wrapped key to recover the original key.",
         "other": "Another cryptographic function.",
         "unknown": "The cryptographic function is not known."
+      }
+    },
+    "lifecycleControl": {
+      "type": "object",
+      "title": "Lifecycle Control",
+      "description": "How a cryptographic lifecycle operation, such as key rotation or certificate renewal, is performed. The `automation` property captures the degree of automation and `mechanism` captures the concrete method, for example automatic renewal via the ACME protocol, automatic rotation managed by a KMS, or a manual M-of-N key ceremony.",
+      "additionalProperties": false,
+      "properties": {
+        "automation": {
+          "type": "string",
+          "title": "Automation",
+          "description": "The degree of automation with which the operation is performed, ordered from least to most agile.",
+          "enum": [
+            "not-supported",
+            "manual",
+            "on-demand",
+            "automatic",
+            "other",
+            "unknown"
+          ],
+          "meta:enum": {
+            "not-supported": "The operation is not supported.",
+            "manual": "The operation is initiated and executed manually.",
+            "on-demand": "The operation can be triggered on demand, for example through an API call.",
+            "automatic": "The operation is performed automatically based on policy or schedule.",
+            "other": "Another mechanism applies.",
+            "unknown": "The mechanism is not known."
+          }
+        },
+        "mechanism": {
+          "type": "string",
+          "title": "Lifecycle Mechanism",
+          "description": "The concrete protocol, system, interface, or process used to perform the operation, such as the ACME (RFC 8555), EST (RFC 7030), SCEP (RFC 8894), CMP (RFC 4210), or CMC (RFC 5272) certificate protocols, KMIP, PKCS#11, and cloud key-management services for key rotation, or a manual M-of-N key ceremony.",
+          "examples": [
+            "ACME",
+            "EST",
+            "SCEP",
+            "CMP",
+            "CMC",
+            "KMIP",
+            "PKCS#11",
+            "HashiCorp Vault Transit",
+            "M-of-N key ceremony"
+          ]
+        }
       }
     },
     "relatedCryptographicAssets": {
