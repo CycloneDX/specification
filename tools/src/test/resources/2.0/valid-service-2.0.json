@@ -8,7 +8,18 @@
     {
       "bom-ref": "pkg:maven/com.acme/stock-java-client@1.0.12",
       "type": "library",
-      "publisher": "Acme Inc",
+      "parties": [
+        {
+          "roles": [
+            {
+              "role": "publisher"
+            }
+          ],
+          "organization": {
+            "name": "Acme Inc"
+          }
+        }
+      ],
       "group": "com.acme",
       "name": "stock-java-client",
       "version": "1.0.12",
@@ -25,24 +36,51 @@
           }
         }
       ]
-    }
-  ],
-  "services": [
+    },
     {
       "bom-ref": "b2a46a4b-8367-4bae-9820-95557cfe03a8",
-      "provider": {
-        "name": "Partner Org",
-        "url": [
-          "https://partner.org"
-        ],
-        "contact": [
-          {
-            "name": "Support",
-            "email": "support@partner.org",
-            "phone": "800-555-1212"
+      "type": "service",
+      "isExternal": true,
+      "parties": [
+        {
+          "bom-ref": "party-partner-org",
+          "roles": [
+            {
+              "role": "provider"
+            }
+          ],
+          "organization": {
+            "name": "Partner Org",
+            "url": [
+              {
+                "name": "homepage",
+                "url": "https://partner.org"
+              }
+            ]
           }
-        ]
-      },
+        },
+        {
+          "roles": [
+            {
+              "role": "support-contact"
+            }
+          ],
+          "person": {
+            "name": "Support",
+            "email": [
+              {
+                "address": "support@partner.org"
+              }
+            ],
+            "phone": [
+              {
+                "number": "800-555-1212"
+              }
+            ],
+            "affiliation": "party-partner-org"
+          }
+        }
+      ],
       "group": "org.partner",
       "name": "Stock ticker service",
       "version": "2020-Q2",
@@ -51,24 +89,32 @@
         "https://partner.org/api/v1/lookup",
         "https://partner.org/api/v1/stock"
       ],
-      "authenticated": true,
-      "x-trust-boundary": true,
-      "data": [
+      "dataProfiles": [
         {
-          "classification": "PII",
-          "flow": "inbound"
+          "name": "Customer PII",
+          "classification": "confidential",
+          "informationTypes": [
+            "pii"
+          ]
         },
         {
-          "classification": "PIFI",
-          "flow": "outbound"
+          "name": "Personally Identifiable Financial Information",
+          "classification": "confidential",
+          "informationTypes": [
+            "pii",
+            "financial"
+          ]
         },
         {
-          "classification": "public",
-          "flow": "bi-directional"
+          "name": "Public Market Data",
+          "classification": "public"
         },
         {
-          "classification": "partner-data",
-          "flow": "unknown"
+          "name": "Partner Data",
+          "classification": {
+            "name": "partner-restricted",
+            "description": "Data subject to the partner data-sharing agreement."
+          }
         }
       ],
       "licenses": [
