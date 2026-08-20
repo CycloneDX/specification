@@ -16,7 +16,7 @@ validation, tooling, and data exchange.
 
 ## Modularity and Model Composition
 
-CycloneDX 2.0 is defined as a modular specification. All core concepts—such as components, services, vulnerabilities, 
+CycloneDX 2.0 is defined as a modular specification. All core concepts—such as components, vulnerabilities, 
 licensing, and AI/ML metadata, are encapsulated in reusable model definitions located in the [`model/`](./model) directory.
 
 This modular architecture promotes:
