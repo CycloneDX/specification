@@ -38,8 +38,127 @@
           },
           "description": "The risk appetites that apply to this collection. Multiple entries support a document covering more than one party."
         },
+        "qualitativeMatrices": {
+          "type": "array",
+          "title": "Qualitative Matrices",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/qualitativeMatrix"
+          },
+          "description": "Named qualitative risk matrices available to ratings in this collection."
+        },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "qualitativeMatrix": {
+      "type": "object",
+      "title": "Qualitative Matrix",
+      "description": "A named risk matrix that defines likelihood and impact scales and the resulting score and level for each combination.",
+      "required": [
+        "bom-ref",
+        "name",
+        "likelihoodLevels",
+        "impactLevels",
+        "outcomes"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The name of the matrix."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of the matrix and its intended use."
+        },
+        "likelihoodLevels": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/qualitativeMatrixAxisLevel"
+          },
+          "description": "The ordered likelihood levels used by the matrix."
+        },
+        "impactLevels": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/qualitativeMatrixAxisLevel"
+          },
+          "description": "The ordered impact levels used by the matrix."
+        },
+        "outcomes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/qualitativeMatrixOutcome"
+          },
+          "description": "The score and named result for each likelihood and impact combination."
+        }
+      }
+    },
+    "qualitativeMatrixAxisLevel": {
+      "type": "object",
+      "required": [
+        "name",
+        "value"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The stable name of this level."
+        },
+        "value": {
+          "type": "number",
+          "minimum": 0,
+          "description": "The ordinal or numeric value of this level."
+        },
+        "description": {
+          "type": "string",
+          "description": "The meaning of this level."
+        }
+      }
+    },
+    "qualitativeMatrixOutcome": {
+      "type": "object",
+      "required": [
+        "likelihood",
+        "impact",
+        "score",
+        "level"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "likelihood": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The name of a level from the matrix likelihood scale."
+        },
+        "impact": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The name of a level from the matrix impact scale."
+        },
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "description": "The numeric score assigned by this combination."
+        },
+        "level": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The matrix-specific qualitative result."
         }
       }
     },
@@ -894,6 +1013,15 @@
         "vector": {
           "type": "string",
           "description": "A textual representation of the metric values used to derive the score, in the format defined by the methodology."
+        },
+        "qualitativeMatrix": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "description": "Reference to the qualitative matrix used to derive this score."
+        },
+        "matrixLevel": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The matrix-specific qualitative result, such as very-low or very-high."
         },
         "methodology": {
           "title": "Methodology",
