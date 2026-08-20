@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "http://cyclonedx.org/schema/cryptography-defs.schema.json",
-  "$comment": "2026-08-07T13:10:42Z",
+  "$comment": "2026-08-20T12:03:27Z",
   "title": "Cryptographic Definitions",
   "description": "Enumerates cryptographic algorithm families, elliptic curves, and protocols with their specific metadata.",
   "type": "object",
@@ -317,6 +317,7 @@
         "A5/1",
         "A5/2",
         "AES",
+        "ANSI-KDF",
         "ARIA",
         "Argon2",
         "Ascon",
@@ -372,6 +373,7 @@
         "RC5",
         "RC6",
         "RIPEMD",
+        "RSA-X931",
         "RSAES-OAEP",
         "RSAES-PKCS1",
         "RSASSA-PKCS1",
@@ -387,13 +389,16 @@
         "SM9",
         "SNOW3G",
         "SP800-108",
+        "SP800-56C",
         "SPAKE2",
         "SPAKE2PLUS",
         "SRP",
+        "SSH-KDF",
         "Salsa20",
         "Serpent",
         "SipHash",
         "Skipjack",
+        "TLS-PRF",
         "TUAK",
         "Twofish",
         "UMAC",
@@ -664,9 +669,11 @@
       "description": "An enum for the protocol families.",
       "enum": [
         "5g-aka",
+        "ah",
         "dtls",
         "eap-aka",
         "eap-aka-prime",
+        "esp",
         "ike",
         "ipsec",
         "prins",
@@ -764,10 +771,10 @@
     "algorithmSet": {
       "type": "array",
       "title": "Algorithm Set",
-      "description": "The set of algorithms that can fill a composition slot. How many of them are used at runtime is stated by the slot's selection. Each member is either the concrete name of an algorithm, matching a variant pattern of an algorithm family defined in this document, or a named bundle of such algorithms.",
+      "description": "The set of algorithms that can fill a composition slot. How many of them are used at runtime is stated by the slot's selection. Each member is the concrete name of an algorithm, a named bundle of algorithms, or a reference to a sub-protocol.",
       "items": {
         "title": "Algorithm Set Member",
-        "description": "A member of an algorithm set: an algorithm name, or a named bundle.",
+        "description": "A member of an algorithm set: an algorithm name, a named bundle, or a sub-protocol reference.",
         "oneOf": [
           {
             "type": "string",
@@ -799,6 +806,27 @@
             "required": [
               "name",
               "algorithms"
+            ]
+          },
+          {
+            "type": "object",
+            "title": "Sub-Protocol Reference",
+            "description": "A reference to a sub-protocol, by protocol family and optionally version. The composition of the sub-protocol is given by its own protocol entry in this document, which may itself reference further sub-protocols.",
+            "additionalProperties": false,
+            "properties": {
+              "protocol": {
+                "$ref": "#/definitions/protocolFamiliesEnum",
+                "title": "Protocol Family",
+                "description": "The protocol family of the referenced sub-protocol."
+              },
+              "version": {
+                "type": "string",
+                "title": "Version",
+                "description": "The version of the referenced sub-protocol."
+              }
+            },
+            "required": [
+              "protocol"
             ]
           }
         ]

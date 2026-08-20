@@ -4331,6 +4331,121 @@
           ]
         }
       ]
+    },
+    {
+      "family": "ike",
+      "description": "Internet Key Exchange (IKE) negotiates security associations and keying material for IPsec.",
+      "standard": [
+        {
+          "name": "RFC7296",
+          "url": "https://doi.org/10.17487/RFC7296"
+        }
+      ],
+      "version": [
+        {
+          "version": "2",
+          "standard": [
+            {
+              "name": "RFC7296",
+              "url": "https://doi.org/10.17487/RFC7296"
+            }
+          ],
+          "composition": [
+            {
+              "role": "encryption",
+              "selection": "one-of",
+              "selectedBy": "negotiation",
+              "algorithmSet": [
+                "AES-128-GCM",
+                "AES-256-GCM",
+                "AES-256-CBC",
+                "ChaCha20-Poly1305"
+              ]
+            },
+            {
+              "role": "prf",
+              "selection": "one-of",
+              "selectedBy": "negotiation",
+              "algorithmSet": [
+                "HMAC-SHA-256",
+                "HMAC-SHA-384",
+                "AES-CMAC-PRF-128"
+              ]
+            },
+            {
+              "role": "integrity",
+              "selection": "one-of",
+              "selectedBy": "negotiation",
+              "algorithmSet": [
+                "HMAC-SHA-256-128",
+                "HMAC-SHA-384-192"
+              ]
+            },
+            {
+              "role": "key-exchange",
+              "selection": "any-of",
+              "selectedBy": "negotiation",
+              "algorithmSet": [
+                "ECDH-secp256r1",
+                "ECDH-secp384r1",
+                "x25519",
+                "ML-KEM-768"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "family": "ipsec",
+      "description": "Internet Protocol Security (IPsec) secures IP traffic using a key management protocol and packet protection protocols.",
+      "standard": [
+        {
+          "name": "RFC4301",
+          "url": "https://doi.org/10.17487/RFC4301"
+        }
+      ],
+      "version": [
+        {
+          "version": "3",
+          "standard": [
+            {
+              "name": "RFC4301",
+              "url": "https://doi.org/10.17487/RFC4301"
+            }
+          ],
+          "composition": [
+            {
+              "role": "key-management",
+              "selection": "one-of",
+              "selectedBy": "configuration",
+              "algorithmSet": [
+                {
+                  "protocol": "ike",
+                  "version": "1"
+                },
+                {
+                  "protocol": "ike",
+                  "version": "2"
+                }
+              ]
+            },
+            {
+              "role": "packet-protection",
+              "selection": "any-of",
+              "selectedBy": "configuration",
+              "algorithmSet": [
+                {
+                  "protocol": "esp"
+                },
+                {
+                  "protocol": "ah"
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ]
 }
