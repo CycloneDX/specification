@@ -7,6 +7,7 @@ const path = require('path');
 // This constant is used as the default value for ref exceptions; can be overridden via options.refExceptions.
 const DEFAULT_REF_EXCEPTION_FILES = [
     'spdx.schema.json',
+    'behavior-taxonomy.schema.json',
     'cryptography-defs.schema.json',
     'jsf-0.82.schema.json'
 ];
@@ -67,15 +68,25 @@ function collectRefKeywords(obj, keys, predicate, pathStack = []) {
 }
 
 /**
+ * make schema name from schema file
+ * @param file
+ * @return {string}
+ */
+function makeSchemaName(file)
+{
+    return path.basename(file, '.schema.json');
+}
+
+/**
  * Recursively walks through an object and rewrites $ref paths
  */
-function rewriteRefs(obj, schemaFiles, defsKeyword, currentSchemaName, refExceptionSet) {
+function rewriteRefs(obj, defsKeyword, currentSchemaName, currentSchemaDir, targetSchemaDir, refExceptionSet) {
     if (typeof obj !== 'object' || obj === null) {
         return obj;
     }
 
     if (Array.isArray(obj)) {
-        return obj.map(item => rewriteRefs(item, schemaFiles, defsKeyword, currentSchemaName, refExceptionSet));
+        return obj.map(item => rewriteRefs(item, defsKeyword, currentSchemaName, currentSchemaDir, targetSchemaDir,  refExceptionSet));
     }
 
     const newObj = {};
@@ -88,12 +99,18 @@ function rewriteRefs(obj, schemaFiles, defsKeyword, currentSchemaName, refExcept
                 const fragment = fileMatch[2] || '';
 
                 const basename = path.basename(filename);
-                const schemaName = basename.replace('.schema.json', '');
+                const schemaName = makeSchemaName(basename);
 
-                // If the target file is in the exception list, leave the ref as-is
+                // If the target file is in the exception list, rewire the ref
                 if (refExceptionSet && refExceptionSet.has(basename.toLowerCase())) {
-                    newObj[key] = value;
-                } else {
+                    const filenameRewired = path.relative(
+                        targetSchemaDir,
+                        path.resolve(currentSchemaDir, filename)
+                    );
+                    newObj[key] = `${filenameRewired}${fragment}`;
+                }
+                // The target file shall be bundled
+                else {
                     // Normalize fragment: drop leading '#' and optional leading '/'
                     let fragPath = '';
                     if (fragment) {
@@ -117,7 +134,7 @@ function rewriteRefs(obj, schemaFiles, defsKeyword, currentSchemaName, refExcept
                 newObj[key] = value;
             }
         } else {
-            newObj[key] = rewriteRefs(value, schemaFiles, defsKeyword, currentSchemaName, refExceptionSet);
+            newObj[key] = rewriteRefs(value, defsKeyword, currentSchemaName, currentSchemaDir, targetSchemaDir,  refExceptionSet);
         }
     }
     return newObj;
@@ -176,7 +193,7 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
         console.log(`Root schema: ${absoluteRootPath}`);
 
         // Generate output filenames
-        const baseFilename = rootSchemaFilename.replace('.schema.json', '');
+        const baseFilename = makeSchemaName(rootSchemaFilename);
         const bundledFilename = `${baseFilename}-bundled.schema.json`;
         const minifiedFilename = `${baseFilename}-bundled.min.schema.json`;
 
@@ -208,18 +225,16 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
                 detectedSchemaVersion = schema.$schema;
             }
 
-            const schemaName = path.basename(file, '.schema.json');
-            schemas[schemaName] = schema;
+            schemas[schemaPath] = schema;
         }
 
         // Read the root schema
         console.log(`\nReading root schema...`);
         const rootContent = await fs.readFile(absoluteRootPath, 'utf8');
         const rootSchema = JSON.parse(rootContent);
-        const rootSchemaName = path.basename(rootSchemaFilename, '.schema.json');
 
         // Add root schema to the schemas collection
-        schemas[rootSchemaName] = rootSchema;
+        schemas[absoluteRootPath] = rootSchema;
 
         // Use detected version from root schema if available
         if (rootSchema.$schema) {
@@ -246,7 +261,8 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
         // Pre-check: external file $ref targets must exist among loaded schemas
         console.log('Validating external $ref targets...');
         const allowedFiles = new Set([...schemaFiles, rootSchemaFilename]);
-        for (const [name, schema] of Object.entries(schemas)) {
+        for (const [schemaPath, schema] of Object.entries(schemas)) {
+            const schemaDir = path.dirname(schemaPath);
             // Only $ref can be external; $dynamicRef/$recursiveRef are JSON Pointers by spec
             const refs = collectRefKeywords(schema, ['$ref'], (v) => /^(\.?.*\.schema\.json)(#.*)?$/.test(v));
             for (const { ref, key, path: refPath } of refs) {
@@ -254,10 +270,18 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
                 if (!m) continue;
                 const target = m[1];
                 const base = path.basename(target);
-                // Skip validation if target file is in exceptions
-                if (refExceptionSet.has(base.toLowerCase())) continue;
+                if (refExceptionSet.has(base.toLowerCase()))
+                {
+                    try {
+                        await fs.access(path.resolve(schemaDir, target));
+                    } catch (err) {
+                        throw new Error(`Missing external ${key} target file '${target}' referenced from schema '${schemaPath}' at '${refPath}'`,
+                            {cause: err});
+                    }
+                    continue;
+                }
                 if (!allowedFiles.has(base)) {
-                    throw new Error(`Unresolved external ${key} target file '${target}' referenced from schema '${name}' at '${refPath}'`);
+                    throw new Error(`Unresolved external ${key} target file '${target}' referenced from schema '${schemaPath}' at '${refPath}'`);
                 }
             }
         }
@@ -266,19 +290,19 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
 
         // Rewrite all $refs in all schemas
         const rewrittenDefinitions = {};
-        for (const [name, schema] of Object.entries(schemas)) {
-            console.log(`  Rewriting refs in ${name}...`);
-            rewrittenDefinitions[name] = rewriteRefs(schema, [...schemaFiles, rootSchemaFilename], defsKeyword, name, refExceptionSet);
+        for (const [schemaPath, schema] of Object.entries(schemas)) {
+            console.log(`  Rewriting refs in ${schemaPath}...`);
+            rewrittenDefinitions[schemaPath] = rewriteRefs(schema, defsKeyword, makeSchemaName(schemaPath), path.dirname(schemaPath), rootSchemaDir, refExceptionSet);
         }
 
         // Get the rewritten root schema
-        const rootSchemaRewritten = rewrittenDefinitions[rootSchemaName];
+        const rootSchemaRewritten = rewrittenDefinitions[absoluteRootPath];
 
         // Strip top-level metadata keys from each embedded definition ($defs)
         const keysToStripFromDefs = ['$schema', '$id', '$comment'];
         const cleanedDefinitions = {};
-        for (const [defName, defSchema] of Object.entries(rewrittenDefinitions)) {
-            cleanedDefinitions[defName] = stripTopLevelKeys(defSchema, keysToStripFromDefs);
+        for (const [schemaPath, defSchema] of Object.entries(rewrittenDefinitions)) {
+            cleanedDefinitions[makeSchemaName(schemaPath)] = stripTopLevelKeys(defSchema, keysToStripFromDefs);
         }
 
         // Build the final schema with root schema properties at the top level
