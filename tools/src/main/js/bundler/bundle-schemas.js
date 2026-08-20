@@ -7,6 +7,7 @@ const path = require('path');
 // This constant is used as the default value for ref exceptions; can be overridden via options.refExceptions.
 const DEFAULT_REF_EXCEPTION_FILES = [
     'spdx.schema.json',
+    'behavior-taxonomy.schema.json',
     'cryptography-defs.schema.json',
     'jsf-0.82.schema.json'
 ];
