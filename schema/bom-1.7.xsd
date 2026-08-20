@@ -22,7 +22,7 @@ limitations under the License.
            targetNamespace="http://cyclonedx.org/schema/bom/1.7"
            vc:minVersion="1.0"
            vc:maxVersion="1.1"
-           version="1.7.0">
+           version="1.7.1">
 
     <xs:import namespace="http://cyclonedx.org/schema/spdx" schemaLocation="http://cyclonedx.org/schema/spdx"/>
 
@@ -1204,7 +1204,7 @@ limitations under the License.
                         <xs:documentation>
                             Specifies the format and nature of the data being attached, helping systems correctly
                             interpret and process the content. Common content type examples include `application/json`
-                            for JSON data and `text/plain` for plan text documents.
+                            for JSON data and `text/plain` for plain text documents.
                             RFC 2045 section 5.1 outlines the structure and use of content types. For a comprehensive
                             list of registered content types, refer to the IANA media types registry at
                             https://www.iana.org/assignments/media-types/media-types.xhtml.
@@ -3499,7 +3499,7 @@ limitations under the License.
                             </xs:annotation>
                             <xs:complexType>
                                 <xs:sequence>
-                                    <xs:element name="user" type="xs:string" minOccurs="0" maxOccurs="1" />
+                                    <xs:element name="user" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
@@ -3511,7 +3511,7 @@ limitations under the License.
                             </xs:annotation>
                             <xs:complexType>
                                 <xs:sequence>
-                                    <xs:element name="useCase" type="xs:string" minOccurs="0" maxOccurs="1" />
+                                    <xs:element name="useCase" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
@@ -3525,7 +3525,7 @@ limitations under the License.
                             </xs:annotation>
                             <xs:complexType>
                                 <xs:sequence>
-                                    <xs:element name="technicalLimitation" type="xs:string" minOccurs="0" maxOccurs="1" />
+                                    <xs:element name="technicalLimitation" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
@@ -3537,7 +3537,7 @@ limitations under the License.
                             </xs:annotation>
                             <xs:complexType>
                                 <xs:sequence>
-                                    <xs:element name="performanceTradeoff" type="xs:string" minOccurs="0" maxOccurs="1" />
+                                    <xs:element name="performanceTradeoff" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
@@ -3628,6 +3628,16 @@ limitations under the License.
                         </xs:element>
                     </xs:sequence>
                 </xs:complexType>
+            </xs:element>
+            <xs:element name="properties" type="bom:propertiesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Provides the ability to document properties in a name/value store.
+                        This provides flexibility to include data not officially supported in the standard
+                        without having to use additional namespaces or create extensions. Property names
+                        of interest to the general public are encouraged to be registered in the
+                        CycloneDX Property Taxonomy - https://github.com/CycloneDX/cyclonedx-property-taxonomy.
+                        Formal registration is OPTIONAL.</xs:documentation>
+                </xs:annotation>
             </xs:element>
         </xs:sequence>
         <xs:attribute name="bom-ref" type="bom:refType">
@@ -4461,7 +4471,7 @@ limitations under the License.
             </xs:element>
             <xs:element name="ratings" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation xml:lang="en">List of vulnerability ratings.</xs:documentation>
+                    <xs:documentation xml:lang="en">List of vulnerability ratings. Consumers SHOULD consider ratings in prioritization decisions; source ratings may differ and aid prioritization.</xs:documentation>
                 </xs:annotation>
                 <xs:complexType>
                     <xs:sequence>

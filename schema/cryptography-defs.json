@@ -1,6 +1,6 @@
 {
   "$schema": "http://cyclonedx.org/schema/cryptography-defs.schema.json",
-  "lastUpdated": "2025-03-22T00:00:00Z",
+  "lastUpdated": "2026-02-24T00:00:00Z",
   "algorithms": [
     {
       "family": "RSASSA-PKCS1",
@@ -16,7 +16,7 @@
       ],
       "variant": [
         {
-          "pattern": "RSA-PKCS1-1.5[-{digestAlgorithm}][-{keyLength}]",
+          "pattern": "RSA-PKCS1-1.5[-{hashAlgorithm}][-{keyLength}]",
           "primitive": "signature"
         }
       ]
@@ -35,7 +35,22 @@
       ],
       "variant": [
         {
-          "pattern": "RSA-PSS[-{digestAlgorithm}][-{saltLength}][-{keyLength}]",
+          "pattern": "RSA-PSS[-{hashAlgorithm}][-{maskGenAlgorithm}][-{saltLength}][-{keyLength}]",
+          "primitive": "signature"
+        }
+      ]
+    },
+    {
+      "family": "RSA-X931",
+      "standard": [
+        {
+          "name": "X9.31",
+          "url": "https://standards.globalspec.com/std/1955293/ansi-x9-31"
+        }
+      ],
+      "variant": [
+        {
+          "pattern": "RSA-X9.31[-{hashAlgorithm}][-{keyLength}]",
           "primitive": "signature"
         }
       ]
@@ -80,7 +95,7 @@
       ],
       "variant": [
         {
-          "pattern": "Ed(25519|448)[-(ph|ctx)]",
+          "pattern": "Ed(25519|448)[(ph|ctx)]",
           "primitive": "signature"
         }
       ]
@@ -99,7 +114,7 @@
       ],
       "variant": [
         {
-          "pattern": "ECDSA[-{ellipticCurve}][-{hash}]",
+          "pattern": "ECDSA[-{ellipticCurve}][-{hashAlgorithm}]",
           "primitive": "signature"
         }
       ]
@@ -119,6 +134,21 @@
       "variant": [
         {
           "pattern": "ECIES[-{ellipticCurve}][-{kdf}][-{symmetricCipher}][-{mac}]",
+          "primitive": "pke"
+        }
+      ]
+    },   
+    {
+      "family": "HPKE",
+      "standard": [
+        {
+          "name": "RFC9180",
+          "url": "https://doi.org/10.17487/RFC9180"
+        }
+      ],
+      "variant": [
+        {
+          "pattern": "HPKE[-(mode_base|mode_psk|mode_auth|mode_auth_psk)]-{kem}-{kdf}-{aead}",
           "primitive": "pke"
         }
       ]
@@ -171,7 +201,7 @@
       ],
       "variant": [
         {
-          "pattern": "DSA[-{length}][-{hash}]",
+          "pattern": "DSA[-{length}][-{hashAlgorithm}]",
           "primitive": "signature"
         }
       ]
@@ -223,6 +253,48 @@
       ]
     },
     {
+      "family": "SRP",
+      "standard": [
+        {
+          "name": "RFC2945",
+          "url": "https://doi.org/10.17487/RFC2945"
+        },
+        {
+          "name": "RFC5054",
+          "url": "https://doi.org/10.17487/RFC5054"
+        }
+      ],
+      "variant": [
+        {
+          "pattern": "SRP-3[-{hashAlgorithm}][-{namedGroup}]",
+          "primitive": "key-agree"
+        },
+        {
+          "pattern": "SRP-6[-{hashAlgorithm}][-{namedGroup}]",
+          "primitive": "key-agree"
+        }
+      ]
+    },
+    {
+      "family": "J-PAKE",
+      "standard": [
+        {
+          "name": "RFC8236",
+          "url": "https://doi.org/10.17487/RFC8236"
+        }
+      ],
+      "variant": [
+        {
+          "pattern": "J-PAKE[-{namedGroup}][-{kdf}][-{mac}]",
+          "primitive": "key-agree"
+        },
+        {
+          "pattern": "J-PAKE[-{ellipticCurve}][-{kdf}][-{mac}]",
+          "primitive": "key-agree"
+        }
+      ]
+    },
+    {
       "family": "SHA-1",
       "standard": [
         {
@@ -261,12 +333,12 @@
         },
         {
           "name": "SP800-185",
-          "url": "https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf"
+          "url": "https://doi.org/10.6028/NIST.SP.800-185"
         }
       ],
       "variant": [
         {
-          "pattern": "SHA-3-(224|256|384|512)",
+          "pattern": "SHA3-(224|256|384|512)",
           "primitive": "hash"
         },
         {
@@ -282,7 +354,7 @@
           "primitive": "mac"
         },
         {
-          "pattern": "HMACXOF(128|256)",
+          "pattern": "KMACXOF(128|256)",
           "primitive": "mac"
         },
         {
@@ -311,11 +383,15 @@
           "url": "https://doi.org/10.6028/NIST.FIPS.197-upd1"
         },
         {
-          "name": "SP800-38{A-G}",
+          "name": "SP800-38A",
           "url": "https://doi.org/10.6028/NIST.SP.800-38A"
         },
         {
-          "name": "RFC 5116",
+          "name": "SP800-38E",
+          "url": "https://doi.org/10.6028/NIST.SP.800-38E"
+        },
+        {
+          "name": "RFC5116",
           "url": "https://doi.org/10.17487/RFC5116"
         }
       ],
@@ -327,12 +403,16 @@
         {
           "standard": [
             {
+              "name": "SP800-38C",
+              "url": "https://doi.org/10.6028/NIST.SP.800-38C"
+            },
+            {
               "name": "SP800-38D",
               "url": "https://doi.org/10.6028/NIST.SP.800-38D"
             },
             {
-              "name": "RFC 3610",
-              "url": "https://doi.org/10.17487/RFC5116"
+              "name": "RFC3610",
+              "url": "https://doi.org/10.17487/RFC3610"
             }
           ],
           "pattern": "AES[-(128|192|256)][-(GCM|CCM)][-{tagLength}][-{ivLength}]",
@@ -341,17 +421,87 @@
         {
           "standard": [
             {
+              "name": "RFC8452",
+              "url": "https://doi.org/10.17487/RFC8452"
+            }
+          ],
+          "pattern": "AES[-(128|192|256)]-GCM-SIV[-{tagLength}][-{ivLength}]",
+          "primitive": "ae"
+        },
+        {
+          "standard": [
+            {
+              "name": "RFC7253",
+              "url": "https://doi.org/10.17487/RFC7253"
+            }
+          ],
+          "pattern": "AES[-(128|192|256)]-OCB[-{tagLength}]",
+          "primitive": "ae"
+        },
+        {
+          "standard": [
+            {
+              "name": "RFC3686",
+              "url": "https://doi.org/10.17487/RFC3686"
+            }
+          ],
+          "pattern": "AES[-(128|192|256)]-CTR-HMAC-SHA1[-96]",
+          "primitive": "ae"
+        },
+        {
+          "standard": [
+            {
+              "name": "RFC5297",
+              "url": "https://doi.org/10.17487/RFC5297"
+            }
+          ],
+          "pattern": "AES[-(128|192|256)]-SIV",
+          "primitive": "ae"
+        },
+        {
+          "standard": [
+            {
+              "name": "SP800-38F",
+              "url": "https://doi.org/10.6028/NIST.SP.800-38F"
+            }
+          ],
+          "pattern": "AES[-(128|192|256)][-(KW|KWP)]",
+          "primitive": "key-wrap"
+        },
+        {
+          "standard": [
+            {
               "name": "RFC5649",
               "url": "https://doi.org/10.17487/RFC5649"
             }
           ],
-          "pattern": "AES[-(128|192|256)]-Wrap[-(PAD|KWP|PKCS7)]",
+          "pattern": "AES[-(128|192|256)]-Wrap[-PKCS7]",
           "primitive": "key-wrap"
         },
         {
+          "standard": [
+            {
+              "name": "SP800-38B",
+              "url": "https://doi.org/10.6028/NIST.SP.800-38B"
+            },
+            {
+              "name": "SP800-38D",
+              "url": "https://doi.org/10.6028/NIST.SP.800-38D"
+            }
+          ],
           "pattern": "AES[-(128|192|256)][-(GMAC|CMAC)]",
           "primitive": "mac"
         },
+        {
+          "standard": [
+            {
+              "name": "RFC4615",
+              "url": "https://doi.org/10.17487/RFC4615"
+            }
+          ],
+          "pattern": "AES-CMAC-PRF-128",
+          "primitive": "mac"
+        },        
         {
           "pattern": "AES[-(128|192|256)][-(XCBC_MAC[_96])]",
           "primitive": "mac"
@@ -368,7 +518,7 @@
       ],
       "variant": [
         {
-          "pattern": "HKDF[-{hashFunction}]",
+          "pattern": "HKDF[-{hashAlgorithm}]",
           "primitive": "kdf"
         }
       ]
@@ -387,7 +537,7 @@
       ],
       "variant": [
         {
-          "pattern": "HMAC[-{hashFunction}][-{tagLength}]",
+          "pattern": "HMAC[-{hashAlgorithm}][-{tagLength}]",
           "primitive": "mac"
         }
       ]
@@ -408,16 +558,16 @@
       ]
     },
     {
-      "family": "KMAC",
+      "family": "UMAC",
       "standard": [
         {
-          "name": "SP800-108r1",
-          "url": "https://doi.org/10.6028/NIST.SP.800-108r1-upd1"
+          "name": "RFC4418",
+          "url": "https://doi.org/10.17487/RFC4418"
         }
       ],
       "variant": [
         {
-          "pattern": "KMAC[-(128|256)]",
+          "pattern": "UMAC[-(32|64|96|128)]",
           "primitive": "mac"
         }
       ]
@@ -468,6 +618,10 @@
         {
           "pattern": "ChaCha20-Poly1305",
           "primitive": "ae"
+        },
+        {
+          "pattern": "XChaCha20-Poly1305",
+          "primitive": "ae"
         }
       ]
     },
@@ -487,36 +641,6 @@
         {
           "pattern": "Salsa20-Poly1305",
           "primitive": "ae"
-        }
-      ]
-    },
-    {
-      "family": "MD5",
-      "standard": [
-        {
-          "name": "RFC1321",
-          "url": "https://doi.org/10.17487/RFC1321"
-        }
-      ],
-      "variant": [
-        {
-          "pattern": "MD5",
-          "primitive": "hash"
-        }
-      ]
-    },
-    {
-      "family": "MD4",
-      "standard": [
-        {
-          "name": "RFC1320",
-          "url": "https://doi.org/10.17487/RFC1320"
-        }
-      ],
-      "variant": [
-        {
-          "pattern": "MD4",
-          "primitive": "hash"
         }
       ]
     },
@@ -563,7 +687,7 @@
         },
         {
           "name": "ANSI INCITS 92-1981",
-          "url": "https://csrc.nist.gov/pubs/fips/46-3/final"
+          "url": "https://webstore.ansi.org/standards/incits/ansiincits921981r2003"
         }
       ],
       "variant": [
@@ -607,7 +731,7 @@
       "family": "ML-DSA",
       "standard": [
         {
-          "name": "FIPS 204",
+          "name": "FIPS204",
           "url": "https://doi.org/10.6028/NIST.FIPS.204"
         }
       ],
@@ -617,7 +741,7 @@
           "primitive": "signature"
         },
         {
-          "pattern": "HashML-DSA-(44|65|87)[-{hashFunction}]",
+          "pattern": "HashML-DSA-(44|65|87)[-{hashAlgorithm}]",
           "primitive": "signature"
         }
       ]
@@ -626,7 +750,7 @@
       "family": "SLH-DSA",
       "standard": [
         {
-          "name": "FIPS 205",
+          "name": "FIPS205",
           "url": "https://doi.org/10.6028/NIST.FIPS.205"
         }
       ],
@@ -636,7 +760,7 @@
           "primitive": "signature"
         },
         {
-          "pattern": "HashSLH-DSA-(SHA2|SHAKE)-(128s|128f|192s|192f|256s|256f)[-{hashFunction}]",
+          "pattern": "HashSLH-DSA-(SHA2|SHAKE)-(128s|128f|192s|192f|256s|256f)[-{hashAlgorithm}]",
           "primitive": "signature"
         }
       ]
@@ -682,7 +806,7 @@
       ],
       "variant": [
         {
-          "pattern": "LMS[_{hashFunction}][_M{bytesPerNode}][_H{treeHeight}]",
+          "pattern": "LMS[_{hashAlgorithm}][_M{bytesPerNode}][_H{treeHeight}]",
           "primitive": "signature"
         },
         {
@@ -695,7 +819,7 @@
       "family": "ML-KEM",
       "standard": [
         {
-          "name": "FIPS 203",
+          "name": "FIPS203",
           "url": "https://doi.org/10.6028/NIST.FIPS.203"
         }
       ],
@@ -720,16 +844,89 @@
       ],
       "variant": [
         {
-          "pattern": "IKE_PRF_DERIVE",
-          "primitive": "key-agree"
+          "pattern": "IKE_PRF_DERIVE[-{hashAlgorithm}]",
+          "primitive": "kdf"
         },
         {
-          "pattern": "IKE1_(PRF|Extended)_DERIVE",
-          "primitive": "key-agree"
+          "pattern": "IKE1_(PRF|Extended)_DERIVE[-{hashAlgorithm}]",
+          "primitive": "kdf"
         },
         {
-          "pattern": "IKE2_PRF_PLUS_DERIVE",
-          "primitive": "key-agree"
+          "pattern": "IKE2_PRF_PLUS_DERIVE[-{hashAlgorithm}]",
+          "primitive": "kdf"
+        }
+      ]
+    },
+    {
+      "family": "ANSI-KDF",
+      "standard": [
+        {
+          "name": "X9.42",
+          "url": "https://webstore.ansi.org/standards/ASCX9/ansix9422003r2013"
+        },
+        {
+          "name": "X9.63",
+          "url": "https://webstore.ansi.org/standards/ASCX9/ansix9632011r2017"
+        }
+      ],
+      "variant": [
+        {
+          "pattern": "ANSI-KDF-X9.42[-{hashAlgorithm}]",
+          "primitive": "kdf"
+        },
+        {
+          "pattern": "ANSI-KDF-X9.63[-{hashAlgorithm}]",
+          "primitive": "kdf"
+        }
+      ]
+    },
+    {
+      "family": "SSH-KDF",
+      "standard": [
+        {
+          "name": "RFC4253",
+          "url": "https://doi.org/10.17487/RFC4253"
+        }
+      ],
+      "variant": [
+        {
+          "pattern": "SSH-KDF[-{hashAlgorithm}]",
+          "primitive": "kdf"
+        }
+      ]
+    },
+    {
+      "family": "TLS-PRF",
+      "standard": [
+        {
+          "name": "RFC2246",
+          "url": "https://doi.org/10.17487/RFC2246"
+        },
+        {
+          "name": "RFC5246",
+          "url": "https://doi.org/10.17487/RFC5246"
+        },
+        {
+          "name": "RFC7627",
+          "url": "https://doi.org/10.17487/RFC7627"
+        },
+        {
+          "name": "RFC8446",
+          "url": "https://doi.org/10.17487/RFC8446"
+        }
+      ],
+      "variant": [
+        {
+          "pattern": "TLS1-PRF[-RFC7627]",
+          "primitive": "kdf"
+        },
+        {
+          "pattern": "TLS12-PRF[-RFC7627][-{hashAlgorithm}]",
+          "primitive": "kdf"
+        },
+        {
+          "pattern": "TLS13-PRF[-{hashAlgorithm}]",
+          "primitive": "kdf"
         }
       ]
     },
@@ -773,7 +970,7 @@
               "url": "https://doi.org/10.17487/RFC4357"
             }
           ],
-          "pattern": "GOST38147[-{mode}][-{padding}]",
+          "pattern": "GOST28147[-{mode}][-{padding}]",
           "primitive": "block-cipher"
         },
         {
@@ -783,8 +980,92 @@
               "url": "https://doi.org/10.17487/RFC4357"
             }
           ],
-          "pattern": "GOST38147_MAC",
+          "pattern": "GOST28147_MAC",
           "primitive": "mac"
+        }
+      ]
+    },
+    {
+      "family": "SM2",
+      "standard": [
+        {
+          "name": "RFC8998",
+          "url": "https://www.rfc-editor.org/rfc/rfc8998.html"
+        }
+      ],
+      "variant": [
+        {
+          "pattern": "SM2[-256]",
+          "primitive": "signature"
+        },
+        {
+          "pattern": "SM2-(ENC|ENCRYPTION)[-256]",
+          "primitive": "pke"
+        },
+        {
+          "pattern": "SM2-(KEX|KEYEXCHANGE|KEY-EXCHANGE|KEYAGREE|KEY-AGREE|KEYAGREEMENT|KEY-AGREEMENT)[-256]",
+          "primitive": "key-agree"
+        }
+      ]
+    },
+    {
+      "family": "SM3",
+      "standard": [
+        {
+          "name": "RFC8998",
+          "url": "https://www.rfc-editor.org/rfc/rfc8998.html"
+        }
+      ],
+      "variant": [
+        {
+          "pattern": "SM3",
+          "primitive": "hash"
+        }
+      ]
+    },
+    {
+      "family": "SM4",
+      "standard": [
+        {
+          "name": "ISO/IEC18033-3:2010/Amd1:2021",
+          "url": "https://www.iso.org/standard/81564.html"
+        }
+      ],
+      "variant": [
+        {
+          "pattern": "SM4[-(ECB|CBC|CFB|OFB|CTR|XTS)][-{padding}][-{ivlen}]",
+          "primitive": "block-cipher"
+        },
+        {
+          "pattern": "SM4-(GCM|CCM)[-{tagLength}][-{ivLength}]",
+          "primitive": "ae"
+        }
+      ]
+    },
+    {
+      "family": "SM9",
+      "standard": [
+        {
+          "name": "GM/T0044.1-2016",
+          "url": "https://www.gmbz.org.cn/upload/2025-01-23/1737625691994053970.pdf"
+        }
+      ],
+      "variant": [
+        {
+          "pattern": "SM9-(SIG|SIGNATURE)",
+          "primitive": "signature"
+        },
+        {
+          "pattern": "SM9-(KEX|KEYEXCHANGE|KEY-EXCHANGE|KEYAGREE|KEYAGREEMENT|KEY-AGREE|KEY-AGREEMENT)",
+          "primitive": "key-agree"
+        },
+        {
+          "pattern": "SM9-(KEM|KEYENCAPSULATION|KEY-ENCAPSULATION)",
+          "primitive": "kem"
+        },
+        {
+          "pattern": "SM9-(ENC|ENCRYPTION|PKE|PUBLICKEY-ENCRYPTION|PUBLIC-KEY-ENCRYPTION)",
+          "primitive": "pke"
         }
       ]
     },
@@ -806,7 +1087,7 @@
           "primitive": "block-cipher"
         },
         {
-          "pattern": "SEED-128[-{mode}][-{padding}]-HMAC[-{hashFunction}][-{tagLength}]",
+          "pattern": "SEED-128[-{mode}][-{padding}]-HMAC[-{hashAlgorithm}][-{tagLength}]",
           "primitive": "ae"
         },
         {
@@ -908,8 +1189,27 @@
       ],
       "variant": [
         {
-          "pattern": "SP800_108_(CounterKDF|FeedbackKDF|DoublePipelineKDF)[-{prfFunction}][-{dkmLength}]",
-          "primitive": "key-derive"
+          "pattern": "SP800_108_(CounterKDF|FeedbackKDF|DoublePipelineKDF|KMAC)[-{prfFunction}][-{dkmLength}]",
+          "primitive": "kdf"
+        }
+      ]
+    },
+    {
+      "family": "SP800-56C",
+      "standard": [
+        {
+          "name": "SP800-56C",
+          "url": "https://doi.org/10.6028/NIST.SP.800-56Cr2"
+        }
+      ],
+      "variant": [
+        {
+          "pattern": "SP800_56C_OneStep[-{auxFunction}][-{dkmLength}]",
+          "primitive": "kdf"
+        },
+        {
+          "pattern": "SP800_56C_TwoStep_(CounterKDF|FeedbackKDF|DoublePipelineKDF)[-{auxFunction}][-{dkmLength}]",
+          "primitive": "kdf"
         }
       ]
     },
@@ -935,11 +1235,11 @@
           "primitive": "hash"
         },
         {
-          "pattern": "BLAKE2b-(160|256|384|512)-HMAC",
+          "pattern": "BLAKE2s-(160|256)-HMAC",
           "primitive": "mac"
         }
       ]
-    },
+    }, 
     {
       "family": "BLAKE3",
       "standard": [
@@ -965,7 +1265,7 @@
       ],
       "variant": [
         {
-          "pattern": "X3DH[-{hashFunction}]",
+          "pattern": "X3DH[-{hashAlgorithm}]",
           "primitive": "key-agree"
         }
       ]
@@ -980,12 +1280,27 @@
       ],
       "variant": [
         {
-          "pattern": "BLS(13-381|13-377|BN254)",
+          "pattern": "BLS(12-381|12-377|BN254)",
           "primitive": "signature"
         },
         {
           "pattern": "BLS[-{ellipticCurve}]",
           "primitive": "signature"
+        }
+      ]
+    },
+    {
+      "family": "OPAQUE",
+      "standard": [
+        {
+          "name": "RFC9807",
+          "url": "https://doi.org/10.17487/RFC9807"
+        }
+      ],
+      "variant": [
+        {
+          "pattern": "OPAQUE-3DH[-{group}][-{hashAlgorithm}][-{ksf}][-{kdf}][-{mac}]",
+          "primitive": "key-agree"
         }
       ]
     },
@@ -1009,6 +1324,36 @@
       ]
     },
     {
+      "family": "SPAKE2",
+      "standard": [
+        {
+          "name": "RFC9382",
+          "url": "https://doi.org/10.17487/RFC9382"
+        }
+      ],
+      "variant": [
+        {
+          "pattern": "SPAKE2[-{group}][-{hashAlgorithm}][-{kdf}][-{mac}]",
+          "primitive": "key-agree"
+        }
+      ]
+    },
+    {
+      "family": "SPAKE2PLUS",
+      "standard": [
+        {
+          "name": "RFC9383",
+          "url": "https://doi.org/10.17487/RFC9383"
+        }
+      ],
+      "variant": [
+        {
+          "pattern": "SPAKE2+[-{group}][-{hashAlgorithm}][-{kdf}][-{mac}]",
+          "primitive": "key-agree"
+        }
+      ]
+    },
+    {
       "family": "TUAK",
       "standard": [
         {
@@ -1018,11 +1363,11 @@
       ],
       "variant": [
         {
-          "pattern": "TUAC[-MAC]",
+          "pattern": "TUAK[-MAC]",
           "primitive": "mac"
         },
         {
-          "pattern": "TUAC[-KDF]",
+          "pattern": "TUAK[-KDF]",
           "primitive": "kdf"
         }
       ]
@@ -1308,13 +1653,28 @@
       "standard": [
         {
           "name": "SipHash Spec",
-          "url": "https://131002.net/siphash/"
+          "url": "https://doi.org/10.1007/978-3-642-34931-7_28"
         }
       ],
       "variant": [
         {
           "pattern": "SipHash[-{compressionRounds}-{finalizationRounds}]",
-          "primitive": "hash"
+          "primitive": "mac"
+        }
+      ]
+    },
+    {
+      "family": "Argon2",
+      "standard": [
+        {
+          "name": "RFC9106",
+          "url": "https://doi.org/10.17487/RFC9106"
+        }
+      ],
+      "variant": [
+        {
+          "pattern": "Argon2(id|i|d)[-{memoryKiB}][-{passes}][-{parallelism}][-{saltLenBytes}][-{secretLenBytes}][-{associatedDataLenBytes}][-{tagLenBytes}]",
+          "primitive": "kdf"
         }
       ]
     },
@@ -1328,7 +1688,7 @@
       ],
       "variant": [
         {
-          "pattern": "PBKDF1[-{hashFunction}][-{iterations}][-{dkLen}]",
+          "pattern": "PBKDF1[-{hashAlgorithm}][-{iterations}][-{dkLen}]",
           "primitive": "kdf"
         }
       ]
@@ -1347,7 +1707,7 @@
       ],
       "variant": [
         {
-          "pattern": "PBKDF2[-{hashFunction}][-{iterations}][-{dkLen}]",
+          "pattern": "PBKDF2[-{hashAlgorithm}][-{iterations}][-{dkLen}]",
           "primitive": "kdf"
         }
       ]
@@ -1392,7 +1752,7 @@
       ],
       "variant": [
         {
-          "pattern": "PBMAC1[-{macAlgorithm}][-{hashFunction}][-{iterations}][-{dkLen}]",
+          "pattern": "PBMAC1[-{macAlgorithm}][-{hashAlgorithm}][-{iterations}][-{dkLen}]",
           "primitive": "mac"
         }
       ]
@@ -1407,8 +1767,38 @@
       ],
       "variant": [
         {
-          "pattern": "bcrypt[-{cost)]",
-          "primitive": "hash"
+          "pattern": "bcrypt[-{cost}]",
+          "primitive": "kdf"
+        }
+      ]
+    },
+    {
+      "family": "scrypt",
+      "standard": [
+        {
+          "name": "RFC7914",
+          "url": "https://doi.org/10.17487/RFC7914"
+        }
+      ],
+      "variant": [
+        {
+          "pattern": "scrypt[-{N}][-{r}][-{p}][-{dkLen}]",
+          "primitive": "kdf"
+        }
+      ]
+    },
+    {
+      "family": "yescrypt",
+      "standard": [
+        {
+          "name": "yescrypt - scalable KDF and password hashing scheme",
+          "url": "https://www.openwall.com/yescrypt/"
+        }
+      ],
+      "variant": [
+        {
+          "pattern": "[{hashAlgorithm}-]yescrypt[-{N_log2}][-{r}][-{p}][-{t}]",
+          "primitive": "kdf"
         }
       ]
     },
@@ -1441,7 +1831,7 @@
       "standard": [
         {
           "name": "TIA TR45.0.A",
-          "url": ""
+          "url": "https://patents.google.com/patent/US5159634"
         }
       ],
       "variant": [
@@ -1461,7 +1851,7 @@
       ],
       "variant": [
         {
-          "pattern": "Fortuna[-{blockCipher}][-{hashFunction}]",
+          "pattern": "Fortuna[-{blockCipher}][-{hashAlgorithm}]",
           "primitive": "drbg"
         }
       ]
@@ -1476,7 +1866,52 @@
       ],
       "variant": [
         {
-          "pattern": "Yarrow[-{blockCipher}][-{hashFunction}]",
+          "pattern": "Yarrow[-{blockCipher}][-{hashAlgorithm}]",
+          "primitive": "drbg"
+        }
+      ]
+    },
+    {
+      "family": "CTR_DRBG",
+      "standard": [
+        {
+          "name": "SP800-90Ar1",
+          "url": "https://doi.org/10.6028/NIST.SP.800-90Ar1"
+        }
+      ],
+      "variant": [
+        {
+          "pattern": "CTR_DRBG[-{cipherAlgorithm}][-{keyLength}]",
+          "primitive": "drbg"
+        }
+      ]
+    },
+    {
+      "family": "Hash_DRBG",
+      "standard": [
+        {
+          "name": "SP800-90Ar1",
+          "url": "https://doi.org/10.6028/NIST.SP.800-90Ar1"
+        }
+      ],
+      "variant": [
+        {
+          "pattern": "Hash_DRBG[-{hashAlgorithm}]",
+          "primitive": "drbg"
+        }
+      ]
+    },
+    {
+      "family": "HMAC_DRBG",
+      "standard": [
+        {
+          "name": "SP800-90Ar1",
+          "url": "https://doi.org/10.6028/NIST.SP.800-90Ar1"
+        }
+      ],
+      "variant": [
+        {
+          "pattern": "HMAC_DRBG[-{hashAlgorithm}]",
           "primitive": "drbg"
         }
       ]

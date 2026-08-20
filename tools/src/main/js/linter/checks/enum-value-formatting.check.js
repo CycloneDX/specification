@@ -64,17 +64,47 @@ class EnumValueFormattingCheck extends LintCheck {
       // Skip empty enums
       if (node.length === 0) return;
       
-      // Check if meta:enum exists on parent
-      const hasMetaEnum = parent && 'meta:enum' in parent;
-      const metaEnum = hasMetaEnum ? parent['meta:enum'] : {};
-      
+      const loc = (p) => (typeof p === 'string' && p.length ? p : '(unknown path)');
+      // meta:enum is sibling of enum; path is from traverseSchema (contract: path for this node).
+      const metaEnumBasePath = !path
+        ? 'meta:enum'
+        : path.endsWith('.enum')
+          ? path.replace(/\.enum$/, '.meta:enum')
+          : path === 'enum'
+            ? 'meta:enum'
+            : `${path}.meta:enum`;
+
+      // Check if meta:enum exists on parent (own property only; avoid prototype chain)
+      const hasMetaEnum =
+        !!parent && Object.prototype.hasOwnProperty.call(parent, 'meta:enum');
+      const metaEnumRaw = hasMetaEnum ? parent['meta:enum'] : null;
+      const metaEnumIsPlainObject =
+        metaEnumRaw !== null &&
+        typeof metaEnumRaw === 'object' &&
+        !Array.isArray(metaEnumRaw) &&
+        (Object.getPrototypeOf(metaEnumRaw) === Object.prototype ||
+          Object.getPrototypeOf(metaEnumRaw) === null);
+
+      if (hasMetaEnum && !metaEnumIsPlainObject) {
+        issues.push(this.createIssue(
+          'meta:enum must be a plain object mapping enum values to descriptions.',
+          loc(metaEnumBasePath),
+          {
+            actualType: Array.isArray(metaEnumRaw)
+              ? 'array'
+              : typeof metaEnumRaw
+          },
+          Severity.ERROR
+        ));
+      }
+
+      const metaEnum = metaEnumIsPlainObject ? metaEnumRaw : {};
+      const enumSet = new Set(node.filter(v => typeof v === 'string'));
+
       // Track detected case styles
       const detectedStyles = new Map();
       
-      for (const value of node) {
-        // Skip non-string values
-        if (typeof value !== 'string') continue;
-        
+      for (const value of enumSet) {
         // Detect case style
         const style = this.detectCaseStyle(value);
         
@@ -87,7 +117,7 @@ class EnumValueFormattingCheck extends LintCheck {
         if (/\s/.test(value)) {
           issues.push(this.createIssue(
             `Enum value "${value}" contains whitespace. Use ${preferredCase} instead.`,
-            `${path}`,
+            loc(path),
             {
               value,
               suggestion: this.convertToCase(value, preferredCase)
@@ -100,16 +130,16 @@ class EnumValueFormattingCheck extends LintCheck {
         if (/[^a-zA-Z0-9_-]/.test(value)) {
           issues.push(this.createIssue(
             `Enum value "${value}" contains special characters.`,
-            `${path}`,
+            loc(path),
             { value }
           ));
         }
         
-        // Check meta:enum coverage only if meta:enum exists
-        if (hasMetaEnum && !metaEnum[value]) {
+        // Check meta:enum coverage only when meta:enum is a plain object
+        if (hasMetaEnum && metaEnumIsPlainObject && !Object.prototype.hasOwnProperty.call(metaEnum, value)) {
           issues.push(this.createIssue(
             `Enum value "${value}" is missing a description in meta:enum.`,
-            `${path}`,
+            loc(metaEnumBasePath),
             { value },
             Severity.ERROR
           ));
@@ -125,7 +155,7 @@ class EnumValueFormattingCheck extends LintCheck {
         issues.push(this.createIssue(
           `Enum values use inconsistent case styles: ${stylesUsed}. ` +
           `Consider using ${preferredCase} consistently.`,
-          path,
+          loc(path),
           {
             detectedStyles: Object.fromEntries(detectedStyles)
           },
@@ -133,14 +163,13 @@ class EnumValueFormattingCheck extends LintCheck {
         ));
       }
       
-      // Check if meta:enum has extra values not in enum
-      if (hasMetaEnum) {
-        const enumSet = new Set(node.filter(v => typeof v === 'string'));
+      // Check if meta:enum has extra values not in enum (only when it's a plain object)
+      if (hasMetaEnum && metaEnumIsPlainObject) {
         for (const metaKey of Object.keys(metaEnum)) {
           if (!enumSet.has(metaKey)) {
             issues.push(this.createIssue(
               `meta:enum contains "${metaKey}" which is not in the enum array.`,
-              `${path.replace('.enum', '.meta:enum')}.${metaKey}`,
+              `${metaEnumBasePath}.${metaKey}`,
               { value: metaKey }
             ));
           }
