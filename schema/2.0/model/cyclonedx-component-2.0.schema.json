@@ -403,7 +403,19 @@
           "description": "An identifier which can be used to reference this license evidence elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "license": {
-          "$ref": "cyclonedx-license-2.0.schema.json#/$defs/license",
+          "allOf": [
+            {
+              "$ref": "cyclonedx-license-2.0.schema.json#/$defs/license"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "id": true,
+                "name": true
+              },
+              "additionalProperties": false
+            }
+          ],
           "title": "License",
           "description": "The detected license, expressed as a single SPDX license identifier or a named license."
         },
