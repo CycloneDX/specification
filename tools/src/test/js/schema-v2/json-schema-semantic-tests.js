@@ -235,7 +235,10 @@ function testRefTypeUsage(schema, schemaFile) {
 function testAdditionalProperties(schema, schemaFile) {
     let errCnt = 0
     for (const [path, node] of _findObjectSchemas(schema)) {
-        if (path.endsWith('.if') || path.endsWith('.not')) continue;
+        if (Object.keys(node).join('|') === 'type') {
+            // this is a sole type constraint
+            continue
+        }
 
         if ('unevaluatedProperties' in node) {
             // Don't need 'additionalProperties', since 'unevaluatedProperties' takes care.
