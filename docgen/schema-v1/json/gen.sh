@@ -2,7 +2,6 @@
 set -eu
 
 declare -a CDX_VERSIONS=(
-  '2.0'
   '1.7'
   '1.6'
   '1.5'
@@ -22,7 +21,7 @@ Supported values for CDX_VERSION: ${CDX_VERSIONS[*]}
 
 
 THIS_PATH="$(realpath "$(dirname "$0")")"
-SCHEMA_PATH="$(realpath "$THIS_PATH/../../schema")"
+SCHEMA_PATH="$(realpath "$THIS_PATH/../../../schema")"
 DOCS_PATH="$THIS_PATH/docs"
 TEMPLATES_PATH="$THIS_PATH/templates"
 
@@ -48,15 +47,11 @@ generate () {
   local title="CycloneDX v${version} JSON Reference"
   echo "Generating: $title"
 
-  local SCHEMA_FILE
-  if [[ "$version" == 1.* ]]; then
-    SCHEMA_FILE="$SCHEMA_PATH/bom-${version}.schema.json"
-    local STRICT_SCHEMA_FILE="$SCHEMA_PATH/bom-${version}-strict.schema.json"
-    if [ -f "$STRICT_SCHEMA_FILE" ]; then
+  local SCHEMA_FILE="$SCHEMA_PATH/bom-${version}.schema.json"
+  local STRICT_SCHEMA_FILE="$SCHEMA_PATH/bom-${version}-strict.schema.json"
+  if [ -f "$STRICT_SCHEMA_FILE" ]
+  then
       SCHEMA_FILE="$STRICT_SCHEMA_FILE"
-    fi
-  else
-    SCHEMA_FILE="$SCHEMA_PATH/${version}/cyclonedx-${version}-bundled.schema.json"
   fi
   echo "SCHEMA_FILE: $SCHEMA_FILE"
 

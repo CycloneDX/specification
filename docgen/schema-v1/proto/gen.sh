@@ -7,13 +7,10 @@ declare -a CDX_VERSIONS=(
   '1.5'
   '1.4'
   '1.3'
-  '1.2'
-  '1.1'
-  '1.0'
 )
 
 # region help
-DESC="Generate HTML Schema navigator for CycloneDX XML"
+DESC="Generate HTML Schema navigator for CycloneDX ProtoBuf"
 USAGE="
 Usage: $0 [CDX_VERSION...]
 
@@ -23,47 +20,57 @@ Supported values for CDX_VERSION: ${CDX_VERSIONS[*]}
 
 
 THIS_PATH="$(realpath "$(dirname "$0")")"
-SCHEMA_PATH="$(realpath "$THIS_PATH/../../schema")"
+SCHEMA_PATH="$(realpath "$THIS_PATH/../../../schema")"
 DOCS_PATH="$THIS_PATH/docs"
+TEMPLATES_PATH="$THIS_PATH/templates"
 
 # Centralized header injection
 source "$THIS_PATH/../static/inject-header.sh"
 
-SAXON_VERSION='10.9'
+PROTOC_GEN_DOC_VERSION='1.5.1'
 
 
 # --
 
 
-SAXON_JAR="Saxon-HE-${SAXON_VERSION}.jar"
-prepare () {
-  if [ ! -f "$THIS_PATH/$SAXON_JAR" ]; then
-    echo "fetching $SAXON_JAR"
-    curl --output-dir "$THIS_PATH" -O \
-      "https://repo1.maven.org/maven2/net/sf/saxon/Saxon-HE/$SAXON_VERSION/$SAXON_JAR"
-  fi
+prepare() {
+  ## docs: https://github.com/pseudomuto/protoc-gen-doc
+  PROTOC_CONTAINER_IMAGE="pseudomuto/protoc-gen-doc:${PROTOC_GEN_DOC_VERSION}"
+  docker pull "$PROTOC_CONTAINER_IMAGE"
 }
-
 
 generate () {
   local version="$1"
-  local title="CycloneDX v$version XML Reference"
+  local title="CycloneDX v$version Protobuf Reference"
   echo "Generating: $title"
 
-  local OUT_FILE="$DOCS_PATH/$version/xml/index.html"
-  local OUT_DIR="$(dirname "$OUT_FILE")"
-  rm -rf "$OUT_DIR"
+  local OUT_DIR="$DOCS_PATH/$version/proto"
+  local OUT_FILE="index.html"
   mkdir -p "$OUT_DIR"
 
-  ## docs: https://www.saxonica.com/documentation10/index.html#!using-xsl/commandline
-  java -jar "$THIS_PATH/$SAXON_JAR" \
-    -s:"$SCHEMA_PATH/bom-${version}.xsd" \
-    -xsl:"$THIS_PATH/xs3p.xsl" \
-    -o:"$OUT_FILE" \
-    cycloneDxVersion="$version" \
-    title="$title"
+  docker run --rm \
+    -v "${OUT_DIR}:/out" \
+    -v "${SCHEMA_PATH}:/protos:ro" \
+    -v "${TEMPLATES_PATH}:/templates:ro" \
+    "$PROTOC_CONTAINER_IMAGE" \
+      --doc_opt=/templates/html.tmpl,"$OUT_FILE" \
+      "bom-${version}.proto"
 
-  inject_header "$OUT_FILE" "$version" "xml"
+  # fix file permissions
+  docker run --rm \
+    -v "${OUT_DIR}:/out" \
+    --entrypoint chown \
+    "$PROTOC_CONTAINER_IMAGE" \
+    "$(id -u):$(id -g)" -R /out
+
+  sed -i -e "s/\${quotedTitle}/\"$title\"/g" "$OUT_DIR/$OUT_FILE"
+  sed -i -e "s/\${title}/$title/g" "$OUT_DIR/$OUT_FILE"
+  sed -i -e "s/\${version}/$version/g" "$OUT_DIR/$OUT_FILE"
+
+  sed -i -E -e "s#(<p>)buf:.+</p>##g" "$OUT_DIR/$OUT_FILE"
+  sed -i -E -e "s#^buf:[^<\n]+##g" "$OUT_DIR/$OUT_FILE"
+
+  inject_header "$OUT_DIR/$OUT_FILE" "$version" "proto"
 }
 
 
