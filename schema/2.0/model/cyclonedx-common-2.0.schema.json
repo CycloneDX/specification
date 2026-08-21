@@ -921,6 +921,168 @@
       "$ref": "cyclonedx-jss_X590_2023_10-2.0.schema.json#/$defs/signatures",
       "title": "Signatures",
       "description": "Enveloped signatures in [JSON Signature Scheme (JSS/ITU-T X.590)](https://www.itu.int/epublications/publication/itu-t-x-590-2023-10-json-signature-scheme-jss)."
+    },
+    "measure": {
+      "type": "object",
+      "title": "Measure",
+      "description": "A measurement expressed as a numeric value and a unit. Contexts that use this definition may constrain the permitted units. When the unit is omitted, the value represents a count.",
+      "additionalProperties": false,
+      "required": ["value"],
+      "properties": {
+        "value": {
+          "type": "number",
+          "title": "Value",
+          "description": "The numeric value of the measurement.",
+          "examples": [127, 0.87, 2500, 52.3]
+        },
+        "unit": {
+          "type": "string",
+          "title": "Unit",
+          "description": "The unit of measure.",
+          "examples": ["ms", "%", "tokens/s", "GiB", "kWh", "tCO2eq"]
+        }
+      }
+    },
+    "timeUnits": {
+      "title": "Time Units",
+      "description": "Units of time for duration and latency measurements.",
+      "enum": ["ns", "us", "ms", "s", "min", "h"],
+      "meta:enum": {
+        "ns": "Nanoseconds, commonly used for high precision timing measurements.",
+        "us": "Microseconds, commonly used for fine grained latency measurements.",
+        "ms": "Milliseconds, commonly used for latency measurements.",
+        "s": "Seconds, commonly used for latency and duration measurements.",
+        "min": "Minutes, commonly used for duration measurements.",
+        "h": "Hours, commonly used for duration measurements."
+      }
+    },
+    "throughputUnits": {
+      "title": "Throughput Units",
+      "description": "Units of throughput for rate measurements.",
+      "enum": ["tokens/s", "requests/s", "ops/s"],
+      "meta:enum": {
+        "tokens/s": "Tokens per second, commonly used for language model throughput measurements.",
+        "requests/s": "Requests per second, commonly used for API and service throughput measurements.",
+        "ops/s": "Operations per second, commonly used for general throughput measurements."
+      }
+    },
+    "computeUnits": {
+      "title": "Compute Units",
+      "description": "Units of computational work and computational rate.",
+      "enum": ["FLOP", "FLOPS", "GFLOPS", "TFLOPS", "PFLOPS"],
+      "meta:enum": {
+        "FLOP": "Total floating point operations, commonly used to express cumulative training compute.",
+        "FLOPS": "Floating point operations per second.",
+        "GFLOPS": "Billion floating point operations per second.",
+        "TFLOPS": "Trillion floating point operations per second.",
+        "PFLOPS": "Quadrillion floating point operations per second."
+      }
+    },
+    "memoryUnits": {
+      "title": "Memory Units",
+      "description": "Units of digital information for memory and storage measurements.",
+      "enum": ["B", "KB", "MB", "GB", "TB", "PB", "KiB", "MiB", "GiB", "TiB", "PiB"],
+      "meta:enum": {
+        "B": "Bytes.",
+        "KB": "Kilobytes.",
+        "MB": "Megabytes.",
+        "GB": "Gigabytes.",
+        "TB": "Terabytes.",
+        "PB": "Petabytes.",
+        "KiB": "Kibibytes.",
+        "MiB": "Mebibytes.",
+        "GiB": "Gibibytes.",
+        "TiB": "Tebibytes.",
+        "PiB": "Pebibytes."
+      }
+    },
+    "ratioUnits": {
+      "title": "Ratio Units",
+      "description": "Units for dimensionless ratio measurements.",
+      "enum": ["%", "ppm"],
+      "meta:enum": {
+        "%": "Percentage, commonly used for accuracy, precision, recall, and other ratio based metrics.",
+        "ppm": "Parts per million, a dimensionless unit expressing the ratio of one part per million parts."
+      }
+    },
+    "energyUnits": {
+      "title": "Energy Units",
+      "description": "Units of energy.",
+      "enum": ["kWh"],
+      "meta:enum": {
+        "kWh": "Kilowatt hour, the energy delivered by one kilowatt of power for one hour."
+      }
+    },
+    "co2Units": {
+      "title": "CO2 Units",
+      "description": "Units of carbon dioxide equivalent.",
+      "enum": ["tCO2eq"],
+      "meta:enum": {
+        "tCO2eq": "Tonnes of carbon dioxide equivalent."
+      }
+    },
+    "energyMeasure": {
+      "title": "Energy Measure",
+      "description": "A measure of energy. The unit is constrained to a standardized energy unit for accurate comparison and reporting.",
+      "allOf": [
+        {"$ref": "#/$defs/measure"},
+        {
+          "required": ["unit"],
+          "properties": {
+            "unit": {"$ref": "#/$defs/energyUnits"}
+          }
+        }
+      ]
+    },
+    "co2Measure": {
+      "title": "CO2 Measure",
+      "description": "A measure of carbon dioxide equivalent. The unit is constrained to a standardized unit for accurate environmental impact reporting.",
+      "allOf": [
+        {"$ref": "#/$defs/measure"},
+        {
+          "required": ["unit"],
+          "properties": {
+            "unit": {"$ref": "#/$defs/co2Units"}
+          }
+        }
+      ]
+    },
+    "graphic": {
+      "type": "object",
+      "title": "Graphic",
+      "description": "A named graphic, such as a chart, plot, or diagram.",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name of the graphic."
+        },
+        "image": {
+          "title": "Graphic Image",
+          "description": "The graphic, which may be a vector or raster image. Base64 encoding shall be specified for binary images.",
+          "$ref": "#/$defs/attachment"
+        }
+      }
+    },
+    "graphicsCollection": {
+      "type": "object",
+      "title": "Graphics Collection",
+      "description": "A collection of graphics that represent various measurements.",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of this collection of graphics."
+        },
+        "collection": {
+          "type": "array",
+          "title": "Collection",
+          "description": "A collection of graphics.",
+          "items": {"$ref": "#/$defs/graphic"}
+        }
+      }
     }
   }
 }
