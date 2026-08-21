@@ -220,12 +220,18 @@
             ]
           },
           "then": {
+            "type": "object",
             "properties": {
               "nodes": {
+                "type": "array",
                 "items": {
                   "required": [
                     "ordinal"
-                  ]
+                  ],
+                  "properties": {
+                    "ordinal": true
+                  },
+                  "type": "object"
                 }
               }
             }
@@ -289,12 +295,12 @@
           "description": "For an activity node, the behavior performed, drawn from the taxonomy. Mutually exclusive with 'ref' and 'graph'."
         },
         "ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "title": "Behavior Reference",
           "description": "For an activity node, a reference to a behavior instance. Mutually exclusive with 'behavior' and 'graph'."
         },
         "graph": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "title": "Graph Reference",
           "description": "A reference to a nested behavior graph. For an activity node it is the sub-process performed and is mutually exclusive with 'behavior' and 'ref'; for a composite node it is the nested region."
         },
@@ -339,17 +345,17 @@
           }
         },
         "onEntry": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "title": "On Entry",
           "description": "For a state node, a reference to a behavior instance performed when the state is entered."
         },
         "onExit": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "title": "On Exit",
           "description": "For a state node, a reference to a behavior instance performed when the state is exited."
         },
         "doActivity": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "title": "Do Activity",
           "description": "For a state node, a reference to a behavior instance performed while the subject remains in the state."
         }
@@ -371,17 +377,29 @@
               {
                 "required": [
                   "behavior"
-                ]
+                ],
+                "properties": {
+                  "behavior": true
+                },
+                "type": "object"
               },
               {
                 "required": [
                   "ref"
-                ]
+                ],
+                "properties": {
+                  "ref": true
+                },
+                "type": "object"
               },
               {
                 "required": [
                   "graph"
-                ]
+                ],
+                "properties": {
+                  "graph": true
+                },
+                "type": "object"
               }
             ]
           }
@@ -412,12 +430,12 @@
           "description": "A description of the transition."
         },
         "source": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "title": "Source",
           "description": "Reference to the source node."
         },
         "target": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "title": "Target",
           "description": "Reference to the target node."
         },
@@ -435,7 +453,7 @@
           "description": "Whether this transition is taken when no other guard from the same source node holds."
         },
         "effect": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "title": "Effect",
           "description": "Reference to a behavior instance performed when the transition fires."
         }

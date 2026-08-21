@@ -366,14 +366,15 @@
           "title": "Service Requirement",
           "description": "Requirement: endpoints and dataProfiles may only be used for components of type `service`.",
           "if": {
+            "type": "object",
             "properties": { "type": { "const": "service" } }
           },
           "then": true,
           "else": {
             "not": {
               "anyOf": [
-                { "required": ["endpoints"] },
-                { "required": ["dataProfiles"] }
+                { "required": ["endpoints"], "properties": { "endpoints":  true }, "type": "object"},
+                { "required": ["dataProfiles"], "properties": { "dataProfiles":  true }, "type": "object" }
               ]
             }
           }
@@ -525,8 +526,8 @@
       "title": "License Evidence",
       "description": "A detected license, together with how it was detected, the confidence in the detection, the tools and parties involved, and where it was found.",
       "oneOf": [
-        { "required": [ "license" ] },
-        { "required": [ "expression" ] }
+        { "required": [ "license" ], "properties": { "license":  true }, "type": "object" },
+        { "required": [ "expression" ], "properties": { "expression":  true }, "type": "object" }
       ],
       "additionalProperties": false,
       "properties": {
