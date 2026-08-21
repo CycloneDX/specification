@@ -97,13 +97,15 @@ const _ajvValidate = ajv.compile(bomSchema)
  * @return {null|object}
  */
 async function validateFile(file) {
+    let parsed
     try {
-        return _ajvValidate(JSON.parse(await readFile(file, 'utf-8')))
-            ? null
-            : _ajvValidate.errors
+        parsed = JSON.parse(await readFile(file, 'utf-8'))
     } catch (err) {
-        throw new Error(`Error: failed parsing file file://${file}`, {cause: err})
+        throw new Error(`Failed parsing JSON file://${file}`, {cause: err})
     }
+    return _ajvValidate(parsed)
+        ? null
+        : _ajvValidate.errors
 }
 
 // endregion validator
