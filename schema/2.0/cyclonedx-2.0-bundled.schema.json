@@ -8,7 +8,6 @@
     "specFormat",
     "specVersion"
   ],
-  "additionalProperties": false,
   "properties": {
     "$schema": {
       "type": "string"
@@ -112,6 +111,7 @@
       "$ref": "#/$defs/cyclonedx-common-2.0/$defs/extensibleProperties"
     }
   ],
+  "unevaluatedProperties": false,
   "$defs": {
     "cyclonedx-ai-modelcard-2.0": {
       "type": "null",
@@ -505,7 +505,6 @@
               "description": "A description of the energy provider."
             },
             "organization": {
-              "type": "object",
               "title": "Organization",
               "description": "The organization that provides energy.",
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/organizationalEntity"
@@ -737,17 +736,26 @@
                 {
                   "required": [
                     "organization"
-                  ]
+                  ],
+                  "properties": {
+                    "organization": true
+                  }
                 },
                 {
                   "required": [
                     "individual"
-                  ]
+                  ],
+                  "properties": {
+                    "individual": true
+                  }
                 },
                 {
                   "required": [
                     "component"
-                  ]
+                  ],
+                  "properties": {
+                    "component": true
+                  }
                 }
               ],
               "additionalProperties": false,
@@ -1008,10 +1016,17 @@
               "then": {
                 "properties": {
                   "nodes": {
+                    "type": "array",
                     "items": {
                       "required": [
                         "ordinal"
-                      ]
+                      ],
+                      "properties": {
+                        "ordinal": true
+                      },
+                      "additionalProperties": true,
+                      "$comment": "additionalProperties explicitly allowed - this is just a minimal constraint",
+                      "type": "object"
                     }
                   }
                 }
@@ -1075,12 +1090,12 @@
               "description": "For an activity node, the behavior performed, drawn from the taxonomy. Mutually exclusive with 'ref' and 'graph'."
             },
             "ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Behavior Reference",
               "description": "For an activity node, a reference to a behavior instance. Mutually exclusive with 'behavior' and 'graph'."
             },
             "graph": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Graph Reference",
               "description": "A reference to a nested behavior graph. For an activity node it is the sub-process performed and is mutually exclusive with 'behavior' and 'ref'; for a composite node it is the nested region."
             },
@@ -1125,17 +1140,17 @@
               }
             },
             "onEntry": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "On Entry",
               "description": "For a state node, a reference to a behavior instance performed when the state is entered."
             },
             "onExit": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "On Exit",
               "description": "For a state node, a reference to a behavior instance performed when the state is exited."
             },
             "doActivity": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Do Activity",
               "description": "For a state node, a reference to a behavior instance performed while the subject remains in the state."
             }
@@ -1157,17 +1172,26 @@
                   {
                     "required": [
                       "behavior"
-                    ]
+                    ],
+                    "properties": {
+                      "behavior": true
+                    }
                   },
                   {
                     "required": [
                       "ref"
-                    ]
+                    ],
+                    "properties": {
+                      "ref": true
+                    }
                   },
                   {
                     "required": [
                       "graph"
-                    ]
+                    ],
+                    "properties": {
+                      "graph": true
+                    }
                   }
                 ]
               }
@@ -1198,12 +1222,12 @@
               "description": "A description of the transition."
             },
             "source": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Source",
               "description": "Reference to the source node."
             },
             "target": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Target",
               "description": "Reference to the target node."
             },
@@ -1221,7 +1245,7 @@
               "description": "Whether this transition is taken when no other guard from the same source node holds."
             },
             "effect": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Effect",
               "description": "Reference to a behavior instance performed when the transition fires."
             }
@@ -1381,6 +1405,7 @@
               "uniqueItems": true,
               "items": {
                 "type": "object",
+                "additionalProperties": false,
                 "properties": {
                   "ref": {
                     "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
@@ -1814,7 +1839,11 @@
               "required": [
                 "bom-ref",
                 "componentRef"
-              ]
+              ],
+              "properties": {
+                "bom-ref": true,
+                "componentRef": true
+              }
             },
             {
               "title": "Party Reference Asset",
@@ -1822,7 +1851,11 @@
               "required": [
                 "bom-ref",
                 "partyRef"
-              ]
+              ],
+              "properties": {
+                "bom-ref": true,
+                "partyRef": true
+              }
             },
             {
               "title": "Inline Asset",
@@ -1831,7 +1864,12 @@
                 "bom-ref",
                 "type",
                 "name"
-              ]
+              ],
+              "properties": {
+                "bom-ref": true,
+                "type": true,
+                "name": true
+              }
             }
           ]
         },
@@ -2529,47 +2567,74 @@
             {
               "required": [
                 "aggregates"
-              ]
+              ],
+              "properties": {
+                "aggregates": true
+              }
             },
             {
               "required": [
                 "associates"
-              ]
+              ],
+              "properties": {
+                "associates": true
+              }
             },
             {
               "required": [
                 "composes"
-              ]
+              ],
+              "properties": {
+                "composes": true
+              }
             },
             {
               "required": [
                 "contains"
-              ]
+              ],
+              "properties": {
+                "contains": true
+              }
             },
             {
               "required": [
                 "dependsOn"
-              ]
+              ],
+              "properties": {
+                "dependsOn": true
+              }
             },
             {
               "required": [
                 "generalizes"
-              ]
+              ],
+              "properties": {
+                "generalizes": true
+              }
             },
             {
               "required": [
                 "realizes"
-              ]
+              ],
+              "properties": {
+                "realizes": true
+              }
             },
             {
               "required": [
                 "serves"
-              ]
+              ],
+              "properties": {
+                "serves": true
+              }
             },
             {
               "required": [
                 "custom"
-              ]
+              ],
+              "properties": {
+                "custom": true
+              }
             }
           ],
           "properties": {
@@ -3074,13 +3139,13 @@
           }
         },
         "visualizationType": {
-          "type": "object",
           "title": "Visualization Type",
           "description": "The type of diagram or visual representation.",
           "oneOf": [
             {
               "title": "Predefined Visualization Type",
               "description": "A visualization type selected from a predefined set of well-known diagram types.",
+              "type": "object",
               "required": [
                 "type"
               ],
@@ -3143,6 +3208,7 @@
             {
               "title": "Custom Visualization Type",
               "description": "A custom visualization type not covered by the predefined enumeration.",
+              "type": "object",
               "required": [
                 "name"
               ],
@@ -3612,11 +3678,17 @@
           ],
           "anyOf": [
             {
+              "properties": {
+                "attributedTo": true
+              },
               "required": [
                 "attributedTo"
               ]
             },
             {
+              "properties": {
+                "process": true
+              },
               "required": [
                 "process"
               ]
@@ -3624,11 +3696,17 @@
           ],
           "oneOf": [
             {
+              "properties": {
+                "pointers": true
+              },
               "required": [
                 "pointers"
               ]
             },
             {
+              "properties": {
+                "expressions": true
+              },
               "required": [
                 "expressions"
               ]
@@ -3649,7 +3727,12 @@
         },
         "refLinkType": {
           "description": "Descriptor for an element identified by the attribute 'bom-ref' in the same BOM document.\nIn contrast to `bomLinkElementType`.",
-          "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+          "allOf": [
+            {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            }
+          ],
+          "$comment": "value-range is same as 'refType'"
         },
         "bomLinkDocumentType": {
           "title": "BOM-Link Document",
@@ -4084,7 +4167,9 @@
             }
           }
         },
-        "organizationalEntityOrContact": {},
+        "organizationalEntityOrContact": {
+          "$comment": "TODO"
+        },
         "origin": {
           "type": "object",
           "title": "Origin",
@@ -4263,44 +4348,68 @@
         "extensibleProperties": {
           "type": "object",
           "title": "Extensible Properties",
+          "$comment": "This is a mixin. It intentionally does NOT restrict additional/unevaluated properties itself; schemas composing it via `allOf` are expected to close themselves with `unevaluatedProperties: false` so that both their own defined properties and these patternProperties remain usable.",
           "patternProperties": {
             "^ext:[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}:.+$": {
-              "description": "CycloneDX supports a structured and namespace-aware mechanism for extensibility through the use of extensible properties. This mechanism enables organizations, ecosystems, and tool vendors to safely introduce custom properties without conflicting with the core schema or other extensions.\n\nExtensible properties are defined as a JSON object whose keys must conform to a strict pattern that resembles a reverse domain name structure, prefixed with ext:. This pattern provides a namespacing convention that aligns with well-established practices in other structured formats (e.g., XML namespaces).",
+              "description": "CycloneDX supports a structured and namespace-aware mechanism for extensibility through the use of extensible properties. This mechanism enables organizations, ecosystems, and tool vendors to safely introduce custom properties without conflicting with the core schema or other extensions.\n\nExtensible properties are defined as a JSON object whose keys must conform to a strict pattern that resembles a reverse domain name structure, prefixed with ext:. This pattern provides a namespacing convention that aligns with well-established practices in other structured formats (e.g., XML namespaces).\n\nValues that are objects must declare the schema they conform to via `$schema`. This requirement applies recursively to objects contained in arrays, at any nesting depth.",
               "examples": [
                 "ext:<domain>:<name>",
                 "ext:example.org:myExtension"
               ],
-              "if": {
-                "type": [
-                  "object",
-                  "array"
-                ]
-              },
-              "then": {
-                "type": "object",
-                "required": [
-                  "$schema"
-                ],
-                "properties": {
-                  "$schema": {
-                    "type": "string",
-                    "format": "uri"
-                  }
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/extensibleProperties/$defs/propertyValue"
+            }
+          },
+          "$defs": {
+            "propertyObject": {
+              "type": "object",
+              "title": "Extensible Property Object",
+              "$comment": "Internal helper for extensibleProperties. Not part of the public schema API — do not reference externally; may change without notice.\n\nadditionalProperties explicitly allowed for extensibility reasons.",
+              "required": [
+                "$schema"
+              ],
+              "properties": {
+                "$schema": {
+                  "type": "string",
+                  "format": "uri"
                 }
               },
+              "additionalProperties": true
+            },
+            "propertyValue": {
+              "title": "Extensible Property Value",
+              "$comment": "Internal helper for extensibleProperties. Not part of the public schema API — do not reference externally; may change without notice.\nRecursive: objects must declare a `$schema`, arrays may nest arbitrarily deep with the same rule applied to every item, all other values are plain scalars.",
+              "if": {
+                "type": "object"
+              },
+              "then": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/extensibleProperties/$defs/propertyObject"
+              },
               "else": {
-                "type": [
-                  "string",
-                  "number",
-                  "boolean",
-                  "null"
-                ]
+                "if": {
+                  "type": "array"
+                },
+                "then": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/extensibleProperties/$defs/propertyValue"
+                  }
+                },
+                "else": {
+                  "type": [
+                    "string",
+                    "number",
+                    "boolean",
+                    "null"
+                  ]
+                }
               }
             }
           }
         },
         "baseObject": {
+          "type": "object",
           "description": "Base object for all CycloneDX entities. Automatically includes support for extensible properties.",
+          "$comment": "This is a mixin. It intentionally does NOT set `unevaluatedProperties: false` — that keyword cannot see properties defined by schemas composing this one via `allOf`, and would reject them. Concrete (leaf) schemas composing this mixin must close themselves with `unevaluatedProperties: false`.",
           "allOf": [
             {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/extensibleProperties"
@@ -4337,7 +4446,6 @@
           ]
         },
         "lifecycle": {
-          "type": "object",
           "title": "Lifecycle",
           "description": "The product lifecycle(s) that this BOM represents.",
           "oneOf": [
@@ -4345,6 +4453,7 @@
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/preDefinedLifecyclePhase"
             },
             {
+              "type": "object",
               "title": "Custom Lifecycle Phase",
               "required": [
                 "name"
@@ -4374,6 +4483,7 @@
           }
         },
         "preDefinedLifecyclePhase": {
+          "type": "object",
           "title": "Pre-Defined Phase",
           "required": [
             "phase"
@@ -4964,8 +5074,12 @@
           },
           "allOf": [
             {
-              "description": "Requirement: ensure that `version` and `versionRange` are not present simultaneously.",
+              "description": "Requirement: ensure that `version` and `versionRange` are mutually exclusive.",
               "not": {
+                "properties": {
+                  "version": true,
+                  "versionRange": true
+                },
                 "required": [
                   "version",
                   "versionRange"
@@ -5070,12 +5184,18 @@
                     {
                       "required": [
                         "endpoints"
-                      ]
+                      ],
+                      "properties": {
+                        "endpoints": true
+                      }
                     },
                     {
                       "required": [
                         "dataProfiles"
-                      ]
+                      ],
+                      "properties": {
+                        "dataProfiles": true
+                      }
                     }
                   ]
                 }
@@ -5250,12 +5370,18 @@
             {
               "required": [
                 "license"
-              ]
+              ],
+              "properties": {
+                "license": true
+              }
             },
             {
               "required": [
                 "expression"
-              ]
+              ],
+              "properties": {
+                "expression": true
+              }
             }
           ],
           "additionalProperties": false,
@@ -6510,11 +6636,11 @@
                   "title": "Certificate Lifecycle State",
                   "description": "The certificate lifecycle is a comprehensive process that manages digital certificates from their initial creation to eventual expiration or revocation. It typically involves several stages.",
                   "items": {
-                    "type": "object",
                     "title": "State",
                     "description": "The state of the certificate.",
                     "oneOf": [
                       {
+                        "type": "object",
                         "title": "Pre-Defined State",
                         "required": [
                           "state"
@@ -6550,6 +6676,7 @@
                         }
                       },
                       {
+                        "type": "object",
                         "title": "Custom State",
                         "required": [
                           "name"
@@ -6616,11 +6743,11 @@
                   "title": "Certificate Extensions",
                   "description": "A certificate extension is a field that provides additional information about the certificate or its use. Extensions are used to convey additional information beyond the standard fields.",
                   "items": {
-                    "type": "object",
                     "title": "Extension",
                     "description": "",
                     "oneOf": [
                       {
+                        "type": "object",
                         "title": "Common Extensions",
                         "required": [
                           "commonExtensionName",
@@ -6665,6 +6792,7 @@
                         }
                       },
                       {
+                        "type": "object",
                         "title": "Custom Extensions",
                         "description": "Custom extensions may convey application-specific or vendor-specific data not covered by standard extensions. The structure and semantics of custom extensions are typically defined outside of public standards. CycloneDX leverages properties to support this capability.",
                         "required": [
@@ -6980,7 +7108,7 @@
               "title": "Related Algorithms",
               "description": "A list of algorithms related to the cipher suite.",
               "items": {
-                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
                 "title": "Algorithm reference",
                 "description": "The bom-ref to algorithm cryptographic asset."
               }
@@ -7050,7 +7178,7 @@
               "description": "The key length of the encryption algorithm."
             },
             "algorithm": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Algorithm reference",
               "description": "The bom-ref to algorithm cryptographic asset."
             }
@@ -7071,7 +7199,7 @@
               ]
             },
             "algorithm": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Algorithm reference",
               "description": "The bom-ref to algorithm cryptographic asset."
             }
@@ -7092,7 +7220,7 @@
               ]
             },
             "algorithm": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Algorithm reference",
               "description": "The bom-ref to algorithm cryptographic asset."
             }
@@ -7110,7 +7238,7 @@
               "description": "A group identifier for the key exchange algorithm."
             },
             "algorithm": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Algorithm reference",
               "description": "The bom-ref to algorithm cryptographic asset."
             }
@@ -7128,7 +7256,7 @@
               "description": "A name for the authentication method."
             },
             "algorithm": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Algorithm reference",
               "description": "The bom-ref to algorithm cryptographic asset."
             }
@@ -7251,18 +7379,18 @@
               ]
             },
             "ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Reference to cryptographic asset",
               "description": "The bom-ref to cryptographic asset."
             }
           }
         },
         "fingerprint": {
-          "type": "object",
           "title": "Fingerprint",
           "description": "The fingerprint is a cryptographic hash of the asset.",
           "oneOf": [
             {
+              "type": "object",
               "title": "Standard Hash",
               "description": "A fingerprint computed using a standard, well-known hash algorithm.",
               "required": [
@@ -7280,6 +7408,7 @@
               }
             },
             {
+              "type": "object",
               "title": "Custom Fingerprint",
               "description": "A fingerprint computed with a custom or non-standard algorithm not covered by the standard hash algorithms.",
               "required": [
@@ -7325,7 +7454,7 @@
               "title": "References",
               "description": "The bom-refs to the assets securing this asset (e.g., algorithms, hardware, keys).",
               "items": {
-                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               }
             }
           }
@@ -7858,17 +7987,27 @@
               "required": [
                 "name",
                 "type"
-              ]
+              ],
+              "properties": {
+                "name": true,
+                "type": true
+              }
             },
             {
               "required": [
                 "party"
-              ]
+              ],
+              "properties": {
+                "party": true
+              }
             },
             {
               "required": [
                 "ref"
-              ]
+              ],
+              "properties": {
+                "ref": true
+              }
             }
           ],
           "examples": [
@@ -8573,11 +8712,18 @@
                     "additionalProperties": false,
                     "oneOf": [
                       {
+                        "properties": {
+                          "signatures": true
+                        },
                         "required": [
-                          "signature"
+                          "signatures"
                         ]
                       },
                       {
+                        "properties": {
+                          "externalReference": true,
+                          "organization": true
+                        },
                         "required": [
                           "externalReference",
                           "organization"
@@ -8977,6 +9123,9 @@
               "$ref": "#/$defs/cyclonedx-evidence-2.0/$defs/analysisMethod"
             },
             {
+              "type": "object",
+              "additionalProperties": true,
+              "$comment": "additionalProperties explicitly allowed - it is controlled by the other `allOf`",
               "properties": {
                 "technique": {
                   "not": {
@@ -9006,6 +9155,9 @@
               "$ref": "#/$defs/cyclonedx-evidence-2.0/$defs/analysisMethod"
             },
             {
+              "type": "object",
+              "additionalProperties": true,
+              "$comment": "additionalProperties explicitly allowed - it is controlled by the other `allOf`",
               "properties": {
                 "technique": {
                   "not": {
@@ -9925,21 +10077,33 @@
           "type": "object",
           "oneOf": [
             {
+              "properties": {
+                "resource": true
+              },
               "required": [
                 "resource"
               ]
             },
             {
+              "properties": {
+                "parameters": true
+              },
               "required": [
                 "parameters"
               ]
             },
             {
+              "properties": {
+                "environmentVars": true
+              },
               "required": [
                 "environmentVars"
               ]
             },
             {
+              "properties": {
+                "data": true
+              },
               "required": [
                 "data"
               ]
@@ -10015,16 +10179,25 @@
           "type": "object",
           "oneOf": [
             {
+              "properties": {
+                "resource": true
+              },
               "required": [
                 "resource"
               ]
             },
             {
+              "properties": {
+                "environmentVars": true
+              },
               "required": [
                 "environmentVars"
               ]
             },
             {
+              "properties": {
+                "data": true
+              },
               "required": [
                 "data"
               ]
@@ -10125,11 +10298,17 @@
           },
           "oneOf": [
             {
+              "properties": {
+                "ref": true
+              },
               "required": [
                 "ref"
               ]
             },
             {
+              "properties": {
+                "externalReference": true
+              },
               "required": [
                 "externalReference"
               ]
@@ -10228,7 +10407,20 @@
             "2023-10-29T13:56:08Z",
             "2023-10-29T13:56:08.000Z",
             "2023-11-15T08:30:00.123Z"
-          ]
+          ],
+          "$defs": {
+            "withMilliseconds": {
+              "$comment": "Internal helper for timestamp. Not part of the public schema API — do not reference externally; may change without notice.",
+              "title": "Timestamp with Milliseconds",
+              "description": "An RFC 3339 timestamp in the UTC+0 time zone. Must use the 'Z' suffix. Sub-second precision MUST be exactly three digits (millisecond precision). Matches the pattern: yyyy-mm-ddThh:mm:ss.sssZ",
+              "type": "string",
+              "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9][0-9][0-9]Z$",
+              "examples": [
+                "2023-10-29T13:56:08.000Z",
+                "2023-11-15T08:30:00.123Z"
+              ]
+            }
+          }
         },
         "identifier": {
           "title": "Identifier",
@@ -10410,18 +10602,16 @@
               "type": "string"
             },
             "created": {
-              "$ref": "#/$defs/cyclonedx-jss_X590_2023_10-2.0/$defs/timestamp",
+              "$ref": "#/$defs/cyclonedx-jss_X590_2023_10-2.0/$defs/timestamp/$defs/withMilliseconds",
               "title": "Created Timestamp",
               "description": "The time at which this signature was originally created. The creator can use any time it deems most appropriate as the time the signature was created, but it MUST be precise to the nearest millisecond (exactly three digits after the decimal place in seconds). The created property MUST NOT be changed when creating a new version of the signature.",
-              "$comment": "Normative source: ITU-T X.590 clause 6.3.1",
-              "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"
+              "$comment": "Normative source: ITU-T X.590 clause 6.3.1"
             },
             "modified": {
-              "$ref": "#/$defs/cyclonedx-jss_X590_2023_10-2.0/$defs/timestamp",
+              "$ref": "#/$defs/cyclonedx-jss_X590_2023_10-2.0/$defs/timestamp/$defs/withMilliseconds",
               "title": "Modified Timestamp",
               "description": "The time that this particular version of the signature was last modified. The creator can use any time it deems most appropriate as the time that this version of the signature was modified, but it MUST be precise to the nearest millisecond (exactly three digits after the decimal place in seconds). The modified property MUST be later than or equal to the value of the created property. If the created and modified properties are the same, then this is the first version of the signature.",
-              "$comment": "Normative source: ITU-T X.590 clause 6.3.1. Cross-field invariant: 'modified' MUST be greater than or equal to 'created'. JSON Schema 2020-12 cannot compare two sibling property values, so this constraint is NOT enforced by this schema and MUST be validated by the consuming tool or conformance suite.",
-              "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"
+              "$comment": "Normative source: ITU-T X.590 clause 6.3.1. Cross-field invariant: 'modified' MUST be greater than or equal to 'created'. JSON Schema 2020-12 cannot compare two sibling property values, so this constraint is NOT enforced by this schema and MUST be validated by the consuming tool or conformance suite."
             },
             "revoked": {
               "title": "Revoked Flag",
@@ -10456,24 +10646,36 @@
           ],
           "anyOf": [
             {
+              "properties": {
+                "public_key": true
+              },
               "required": [
                 "public_key"
               ],
               "description": "Public key material provided as PEM-encoded public key (header/footer stripped)."
             },
             {
+              "properties": {
+                "public_cert_chain": true
+              },
               "required": [
                 "public_cert_chain"
               ],
               "description": "Public key material provided as a base64-encoded DER X.509 certificate chain."
             },
             {
+              "properties": {
+                "cert_url": true
+              },
               "required": [
                 "cert_url"
               ],
               "description": "Public key material provided by reference to a TLS-accessible certificate URI."
             },
             {
+              "properties": {
+                "thumbprint": true
+              },
               "required": [
                 "thumbprint"
               ],
@@ -10604,11 +10806,17 @@
           "description": "Specifies the details and attributes related to a software license. It can either include a valid SPDX license identifier or a named license, along with additional properties such as license acknowledgment, comprehensive commercial licensing information, and the full text of the license.",
           "oneOf": [
             {
+              "properties": {
+                "id": true
+              },
               "required": [
                 "id"
               ]
             },
             {
+              "properties": {
+                "name": true
+              },
               "required": [
                 "name"
               ]
@@ -10708,11 +10916,17 @@
               },
               "oneOf": [
                 {
+                  "properties": {
+                    "organization": true
+                  },
                   "required": [
                     "organization"
                   ]
                 },
                 {
+                  "properties": {
+                    "individual": true
+                  },
                   "required": [
                     "individual"
                   ]
@@ -10738,11 +10952,17 @@
               },
               "oneOf": [
                 {
+                  "properties": {
+                    "organization": true
+                  },
                   "required": [
                     "organization"
                   ]
                 },
                 {
+                  "properties": {
+                    "individual": true
+                  },
                   "required": [
                     "individual"
                   ]
@@ -10768,11 +10988,17 @@
               },
               "oneOf": [
                 {
+                  "properties": {
+                    "organization": true
+                  },
                   "required": [
                     "organization"
                   ]
                 },
                 {
+                  "properties": {
+                    "individual": true
+                  },
                   "required": [
                     "individual"
                   ]
@@ -10914,6 +11140,7 @@
           "title": "Distribution Constraints",
           "description": "Conditions and constraints governing the sharing and distribution of the data or components described by this BOM.",
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "tlp": {
               "$ref": "#/$defs/cyclonedx-metadata-2.0/$defs/tlpClassification",
@@ -11004,21 +11231,33 @@
           },
           "oneOf": [
             {
+              "properties": {
+                "organization": true
+              },
               "required": [
                 "organization"
               ]
             },
             {
+              "properties": {
+                "person": true
+              },
               "required": [
                 "person"
               ]
             },
             {
+              "properties": {
+                "system": true
+              },
               "required": [
                 "system"
               ]
             },
             {
+              "properties": {
+                "persona": true
+              },
               "required": [
                 "persona"
               ]
@@ -12263,7 +12502,7 @@
                 "title": "Patent References",
                 "description": "A list of BOM references (`bom-ref`) linking to patents or patent families associated with this assertion.",
                 "items": {
-                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
                 }
               },
               "asserter": {
@@ -12997,12 +13236,18 @@
                 {
                   "required": [
                     "min"
-                  ]
+                  ],
+                  "properties": {
+                    "min": true
+                  }
                 },
                 {
                   "required": [
                     "max"
-                  ]
+                  ],
+                  "properties": {
+                    "max": true
+                  }
                 }
               ],
               "additionalProperties": false,
@@ -17161,6 +17406,7 @@
               "type": "object",
               "title": "Proof of Concept",
               "description": "Evidence used to reproduce the vulnerability.",
+              "additionalProperties": false,
               "properties": {
                 "reproductionSteps": {
                   "type": "string",
@@ -17354,11 +17600,17 @@
                       "type": "object",
                       "oneOf": [
                         {
+                          "properties": {
+                            "version": true
+                          },
                           "required": [
                             "version"
                           ]
                         },
                         {
+                          "properties": {
+                            "range": true
+                          },
                           "required": [
                             "range"
                           ]
@@ -17739,6 +17991,7 @@
                 ],
                 "properties": {
                   "methods": {
+                    "type": "array",
                     "minItems": 1,
                     "contains": {
                       "required": [
@@ -17762,7 +18015,10 @@
                             ]
                           }
                         }
-                      }
+                      },
+                      "additionalProperties": true,
+                      "$comment": "additionalProperties explicitly allowed - this is just a minimal constraint",
+                      "type": "object"
                     }
                   }
                 }
@@ -17891,7 +18147,6 @@
         "specFormat",
         "specVersion"
       ],
-      "additionalProperties": false,
       "properties": {
         "$schema": {
           "type": "string"
@@ -17994,7 +18249,8 @@
         {
           "$ref": "#/$defs/cyclonedx-common-2.0/$defs/extensibleProperties"
         }
-      ]
+      ],
+      "unevaluatedProperties": false
     }
   }
 }
