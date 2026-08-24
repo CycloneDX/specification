@@ -166,8 +166,7 @@ const _RefBestPracticeAllowedSiblings = Object.freeze(new Set([
 ]))
 
 /**
- * `$ref` must follow JSON schema best-practice,
- * based on {@link _RefBestPracticeAllowedSiblings}
+ * `$ref` must follow JSON schema best-practice.
  * @param {*} schema
  * @param {string} schemaFile
  * @return {number} number of errors found
