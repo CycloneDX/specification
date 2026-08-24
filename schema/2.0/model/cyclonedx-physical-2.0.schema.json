@@ -1,0 +1,324 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-physical-2.0.schema.json",
+  "type": "null",
+  "title": "CycloneDX Physical Model",
+  "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
+  "$defs": {
+    "classification": {
+      "type": "object",
+      "title": "Classification",
+      "description": "Hierarchical classification of a physical item. The `category` and `subcategory` form a free-text hierarchy; the `codes` array carries scheme-bound classification codes drawn from external taxonomies.",
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Category",
+          "description": "High-level category, such as `semiconductor`, `passive`, `connector`, `electromechanical`, or `optoelectronic`."
+        },
+        "subcategory": {
+          "type": "string",
+          "title": "Subcategory",
+          "description": "More specific classification within the category, such as `microcontroller`, `voltage-regulator`, or `ceramic-resonator`."
+        },
+        "codes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/taxonomyCode" },
+          "title": "Codes",
+          "description": "Scheme-bound classification codes from external taxonomies."
+        }
+      }
+    },
+
+    "taxonomyCode": {
+      "type": "object",
+      "title": "Taxonomy Code",
+      "description": "A classification code assigned by an external taxonomy.",
+      "required": [ "standard", "value" ],
+      "additionalProperties": false,
+      "properties": {
+        "standard": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Standard",
+          "description": "The taxonomy or coding standard that issued the code.",
+          "examples": [ "NAICS", "HS", "UNSPSC", "JEDEC", "PNNL", "ECCN" ]
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Value",
+          "description": "The code value as defined by the standard."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "Human-readable description of the code."
+        },
+        "url": {
+          "type": "string",
+          "format": "iri-reference",
+          "title": "URL",
+          "description": "URL of the code definition or the publishing authority."
+        }
+      }
+    },
+
+    "boardLocation": {
+      "type": "object",
+      "title": "Board Location",
+      "description": "Placement of an item on a printed circuit board, panel, or assembly. A single item record may cover multiple physical placements when the items are functionally identical, in which case all reference designators are listed.",
+      "additionalProperties": false,
+      "required": [ "designators" ],
+      "properties": {
+        "designators": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true,
+          "minItems": 1,
+          "title": "Designators",
+          "description": "Reference designators identifying the placement on the assembly, such as U5, R12, C3.",
+          "examples": [ [ "U5" ], [ "C3", "C4", "C9", "C11", "C14", "C15" ] ]
+        },
+        "layer": {
+          "type": "string",
+          "title": "Layer",
+          "description": "Board layer on which the item is mounted."
+        },
+        "subsystem": {
+          "type": "string",
+          "title": "Subsystem",
+          "description": "Functional subsystem on the board with which the item is associated.",
+          "examples": [ "power-input", "usb-interface", "main-mcu" ]
+        }
+      }
+    },
+
+    "deviceType": {
+      "title": "Device Type",
+      "description": "Package or mounting style of the physical item. Either a predefined device type or a custom device type.",
+      "oneOf": [
+        {
+          "title": "Predefined Device Type",
+          "$ref": "#/$defs/preDefinedDeviceType"
+        },
+        {
+          "title": "Custom Device Type",
+          "$ref": "#/$defs/customDeviceType"
+        }
+      ]
+    },
+
+    "preDefinedDeviceType": {
+      "type": "string",
+      "title": "Predefined Device Type",
+      "description": "Package or mounting style of the physical item, drawn from the predefined set.",
+      "enum": [
+        "smd",
+        "pth",
+        "dip",
+        "sip",
+        "qfn",
+        "qfp",
+        "bga",
+        "csp",
+        "sot",
+        "to",
+        "wlcsp",
+        "module",
+        "die",
+        "discrete"
+      ],
+      "meta:enum": {
+        "smd":      "Generic surface-mount device, package shape not otherwise specified.",
+        "pth":      "Plated through-hole, leaded part inserted into the board.",
+        "dip":      "Dual in-line package, through-hole.",
+        "sip":      "Single in-line package, through-hole.",
+        "qfn":      "Quad flat no-leads, surface-mount.",
+        "qfp":      "Quad flat package with leads, surface-mount.",
+        "bga":      "Ball grid array, surface-mount.",
+        "csp":      "Chip-scale package, surface-mount.",
+        "sot":      "Small-outline transistor package, surface-mount.",
+        "to":       "Transistor outline package, through-hole or surface-mount variants.",
+        "wlcsp":    "Wafer-level chip-scale package.",
+        "module":   "Pre-assembled module containing multiple devices.",
+        "die":      "Bare semiconductor die, unpackaged.",
+        "discrete": "Discrete component without a standardized integrated-circuit package."
+      }
+    },
+
+    "customDeviceType": {
+      "type": "object",
+      "title": "Custom Device Type",
+      "description": "A device type that is not present in the predefined set.",
+      "required": [ "name" ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Name",
+          "description": "The name of the custom device type.",
+          "examples": [ "lga", "pga", "cob" ]
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "Description of the custom device type."
+        }
+      }
+    },
+
+    "materialForm": {
+      "title": "Material Form",
+      "description": "Physical form in which the material is supplied. Either a predefined material form or a custom material form.",
+      "anyOf": [
+        {
+          "title": "Predefined Material Form",
+          "$ref": "#/$defs/preDefinedMaterialForm"
+        },
+        {
+          "title": "Custom Material Form",
+          "$ref": "#/$defs/customMaterialForm"
+        }
+      ]
+    },
+
+    "preDefinedMaterialForm": {
+      "type": "string",
+      "title": "Predefined Material Form",
+      "description": "Physical form in which the material is supplied, drawn from the predefined set.",
+      "enum": [
+        "powder",
+        "ingot",
+        "billet",
+        "bar",
+        "rod",
+        "wire",
+        "sheet",
+        "foil",
+        "plate",
+        "tube",
+        "pellet",
+        "flake",
+        "sponge",
+        "liquid",
+        "gas"
+      ],
+      "meta:enum": {
+        "powder":  "Finely divided particulate form.",
+        "ingot":   "Cast mass intended for further processing, such as rolling or remelting.",
+        "billet":  "Semi-finished cast or wrought form intended for extrusion, forging, or rolling.",
+        "bar":     "Solid elongated form of uniform cross-section.",
+        "rod":     "Solid elongated form of round cross-section, typically smaller than a bar.",
+        "wire":    "Drawn form of small round cross-section, supplied in coils or on spools.",
+        "sheet":   "Flat rolled form of uniform thickness, thinner than plate.",
+        "foil":    "Very thin flat rolled form, thinner than sheet.",
+        "plate":   "Flat rolled form of uniform thickness, thicker than sheet.",
+        "tube":    "Hollow elongated form of uniform cross-section.",
+        "pellet":  "Small agglomerated or compacted body of regular shape.",
+        "flake":   "Thin irregular particulate form.",
+        "sponge":  "Porous granular form produced by reduction processes, such as titanium sponge.",
+        "liquid":  "Liquid form, including melts, solutions, and suspensions.",
+        "gas":     "Gaseous form, including compressed and liquefied gases."
+      }
+    },
+
+    "customMaterialForm": {
+      "type": "object",
+      "title": "Custom Material Form",
+      "description": "A material form that is not present in the predefined set.",
+      "required": [ "name" ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Name",
+          "description": "The name of the custom material form.",
+          "examples": [ "slab", "coil", "briquette" ]
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "Description of the custom material form."
+        }
+      }
+    },
+
+    "leadTime": {
+      "type": "object",
+      "title": "Lead Time",
+      "description": "Supplier lead time for procuring the item.",
+      "required": [ "value", "unit" ],
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "type": "number",
+          "minimum": 0,
+          "title": "Value",
+          "description": "Typical lead time as a numeric value in the specified unit."
+        },
+        "unit": {
+          "type": "string",
+          "enum": [ "days", "weeks", "months" ],
+          "title": "Unit"
+        },
+        "range": {
+          "type": "object",
+          "title": "Range",
+          "description": "Observed range of lead times, useful when supply is volatile.",
+          "anyOf": [
+            { "required": ["min"], "properties": { "min":  true } },
+            { "required": ["max"], "properties": { "max":  true } }
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "min": {
+              "type": "number",
+              "minimum": 0,
+              "title": "Minimum"
+            },
+            "max": {
+              "type": "number",
+              "minimum": 0,
+              "title": "Maximum"
+            }
+          }
+        },
+        "observedDate": {
+          "type": "string",
+          "format": "date",
+          "title": "Observed Date",
+          "description": "Date on which the lead time was observed or quoted."
+        }
+      }
+    },
+
+    "quantity": {
+      "type": "object",
+      "title": "Quantity",
+      "description": "The quantity of the item in the context in which it is declared, such as the number of identical parts within the enclosing assembly or the amount of material in the described lot. When board reference designators are present, the quantity should agree with the number of designators.",
+      "required": [ "value" ],
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "type": "number",
+          "minimum": 0,
+          "title": "Value",
+          "description": "The numeric quantity. Discrete items are counted; bulk materials are measured in the specified unit.",
+          "examples": [ 6, 2.5 ]
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Unit",
+          "description": "The unit of measure, expressed as an SI symbol or a UN/ECE Recommendation 20 code. When omitted, the value is a count of discrete items.",
+          "examples": [ "kg", "g", "m", "L" ]
+        }
+      }
+    }
+  }
+}
