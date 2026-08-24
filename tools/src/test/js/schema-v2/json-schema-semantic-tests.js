@@ -202,7 +202,7 @@ function testRefBestPractice(schema, schemaFile) {
                 if (resolved === schemaFile) {
                     ++errCnt
                     const fragment = hashPos === -1
-                        ? '#'
+                        ? ref
                         : ref.slice(hashPos)
                     _printError(
                         ref, fragment,
