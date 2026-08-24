@@ -98,7 +98,7 @@ function* _findNodes(node, matcher, path = '$') {
  * @private
  */
 const _findRefs = (schema) => _findNodes(schema,
-    n => typeof n['$ref'] === 'string')
+    n => '$ref' in n)
 
 /**
  * @function
@@ -154,32 +154,70 @@ function _printError(actual, expected, msg, schemaFile, schemaPath) {
 
 // region tests
 
+const _RefBestPracticeAllowedSiblings = Object.freeze(new Set([
+    '$ref', // the $ref itself
+    '$comment', 'title', 'description', 'examples', // documentational
+    /* do NOT add any non-documentationals
+       instead, use:
+       { "allOf": { "$ref": ... }, "$id" ..., "$anchor": ... }
+       { "allOf": { "$ref": ... }, "default" ... }
+       instead of additionalProperties -- { "allOf": { "$ref": ... }, "unevaluatedItems" ... }
+     */
+]))
+
 /**
- * `$ref` must not reference its own file by name/path;
- * self-references must use the plain `#...` fragment form.
+ * `$ref` must follow JSON schema best-practice.
  * @param {*} schema
  * @param {string} schemaFile
  * @return {number} number of errors found
  */
-function testNoSelfRefByFile(schema, schemaFile) {
+function testRefBestPractice(schema, schemaFile) {
     let errCnt = 0
     for (const [path, node] of _findRefs(schema)) {
         const ref = node['$ref']
-        const hashPos = ref.indexOf('#')
-        const filePart = hashPos === -1
-            ? ref
-            : ref.slice(0, hashPos)
-        if (filePart === '') continue;
-        const resolved = join(dirname(schemaFile), filePart)
-        if (resolved === schemaFile) {
+
+        if (typeof ref !== 'string') {
             ++errCnt
-            const fragment = hashPos === -1
-                ? '#'
-                : ref.slice(hashPos)
             _printError(
-                ref, fragment,
-                'self-$ref must start with "#"',
-                schemaFile, path)
+                ref, 'a string',
+                'unexpected type of $ref',
+                schemaFile, `${path}.$ref`)
+            continue
+        }
+
+        if (ref.startsWith('/')) {
+            ++errCnt
+            _printError(
+                ref, 'a string',
+                'absolute $ref',
+                schemaFile, `${path}.$ref`)
+        } else {
+            const hashPos = ref.indexOf('#')
+            const filePart = hashPos === -1
+                ? ref
+                : ref.slice(0, hashPos)
+            if (filePart !== '') {
+                const resolved = join(dirname(schemaFile), filePart)
+                if (resolved === schemaFile) {
+                    ++errCnt
+                    const fragment = hashPos === -1
+                        ? '#'
+                        : ref.slice(hashPos)
+                    _printError(
+                        ref, fragment,
+                        'same-file $ref must start with "#"',
+                        schemaFile, path)
+                }
+            }
+        }
+
+        const otherKeys = new Set(Object.keys(node))
+        for (const key of otherKeys.difference(_RefBestPracticeAllowedSiblings)) {
+            ++errCnt
+            _printError(
+                'present', 'absent',
+                'unexpected key along with $ref',
+                schemaFile, `${path}.${key}`)
         }
     }
     return errCnt
@@ -337,7 +375,7 @@ function testMetaEnum(schema, schemaFile) {
 
 /** @type {Readonly<Record<string, function(*, string): number>>} */
 const tests = Object.freeze({
-    'no self-$ref by file': testNoSelfRefByFile,
+    '$ref best practice': testRefBestPractice,
     'refType usage (`bom-ref` <-> refType)': testRefTypeUsage,
     'additionalProperties is `false`': testAdditionalProperties,
     'meta:enum completeness': testMetaEnum,
