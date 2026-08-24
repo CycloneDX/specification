@@ -50,27 +50,31 @@
         "annotator": {
           "type": "object",
           "title": "Annotator",
-          "description": "The organization, person, component, or service which created the textual content of the annotation.",
+          "description": "The organization, person, or component which created the textual content of the annotation.",
           "oneOf": [
             {
               "required": [
                 "organization"
-              ]
+              ],
+              "properties": {
+                "organization": true
+              }
             },
             {
               "required": [
                 "individual"
-              ]
+              ],
+              "properties": {
+                "individual": true
+              }
             },
             {
               "required": [
                 "component"
-              ]
-            },
-            {
-              "required": [
-                "service"
-              ]
+              ],
+              "properties": {
+                "component": true
+              }
             }
           ],
           "additionalProperties": false,
@@ -86,10 +90,6 @@
             "component": {
               "description": "The tool or component that created the annotation",
               "$ref": "cyclonedx-component-2.0.schema.json#/$defs/component"
-            },
-            "service": {
-              "description": "The service that created the annotation",
-              "$ref": "cyclonedx-service-2.0.schema.json#/$defs/service"
             }
           }
         },
@@ -104,10 +104,8 @@
           "title": "Text",
           "description": "The textual content of the annotation."
         },
-        "signature": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/signature",
-          "title": "Signature",
-          "description": "Enveloped signature in [JSON Signature Format (JSF)](https://cyberphone.github.io/doc/security/jsf.html)."
+        "signatures": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/signatures"
         }
       }
     }
