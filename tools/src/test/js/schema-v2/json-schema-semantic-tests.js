@@ -194,14 +194,14 @@ function testRefBestPractice(schema, schemaFile) {
         } else {
             const hashPos = ref.indexOf('#')
             const filePart = hashPos === -1
-                ? ''
+                ? ref
                 : ref.slice(0, hashPos)
             if (filePart !== '') {
                 const resolved = join(dirname(schemaFile), filePart)
                 if (resolved === schemaFile) {
                     ++errCnt
                     const fragment = hashPos === -1
-                        ? ref
+                        ? '#'
                         : ref.slice(hashPos)
                     _printError(
                         ref, fragment,
