@@ -153,6 +153,7 @@
           "uniqueItems": true,
           "items": {
             "type": "object",
+            "additionalProperties": false,
             "properties": {
               "ref": {
                 "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
@@ -586,7 +587,11 @@
           "required": [
             "bom-ref",
             "componentRef"
-          ]
+          ],
+          "properties": {
+            "bom-ref":  true,
+            "componentRef": true
+          }
         },
         {
           "title": "Party Reference Asset",
@@ -594,7 +599,11 @@
           "required": [
             "bom-ref",
             "partyRef"
-          ]
+          ],
+          "properties": {
+            "bom-ref":  true,
+            "partyRef": true
+          }
         },
         {
           "title": "Inline Asset",
@@ -603,7 +612,12 @@
             "bom-ref",
             "type",
             "name"
-          ]
+          ],
+          "properties": {
+            "bom-ref":  true,
+            "type":  true,
+            "name": true
+          }
         }
       ]
     },
@@ -1298,51 +1312,15 @@
         "ref"
       ],
       "oneOf": [
-        {
-          "required": [
-            "aggregates"
-          ]
-        },
-        {
-          "required": [
-            "associates"
-          ]
-        },
-        {
-          "required": [
-            "composes"
-          ]
-        },
-        {
-          "required": [
-            "contains"
-          ]
-        },
-        {
-          "required": [
-            "dependsOn"
-          ]
-        },
-        {
-          "required": [
-            "generalizes"
-          ]
-        },
-        {
-          "required": [
-            "realizes"
-          ]
-        },
-        {
-          "required": [
-            "serves"
-          ]
-        },
-        {
-          "required": [
-            "custom"
-          ]
-        }
+        { "required": [ "aggregates" ], "properties": { "aggregates": true } },
+        { "required": [ "associates" ], "properties": { "associates": true } },
+        { "required": [ "composes" ], "properties": { "composes": true } },
+        { "required": [ "contains" ], "properties": { "contains": true } },
+        { "required": [ "dependsOn" ], "properties": { "dependsOn": true } },
+        { "required": [ "generalizes" ], "properties": { "generalizes": true } },
+        { "required": [ "realizes" ], "properties": { "realizes": true } },
+        { "required": [ "serves" ], "properties": { "serves": true } },
+        { "required": [ "custom" ], "properties": { "custom": true } }
       ],
       "properties": {
         "ref": {
@@ -1846,13 +1824,13 @@
       }
     },
     "visualizationType": {
-      "type": "object",
       "title": "Visualization Type",
       "description": "The type of diagram or visual representation.",
       "oneOf": [
         {
           "title": "Predefined Visualization Type",
           "description": "A visualization type selected from a predefined set of well-known diagram types.",
+          "type": "object",
           "required": [
             "type"
           ],
@@ -1915,6 +1893,7 @@
         {
           "title": "Custom Visualization Type",
           "description": "A custom visualization type not covered by the predefined enumeration.",
+          "type": "object",
           "required": [
             "name"
           ],

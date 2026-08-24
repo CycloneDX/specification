@@ -13,7 +13,8 @@
     },
     "refLinkType": {
       "description": "Descriptor for an element identified by the attribute 'bom-ref' in the same BOM document.\nIn contrast to `bomLinkElementType`.",
-      "$ref": "#/$defs/refType"
+      "allOf": [{ "$ref": "#/$defs/refType" }],
+      "$comment": "value-range is same as 'refType'"
     },
     "bomLinkDocumentType": {
       "title": "BOM-Link Document",
@@ -421,7 +422,7 @@
       }
     },
     "organizationalEntityOrContact": {
-
+        "$comment": "TODO"
     },
     "origin": {
       "type": "object",
@@ -580,43 +581,70 @@
     "extensibleProperties": {
       "type": "object",
       "title": "Extensible Properties",
+      "$comment": "This is a mixin. It intentionally does NOT restrict additional/unevaluated properties itself; schemas composing it via `allOf` are expected to close themselves with `unevaluatedProperties: false` so that both their own defined properties and these patternProperties remain usable.",
       "patternProperties": {
         "^ext:[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}:.+$": {
-          "description": "CycloneDX supports a structured and namespace-aware mechanism for extensibility through the use of extensible properties. This mechanism enables organizations, ecosystems, and tool vendors to safely introduce custom properties without conflicting with the core schema or other extensions.\n\nExtensible properties are defined as a JSON object whose keys must conform to a strict pattern that resembles a reverse domain name structure, prefixed with ext:. This pattern provides a namespacing convention that aligns with well-established practices in other structured formats (e.g., XML namespaces).",
+          "description": "CycloneDX supports a structured and namespace-aware mechanism for extensibility through the use of extensible properties. This mechanism enables organizations, ecosystems, and tool vendors to safely introduce custom properties without conflicting with the core schema or other extensions.\n\nExtensible properties are defined as a JSON object whose keys must conform to a strict pattern that resembles a reverse domain name structure, prefixed with ext:. This pattern provides a namespacing convention that aligns with well-established practices in other structured formats (e.g., XML namespaces).\n\nValues that are objects must declare the schema they conform to via `$schema`. This requirement applies recursively to objects contained in arrays, at any nesting depth.",
           "examples": [
             "ext:<domain>:<name>",
             "ext:example.org:myExtension"
           ],
-          "if": {
-            "type": ["object", "array"]
-          },
-          "then": {
-            "type": "object",
-            "required": ["$schema"],
-            "properties": {
-              "$schema": {
-                "type": "string",
-                "format": "uri"
-              }
+          "$ref": "#/$defs/extensibleProperties/$defs/propertyValue"
+        }
+      },
+      "$defs": {
+        "propertyObject": {
+          "type": "object",
+          "title": "Extensible Property Object",
+          "$comment": "Internal helper for extensibleProperties. Not part of the public schema API — do not reference externally; may change without notice.\n\nadditionalProperties explicitly allowed for extensibility reasons.",
+          "required": ["$schema"],
+          "properties": {
+            "$schema": {
+              "type": "string",
+              "format": "uri"
             }
           },
+          "additionalProperties": true
+        },
+        "propertyValue": {
+          "title": "Extensible Property Value",
+          "$comment": "Internal helper for extensibleProperties. Not part of the public schema API — do not reference externally; may change without notice.\nRecursive: objects must declare a `$schema`, arrays may nest arbitrarily deep with the same rule applied to every item, all other values are plain scalars.",
+          "if": {
+            "type": "object"
+          },
+          "then": {
+            "$ref": "#/$defs/extensibleProperties/$defs/propertyObject"
+          },
           "else": {
-            "type": ["string", "number", "boolean", "null"]
+            "if": {
+              "type": "array"
+            },
+            "then": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/extensibleProperties/$defs/propertyValue"
+              }
+            },
+            "else": {
+              "type": ["string", "number", "boolean", "null"]
+            }
           }
         }
       }
     },
     "baseObject": {
+      "type": "object",
       "description": "Base object for all CycloneDX entities. Automatically includes support for extensible properties.",
+      "$comment": "This is a mixin. It intentionally does NOT set `unevaluatedProperties: false` — that keyword cannot see properties defined by schemas composing this one via `allOf`, and would reject them. Concrete (leaf) schemas composing this mixin must close themselves with `unevaluatedProperties: false`.",
       "allOf": [
-        { "$ref": "cyclonedx-common-2.0.schema.json#/$defs/extensibleProperties" }
+        { "$ref": "#/$defs/extensibleProperties" }
       ],
       "properties": {
         "properties": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+          "$ref": "#/$defs/properties"
         },
         "externalReferences": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReferences"
+          "$ref": "#/$defs/externalReferences"
         }
       }
     },
@@ -642,7 +670,6 @@
       ]
     },
     "lifecycle": {
-      "type": "object",
       "title": "Lifecycle",
       "description": "The product lifecycle(s) that this BOM represents.",
       "oneOf": [
@@ -650,6 +677,7 @@
           "$ref": "#/$defs/preDefinedLifecyclePhase"
         },
         {
+          "type": "object",
           "title": "Custom Lifecycle Phase",
           "required": ["name"],
           "additionalProperties": false,
@@ -675,6 +703,7 @@
       "items": { "$ref":  "#/$defs/lifecycle"}
     },
     "preDefinedLifecyclePhase": {
+      "type": "object",
       "title": "Pre-Defined Phase",
       "required": ["phase"],
       "additionalProperties": false,
