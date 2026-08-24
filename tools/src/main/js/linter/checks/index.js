@@ -49,6 +49,5 @@ export * from './no-uppercase-rfc.check.js';
 export * from './no-must-word.check.js';
 export * from './title-formatting.check.js';
 export * from './enum-value-formatting.check.js';
-export * from './ref-usage.check.js';
 export * from './duplicate-content.check.js';
 export * from './duplicate-definitions.check.js';
