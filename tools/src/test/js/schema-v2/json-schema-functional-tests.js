@@ -58,9 +58,10 @@ console.debug('DEBUG | testdataDir = ', testdataDir);
 
 // region validator
 
-const [spdxSchema, cryptoDefsSchema, bomSchema, bomSchemaModules] = await Promise.all([
+const [spdxSchema, cryptoDefsSchema, behaviorTaxonomySchema, bomSchema, bomSchemaModules] = await Promise.all([
     readFile(join(schemaRootDir, 'spdx.schema.json'), 'utf-8').then(JSON.parse),
     readFile(join(schemaRootDir, 'cryptography-defs.schema.json'), 'utf-8').then(JSON.parse),
+    readFile(join(schemaRootDir, 'behavior-taxonomy.schema.json'), 'utf-8').then(JSON.parse),
     readFile(schemaFile, 'utf-8').then(JSON.parse),
     glob(join(schemaModelDir, schemaGlob)).then(fs => Promise.all(fs.map(
         f => readFile(f, 'utf-8').then(s => [basename(f), JSON.parse(s)])
@@ -77,6 +78,7 @@ const ajv = new Ajv2020({
 ajv.addMetaSchema(draft7MetaSchema);
 ajv.addSchema(spdxSchema, 'https://cyclonedx.org/schema/spdx.schema.json')
 ajv.addSchema(cryptoDefsSchema, 'https://cyclonedx.org/schema/cryptography-defs.schema.json')
+ajv.addSchema(behaviorTaxonomySchema, 'https://cyclonedx.org/schema/behavior-taxonomy.schema.json')
 for (const [f, s] of bomSchemaModules) {
     ajv.addSchema(s, `https://cyclonedx.org/schema/${testschemaVersion}/model/${f}`)
 }
@@ -95,7 +97,13 @@ const _ajvValidate = ajv.compile(bomSchema)
  * @return {null|object}
  */
 async function validateFile(file) {
-    return _ajvValidate(JSON.parse(await readFile(file, 'utf-8')))
+    let parsed
+    try {
+        parsed = JSON.parse(await readFile(file, 'utf-8'))
+    } catch (err) {
+        throw new Error(`Failed parsing JSON file://${file}`, {cause: err})
+    }
+    return _ajvValidate(parsed)
         ? null
         : _ajvValidate.errors
 }

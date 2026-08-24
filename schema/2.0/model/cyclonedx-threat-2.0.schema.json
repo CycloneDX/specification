@@ -1,0 +1,1476 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-threat-2.0.schema.json",
+  "type": "null",
+  "title": "CycloneDX Threat Model",
+  "$comment": "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
+  "$defs": {
+    "threats": {
+      "type": "object",
+      "title": "Threats",
+      "description": "Threat-modelling content, including the documented threats, the scenarios that realize them, the attack patterns and attack trees that describe how they are carried out, and the trust boundaries they cross.",
+      "additionalProperties": false,
+      "properties": {
+        "threats": {
+          "type": "array",
+          "title": "Threats",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/threat"
+          },
+          "description": "The documented threats. Each describes what can go wrong, independent of any specific actor or occurrence."
+        },
+        "scenarios": {
+          "type": "array",
+          "title": "Scenarios",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/threatScenario"
+          },
+          "description": "The threat scenarios, each realizing one or more documented threats in a specific way."
+        },
+        "attackPatterns": {
+          "type": "array",
+          "title": "Attack Patterns",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/attackPattern"
+          },
+          "description": "A library of attack patterns, typically aligned with CAPEC, that threats and scenarios can reference."
+        },
+        "attackTrees": {
+          "type": "array",
+          "title": "Attack Trees",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/attackTree"
+          },
+          "description": "Attack trees that decompose attacker goals into sub-goals and techniques."
+        },
+        "attackPaths": {
+          "type": "array",
+          "title": "Attack Paths",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/attackPath"
+          },
+          "description": "Attack paths that describe the ordered progression of an attack across elements and trust boundaries, including lateral movement."
+        },
+        "abuseCases": {
+          "type": "array",
+          "title": "Abuse Cases",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/abuseCase"
+          },
+          "description": "Abuse or misuse cases that describe how the system can be exercised by an adversary."
+        },
+        "trustBoundaries": {
+          "type": "array",
+          "title": "Trust Boundaries",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/trustBoundary"
+          },
+          "description": "The trust boundaries of the system, extending the architectural boundaries defined in a blueprint with trust semantics."
+        },
+        "methodologies": {
+          "type": "array",
+          "title": "Methodologies",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/methodology"
+          },
+          "description": "The threat modeling methodologies applied to produce this threat model, such as STRIDE, LINDDUN, PASTA, or attack trees."
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "methodology": {
+      "title": "Threat Modeling Methodology",
+      "description": "A threat modeling methodology applied to produce this threat model. Use the custom option for methodologies not covered by the enumeration.",
+      "oneOf": [
+        {
+          "type": "string",
+          "title": "Predefined Threat Modeling Methodology",
+          "enum": [
+            "STRIDE",
+            "LINDDUN",
+            "PASTA",
+            "MAESTRO",
+            "OWASP",
+            "TRIKE",
+            "VAST",
+            "ATFAA",
+            "attack-tree"
+          ],
+          "meta:enum": {
+            "STRIDE": "Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege.",
+            "LINDDUN": "Linkability, Identifiability, Non-repudiation, Detectability, Disclosure of information, Unawareness, Non-compliance.",
+            "PASTA": "Process for Attack Simulation and Threat Analysis.",
+            "MAESTRO": "Multi-Agent Environment, Security, Threat, Risk, and Outcome.",
+            "OWASP": "OWASP threat modelling methodology.",
+            "TRIKE": "Risk-based threat modelling methodology.",
+            "VAST": "Visual, Agile, and Simple Threat modelling.",
+            "ATFAA": "Advanced Threat Framework for Autonomous AI Agents.",
+            "attack-tree": "Attack tree methodology, decomposing attacker goals into sub-goals and techniques."
+          }
+        },
+        {
+          "type": "object",
+          "title": "Custom Threat Modeling Methodology",
+          "required": [
+            "name"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Name",
+              "description": "The name of the custom threat modeling methodology."
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the custom threat modeling methodology."
+            }
+          }
+        }
+      ]
+    },
+    "threat": {
+      "type": "object",
+      "title": "Threat",
+      "description": "A documented threat, describing what can go wrong independent of any specific actor or occurrence. A threat can be catalogued on its own; a threat scenario references it to describe a specific realization.",
+      "additionalProperties": false,
+      "required": [
+        "bom-ref",
+        "name"
+      ],
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "An identifier which can be used to reference the threat elsewhere using a bom-ref or bom-link."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Name",
+          "description": "The name of the threat."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the threat."
+        },
+        "source": {
+          "type": "string",
+          "title": "Source",
+          "description": "The source of the threat, such as a threat intelligence feed, a threat catalogue, or an analysis activity."
+        },
+        "origin": {
+          "title": "Origin",
+          "description": "The nature of the threat source that gives rise to this threat, following the threat source types of [NIST SP 800-30](https://csrc.nist.gov/pubs/sp/800/30/r1/final). Use the custom option for an origin not covered by the enumeration.",
+          "oneOf": [
+            {
+              "type": "string",
+              "title": "Predefined Origin",
+              "enum": [
+                "adversarial",
+                "accidental",
+                "structural",
+                "environmental"
+              ],
+              "meta:enum": {
+                "adversarial": "An adversary acting with intent, such as an individual, group, organization, or nation state.",
+                "accidental": "An erroneous action taken without malicious intent, such as a mistake by a privileged user or administrator.",
+                "structural": "A failure of equipment, software, or environmental controls, such as resource exhaustion or expiry of a component.",
+                "environmental": "A natural or human-made event outside the control of the organization, such as a fire, flood, or wide-area infrastructure outage."
+              }
+            },
+            {
+              "type": "object",
+              "title": "Custom Origin",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom origin."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom origin."
+                }
+              }
+            }
+          ]
+        },
+        "categories": {
+          "type": "array",
+          "title": "Categories",
+          "uniqueItems": true,
+          "description": "The methodology-specific categories that this threat falls under. A threat may be categorized under more than one methodology, for example STRIDE and MAESTRO. The methodology is one of the supported threat-modelling methodologies, and it determines which category values are permitted.",
+          "items": {
+            "type": "object",
+            "title": "Threat Category",
+            "description": "A threat category. The taxonomy determines the permitted category values.",
+            "additionalProperties": false,
+            "required": ["taxonomy", "category"],
+            "properties": {
+              "taxonomy": {
+                "type": "string",
+                "title": "Taxonomy",
+                "description": "The threat classification taxonomy that the category is drawn from.",
+                "enum": ["STRIDE", "LINDDUN", "MAESTRO", "MITRE-ATTACK"],
+                "meta:enum": {
+                  "STRIDE": "Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, and Elevation of Privilege.",
+                  "LINDDUN": "Linkability, Identifiability, Non-repudiation, Detectability, Disclosure of information, Unawareness, and Non-compliance.",
+                  "MAESTRO": "Multi-Agent Environment, Security, Threat, Risk, and Outcome, whose categories are its seven architectural layers.",
+                  "MITRE-ATTACK": "The MITRE ATT&CK framework, whose categories are its Enterprise tactics."
+                }
+              },
+              "category": {
+                "type": "string",
+                "minLength": 1,
+                "title": "Category",
+                "description": "The category within the taxonomy. The permitted values are determined by the taxonomy."
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "required": ["taxonomy"],
+                  "properties": { "taxonomy": { "const": "STRIDE" } }
+                },
+                "then": {
+                  "properties": {
+                    "category": {
+                      "enum": ["spoofing", "tampering", "repudiation", "information-disclosure", "denial-of-service", "elevation-of-privilege"],
+                      "meta:enum": {
+                        "spoofing": "Impersonating something or someone, violating authenticity.",
+                        "tampering": "Modifying data or code, violating integrity.",
+                        "repudiation": "Denying having performed an action, violating non-repudiation.",
+                        "information-disclosure": "Exposing information to unauthorized parties, violating confidentiality.",
+                        "denial-of-service": "Denying or degrading service to legitimate users, violating availability.",
+                        "elevation-of-privilege": "Gaining capabilities without proper authorization, violating authorization."
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "required": ["taxonomy"],
+                  "properties": { "taxonomy": { "const": "LINDDUN" } }
+                },
+                "then": {
+                  "properties": {
+                    "category": {
+                      "enum": ["linkability", "identifiability", "non-repudiation", "detectability", "disclosure-of-information", "unawareness", "non-compliance"],
+                      "meta:enum": {
+                        "linkability": "Linking data items to learn more about an individual.",
+                        "identifiability": "Identifying an individual from data.",
+                        "non-repudiation": "Being unable to deny a claim, harming plausible deniability.",
+                        "detectability": "Detecting that an item of interest exists.",
+                        "disclosure-of-information": "Revealing personal data, violating confidentiality.",
+                        "unawareness": "Individuals being unaware of the processing of their data.",
+                        "non-compliance": "Deviating from policy, regulation, or best practice."
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "required": ["taxonomy"],
+                  "properties": { "taxonomy": { "const": "MAESTRO" } }
+                },
+                "then": {
+                  "properties": {
+                    "category": {
+                      "enum": ["foundation-models", "data-operations", "agent-frameworks", "deployment-and-infrastructure", "evaluation-and-observability", "security-and-compliance", "agent-ecosystem"],
+                      "meta:enum": {
+                        "foundation-models": "Layer 1. The core models that provide the agent's capabilities.",
+                        "data-operations": "Layer 2. Storage, retrieval, and processing of the agent's data.",
+                        "agent-frameworks": "Layer 3. The frameworks and tools that build and run agents.",
+                        "deployment-and-infrastructure": "Layer 4. The infrastructure on which agents are deployed and scaled.",
+                        "evaluation-and-observability": "Layer 5. Evaluation, monitoring, and observability of agent behaviour.",
+                        "security-and-compliance": "Layer 6. The cross-cutting security and compliance controls.",
+                        "agent-ecosystem": "Layer 7. The applications and marketplace where agents deliver value to end-users."
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "required": ["taxonomy"],
+                  "properties": { "taxonomy": { "const": "MITRE-ATTACK" } }
+                },
+                "then": {
+                  "properties": {
+                    "category": {
+                      "enum": ["reconnaissance", "resource-development", "initial-access", "execution", "persistence", "privilege-escalation", "defense-evasion", "credential-access", "discovery", "lateral-movement", "collection", "command-and-control", "exfiltration", "impact"]
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "weaknesses": {
+          "$ref": "cyclonedx-weakness-2.0.schema.json#/$defs/weaknesses",
+          "description": "The weaknesses, such as CWE classifications, that this threat exploits."
+        },
+        "relatedVulnerabilities": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the vulnerabilities that this threat exploits or that inform it."
+        },
+        "attackPatterns": {
+          "type": "array",
+          "title": "Attack Patterns",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the attack patterns by which this threat is carried out."
+        },
+        "attackTrees": {
+          "type": "array",
+          "title": "Attack Trees",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the attack trees that decompose this threat."
+        },
+        "abuseCases": {
+          "type": "array",
+          "title": "Abuse Cases",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the abuse cases that illustrate how this threat can be exercised."
+        },
+        "killChainPhase": {
+          "$ref": "#/$defs/killChainPhase",
+          "description": "The phase of the cyber kill chain at which this threat operates."
+        },
+        "behaviors": {
+          "type": "array",
+          "title": "Behaviors",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the declared behaviors that constitute the intent of this threat, drawn from the behavior taxonomy."
+        },
+        "indicators": {
+          "$ref": "#/$defs/indicators"
+        },
+        "affectedAssets": {
+          "type": "array",
+          "title": "Affected Assets",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the kinds of assets this threat affects."
+        },
+        "relatedBusinessObjectives": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the business objectives this threat endangers."
+        },
+        "mitigations": {
+          "type": "array",
+          "title": "Mitigations",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the controls that mitigate this threat."
+        },
+        "externalReferences": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReferences"
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "threatScenario": {
+      "type": "object",
+      "title": "Threat Scenario",
+      "description": "A specific realization of a threat, in which an actor seeks to cause harm. The scenario references the threat it realizes, supplies the actor by reference to a party, and carries the scenario-specific traits and risk assessment, such as motivation, intent, access level, likelihood, and impact.",
+      "additionalProperties": false,
+      "required": [
+        "bom-ref",
+        "name",
+        "threats"
+      ],
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "An identifier which can be used to reference the threat scenario elsewhere using a bom-ref or bom-link."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Name",
+          "description": "The name of the threat scenario."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the threat scenario."
+        },
+        "threats": {
+          "type": "array",
+          "title": "Threats",
+          "uniqueItems": true,
+          "minItems": 1,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the threats that this scenario realizes. A scenario realizes one or more threats."
+        },
+        "actor": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "description": "Reference using bom-link or bom-ref to the party that is the actor in this scenario. Named adversary groups are organizations and abstract attacker classes are personas."
+        },
+        "threatProfile": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "description": "Reference using bom-link or bom-ref to a reusable threat profile that describes the durable capabilities of the actor."
+        },
+        "motivation": {
+          "type": "array",
+          "title": "Motivation",
+          "uniqueItems": true,
+          "description": "The motivations of the actor in this scenario.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "financial",
+              "political",
+              "personal",
+              "ideological",
+              "espionage",
+              "destruction",
+              "disruption",
+              "reputation",
+              "curiosity",
+              "competitive",
+              "revenge",
+              "activism"
+            ],
+            "meta:enum": {
+              "financial": "Motivated by financial gain.",
+              "political": "Motivated by political objectives.",
+              "personal": "Motivated by personal reasons.",
+              "ideological": "Motivated by ideology or belief.",
+              "espionage": "Motivated by intelligence gathering.",
+              "destruction": "Motivated by the desire to destroy.",
+              "disruption": "Motivated by the desire to disrupt operations.",
+              "reputation": "Motivated by reputational gain or harm.",
+              "curiosity": "Motivated by curiosity.",
+              "competitive": "Motivated by competitive advantage.",
+              "revenge": "Motivated by revenge.",
+              "activism": "Motivated by activism."
+            }
+          }
+        },
+        "intent": {
+          "type": "string",
+          "title": "Intent",
+          "description": "The intent of the actor in this scenario.",
+          "enum": [
+            "accidental",
+            "opportunistic",
+            "targeted",
+            "persistent"
+          ],
+          "meta:enum": {
+            "accidental": "The harm is caused without intent.",
+            "opportunistic": "The actor takes advantage of an opportunity as it arises.",
+            "targeted": "The actor deliberately targets the subject.",
+            "persistent": "The actor pursues the target persistently over time."
+          }
+        },
+        "accessLevel": {
+          "type": "string",
+          "title": "Access Level",
+          "description": "The level of access the actor is assumed to have in this scenario.",
+          "enum": [
+            "none",
+            "external",
+            "internal",
+            "privileged",
+            "physical"
+          ],
+          "meta:enum": {
+            "none": "No access.",
+            "external": "External access only.",
+            "internal": "Internal access, such as that of an ordinary user.",
+            "privileged": "Privileged or administrative access.",
+            "physical": "Physical access to the target."
+          }
+        },
+        "attackVector": {
+          "$ref": "#/$defs/attackVector"
+        },
+        "exploitability": {
+          "$ref": "#/$defs/exploitability"
+        },
+        "likelihood": {
+          "$ref": "cyclonedx-risk-2.0.schema.json#/$defs/likelihood"
+        },
+        "impact": {
+          "$ref": "cyclonedx-risk-2.0.schema.json#/$defs/impact"
+        },
+        "riskScore": {
+          "$ref": "cyclonedx-risk-2.0.schema.json#/$defs/riskScore"
+        },
+        "riskAttributes": {
+          "type": "array",
+          "title": "Risk Attributes",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-risk-2.0.schema.json#/$defs/riskAttribute"
+          },
+          "description": "The security and privacy attributes that this threat would compromise if realized."
+        },
+        "affectedAssets": {
+          "type": "array",
+          "title": "Affected Assets",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the assets affected in this scenario."
+        },
+        "relatedRisks": {
+          "type": "array",
+          "title": "Related Risks",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the risks that this scenario contributes to."
+        },
+        "relatedVulnerabilities": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the vulnerabilities exploited in this scenario."
+        },
+        "externalReferences": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReferences"
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "threatProfiles": {
+      "type": "array",
+      "title": "Threat Profiles",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/threatProfile"
+      },
+      "description": "Reusable threat profiles, each describing the durable characteristics of an actor that may pose a threat."
+    },
+    "threatProfile": {
+      "type": "object",
+      "title": "Threat Profile",
+      "description": "A durable, actor-level characterization of the capability to pose a threat, capturing attributes that persist across scenarios. Scenario-specific attributes, such as motivation, intent, and access level, belong on a threat scenario rather than on this profile.",
+      "additionalProperties": false,
+      "required": [
+        "bom-ref"
+      ],
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "An identifier which can be used to reference this threat profile elsewhere using a bom-ref or bom-link."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Name",
+          "description": "The name of the threat profile."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the threat profile."
+        },
+        "sophistication": {
+          "type": "string",
+          "title": "Sophistication",
+          "description": "The level of technical sophistication an actor characterized by this profile is assumed to possess.",
+          "enum": ["none", "minimal", "intermediate", "advanced", "expert"],
+          "meta:enum": {
+            "none": "No technical sophistication.",
+            "minimal": "Minimal sophistication, relying on readily available tools and techniques.",
+            "intermediate": "Intermediate technical skills.",
+            "advanced": "Advanced skills consistent with a persistent and well-resourced actor.",
+            "expert": "Expert skills consistent with the most capable actors."
+          }
+        },
+        "resources": {
+          "type": "string",
+          "title": "Resources",
+          "description": "The level of resources an actor characterized by this profile is assumed to have available.",
+          "enum": ["minimal", "limited", "moderate", "substantial", "unlimited"],
+          "meta:enum": {
+            "minimal": "Minimal resources.",
+            "limited": "Limited resources.",
+            "moderate": "Moderate resources.",
+            "substantial": "Substantial resources.",
+            "unlimited": "Effectively unlimited resources."
+          }
+        },
+        "skillSet": {
+          "type": "array",
+          "title": "Skill Set",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "description": "The specific skills an actor characterized by this profile is assumed to possess."
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "attackVector": {
+      "type": "object",
+      "title": "Attack Vector",
+      "description": "The conditions under which an attack is possible, following the convention of common vulnerability scoring systems.",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "title": "Type",
+          "description": "The context by which an attack is possible.",
+          "enum": [
+            "network",
+            "adjacent",
+            "local",
+            "physical"
+          ],
+          "meta:enum": {
+            "network": "Remotely exploitable via a network.",
+            "adjacent": "Exploitable from an adjacent network.",
+            "local": "Requires local access.",
+            "physical": "Requires physical access."
+          }
+        },
+        "complexity": {
+          "type": "string",
+          "title": "Complexity",
+          "description": "The complexity of the attack.",
+          "enum": [
+            "low",
+            "high"
+          ],
+          "meta:enum": {
+            "low": "The attack has low complexity.",
+            "high": "The attack has high complexity."
+          }
+        },
+        "privileges": {
+          "type": "string",
+          "title": "Privileges",
+          "description": "The level of privileges required to carry out the attack.",
+          "enum": [
+            "none",
+            "low",
+            "high"
+          ],
+          "meta:enum": {
+            "none": "No privileges are required.",
+            "low": "Low privileges are required.",
+            "high": "High privileges are required."
+          }
+        },
+        "userInteraction": {
+          "type": "string",
+          "title": "User Interaction",
+          "description": "Whether the attack requires interaction from a user other than the attacker.",
+          "enum": [
+            "none",
+            "required"
+          ],
+          "meta:enum": {
+            "none": "No user interaction is required.",
+            "required": "User interaction is required."
+          }
+        },
+        "scope": {
+          "type": "string",
+          "title": "Scope",
+          "description": "Whether a successful attack affects resources beyond the vulnerable component.",
+          "enum": [
+            "unchanged",
+            "changed"
+          ],
+          "meta:enum": {
+            "unchanged": "The attack affects only the vulnerable component.",
+            "changed": "The attack affects resources beyond the vulnerable component."
+          }
+        }
+      }
+    },
+    "attackPattern": {
+      "type": "object",
+      "title": "Attack Pattern",
+      "description": "A description of the common attributes and approach of an attack, typically aligned with CAPEC. Techniques are aligned with MITRE ATT&CK.",
+      "additionalProperties": false,
+      "required": [
+        "bom-ref",
+        "name"
+      ],
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "An identifier which can be used to reference the attack pattern elsewhere using a bom-ref or bom-link."
+        },
+        "capecId": {
+          "type": "integer",
+          "minimum": 1,
+          "title": "CAPEC Identifier",
+          "description": "The Common Attack Pattern Enumeration and Classification (CAPEC) identifier for this attack pattern."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Name",
+          "description": "The name of the attack pattern."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the attack pattern."
+        },
+        "prerequisites": {
+          "type": "array",
+          "title": "Prerequisites",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "description": "The conditions that must hold for the attack to be possible."
+        },
+        "techniques": {
+          "type": "array",
+          "title": "Techniques",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/technique"
+          },
+          "description": "The techniques used to carry out the attack, typically aligned with MITRE ATT&CK."
+        },
+        "mitigations": {
+          "type": "array",
+          "title": "Mitigations",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the controls that mitigate this attack pattern."
+        },
+        "examples": {
+          "type": "array",
+          "title": "Examples",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "description": "Real-world examples of the attack pattern."
+        }
+      }
+    },
+    "technique": {
+      "type": "object",
+      "title": "Technique",
+      "description": "A specific technique used to carry out an attack, typically aligned with MITRE ATT&CK.",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Identifier",
+          "description": "The identifier of the technique, such as a MITRE ATT&CK technique identifier."
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name of the technique."
+        },
+        "tactic": {
+          "type": "string",
+          "title": "Tactic",
+          "description": "The tactic that the technique supports, such as a MITRE ATT&CK tactic."
+        },
+        "procedure": {
+          "type": "string",
+          "title": "Procedure",
+          "description": "The specific procedure by which the technique is carried out."
+        }
+      }
+    },
+    "attackTree": {
+      "type": "object",
+      "title": "Attack Tree",
+      "description": "A decomposition of an attacker goal into sub-goals and techniques, expressed as a flat collection of nodes. Each node lists its child nodes by reference together with an operator that says how those children combine, so the tree is expressed without nesting. One node is the root, representing the attacker goal.",
+      "additionalProperties": false,
+      "required": [
+        "bom-ref",
+        "nodes"
+      ],
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "An identifier which can be used to reference the attack tree elsewhere using a bom-ref or bom-link."
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name of the attack tree."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the attack tree."
+        },
+        "root": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "title": "Root BOM Reference",
+          "description": "Optional reference using bom-link or bom-ref to the root node within nodes, representing the attacker goal. When omitted, the root is the node that no other node lists as a child."
+        },
+        "nodes": {
+          "type": "array",
+          "title": "Nodes",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/attackTreeNode"
+          },
+          "description": "The nodes of the attack tree. Each node references its child nodes, which are themselves entries in this array, forming the hierarchy without nesting."
+        }
+      }
+    },
+    "attackTreeNode": {
+      "type": "object",
+      "title": "Attack Tree Node",
+      "description": "A node in an attack tree, representing an attacker goal, sub-goal, or technique. A node references its child nodes and carries an operator that says how those children combine. The hierarchy is expressed by these references rather than by nesting.",
+      "additionalProperties": false,
+      "required": [
+        "bom-ref",
+        "name"
+      ],
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "An identifier which can be used to reference the node elsewhere using a bom-ref or bom-link."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Name",
+          "description": "The goal, sub-goal, or technique that the node represents."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the node."
+        },
+        "operator": {
+          "type": "string",
+          "title": "Operator",
+          "description": "Specifies how the nodes listed in 'children' combine to achieve this node. A value of 'and' requires every child node; a value of 'or' requires any single child node. For example, a node whose children are a phishing node and a credential-stuffing node uses 'or' when either alone achieves it, or 'and' when both are needed together. A node with no children is a leaf and omits this property.",
+          "enum": [
+            "and",
+            "or"
+          ],
+          "meta:enum": {
+            "and": "All child nodes are required to achieve this node.",
+            "or": "Any one child node is sufficient to achieve this node."
+          }
+        },
+        "children": {
+          "type": "array",
+          "title": "Children",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the child nodes that decompose this node. Each child node is a separate entry in the same nodes array, so the hierarchy is expressed without nesting. A child node may be shared by more than one parent."
+        },
+        "attackPattern": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "description": "Reference using bom-link or bom-ref to the attack pattern that this node represents."
+        },
+        "weakness": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "description": "Reference using bom-link or bom-ref to the weakness that this node exploits."
+        },
+        "cost": {
+          "type": "string",
+          "title": "Cost",
+          "description": "The relative cost to an attacker of achieving this node.",
+          "enum": [
+            "negligible",
+            "low",
+            "moderate",
+            "high",
+            "prohibitive"
+          ],
+          "meta:enum": {
+            "negligible": "Negligible cost.",
+            "low": "Low cost.",
+            "moderate": "Moderate cost.",
+            "high": "High cost.",
+            "prohibitive": "Prohibitive cost."
+          }
+        },
+        "skill": {
+          "type": "string",
+          "title": "Skill",
+          "description": "The skill level required to achieve this node.",
+          "enum": [
+            "none",
+            "basic",
+            "intermediate",
+            "advanced",
+            "expert"
+          ],
+          "meta:enum": {
+            "none": "No special skill is required.",
+            "basic": "Basic skill is required.",
+            "intermediate": "Intermediate skill is required.",
+            "advanced": "Advanced skill is required.",
+            "expert": "Expert skill is required."
+          }
+        },
+        "detectability": {
+          "type": "string",
+          "title": "Detectability",
+          "description": "How readily an attempt to achieve this node can be detected.",
+          "enum": [
+            "undetectable",
+            "low",
+            "moderate",
+            "high"
+          ],
+          "meta:enum": {
+            "undetectable": "The attempt is effectively undetectable.",
+            "low": "The attempt is difficult to detect.",
+            "moderate": "The attempt is moderately detectable.",
+            "high": "The attempt is readily detectable."
+          }
+        },
+        "mitigations": {
+          "type": "array",
+          "title": "Mitigations",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the controls that mitigate this node."
+        }
+      }
+    },
+    "abuseCase": {
+      "type": "object",
+      "title": "Abuse Case",
+      "description": "A description of how an adversary can misuse the system to achieve a malicious goal. An abuse case is the security counterpart of a use case and reuses its flow structure.",
+      "additionalProperties": false,
+      "required": [
+        "bom-ref",
+        "name"
+      ],
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "An identifier which can be used to reference the abuse case elsewhere using a bom-ref or bom-link."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Name",
+          "description": "The name of the abuse case, typically expressed as a malicious goal."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A narrative describing how the system can be misused or abused."
+        },
+        "abuser": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "description": "Reference using bom-link or bom-ref to the party that abuses the system, typically an attacker persona."
+        },
+        "realizes": {
+          "type": "array",
+          "title": "Realizes",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the threats that this abuse case realizes."
+        },
+        "preconditions": {
+          "type": "array",
+          "title": "Preconditions",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "description": "The conditions that must hold before the abuse case can begin."
+        },
+        "mainFlow": {
+          "type": "array",
+          "title": "Main Flow",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-usecase-2.0.schema.json#/$defs/step"
+          },
+          "description": "The ordered steps the abuser follows."
+        },
+        "targets": {
+          "type": "array",
+          "title": "Targets",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the assets or flows targeted in this abuse case."
+        },
+        "detectionOpportunities": {
+          "type": "array",
+          "title": "Detection Opportunities",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "description": "The signals, logs, or controls that present an opportunity to detect the abuse."
+        },
+        "mitigations": {
+          "type": "array",
+          "title": "Mitigations",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the controls that mitigate this abuse case."
+        }
+      }
+    },
+    "exploitability": {
+      "type": "object",
+      "title": "Exploitability",
+      "description": "The degree to which a threat can be exploited in practice.",
+      "additionalProperties": false,
+      "properties": {
+        "level": {
+          "type": "string",
+          "title": "Level",
+          "description": "The maturity of available exploitation capability.",
+          "enum": [
+            "theoretical",
+            "proof-of-concept",
+            "functional",
+            "weaponized"
+          ],
+          "meta:enum": {
+            "theoretical": "Exploitation is theoretically possible but has not been demonstrated.",
+            "proof-of-concept": "A proof of concept exists.",
+            "functional": "A functional exploit exists.",
+            "weaponized": "A weaponized exploit is in use."
+          }
+        },
+        "complexity": {
+          "type": "string",
+          "title": "Complexity",
+          "description": "The complexity of exploitation.",
+          "enum": [
+            "trivial",
+            "low",
+            "medium",
+            "high",
+            "very-high"
+          ],
+          "meta:enum": {
+            "trivial": "Exploitation is trivial.",
+            "low": "Exploitation has low complexity.",
+            "medium": "Exploitation has medium complexity.",
+            "high": "Exploitation has high complexity.",
+            "very-high": "Exploitation has very high complexity."
+          }
+        },
+        "skillRequired": {
+          "type": "string",
+          "title": "Skill Required",
+          "description": "The skill level required to exploit the threat.",
+          "enum": [
+            "none",
+            "basic",
+            "intermediate",
+            "advanced",
+            "expert"
+          ],
+          "meta:enum": {
+            "none": "No special skill is required.",
+            "basic": "Basic skill is required.",
+            "intermediate": "Intermediate skill is required.",
+            "advanced": "Advanced skill is required.",
+            "expert": "Expert skill is required."
+          }
+        },
+        "automatable": {
+          "type": "boolean",
+          "title": "Automatable",
+          "description": "Whether exploitation can be automated."
+        }
+      }
+    },
+    "indicators": {
+      "type": "object",
+      "title": "Indicators",
+      "description": "The observable indicators associated with a threat.",
+      "additionalProperties": false,
+      "properties": {
+        "compromise": {
+          "type": "array",
+          "title": "Indicators of Compromise",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "description": "The indicators that a compromise has occurred."
+        },
+        "attack": {
+          "type": "array",
+          "title": "Indicators of Attack",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "description": "The indicators that an attack is under way."
+        },
+        "signatures": {
+          "type": "array",
+          "title": "Signatures",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/signature"
+          },
+          "description": "The detection signatures associated with the threat."
+        }
+      }
+    },
+    "signature": {
+      "type": "object",
+      "title": "Signature",
+      "description": "A detection signature for a threat.",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "value"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "title": "Type",
+          "description": "The type of signature.",
+          "enum": [
+            "yara",
+            "snort",
+            "regex",
+            "hash",
+            "behavior"
+          ],
+          "meta:enum": {
+            "yara": "A YARA rule.",
+            "snort": "A Snort rule.",
+            "regex": "A regular expression.",
+            "hash": "A cryptographic hash.",
+            "behavior": "A behavioural signature."
+          }
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Value",
+          "description": "The signature value or pattern."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of what the signature detects."
+        },
+        "confidence": {
+          "type": "string",
+          "title": "Confidence",
+          "description": "The confidence level of a detection by this signature.",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "meta:enum": {
+            "low": "Low confidence.",
+            "medium": "Medium confidence.",
+            "high": "High confidence."
+          }
+        }
+      }
+    },
+    "trustBoundary": {
+      "type": "object",
+      "title": "Trust Boundary",
+      "description": "A security annotation marking an architectural boundary as one across which trust changes. It references a boundary defined in a blueprint, where the zones, type, and crossing requirements already live, and adds only the trust differential and the threats and controls at that boundary.",
+      "additionalProperties": false,
+      "required": [
+        "bom-ref",
+        "boundary"
+      ],
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "An identifier which can be used to reference the trust boundary elsewhere using a bom-ref or bom-link."
+        },
+        "boundary": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "description": "Reference using bom-link or bom-ref to the blueprint boundary that this trust boundary annotates."
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name of the trust boundary."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the trust boundary."
+        },
+        "trustLevel": {
+          "type": "string",
+          "title": "Trust Level",
+          "description": "The trust level differential across the boundary.",
+          "enum": [
+            "untrusted",
+            "semi-trusted",
+            "trusted",
+            "highly-trusted"
+          ],
+          "meta:enum": {
+            "untrusted": "The boundary separates an untrusted zone.",
+            "semi-trusted": "The boundary separates a semi-trusted zone.",
+            "trusted": "The boundary separates a trusted zone.",
+            "highly-trusted": "The boundary separates a highly trusted zone."
+          }
+        },
+        "threatsAtBoundary": {
+          "type": "array",
+          "title": "Threats At Boundary",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the threats that could exploit this boundary."
+        },
+        "controlsAtBoundary": {
+          "type": "array",
+          "title": "Controls At Boundary",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the controls in place at this boundary. Intended primarily for referencing externally defined controls. Where the control and boundary are declared together, prefer the control's appliesTo property."
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "killChainPhase": {
+      "type": "string",
+      "title": "Kill Chain Phase",
+      "description": "A phase of the cyber kill chain.",
+      "enum": [
+        "reconnaissance",
+        "weaponization",
+        "delivery",
+        "exploitation",
+        "installation",
+        "command-and-control",
+        "actions-on-objectives"
+      ],
+      "meta:enum": {
+        "reconnaissance": "Gathering information about the target.",
+        "weaponization": "Creating a malicious payload.",
+        "delivery": "Transmitting the payload to the target.",
+        "exploitation": "Exploiting a vulnerability or weakness.",
+        "installation": "Installing malicious software or establishing a foothold.",
+        "command-and-control": "Establishing a command and control channel.",
+        "actions-on-objectives": "Achieving the goals of the attack."
+      }
+    },
+    "attackPathStep": {
+      "type": "object",
+      "title": "Attack Path Step",
+      "description": "A single step in an attack path, describing one action in the progression of an attack.",
+      "required": [
+        "description"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "A short name for the step."
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Description",
+          "description": "The action the adversary performs in this step."
+        },
+        "technique": {
+          "$ref": "#/$defs/technique",
+          "description": "The technique used in this step, typically aligned with MITRE ATT&CK."
+        },
+        "attackPattern": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "description": "Reference using bom-link or bom-ref to the attack pattern applied in this step."
+        },
+        "killChainPhase": {
+          "$ref": "#/$defs/killChainPhase",
+          "description": "The phase of the cyber kill chain at which this step operates."
+        },
+        "source": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "description": "Reference using bom-link or bom-ref to the element or zone from which this step originates."
+        },
+        "destination": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "description": "Reference using bom-link or bom-ref to the element or zone this step reaches."
+        },
+        "boundaryCrossed": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "description": "Reference using bom-link or bom-ref to the trust boundary this step crosses."
+        },
+        "exploits": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the weaknesses or vulnerabilities this step exploits."
+        },
+        "mitigations": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the controls that detect or prevent this step."
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "attackPath": {
+      "type": "object",
+      "title": "Attack Path",
+      "description": "An ordered sequence of steps that an adversary follows to progress from initial access toward an objective, crossing elements and trust boundaries. An attack path complements an attack tree: the tree decomposes a goal into alternatives, whereas the path expresses the temporal progression of a single attack, including lateral movement.",
+      "required": [
+        "bom-ref",
+        "name",
+        "steps"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Name",
+          "description": "A human-readable name for the attack path."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the attack path."
+        },
+        "objective": {
+          "type": "string",
+          "title": "Objective",
+          "description": "The attacker objective that the path works toward, such as exfiltrating data or achieving code execution."
+        },
+        "actor": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "description": "Reference using bom-link or bom-ref to the adversary that follows this path."
+        },
+        "steps": {
+          "type": "array",
+          "title": "Steps",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/attackPathStep"
+          },
+          "description": "The ordered steps of the path, from the initial action to the objective. The order of the array is significant."
+        },
+        "realizes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the threats that this path realizes."
+        },
+        "relatedRisks": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the risks that this path contributes to."
+        },
+        "externalReferences": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReferences"
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    }
+  }
+}
