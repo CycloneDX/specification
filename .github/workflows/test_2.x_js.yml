@@ -37,5 +37,14 @@ jobs:
           package-manager-cache: false
       - name: Install Dependencies
         run: npm install
-      - name: Run test 
+      - name: Run test
+        env:
+          VALIDATE_BUNDLED: >-
+            ${{ github.ref == 'refs/heads/master'
+             || github.ref == 'refs/heads/main'
+             || github.ref == 'refs/heads/2.0-dev'
+             || (  github.event_name == 'pull_request' 
+                && github.base_ref == 'master'
+                )
+            }}
         run: npm test

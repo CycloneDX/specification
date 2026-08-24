@@ -24,12 +24,13 @@ const _thisDir = dirname(fileURLToPath(import.meta.url))
 const testschemaVersion = (parseArgs({options: {v: {type: 'string', short: 'v'}}}).values.v ?? '').trim()
 const schemaRootDir = join(_thisDir, '..', '..', '..', '..', '..', 'schema')
 const schemaDir = join(schemaRootDir, testschemaVersion)
-const schemaFiles = Object.freeze([
-    join(schemaDir, `cyclonedx-${testschemaVersion}.schema.json`),
-    // yes, we also test those bundled schemas - to check that the bundler did produce a working schwma
-    join(schemaDir, `cyclonedx-${testschemaVersion}-bundled.schema.json`),
-    join(schemaDir, `cyclonedx-${testschemaVersion}-bundled.min.schema.json`),
-])
+
+const schemaFiles = [join(schemaDir, `cyclonedx-${testschemaVersion}.schema.json`)]
+if (process.env['VALIDATE_BUNDLED'] === 'true') {
+    schemaFiles.push(join(schemaDir, `cyclonedx-${testschemaVersion}-bundled.schema.json`))
+    schemaFiles.push(join(schemaDir, `cyclonedx-${testschemaVersion}-bundled.min.schema.json`))
+}
+
 const schemaFilesBundleMatcher = /-bundled/
 const schemaModelDir = join(schemaDir, `model`)
 const testdataDir = join(_thisDir, '..', '..', 'resources', testschemaVersion)
@@ -55,14 +56,15 @@ console.debug('DEBUG | schemaModelDir = ', schemaModelDir);
 
 // endregion config
 
-const [spdxSchema, cryptoDefsSchema, schemas, schemaModules] = await Promise.all([
+const [spdxSchema, cryptoDefsSchema, behaviorTaxonomySchema, schemas, schemaModules] = await Promise.all([
     readFile(join(schemaRootDir, 'spdx.schema.json'), 'utf-8').then(JSON.parse),
     readFile(join(schemaRootDir, 'cryptography-defs.schema.json'), 'utf-8').then(JSON.parse),
+    readFile(join(schemaRootDir, 'behavior-taxonomy.schema.json'), 'utf-8').then(JSON.parse),
     Promise.all(schemaFiles.map(
-        f => readFile(f, 'utf-8').then(s => [basename(f), JSON.parse(s)])
+        f => readFile(f, 'utf-8').then(s => [f, JSON.parse(s)])
     )),
     glob(join(schemaModelDir, schemaGlob)).then(fs => Promise.all(fs.map(
-        f => readFile(f, 'utf-8').then(s => [basename(f), JSON.parse(s)])
+        f => readFile(f, 'utf-8').then(s => [f, JSON.parse(s)])
     )))
 ])
 
@@ -90,6 +92,7 @@ function getAjv(bundled) {
     ajv.addMetaSchema(draft7MetaSchema);
     ajv.addSchema(spdxSchema, 'https://cyclonedx.org/schema/spdx.schema.json')
     ajv.addSchema(cryptoDefsSchema, 'https://cyclonedx.org/schema/cryptography-defs.schema.json')
+    ajv.addSchema(behaviorTaxonomySchema, 'https://cyclonedx.org/schema/behavior-taxonomy.schema.json')
     if (!bundled) {
         for (const [f, s] of schemaModules) {
             ajv.addSchema(s, `https://cyclonedx.org/schema/${testschemaVersion}/model/${f}`)
@@ -108,7 +111,7 @@ let errCnt = 0
 
 for (const [schemaFile, schema] of schemas) {
     console.log('\n> SchemaFile: ', schemaFile);
-    const ajv = getAjv(schemaFilesBundleMatcher.test(schemaFile))
+    const ajv = getAjv(schemaFilesBundleMatcher.test(basename(schemaFile)))
 
     console.group(`> compile schema, log warnings ...`)
     try {

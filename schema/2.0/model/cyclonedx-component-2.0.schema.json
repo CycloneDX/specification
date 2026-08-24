@@ -35,7 +35,9 @@
             "file",
             "machine-learning-model",
             "data",
-            "cryptographic-asset"
+            "cryptographic-asset",
+            "material",
+            "service"
           ],
           "meta:enum": {
             "application": "A software application. Refer to [https://en.wikipedia.org/wiki/Application_software](https://en.wikipedia.org/wiki/Application_software) for information about applications.",
@@ -50,7 +52,9 @@
             "file": "A computer file. Refer to [https://en.wikipedia.org/wiki/Computer_file](https://en.wikipedia.org/wiki/Computer_file) for information about files.",
             "machine-learning-model": "A model based on training data that can make predictions or decisions without being explicitly programmed to do so.",
             "data": "A collection of discrete values that convey information.",
-            "cryptographic-asset": "A cryptographic asset including algorithms, protocols, certificates, keys, tokens, and secrets."
+            "cryptographic-asset": "A cryptographic asset including algorithms, protocols, certificates, keys, tokens, and secrets.",
+            "material": "A physical substance in raw or processed form that is used to make, maintain, or repair an item, such as a metal, alloy, polymer, chemical, or other matter. Materials are commonly tracked for sourcing, provenance, and regulatory compliance. A finished physical item should be classified as 'device' instead.",
+            "service": "A service, including microservices, function-as-a-service, and other types of network or intra-process services. Service-specific attributes, endpoints and the data profiles characterizing the data the service handles, apply exclusively to this component type."
           },
           "title": "Component Type",
           "description": "Specifies the type of component. For software components, classify as application if no more specific appropriate classification is available or cannot be determined for the component.",
@@ -70,6 +74,13 @@
         },
         "parties": {
           "$ref": "cyclonedx-party-2.0.schema.json#/$defs/parties"
+        },
+        "origins": {
+          "type": "array",
+          "title": "Component Origins",
+          "description": "The geographic origins of the component, each expressed as a distribution across one or more countries or subdivisions. Multiple origins are allowed, each calculated on a different basis.",
+          "minItems": 1,
+          "items": { "$ref": "cyclonedx-common-2.0.schema.json#/$defs/origin" }
         },
         "group": {
           "type": "string",
@@ -137,6 +148,14 @@
           "$ref": "cyclonedx-patent-2.0.schema.json#/$defs/patentAssertions",
           "title": "Component Patent(s)"
         },
+        "requirementAssertions": {
+          "$ref": "cyclonedx-requirement-2.0.schema.json#/$defs/requirementAssertions",
+          "title": "Component Requirement(s)"
+        },
+        "useCaseAssertions": {
+          "$ref": "cyclonedx-usecase-2.0.schema.json#/$defs/useCaseAssertions",
+          "title": "Component Use Case(s)"
+        },
         "identifiers": {
           "$ref": "#/$defs/identifiers"
         },
@@ -188,7 +207,7 @@
           "items": {"$ref": "#/$defs/componentOrChoice"},
           "uniqueItems": true,
           "title": "Components",
-          "description": "A list of software and hardware components included in the parent component. Entries may be concrete components or component-choice wrappers expressing conditional or alternate relationships. This is not a dependency tree. It provides a way to specify a hierarchical representation of component assemblies, similar to system &#8594; subsystem &#8594; parts assembly in physical supply chains."
+          "description": "A list of components included in the parent component, including software, hardware, and services. Entries may be concrete components or component-choice wrappers expressing conditional or alternate relationships. This is not a dependency tree. It provides a way to specify a hierarchical representation of component assemblies, similar to system &#8594; subsystem &#8594; parts assembly in physical supply chains."
         },
         "evidence": {
           "$ref": "#/$defs/componentEvidence",
@@ -214,6 +233,61 @@
           "$ref": "cyclonedx-cryptography-2.0.schema.json#/$defs/cryptoProperties",
           "title": "Cryptographic Properties"
         },
+        "agility": {
+          "$ref": "#/$defs/agility"
+        },
+        "classification": {
+          "$ref": "cyclonedx-physical-2.0.schema.json#/$defs/classification",
+          "title": "Classification",
+          "description": "Hierarchical classification of the item, with optional taxonomy codes from external standards. This object may only be specified for components of type `device` or `material` and shall not be specified for other component types."
+        },
+        "boardLocation": {
+          "$ref": "cyclonedx-physical-2.0.schema.json#/$defs/boardLocation",
+          "title": "Board Location",
+          "description": "Placement of the item on a printed circuit board, panel, or assembly. This object may only be specified for components of type `device` and shall not be specified for other component types."
+        },
+        "deviceType": {
+          "$ref": "cyclonedx-physical-2.0.schema.json#/$defs/deviceType",
+          "title": "Device Type",
+          "description": "Package or mounting style of the physical item, expressed as a predefined device type or a custom device type. This object may only be specified for components of type `device` and shall not be specified for other component types."
+        },
+        "leadTime": {
+          "$ref": "cyclonedx-physical-2.0.schema.json#/$defs/leadTime",
+          "title": "Lead Time",
+          "description": "Supplier lead time for procuring the item. This object may only be specified for components of type `device` or `material` and shall not be specified for other component types."
+        },
+        "materialForm": {
+          "$ref": "cyclonedx-physical-2.0.schema.json#/$defs/materialForm",
+          "title": "Material Form",
+          "description": "Physical form in which the material is supplied, expressed as a predefined material form or a custom material form. This object may only be specified for components of type `material` and shall not be specified for other component types."
+        },
+        "quantity": {
+          "$ref": "cyclonedx-physical-2.0.schema.json#/$defs/quantity",
+          "title": "Quantity",
+          "description": "The quantity of the item in the context in which it is declared, such as the number of identical parts within the enclosing assembly or the amount of material in the described lot. This object may only be specified for components of type `device` or `material` and shall not be specified for other component types."
+        },
+        "certifications": {
+          "$ref": "cyclonedx-certification-2.0.schema.json#/$defs/certifications",
+          "title": "Certifications",
+          "description": "Certifications held by or applicable to the component. Applicable to components of any type, hardware and software alike."
+        },
+        "endpoints": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "iri-reference"
+          },
+          "title": "Endpoints",
+          "description": "The endpoint URIs of the service. Multiple endpoints are allowed. May only be used for components of type `service`.",
+          "examples": ["https://example.com/api/v1/ticker"]
+        },
+        "dataProfiles": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataProfileChoice"},
+          "title": "Data Profiles",
+          "description": "The data handled by the service, characterized by data profiles. Each entry is either an inline profile object or a reference using bom-link or bom-ref to a previously declared profile, typically declared in the root profiles catalogue. May only be used for components of type `service`. Data movement is intentionally not expressed here: flow direction, sources, destinations, authentication, and boundary crossings are modelled via blueprint flows, assets, and boundaries, which reference this component by bom-ref."
+        },
         "tags": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/tags",
           "title": "Tags"
@@ -230,8 +304,9 @@
       },
       "allOf": [
         {
-          "description": "Requirement: ensure that `version` and `versionRange` are not present simultaneously.",
+          "description": "Requirement: ensure that `version` and `versionRange` are mutually exclusive.",
           "not": {
+            "properties": { "version": true, "versionRange": true },
             "required": ["version", "versionRange"]
           }
         },
@@ -244,6 +319,64 @@
             "not": { "required": ["versionRange"] }
           },
           "else": true
+        },
+        {
+          "description": "Requirement: `classification`, `leadTime`, and `quantity` may only be present when `type` is `device` or `material`.",
+          "if": {
+            "properties": { "type": { "enum": ["device", "material"] } },
+            "required": ["type"]
+          },
+          "then": true,
+          "else": {
+            "properties": {
+              "classification": false,
+              "leadTime": false,
+              "quantity": false
+            }
+          }
+        },
+        {
+          "description": "Requirement: `boardLocation` and `deviceType` may only be present when `type` is `device`.",
+          "if": {
+            "properties": { "type": { "const": "device" } },
+            "required": ["type"]
+          },
+          "then": true,
+          "else": {
+            "properties": {
+              "boardLocation": false,
+              "deviceType": false
+            }
+          }
+        },
+        {
+          "description": "Requirement: `materialForm` may only be present when `type` is `material`.",
+          "if": {
+            "properties": { "type": { "const": "material" } },
+            "required": ["type"]
+          },
+          "then": true,
+          "else": {
+            "properties": {
+              "materialForm": false
+            }
+          }
+        },
+        {
+          "title": "Service Requirement",
+          "description": "Requirement: endpoints and dataProfiles may only be used for components of type `service`.",
+          "if": {
+            "properties": { "type": { "const": "service" } }
+          },
+          "then": true,
+          "else": {
+            "not": {
+              "anyOf": [
+                { "required": ["endpoints"], "properties": { "endpoints":  true } },
+                { "required": ["dataProfiles"], "properties": { "dataProfiles":  true } }
+              ]
+            }
+          }
         }
       ]
     },
@@ -320,7 +453,7 @@
       }
     },
     "version": {
-      "description": "A single disjunctive version identifier, for a component or service.",
+      "description": "A single disjunctive version identifier for a component.",
       "type": "string",
       "maxLength": 1024,
       "examples": [
@@ -351,28 +484,6 @@
       "description": "A copyright notice informing users of the underlying claims to copyright ownership in a published work.",
       "examples": ["Acme Inc"]
     },
-    "copyright": {
-      "type": "array",
-      "items": {"$ref": "#/$defs/copyrightObject"},
-      "title": "Copyright",
-      "description": "Captures intellectual property assertions, providing evidence of possible ownership and legal protection."
-    },
-    "copyrightObject": {
-      "type": "object",
-      "title": "Copyright",
-      "description": "A copyright notice informing users of the underlying claims to copyright ownership in a published work.",
-      "required": [
-        "text"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "text": {
-          "type": "string",
-          "title": "Copyright Text",
-          "description": "The textual content of the copyright."
-        }
-      }
-    },
     "componentEvidence": {
       "type": "object",
       "title": "Evidence",
@@ -382,147 +493,170 @@
         "identity": {
           "type": "array",
           "title": "Identity Evidence",
-          "description": "Evidence that substantiates the identity of a component. The identity may be an object or an array of identity objects. Support for specifying identity as a single object was introduced in CycloneDX v1.5. Arrays were introduced in v1.6. It is recommended that all implementations use arrays, even if only one identity object is specified.",
+          "description": "Evidence that substantiates the identity of the component, including how each identity was determined, the confidence, and the tools and parties involved.",
           "items": { "$ref": "#/$defs/componentIdentityEvidence" }
         },
         "occurrences": {
           "type": "array",
           "title": "Occurrences",
           "description": "Evidence of individual instances of a component spread across multiple locations.",
-          "items": {
-            "type": "object",
-            "required": [ "location" ],
-            "additionalProperties": false,
-            "properties": {
-              "bom-ref": {
-                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-                "title": "BOM Reference",
-                "description": "An identifier which can be used to reference the occurrence elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
-              },
-              "location": {
-                "type": "string",
-                "title": "Location",
-                "description": "The location or path to where the component was found."
-              },
-              "line": {
-                "type": "integer",
-                "minimum": 0,
-                "title": "Line Number",
-                "description": "The line number where the component was found."
-              },
-              "offset": {
-                "type": "integer",
-                "minimum": 0,
-                "title": "Offset",
-                "description": "The offset where the component was found."
-              },
-              "symbol": {
-                "type": "string",
-                "title": "Symbol",
-                "description": "The symbol name that was found associated with the component."
-              },
-              "additionalContext": {
-                "type": "string",
-                "title": "Additional Context",
-                "description": "Any additional context of the detected component (e.g. a code snippet)."
-              },
-              "accountInfo": {
-                "type": "string",
-                "title": "Account Information",
-                "description": "The account or user information associated with the occurrence."
-              },
-              "systemOwner": {
-                "type": "string",
-                "title": "System Owner",
-                "description": "The owner of the system where the component was found."
-              },
-              "startTime": {
-                "type": "string",
-                "format": "date-time",
-                "title": "Start Time",
-                "description": "The date and time when the process detecting the occurrence started."
-              },
-              "endTime": {
-                "type": "string",
-                "format": "date-time",
-                "title": "End Time",
-                "description": "The date and time when the process detecting the occurrence ended."
-              },
-              "usageCount": {
-                "type": "integer",
-                "minimum": 0,
-                "title": "Usage Count",
-                "description": "The number of times the component occurred in the detecting process."
-              }
-            }
-          }
+          "items": { "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/occurrence" }
         },
-        "callstack": {
-          "type": "object",
-          "title": "Call Stack",
-          "description": "Evidence of the components use through the callstack.",
-          "additionalProperties": false,
-          "properties": {
-            "frames": {
-              "type": "array",
-              "title": "Frames",
-              "description": "Within a call stack, a frame is a discrete unit that encapsulates an execution context, including local variables, parameters, and the return address. As function calls are made, frames are pushed onto the stack, forming an array-like structure that orchestrates the flow of program execution and manages the sequence of function invocations.",
-              "items": {
-                "type": "object",
-                "required": [
-                  "module"
-                ],
-                "additionalProperties": false,
-                "properties": {
-                  "package": {
-                    "title": "Package",
-                    "description": "A package organizes modules into namespaces, providing a unique namespace for each type it contains.",
-                    "type": "string"
-                  },
-                  "module": {
-                    "title": "Module",
-                    "description": "A module or class that encloses functions/methods and other code.",
-                    "type": "string"
-                  },
-                  "function": {
-                    "title": "Function",
-                    "description": "A block of code designed to perform a particular task.",
-                    "type": "string"
-                  },
-                  "parameters": {
-                    "title": "Parameters",
-                    "description": "Arguments that are passed to the module or function.",
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  "line": {
-                    "title": "Line",
-                    "description": "The line number the code that is called resides on.",
-                    "type": "integer"
-                  },
-                  "column": {
-                    "title": "Column",
-                    "description": "The column the code that is called resides.",
-                    "type": "integer"
-                  },
-                  "fullFilename": {
-                    "title": "Full Filename",
-                    "description": "The full path and filename of the module.",
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
+        "callStacks": {
+          "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/callStacks",
+          "description": "Evidence of the components use through one or more call stacks."
         },
         "licenses": {
-          "$ref": "cyclonedx-license-2.0.schema.json#/$defs/licenseChoice",
-          "title": "License Evidence"
+          "type": "array",
+          "title": "License Evidence",
+          "description": "Evidence that substantiates the licenses detected in the component, including how each license was detected, the confidence, the tools and parties involved, and where it was found.",
+          "items": { "$ref": "#/$defs/licenseEvidence" }
         },
         "copyright": {
-          "$ref": "#/$defs/copyright"
+          "type": "array",
+          "title": "Copyright Evidence",
+          "description": "Evidence that substantiates the copyright statements detected in the component, including how each was detected, the confidence, the tools and parties involved, and where it was found.",
+          "items": { "$ref": "#/$defs/copyrightEvidence" }
+        }
+      }
+    },
+    "licenseEvidence": {
+      "type": "object",
+      "title": "License Evidence",
+      "description": "A detected license, together with how it was detected, the confidence in the detection, the tools and parties involved, and where it was found.",
+      "oneOf": [
+        { "required": [ "license" ], "properties": { "license":  true } },
+        { "required": [ "expression" ], "properties": { "expression":  true } }
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "BOM Reference",
+          "description": "An identifier which can be used to reference this license evidence elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        },
+        "license": {
+          "allOf": [
+            {
+              "$ref": "cyclonedx-license-2.0.schema.json#/$defs/license"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "id": true,
+                "name": true
+              },
+              "additionalProperties": false
+            }
+          ],
+          "title": "License",
+          "description": "The detected license, expressed as a single SPDX license identifier or a named license."
+        },
+        "expression": {
+          "type": "string",
+          "title": "License Expression",
+          "description": "The detected license, expressed as an SPDX license expression."
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "title": "Confidence",
+          "description": "The overall confidence of the detection from 0 to 1, where 1 is 100% confidence."
+        },
+        "methods": {
+          "type": "array",
+          "title": "Methods",
+          "description": "The methods used to detect the license.",
+          "items": { "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/identificationMethod" }
+        },
+        "tools": {
+          "type": "array",
+          "uniqueItems": true,
+          "title": "Tools",
+          "description": "The tools that detected the license, referenced by `bom-ref`.",
+          "items": {
+            "anyOf": [
+              { "title": "Ref", "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType" },
+              { "title": "BOM-Link Element", "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType" }
+            ]
+          }
+        },
+        "occurrences": {
+          "type": "array",
+          "title": "Occurrences",
+          "description": "The locations at which the license was detected, for example a license file or a source header.",
+          "items": { "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/occurrence" }
+        },
+        "assertion": {
+          "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/assertion",
+          "description": "The parties involved in detecting the license and the perspective from which the detection is asserted."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Timestamp",
+          "description": "The date and time at which the license was detected."
+        }
+      }
+    },
+    "copyrightEvidence": {
+      "type": "object",
+      "title": "Copyright Evidence",
+      "description": "A detected copyright statement, together with how it was detected, the confidence in the detection, the tools and parties involved, and where it was found.",
+      "required": [ "text" ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "BOM Reference",
+          "description": "An identifier which can be used to reference this copyright evidence elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        },
+        "text": {
+          "type": "string",
+          "title": "Copyright Text",
+          "description": "The detected copyright statement."
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "title": "Confidence",
+          "description": "The overall confidence of the detection from 0 to 1, where 1 is 100% confidence."
+        },
+        "methods": {
+          "type": "array",
+          "title": "Methods",
+          "description": "The methods used to detect the copyright statement.",
+          "items": { "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/identificationMethod" }
+        },
+        "tools": {
+          "type": "array",
+          "uniqueItems": true,
+          "title": "Tools",
+          "description": "The tools that detected the copyright statement, referenced by `bom-ref`.",
+          "items": {
+            "anyOf": [
+              { "title": "Ref", "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType" },
+              { "title": "BOM-Link Element", "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType" }
+            ]
+          }
+        },
+        "occurrences": {
+          "type": "array",
+          "title": "Occurrences",
+          "description": "The locations at which the copyright statement was detected.",
+          "items": { "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/occurrence" }
+        },
+        "assertion": {
+          "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/assertion",
+          "description": "The parties involved in detecting the copyright statement and the perspective from which the detection is asserted."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Timestamp",
+          "description": "The date and time at which the copyright statement was detected."
         }
       }
     },
@@ -552,45 +686,7 @@
           "type": "array",
           "title": "Methods",
           "description": "The methods used to extract and/or analyze the evidence.",
-          "items": {
-            "type": "object",
-            "required": [
-              "technique" ,
-              "confidence"
-            ],
-            "additionalProperties": false,
-            "properties": {
-              "technique": {
-                "title": "Technique",
-                "description": "The technique used in this method of analysis.",
-                "type": "string",
-                "enum": [
-                  "source-code-analysis",
-                  "binary-analysis",
-                  "manifest-analysis",
-                  "ast-fingerprint",
-                  "hash-comparison",
-                  "instrumentation",
-                  "dynamic-analysis",
-                  "filename",
-                  "attestation",
-                  "other"
-                ]
-              },
-              "confidence": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1,
-                "title": "Confidence",
-                "description": "The confidence of the evidence from 0 - 1, where 1 is 100% confidence. Confidence is specific to the technique used. Each technique of analysis can have independent confidence."
-              },
-              "value": {
-                "type": "string",
-                "title": "Value",
-                "description": "The value or contents of the evidence."
-              }
-            }
-          }
+          "items": { "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/identificationMethod" }
         },
         "tools": {
           "type": "array",
@@ -600,6 +696,16 @@
           },
           "title": "BOM References",
           "description": "The object in the BOM identified by its bom-ref. This is often a component or service but may be any object type supporting bom-refs. Tools used for analysis should already be defined in the BOM, either in the metadata/tools, components, or formulation."
+        },
+        "assertion": {
+          "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/assertion",
+          "description": "The party asserting this identity determination and the perspective from which it is made. Attribution lets identity determinations from different parties, such as a supplier and a downstream analyzer, coexist and be weighed."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Timestamp",
+          "description": "The date and time at which this identity determination was made or last held to be valid."
         }
       }
     },
@@ -640,31 +746,9 @@
           "type": "string"
         },
         "contents": {
-          "type": "object",
+          "$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataContents",
           "title": "Data Contents",
-          "description": "The contents or references to the contents of the data being described.",
-          "additionalProperties": false,
-          "properties": {
-            "attachment": {
-              "title": "Data Attachment",
-              "description": "A way to include textual or encoded data.",
-              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/attachment"
-            },
-            "url": {
-              "type": "string",
-              "title": "Data URL",
-              "description": "The URL to where the data can be retrieved.",
-              "format": "iri-reference"
-            },
-            "properties": {
-              "type": "array",
-              "title": "Configuration Properties",
-              "description": "Provides the ability to document name-value parameters used for configuration.",
-              "items": {
-                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/property"
-              }
-            }
-          }
+          "description": "The contents or references to the contents of the data being described."
         },
         "classification": {
           "$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataClassification"
@@ -686,6 +770,74 @@
         "governance": {
           "title": "Data Governance",
           "$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataGovernance"
+        }
+      }
+    },
+    "agility": {
+      "type": "object",
+      "title": "Agility",
+      "description": "Properties describing how this component's configuration was determined and how a change to it can be applied. These properties support change management and, for cryptographic assets, cryptographic-agility.",
+      "additionalProperties": false,
+      "properties": {
+        "configurationSource": {
+          "type": "string",
+          "title": "Configuration Source",
+          "description": "Describes how this component's configuration was determined. Values are roughly ordered from least to most agile, the ordering is approximate.",
+          "enum": [
+            "hardcoded",
+            "product-default",
+            "administrator-configured",
+            "policy-managed",
+            "other",
+            "unknown"
+          ],
+          "meta:enum": {
+            "hardcoded": "The configuration is fixed in code or firmware and is not intended to be changed.",
+            "product-default": "The configuration is inherited from product or vendor defaults and can typically be overridden.",
+            "administrator-configured": "The configuration is explicitly set by an administrator through external configuration.",
+            "policy-managed": "The configuration is determined by a policy or governance engine.",
+            "other": "Another configuration source applies.",
+            "unknown": "The configuration source is not known."
+          }
+        },
+        "negotiated": {
+          "type": "boolean",
+          "title": "Negotiated",
+          "description": "Indicates whether the effective configuration is selected at runtime through negotiation with one or multiple peers, such as a protocol handshake, rather than being statically fixed. This is orthogonal to `configurationSource`, which describes how the permitted configuration was determined."
+        },
+        "configurationRef": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "title": "Configuration Reference",
+          "description": "The bom-ref of the configuration that determines this component's configuration. Typically points to a component of type 'data' whose data type is 'configuration'."
+        },
+        "changeMechanism": {
+          "type": "array",
+          "title": "Change Mechanism",
+          "description": "The step or steps required to apply a change to this component's configuration. When more than one value is present, all are required (for example, a software update followed by a restart). Values are roughly ordered from least to most disruptive. Use a single value of 'not-possible' when the configuration cannot be changed.",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "not-possible",
+              "hardware-replacement",
+              "firmware-update",
+              "software-update",
+              "restart-required",
+              "runtime-config",
+              "other",
+              "unknown"
+            ],
+            "meta:enum": {
+              "not-possible": "The configuration cannot be changed through any supported means.",
+              "hardware-replacement": "The change requires replacing or adding hardware.",
+              "firmware-update": "The change requires a firmware update.",
+              "software-update": "The change requires a software or package update.",
+              "restart-required": "The change requires restarting software or service processes.",
+              "runtime-config": "The change can be applied at runtime without a restart.",
+              "other": "Another change mechanism applies.",
+              "unknown": "The change mechanism is not known."
+            }
+          }
         }
       }
     },

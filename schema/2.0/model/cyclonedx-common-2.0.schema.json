@@ -13,8 +13,8 @@
     },
     "refLinkType": {
       "description": "Descriptor for an element identified by the attribute 'bom-ref' in the same BOM document.\nIn contrast to `bomLinkElementType`.",
-      "$ref": "#/$defs/refType",
-      "$comment": "same value range as `refType`"
+      "allOf": [{ "$ref": "#/$defs/refType" }],
+      "$comment": "value-range is same as 'refType'"
     },
     "bomLinkDocumentType": {
       "title": "BOM-Link Document",
@@ -394,6 +394,13 @@
           "title": "Organizational Contact",
           "description": "A contact at the organization. Multiple contacts are allowed.",
           "items": {"$ref": "#/$defs/organizationalContact"}
+        },
+        "origins": {
+          "type": "array",
+          "title": "Organization Origins",
+          "description": "The geographic origins associated with the organization, such as the country or countries where its goods or services originate. Multiple origins are allowed, each calculated on a different basis.",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/origin"}
         }
       }
     },
@@ -429,7 +436,132 @@
       }
     },
     "organizationalEntityOrContact": {
-
+        "$comment": "TODO"
+    },
+    "origin": {
+      "type": "object",
+      "title": "Origin",
+      "description": "Describes the geographic origin of the subject (for example, a component or party), expressed as a distribution across one or more countries or subdivisions, calculated on a stated basis. An origin may be scoped to a lifecycle or transformation stage, enabling stage-specific provenance such as distinguishing where a material was mined from where it was melted.",
+      "additionalProperties": false,
+      "required": [ "basis", "distribution" ],
+      "properties": {
+        "stage": {
+          "title": "Origin Stage",
+          "description": "The lifecycle or transformation stage of the subject to which this origin applies. When omitted, the origin describes the subject as a whole.",
+          "oneOf": [
+            {
+              "type": "string",
+              "title": "Predefined Origin Stage",
+              "description": "An origin stage drawn from the predefined set.",
+              "enum": [
+                "designed",
+                "mined",
+                "harvested",
+                "recycled",
+                "refined",
+                "separated",
+                "smelted",
+                "melted",
+                "processed",
+                "manufactured",
+                "assembled",
+                "developed",
+                "built",
+                "tested",
+                "collected",
+                "trained",
+                "hosted",
+                "operated",
+                "maintained"
+              ],
+              "meta:enum": {
+                "designed": "Creation of the design, specifications, or intellectual property of the subject, such as product design or integrated circuit design.",
+                "mined": "Extraction of raw material from the earth, including ore mining and quarrying.",
+                "harvested": "Collection of biologically derived raw material, such as timber, fibres, or natural rubber.",
+                "recycled": "Recovery of material from scrap, waste, or previously used items.",
+                "refined": "Purification of material, including chemical refining and electrorefining.",
+                "separated": "Separation of individual elements or compounds from a mixed feedstock, such as rare earth element separation.",
+                "smelted": "Extraction of metal from ore or concentrate by smelting.",
+                "melted": "Melting of material into a homogeneous mass, such as an alloying melt or a remelt.",
+                "processed": "Intermediate transformation not covered by a more specific stage, such as milling, atomization, or heat treatment.",
+                "manufactured": "Fabrication of the item from its input materials or parts.",
+                "assembled": "Integration of constituent parts into the finished item.",
+                "developed": "Authoring of the source code of software or firmware.",
+                "built": "Production of software artifacts from source, including compilation, packaging, and container image assembly.",
+                "tested": "Verification of the subject against its requirements, such as software testing, hardware qualification, or final device test.",
+                "collected": "Gathering of data from its sources, such as measurements, records, or user generated content.",
+                "trained": "Training of a machine learning model, attributed to the regions where the training computation was performed.",
+                "hosted": "Provision of the infrastructure on which a service or data resides, such as data centre regions.",
+                "operated": "Operation and administration of the subject, attributed to the regions where operating personnel or systems are located.",
+                "maintained": "Ongoing maintenance of the subject after release, including updates, patches, and security fixes."
+              }
+            },
+            {
+              "type": "object",
+              "title": "Custom Origin Stage",
+              "description": "An origin stage that is not present in the predefined set.",
+              "required": [ "name" ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom origin stage.",
+                  "examples": [ "sintered", "coated", "packaged" ]
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "Description of the custom origin stage."
+                }
+              }
+            }
+          ]
+        },
+        "basis": {
+          "type": "string",
+          "title": "Origin Basis",
+          "description": "A free-form description of the methodology or unit on which the origin distribution is calculated. Each origin of the same subject shall use a distinct combination of stage and basis.",
+          "minLength": 1,
+          "examples": [ "number of parts", "manufacturing cost", "net weight" ]
+        },
+        "distribution": {
+          "type": "array",
+          "title": "Origin Distribution",
+          "description": "The distribution of the origin across regions. The percentages of all entries shall total 100, within rounding of the stated precision.",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/originRegion" }
+        }
+      }
+    },
+    "originRegion": {
+      "type": "object",
+      "title": "Origin Region",
+      "description": "A single region of origin, its share of the whole, and optionally the party that performed the stage in that region.",
+      "additionalProperties": false,
+      "required": [ "isoCode", "percentage" ],
+      "properties": {
+        "isoCode": {
+          "type": "string",
+          "title": "ISO Code",
+          "description": "The country or subdivision of origin, expressed as an ISO 3166-1 alpha-2 country code (for example, 'CA' for Canada) or an ISO 3166-2 subdivision code (for example, 'US-CA' for California, United States).",
+          "pattern": "^[A-Z]{2}(-[A-Z0-9]{1,3})?$",
+          "examples": [ "CA", "US-CA" ]
+        },
+        "percentage": {
+          "type": "number",
+          "title": "Percentage",
+          "description": "The percentage of the whole attributable to this region. The percentages of all entries in a distribution must total 100, within rounding of the stated precision.",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "performedBy": {
+          "$ref": "#/$defs/refLinkType",
+          "title": "Performed By",
+          "description": "Reference to the party that performed this stage of origin for this share of the distribution, such as the smelter that melted a material or the organization that developed a software component. Entries in a distribution may repeat a region in order to attribute shares to different parties."
+        }
+      }
     },
     "properties": {
       "type": "array",
@@ -463,43 +595,70 @@
     "extensibleProperties": {
       "type": "object",
       "title": "Extensible Properties",
+      "$comment": "This is a mixin. It intentionally does NOT restrict additional/unevaluated properties itself; schemas composing it via `allOf` are expected to close themselves with `unevaluatedProperties: false` so that both their own defined properties and these patternProperties remain usable.",
       "patternProperties": {
         "^ext:[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}:.+$": {
-          "description": "CycloneDX supports a structured and namespace-aware mechanism for extensibility through the use of extensible properties. This mechanism enables organizations, ecosystems, and tool vendors to safely introduce custom properties without conflicting with the core schema or other extensions.\n\nExtensible properties are defined as a JSON object whose keys must conform to a strict pattern that resembles a reverse domain name structure, prefixed with ext:. This pattern provides a namespacing convention that aligns with well-established practices in other structured formats (e.g., XML namespaces).",
+          "description": "CycloneDX supports a structured and namespace-aware mechanism for extensibility through the use of extensible properties. This mechanism enables organizations, ecosystems, and tool vendors to safely introduce custom properties without conflicting with the core schema or other extensions.\n\nExtensible properties are defined as a JSON object whose keys must conform to a strict pattern that resembles a reverse domain name structure, prefixed with ext:. This pattern provides a namespacing convention that aligns with well-established practices in other structured formats (e.g., XML namespaces).\n\nValues that are objects must declare the schema they conform to via `$schema`. This requirement applies recursively to objects contained in arrays, at any nesting depth.",
           "examples": [
             "ext:<domain>:<name>",
             "ext:example.org:myExtension"
           ],
-          "if": {
-            "type": ["object", "array"]
-          },
-          "then": {
-            "type": "object",
-            "required": ["$schema"],
-            "properties": {
-              "$schema": {
-                "type": "string",
-                "format": "uri"
-              }
+          "$ref": "#/$defs/extensibleProperties/$defs/propertyValue"
+        }
+      },
+      "$defs": {
+        "propertyObject": {
+          "type": "object",
+          "title": "Extensible Property Object",
+          "$comment": "Internal helper for extensibleProperties. Not part of the public schema API — do not reference externally; may change without notice.\n\nadditionalProperties explicitly allowed for extensibility reasons.",
+          "required": ["$schema"],
+          "properties": {
+            "$schema": {
+              "type": "string",
+              "format": "uri"
             }
           },
+          "additionalProperties": true
+        },
+        "propertyValue": {
+          "title": "Extensible Property Value",
+          "$comment": "Internal helper for extensibleProperties. Not part of the public schema API — do not reference externally; may change without notice.\nRecursive: objects must declare a `$schema`, arrays may nest arbitrarily deep with the same rule applied to every item, all other values are plain scalars.",
+          "if": {
+            "type": "object"
+          },
+          "then": {
+            "$ref": "#/$defs/extensibleProperties/$defs/propertyObject"
+          },
           "else": {
-            "type": ["string", "number", "boolean", "null"]
+            "if": {
+              "type": "array"
+            },
+            "then": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/extensibleProperties/$defs/propertyValue"
+              }
+            },
+            "else": {
+              "type": ["string", "number", "boolean", "null"]
+            }
           }
         }
       }
     },
     "baseObject": {
+      "type": "object",
       "description": "Base object for all CycloneDX entities. Automatically includes support for extensible properties.",
+      "$comment": "This is a mixin. It intentionally does NOT set `unevaluatedProperties: false` — that keyword cannot see properties defined by schemas composing this one via `allOf`, and would reject them. Concrete (leaf) schemas composing this mixin must close themselves with `unevaluatedProperties: false`.",
       "allOf": [
-        { "$ref": "cyclonedx-common-2.0.schema.json#/$defs/extensibleProperties" }
+        { "$ref": "#/$defs/extensibleProperties" }
       ],
       "properties": {
         "properties": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+          "$ref": "#/$defs/properties"
         },
         "externalReferences": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReferences"
+          "$ref": "#/$defs/externalReferences"
         }
       }
     },
@@ -510,8 +669,21 @@
       "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$",
       "description": "An RFC 3339-compliant UTC timestamp using Zulu time (i.e., ending with 'Z'). The format must be 'YYYY-MM-DDTHH:MM:SSZ' or include optional fractional seconds, e.g., 'YYYY-MM-DDTHH:MM:SS.sssZ'. Offsets such as '+00:00' are not allowed."
     },
+    "ordinalVersion": {
+      "title": "Ordinal Version",
+      "description": "An ordinal version is a dot-delimited, purely numeric identifier where each segment represents an ordered level in the hierarchy. The segments have no prescribed meaning beyond numeric ordering, allowing straightforward comparison and sorting.",
+      "type": "string",
+      "pattern": "^[0-9]+(\\.[0-9]+)*$",
+      "examples": [
+        "0.8.15",
+        "1",
+        "1.2",
+        "1.2.3",
+        "2025.09.02",
+        "10.4.7.3"
+      ]
+    },
     "lifecycle": {
-      "type": "object",
       "title": "Lifecycle",
       "description": "The product lifecycle(s) that this BOM represents.",
       "oneOf": [
@@ -519,6 +691,7 @@
           "$ref": "#/$defs/preDefinedLifecyclePhase"
         },
         {
+          "type": "object",
           "title": "Custom Lifecycle Phase",
           "required": ["name"],
           "additionalProperties": false,
@@ -544,6 +717,7 @@
       "items": { "$ref":  "#/$defs/lifecycle"}
     },
     "preDefinedLifecyclePhase": {
+      "type": "object",
       "title": "Pre-Defined Phase",
       "required": ["phase"],
       "additionalProperties": false,

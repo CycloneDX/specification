@@ -123,6 +123,16 @@ function _refTypeRefFor(schemaFile) {
 }
 
 /**
+ * @function
+ * @param {*} schema
+ * @return {Generator<[string, *], void, *>} every node that has an `enum` or a `meta:enum`
+ * @private
+ */
+const _findObjectWithEnum = (schema) => _findNodes(schema,
+    n => 'enum' in n || 'meta:enum' in n)
+
+
+/**
  * @param {*} actual
  * @param {*} expected
  * @param {string} msg
@@ -201,7 +211,8 @@ function testRefTypeUsage(schema, schemaFile) {
             }
             continue
         }
-        if (ref === refTypeRef && path !== exceptionPath) {
+        if (ref === refTypeRef) {
+            if (exceptionPath && path.startsWith(exceptionPath)) continue;
             ++errCnt
             _printError(
                 ref, `different from: ${refTypeRef}`,
@@ -213,25 +224,100 @@ function testRefTypeUsage(schema, schemaFile) {
 }
 
 /**
- * object schemas must have `additionalProperties: false`,
- * unless explicitly allowed via `$comment`.
+ * object schemas must have `additionalProperties` set,
+ * unless `unevaluatedProperties` is set,
+ * or `$comment` containing 'this is a mixin',
+ * or explicitly allowed via `$comment` containing 'additionalproperties explicitly allowed'.
  * @param {*} schema
  * @param {string} schemaFile
  * @return {number} number of errors found
  */
-function testAdditionalPropertiesFalse(schema, schemaFile) {
+function testAdditionalProperties(schema, schemaFile) {
     let errCnt = 0
     for (const [path, node] of _findObjectSchemas(schema)) {
-        if (path.endsWith('.if') || path.endsWith('.not')) continue;
-        const expected = typeof node['$comment'] === 'string'
-            && node['$comment'].includes('additionalProperties explicitly allowed')
-        const actual = node['additionalProperties']
+        if (Object.keys(node).join('|') === 'type') {
+            // this is a sole type constraint
+            continue
+        }
+
+        const unevaluatedProperties = node.unevaluatedProperties
+        const additionalProperties = node.additionalProperties
+
+        if (unevaluatedProperties !== undefined) {
+            // Don't need 'additionalProperties', since 'unevaluatedProperties' takes care.
+            // see https://json-schema.org/draft/2020-12/json-schema-core#section-11.3
+            if (additionalProperties !== undefined) {
+                ++errCnt
+                _printError(
+                    'both set', 'exactly one set',
+                    'either .additionalProperties or .unevaluatedProperties should be set',
+                    schemaFile, path)
+            }
+            continue;
+        }
+
+        const commentLC = typeof node['$comment'] === 'string'
+            ? node['$comment'].toLowerCase()
+            : ''
+
+        if (commentLC.includes('this is a mixin')) {
+            // This is a mixin. It intentionally does NOT restrict additional/unevaluated properties itself; schemas composing it via `allOf` are expected to close themselves with `unevaluatedProperties: false` so that both their own defined properties and these patternProperties remain usable.
+            continue;
+        }
+
+        const expected = commentLC.includes('additionalproperties explicitly allowed')
+        const actual = additionalProperties
         if (actual !== expected) {
             ++errCnt
             _printError(
                 actual, expected,
-                'wrong .additionalProperties',
+                'either .additionalProperties or .unevaluatedProperties must be set',
                 schemaFile, path)
+        }
+    }
+    return errCnt
+}
+
+/**
+ * `meta:enum` must be an object,
+ * and every `enum` value must exist as a key in it.
+ * @param {*} schema
+ * @param {string} schemaFile
+ * @return {number} number of errors found
+ */
+function testMetaEnum(schema, schemaFile) {
+    let errCnt = 0
+    for (const [path, node] of _findObjectWithEnum(schema)) {
+        const metaEnum = node['meta:enum']
+        if (metaEnum === undefined) {
+            // metaEnum is optional
+            continue
+        }
+        if (typeof metaEnum !== 'object' || metaEnum === null || Array.isArray(metaEnum)) {
+            ++errCnt
+            _printError(
+                metaEnum, 'an object',
+                'meta:enum must be an object',
+                schemaFile, `${path}.meta:enum`)
+            continue
+        }
+        const enumValues = node['enum']
+        if (!Array.isArray(enumValues)) {
+            ++errCnt
+            _printError(
+                enumValues, 'an array',
+                'meta:enum without a sibling enum array',
+                schemaFile, `${path}.enum`)
+            continue
+        }
+        for (const value of enumValues) {
+            if (!Object.hasOwn(metaEnum, value)) {
+                ++errCnt
+                _printError(
+                    undefined, `a key ${JSON.stringify(String(value))}`,
+                    'enum value missing in meta:enum',
+                    schemaFile, `${path}.meta:enum`)
+            }
         }
     }
     return errCnt
@@ -245,7 +331,8 @@ function testAdditionalPropertiesFalse(schema, schemaFile) {
 const tests = Object.freeze({
     'no self-$ref by file': testNoSelfRefByFile,
     'refType usage (`bom-ref` <-> refType)': testRefTypeUsage,
-    'additionalProperties is `false`': testAdditionalPropertiesFalse,
+    'additionalProperties is `false`': testAdditionalProperties,
+    'meta:enum completeness': testMetaEnum,
 })
 
 const schemas = await Promise.all(schemaFiles.map(
