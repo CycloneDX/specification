@@ -310,14 +310,22 @@ function testMetaEnum(schema, schemaFile) {
                 schemaFile, `${path}.enum`)
             continue
         }
-        for (const value of enumValues) {
-            if (!Object.hasOwn(metaEnum, value)) {
-                ++errCnt
-                _printError(
-                    undefined, `a key ${JSON.stringify(String(value))}`,
-                    'enum value missing in meta:enum',
-                    schemaFile, `${path}.meta:enum`)
-            }
+        const enumSet = new Set(enumValues)
+        const metaSet = new Set(Object.keys(metaEnum))
+
+        for (const value of enumSet.difference(metaSet)) {
+            ++errCnt
+            _printError(
+                undefined, `a key ${JSON.stringify(value)}`,
+                'enum value missing in meta:enum',
+                schemaFile, `${path}.meta:enum`)
+        }
+        for (const value of metaSet.difference(enumSet)) {
+            ++errCnt
+            _printError(
+                undefined, `a string ${JSON.stringify(value)}`,
+                'meta:enum value missing in enum',
+                schemaFile, `${path}.enum`)
         }
     }
     return errCnt
