@@ -304,8 +304,9 @@
       },
       "allOf": [
         {
-          "description": "Requirement: ensure that `version` and `versionRange` are not present simultaneously.",
+          "description": "Requirement: ensure that `version` and `versionRange` are mutually exclusive.",
           "not": {
+            "properties": { "version": true, "versionRange": true },
             "required": ["version", "versionRange"]
           }
         },
@@ -371,8 +372,8 @@
           "else": {
             "not": {
               "anyOf": [
-                { "required": ["endpoints"] },
-                { "required": ["dataProfiles"] }
+                { "required": ["endpoints"], "properties": { "endpoints":  true } },
+                { "required": ["dataProfiles"], "properties": { "dataProfiles":  true } }
               ]
             }
           }
@@ -524,8 +525,8 @@
       "title": "License Evidence",
       "description": "A detected license, together with how it was detected, the confidence in the detection, the tools and parties involved, and where it was found.",
       "oneOf": [
-        { "required": [ "license" ] },
-        { "required": [ "expression" ] }
+        { "required": [ "license" ], "properties": { "license":  true } },
+        { "required": [ "expression" ], "properties": { "expression":  true } }
       ],
       "additionalProperties": false,
       "properties": {
