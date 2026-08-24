@@ -240,9 +240,19 @@ function testAdditionalProperties(schema, schemaFile) {
             continue
         }
 
-        if ('unevaluatedProperties' in node) {
+        const unevaluatedProperties = node.unevaluatedProperties
+        const additionalProperties = node.additionalProperties
+
+        if (unevaluatedProperties !== undefined) {
             // Don't need 'additionalProperties', since 'unevaluatedProperties' takes care.
             // see https://json-schema.org/draft/2020-12/json-schema-core#section-11.3
+            if (additionalProperties !== undefined) {
+                ++errCnt
+                _printError(
+                    'both set', 'exactly one set',
+                    'either .additionalProperties or .unevaluatedProperties should be set',
+                    schemaFile, path)
+            }
             continue;
         }
 
@@ -256,7 +266,7 @@ function testAdditionalProperties(schema, schemaFile) {
         }
 
         const expected = commentLC.includes('additionalproperties explicitly allowed')
-        const actual = node['additionalProperties']
+        const actual = additionalProperties
         if (actual !== expected) {
             ++errCnt
             _printError(
