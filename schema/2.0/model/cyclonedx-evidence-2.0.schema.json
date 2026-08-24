@@ -1,0 +1,568 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-evidence-2.0.schema.json",
+  "type": "null",
+  "title": "CycloneDX Evidence Model",
+  "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
+  "$defs": {
+    "occurrence": {
+      "type": "object",
+      "title": "Occurrence",
+      "description": "Evidence of an individual location at which a subject, such as a component or a vulnerability, was found.",
+      "required": [
+        "location"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "BOM Reference",
+          "description": "An identifier which can be used to reference the occurrence elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        },
+        "location": {
+          "type": "string",
+          "title": "Location",
+          "description": "The location or path at which the subject was found, for example a file path, a URL, or a package coordinate."
+        },
+        "line": {
+          "type": "integer",
+          "minimum": 0,
+          "title": "Line Number",
+          "description": "The line number at which the subject was found."
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0,
+          "title": "Offset",
+          "description": "The byte offset at which the subject was found, for example within a binary."
+        },
+        "symbol": {
+          "type": "string",
+          "title": "Symbol",
+          "description": "The symbol, function, or method name associated with the occurrence."
+        },
+        "additionalContext": {
+          "type": "string",
+          "title": "Additional Context",
+          "description": "Any additional context of the occurrence, for example a code snippet or a matched pattern."
+        },
+        "accountInfo": {
+          "type": "string",
+          "title": "Account Information",
+          "description": "The account or user information associated with the occurrence. This can be personal data. It should be minimized or omitted where not necessary, since a bill of materials is frequently redistributed."
+        },
+        "systemOwner": {
+          "type": "string",
+          "title": "System Owner",
+          "description": "The owner of the system where the subject was found."
+        },
+        "startTime": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Start Time",
+          "description": "The date and time when the process detecting the occurrence started."
+        },
+        "endTime": {
+          "type": "string",
+          "format": "date-time",
+          "title": "End Time",
+          "description": "The date and time when the process detecting the occurrence ended."
+        },
+        "usageCount": {
+          "type": "integer",
+          "minimum": 0,
+          "title": "Usage Count",
+          "description": "The number of times the subject occurred in the detecting process."
+        }
+      }
+    },
+    "callStacks": {
+      "type": "array",
+      "title": "Call Stacks",
+      "description": "Evidence of the subject through one or more call stacks or data flow paths. A subject can be reached by more than one path, for example a sensitive operation reached from several entry points, or untrusted data reaching a sink through several flows. Each entry records an independent path.",
+      "items": { "$ref": "#/$defs/callStack" }
+    },
+    "callStack": {
+      "type": "object",
+      "title": "Call Stack",
+      "description": "A single call stack or data flow path by which the subject is reached.",
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "BOM Reference",
+          "description": "An identifier which can be used to reference this call stack elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "An optional name or label for this path, for example the entry point through which the subject is reached."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "An optional description of this path."
+        },
+        "frames": {
+          "type": "array",
+          "title": "Frames",
+          "description": "The ordered frames of the call stack or data flow path, ordered from the entry point, or source, to the sensitive operation, or sink. Within a call stack, a frame is a discrete unit that encapsulates an execution context, including local variables, parameters, and the return address. As function calls are made, frames are pushed onto the stack, forming an array-like structure that orchestrates the flow of program execution and manages the sequence of function invocations.",
+          "items": { "$ref": "#/$defs/frame" }
+        }
+      }
+    },
+    "frame": {
+      "type": "object",
+      "title": "Frame",
+      "description": "A discrete unit within a call stack or data flow path.",
+      "required": [
+        "module"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "package": {
+          "type": "string",
+          "title": "Package",
+          "description": "A package organizes modules into namespaces, providing a unique namespace for each type it contains."
+        },
+        "module": {
+          "type": "string",
+          "title": "Module",
+          "description": "A module or class that encloses functions/methods and other code."
+        },
+        "function": {
+          "type": "string",
+          "title": "Function",
+          "description": "A block of code designed to perform a particular task."
+        },
+        "parameters": {
+          "type": "array",
+          "title": "Parameters",
+          "description": "Arguments that are passed to the module or function.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "line": {
+          "type": "integer",
+          "title": "Line",
+          "description": "The line number the code that is called resides on."
+        },
+        "column": {
+          "type": "integer",
+          "title": "Column",
+          "description": "The column the code that is called resides."
+        },
+        "fullFilename": {
+          "type": "string",
+          "title": "Full Filename",
+          "description": "The full path and filename of the module."
+        }
+      }
+    },
+    "analysisMethod": {
+      "type": "object",
+      "title": "Analysis Method",
+      "description": "A single method of analysis that contributed to a determination, the technique it applied, the confidence specific to that technique, and its result.",
+      "required": [
+        "technique",
+        "confidence"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "technique": {
+          "$ref": "#/$defs/analysisTechnique",
+          "description": "The technique used in this method of analysis."
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "title": "Confidence",
+          "description": "The confidence of the evidence from 0 to 1, where 1 is 100% confidence. Confidence is specific to the technique used. Each technique of analysis can have independent confidence."
+        },
+        "value": {
+          "type": "string",
+          "title": "Value",
+          "description": "The value or contents of the evidence, for example a matched identifier, a signature, or a summary of the result."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the evidence that can contain additional information about the investigation, for example the reasoning applied or the conditions observed."
+        },
+        "result": {
+          "$ref": "#/$defs/analysisResult",
+          "description": "The outcome of applying this method, distinguishing a positive detection from a method that ran and found nothing or was inconclusive. This makes negative evidence machine actionable."
+        },
+        "rule": {
+          "$ref": "#/$defs/detectionRule",
+          "description": "The rule, policy, or query that produced this method's result. Recording it, together with the version of the ruleset or policy bundle that contains it, supports reproducibility, which matters most for findings in custom code that will never receive a CVE."
+        },
+        "externalReferences": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReferences",
+          "description": "External references to material that supports this method, for example a scanner report, an advisory, or documentation of the rule."
+        }
+      }
+    },
+    "detectionRule": {
+      "type": "object",
+      "title": "Detection Rule",
+      "description": "A rule, policy, or query that identified a finding, for example a static or dynamic analysis rule, a policy, or a query. The scanner, engine, and ruleset are versioned components referenced from `tools`; this object identifies the specific rule and binds it to that ruleset.",
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "BOM Reference",
+          "description": "An identifier which can be used to reference the rule elsewhere in the BOM, for example when the same rule produces many findings. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        },
+        "id": {
+          "type": "string",
+          "title": "Rule Identifier",
+          "description": "The identifier of the rule, policy, or query, for example a static analysis rule identifier or a query identifier."
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "A human-readable name for the rule, policy, or query."
+        },
+        "version": {
+          "type": "string",
+          "title": "Version",
+          "description": "The version of the rule, or of the ruleset or policy bundle that contains it."
+        },
+        "ruleset": {
+          "anyOf": [
+            {
+              "title": "Ref",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+            },
+            {
+              "title": "BOM-Link Element",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+            }
+          ],
+          "title": "Ruleset",
+          "description": "A reference, by `bom-ref`, to the ruleset or policy bundle that contains this rule, typically modelled as a versioned component or service in `tools`."
+        },
+        "text": {
+          "type": "string",
+          "title": "Text",
+          "description": "The rule, policy, or query text. Large or sensitive rule content should instead be referenced through supporting data of type `rule`."
+        }
+      }
+    },
+    "analysisResult": {
+      "type": "string",
+      "title": "Analysis Result",
+      "description": "The outcome of a method of analysis.",
+      "enum": [
+        "detected",
+        "not-detected",
+        "inconclusive"
+      ],
+      "meta:enum": {
+        "detected": "The method found the subject of the analysis, for example the identifier matched or the vulnerable condition was observed.",
+        "not-detected": "The method ran and did not find the subject of the analysis, for example the vulnerable code was determined to be unreachable. This is meaningful negative evidence, distinct from a method that was not run.",
+        "inconclusive": "The method ran but could not determine an outcome."
+      }
+    },
+    "identificationMethod": {
+      "title": "Identification Method",
+      "description": "A method of analysis used to identify a subject, such as a component. The technique is constrained to those meaningful for identification; techniques that only apply to vulnerability assessment are not permitted.",
+      "allOf": [
+        { "$ref": "#/$defs/analysisMethod" },
+        {
+          "type": "object",
+          "additionalProperties": true,
+          "$comment": "additionalProperties explicitly allowed - it is controlled by the other `allOf`",
+          "properties": {
+            "technique": {
+              "not": {
+                "enum": [
+                  "signature",
+                  "reachability-analysis",
+                  "taint-analysis",
+                  "penetration-testing",
+                  "exploitation",
+                  "runtime-protection",
+                  "emulation",
+                  "pipeline-analysis",
+                  "infrastructure-as-code-analysis",
+                  "mobile-analysis"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "assessmentMethod": {
+      "title": "Assessment Method",
+      "description": "A method of analysis used to assess a vulnerability. The technique is constrained to those meaningful for assessment; the identification-only `filename` technique is not permitted.",
+      "allOf": [
+        { "$ref": "#/$defs/analysisMethod" },
+        {
+          "type": "object",
+          "additionalProperties": true,
+          "$comment": "additionalProperties explicitly allowed - it is controlled by the other `allOf`",
+          "properties": {
+            "technique": {
+              "not": {
+                "enum": [
+                  "filename"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "assertion": {
+      "type": "object",
+      "title": "Assertion",
+      "description": "Attribution of an evidence determination to the parties involved in producing it so that determinations from different vantages, for example a supplier and a downstream consumer, can coexist and be weighed independently. Evidence is inherently perspectival: a supplier may assert that a component is not affected while a consumer, testing a deployed configuration, asserts that it is, and both determinations are valid from their respective vantage. More than one party can be involved in producing evidence, for example the analyst who performed the work, a reviewer who validated it, and the organization accountable for it; each is attributed with its own role. This attributes evidence to the parties involved, which is distinct from the `tools` that were used.",
+      "additionalProperties": false,
+      "properties": {
+        "parties": {
+          "type": "array",
+          "minItems": 1,
+          "title": "Parties",
+          "description": "The parties involved in producing this evidence, each attributed with the role in which they were involved. When recorded, this attributes evidence to every party involved, not only the tools used. A party should resolve to a party declared in the BOM.",
+          "items": { "$ref": "#/$defs/partyAttribution" }
+        }
+      }
+    },
+    "partyAttribution": {
+      "type": "object",
+      "title": "Party Attribution",
+      "description": "A party involved in producing evidence, attributed with the role in which it was involved.",
+      "required": [
+        "party"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "party": {
+          "$ref": "cyclonedx-party-2.0.schema.json#/$defs/partyChoice",
+          "title": "Party",
+          "description": "The party involved, represented inline or as a reference to a previously declared party."
+        },
+        "role": {
+          "$ref": "cyclonedx-party-2.0.schema.json#/$defs/role",
+          "title": "Role",
+          "description": "The role or vantage in which the party was involved, for example supplier, manufacturer, distributor, operator, customer, end-user, asserter, auditor, reviewer, or researcher."
+        }
+      }
+    },
+    "analysisTechnique": {
+      "title": "Technique",
+      "description": "The technique used in a method of analysis. The vocabulary spans both the identification of a subject, such as a component, and the assessment of a vulnerability, so that evidence is described consistently wherever it appears. Either a predefined value or a custom technique described by name and description.",
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "source-code-analysis",
+            "binary-analysis",
+            "dynamic-analysis",
+            "instrumentation",
+            "manifest-analysis",
+            "ast-fingerprint",
+            "content-match",
+            "hash-comparison",
+            "filename",
+            "software-identifier",
+            "signature",
+            "reachability-analysis",
+            "taint-analysis",
+            "penetration-testing",
+            "exploitation",
+            "runtime-protection",
+            "emulation",
+            "pipeline-analysis",
+            "infrastructure-as-code-analysis",
+            "mobile-analysis",
+            "visual-inspection",
+            "x-ray-inspection",
+            "electrical-testing",
+            "material-analysis",
+            "decapsulation",
+            "manual-review",
+            "attestation",
+            "unknown"
+          ],
+          "meta:enum": {
+            "source-code-analysis": "Analysis of human-readable source code without executing it, for example static application security testing (SAST) or source composition analysis.",
+            "binary-analysis": "Static analysis of a compiled artefact, for example binary static application security testing, firmware analysis, or binary composition analysis.",
+            "dynamic-analysis": "Analysis of a running application through external interaction, for example dynamic application security testing (DAST) or fuzzing.",
+            "instrumentation": "Analysis that observes the application from within during execution using an agent or hooks, for example interactive application security testing (IAST).",
+            "manifest-analysis": "Analysis of a manifest, lockfile, or other declared inventory that records the presence of a component or dependency.",
+            "ast-fingerprint": "Comparison of an abstract syntax tree fingerprint against a known pattern or signature.",
+            "content-match": "Matching content against a known corpus, for example detecting a license by its text, detecting a copyright statement, or identifying code by a snippet match.",
+            "hash-comparison": "Comparison of a cryptographic hash of a file or function against a known value.",
+            "filename": "Identification based on the name of a file or artefact.",
+            "software-identifier": "Matching of a software identifier, for example a CPE, Package URL (PURL), or other coordinate, against a component.",
+            "signature": "Matching of a byte or code signature that indicates the presence or configuration of specific code.",
+            "reachability-analysis": "Analysis of the call graph or control flow to determine whether specific code can be reached under some execution path.",
+            "taint-analysis": "Analysis of data flow that tracks whether untrusted or attacker-controllable input can reach specific code.",
+            "penetration-testing": "Assessment by testers who attempt to identify and demonstrate a finding, whether manual or tool assisted.",
+            "exploitation": "Execution of a working exploit against the subject that demonstrates a finding can be triggered.",
+            "runtime-protection": "Observation by a protective control that detected or blocked an attempt, for example a web application firewall (WAF), web application and API protection (WAAP), or runtime application self-protection (RASP).",
+            "emulation": "Analysis performed by executing the subject within an emulated or sandboxed environment.",
+            "pipeline-analysis": "Analysis performed within a build or delivery pipeline, for example continuous integration and continuous delivery security checks.",
+            "infrastructure-as-code-analysis": "Analysis of declarative infrastructure definitions for a matching pattern or configuration.",
+            "mobile-analysis": "Analysis specific to a mobile application, for example mobile application security testing (MAST).",
+            "visual-inspection": "Visual examination of a physical item, including package markings, labels, date and lot codes, and construction, typically substantiated by a photograph.",
+            "x-ray-inspection": "Radiographic examination of the internal construction of a physical item, for example the die, lead frame, and wire bonds of a packaged semiconductor.",
+            "electrical-testing": "Electrical measurement of a physical item compared against expected characteristics, for example parametric testing or curve tracing.",
+            "material-analysis": "Analysis of the materials of a physical item, for example X-ray fluorescence or spectroscopy of the package, leads, or die.",
+            "decapsulation": "Destructive removal of the packaging of a physical item to expose the internal construction for examination, for example exposing a semiconductor die.",
+            "manual-review": "Review or expert analysis performed by a human analyst.",
+            "attestation": "A determination asserted by a party, for example a supplier or an assessor, rather than derived from direct analysis.",
+            "unknown": "The technique is not known or was not recorded, for example when a determination is imported from an external source that did not disclose how it was reached. This is distinct from naming a real but unlisted technique through the custom object form."
+          }
+        },
+        {
+          "type": "object",
+          "title": "Custom Analysis Technique",
+          "description": "A custom analysis technique not represented in the predefined vocabulary.",
+          "required": [
+            "name"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Name",
+              "description": "The name of the custom analysis technique."
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the custom analysis technique."
+            }
+          }
+        }
+      ]
+    },
+    "supportingData": {
+      "type": "object",
+      "title": "Supporting Data",
+      "description": "A labelled item of supporting material that records or reproduces evidence, for example scanner output, a request and response transcript, a prompt and completion pair from a language model assessment, a payload, or a screenshot. A bill of materials is frequently signed and redistributed and cannot be recalled once distributed, so supporting material should be minimized and, where it contains secrets, personal data, or working exploit code, referenced through `contents.url` behind access control rather than inlined, redacted or defanged before inclusion, and classified so that recipients can handle it appropriately.",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name or label of the data, for example 'attack prompt', 'model response', 'HTTP request', or 'scanner report'."
+        },
+        "ref": {
+          "anyOf": [
+            {
+              "title": "Ref",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+            },
+            {
+              "title": "BOM-Link Element",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+            }
+          ],
+          "title": "Reference",
+          "description": "An optional reference, by `bom-ref`, to the specific determination this material corroborates, for example a presence evidence entry. This links proof to a particular claim and perspective rather than leaving it pooled and unattributed."
+        },
+        "type": {
+          "$ref": "#/$defs/evidenceDataType",
+          "description": "The kind of supporting material, used to categorize the data in a standardized way."
+        },
+        "contents": {
+          "$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataContents",
+          "title": "Data Contents",
+          "description": "The contents or references to the contents of the data being described. Referencing the material through `url` behind access control is preferred over inlining an `attachment` when the material contains secrets, personal data, or working exploit code."
+        },
+        "classification": {
+          "$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataClassification",
+          "description": "The sensitivity or classification of the supporting material, for example where a payload or transcript contains regulated data."
+        },
+        "sensitiveData": {
+          "type": "array",
+          "title": "Sensitive Data",
+          "description": "A description of any sensitive data contained in the supporting material, for example credentials, tokens, or personal data present in a transcript or payload.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "governance": {
+          "$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataGovernance",
+          "title": "Data Governance",
+          "description": "Ownership, stewardship, and custodianship of the supporting material, and any handling or distribution constraints that apply to it."
+        },
+        "redacted": {
+          "type": "boolean",
+          "title": "Redacted",
+          "description": "Whether the supporting material has been redacted or defanged to remove secrets, personal data, or the ability to execute an exploit before inclusion in the BOM."
+        }
+      }
+    },
+    "evidenceDataType": {
+      "title": "Supporting Data Type",
+      "description": "The kind of supporting material. Either a predefined value or a custom type described by name and description.",
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "request",
+            "response",
+            "prompt",
+            "completion",
+            "payload",
+            "configuration",
+            "log",
+            "report",
+            "screenshot",
+            "photograph",
+            "exploit",
+            "data-flow",
+            "rule"
+          ],
+          "meta:enum": {
+            "request": "A request sent to the subject, for example an HTTP request.",
+            "response": "A response returned by the subject, for example an HTTP response.",
+            "prompt": "A prompt submitted to a model or agent, for example an attack prompt in a language model assessment.",
+            "completion": "A completion or response produced by a model or agent.",
+            "payload": "An input, sample, or payload used to exercise the subject.",
+            "configuration": "A configuration or setting relevant to the determination.",
+            "log": "A log or trace captured during analysis.",
+            "report": "A report or output produced by a tool.",
+            "screenshot": "A captured image that illustrates the evidence.",
+            "photograph": "A photograph of a physical item, for example the markings on a chip package.",
+            "exploit": "Proof of concept or exploit code.",
+            "data-flow": "A representation of a data flow or taint path.",
+            "rule": "A detection rule, policy, or query used to identify the finding, for example the full text of a static analysis rule or query."
+          }
+        },
+        {
+          "type": "object",
+          "title": "Custom Supporting Data Type",
+          "description": "A custom supporting data type not represented in the predefined vocabulary.",
+          "required": [
+            "name"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Name",
+              "description": "The name of the custom supporting data type."
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the custom supporting data type."
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,302 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-usecase-2.0.schema.json",
+  "type": "null",
+  "title": "CycloneDX Use Case Model",
+  "$comment": "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
+  "$defs": {
+    "useCases": {
+      "type": "array",
+      "title": "Use Cases",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/useCase"
+      },
+      "description": "A collection of use cases that describe how actors interact with the system to achieve specific goals."
+    },
+    "useCase": {
+      "type": "object",
+      "title": "Use Case",
+      "description": "A structured description of how one or more actors interact with the system to achieve a specific goal, including the primary flow, alternative paths, and exception scenarios.",
+      "required": [
+        "bom-ref",
+        "name"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "minLength": 1,
+          "description": "The name or title of the use case, typically expressed as a verb phrase that captures the goal from the actor's perspective (e.g., 'Place Order', 'Reset Password')."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A detailed narrative of the use case, including the actor's goal, the scope of the interaction, and any relevant business rules or constraints that govern its execution."
+        },
+        "actors": {
+          "type": "array",
+          "title": "Actors",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the actors that participate in this use case, representing anyone or anything that initiates or interacts with the described flow."
+        },
+        "preconditions": {
+          "type": "array",
+          "title": "Preconditions",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "description": "Conditions that must hold true before the use case can begin execution, such as required system state, authenticated sessions, available resources, or prior completed use cases."
+        },
+        "postconditions": {
+          "type": "array",
+          "title": "Postconditions",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "description": "Conditions that will be true after the use case completes successfully, describing the expected system state, data changes, notifications sent, or side effects produced."
+        },
+        "mainFlow": {
+          "type": "array",
+          "title": "Main Flow",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/step"
+          },
+          "description": "The primary sequence of steps representing the most common or expected path through the use case, from the triggering action to the successful outcome."
+        },
+        "alternativeFlows": {
+          "type": "array",
+          "title": "Alternative Flows",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/flow"
+          },
+          "description": "Variant paths that branch from the main flow under specific conditions, representing valid but less common ways to achieve the use case goal or a modified outcome."
+        },
+        "exceptions": {
+          "type": "array",
+          "title": "Exceptions",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/exception"
+          },
+          "description": "Error or failure scenarios that may interrupt the main or alternative flows, including the triggering condition and how the system responds to recover or terminate gracefully."
+        },
+        "successCriteria": {
+          "type": "array",
+          "title": "Success Criteria",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "description": "Measurable or observable criteria that determine whether the use case has been completed successfully, used for validation, acceptance testing, and stakeholder sign-off."
+        },
+        "requirements": {
+          "type": "array",
+          "title": "Requirements",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the requirements that are implemented, validated, or addressed by this use case."
+        },
+        "businessObjectives": {
+          "type": "array",
+          "title": "Business Objectives",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the business objectives this use case supports."
+        },
+        "notes": {
+          "type": "array",
+          "title": "Notes",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "description": "Supplementary information, clarifications, open questions, or implementation guidance that provides additional context beyond the formal use case structure."
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "step": {
+      "type": "object",
+      "title": "Step",
+      "description": "A single discrete action within a use case flow, performed by a specific actor, that advances the interaction toward the use case goal.",
+      "required": [
+        "number",
+        "description"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "number": {
+          "type": "integer",
+          "title": "Number",
+          "minimum": 1,
+          "description": "The sequence number indicating the ordinal position of this step within its flow, starting at 1."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "minLength": 1,
+          "description": "A clear, action-oriented statement describing what the actor does in this step and the expected system response, written in the form 'The [actor] [action]'."
+        },
+        "actor": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "description": "Reference using bom-link or bom-ref to the actor who initiates or performs this step, which may be a human user, an external system, or the system under design."
+        }
+      }
+    },
+    "flow": {
+      "type": "object",
+      "title": "Flow",
+      "description": "An alternative sequence of steps that branches from the main flow under a specific condition, representing a valid variant path through the use case.",
+      "required": [
+        "name",
+        "condition"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "minLength": 1,
+          "description": "A short, descriptive name identifying this alternative flow (e.g., 'Payment Declined', 'Guest Checkout')."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A narrative explaining the purpose and context of this alternative flow, including how it differs from the main flow and under what circumstances it applies."
+        },
+        "condition": {
+          "type": "string",
+          "title": "Condition",
+          "minLength": 1,
+          "description": "The specific condition, decision point, or triggering event that causes execution to diverge from the main flow into this alternative path."
+        },
+        "steps": {
+          "type": "array",
+          "title": "Steps",
+          "items": {
+            "$ref": "#/$defs/step"
+          },
+          "description": "The ordered sequence of steps that comprise this alternative flow, following the same structure as main flow steps."
+        }
+      }
+    },
+    "exception": {
+      "type": "object",
+      "title": "Exception",
+      "description": "An error or failure scenario that may interrupt the normal execution of a use case, including the condition that triggers it and how the system responds.",
+      "required": [
+        "name",
+        "condition"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "minLength": 1,
+          "description": "A short, descriptive name identifying this exception scenario (e.g., 'Session Timeout', 'Insufficient Funds', 'Service Unavailable')."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A narrative describing the nature of this exception, its potential causes, and its impact on the use case and the actors involved."
+        },
+        "condition": {
+          "type": "string",
+          "title": "Condition",
+          "minLength": 1,
+          "description": "The specific error condition, system state, or external event that triggers this exception during the execution of the use case."
+        },
+        "handling": {
+          "type": "string",
+          "title": "Handling",
+          "description": "The recovery strategy or response the system takes when this exception occurs, such as retrying the operation, rolling back changes, notifying the user, or escalating to support."
+        }
+      }
+    },
+    "useCaseAssertions": {
+      "type": "array",
+      "title": "Use Case Assertions",
+      "description": "A list of assertions describing how a component relates to use cases defined in the BOM.",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "title": "Use Case Assertion",
+        "description": "An assertion linking one or more use cases to a component, specifying the nature of the relationship.",
+        "required": [
+          "assertionType",
+          "useCaseRefs"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "bom-ref": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+            "title": "BOM Reference",
+            "description": "An identifier which can be used to reference the assertion elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
+          },
+          "assertionType": {
+            "type": "string",
+            "title": "Assertion Type",
+            "description": "The type of assertion being made about the relationship between the component and the use case.",
+            "enum": [
+              "extends",
+              "implements",
+              "inhibits",
+              "not-applicable",
+              "not-assessed",
+              "other",
+              "participates-in",
+              "supports",
+              "triggers",
+              "validates"
+            ],
+            "meta:enum": {
+              "extends": "The component adds optional or conditional behavior to the use case, augmenting its primary flow with additional capability.",
+              "implements": "The component implements or realises the use case, providing the primary capability that makes the use case functional.",
+              "inhibits": "The component is known to interfere with or block the correct execution of the use case.",
+              "not-applicable": "The use case does not pertain to this component. The evaluator has reviewed the use case and determined it is irrelevant.",
+              "not-assessed": "The relationship between the component and the use case has not yet been evaluated.",
+              "other": "A relationship that does not fit into the other predefined assertion types.",
+              "participates-in": "The component participates in the use case but is not solely responsible for its implementation.",
+              "supports": "The component provides enabling infrastructure for the use case without directly implementing or participating in it.",
+              "triggers": "The component initiates or kicks off the use case without being responsible for its implementation.",
+              "validates": "The component validates, tests, or verifies the correct execution of the use case."
+            }
+          },
+          "useCaseRefs": {
+            "type": "array",
+            "title": "Use Case References",
+            "description": "A list of BOM references linking to use case objects defined in the BOM.",
+            "uniqueItems": true,
+            "items": {
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+            }
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "description": "Additional context or clarification regarding the assertion."
+          }
+        }
+      }
+    }
+  }
+}
