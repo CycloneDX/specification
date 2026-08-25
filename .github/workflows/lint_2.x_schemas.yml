@@ -14,9 +14,43 @@ concurrency:
 permissions: {}
 
 jobs:
+  discover-schemas:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    outputs:
+      versions: ${{ steps.discover.outputs.versions }}
+    steps:
+      - name: Checkout repository
+        # see https://github.com/actions/checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Discover schema versions
+        id: discover
+        run: |
+          mapfile -d '' -t dirs < <(
+            find schema \
+              -mindepth 1 -maxdepth 1 \
+              -type d \
+              -name '2.*' \
+              -printf '%f\0' \
+            | sort -z
+          )
+          if [ ${#dirs[@]} -eq 0 ]; then
+            echo 'No schema/2.* directories found' >&2
+            exit 1
+          fi
+          printf 'versions=' >> "$GITHUB_OUTPUT"
+          printf '%s\n' "${dirs[@]}" | jq -R . | jq -c -s . >> "$GITHUB_OUTPUT"
   lint-schemas:
+    needs: discover-schemas
     timeout-minutes: 30
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ${{ fromJSON(needs.discover-schemas.outputs.versions) }}
+    name: lint-schemas (${{ matrix.version }})
     steps:
       - name: Checkout repository
         # see https://github.com/actions/checkout
@@ -37,19 +71,24 @@ jobs:
         working-directory: tools/src/main/js/linter
         run: npm install
       - name: Lint schemas
+        env:
+          SCHEMA_VERSION: ${{ matrix.version }}
         run: |
           mapfile -d '' -t schemas < <(
-            find schema \
+            find "schema/${SCHEMA_VERSION}" \
               -type f \
-              -path 'schema/2.*/*' \
               -name '*.schema.json' \
               -not -name '*-bundled*.schema.json' \
               -print0
           )
+          if [ ${#schemas[@]} -eq 0 ]; then
+            echo "No schemas found in schema/${SCHEMA_VERSION}" >&2
+            exit 1
+          fi
           node tools/src/main/js/linter/cli.js \
             --format json \
             "${schemas[@]}" \
-            > tools/src/main/js/linter/CI_report.json
+            > "tools/src/main/js/linter/CI_report.json"
       - name: Print report
         if: '!cancelled()'
         run: cat tools/src/main/js/linter/CI_report.json
@@ -58,7 +97,7 @@ jobs:
         # https://github.com/actions/upload-artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: report.json
+          name: report-${{ matrix.version }}.json
           path: tools/src/main/js/linter/CI_report.json
           if-no-files-found: error
           retention-days: 7
