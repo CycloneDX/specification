@@ -518,8 +518,8 @@ const tests = Object.freeze({
     '$ref best practice': testRefBestPractice,
     'refType usage (`bom-ref` <-> refType)': testRefTypeUsage,
     'additionalProperties is `false`': testAdditionalProperties,
-    'meta:enum completeness': testMetaEnum,
     'default value in range': testDefaultValues,
+    'meta:enum completeness': testMetaEnum,
 })
 
 const schemas = await Promise.all(schemaFiles.map(
