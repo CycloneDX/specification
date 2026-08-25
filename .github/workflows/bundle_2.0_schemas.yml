@@ -3,13 +3,18 @@ name: Bundle CycloneDX 2.0 JSON Schemas
 on:
   push:
     branches:
-      - 2.0-dev
-      - 2.0-dev-threatmodeling
+      - 'master'
+      - 'main'
+      - '2.0-dev'
     paths:
       - '.github/workflows/bundle_2.0_schemas.yml' # self
       - 'schema/2.0/**/*.schema.json'
       - 'tools/src/main/js/bundler/**'
   workflow_dispatch:  # Allows manual trigger
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 # https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token
 permissions: {}
@@ -51,10 +56,10 @@ jobs:
         run: |
           BUNDLED_FILE="schema/2.0/cyclonedx-2.0-bundled.schema.json"
           MINIFIED_FILE="schema/2.0/cyclonedx-2.0-bundled.min.schema.json"
-          
+
           # Add both files (works for both new and modified files)
           git add "$BUNDLED_FILE" "$MINIFIED_FILE"
-          
+
           # Check if there are staged changes
           if git diff --staged --quiet; then
             echo "No changes to bundled schemas"
