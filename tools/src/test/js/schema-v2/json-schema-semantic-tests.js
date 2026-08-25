@@ -240,7 +240,7 @@ function _refTypeRefFor(schemaFile) {
  * @private
  */
 const _findObjectWithEnum = (schema) => _findNodes(schema,
-    n => 'enum' in n || 'meta:enum' in n)
+    n => 'enum' in n)
 
 const _findObjectWithDefault = (schema) => _findNodes(schema,
     n => 'default' in n)
@@ -430,6 +430,29 @@ function testAdditionalProperties(schema, schemaFile) {
 }
 
 /**
+ * Enum values adheres constraints.
+ * @param {*} schema
+ * @param {string} schemaFile
+ * @return {number} number of errors found
+ */
+function testEnumValues(schema, schemaFile) {
+    let errCnt = 0
+    for (const [path, node] of _findObjectWithEnum(schema)) {
+        const valueConstraintTest = _makeValueConstraintTest(node)
+        for (const enumValue of node.enum) {
+            if (!valueConstraintTest(enumValue)) {
+                ++errCnt
+                _printError(
+                    enumValue, `in range of type and constraints`,
+                    'enum value out of range',
+                    schemaFile, `${path}.enum`)
+            }
+        }
+    }
+    return errCnt
+}
+
+/**
  * `meta:enum` must be an object,
  * and every `enum` value must exist as a key in it.
  * @param {*} schema
@@ -533,8 +556,9 @@ const tests = Object.freeze({
     '$ref best practice': testRefBestPractice,
     'refType usage (`bom-ref` <-> refType)': testRefTypeUsage,
     'additionalProperties is `false`': testAdditionalProperties,
-    'default value in range': testDefaultValues,
+    'enum value in range': testEnumValues,
     'meta:enum completeness': testMetaEnum,
+    'default value in range': testDefaultValues,
 })
 
 const schemas = await Promise.all(schemaFiles.map(
