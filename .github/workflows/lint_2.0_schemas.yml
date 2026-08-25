@@ -4,11 +4,11 @@ on:
   push:
     branches:
       - 2.0-dev
-      - 2.0-dev-threatmodeling
     paths:
       - '.github/workflows/lint_2.0_schemas.yml' # self
       - 'schema/2.0/**/*.schema.json'
       - 'tools/src/main/js/linter/**'
+  pull_request:
   workflow_dispatch:  # Allows manual trigger
 
 concurrency:
@@ -43,6 +43,10 @@ jobs:
         run: npm install
       - name: Lint schemas
         run: >-
+          find schema/2.0
+          -type f
+          -name '*.schema.json'
+          -not -name '*-bundled*.schema.json'
+          -print0
+          | xargs -0 --no-run-if-empty
           node tools/src/main/js/linter/cli.js
-          schema/2.0/cyclonedx-2.0.schema.json
-          schema/2.0/model/*.schema.json
