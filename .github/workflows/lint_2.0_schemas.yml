@@ -39,16 +39,20 @@ jobs:
       - name: Lint schemas
         run: |
           mapfile -d '' -t schemas < <(
-          find schema/2.0 \
-           -type f \
-           -name '*.schema.json' \
-           -not -name '*-bundled*.schema.json' \
-           -print0
+            find schema \
+              -type f \
+              -path 'schema/2.*/*' \
+              -name '*.schema.json' \
+              -not -name '*-bundled*.schema.json' \
+              -print0
           )
           node tools/src/main/js/linter/cli.js \
-          --format json \
-          "${schemas[@]}" \
-          | tee tools/src/main/js/linter/CI_report.json
+            --format json \
+            "${schemas[@]}" \
+            > tools/src/main/js/linter/CI_report.json
+      - name: Print report
+        if: '!cancelled()'
+        run: cat tools/src/main/js/linter/CI_report.json
       - name: Artifact report
         if: '!cancelled()'
         # https://github.com/actions/upload-artifact
