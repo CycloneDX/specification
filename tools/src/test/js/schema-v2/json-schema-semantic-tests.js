@@ -84,13 +84,15 @@ function _makeValueConstraintTest(node) {
                 // https://json-schema.org/understanding-json-schema/reference/array
                 constraints.push(v => Array.isArray(v))
                 if ('minItems' in node) {
-                    constraints.push(v => v.length >= node.minItems)
+                    const minItems = node.minItems
+                    constraints.push(v => v.length >= minItems)
                 }
                 if ('maxItems' in node) {
-                    constraints.push(v => v.length <= node.maxItems)
+                    const maxItems = node.maxItems
+                    constraints.push(v => v.length <= maxItems)
                 }
                 if (node.uniqueItems === true) {
-                    // only works for primitives
+                    // TODO: current implementation only works for primitives
                     constraints.push(v => v.length === new Set(v).size)
                 }
                 // TODO: node.prefixItems
@@ -112,23 +114,36 @@ function _makeValueConstraintTest(node) {
                 // https://json-schema.org/understanding-json-schema/reference/numeric
                 constraints.push(v => typeof v === 'number')
                 if ('minimum' in node) {
-                    constraints.push(v => v >= node.minimum)
+                    const minimum = node.minimum
+                    constraints.push(v => v >= minimum)
                 }
                 if ('exclusiveMinimum' in node) {
-                    constraints.push(v => v > node.exclusiveMinimum)
+                    const exclusiveMinimum = node.exclusiveMinimum
+                    constraints.push(v => v > exclusiveMinimum)
                 }
                 if ('exclusiveMaximum' in node) {
-                    constraints.push(v => v < node.exclusiveMaximum)
+                    const exclusiveMaximum = node.exclusiveMaximum
+                    constraints.push(v => v < exclusiveMaximum)
                 }
                 if ('maximum' in node) {
-                    constraints.push(v => v <= node.maximum)
+                    const maximum = node.maximum
+                    constraints.push(v => v <= maximum)
                 }
                 if ('multipleOf' in node) {
-                    constraints.push(v => v % node.multipleOf === 0)
+                    const multipleOf = node.multipleOf
+                    constraints.push(
+                        /* The mathematical correct version:
+                         *      v => v % node.multipleOf === 0
+                         *  has implementational issues -- as an example:
+                         *      0.3 % 0.1 = 0.09999999999999998
+                         *  So we use a tolerance or a rounding check instead.
+                         */
+                        v => Math.abs(v / multipleOf - Math.round(v / multipleOf)) < 1e-9
+                    )
                 }
                 break
             case 'object':
-                constraints.push(v => (typeof v === 'object' && v !== null && !Array.isArray(v)))
+                constraints.push(v => typeof v === 'object' && v !== null && !Array.isArray(v))
                 // TODO: required
                 // TODO: properties
                 // TODO: minProperties
@@ -139,10 +154,12 @@ function _makeValueConstraintTest(node) {
                 // https://json-schema.org/understanding-json-schema/reference/string
                 constraints.push(v => typeof v === 'string')
                 if ('minLength' in node) {
-                    constraints.push(v => v.length >= node.minLength)
+                    const minLength = node.minLength
+                    constraints.push(v => v.length >= minLength)
                 }
                 if ('maxLength' in node) {
-                    constraints.push(v => v.length <= node.maxLength)
+                    const maxLength = node.maxLength
+                    constraints.push(v => v.length <= maxLength)
                 }
                 if ('pattern' in node) {
                     // https://json-schema.org/understanding-json-schema/reference/string#regexp
@@ -389,7 +406,7 @@ function testAdditionalProperties(schema, schemaFile) {
                     'either .additionalProperties or .unevaluatedProperties should be set',
                     schemaFile, path)
             }
-            continue;
+            continue
         }
 
         const commentLC = typeof node['$comment'] === 'string'
@@ -398,7 +415,7 @@ function testAdditionalProperties(schema, schemaFile) {
 
         if (commentLC.includes('this is a mixin')) {
             // This is a mixin. It intentionally does NOT restrict additional/unevaluated properties itself; schemas composing it via `allOf` are expected to close themselves with `unevaluatedProperties: false` so that both their own defined properties and these patternProperties remain usable.
-            continue;
+            continue
         }
 
         const expected = commentLC.includes('additionalproperties explicitly allowed')
