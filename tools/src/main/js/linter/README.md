@@ -58,6 +58,7 @@ node cli.js schema.json
 | `additional-properties-false` | Object definitions must have `additionalProperties: false` |
 | `title-formatting` | Titles must use sentence case |
 | `enum-value-formatting` | Enum values must be lowercase kebab-case; `meta:enum` must cover all values |
+| `enum-value-other` | Enum values must not be literal "other"; use custom-object style instead |
 | `ref-usage` | `$ref` must not be combined with other keywords |
 | `duplicate-content` | Titles and descriptions must be unique within a schema |
 | `duplicate-definitions` | Definitions must be reused via `$ref`, not duplicated |
