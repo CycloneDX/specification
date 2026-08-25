@@ -67,6 +67,102 @@ const __FINDNODES_SKIP_KEYS = Object.freeze(new Set(
     ['enum', 'const', 'examples', 'default', 'meta:enum']))
 
 /**
+ * Make a value constraints test for a specific node.
+ * @param {*} node
+ * @return {function(*): boolean} value constraints test
+ * @private
+ */
+function _makeValueConstraintTest(node) {
+    const typeChecks = new Set(
+        Array.isArray(node.type)
+            ? node.type
+            : [node.type]
+    ).values().map(type => {
+        const constraints = []
+        switch (type) {
+            case 'array':
+                // https://json-schema.org/understanding-json-schema/reference/array
+                constraints.push(v => Array.isArray(v))
+                if ('minItems' in node) {
+                    constraints.push(v => v.length >= node.minItems)
+                }
+                if ('maxItems' in node) {
+                    constraints.push(v => v.length <= node.maxItems)
+                }
+                if (node.uniqueItems === true) {
+                    // only works for primitives
+                    constraints.push(v => v.length === new Set(v).size)
+                }
+                // TODO: node.prefixItems
+                // TODO: tuple array
+                break
+            case 'boolean':
+                // https://json-schema.org/understanding-json-schema/reference/boolean
+                constraints.push(v => (v === true || v === false))
+                break
+            case 'null':
+                // https://json-schema.org/understanding-json-schema/reference/null
+                constraints.push(v => v === null)
+                break
+            case 'integer':
+                // https://json-schema.org/understanding-json-schema/reference/numeric#integer
+                constraints.push(v => Number.isInteger(v))
+            // falls through to 'number'
+            case 'number':
+                // https://json-schema.org/understanding-json-schema/reference/numeric
+                constraints.push(v => typeof v === 'number')
+                if ('minimum' in node) {
+                    constraints.push(v => v >= node.minimum)
+                }
+                if ('exclusiveMinimum' in node) {
+                    constraints.push(v => v > node.exclusiveMinimum)
+                }
+                if ('exclusiveMaximum' in node) {
+                    constraints.push(v => v < node.exclusiveMaximum)
+                }
+                if ('maximum' in node) {
+                    constraints.push(v => v <= node.maximum)
+                }
+                if ('multipleOf' in node) {
+                    constraints.push(v => v % node.multipleOf === 0)
+                }
+                break
+            case 'object':
+                constraints.push(v => (typeof v === 'object' && v !== null && !Array.isArray(v)))
+                // TODO: required
+                // TODO: properties
+                // TODO: minProperties
+                // TODO: maxProperties
+                // TODO: patternProperties
+                break
+            case 'string':
+                // https://json-schema.org/understanding-json-schema/reference/string
+                constraints.push(v => typeof v === 'string')
+                if ('minLength' in node) {
+                    constraints.push(v => v.length >= node.minLength)
+                }
+                if ('maxLength' in node) {
+                    constraints.push(v => v.length <= node.maxLength)
+                }
+                if ('pattern' in node) {
+                    // https://json-schema.org/understanding-json-schema/reference/string#regexp
+                    const pattern = new RegExp(node.pattern)
+                    constraints.push(v => pattern.test(v))
+                }
+                // TODO: node.format
+                break
+            case undefined:
+                // no constraints nor restrictions
+                break
+            default:
+                throw new Error(`Unsupported type: ${JSON.stringify(node.type)}`)
+        }
+        return constraints
+    }).toArray()
+    return v => typeChecks.some(ts => ts.every(t => t(v)))
+}
+
+/**
  * Walks a schema, yields [path, node] for every node the matcher accepts.
  * @param {*} node
  * @param {function(*): boolean} matcher
@@ -131,6 +227,8 @@ function _refTypeRefFor(schemaFile) {
 const _findObjectWithEnum = (schema) => _findNodes(schema,
     n => 'enum' in n || 'meta:enum' in n)
 
+const _findObjectWithDefault = (schema) => _findNodes(schema,
+    n => 'default' in n)
 
 /**
  * @param {*} actual
@@ -154,7 +252,7 @@ function _printError(actual, expected, msg, schemaFile, schemaPath) {
 
 // region tests
 
-const _RefBestPracticeAllowedSiblings = Object.freeze(new Set([
+const _REF_ALLOWED_SIBLINGS = Object.freeze(new Set([
     '$ref', // the $ref itself
     '$comment', 'title', 'description', 'examples', // documentational
     /* do NOT add any non-documentationals
@@ -212,7 +310,7 @@ function testRefBestPractice(schema, schemaFile) {
         }
 
         const otherKeys = new Set(Object.keys(node))
-        for (const key of otherKeys.difference(_RefBestPracticeAllowedSiblings)) {
+        for (const key of otherKeys.difference(_REF_ALLOWED_SIBLINGS)) {
             ++errCnt
             _printError(
                 'present', 'absent',
@@ -369,6 +467,48 @@ function testMetaEnum(schema, schemaFile) {
     return errCnt
 }
 
+/**
+ * Default values adheres constraints.
+ * @param {*} schema
+ * @param {string} schemaFile
+ * @return {number} number of errors found
+ */
+function testDefaultValues(schema, schemaFile) {
+    let errCnt = 0
+    for (const [path, node] of _findObjectWithDefault(schema)) {
+        if (path.endsWith('.properties')) continue;
+        const defaultValue = node.default
+        if ('const' in node) {
+            if (defaultValue !== node.const) {
+                ++errCnt
+                _printError(
+                    defaultValue, node.const,
+                    'default value out of range',
+                    schemaFile, `${path}.default`)
+            }
+            continue
+        }
+        if ('enum' in node) {
+            if (undefined === node.enum.find(e => e === defaultValue)) {
+                ++errCnt
+                _printError(
+                    defaultValue, `one of ${JSON.stringify(node.enum)}`,
+                    'default value out of range',
+                    schemaFile, `${path}.default`)
+            }
+            continue
+        }
+        if (!_makeValueConstraintTest(node)(defaultValue)) {
+            ++errCnt
+            _printError(
+                defaultValue, `in range of type and constraints`,
+                'default value out of range',
+                schemaFile, `${path}.default`)
+        }
+    }
+    return errCnt
+}
+
 // endregion tests
 
 // region main
@@ -379,6 +519,7 @@ const tests = Object.freeze({
     'refType usage (`bom-ref` <-> refType)': testRefTypeUsage,
     'additionalProperties is `false`': testAdditionalProperties,
     'meta:enum completeness': testMetaEnum,
+    'default value in range': testDefaultValues,
 })
 
 const schemas = await Promise.all(schemaFiles.map(
