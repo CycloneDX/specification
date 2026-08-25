@@ -73,11 +73,12 @@ const __FINDNODES_SKIP_KEYS = Object.freeze(new Set(
  * @private
  */
 function _makeValueConstraintTest(node) {
-    const typeChecks = new Set(
+    if (node.type === undefined) return () => true
+    const typeChecks = [...new Set(
         Array.isArray(node.type)
             ? node.type
             : [node.type]
-    ).values().map(type => {
+    )].map(type => {
         const constraints = []
         switch (type) {
             case 'array':
@@ -163,19 +164,16 @@ function _makeValueConstraintTest(node) {
                 }
                 if ('pattern' in node) {
                     // https://json-schema.org/understanding-json-schema/reference/string#regexp
-                    const pattern = new RegExp(node.pattern, 'u')
+                    const pattern = new RegExp(node.pattern)
                     constraints.push(v => pattern.test(v))
                 }
                 // TODO: node.format
-                break
-            case undefined:
-                // no constraints nor restrictions
                 break
             default:
                 throw new Error(`Unsupported type: ${JSON.stringify(node.type)}`)
         }
         return constraints
-    }).toArray()
+    })
     return v => typeChecks.some(ts => ts.every(t => t(v)))
 }
 
