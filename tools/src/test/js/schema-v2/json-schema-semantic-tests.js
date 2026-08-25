@@ -146,7 +146,7 @@ function _makeValueConstraintTest(node) {
                 }
                 if ('pattern' in node) {
                     // https://json-schema.org/understanding-json-schema/reference/string#regexp
-                    const pattern = new RegExp(node.pattern)
+                    const pattern = new RegExp(node.pattern, 'u')
                     constraints.push(v => pattern.test(v))
                 }
                 // TODO: node.format
