@@ -1,0 +1,103 @@
+name: Lint CycloneDX 2.x JSON Schemas
+
+on:
+  push:
+    branches: ['master', 'main']
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token
+permissions: {}
+
+jobs:
+  discover-schemas:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    outputs:
+      versions: ${{ steps.discover.outputs.versions }}
+    steps:
+      - name: Checkout repository
+        # see https://github.com/actions/checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Discover schema versions
+        id: discover
+        run: |
+          mapfile -d '' -t dirs < <(
+            find schema \
+              -mindepth 1 -maxdepth 1 \
+              -type d \
+              -name '2.*' \
+              -printf '%f\0' \
+            | sort -z
+          )
+          if [ ${#dirs[@]} -eq 0 ]; then
+            echo 'No schema/2.* directories found' >&2
+            exit 1
+          fi
+          printf 'versions=' >> "$GITHUB_OUTPUT"
+          printf '%s\n' "${dirs[@]}" | jq -R . | jq -c -s . >> "$GITHUB_OUTPUT"
+  lint-schemas:
+    needs: discover-schemas
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ${{ fromJSON(needs.discover-schemas.outputs.versions) }}
+    name: lint-schemas (${{ matrix.version }})
+    steps:
+      - name: Checkout repository
+        # see https://github.com/actions/checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install aspell
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends aspell aspell-en
+      - name: Setup Node.js
+        # see https://github.com/actions/setup-node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24.x'
+          package-manager-cache: false
+      - name: Install linter
+        working-directory: tools/src/main/js/linter
+        run: npm install
+      - name: Lint schemas
+        env:
+          SCHEMA_VERSION: ${{ matrix.version }}
+        run: |
+          mapfile -d '' -t schemas < <(
+            find "schema/${SCHEMA_VERSION}" \
+              -type f \
+              -name '*.schema.json' \
+              -not -name '*-bundled*.schema.json' \
+              -print0
+          )
+          if [ ${#schemas[@]} -eq 0 ]; then
+            echo "No schemas found in schema/${SCHEMA_VERSION}" >&2
+            exit 1
+          fi
+          node tools/src/main/js/linter/cli.js \
+            --format json \
+            "${schemas[@]}" \
+            > "tools/src/main/js/linter/CI_report.json"
+      - name: Print report
+        if: '!cancelled()'
+        run: cat tools/src/main/js/linter/CI_report.json
+      - name: Artifact report
+        if: '!cancelled()'
+        # https://github.com/actions/upload-artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: report-${{ matrix.version }}.json
+          path: tools/src/main/js/linter/CI_report.json
+          if-no-files-found: error
+          retention-days: 7
