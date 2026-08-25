@@ -37,11 +37,24 @@ jobs:
         working-directory: tools/src/main/js/linter
         run: npm install
       - name: Lint schemas
-        run: >-
-          find schema/2.0
-          -type f
-          -name '*.schema.json'
-          -not -name '*-bundled*.schema.json'
-          -print0
-          | xargs -0 --no-run-if-empty
-          node tools/src/main/js/linter/cli.js
+        run: |
+          mapfile -d '' -t schemas < <(
+          find schema/2.0 \
+           -type f \
+           -name '*.schema.json' \
+           -not -name '*-bundled*.schema.json' \
+           -print0
+          )
+          node tools/src/main/js/linter/cli.js \
+          --format json \
+          "${schemas[@]}" \
+          | tee tools/src/main/js/linter/CI_report.json
+      - name: Artifact report
+        if: '!cancelled()'
+        # https://github.com/actions/upload-artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: report.json
+          path: tools/src/main/js/linter/CI_report.json
+          if-no-files-found: error
+          retention-days: 7
