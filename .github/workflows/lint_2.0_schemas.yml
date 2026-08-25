@@ -1,0 +1,48 @@
+name: Lint CycloneDX 2.0 JSON Schemas
+
+on:
+  push:
+    branches:
+      - 2.0-dev
+      - 2.0-dev-threatmodeling
+    paths:
+      - '.github/workflows/lint_2.0_schemas.yml' # self
+      - 'schema/2.0/**/*.schema.json'
+      - 'tools/src/main/js/linter/**'
+  workflow_dispatch:  # Allows manual trigger
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token
+permissions: {}
+
+jobs:
+  lint-schemas:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        # see https://github.com/actions/checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install aspell
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends aspell aspell-en
+      - name: Setup Node.js
+        # see https://github.com/actions/setup-node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24.x'
+          package-manager-cache: false
+      - name: Install linter
+        working-directory: tools/src/main/js/linter
+        run: npm install
+      - name: Lint schemas
+        run: >-
+          node tools/src/main/js/linter/cli.js
+          schema/2.0/cyclonedx-2.0.schema.json
+          schema/2.0/model/*.schema.json
