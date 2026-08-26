@@ -143,7 +143,12 @@ function showChecks(format) {
   const checks = getRegisteredChecks();
   switch (format) {
       case 'json':
-          console.log(JSON.stringify(Array.from(checks.keys())))
+          console.log(JSON.stringify(
+              Object.fromEntries(checks.entries().map(
+                      ([id, {defaultSeverity, name, description}]) =>
+                          [id, {defaultSeverity, name, description}]
+                  )
+              ), null, 2))
           break
       case 'compact': // fall through - unless implemented
       case 'stylish': // fall through - is default
