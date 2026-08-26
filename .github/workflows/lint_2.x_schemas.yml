@@ -69,7 +69,7 @@ jobs:
         id: discover
         run: |
           printf 'tests=' >> "$GITHUB_OUTPUT"
-          node tools/src/main/js/linter/cli.js -l -f json >> "$GITHUB_OUTPUT"
+          node tools/src/main/js/linter/cli.js -l -f json | jq -c 'keys' >> "$GITHUB_OUTPUT"
   lint-schemas:
     needs:
       - discover-schema
