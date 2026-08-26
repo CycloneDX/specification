@@ -1,4 +1,4 @@
-name: Lint CycloneDX 2.x JSON Schemas
+name: CT CDX-2.x Lint
 
 on:
   push:
@@ -13,8 +13,11 @@ concurrency:
 # https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token
 permissions: {}
 
+env:
+  NODE_VERSION: '24.x'
+
 jobs:
-  discover-schemas:
+  discover-schema:
     timeout-minutes: 5
     runs-on: ubuntu-latest
     outputs:
@@ -42,15 +45,48 @@ jobs:
           fi
           printf 'versions=' >> "$GITHUB_OUTPUT"
           printf '%s\n' "${dirs[@]}" | jq -R . | jq -c -s . >> "$GITHUB_OUTPUT"
+  discover-linter:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    outputs:
+      tests: ${{ steps.discover.outputs.tests }}
+    steps:
+      - name: Checkout repository
+        # see https://github.com/actions/checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup Node.js
+        # see https://github.com/actions/setup-node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          package-manager-cache: false
+      - name: Install linter
+        working-directory: tools/src/main/js/linter
+        run: npm install
+      - name: Discover linter tests
+        id: discover
+        run: |
+          printf 'tests=' >> "$GITHUB_OUTPUT"
+          node tools/src/main/js/linter/cli.js -l -f json >> "$GITHUB_OUTPUT"
   lint-schemas:
-    needs: discover-schemas
-    timeout-minutes: 30
+    needs:
+      - discover-schema
+      - discover-linter
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        version: ${{ fromJSON(needs.discover-schemas.outputs.versions) }}
-    name: lint-schemas (${{ matrix.version }})
+        schema_version: ${{ fromJSON(needs.discover-schema.outputs.versions) }}
+        linter_test: ${{ fromJSON(needs.discover-linter.outputs.tests) }}
+        # you could exclude some combinations via matrix.exclude
+        # docs: https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idstrategymatrixexclude
+        # exclude:
+        #  - schema_version: '2.0'
+        #    linter_test: 'no-uppercase-rfc'
+    name: ${{ matrix.schema_version }} ${{ matrix.linter_test }}
     steps:
       - name: Checkout repository
         # see https://github.com/actions/checkout
@@ -65,14 +101,15 @@ jobs:
         # see https://github.com/actions/setup-node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: '24.x'
+          node-version: ${{ env.NODE_VERSION }}
           package-manager-cache: false
       - name: Install linter
         working-directory: tools/src/main/js/linter
         run: npm install
       - name: Lint schemas
         env:
-          SCHEMA_VERSION: ${{ matrix.version }}
+          SCHEMA_VERSION: ${{ matrix.schema_version }}
+          LINTER_TEST: ${{ matrix.linter_test }}
         run: |
           mapfile -d '' -t schemas < <(
             find "schema/${SCHEMA_VERSION}" \
@@ -86,6 +123,7 @@ jobs:
             exit 1
           fi
           node tools/src/main/js/linter/cli.js \
+            --include "$LINTER_TEST" \
             --format json \
             "${schemas[@]}" \
             > "tools/src/main/js/linter/CI_report.json"
@@ -97,7 +135,13 @@ jobs:
         # https://github.com/actions/upload-artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: report-${{ matrix.version }}.json
+          name: report-${{ matrix.schema_version }}-${{ matrix.linter_test }}.json
           path: tools/src/main/js/linter/CI_report.json
           if-no-files-found: error
           retention-days: 7
+  # summary:
+    # TODO: write a summary job that collects all artifacts,
+    #       and summarizes the result for each detected schema version
+    #       it might evenre-package all the artifacts to a `report-${{ matrix.schema_version }}_collected`
+    #       or something ... them we would no longer need to keep the other artifacts for long (maybea day)
+    # but this is to come in a different task
