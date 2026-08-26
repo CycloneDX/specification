@@ -13,6 +13,9 @@ concurrency:
 # https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token
 permissions: {}
 
+env:
+  NODE_VERSION: '24.x'
+
 jobs:
   discover-schema:
     timeout-minutes: 5
@@ -57,7 +60,7 @@ jobs:
         # see https://github.com/actions/setup-node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: '24.x'
+          node-version: ${{ env.NODE_VERSION }}
           package-manager-cache: false
       - name: Install linter
         working-directory: tools/src/main/js/linter
@@ -98,7 +101,7 @@ jobs:
         # see https://github.com/actions/setup-node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: '24.x'
+          node-version: ${{ env.NODE_VERSION }}
           package-manager-cache: false
       - name: Install linter
         working-directory: tools/src/main/js/linter
@@ -136,3 +139,9 @@ jobs:
           path: tools/src/main/js/linter/CI_report.json
           if-no-files-found: error
           retention-days: 7
+  # summary:
+    # TODO: write a summary job that collects all artifacts,
+    #       and summarizes the result for each detected schema version
+    #       it might evenre-package all the artifacts to a `report-${{ matrix.schema_version }}_collected`
+    #       or something ... them we would no longer need to keep the other artifacts for long (maybea day)
+    # but this is to come in a different task
