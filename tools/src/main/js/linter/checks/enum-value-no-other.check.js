@@ -1,7 +1,7 @@
 /**
  * CycloneDX Schema Linter - Enum Value Formatting Check
  *
- * Validates that enum values is not literal "other"
+ * Validates that enum values are not literal "other"
  *
  * @license Apache-2.0
  */
@@ -11,13 +11,13 @@ import { LintCheck, registerCheck, Severity, traverseSchema } from '../index.js'
 const LiteralOther = /other/i;
 
 /**
- * Check that validates enum value formatting
+ * Check that validates enum value are not literal "other"
  */
-class EnumValueOtherCheck extends LintCheck {
+class EnumValueNoOtherCheck extends LintCheck {
   constructor() {
     super(
-      'enum-value-other',
-      'Enum Value Literal Other',
+      'enum-value-no-other',
+      'Enum Value No Other',
       'Validates that enum values are not literal "other".',
       Severity.ERROR
     );
@@ -59,8 +59,8 @@ class EnumValueOtherCheck extends LintCheck {
 }
 
 // Create and register the check
-const check = new EnumValueOtherCheck();
+const check = new EnumValueNoOtherCheck();
 registerCheck(check);
 
-export { EnumValueOtherCheck };
+export { EnumValueNoOtherCheck };
 export default check;
