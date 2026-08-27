@@ -1,12 +1,12 @@
 /**
  * CycloneDX Schema Linter - Core Engine
- * 
+ *
  * A modular linter for CycloneDX 2.0 JSON schemas, enforcing:
  * - ISO House Style conventions
  * - Oxford English spelling for descriptions
  * - American English for property names
  * - Consistent formatting and structure
- * 
+ *
  * @license Apache-2.0
  */
 
@@ -229,6 +229,16 @@ export class SchemaLinter {
     };
   }
 
+  * getEnabledChecks () {
+    const checks = this.getApplicableChecks();
+    for (const check of checks) {
+      const checkConfig = this.config.checks[check.id] || {};
+      if (checkConfig.enabled !== false) {
+        yield check
+      }
+    }
+  }
+
   /**
    * Lint a schema file
    * @param {string} filePath - Path to the schema file
@@ -236,10 +246,10 @@ export class SchemaLinter {
    */
   async lintFile(filePath) {
     const result = new LintResult(filePath);
-    
+
     let rawContent;
     let schema;
-    
+
     try {
       rawContent = readFileSync(filePath, 'utf-8');
     } catch (err) {
@@ -251,7 +261,7 @@ export class SchemaLinter {
       ));
       return result.finalise();
     }
-    
+
     try {
       schema = JSON.parse(rawContent);
     } catch (err) {
@@ -264,16 +274,10 @@ export class SchemaLinter {
       return result.finalise();
     }
 
-    // Run all applicable checks
-    const checks = this.getApplicableChecks();
-    
-    for (const check of checks) {
+    // Run all enabled checks
+    for (const check of this.getEnabledChecks()) {
       const checkConfig = this.config.checks[check.id] || {};
-      
-      if (checkConfig.enabled === false) {
-        continue;
-      }
-      
+
       try {
         const issues = await check.run(schema, rawContent, checkConfig, filePath);
         issues.forEach(issue => result.addIssue(issue));
@@ -300,9 +304,9 @@ export class SchemaLinter {
    */
   async lintString(content, virtualPath = '<string>') {
     const result = new LintResult(virtualPath);
-    
+
     let schema;
-    
+
     try {
       schema = JSON.parse(content);
     } catch (err) {
@@ -315,16 +319,10 @@ export class SchemaLinter {
       return result.finalise();
     }
 
-    // Run all applicable checks
-    const checks = this.getApplicableChecks();
-    
-    for (const check of checks) {
+    // Run all enabled checks
+    for (const check of this.getEnabledChecks()) {
       const checkConfig = this.config.checks[check.id] || {};
-      
-      if (checkConfig.enabled === false) {
-        continue;
-      }
-      
+
       try {
         const issues = await check.run(schema, content, checkConfig);
         issues.forEach(issue => result.addIssue(issue));
@@ -362,19 +360,19 @@ export class SchemaLinter {
    */
   getApplicableChecks() {
     const allChecks = Array.from(checkRegistry.values());
-    
+
     let checks = allChecks;
-    
+
     // Filter to only included checks if specified
     if (this.config.includeChecks) {
       checks = checks.filter(c => this.config.includeChecks.includes(c.id));
     }
-    
+
     // Exclude specified checks
     if (this.config.excludeChecks.length > 0) {
       checks = checks.filter(c => !this.config.excludeChecks.includes(c.id));
     }
-    
+
     return checks;
   }
 }
@@ -389,11 +387,11 @@ export class SchemaLinter {
  */
 export function traverseSchema(schema, visitor, path = '$', key = null, parent = null) {
   visitor(schema, path, key, parent);
-  
+
   if (typeof schema !== 'object' || schema === null) {
     return;
   }
-  
+
   if (Array.isArray(schema)) {
     schema.forEach((item, index) => {
       traverseSchema(item, visitor, `${path}[${index}]`, index, schema);
