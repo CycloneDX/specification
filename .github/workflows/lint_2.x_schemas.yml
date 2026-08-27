@@ -170,27 +170,29 @@ jobs:
         shell: python
         run: |
           import json, os
-          from collections import Counter
+          from collections import Counter, defaultdict
           from pathlib import Path
           SEVERITY = ('error', 'warning', 'info')
-          by_check, by_file = Counter(), Counter()
+          by_check, by_file = defaultdict(Counter), defaultdict(Counter)
           for f in Path('.').glob('*.json'):
-              for r in json.loads(f.read_text())['results']:
-                  for i in r['issues']:
-                      by_check[(i['checkId'], i['severity'])] += 1
-                      by_file[(r['filePath'], i['severity'])] += 1
-          def md_table(title, header, counter):
-              keys = sorted({k for k, _ in counter})
-              lines = [f'## {title}',
-                       f'| {header} | ' + ' | '.join(SEVERITY) + ' |',
-                       '|---|---|---|---|']
-              for k in keys:
-                  lines.append(f'| `{k}` | ' +
-                               ' | '.join(str(counter[(k, s)]) for s in SEVERITY) + ' |')
-              return '\n'.join(lines) + '\n'
+            report = json.loads(f.read_text())
+            for c in report['enabledChecks']:
+              by_check[c]
+            for r in report['results']:
+              file_counter = by_file[r['filePath']]
+              for i in r['issues']:
+                by_check[i['checkId']][i['severity']] += 1
+                file_counter[i['severity']] += 1
+          def md_table(title, header, counters):
+            lines = [f'## {title}',
+                     f'| {header} | ${" | ".join(SEVERITY)} |',
+                     f'|---|{"---|" * len(SEVERITY)}']
+            for k in sorted(counters):
+              lines.append(f'| `{k}` | {" | ".join(str(counters[k][s]) for s in SEVERITY)} |')
+            return '\n'.join(lines) + '\n'
           Path('summary.md').write_text(
-              md_table('By CheckID', 'checkId', by_check) + '\n' +
-              md_table('By File', 'filePath', by_file) + '\n')
+            md_table('By CheckID', 'checkId', by_check) + '\n' +
+            md_table('By File', 'filePath', by_file) + '\n')
       - name: Artifact reports
         id: artifact-reports
         # https://github.com/actions/upload-artifact
@@ -205,6 +207,6 @@ jobs:
           REPORTS_URL: ${{ steps.artifact-reports.outputs.artifact-url }}
         run: |
           cat reports/summary.md
-          echo -e "## Summary for ${SCHEMA_VERSION}\n\n" >> "$GITHUB_STEP_SUMMARY"
-          echo -e "Reports: <${REPORTS_URL}>\n\n" >> "$GITHUB_STEP_SUMMARY"
+          echo -e "# Summary for ${SCHEMA_VERSION}\n" >> "$GITHUB_STEP_SUMMARY"
+          echo -e "Reports: <${REPORTS_URL}>\n" >> "$GITHUB_STEP_SUMMARY"
           cat reports/summary.md >> "$GITHUB_STEP_SUMMARY"
