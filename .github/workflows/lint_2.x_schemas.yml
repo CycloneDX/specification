@@ -113,7 +113,7 @@ jobs:
           SCHEMA_VERSION: ${{ matrix.schema_version }}
           LINTER_TEST: ${{ matrix.linter_test }}
         run: |
-          set -eux
+          set -eu
           mapfile -d '' -t schemas < <(
             find "schema/${SCHEMA_VERSION}" \
               -type f \
@@ -131,7 +131,9 @@ jobs:
             --format json \
             "${schemas[@]}" \
             > "$REPORT_FILE"
-          sed -i "s|${GITHUB_WORKSPACE}/|\"\"|g" "$REPORT_FILE"
+      - name: Make report relative
+        if: '!cancelled()'
+        run: sed -i "s|${GITHUB_WORKSPACE}/|\"\"|g" "$REPORT_FILE"
       - name: Print report
         if: '!cancelled()'
         run: cat "$REPORT_FILE"
