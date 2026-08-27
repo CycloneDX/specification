@@ -86,7 +86,7 @@ jobs:
         # exclude:
         #  - schema_version: '2.0'
         #    linter_test: 'no-uppercase-rfc'
-    name: ${{ matrix.schema_version }} ${{ matrix.linter_test }}
+    name: lint ${{ matrix.schema_version }} ${{ matrix.linter_test }}
     env:
       REPORT_FILE: tools/src/main/js/linter/reports/${{ matrix.schema_version }}_${{ matrix.linter_test }}.json
     steps:
@@ -156,7 +156,7 @@ jobs:
       fail-fast: false
       matrix:
         schema_version: ${{ fromJSON(needs.discover-schema.outputs.versions) }}
-    name: ${{ matrix.schema_version }} summary
+    name: summary ${{ matrix.schema_version }}
     steps:
       - name: Fetch Reports
         # https://github.com/actions/download-artifact
@@ -166,8 +166,6 @@ jobs:
           pattern: report-${{ matrix.schema_version }}-*
           merge-multiple: true
       - name: Make summary
-        env:
-          SCHEMA_VERSION: ${{ matrix.schema_version }}
         working-directory: reports
         shell: python
         run: |
@@ -194,15 +192,18 @@ jobs:
               f'# Summary {os.environ.get("SCHEMA_VERSION")}\n\n' +
               md_table('By CheckID', 'checkId', by_check) + '\n' +
               md_table('By File', 'filePath', by_file) + '\n')
-      - name: Print summary
-        run: |
-          cat reports/summary.md
-          cat reports/summary.md >> "$GITHUB_STEP_SUMMARY"
       - name: Artifact reports
-        if: '!cancelled()'
+        id: artifact-reports
         # https://github.com/actions/upload-artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: reports-${{ matrix.schema_version }}
           path: reports/
           if-no-files-found: error
+      - name: Print summary
+        env:
+          REPORTS_DL: ${{ steps.artifact-reports.outputs.artifact-url }}
+        run: |
+          cat reports/summary.md
+          cat reports/summary.md >> "$GITHUB_STEP_SUMMARY"
+          echo -e "\n---\n## Reports\n<$REPORTS_DL>" >> "$GITHUB_STEP_SUMMARY"
