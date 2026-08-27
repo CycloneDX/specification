@@ -173,6 +173,17 @@ jobs:
           from collections import Counter, defaultdict
           from pathlib import Path
           SEVERITY = ('error', 'warning', 'info')
+          ICONS = {'error': '❌', 'warning': '⚠️', 'info': 'ℹ️'}
+          def md_icon(counter):
+            return next((ICONS[s] for s in SEVERITY if counter[s] > 0), ' ')
+          def md_table(title, header, counters):
+            lines = [f'## {title}',
+                     f'|   | {header} | ${" | ".join(SEVERITY)} |',
+                     f'|---|---|{"---|" * len(SEVERITY)}']
+            for k in sorted(counters):
+              counter = counters[k]
+              lines.append(f'| { md_icon(counter)} | `{k}` | {" | ".join(str(counter[s]) for s in SEVERITY)} |')
+            return '\n'.join(lines) + '\n'
           by_check, by_file = defaultdict(Counter), defaultdict(Counter)
           for f in Path('.').glob('*.json'):
             report = json.loads(f.read_text())
@@ -183,13 +194,6 @@ jobs:
               for i in r['issues']:
                 by_check[i['checkId']][i['severity']] += 1
                 file_counter[i['severity']] += 1
-          def md_table(title, header, counters):
-            lines = [f'## {title}',
-                     f'| {header} | ${" | ".join(SEVERITY)} |',
-                     f'|---|{"---|" * len(SEVERITY)}']
-            for k in sorted(counters):
-              lines.append(f'| `{k}` | {" | ".join(str(counters[k][s]) for s in SEVERITY)} |')
-            return '\n'.join(lines) + '\n'
           Path('summary.md').write_text(
             md_table('By CheckID', 'checkId', by_check) + '\n' +
             md_table('By File', 'filePath', by_file) + '\n')
