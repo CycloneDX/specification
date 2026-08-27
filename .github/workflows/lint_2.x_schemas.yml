@@ -87,6 +87,8 @@ jobs:
         #  - schema_version: '2.0'
         #    linter_test: 'no-uppercase-rfc'
     name: ${{ matrix.schema_version }} ${{ matrix.linter_test }}
+    env:
+      REPORT_FILE: tools/src/main/js/linter/reports/${{ matrix.schema_version }}_${{ matrix.linter_test }}.json
     steps:
       - name: Checkout repository
         # see https://github.com/actions/checkout
@@ -122,33 +124,36 @@ jobs:
             echo "No schemas found in schema/${SCHEMA_VERSION}" >&2
             exit 1
           fi
+          mkdir -p "$(dirname("$REPORT_FILE"))"
           node tools/src/main/js/linter/cli.js \
             --include "$LINTER_TEST" \
             --format json \
             "${schemas[@]}" \
-            > "tools/src/main/js/linter/CI_report/${SCHEMA_VERSION}-${LINTER_TEST}.json"
+            > "$REPORT_FILE"
+          set -i "s|${GITHUB_WORKSPACE}/|\"\"|g" "$REPORT_FILE"
       - name: Print report
         if: '!cancelled()'
-        run: cat tools/src/main/js/linter/CI_report.json
+        run: cat "$REPORT_FILE"
       - name: Artifact report
         if: '!cancelled()'
         # https://github.com/actions/upload-artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: report-${{ matrix.schema_version }}-${{ matrix.linter_test }}.json
-          path: tools/src/main/js/linter/CI_report/
+          name: report-${{ matrix.schema_version }}-${{ matrix.linter_test }}
+          path: ${{ env.REPORT_FILE }}
           if-no-files-found: error
           retention-days: 1
   summary:
+    if: '!cancelled()'
     needs:
       - discover-schema
       - lint-schemas
-    name: Summary
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         schema_version: ${{ fromJSON(needs.discover-schema.outputs.versions) }}
+    name: Summary ${{ matrix.schema_version }}
     steps:
       - name: Fetch Artifacts
         # https://github.com/actions/download-artifact
@@ -161,7 +166,7 @@ jobs:
         # https://github.com/actions/upload-artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: report-${{ matrix.schema_version }}
+          name: summary-${{ matrix.schema_version }}
           path: reports/
           if-no-files-found: error
       # TODO: print report
