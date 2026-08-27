@@ -126,7 +126,7 @@ jobs:
             --include "$LINTER_TEST" \
             --format json \
             "${schemas[@]}" \
-            > "tools/src/main/js/linter/CI_report.json"
+            > "tools/src/main/js/linter/CI_report/${SCHEMA_VERSION}-${LINTER_TEST}.json"
       - name: Print report
         if: '!cancelled()'
         run: cat tools/src/main/js/linter/CI_report.json
@@ -136,12 +136,32 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: report-${{ matrix.schema_version }}-${{ matrix.linter_test }}.json
-          path: tools/src/main/js/linter/CI_report.json
+          path: tools/src/main/js/linter/CI_report/
           if-no-files-found: error
-          retention-days: 7
-  # summary:
-    # TODO: write a summary job that collects all artifacts,
-    #       and summarizes the result for each detected schema version
-    #       it might evenre-package all the artifacts to a `report-${{ matrix.schema_version }}_collected`
-    #       or something ... them we would no longer need to keep the other artifacts for long (maybea day)
-    # but this is to come in a different task
+          retention-days: 1
+  summary:
+    needs:
+      - discover-schema
+      - lint-schemas
+    name: Summary
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        schema_version: ${{ fromJSON(needs.discover-schema.outputs.versions) }}
+    steps:
+      - name: Fetch Artifacts
+        # https://github.com/actions/download-artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          path: reports
+          pattern: report-${{ matrix.schema_version }}-*
+          merge-multiple: true
+      - name: Artifact report
+        # https://github.com/actions/upload-artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: report-${{ matrix.schema_version }}
+          path: reports/
+          if-no-files-found: error
+      # TODO: print report
