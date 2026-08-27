@@ -189,7 +189,6 @@ jobs:
                                ' | '.join(str(counter[(k, s)]) for s in SEVERITY) + ' |')
               return '\n'.join(lines) + '\n'
           Path('summary.md').write_text(
-              f'# Summary {os.environ.get("SCHEMA_VERSION")}\n\n' +
               md_table('By CheckID', 'checkId', by_check) + '\n' +
               md_table('By File', 'filePath', by_file) + '\n')
       - name: Artifact reports
@@ -202,8 +201,10 @@ jobs:
           if-no-files-found: error
       - name: Print summary
         env:
+          SCHEMA_VERSION: ${{ matrix.schema_version }}
           REPORTS_DL: ${{ steps.artifact-reports.outputs.artifact-url }}
         run: |
           cat reports/summary.md
+          echo -e "${SCHEMA_VERSION}\n\n" >> "$GITHUB_STEP_SUMMARY"
+          echo -e "Based on <${REPORTS_DL}>\n\n" >> "$GITHUB_STEP_SUMMARY"
           cat reports/summary.md >> "$GITHUB_STEP_SUMMARY"
-          echo -e "\n---\n## Reports\n<$REPORTS_DL>" >> "$GITHUB_STEP_SUMMARY"
