@@ -165,12 +165,6 @@ jobs:
           path: reports
           pattern: report-${{ matrix.schema_version }}-*
           merge-multiple: true
-      - name: Print summary
-        env:
-          SCHEMA_VERSION: ${{ matrix.schema_version }}
-        run: |
-          echo "# Summary for $SCHEMA_VERSION" >> "$GITHUB_STEP_SUMMARY"
-          echo "PENDING" >> "$GITHUB_STEP_SUMMARY"
       - name: Artifact reports
         # https://github.com/actions/upload-artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -178,3 +172,9 @@ jobs:
           name: reports-${{ matrix.schema_version }}
           path: reports/
           if-no-files-found: error
+      - name: Print summary
+        env:
+          SCHEMA_VERSION: ${{ matrix.schema_version }}
+        run: |
+          echo "# Summary for $SCHEMA_VERSION" >> "$GITHUB_STEP_SUMMARY"
+          echo "PENDING" >> "$GITHUB_STEP_SUMMARY"
