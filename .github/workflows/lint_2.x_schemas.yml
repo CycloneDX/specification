@@ -87,6 +87,8 @@ jobs:
         #  - schema_version: '2.0'
         #    linter_test: 'no-uppercase-rfc'
     name: ${{ matrix.schema_version }} ${{ matrix.linter_test }}
+    env:
+      REPORT_FILE: tools/src/main/js/linter/reports/${{ matrix.schema_version }}_${{ matrix.linter_test }}.json
     steps:
       - name: Checkout repository
         # see https://github.com/actions/checkout
@@ -111,6 +113,7 @@ jobs:
           SCHEMA_VERSION: ${{ matrix.schema_version }}
           LINTER_TEST: ${{ matrix.linter_test }}
         run: |
+          set -eu
           mapfile -d '' -t schemas < <(
             find "schema/${SCHEMA_VERSION}" \
               -type f \
@@ -122,26 +125,84 @@ jobs:
             echo "No schemas found in schema/${SCHEMA_VERSION}" >&2
             exit 1
           fi
+          mkdir -p "$(dirname "$REPORT_FILE")"
           node tools/src/main/js/linter/cli.js \
             --include "$LINTER_TEST" \
             --format json \
             "${schemas[@]}" \
-            > "tools/src/main/js/linter/CI_report.json"
+            > "$REPORT_FILE"
+      - name: Make report relative
+        if: '!cancelled()'
+        run: sed -i "s|${GITHUB_WORKSPACE}/||g" "$REPORT_FILE"
       - name: Print report
         if: '!cancelled()'
-        run: cat tools/src/main/js/linter/CI_report.json
+        run: cat "$REPORT_FILE"
       - name: Artifact report
         if: '!cancelled()'
         # https://github.com/actions/upload-artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: report-${{ matrix.schema_version }}-${{ matrix.linter_test }}.json
-          path: tools/src/main/js/linter/CI_report.json
+          name: report-${{ matrix.schema_version }}-${{ matrix.linter_test }}
+          path: ${{ env.REPORT_FILE }}
           if-no-files-found: error
-          retention-days: 7
-  # summary:
-    # TODO: write a summary job that collects all artifacts,
-    #       and summarizes the result for each detected schema version
-    #       it might evenre-package all the artifacts to a `report-${{ matrix.schema_version }}_collected`
-    #       or something ... them we would no longer need to keep the other artifacts for long (maybea day)
-    # but this is to come in a different task
+          retention-days: 1
+  summary:
+    if: '!cancelled()'
+    needs:
+      - discover-schema
+      - lint-schemas
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        schema_version: ${{ fromJSON(needs.discover-schema.outputs.versions) }}
+    name: ${{ matrix.schema_version }} summary
+    steps:
+      - name: Fetch Reports
+        # https://github.com/actions/download-artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          path: reports
+          pattern: report-${{ matrix.schema_version }}-*
+          merge-multiple: true
+      - name: Make summary
+        env:
+          SCHEMA_VERSION: ${{ matrix.schema_version }}
+        working-directory: reports
+        shell: python
+        run: |
+          import json, os
+          from collections import Counter
+          from pathlib import Path
+          SEVERITY = ('error', 'warning', 'info')
+          by_check, by_file = Counter(), Counter()
+          for f in Path('.').glob('*.json'):
+              for r in json.loads(f.read_text())['results']:
+                  for i in r['issues']:
+                      by_check[(i['checkId'], i['severity'])] += 1
+                      by_file[(r['filePath'], i['severity'])] += 1
+          def md_table(title, header, counter):
+              keys = sorted({k for k, _ in counter})
+              lines = [f'## {title}',
+                       f'| {header} | ' + ' | '.join(SEVERITY) + ' |',
+                       '|---|---|---|---|']
+              for k in keys:
+                  lines.append(f'| `{k}` | ' +
+                               ' | '.join(str(counter[(k, s)]) for s in SEVERITY) + ' |')
+              return '\n'.join(lines) + '\n'
+          Path('summary.md').write_text(
+              f'# Summary {os.environ.get("SCHEMA_VERSION")}\n\n' +
+              md_table('By CheckID', 'checkId', by_check) + '\n' +
+              md_table('By File', 'filePath', by_file) + '\n')
+      - name: Print summary
+        run: |
+          cat reports/summary.md
+          cat reports/summary.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Artifact reports
+        if: '!cancelled()'
+        # https://github.com/actions/upload-artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: reports-${{ matrix.schema_version }}
+          path: reports/
+          if-no-files-found: error
