@@ -156,7 +156,7 @@ jobs:
       fail-fast: false
       matrix:
         schema_version: ${{ fromJSON(needs.discover-schema.outputs.versions) }}
-    name: Summary ${{ matrix.schema_version }}
+    name: ${{ matrix.schema_version }} summary
     steps:
       - name: Fetch Reports
         # https://github.com/actions/download-artifact
@@ -165,16 +165,42 @@ jobs:
           path: reports
           pattern: report-${{ matrix.schema_version }}-*
           merge-multiple: true
+      - name: Make summary
+        env:
+          SCHEMA_VERSION: ${{ matrix.schema_version }}
+        working-directory: reports
+        shell: python
+        run: |
+          import json, os
+          from collections import Counter
+          from pathlib import Path
+          SEVERITY = ('error', 'warning', 'info')
+          by_check, by_file = Counter(), Counter()
+          for f in Path('.').glob('*.json'):
+              for r in json.loads(f.read_text())['results']:
+                  for i in r['issues']:
+                      by_check[(i['checkId'], i['severity'])] += 1
+                      by_file[(r['filePath'], i['severity'])] += 1
+          def md_table(title, header, counter):
+              keys = sorted({k for k, _ in counter})
+              lines = [f'## {title}',
+                       f'| {header} | ' + ' | '.join(SEVERITY),
+                       '|---|---|---|---|']
+              for k in keys:
+                  lines.append(f'| `{k}` | ' +
+                               ' | '.join(str(counter[(k, s)]) for s in SEVERITY) + ' |')
+              return '\n'.join(lines) + '\n'
+          Path('summary.md').write_text(
+              f'# Summary {os.environ.get("")}\n\n' +
+              md_table('By CheckID', 'checkId', by_check) + '\n' +
+              md_table('By File', 'filePath', by_file)+ '\n')
+      - name: Print summary
+        run: cat reports/summary.md >> "$GITHUB_STEP_SUMMARY"
       - name: Artifact reports
+        if: '!cancelled()'
         # https://github.com/actions/upload-artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: reports-${{ matrix.schema_version }}
           path: reports/
           if-no-files-found: error
-      - name: Print summary
-        env:
-          SCHEMA_VERSION: ${{ matrix.schema_version }}
-        run: |
-          echo "# Summary for $SCHEMA_VERSION" >> "$GITHUB_STEP_SUMMARY"
-          echo "PENDING" >> "$GITHUB_STEP_SUMMARY"
