@@ -7,11 +7,26 @@
  * @license Apache-2.0
  */
 
-
 import path from 'path'
 
 import { LintCheck, registerCheck, Severity } from '../index.js';
 
+
+/**
+ * Default pattern for CycloneDX schema IDs' file path
+ *
+ * Valid patterns:
+ *   https://cyclonedx.org/schema/bom-1.7.schema.json
+ *   https://cyclonedx.org/schema/2.0/cyclonedx-2.0.schema.json
+ *   https://cyclonedx.org/schema/2.0/model/cyclonedx-cryptography-2.0.schema.json
+ *
+ * Pattern breakdown:
+ *   - Base URL: https://cyclonedx.org/schema/
+ *   - Optional version path: any
+ *   - Optional subdirectory: any
+ *   - Schema name: any
+ *   - Extension: .schema.json
+ */
 const DEFAULT_PATTERN = '^https://cyclonedx\\.org(/schema/.+\\.schema\\.json)$';
 
 /**
