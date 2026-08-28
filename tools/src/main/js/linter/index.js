@@ -160,10 +160,11 @@ export class LintCheck {
    * Run the check against a schema
    * @param {object} schema - The parsed JSON schema
    * @param {string} rawContent - The raw file content (for formatting checks)
-   * @param {object} config - Configuration options for this check
+   * @param {object} [config] - Configuration options for this check
+   * @param {string|null} [filePath] - The parsed file's path
    * @returns {LintIssue[]} Array of issues found
    */
-  async run(schema, rawContent, config = {}) {
+  async run(schema, rawContent, config = {}, filePath = null) {
     throw new Error('LintCheck.run() must be implemented by subclass');
   }
 
@@ -171,8 +172,8 @@ export class LintCheck {
    * Create an issue with this check's ID
    * @param {string} message
    * @param {string} path
-   * @param {object} context
-   * @param {string} [severity]
+   * @param {object} [context]
+   * @param {string|null} [severity]
    */
   createIssue(message, path, context = {}, severity = null) {
     return new LintIssue(
