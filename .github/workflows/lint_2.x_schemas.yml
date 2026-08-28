@@ -15,14 +15,6 @@ permissions: {}
 
 env:
   NODE_VERSION: '24.x'
-  INCLUDE_BUNDLED: >-
-    ${{ github.ref == 'refs/heads/master'
-     || github.ref == 'refs/heads/main'
-     || github.ref == 'refs/heads/2.0-dev'
-     || (  github.event_name == 'pull_request'
-        && github.base_ref == '2.0-dev'
-        )
-    }}
 
 jobs:
   discover-schema:
@@ -155,7 +147,14 @@ jobs:
           if-no-files-found: error
           retention-days: 1
   lint-bundled:
-    if: ${{ env.INCLUDE_BUNDLED == 'true' }}
+    if: >-
+      ${{ github.ref == 'refs/heads/master'
+      || github.ref == 'refs/heads/main'
+      || github.ref == 'refs/heads/2.0-dev'
+      || (  github.event_name == 'pull_request'
+         && github.base_ref == '2.0-dev'
+         )
+      }}
     needs:
       - discover-schema
     timeout-minutes: 10
@@ -273,9 +272,7 @@ jobs:
           Path('summary.md').write_text('\n'.join(chain(
             md_table('By CheckID', 'checkId', by_check),
             md_table('By File', 'filePath', by_file),
-            ( '*) bundled files were checked for specific issues only; see raw file section "enabledChecks".'
-              if os.environ.get('INCLUDE_BUNDLED') == 'true'
-              else '', ),
+            ('*) bundled files were checked for specific issues only; see raw file section "enabledChecks".',)
           )))
       - name: Artifact reports
         id: artifact-reports
