@@ -15,6 +15,14 @@ permissions: {}
 
 env:
   NODE_VERSION: '24.x'
+  INCLUDE_BUNDLED: |
+    ${{ github.ref == 'refs/heads/master'
+       || github.ref == 'refs/heads/main'
+       || github.ref == 'refs/heads/2.0-dev'
+       || (  github.event_name == 'pull_request'
+          && github.base_ref == '2.0-dev'
+          )
+      }}
 
 jobs:
   discover-schema:
@@ -147,14 +155,7 @@ jobs:
           if-no-files-found: error
           retention-days: 1
   lint-bundled:
-    if: >-
-      ${{ github.ref == 'refs/heads/master'
-       || github.ref == 'refs/heads/main'
-       || github.ref == 'refs/heads/2.0-dev'
-       || (  github.event_name == 'pull_request'
-          && github.base_ref == '2.0-dev'
-          )
-      }}
+    if: ${{ env.INCLUDE_BUNDLED == 'true' }}
     needs:
       - discover-schema
     timeout-minutes: 10
@@ -220,7 +221,7 @@ jobs:
           name: report_${{ matrix.schema_version }}-bundled
           path: ${{ env.REPORT_FILE }}
           if-no-files-found: error
-          retention-days: 1
+          retention-days: 7
   summary:
     if: '!cancelled()'
     needs:
@@ -238,7 +239,7 @@ jobs:
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           path: reports
-          pattern: report_${{ matrix.schema_version }}[_-]*
+          pattern: report_${{ matrix.schema_version }}_*
           merge-multiple: true
       - name: Make summary
         working-directory: reports
@@ -286,6 +287,6 @@ jobs:
           REPORTS_URL: ${{ steps.artifact-reports.outputs.artifact-url }}
         run: |
           cat reports/summary.md
-          echo -e "# Summary for ${SCHEMA_VERSION}\n" >> "$GITHUB_STEP_SUMMARY"
-          echo -e "Reports: <${REPORTS_URL}>\n" >> "$GITHUB_STEP_SUMMARY"
+          echo -e "# Summary for ${SCHEMA_VERSION}\n" > "$GITHUB_STEP_SUMMARY"
+          echo -e "\nReports: <${REPORTS_URL}>\n\n" >> "$GITHUB_STEP_SUMMARY"
           cat reports/summary.md >> "$GITHUB_STEP_SUMMARY"
