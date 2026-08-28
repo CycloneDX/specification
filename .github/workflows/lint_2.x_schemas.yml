@@ -222,7 +222,7 @@ jobs:
           path: ${{ env.REPORT_FILE }}
           if-no-files-found: error
           retention-days: 1
-  summary:
+  summarize-version:
     if: '!cancelled()'
     needs:
       - discover-schema
@@ -232,7 +232,7 @@ jobs:
       fail-fast: false
       matrix:
         schema_version: ${{ fromJSON(needs.discover-schema.outputs.versions) }}
-    name: summary ${{ matrix.schema_version }}
+    name: summarize ${{ matrix.schema_version }}
     steps:
       - name: Fetch Reports
         # https://github.com/actions/download-artifact
@@ -292,5 +292,5 @@ jobs:
         run: |
           cat reports/summary.md
           echo -e "# Summary for ${SCHEMA_VERSION}\n" > "$GITHUB_STEP_SUMMARY"
-          echo -e "\nReports: <${REPORTS_URL}>\n\n" >> "$GITHUB_STEP_SUMMARY"
+          echo -e "Reports: <${REPORTS_URL}>\n\n" >> "$GITHUB_STEP_SUMMARY"
           cat reports/summary.md >> "$GITHUB_STEP_SUMMARY"
