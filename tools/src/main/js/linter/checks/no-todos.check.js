@@ -39,7 +39,7 @@ class NoTodosCheck extends LintCheck {
     traverseSchema(schema, (node, path, key, parent) => {
       if (TODO_PATTERNS.test(key)) {
         issues.push(this.createIssue(
-          `There is an open ToDO`,
+          `There is an open ToDo`,
           path,
           { key }
         ));
