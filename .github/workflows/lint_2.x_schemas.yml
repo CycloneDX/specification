@@ -221,7 +221,7 @@ jobs:
           name: report_${{ matrix.schema_version }}-bundled
           path: ${{ env.REPORT_FILE }}
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 1
   summary:
     if: '!cancelled()'
     needs:
@@ -239,7 +239,7 @@ jobs:
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           path: reports
-          pattern: report_${{ matrix.schema_version }}_*
+          pattern: report_${{ matrix.schema_version }}[_-]]*
           merge-multiple: true
       - name: Make summary
         working-directory: reports
@@ -247,19 +247,19 @@ jobs:
         run: |
           import json, os
           from collections import Counter, defaultdict
+          from itertools import chain
           from pathlib import Path
           SEVERITY = ('error', 'warning', 'info')
           _ICONS = {'error': '❌', 'warning': '⚠️', 'info': 'ℹ️'}
           def md_icon(counter):
             return next((_ICONS[s] for s in SEVERITY if counter[s] > 0), '✅')
           def md_table(title, header, counters):
-            lines = [f'## {title}',
-                     f'|   | {header} | {" | ".join(SEVERITY)} |',
-                     f'|:-:|---|{"--:|" * len(SEVERITY)}']
+            yield f'## {title}'
+            yield f'|   | {header} | {" | ".join(SEVERITY)} |'
+            yield f'|:-:|---|{"--:|" * len(SEVERITY)}'
             for k in sorted(counters):
               c = counters[k]
-              lines.append(f'| {md_icon(c)} | `{k}` | {" | ".join(str(c[s]) for s in SEVERITY)} |')
-            return '\n'.join(lines) + '\n'
+              yield f'| {md_icon(c)} | `{k}` | {" | ".join(str(c[s]) for s in SEVERITY)} |'
           by_check, by_file = defaultdict(Counter), defaultdict(Counter)
           for f in Path('.').glob('*.json'):
             report = json.loads(f.read_text())
@@ -270,9 +270,13 @@ jobs:
               for i in r['issues']:
                 by_check[i['checkId']][i['severity']] += 1
                 file_counter[i['severity']] += 1
-          Path('summary.md').write_text(
-            md_table('By CheckID', 'checkId', by_check) + '\n' +
-            md_table('By File', 'filePath', by_file) + '\n')
+          Path('summary.md').write_text('\n'.join(chain(
+            md_table('By CheckID', 'checkId', by_check),
+            md_table('By File', 'filePath', by_file),
+            ('*) bundled files were checked for specific issues only; see raw file section "enabledChecks".'
+             if os.environ.get('INCLUDE_BUNDLED') == 'true'
+             else '',),
+          )))
       - name: Artifact reports
         id: artifact-reports
         # https://github.com/actions/upload-artifact
