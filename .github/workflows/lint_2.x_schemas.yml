@@ -132,13 +132,13 @@ jobs:
             "${schemas[@]}" \
             > "$REPORT_FILE"
       - name: Make report relative
-        if: '!cancelled()'
+        if: ${{ !cancelled() }}
         run: sed -i "s|${GITHUB_WORKSPACE}/||g" "$REPORT_FILE"
       - name: Print report
-        if: '!cancelled()'
+        if: ${{ !cancelled() }}
         run: cat "$REPORT_FILE"
       - name: Artifact report
-        if: '!cancelled()'
+        if: ${{ !cancelled() }}
         # https://github.com/actions/upload-artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -146,24 +146,102 @@ jobs:
           path: ${{ env.REPORT_FILE }}
           if-no-files-found: error
           retention-days: 1
-  summary:
-    if: '!cancelled()'
+  lint-bundled:
+    if: >-
+      ${{ github.ref == 'refs/heads/master'
+      || github.ref == 'refs/heads/main'
+      || github.ref == 'refs/heads/2.0-dev'
+      || (  github.event_name == 'pull_request'
+         && github.base_ref == 'master'
+         )
+      }}
     needs:
       - discover-schema
-      - lint-schemas
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         schema_version: ${{ fromJSON(needs.discover-schema.outputs.versions) }}
-    name: summary ${{ matrix.schema_version }}
+    name: lint ${{ matrix.schema_version }}-bundled
+    env:
+      REPORT_FILE: tools/src/main/js/linter/reports/${{ matrix.schema_version }}-bundled.json
+    steps:
+      - name: Checkout repository
+        # see https://github.com/actions/checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup Node.js
+        # see https://github.com/actions/setup-node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          package-manager-cache: false
+      - name: Install linter
+        working-directory: tools/src/main/js/linter
+        run: npm install
+      - name: Lint schemas
+        env:
+          SCHEMA_VERSION: ${{ matrix.schema_version }}
+        run: |
+          set -eu
+          mapfile -d '' -t schemas < <(
+            find "schema/${SCHEMA_VERSION}" \
+              -type f \
+              -name '*-bundled*.schema.json' \
+              -print0
+          )
+          if [ ${#schemas[@]} -eq 0 ]; then
+            echo "No schemas found in schema/${SCHEMA_VERSION}" >&2
+            exit 1
+          fi
+          mkdir -p "$(dirname "$REPORT_FILE")"
+          # only run checks not carried over from source files
+          node tools/src/main/js/linter/cli.js \
+            --include schema-draft \
+            --include schema-id-pattern \
+            --include schema-id-filepath \
+            --include schema-comment \
+            --format json \
+            "${schemas[@]}" \
+            > "$REPORT_FILE"
+      - name: Make report relative
+        if: ${{ !cancelled() }}
+        run: sed -i "s|${GITHUB_WORKSPACE}/||g" "$REPORT_FILE"
+      - name: Print report
+        if: '!cancelled()'
+        run: cat "$REPORT_FILE"
+      - name: Artifact report
+        if: ${{ !cancelled() }}
+        # https://github.com/actions/upload-artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: report_${{ matrix.schema_version }}-bundled
+          path: ${{ env.REPORT_FILE }}
+          if-no-files-found: error
+          retention-days: 1
+  summarize-version:
+    if: ${{ !cancelled() }}
+    needs:
+      - discover-schema
+      - lint-schemas
+      - lint-bundled
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        schema_version: ${{ fromJSON(needs.discover-schema.outputs.versions) }}
+    name: summarize ${{ matrix.schema_version }}
+    env:
+      BUNDLED_RAN: ${{ needs.lint-bundled.result != 'skipped' }}
     steps:
       - name: Fetch Reports
         # https://github.com/actions/download-artifact
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           path: reports
-          pattern: report_${{ matrix.schema_version }}_*
+          pattern: report_${{ matrix.schema_version }}[_-]*
           merge-multiple: true
       - name: Make summary
         working-directory: reports
@@ -171,19 +249,20 @@ jobs:
         run: |
           import json, os
           from collections import Counter, defaultdict
+          from itertools import chain
           from pathlib import Path
           SEVERITY = ('error', 'warning', 'info')
           _ICONS = {'error': '❌', 'warning': '⚠️', 'info': 'ℹ️'}
           def md_icon(counter):
             return next((_ICONS[s] for s in SEVERITY if counter[s] > 0), '✅')
           def md_table(title, header, counters):
-            lines = [f'## {title}',
-                     f'|   | {header} | {" | ".join(SEVERITY)} |',
-                     f'|:-:|---|{"--:|" * len(SEVERITY)}']
+            yield f'## {title}'
+            yield f'|   | {header} | {" | ".join(SEVERITY)} |'
+            yield f'|:-:|---|{"--:|" * len(SEVERITY)}'
             for k in sorted(counters):
               c = counters[k]
-              lines.append(f'| {md_icon(c)} | `{k}` | {" | ".join(str(c[s]) for s in SEVERITY)} |')
-            return '\n'.join(lines) + '\n'
+              yield f'| {md_icon(c)} | `{k}` | {" | ".join(str(c[s]) for s in SEVERITY)} |'
+            yield ''
           by_check, by_file = defaultdict(Counter), defaultdict(Counter)
           for f in Path('.').glob('*.json'):
             report = json.loads(f.read_text())
@@ -194,9 +273,13 @@ jobs:
               for i in r['issues']:
                 by_check[i['checkId']][i['severity']] += 1
                 file_counter[i['severity']] += 1
-          Path('summary.md').write_text(
-            md_table('By CheckID', 'checkId', by_check) + '\n' +
-            md_table('By File', 'filePath', by_file) + '\n')
+          Path('summary.md').write_text('\n'.join(chain(
+            md_table('By CheckID', 'checkId', by_check),
+            md_table('By File', 'filePath', by_file),
+            ( '*) bundled files were checked for specific issues only; see raw file section "enabledChecks".'
+              if os.environ.get('BUNDLED_RAN') == 'true'
+              else '', ),
+          )))
       - name: Artifact reports
         id: artifact-reports
         # https://github.com/actions/upload-artifact
@@ -211,6 +294,6 @@ jobs:
           REPORTS_URL: ${{ steps.artifact-reports.outputs.artifact-url }}
         run: |
           cat reports/summary.md
-          echo -e "# Summary for ${SCHEMA_VERSION}\n" >> "$GITHUB_STEP_SUMMARY"
-          echo -e "Reports: <${REPORTS_URL}>\n" >> "$GITHUB_STEP_SUMMARY"
+          echo -e "# Summary for ${SCHEMA_VERSION}\n" > "$GITHUB_STEP_SUMMARY"
+          echo -e "Reports: <${REPORTS_URL}>\n\n" >> "$GITHUB_STEP_SUMMARY"
           cat reports/summary.md >> "$GITHUB_STEP_SUMMARY"
