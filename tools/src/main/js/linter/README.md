@@ -45,6 +45,7 @@ node cli.js schema.json
 |-------|-------------|
 | `schema-draft` | Validates `$schema` is `https://json-schema.org/draft/2020-12/schema` |
 | `schema-id-pattern` | Validates `$id` matches CycloneDX URL pattern |
+| `schema-id-filepath` | Validates `$id` property matches the expected file path |
 | `schema-comment` | Validates `$comment` contains required OWASP/Ecma standard notice |
 | `model-property-order` | Validates model schemas have properties in order: `$schema`, `$id`, `type`, `title`, `$comment`, `$defs` |
 | `model-structure` | Validates model schemas have `type: "null"`, `$defs`, and no `properties` |
@@ -55,10 +56,10 @@ node cli.js schema.json
 | `description-oxford-english` | Descriptions must use Oxford English spelling (British with -ize) |
 | `no-uppercase-rfc` | No uppercase RFC 2119 keywords (MUST, SHALL, SHOULD, etc.) |
 | `no-must-word` | Use "shall" instead of "must" per ISO House Style |
-| `additional-properties-false` | Object definitions must have `additionalProperties: false` |
 | `title-formatting` | Titles must use sentence case |
 | `enum-value-formatting` | Enum values must be lowercase kebab-case; `meta:enum` must cover all values |
-| `ref-usage` | `$ref` must not be combined with other keywords |
+| `enum-value-no-other` | Enum values must not be literal "other" |
+| `enum-value-other` | Enum values must not be literal "other"; use custom-object style instead |
 | `duplicate-content` | Titles and descriptions must be unique within a schema |
 | `duplicate-definitions` | Definitions must be reused via `$ref`, not duplicated |
 

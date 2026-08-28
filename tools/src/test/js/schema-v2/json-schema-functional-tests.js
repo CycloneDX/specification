@@ -69,10 +69,11 @@ const [spdxSchema, cryptoDefsSchema, behaviorTaxonomySchema, bomSchema, bomSchem
 ])
 
 const ajv = new Ajv2020({
+    verbose: true,
+    addUsedSchema: false,
     // not running in strict - this is done in the linter-test already
     strict: false,
     validateFormats: true,
-    addUsedSchema: false,
 });
 // some ref'd schemas mightbe draft-07
 ajv.addMetaSchema(draft7MetaSchema);
