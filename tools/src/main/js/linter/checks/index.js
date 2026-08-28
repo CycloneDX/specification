@@ -36,6 +36,7 @@ export async function loadAllChecks() {
 
 // Export individual check modules for direct access if needed
 export * from './schema-id-pattern.check.js';
+export * from './schema-id-filepath.check.js';
 export * from './schema-comment.check.js';
 export * from './schema-draft.check.js';
 export * from './model-property-order.check.js';
