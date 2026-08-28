@@ -233,6 +233,8 @@ jobs:
       matrix:
         schema_version: ${{ fromJSON(needs.discover-schema.outputs.versions) }}
     name: summarize ${{ matrix.schema_version }}
+    env:
+      BUNDLED_RAN: ${{ needs.lint-bundled.result != 'skipped' }}
     steps:
       - name: Fetch Reports
         # https://github.com/actions/download-artifact
@@ -273,7 +275,9 @@ jobs:
           Path('summary.md').write_text('\n'.join(chain(
             md_table('By CheckID', 'checkId', by_check),
             md_table('By File', 'filePath', by_file),
-            ('*) bundled files were checked for specific issues only; see raw file section "enabledChecks".',)
+            ( '*) bundled files were checked for specific issues only; see raw file section "enabledChecks".'
+              if os.environ.get('BUNDLED_RAN') == 'true'
+              else '', ),
           )))
       - name: Artifact reports
         id: artifact-reports
