@@ -1,0 +1,168 @@
+{
+  "$schema": "https://cyclonedx.org/schema/2.0/cyclonedx-2.0.schema.json",
+  "specFormat": "CycloneDX",
+  "specVersion": "2.0",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-08-29T12:00:00Z"
+  },
+  "perspectives": [
+    {
+      "bom-ref": "perspective-model-card",
+      "name": "Model Card",
+      "description": "Defines the data elements of a machine learning model card, following the industry-standard model card structure: model details, intended use, training data and procedure, quantitative analysis, technical limitations, and ethical, fairness, and environmental considerations. The mappings project that structure onto the CycloneDX 2.0 decomposition of the former first-class modelCard entity: intrinsic technical characteristics live in modelProperties, which may only appear on components of type machine-learning-model; training datasets are components of type data; intended use cases are use case definitions referenced from the model; and ethical and fairness considerations are entries in the document's risk model. This perspective assumes the AI/ML model properties proposed in CycloneDX/specification#990.",
+      "domains": [
+        "machine-learning",
+        "artificial-intelligence",
+        "transparency",
+        "ethics"
+      ],
+      "mappings": [
+        {
+          "expression": "$.components[?(@.type=='machine-learning-model')]['name','version','description']",
+          "nativeName": "Model Details",
+          "nativeDescription": "The identifying facts of the model: its name, version, and a description of what it is and does.",
+          "relevance": "required",
+          "weight": 1.0,
+          "rationale": "A model card is meaningless without stating which model, and which revision of it, the card describes."
+        },
+        {
+          "expression": "$.components[?(@.type=='machine-learning-model')].parties[?(@.roles[?(@.role=='supplier')])]",
+          "nativeName": "Developed By",
+          "nativeDescription": "The organization or individuals responsible for developing and supplying the model.",
+          "relevance": "required",
+          "weight": 0.9,
+          "rationale": "Accountability for a model's behaviour requires knowing who produced it. Expressed through the party model with the supplier role."
+        },
+        {
+          "expression": "$.components[?(@.type=='machine-learning-model')].licenses",
+          "nativeName": "License",
+          "nativeDescription": "The license under which the model, and by extension its weights, may be used.",
+          "relevance": "required",
+          "weight": 0.8,
+          "rationale": "Model cards conventionally state usage terms; license determines whether a given use is permitted at all."
+        },
+        {
+          "expression": "$.components[?(@.type=='machine-learning-model')].modelProperties.tasks",
+          "nativeName": "Supported Tasks",
+          "nativeDescription": "The machine learning tasks the model is designed to perform.",
+          "relevance": "required",
+          "weight": 0.9,
+          "rationale": "Tasks anchor the card: they determine the applicable inputs, outputs, and evaluation metrics."
+        },
+        {
+          "expression": "$.components[?(@.type=='machine-learning-model')].modelProperties.learningTypes",
+          "nativeName": "Learning Paradigms",
+          "nativeDescription": "The learning paradigms applied when training the model, such as supervised or reinforcement learning.",
+          "relevance": "recommended",
+          "weight": 0.5,
+          "rationale": "Helps readers judge what kinds of data and feedback shaped the model's behaviour."
+        },
+        {
+          "expression": "$.components[?(@.type=='machine-learning-model')].modelProperties.architecture",
+          "nativeName": "Model Architecture",
+          "nativeDescription": "The architecture family and structural characteristics of the model.",
+          "relevance": "recommended",
+          "weight": 0.7,
+          "rationale": "Architecture contextualizes capability and performance claims and supports reproducibility."
+        },
+        {
+          "expression": "$.components[?(@.type=='machine-learning-model')].modelProperties['inputs','outputs']",
+          "nativeName": "Input and Output Parameters",
+          "nativeDescription": "The modalities, formats, and constraints of the data the model consumes and produces.",
+          "relevance": "recommended",
+          "weight": 0.6,
+          "rationale": "Input and output specifications define the model's operational envelope and integration contract."
+        },
+        {
+          "expression": "$.components[?(@.type=='machine-learning-model')].modelProperties['parameterCount','quantization']",
+          "nativeName": "Model Size and Quantization",
+          "nativeDescription": "The parameter count of the model and any quantization applied to its weights.",
+          "relevance": "optional",
+          "weight": 0.3,
+          "rationale": "Size and quantization inform deployment cost and can affect accuracy relative to the unquantized model."
+        },
+        {
+          "expression": "$.components[?(@.type=='machine-learning-model')].modelProperties.training",
+          "nativeName": "Training Data and Procedure",
+          "nativeDescription": "How the model was trained: the training formula and the datasets used.",
+          "relevance": "recommended",
+          "weight": 0.8,
+          "rationale": "Training data provenance is central to assessing bias, capability boundaries, and data protection obligations."
+        },
+        {
+          "expression": "$.components[?(@.type=='data')]",
+          "nativeName": "Datasets",
+          "nativeDescription": "Dataset components referenced from the model's training information, carrying dataset composition, governance, and sensitive-data declarations.",
+          "relevance": "recommended",
+          "weight": 0.6,
+          "rationale": "Training references resolve to components of type data; the dataset detail a card reader needs lives on those components."
+        },
+        {
+          "expression": "$.components[?(@.type=='machine-learning-model')].modelProperties.evaluation",
+          "nativeName": "Quantitative Analysis",
+          "nativeDescription": "Evaluation results: performance metrics, per-slice measurements, confidence intervals, and supporting graphics.",
+          "relevance": "recommended",
+          "weight": 0.8,
+          "rationale": "Metrics, including slice-level results, substantiate capability claims and surface performance disparities between groups."
+        },
+        {
+          "expression": "$.components[?(@.type=='machine-learning-model')].modelProperties.useCases",
+          "nativeName": "Intended Use",
+          "nativeDescription": "References to the use cases the model is intended for.",
+          "relevance": "required",
+          "weight": 0.9,
+          "rationale": "Intended use separates in-scope application from misuse; it is the card section most consulted by adopters and assessors."
+        },
+        {
+          "expression": "$.definitions.useCases",
+          "nativeName": "Use Case Definitions",
+          "nativeDescription": "The use case definitions that the model's intended-use references resolve to.",
+          "relevance": "recommended",
+          "weight": 0.6,
+          "rationale": "The model links to use cases by reference; the definitions carry the actual descriptions a card reader needs."
+        },
+        {
+          "expression": "$.components[?(@.type=='machine-learning-model')].parties[?(@.roles[?(@.role=='end-user')])]",
+          "nativeName": "Intended Users",
+          "nativeDescription": "The audiences the model is intended to be used by.",
+          "relevance": "recommended",
+          "weight": 0.5,
+          "rationale": "Stating who the model is for frames the expertise assumed of its operators. Expressed through the party model with the end-user role."
+        },
+        {
+          "expression": "$.components[?(@.type=='machine-learning-model')].modelProperties.limitations",
+          "nativeName": "Technical Limitations",
+          "nativeDescription": "Known technical limitations of the model, including constraints on accuracy, reasoning, scalability, and appropriate use, and relevant performance tradeoffs.",
+          "relevance": "required",
+          "weight": 0.9,
+          "rationale": "Limitations are the card's primary safeguard against use outside the model's competence."
+        },
+        {
+          "expression": "$.risks.risks[?(@.domains[?(@.type=='ethical')])]",
+          "nativeName": "Ethical Considerations",
+          "nativeDescription": "Risks in the ethical domain associated with the model, including affected parties, benefits, harms, and mitigations.",
+          "relevance": "required",
+          "weight": 0.9,
+          "rationale": "Ethical considerations are expressed as entries in the document's risk model rather than as card-local prose, gaining structured likelihood, impact, and response data."
+        },
+        {
+          "expression": "$.risks.risks[?(@.inherentRisk.impact.categories[?(@=='fairness' || @=='bias')])]",
+          "nativeName": "Fairness Assessments",
+          "nativeDescription": "Risks whose impact is categorized as fairness or bias, describing groups at risk and observed disparities.",
+          "relevance": "recommended",
+          "weight": 0.6,
+          "rationale": "Fairness assessments identify demographic or group-level performance disparities; slice-level evaluation metrics provide their quantitative backing."
+        },
+        {
+          "expression": "$.components[?(@.type=='machine-learning-model')].modelProperties.environmental",
+          "nativeName": "Environmental Considerations",
+          "nativeDescription": "Energy consumption and carbon cost of model activities such as training and inference.",
+          "relevance": "recommended",
+          "weight": 0.5,
+          "rationale": "Environmental impact is an established model card section and increasingly a reporting obligation."
+        }
+      ]
+    }
+  ]
+}
