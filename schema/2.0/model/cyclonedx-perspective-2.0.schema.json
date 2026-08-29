@@ -18,13 +18,36 @@
       "title": "Perspective",
       "description": "A domain-specific view that identifies the types of data relevant to a particular audience and provides optional terminology mappings to facilitate interpretation. Perspectives enable tooling to generate filtered views, translate terminology, and validate document completeness against audience-specific requirements.",
       "additionalProperties": false,
-      "required": [
-        "name",
-        "mappings"
+      "oneOf": [
+        {
+          "$comment": "Reference form: incorporates the published pre-defined perspective by reference; inline mappings shall not be provided.",
+          "properties": {
+            "predefined": true,
+            "mappings": false
+          },
+          "required": [
+            "predefined"
+          ]
+        },
+        {
+          "$comment": "Inline form: the perspective is fully defined in the document and shall not declare a pre-defined identity.",
+          "properties": {
+            "predefined": false,
+            "name": true,
+            "mappings": true
+          },
+          "required": [
+            "name",
+            "mappings"
+          ]
+        }
       ],
       "properties": {
         "bom-ref": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "predefined": {
+          "$ref": "#/$defs/preDefinedPerspective"
         },
         "name": {
           "type": "string",
@@ -64,6 +87,19 @@
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
         }
+      }
+    },
+    "preDefinedPerspective": {
+      "type": "string",
+      "title": "Pre-Defined Perspective",
+      "description": "Identifies a well-known, pre-defined perspective published in the CycloneDX perspectives catalog, incorporating the published definition by reference and enabling tooling to recognize the perspective without matching on free-text names. A perspective declaring a pre-defined identity shall not provide inline mappings; a perspective defining its own mappings shall omit this field.",
+      "enum": [
+        "model-card",
+        "pqc-readiness"
+      ],
+      "meta:enum": {
+        "model-card": "A transparency view for machine learning models following the industry-standard model card structure, covering model details, intended use, training data and procedure, quantitative analysis, technical limitations, and ethical and environmental considerations.",
+        "pqc-readiness": "A view for assessing readiness for the post-quantum cryptography migration, covering cryptographic inventory, quantum resistance of the cryptography in use, and cryptographic agility."
       }
     },
     "perspectiveMapping": {
