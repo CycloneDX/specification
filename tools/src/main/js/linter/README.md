@@ -47,6 +47,7 @@ node cli.js schema.json
 | `schema-id-pattern` | Validates `$id` matches CycloneDX URL pattern |
 | `schema-id-filepath` | Validates `$id` property matches the expected file path |
 | `schema-comment` | Validates `$comment` contains required OWASP/Ecma standard notice |
+| `additional-properties-consistency` | TODO |
 | `model-property-order` | Validates model schemas have properties in order: `$schema`, `$id`, `type`, `title`, `$comment`, `$defs` |
 | `model-structure` | Validates model schemas have `type: "null"`, `$defs`, and no `properties` |
 | `formatting-indent` | Validates 2-space indentation, no tabs, no trailing whitespace, LF line endings |
