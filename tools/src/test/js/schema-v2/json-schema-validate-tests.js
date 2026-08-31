@@ -76,6 +76,10 @@ const [spdxSchema, cryptoDefsSchema, behaviorTaxonomySchema, schemas, schemaModu
 function getAjv(bundled) {
     // see https://ajv.js.org/options.html
     const ajv = new Ajv2020({
+        verbose: true,
+        addUsedSchema: false,
+        keywords: ["meta:enum"],
+        // see https://ajv.js.org/options.html#strict-mode-options
         strict: true,
         strictSchema: true,
         strictNumbers: true,
@@ -84,9 +88,7 @@ function getAjv(bundled) {
         strictRequired: true,
         validateFormats: true,
         allowMatchingProperties: true,
-        addUsedSchema: false,
         allowUnionTypes: true,
-        keywords: ["meta:enum"]
     });
     // some ref'd schemas mightbe draft-07
     ajv.addMetaSchema(draft7MetaSchema);
