@@ -10,7 +10,7 @@
  * @license Apache-2.0
  */
 
-import { dirname, join } from 'path';
+import { dirname, join, resolve } from 'path';
 
 import { LintCheck, registerCheck, Severity, traverseSchema } from '../index.js';
 
@@ -28,7 +28,9 @@ const REF_ALLOWED_SIBLINGS = Object.freeze(new Set([
    */
 ]));
 
-// keys whose values aren't schemas - their entire subtrees are pruned
+/**
+ * Keys whose values aren't schemas - their entire subtrees are pruned
+ */
 const SKIP_KEYS = Object.freeze(new Set([
   'enum', 'const', 'default', // values
   'examples', 'meta:enum', // documentational
@@ -38,15 +40,15 @@ const SKIP_KEYS = Object.freeze(new Set([
  * Build a predicate that tells whether a `$ref` file-part points to the current schema itself.
  * Prefers the actual file path; falls back to the root schema's `$id` URL.
  *
+ * @param {Readonly<*>} schema - the root schema
  * @param {string|null} filePath
- * @param {*} schema - the root schema
  * @return {(function(string): boolean)|null} predicate, or null if no base is determinable
  */
-function makeSameFileTest(filePath, schema) {
+function makeSameFileTest(schema, filePath) {
   if (filePath !== null) {
     // filesystem semantics
     const baseDir = dirname(filePath);
-    return filePart => join(baseDir, filePart) === filePath;
+    return filePart => resolve(baseDir, filePart) === filePath;
   }
   const id = schema?.['$id'];
   if (typeof id === 'string' && URL.canParse(id)) {
@@ -78,7 +80,7 @@ class RefBestPracticeCheck extends LintCheck {
   async run(schema, rawContent, config = {}, filePath = null) {
     const issues = [];
 
-    const isSameFile = makeSameFileTest(filePath, schema);
+    const isSameFile = makeSameFileTest(schema, filePath);
 
     traverseSchema(schema, (node, path, key) => {
       if (typeof key === 'string' && SKIP_KEYS.has(key)) {
