@@ -56,12 +56,14 @@ function makeSameFileTest(schema, filePath) {
       ? null
       : pathToFileURL(resolve(filePath)));
   if (base === null) {
-    return null; // no base known - skip the same-file rule
+    // no base known - skip the same-file rule
+    return null;
   }
   return filePart => {
     try {
       return new URL(filePart, base).href === base.href;
-    } catch {
+    } catch (err) {
+      // maybe throw the error??
       return false;
     }
   };
