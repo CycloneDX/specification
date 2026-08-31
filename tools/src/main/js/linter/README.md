@@ -66,7 +66,7 @@ node cli.js schema.json
 | `no-todos` | No TODO markers in the schema |
 | `ref-best-practice` | `$ref` usage must follow JSON Schema best practice: string value, no absolute references, same-file references start with `#`, and no non-documentational siblings alongside `$ref` |
 | `object-strictness` | Structural object schemas must set exactly one of `additionalProperties`/`unevaluatedProperties`: `true` for mixins (marked by `this is a mixin` in `description` or `$comment`, configurable via `mixinMarker`), `false` otherwise; purely documentational objects are skipped |
-| `no-deprecated` | Nothing may be marked as deprecated (`deprecated` keyword or deprecation notes in titles, descriptions, comments, or `meta:enum`) |
+| `no-deprecated` | No deprecated schemas (`deprecated: true`); optionally (default: on) no deprecation marker (configurable regex) in docs keys (configurable, default `$comment`/`title`/`description`) or `meta:enum` docs |
 
 ## Configuration
 
