@@ -376,6 +376,21 @@ export class SchemaLinter {
 }
 
 /**
+ * Visitor invoked for each node during schema traversal.
+ *
+ * All arguments are to be treated as read-only:
+ * visitors must NOT modify the schema, nodes, or parents — traversal is
+ * for inspection only. Mutating during traversal leads to undefined behaviour.
+ *
+ * @callback SchemaVisitor
+ * @param {Readonly<*>} node - The current value (object, array, or primitive). Do not modify.
+ * @param {string} path - JSON-path-like location, e.g. `$.properties.foo[0]`
+ * @param {string|number|null} key - The property name or array index of `node` in its parent, `null` at the root
+ * @param {Readonly<object>|null} parent - The parent object/array, `null` at the root. Do not modify.
+ * @returns {boolean|void} Return `false` to skip traversal of this node's children; any other value continues.
+ */
+
+/**
  * Utility to traverse a JSON schema depth-first and call a visitor function for each node.
  *
  * The visitor is invoked before descending into a node's children.
@@ -383,14 +398,10 @@ export class SchemaLinter {
  * (the subtree is pruned); any other return value (including `undefined`)
  * continues the traversal.
  *
- * @param {*} schema - The schema (or sub-schema/value) to traverse
- * @param {function(*, string, (string|number|null), (object|null)): (boolean|void)} visitor -
- *   Function called for each node with `(node, path, key, parent)`:
- *   - `node`: the current value (object, array, or primitive)
- *   - `path`: JSON-path-like location, e.g. `$.properties.foo[0]`
- *   - `key`: the property name or array index of `node` in its parent, `null` at the root
- *   - `parent`: the parent object/array, `null` at the root
- *   Return `false` to skip traversal of this node's children.
+ * The traversed schema is treated as immutable: visitors must not mutate it.
+ *
+ * @param {Readonly<*>} schema - The schema (or sub-schema/value) to traverse. Not modified.
+ * @param {SchemaVisitor} visitor - Function called for each node with `(node, path, key, parent)`
  * @param {string} [path='$'] - Current path (used internally)
  * @param {string|number|null} [key=null] - Current key (used internally)
  * @param {object|null} [parent=null] - Parent node (used internally)
