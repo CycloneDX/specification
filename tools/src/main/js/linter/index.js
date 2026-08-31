@@ -376,12 +376,24 @@ export class SchemaLinter {
 }
 
 /**
- * Utility to traverse a JSON schema and call a visitor function
- * @param {object} schema - The schema to traverse
- * @param {function} visitor - Function called for each node: (node, path, key, parent)
- * @param {string} [path] - Current path (used internally)
- * @param {string} [key] - Current key (used internally)
- * @param {object} [parent] - Parent node (used internally)
+ * Utility to traverse a JSON schema depth-first and call a visitor function for each node.
+ *
+ * The visitor is invoked before descending into a node's children.
+ * If the visitor returns `false`, the node's children are not traversed
+ * (the subtree is pruned); any other return value (including `undefined`)
+ * continues the traversal.
+ *
+ * @param {*} schema - The schema (or sub-schema/value) to traverse
+ * @param {function(*, string, (string|number|null), (object|null)): (boolean|void)} visitor -
+ *   Function called for each node with `(node, path, key, parent)`:
+ *   - `node`: the current value (object, array, or primitive)
+ *   - `path`: JSON-path-like location, e.g. `$.properties.foo[0]`
+ *   - `key`: the property name or array index of `node` in its parent, `null` at the root
+ *   - `parent`: the parent object/array, `null` at the root
+ *   Return `false` to skip traversal of this node's children.
+ * @param {string} [path='$'] - Current path (used internally)
+ * @param {string|number|null} [key=null] - Current key (used internally)
+ * @param {object|null} [parent=null] - Parent node (used internally)
  */
 export function traverseSchema(schema, visitor, path = '$', key = null, parent = null) {
   if (visitor(schema, path, key, parent) === false) {
