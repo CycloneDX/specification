@@ -33,6 +33,34 @@ const SKIP_KEYS = Object.freeze(new Set(
   ['enum', 'const', 'examples', 'default', 'meta:enum']));
 
 /**
+ * Build a predicate that tells whether a `$ref` file-part points to the current schema itself.
+ * Prefers the actual file path; falls back to the root schema's `$id` URL.
+ *
+ * @param {string|null} filePath
+ * @param {*} schema - the root schema
+ * @return {(function(string): boolean)|null} predicate, or null if no base is determinable
+ */
+function makeSameFileTest(filePath, schema) {
+  if (filePath !== null) {
+    // filesystem semantics
+    const baseDir = dirname(filePath);
+    return filePart => join(baseDir, filePart) === filePath;
+  }
+  const id = schema?.['$id'];
+  if (typeof id === 'string' && URL.canParse(id)) {
+    // URL semantics: resolve the ref against the $id and compare
+    return filePart => {
+      try {
+        return new URL(filePart, id).href === new URL(id).href;
+      } catch {
+        return false;
+      }
+    };
+  }
+  return null; // no base known - skip the same-file rule
+}
+
+/**
  * Check that validates `$ref` best practice.
  */
 class RefBestPracticeCheck extends LintCheck {
@@ -47,6 +75,8 @@ class RefBestPracticeCheck extends LintCheck {
 
   async run(schema, rawContent, config = {}, filePath = null) {
     const issues = [];
+
+    const isSameFile = makeSameFileTest(filePath, schema);
 
     traverseSchema(schema, (node, path, key, parent) => {
       if (node === null || typeof node !== 'object' || Array.isArray(node)) return;
@@ -70,12 +100,12 @@ class RefBestPracticeCheck extends LintCheck {
           `${path}.$ref`,
           {actual: ref, expected: 'a relative reference'}
         ));
-      } else if (filePath !== null) {
+      } else if (isSameFile !== null) {
         const hashPos = ref.indexOf('#');
         const filePart = hashPos === -1
           ? ref
           : ref.slice(0, hashPos);
-        if (filePart !== '' && join(dirname(filePath), filePart) === filePath) {
+        if (filePart !== '' && isSameFile(filePart)) {
           const fragment = hashPos === -1
             ? '#'
             : ref.slice(hashPos);
