@@ -62,6 +62,8 @@ node cli.js schema.json
 | `enum-value-other` | Enum values must not be literal "other"; use custom-object style instead |
 | `duplicate-content` | Titles and descriptions must be unique within a schema |
 | `duplicate-definitions` | Definitions must be reused via `$ref`, not duplicated |
+| `no-todos` | No TODO markers in the schema |
+| `ref-best-practice` | `$ref` usage must follow JSON Schema best practice: string value, no absolute references, same-file references start with `#`, and no non-documentational siblings alongside `$ref` |
 
 ## Configuration
 
