@@ -279,64 +279,6 @@ const _REF_ALLOWED_SIBLINGS = Object.freeze(new Set([
 ]))
 
 /**
- * `$ref` must follow JSON schema best-practice.
- * @param {*} schema
- * @param {string} schemaFile
- * @return {number} number of errors found
- */
-function testRefBestPractice(schema, schemaFile) {
-    let errCnt = 0
-    for (const [path, node] of _findRefs(schema)) {
-        const ref = node['$ref']
-
-        if (typeof ref !== 'string') {
-            ++errCnt
-            _printError(
-                ref, 'a string',
-                'unexpected type of $ref',
-                schemaFile, `${path}.$ref`)
-            continue
-        }
-
-        if (ref.startsWith('/')) {
-            ++errCnt
-            _printError(
-                ref, 'a string',
-                'absolute $ref',
-                schemaFile, `${path}.$ref`)
-        } else {
-            const hashPos = ref.indexOf('#')
-            const filePart = hashPos === -1
-                ? ref
-                : ref.slice(0, hashPos)
-            if (filePart !== '') {
-                const resolved = join(dirname(schemaFile), filePart)
-                if (resolved === schemaFile) {
-                    ++errCnt
-                    const fragment = hashPos === -1
-                        ? '#'
-                        : ref.slice(hashPos)
-                    _printError(
-                        ref, fragment,
-                        'same-file $ref must start with "#"',
-                        schemaFile, path)
-                }
-            }
-        }
-
-        const otherKeys = new Set(Object.keys(node))
-        for (const key of otherKeys.difference(_REF_ALLOWED_SIBLINGS)) {
-            ++errCnt
-            _printError(
-                'present', 'absent',
-                'unexpected key along with $ref',
-                schemaFile, `${path}.${key}`)
-        }
-    }
-    return errCnt
-}
-
-/**
  * `bom-ref` properties must `$ref` refType — and nothing else may.
  * @param {*} schema
  * @param {string} schemaFile
@@ -500,7 +442,6 @@ function testDefaultValues(schema, schemaFile) {
 
 /** @type {Readonly<Record<string, function(*, string): number>>} */
 const tests = Object.freeze({
-    '$ref best practice': testRefBestPractice,
     'refType usage (`bom-ref` <-> refType)': testRefTypeUsage,
     'additionalProperties is `false`': testAdditionalProperties,
     'enum value in range': testEnumValues,

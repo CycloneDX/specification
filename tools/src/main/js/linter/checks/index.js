@@ -39,6 +39,7 @@ export * from './schema-id-pattern.check.js';
 export * from './schema-id-filepath.check.js';
 export * from './schema-comment.check.js';
 export * from './schema-draft.check.js';
+export * from './ref-best-practice.check.js';
 export * from './model-property-order.check.js';
 export * from './model-structure.check.js';
 export * from './formatting-indent.check.js';
