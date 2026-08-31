@@ -3,14 +3,16 @@
  *
  * Validates consistency of `type: "object"` (sub)schemas regarding
  * `additionalProperties` and `unevaluatedProperties`:
+ * - Object schemas that carry nothing but documentational/annotation keywords
+ *   (title, description, examples, ...) are skipped - there is nothing structural
+ *   to be strict about.
+ * - Exactly one of `additionalProperties`/`unevaluatedProperties`
+ *   must be present - never both, never neither.
  * - A schema is a "mixin" if its `description` or `$comment` contains the
  *   mixin marker string (case-insensitive; default: "this is a mixin",
- *   configurable via `mixinMarker`).
- * - Mixins: `additionalProperties` and `unevaluatedProperties` shall each be
- *   either absent or exactly `false`.
- * - Non-mixins: the object shall be closed - at least one of
- *   `additionalProperties`/`unevaluatedProperties` must be present and `false`,
- *   and neither may hold any value other than `false`.
+ *   configurable via `mixinMarker`). Mixins are meant to be composed via
+ *   `allOf`, so they must be explicitly open: the present keyword must be `true`.
+ * - Non-mixins must be closed: the present keyword must be `false`.
  *
  * @license Apache-2.0
  */
@@ -21,6 +23,26 @@ import { LintCheck, registerCheck, Severity, traverseSchema } from '../index.js'
  * Default marker string identifying a mixin schema.
  */
 const DEFAULT_MIXIN_MARKER = 'this is a mixin';
+
+/**
+ * The mutually exclusive strictness keywords.
+ */
+const STRICTNESS_KEYWORDS = Object.freeze([
+  'additionalProperties', 'unevaluatedProperties']);
+
+/**
+ * Keywords that do not describe object structure:
+ * documentational/annotation keywords, identifiers, and the type declaration itself.
+ * An object schema consisting solely of these (plus the strictness keywords)
+ * is not subject to this check.
+ */
+const NON_STRUCTURAL_KEYWORDS = Object.freeze(new Set([
+  'type',
+  '$id', '$anchor', '$schema', // identifiers
+  'enum', 'const', 'default', // values
+  '$comment', 'title', 'description', 'examples', 'default', 'readOnly', 'writeOnly', 'meta:enum', // documentational/annotations
+  ...STRICTNESS_KEYWORDS, // the strictness declaration itself doesn't count as structure
+]));
 
 /**
  * Keys whose values aren't schemas - their entire subtrees are pruned
@@ -44,6 +66,17 @@ function isObjectType(node) {
 }
 
 /**
+ * Tell whether a (sub)schema carries any structural keyword,
+ * i.e. anything beyond documentation, identifiers, and strictness declarations.
+ *
+ * @param {Readonly<*>} node
+ * @return {boolean}
+ */
+function hasStructure(node) {
+  return Object.keys(node).some(k => !NON_STRUCTURAL_KEYWORDS.has(k));
+}
+
+/**
  * Check that validates strictness of object-type schemas.
  */
 class ObjectStrictnessCheck extends LintCheck {
@@ -51,7 +84,7 @@ class ObjectStrictnessCheck extends LintCheck {
     super(
       'object-strictness',
       'Object Strictness',
-      'Validates that object schemas forbid undeclared properties, unless marked as a mixin.',
+      'Validates that structural object schemas set exactly one of additionalProperties/unevaluatedProperties: true for mixins, false otherwise.',
       Severity.ERROR
     );
   }
@@ -77,30 +110,44 @@ class ObjectStrictnessCheck extends LintCheck {
       if (node === null || typeof node !== 'object' || Array.isArray(node)) return;
       if (!isObjectType(node)) return;
 
-      const mixin = isMixin(node);
-
-      for (const keyword of ['additionalProperties', 'unevaluatedProperties']) {
-        if (keyword in node && node[keyword] !== false) {
-          issues.push(this.createIssue(
-            mixin
-              ? `Mixin object schema must not set ${keyword} to anything but false.`
-              : `Object schema must not set ${keyword} to anything but false.`,
-            `${path}.${keyword}`,
-            { actual: JSON.stringify(node[keyword]), expected: 'false or absent' }
-          ));
-        }
+      if (!hasStructure(node)) {
+        // purely documentational object (e.g. a described free-form map) - nothing to be strict about
+        return;
       }
 
-      if (!mixin &&
-        node['additionalProperties'] !== false &&
-        node['unevaluatedProperties'] !== false
-      ) {
+      const present = STRICTNESS_KEYWORDS.filter(kw => kw in node);
+
+      if (present.length === 0) {
         issues.push(this.createIssue(
-          'Object schema is not a mixin but allows undeclared properties. ' +
-          'Set "additionalProperties": false or "unevaluatedProperties": false, ' +
-          `or mark it as a mixin by adding "${mixinMarker}" to its description or $comment.`,
+          'Object schema must declare its strictness: ' +
+          'set exactly one of "additionalProperties"/"unevaluatedProperties".',
           path,
-          { actual: 'open object', expected: 'additionalProperties:false or unevaluatedProperties:false' }
+          { actual: 'neither present', expected: 'exactly one present' }
+        ));
+        return;
+      }
+
+      if (present.length > 1) {
+        issues.push(this.createIssue(
+          'Object schema must not set both "additionalProperties" and "unevaluatedProperties"; ' +
+          'use exactly one of them.',
+          path,
+          { actual: 'both present', expected: 'exactly one present' }
+        ));
+        return;
+      }
+
+      const keyword = present[0];
+      const expected = isMixin(node)
+
+      if (node[keyword] !== expected) {
+        issues.push(this.createIssue(
+          expected
+            ? `Mixin object schema must set ${keyword} to true.`
+            : `Object schema must set ${keyword} to false, ` +
+            `or be marked as a mixin by adding "${mixinMarker}" to its description or $comment.`,
+          `${path}.${keyword}`,
+          { actual: JSON.stringify(node[keyword]), expected: String(expected) }
         ));
       }
     });

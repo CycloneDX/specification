@@ -40,7 +40,6 @@ export * from './schema-id-filepath.check.js';
 export * from './schema-comment.check.js';
 export * from './schema-draft.check.js';
 export * from './ref-best-practice.check.js';
-export * from './object-strictness.check.js';
 export * from './model-property-order.check.js';
 export * from './model-structure.check.js';
 export * from './formatting-indent.check.js';
@@ -56,4 +55,4 @@ export * from './enum-value-no-other.check.js';
 export * from './duplicate-content.check.js';
 export * from './duplicate-definitions.check.js';
 export * from './no-todos.check.js';
-
+export * from './object-strictness.check.js';
