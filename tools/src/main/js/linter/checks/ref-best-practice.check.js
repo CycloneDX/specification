@@ -81,8 +81,10 @@ class RefBestPracticeCheck extends LintCheck {
     const isSameFile = makeSameFileTest(filePath, schema);
 
     traverseSchema(schema, (node, path, key) => {
-      // don't descend into keys whose values aren't schemas
-      if (typeof key === 'string' && SKIP_KEYS.has(key)) return false;
+      if (typeof key === 'string' && SKIP_KEYS.has(key)) {
+        // don't descend into keys whose values aren't schemas
+        return false;
+      }
 
       if (node === null || typeof node !== 'object' || Array.isArray(node)) return;
       if (!('$ref' in node)) return;
