@@ -1,39 +1,49 @@
 /**
  * CycloneDX Schema Linter - No Deprecated Check
  *
+ * Validates that there are no deprecated schemas:
+ * - no schema has `deprecated` set to `true`
+ * - optionally (default: on), docs keys ($comment, title, description)
+ *   and `meta:enum` docs must not contain a deprecation marker
+ *
  * @license Apache-2.0
  */
 
 import { LintCheck, registerCheck, Severity, traverseSchema } from '../index.js';
 
 /**
- * Pattern to detect deprecation mentions in documentation text
+ * Default pattern to detect deprecation markers in docs texts.
+ * Configurable via check config `docsPattern`.
  */
-const DEPRECATED_PATTERN = /\bdeprecat(?:ed?|ion|es|ing)\b/i;
+const DEFAULT_DOCS_PATTERN = '\\bdeprecated\\b';
 
-const DOCS_KEYS = Object.freeze(new Set([
+/**
+ * Keys whose values are documentational texts.
+ */
+const DOCS_KEYS = Object.freeze([
   '$comment',
   'title',
   'description',
-]));
+]);
 
 /**
- * Keys whose values aren't schemas - skipped entirely
+ * Keys whose values aren't schemas - their entire subtrees are pruned.
+ * `meta:enum` is handled explicitly on its parent schema.
  */
 const SKIP_KEYS = Object.freeze(new Set([
-  'const', 'default', // values
-  'examples', 'meta:enum', // documentational
+  'enum', 'const', 'default', // values
+  'examples', 'meta:enum', // documentational - meta:enum is handled explicitly
 ]));
 
 /**
- * Check that validates nothing is marked as deprecated
+ * Check that validates there are no deprecated schemas.
  */
 class NoDeprecatedCheck extends LintCheck {
   constructor() {
     super(
       'no-deprecated',
-      'No deprecations',
-      'Validates that no definition or property is marked as deprecated',
+      'No Deprecated',
+      'Validates that no schema is deprecated, and optionally that docs do not contain deprecation markers.',
       Severity.ERROR
     );
   }
@@ -41,55 +51,56 @@ class NoDeprecatedCheck extends LintCheck {
   async run(schema, rawContent, config = {}) {
     const issues = [];
 
-    // Optionally allow textual mentions of "deprecated" in docs
-    const allowInDocs = config.allowInDocs ?? false;
+    // whether to inspect docs at all
+    const checkDocs = config.checkDocs ?? true;
+    // configurable deprecation marker; case-insensitive
+    const docsPattern = new RegExp(config.docsPattern ?? DEFAULT_DOCS_PATTERN, 'i');
 
-    traverseSchema(schema, (node, path, key, parent) => {
-      if (SKIP_KEYS.has(key)) {
+    traverseSchema(schema, (node, path, key) => {
+      if (typeof key === 'string' && SKIP_KEYS.has(key)) {
         // don't descend into keys whose values aren't schemas
         return false;
       }
 
-      // JSON Schema `deprecated` keyword - flag unless explicitly set to false
-      if (key === 'deprecated' && node !== false) {
+      if (node === null || typeof node !== 'object' || Array.isArray(node)) return;
+
+      // node is a (potential) schema object
+
+      if (node.deprecated === true) {
         issues.push(this.createIssue(
-          `Marked as deprecated via "${key}"`,
-          path,
-          { key, value: node }
+          'Has a deprecation marker.',
+          `${path}.deprecated`,
+          { actual: true, expected: 'absent or false' }
         ));
-        return;
       }
 
-      if (allowInDocs) return;
+      if (!checkDocs) return;
 
-      // when visiting an enum, check the sibling meta:enum descriptions
-      if (key === 'enum') {
-        const metaEnum = parent?.['meta:enum'];
-        if (metaEnum && typeof metaEnum === 'object') {
-          for (const [value, description] of Object.entries(metaEnum)) {
-            if (typeof description === 'string' && DEPRECATED_PATTERN.test(description)) {
-              issues.push(this.createIssue(
-                `Deprecation mentioned in description of enum value "${value}": ${description}`,
-                path,
-                { value, text: description }
-              ));
-            }
+      for (const docsKey of DOCS_KEYS) {
+        const docs = node[docsKey];
+        if (typeof docs === 'string' && docsPattern.test(docs)) {
+          issues.push(this.createIssue(
+            `Docs contain a deprecation marker: ${docs}`,
+            `${path}.${docsKey}`,
+            { text: docs, pattern: docsPattern.source }
+          ));
+        }
+      }
+
+      const { 'enum': enumValues, 'meta:enum': metaEnum } = node;
+      if (Array.isArray(enumValues)
+        && metaEnum !== null && typeof metaEnum === 'object' && !Array.isArray(metaEnum)
+      ) {
+        for (const enumValue of enumValues) {
+          const docs = metaEnum[enumValue];
+          if (typeof docs === 'string' && docsPattern.test(docs)) {
+            issues.push(this.createIssue(
+              `Enum value docs contain a deprecation marker: ${docs}`,
+              `${path}["meta:enum"].${enumValue}`,
+              { enumValue, text: docs, pattern: docsPattern.source }
+            ));
           }
         }
-        // don't descend into enums whose values aren't schemas
-        return false;
-      }
-
-      if (typeof node !== 'string') return;
-
-      if (!DOCS_KEYS.has(key)) return;
-
-      if (DEPRECATED_PATTERN.test(node)) {
-        issues.push(this.createIssue(
-          `Deprecation mentioned in "${key}": ${node}`,
-          path,
-          { key, text: node }
-        ));
       }
     });
 
