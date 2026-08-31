@@ -10,9 +10,9 @@
  * @license Apache-2.0
  */
 
-import {dirname, join} from 'path';
+import { dirname, join } from 'path';
 
-import {LintCheck, registerCheck, Severity, traverseSchema} from '../index.js';
+import { LintCheck, registerCheck, Severity, traverseSchema } from '../index.js';
 
 /**
  * Keys allowed as siblings of `$ref`.
@@ -28,9 +28,11 @@ const REF_ALLOWED_SIBLINGS = Object.freeze(new Set([
    */
 ]));
 
-// keys whose values aren't schemas - don't inspect nodes underneath them
-const SKIP_KEYS = Object.freeze(new Set(
-  ['enum', 'const', 'examples', 'default', 'meta:enum']));
+// keys whose values aren't schemas - their entire subtrees are pruned
+const SKIP_KEYS = Object.freeze(new Set([
+  'enum', 'const', 'default', // values
+  'examples', 'meta:enum', // documentational
+]));
 
 /**
  * Build a predicate that tells whether a `$ref` file-part points to the current schema itself.
@@ -78,10 +80,12 @@ class RefBestPracticeCheck extends LintCheck {
 
     const isSameFile = makeSameFileTest(filePath, schema);
 
-    traverseSchema(schema, (node, path, key, parent) => {
+    traverseSchema(schema, (node, path, key) => {
+      // don't descend into keys whose values aren't schemas
+      if (typeof key === 'string' && SKIP_KEYS.has(key)) return false;
+
       if (node === null || typeof node !== 'object' || Array.isArray(node)) return;
       if (!('$ref' in node)) return;
-      if (key !== null && SKIP_KEYS.has(key)) return;
 
       const ref = node['$ref'];
 
@@ -89,7 +93,7 @@ class RefBestPracticeCheck extends LintCheck {
         issues.push(this.createIssue(
           'Unexpected type of $ref.',
           `${path}.$ref`,
-          {actual: typeof ref, expected: 'string'}
+          { actual: typeof ref, expected: 'string' }
         ));
         return;
       }
@@ -98,7 +102,7 @@ class RefBestPracticeCheck extends LintCheck {
         issues.push(this.createIssue(
           'Absolute $ref is not allowed.',
           `${path}.$ref`,
-          {actual: ref, expected: 'a relative reference'}
+          { actual: ref, expected: 'a relative reference' }
         ));
       } else if (isSameFile !== null) {
         const hashPos = ref.indexOf('#');
@@ -112,7 +116,7 @@ class RefBestPracticeCheck extends LintCheck {
           issues.push(this.createIssue(
             'Same-file $ref must start with "#".',
             `${path}.$ref`,
-            {actual: ref, expected: fragment}
+            { actual: ref, expected: fragment }
           ));
         }
       }
@@ -122,7 +126,7 @@ class RefBestPracticeCheck extends LintCheck {
           issues.push(this.createIssue(
             'Unexpected key along with $ref. Wrap the $ref in an "allOf" instead.',
             `${path}.${siblingKey}`,
-            {actual: 'present', expected: 'absent'}
+            { actual: 'present', expected: 'absent' }
           ));
         }
       }
@@ -136,5 +140,5 @@ class RefBestPracticeCheck extends LintCheck {
 const check = new RefBestPracticeCheck();
 registerCheck(check);
 
-export {RefBestPracticeCheck};
+export { RefBestPracticeCheck };
 export default check;

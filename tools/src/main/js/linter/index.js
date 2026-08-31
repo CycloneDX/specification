@@ -384,7 +384,9 @@ export class SchemaLinter {
  * @param {object} [parent] - Parent node (used internally)
  */
 export function traverseSchema(schema, visitor, path = '$', key = null, parent = null) {
-  visitor(schema, path, key, parent);
+  if (visitor(schema, path, key, parent) === false) {
+    return; // visitor pruned this subtree
+  }
 
   if (typeof schema !== 'object' || schema === null) {
     return;
