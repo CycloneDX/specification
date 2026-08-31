@@ -10,7 +10,8 @@
  * @license Apache-2.0
  */
 
-import { dirname, join, resolve } from 'path';
+import { resolve } from 'path';
+import { pathToFileURL } from 'url';
 
 import { LintCheck, registerCheck, Severity, traverseSchema } from '../index.js';
 
@@ -36,32 +37,33 @@ const SKIP_KEYS = Object.freeze(new Set([
   'examples', 'meta:enum', // documentational
 ]));
 
+
 /**
- * Build a predicate that tells whether a `$ref` file-part points to the current schema itself.
- * Prefers the actual file path; falls back to the root schema's `$id` URL.
+ * Build a predicate that tells whether a `$ref` file-part resolves to the current schema itself,
+ * mimicking JSON Schema's reference resolution:
+ * the base URI is the root schema's `$id` if present, otherwise the retrieval URI (the file's location).
  *
  * @param {Readonly<*>} schema - the root schema
- * @param {string|null} filePath
- * @return {(function(string): boolean)|null} predicate, or null if no base is determinable
+ * @param {string|null} filePath - OS-native path the schema was read from, if any
+ * @return {(function(string): boolean)|null} predicate, or null if no base URI is determinable
  */
 function makeSameFileTest(schema, filePath) {
-  if (filePath !== null) {
-    // filesystem semantics
-    const baseDir = dirname(filePath);
-    return filePart => resolve(baseDir, filePart) === filePath;
-  }
+  // per JSON Schema spec: `$id` establishes the base URI ...
   const id = schema?.['$id'];
-  if (typeof id === 'string' && URL.canParse(id)) {
-    // URL semantics: resolve the ref against the $id and compare
-    return filePart => {
-      try {
-        return new URL(filePart, id).href === new URL(id).href;
-      } catch {
-        return false;
-      }
-    };
+  const base = (typeof id === 'string' && URL.canParse(id))
+    ? new URL(id)
+    // ... with the retrieval URI as fallback
+    : (filePath !== null ? pathToFileURL(resolve(filePath)) : null);
+  if (base === null) {
+    return null; // no base known - skip the same-file rule
   }
-  return null; // no base known - skip the same-file rule
+  return filePart => {
+    try {
+      return new URL(filePart, base).href === base.href;
+    } catch {
+      return false;
+    }
+  };
 }
 
 /**
