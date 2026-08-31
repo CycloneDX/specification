@@ -18,9 +18,10 @@ import { LintCheck, registerCheck, Severity, traverseSchema } from '../index.js'
 const DEFAULT_DOCS_PATTERN = '\\bdeprecated\\b';
 
 /**
- * Keys whose values are documentational texts.
+ * Default keys whose values are documentational texts.
+ * Configurable via check config `docsKeys`.
  */
-const DOCS_KEYS = Object.freeze([
+const DEFAULT_DOCS_KEYS = Object.freeze([
   '$comment',
   'title',
   'description',
@@ -55,6 +56,8 @@ class NoDeprecatedCheck extends LintCheck {
     const checkDocs = config.checkDocs ?? true;
     // configurable deprecation marker; case-insensitive
     const docsPattern = new RegExp(config.docsPattern ?? DEFAULT_DOCS_PATTERN, 'i');
+    // configurable docs keys to inspect
+    const docsKeys = config.docsKeys ?? DEFAULT_DOCS_KEYS;
 
     traverseSchema(schema, (node, path, key) => {
       if (typeof key === 'string' && SKIP_KEYS.has(key)) {
@@ -68,7 +71,7 @@ class NoDeprecatedCheck extends LintCheck {
 
       if (node.deprecated === true) {
         issues.push(this.createIssue(
-          'Has a deprecation marker.',
+          'Schema is deprecated.',
           `${path}.deprecated`,
           { actual: true, expected: 'absent or false' }
         ));
@@ -76,7 +79,7 @@ class NoDeprecatedCheck extends LintCheck {
 
       if (!checkDocs) return;
 
-      for (const docsKey of DOCS_KEYS) {
+      for (const docsKey of docsKeys) {
         const docs = node[docsKey];
         if (typeof docs === 'string' && docsPattern.test(docs)) {
           issues.push(this.createIssue(
