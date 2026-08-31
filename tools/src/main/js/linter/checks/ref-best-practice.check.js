@@ -52,8 +52,9 @@ function makeSameFileTest(schema, filePath) {
   const id = schema?.['$id'];
   const base = (typeof id === 'string' && URL.canParse(id))
     ? new URL(id)
-    // ... with the retrieval URI as fallback
-    : (filePath !== null ? pathToFileURL(resolve(filePath)) : null);
+    : (filePath === null
+      ? null
+      : pathToFileURL(resolve(filePath)));
   if (base === null) {
     return null; // no base known - skip the same-file rule
   }
