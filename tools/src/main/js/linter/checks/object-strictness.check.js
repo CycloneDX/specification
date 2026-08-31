@@ -39,6 +39,7 @@ const STRICTNESS_KEYWORDS = Object.freeze([
 const NON_STRUCTURAL_KEYWORDS = Object.freeze(new Set([
   'type',
   '$id', '$anchor', '$schema', // identifiers
+  '$defs', 'definitions', // defs
   'enum', 'const', 'default', // values
   '$comment', 'title', 'description', 'examples', 'default', 'readOnly', 'writeOnly', 'meta:enum', // documentational/annotations
   ...STRICTNESS_KEYWORDS, // the strictness declaration itself doesn't count as structure
