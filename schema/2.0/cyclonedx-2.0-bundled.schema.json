@@ -1025,7 +1025,7 @@
                         "ordinal": true
                       },
                       "additionalProperties": true,
-                      "$comment": "additionalProperties explicitly allowed - this is just a minimal constraint",
+                      "$comment": "This is a mixin - this is just a minimal constraint",
                       "type": "object"
                     }
                   }
@@ -4351,6 +4351,7 @@
           "type": "object",
           "title": "Extensible Properties",
           "$comment": "This is a mixin. It intentionally does NOT restrict additional/unevaluated properties itself; schemas composing it via `allOf` are expected to close themselves with `unevaluatedProperties: false` so that both their own defined properties and these patternProperties remain usable.",
+          "additionalProperties": true,
           "patternProperties": {
             "^ext:[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}:.+$": {
               "description": "CycloneDX supports a structured and namespace-aware mechanism for extensibility through the use of extensible properties. This mechanism enables organizations, ecosystems, and tool vendors to safely introduce custom properties without conflicting with the core schema or other extensions.\n\nExtensible properties are defined as a JSON object whose keys must conform to a strict pattern that resembles a reverse domain name structure, prefixed with ext:. This pattern provides a namespacing convention that aligns with well-established practices in other structured formats (e.g., XML namespaces).\n\nValues that are objects must declare the schema they conform to via `$schema`. This requirement applies recursively to objects contained in arrays, at any nesting depth.",
@@ -4365,7 +4366,7 @@
             "propertyObject": {
               "type": "object",
               "title": "Extensible Property Object",
-              "$comment": "Internal helper for extensibleProperties. Not part of the public schema API — do not reference externally; may change without notice.\n\nadditionalProperties explicitly allowed for extensibility reasons.",
+              "$comment": "Internal helper for extensibleProperties. Not part of the public schema API — do not reference externally; may change without notice.\n\nThis is a mixin.",
               "required": [
                 "$schema"
               ],
@@ -4425,7 +4426,8 @@
             "externalReferences": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/externalReferences"
             }
-          }
+          },
+          "additionalProperties": true
         },
         "timestamp": {
           "type": "string",
@@ -9128,7 +9130,7 @@
             {
               "type": "object",
               "additionalProperties": true,
-              "$comment": "additionalProperties explicitly allowed - it is controlled by the other `allOf`",
+              "$comment": "This is a mixin - it is controlled by the other `allOf`",
               "properties": {
                 "technique": {
                   "not": {
@@ -9160,7 +9162,7 @@
             {
               "type": "object",
               "additionalProperties": true,
-              "$comment": "additionalProperties explicitly allowed - it is controlled by the other `allOf`",
+              "$comment": "This is a mixin - it is controlled by the other `allOf`",
               "properties": {
                 "technique": {
                   "not": {
@@ -10545,7 +10547,7 @@
         "signatureObject": {
           "title": "Signature Object",
           "description": "A JSS signature object as defined in ITU-T X.590 clause 6.2. Captures the hashing algorithm, signing algorithm, public key material (in one of four forms), the base64URL-encoded digital signature value, and optional metadata. May nest a child 'signature' property to form a counter-signature chain.",
-          "$comment": "unevaluatedProperties: true is intentional. ITU-T X.590 clause 6.2 explicitly states that implementers MAY add additional properties to satisfy meta-data requirements for their application. The clause 6.3 properties (type, id, related_to, etc.) are themselves defined as non-exhaustive examples of such extensions.",
+          "$comment": "This is a mixin: ITU-T X.590 clause 6.2 explicitly states that implementers MAY add additional properties to satisfy meta-data requirements for their application. The clause 6.3 properties (type, id, related_to, etc.) are themselves defined as non-exhaustive examples of such extensions.",
           "type": "object",
           "properties": {
             "hash_algorithm": {
@@ -18024,7 +18026,7 @@
                         }
                       },
                       "additionalProperties": true,
-                      "$comment": "additionalProperties explicitly allowed - this is just a minimal constraint",
+                      "$comment": "This is a mixin - this is just a minimal constraint",
                       "type": "object"
                     }
                   }
