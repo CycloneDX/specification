@@ -230,16 +230,6 @@ export class SchemaLinter {
     };
   }
 
-  * getEnabledChecks () {
-    const checks = this.getApplicableChecks();
-    for (const check of checks) {
-      const checkConfig = this.config.checks[check.id] || {};
-      if (checkConfig.enabled !== false) {
-        yield check
-      }
-    }
-  }
-
   /**
    * Lint a schema file
    * @param {string} filePath - Path to the schema file
@@ -376,6 +366,13 @@ export class SchemaLinter {
 
     return checks;
   }
+
+  getEnabledChecks() {
+    return this.getApplicableChecks().filter(
+      c => this.config.checks[c.id]?.enabled !== false
+    )
+  }
+
 }
 
 /**

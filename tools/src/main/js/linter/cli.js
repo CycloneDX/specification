@@ -344,7 +344,7 @@ function formatStylish(results, options, linter) {
 function formatJson(results, options, linter) {
   const output = {
     linterConfig: linter.config,
-    enabledChecks: [...linter.getEnabledChecks().map(c => c.id)],
+    enabledChecks: linter.getEnabledChecks().map(c => c.id),
     results: results.map(r => ({
       filePath: r.filePath,
       issues: options.quiet
