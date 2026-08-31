@@ -65,6 +65,7 @@ node cli.js schema.json
 | `duplicate-definitions` | Definitions must be reused via `$ref`, not duplicated |
 | `no-todos` | No TODO markers in the schema |
 | `ref-best-practice` | `$ref` usage must follow JSON Schema best practice: string value, no absolute references, same-file references start with `#`, and no non-documentational siblings alongside `$ref` |
+| `object-strictness` | Structural object schemas must set exactly one of `additionalProperties`/`unevaluatedProperties`: `true` for mixins (marked by `this is a mixin` in `description` or `$comment`, configurable via `mixinMarker`), `false` otherwise; purely documentational objects are skipped |
 
 ## Configuration
 
