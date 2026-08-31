@@ -56,3 +56,4 @@ export * from './duplicate-content.check.js';
 export * from './duplicate-definitions.check.js';
 export * from './no-todos.check.js';
 export * from './object-strictness.check.js';
+export * from './no-deprecated.check.js';
