@@ -267,17 +267,6 @@ function _printError(actual, expected, msg, schemaFile, schemaPath) {
 
 // region tests
 
-const _REF_ALLOWED_SIBLINGS = Object.freeze(new Set([
-    '$ref', // the $ref itself
-    '$comment', 'title', 'description', 'examples', // documentational
-    /* do NOT add any non-documentationals
-       instead, use:
-       { "allOf": { "$ref": ... }, "$id" ..., "$anchor": ... }
-       { "allOf": { "$ref": ... }, "default" ... }
-       instead of additionalProperties -- { "allOf": { "$ref": ... }, "unevaluatedItems" ... }
-     */
-]))
-
 /**
  * `bom-ref` properties must `$ref` refType — and nothing else may.
  * @param {*} schema
