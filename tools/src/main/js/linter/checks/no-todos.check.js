@@ -9,7 +9,7 @@ import { LintCheck, registerCheck, Severity, traverseSchema } from '../index.js'
 /**
  * Patterns to detect ToDo's
  */
-const TODO_PATTERNS = /\bToDo\b/i
+const TODO_PATTERNS = /\bToDos?\b/i
 
 const DOCS_KEYS = Object.freeze(new Set([
   '$comment',
