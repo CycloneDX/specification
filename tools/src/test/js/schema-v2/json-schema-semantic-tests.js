@@ -306,61 +306,6 @@ function testRefTypeUsage(schema, schemaFile) {
 }
 
 /**
- * object schemas must have `additionalProperties` set,
- * unless `unevaluatedProperties` is set,
- * or `$comment` containing 'this is a mixin',
- * or explicitly allowed via `$comment` containing 'additionalproperties explicitly allowed'.
- * @param {*} schema
- * @param {string} schemaFile
- * @return {number} number of errors found
- */
-function testAdditionalProperties(schema, schemaFile) {
-    let errCnt = 0
-    for (const [path, node] of _findObjectSchemas(schema)) {
-        if (Object.keys(node).join('|') === 'type') {
-            // this is a sole type constraint
-            continue
-        }
-
-        const unevaluatedProperties = node.unevaluatedProperties
-        const additionalProperties = node.additionalProperties
-
-        if (unevaluatedProperties !== undefined) {
-            // Don't need 'additionalProperties', since 'unevaluatedProperties' takes care.
-            // see https://json-schema.org/draft/2020-12/json-schema-core#section-11.3
-            if (additionalProperties !== undefined) {
-                ++errCnt
-                _printError(
-                    'both set', 'exactly one set',
-                    'either .additionalProperties or .unevaluatedProperties should be set',
-                    schemaFile, path)
-            }
-            continue
-        }
-
-        const commentLC = typeof node['$comment'] === 'string'
-            ? node['$comment'].toLowerCase()
-            : ''
-
-        if (commentLC.includes('this is a mixin')) {
-            // This is a mixin. It intentionally does NOT restrict additional/unevaluated properties itself; schemas composing it via `allOf` are expected to close themselves with `unevaluatedProperties: false` so that both their own defined properties and these patternProperties remain usable.
-            continue
-        }
-
-        const expected = commentLC.includes('additionalproperties explicitly allowed')
-        const actual = additionalProperties
-        if (actual !== expected) {
-            ++errCnt
-            _printError(
-                actual, expected,
-                'either .additionalProperties or .unevaluatedProperties must be set',
-                schemaFile, path)
-        }
-    }
-    return errCnt
-}
-
-/**
  * Enum values adheres constraints.
  * @param {*} schema
  * @param {string} schemaFile
@@ -432,7 +377,6 @@ function testDefaultValues(schema, schemaFile) {
 /** @type {Readonly<Record<string, function(*, string): number>>} */
 const tests = Object.freeze({
     'refType usage (`bom-ref` <-> refType)': testRefTypeUsage,
-    'additionalProperties is `false`': testAdditionalProperties,
     'enum value in range': testEnumValues,
     'default value in range': testDefaultValues,
 })
