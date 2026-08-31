@@ -6,13 +6,15 @@
  * - Object schemas that carry nothing but documentational/annotation keywords
  *   (title, description, examples, ...) are skipped - there is nothing structural
  *   to be strict about.
- * - Exactly one of `additionalProperties`/`unevaluatedProperties`
- *   must be present - never both, never neither.
  * - A schema is a "mixin" if its `description` or `$comment` contains the
  *   mixin marker string (case-insensitive; default: "this is a mixin",
  *   configurable via `mixinMarker`). Mixins are meant to be composed via
- *   `allOf`, so they must be explicitly open: the present keyword must be `true`.
- * - Non-mixins must be closed: the present keyword must be `false`.
+ *   `allOf`, so they must be explicitly open: if a strictness keyword is
+ *   present, it must be `true`; the keyword may also be omitted entirely
+ *   (JSON Schema objects are implicitly open).
+ * - Non-mixins must be closed: exactly one of
+ *   `additionalProperties`/`unevaluatedProperties` must be present - never
+ *   both, never neither - and it must be `false`.
  *
  * @license Apache-2.0
  */
@@ -41,7 +43,7 @@ const NON_STRUCTURAL_KEYWORDS = Object.freeze(new Set([
   '$id', '$anchor', '$schema', // identifiers
   '$defs', 'definitions', // defs
   'enum', 'const', 'default', // values
-  '$comment', 'title', 'description', 'examples', 'default', 'readOnly', 'writeOnly', 'meta:enum', // documentational/annotations
+  '$comment', 'title', 'description', 'examples', 'readOnly', 'writeOnly', 'meta:enum', // documentational/annotations
   ...STRICTNESS_KEYWORDS, // the strictness declaration itself doesn't count as structure
 ]));
 
@@ -85,7 +87,7 @@ class ObjectStrictnessCheck extends LintCheck {
     super(
       'object-strictness',
       'Object Strictness',
-      'Validates that structural object schemas set exactly one of additionalProperties/unevaluatedProperties: true for mixins, false otherwise.',
+      'Validates that structural object schemas set exactly one of additionalProperties/unevaluatedProperties: false for non-mixins; mixins may set it to true or omit it.',
       Severity.ERROR
     );
   }
@@ -116,15 +118,19 @@ class ObjectStrictnessCheck extends LintCheck {
         return;
       }
 
+      const mixin = isMixin(node);
       const present = STRICTNESS_KEYWORDS.filter(kw => kw in node);
 
       if (present.length === 0) {
-        issues.push(this.createIssue(
-          'Object schema must declare its strictness: ' +
-          'set exactly one of "additionalProperties"/"unevaluatedProperties".',
-          path,
-          { actual: 'neither present', expected: 'exactly one present' }
-        ));
+        if (!mixin) {
+          issues.push(this.createIssue(
+            'Object schema must declare its strictness: ' +
+            'set exactly one of "additionalProperties"/"unevaluatedProperties".',
+            path,
+            { actual: 'neither present', expected: 'exactly one present' }
+          ));
+        }
+        // mixins may omit the strictness keyword entirely - they are implicitly open
         return;
       }
 
@@ -139,16 +145,15 @@ class ObjectStrictnessCheck extends LintCheck {
       }
 
       const keyword = present[0];
-      const expected = isMixin(node)
 
-      if (node[keyword] !== expected) {
+      if (node[keyword] !== mixin) {
         issues.push(this.createIssue(
-          expected
-            ? `Mixin object schema must set ${keyword} to true.`
+          mixin
+            ? `Mixin object schema must set ${keyword} to true (or omit it entirely).`
             : `Object schema must set ${keyword} to false, ` +
             `or be marked as a mixin by adding "${mixinMarker}" to its description or $comment.`,
           `${path}.${keyword}`,
-          { actual: JSON.stringify(node[keyword]), expected: String(expected) }
+          { actual: JSON.stringify(node[keyword]), expected: String(mixin) }
         ));
       }
     });
