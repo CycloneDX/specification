@@ -12,17 +12,30 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-defaults:
-  run:
-    working-directory: tools/src/test/js/schema-v2
 
 # https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token
 permissions: {}
 
+defaults:
+  run:
+    working-directory: tools/src/test/js/schema-v2
+
+env:
+  NODE_VERSION: '24.x'
+
 jobs:
+  discover-schema:
+    uses: ./.github/workflows/discover_2.x_schema.yml
   test_js:
+    needs:
+      - discover-schema
     timeout-minutes: 30
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        schema_version: ${{ fromJSON(needs.discover-schema.outputs.versions) }}
+    name: test ${{ matrix.schema_version }}
     steps:
       - name: Checkout
         # see https://github.com/actions/checkout
@@ -33,7 +46,7 @@ jobs:
         # see https://github.com/actions/setup-node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7.0.0
         with:
-          node-version: '24.x'
+          node-version: ${{ env.NODE_VERSION }}
           package-manager-cache: false
       - name: Install Dependencies
         run: npm install
@@ -47,4 +60,5 @@ jobs:
                 && github.base_ref == 'master'
                 )
             }}
-        run: npm test
+          SCHEMA_VERSION: ${{ matrix.schema_version }}
+        run: npm run "test:v$SCHEMA_VERSION"
