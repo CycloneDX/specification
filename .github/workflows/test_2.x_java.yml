@@ -10,16 +10,30 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token
+permissions: {}
+
 defaults:
   run:
     working-directory: tools
 
-# https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token
-permissions: {}
+env:
+  JAVA_VERSION: '8'
+  JAVA_DISTRIBUTION: 'zulu'
 
 jobs:
+  discover-schema:
+    uses: ./.github/workflows/discover_2.x_schema.yml
   test_java:
+    needs:
+      - discover-schema
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        schema_version: ${{ fromJSON(needs.discover-schema.outputs.versions) }}
+    name: test ${{ matrix.schema_version }}
     steps:
     - name: Checkout
       # see https://github.com/actions/checkout
@@ -30,8 +44,10 @@ jobs:
       # see https://github.com/actions/setup-java
       uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
       with:
-        java-version: '8'
-        distribution: 'zulu'
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: ${{ env.JAVA_DISTRIBUTION }}
         java-package: jdk
     - name: test with Maven
-      run: mvn clean test -Pschema-v2-tests
+      env:
+        SCHEMA_VERSION: ${{ matrix.schema_version }}
+      run: mvn clean test -P"schema-v${SCHEMA_VERSION}-tests"
