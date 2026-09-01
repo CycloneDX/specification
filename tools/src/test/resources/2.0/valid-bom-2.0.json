@@ -10,9 +10,14 @@
       "components": [
         {
           "type": "application",
-          "manufacturer": {
-            "name": "Awesome Vendor"
-          },
+          "parties": [
+            {
+              "roles": [ { "role": "manufacturer" } ],
+              "organization": {
+                "name": "Awesome Vendor"
+              }
+            }
+          ],
           "name": "Awesome Tool",
           "version": "9.1.2",
           "hashes": [
@@ -37,7 +42,12 @@
     ],
     "component": {
       "type": "application",
-      "authors": [ { "name": "Acme Super Heroes" } ],
+      "parties": [
+        {
+          "roles": [ { "role": "author" } ],
+          "organization": { "name": "Acme Super Heroes" }
+        }
+      ],
       "name": "Acme Application",
       "version": "9.1.1",
       "identifiers": [
@@ -82,8 +92,16 @@
     {
       "bom-ref": "pkg:maven/com.acme/acme-catalina@9.0.14?packaging=jar",
       "type": "application",
-      "authors": [ { "name": "Joane Doe et al." } ],
-      "publisher": "Acme Inc",
+      "parties": [
+        {
+          "roles": [ { "role": "author" } ],
+          "person": { "name": "Joane Doe et al." }
+        },
+        {
+          "roles": [ { "role": "publisher" } ],
+          "organization": { "name": "Acme Inc" }
+        }
+      ],
       "group": "com.acme",
       "name": "acme-catalina",
       "version": "9.0.14",
@@ -130,8 +148,16 @@
         "ancestors": [
           {
             "type": "application",
-            "authors": [ { "name": "Globex Super Heroes" } ],
-            "publisher": "Globex",
+            "parties": [
+              {
+                "roles": [ { "role": "author" } ],
+                "person": { "name": "Globex Super Heroes" }
+              },
+              {
+                "roles": [ { "role": "publisher" } ],
+                "organization": { "name": "Globex" }
+              }
+            ],
             "group": "org.globex.catalina",
             "name": "globex-catalina",
             "version": "9.0.14",
@@ -179,45 +205,56 @@
     {
       "type": "library",
       "bom-ref": "pkg:maven/com.example/myapplication@1.0.0?packaging=war",
-      "supplier": {
-        "name": "Example, Inc.",
-        "url": [
-          "https://example.com",
-          "https://example.net"
-        ],
-        "contact": [
-          {
-            "name": "Example Support AMER",
-            "email": "support@example.com",
-            "phone": "800-555-1212"
-          },
-          {
-            "name": "Example Support APAC",
-            "email": "support@apac.example.com"
-          }
-        ]
-      },
-      "manufacturer": {
-        "bom-ref": "example-2-inc",
-        "name": "Example-2, Inc.",
-        "url": [
-          "https://example.org"
-        ],
-        "contact": [
-          {
-            "email": "support@example.org"
-          }
-        ]
-      },
-      "authors": [
+      "parties": [
         {
-          "name": "Anthony Edward Stark",
-          "phone": "555-212-970-4133",
-          "email": "ironman@example.org"
+          "roles": [ { "role": "supplier" } ],
+          "organization": {
+            "name": "Example, Inc.",
+            "url": [
+              { "name": "homepage", "url": "https://example.com" },
+              { "name": "homepage", "url": "https://example.net" }
+            ]
+          }
         },
         {
-          "name": "Peter Benjamin Parker",
-          "email": "spiderman@example.org"
+          "roles": [ { "role": "support-contact" } ],
+          "person": {
+            "name": "Example Support AMER",
+            "email": [ { "address": "support@example.com" } ],
+            "phone": [ { "number": "800-555-1212" } ]
+          }
+        },
+        {
+          "roles": [ { "role": "support-contact" } ],
+          "person": {
+            "name": "Example Support APAC",
+            "email": [ { "address": "support@apac.example.com" } ]
+          }
+        },
+        {
+          "bom-ref": "example-2-inc",
+          "roles": [ { "role": "manufacturer" } ],
+          "organization": {
+            "name": "Example-2, Inc.",
+            "url": [
+              { "name": "homepage", "url": "https://example.org" }
+            ]
+          }
+        },
+        {
+          "roles": [ { "role": "author" } ],
+          "person": {
+            "name": "Anthony Edward Stark",
+            "phone": [ { "number": "555-212-970-4133" } ],
+            "email": [ { "address": "ironman@example.org" } ]
+          }
+        },
+        {
+          "roles": [ { "role": "author" } ],
+          "person": {
+            "name": "Peter Benjamin Parker",
+            "email": [ { "address": "spiderman@example.org" } ]
+          }
         }
       ],
       "group": "org.example",
@@ -277,9 +314,10 @@
     },
     {
       "type": "framework",
-      "authors": [
+      "parties": [
         {
-          "name": "Example Super Heroes"
+          "roles": [ { "role": "author" } ],
+          "organization": { "name": "Example Super Heroes" }
         }
       ],
       "group": "com.example",

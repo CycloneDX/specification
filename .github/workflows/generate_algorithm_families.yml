@@ -2,10 +2,15 @@ name: Generate Algorithm Families Enum
 
 on:
   push:
+    branches: [ 'master' ]
     paths:
       - 'schema/cryptography-defs.json'
       - 'tools/src/main/python/algorithmFamilyGeneration.py'
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   generate-families:
@@ -17,13 +22,15 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        # see https://github.com/actions/checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        # see https://github.com/actions/setup-python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.x'
 
@@ -36,25 +43,25 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           BRANCH_NAME="update-algorithm-families"
-          
+
           # Configure Git
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          
+
           # Check for changes
           if git diff --quiet schema/cryptography-defs.schema.json; then
             echo "No changes to algorithm families"
             exit 0
           fi
-          
+
           # Create branch and commit
           git checkout -b "$BRANCH_NAME"
           git add schema/cryptography-defs.schema.json
           git commit -m "chore: update algorithm families [skip ci]"
-          
+
           # Push to the branch (use GH_TOKEN for authentication)
           git push -u "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" "$BRANCH_NAME" --force
-          
+
           # Create Pull Request using GitHub CLI (gh)
           gh pr create \
             --title "chore: update algorithm families" \
