@@ -52,8 +52,8 @@ jobs:
         SCHEMA_VERSION: ${{ matrix.schema_version }}
       run: |
         mvn help:all-profiles | grep -q "Profile Id: schema-v${SCHEMA_VERSION}-tests" \
-          || { echo "::error::No Maven profile 'schema-v${SCHEMA_VERSION}-tests' in tools/pom.xml"; \
-               exit 1; }
+        || { echo "::error::No Maven profile 'schema-v${SCHEMA_VERSION}-tests' in tools/pom.xml"; \
+             exit 1; }
         mvn clean test -P "schema-v${SCHEMA_VERSION}-tests"
     - name: Print report
       if: ${{ failure() }}
