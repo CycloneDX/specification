@@ -67,7 +67,7 @@ node cli.js schema.json
 | `ref-best-practice` | `$ref` usage must follow JSON Schema best practice: string value, no absolute references, same-file references start with `#`, and no non-documentational siblings alongside `$ref` |
 | `object-strictness` | Structural object schemas must declare their strictness via at most one of `additionalProperties`/`unevaluatedProperties` — never both. Non-mixins must set it to `false`. Mixins (marked by `this is a mixin` in `description` or `$comment`, configurable via `mixinMarker`) must set it to `true` or may omit it entirely; purely documentational objects are skipped |
 | `no-deprecated` | No deprecated schemas (`deprecated: true`); optionally (default: on) no deprecation marker (configurable regex) in docs keys (configurable, default `$comment`/`title`/`description`) or `meta:enum` docs |
-| `cdx-ref-type-usage` | CycloneDX-specific: `bom-ref` properties must `$ref` the shared `refType` definition; nothing else may reference `refType` (except `refLinkType`, which inherits from it) |
+| `cdx2-ref-type-usage` | CycloneDX-specific: `bom-ref` properties must `$ref` the shared `refType` definition; nothing else may reference `refType` (except `refLinkType`, which inherits from it) |
 
 ## Configuration
 
