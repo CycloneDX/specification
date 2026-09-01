@@ -231,6 +231,7 @@
             "patent-assertion",
             "citation",
             "swid-tag",
+            "gs1-digital-link",
             "other"
           ],
           "meta:enum": {
@@ -284,6 +285,7 @@
             "patent-assertion" : "References assertions made regarding patents associated with a component or service. Assertions distinguish between ownership, licensing, and other relevant interactions with patents.",
             "citation": "A reference to external citations applicable to the object identified by this BOM entry or the BOM itself. When used with a BOM-Link, this allows offloading citations into a separate CycloneDX BOM.",
             "swid-tag": "A Software Identification (SWID) tag document conforming to ISO/IEC 19770-2. The reference resolves to the XML SoftwareIdentity document itself, including all of its metadata (entities, evidence, payload, links, and meta elements). This is distinct from the `swid` identifier scheme, which carries only the tagId of a SWID tag.",
+            "gs1-digital-link": "A [GS1 Digital Link URI](https://ref.gs1.org/standards/digital-link/uri-syntax/) that connects the component's GS1 identification key, such as a GTIN, to online sources of information, including product data, safety documentation, digital product passports, and recall status. The URI may include key qualifiers, such as a batch or serial number, enabling identification at the class, batch, or individual item level. Component identity shall be derived from the component's identifiers, not from keys embedded in this URI.",
             "other": "Use this if no other types accurately describe the purpose of the external reference."
           }
         },
@@ -426,7 +428,7 @@
       }
     },
     "organizationalEntityOrContact": {
-        "$comment": "TODO"
+      "$comment": "TODO"
     },
     "origin": {
       "type": "object",
@@ -600,15 +602,14 @@
         "propertyObject": {
           "type": "object",
           "title": "Extensible Property Object",
-          "$comment": "Internal helper for extensibleProperties. Not part of the public schema API — do not reference externally; may change without notice.\n\nadditionalProperties explicitly allowed for extensibility reasons.",
+          "$comment": "Internal helper for extensibleProperties. Not part of the public schema API — do not reference externally; may change without notice.\n\nThis is a mixin.",
           "required": ["$schema"],
           "properties": {
             "$schema": {
               "type": "string",
               "format": "uri"
             }
-          },
-          "additionalProperties": true
+          }
         },
         "propertyValue": {
           "title": "Extensible Property Value",
@@ -630,7 +631,7 @@
               }
             },
             "else": {
-              "type": ["string", "number", "boolean", "null"]
+              "type": ["string", "number", "integer", "boolean", "null"]
             }
           }
         }

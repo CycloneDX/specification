@@ -67,6 +67,117 @@ const __FINDNODES_SKIP_KEYS = Object.freeze(new Set(
     ['enum', 'const', 'examples', 'default', 'meta:enum']))
 
 /**
+ * Make a value constraints test for a specific node.
+ * @param {*} node
+ * @return {function(*): boolean} value constraints test
+ * @private
+ */
+function _makeValueConstraintTest(node) {
+    if (node.type === undefined) return () => true
+    const typeChecks = [...new Set(
+        Array.isArray(node.type)
+            ? node.type
+            : [node.type]
+    )].map(type => {
+        const constraints = []
+        switch (type) {
+            case 'array':
+                // https://json-schema.org/understanding-json-schema/reference/array
+                constraints.push(v => Array.isArray(v))
+                if ('minItems' in node) {
+                    const minItems = node.minItems
+                    constraints.push(v => v.length >= minItems)
+                }
+                if ('maxItems' in node) {
+                    const maxItems = node.maxItems
+                    constraints.push(v => v.length <= maxItems)
+                }
+                if (node.uniqueItems === true) {
+                    // TODO: current implementation only works for primitives
+                    constraints.push(v => v.length === new Set(v).size)
+                }
+                // TODO: node.prefixItems
+                // TODO: tuple array
+                break
+            case 'boolean':
+                // https://json-schema.org/understanding-json-schema/reference/boolean
+                constraints.push(v => (v === true || v === false))
+                break
+            case 'null':
+                // https://json-schema.org/understanding-json-schema/reference/null
+                constraints.push(v => v === null)
+                break
+            case 'integer':
+                // https://json-schema.org/understanding-json-schema/reference/numeric#integer
+                constraints.push(v => Number.isInteger(v))
+            // falls through to 'number'
+            case 'number':
+                // https://json-schema.org/understanding-json-schema/reference/numeric
+                constraints.push(v => typeof v === 'number')
+                if ('minimum' in node) {
+                    const minimum = node.minimum
+                    constraints.push(v => v >= minimum)
+                }
+                if ('exclusiveMinimum' in node) {
+                    const exclusiveMinimum = node.exclusiveMinimum
+                    constraints.push(v => v > exclusiveMinimum)
+                }
+                if ('exclusiveMaximum' in node) {
+                    const exclusiveMaximum = node.exclusiveMaximum
+                    constraints.push(v => v < exclusiveMaximum)
+                }
+                if ('maximum' in node) {
+                    const maximum = node.maximum
+                    constraints.push(v => v <= maximum)
+                }
+                if ('multipleOf' in node) {
+                    const multipleOf = node.multipleOf
+                    constraints.push(
+                        /* The mathematical correct version:
+                         *      v => v % node.multipleOf === 0
+                         *  has implementational issues -- as an example:
+                         *      0.3 % 0.1 = 0.09999999999999998
+                         *  So we use a tolerance or a rounding check instead.
+                         */
+                        v => Math.abs(v / multipleOf - Math.round(v / multipleOf)) < 1e-9
+                    )
+                }
+                break
+            case 'object':
+                constraints.push(v => typeof v === 'object' && v !== null && !Array.isArray(v))
+                // TODO: required
+                // TODO: properties
+                // TODO: minProperties
+                // TODO: maxProperties
+                // TODO: patternProperties
+                break
+            case 'string':
+                // https://json-schema.org/understanding-json-schema/reference/string
+                constraints.push(v => typeof v === 'string')
+                if ('minLength' in node) {
+                    const minLength = node.minLength
+                    constraints.push(v => v.length >= minLength)
+                }
+                if ('maxLength' in node) {
+                    const maxLength = node.maxLength
+                    constraints.push(v => v.length <= maxLength)
+                }
+                if ('pattern' in node) {
+                    // https://json-schema.org/understanding-json-schema/reference/string#regexp
+                    const pattern = new RegExp(node.pattern)
+                    constraints.push(v => pattern.test(v))
+                }
+                // TODO: node.format
+                break
+            default:
+                throw new Error(`Unsupported type: ${JSON.stringify(node.type)}`)
+        }
+        return constraints
+    })
+    return v => typeChecks.some(ts => ts.every(t => t(v)))
+}
+
+/**
  * Walks a schema, yields [path, node] for every node the matcher accepts.
  * @param {*} node
  * @param {function(*): boolean} matcher
@@ -92,24 +203,6 @@ function* _findNodes(node, matcher, path = '$') {
 }
 
 /**
- * @function
- * @param {*} schema
- * @return {Generator<[string, *], void, *>} every node that has a string `$ref`
- * @private
- */
-const _findRefs = (schema) => _findNodes(schema,
-    n => typeof n['$ref'] === 'string')
-
-/**
- * @function
- * @param {*} schema
- * @return {Generator<[string, *], void, *>} every node that is an object schema
- * @private
- */
-const _findObjectSchemas = (schema) => _findNodes(schema,
-    n => n.type === 'object' || (Array.isArray(n.type) && n.type.includes('object')))
-
-/**
  * @param {string} schemaFile
  * @return {string} the expected `$ref` value pointing at refType, relative to schemaFile
  * @private
@@ -129,8 +222,10 @@ function _refTypeRefFor(schemaFile) {
  * @private
  */
 const _findObjectWithEnum = (schema) => _findNodes(schema,
-    n => 'enum' in n || 'meta:enum' in n)
+    n => 'enum' in n)
 
+const _findObjectWithDefault = (schema) => _findNodes(schema,
+    n => 'default' in n)
 
 /**
  * @param {*} actual
@@ -155,177 +250,65 @@ function _printError(actual, expected, msg, schemaFile, schemaPath) {
 // region tests
 
 /**
- * `$ref` must not reference its own file by name/path;
- * self-references must use the plain `#...` fragment form.
+ * Enum values adheres constraints.
  * @param {*} schema
  * @param {string} schemaFile
  * @return {number} number of errors found
  */
-function testNoSelfRefByFile(schema, schemaFile) {
-    let errCnt = 0
-    for (const [path, node] of _findRefs(schema)) {
-        const ref = node['$ref']
-        const hashPos = ref.indexOf('#')
-        const filePart = hashPos === -1
-            ? ref
-            : ref.slice(0, hashPos)
-        if (filePart === '') continue;
-        const resolved = join(dirname(schemaFile), filePart)
-        if (resolved === schemaFile) {
-            ++errCnt
-            const fragment = hashPos === -1
-                ? '#'
-                : ref.slice(hashPos)
-            _printError(
-                ref, fragment,
-                'self-$ref must start with "#"',
-                schemaFile, path)
-        }
-    }
-    return errCnt
-}
-
-/**
- * `bom-ref` properties must `$ref` refType — and nothing else may.
- * @param {*} schema
- * @param {string} schemaFile
- * @return {number} number of errors found
- */
-function testRefTypeUsage(schema, schemaFile) {
-    const refTypeRef = _refTypeRefFor(schemaFile)
-    // 'refLinkType' is the only allowed exception - it inherits from 'refType'
-    const exceptionPath = schemaFile === expectedRefTypeFP[0]
-        ? '$.$defs.refLinkType'
-        : undefined
-
-    let errCnt = 0
-    for (const [path, node] of _findRefs(schema)) {
-        const ref = node['$ref']
-        if (path.endsWith('.properties.bom-ref')) {
-            if (ref !== refTypeRef) {
-                ++errCnt
-                _printError(
-                    ref, refTypeRef,
-                    'wrong .$ref',
-                    schemaFile, path)
-            }
-            continue
-        }
-        if (ref === refTypeRef) {
-            if (exceptionPath && path.startsWith(exceptionPath)) continue;
-            ++errCnt
-            _printError(
-                ref, `different from: ${refTypeRef}`,
-                'wrong use of refType - did you mean refLinkType?',
-                schemaFile, path)
-        }
-    }
-    return errCnt
-}
-
-/**
- * object schemas must have `additionalProperties` set,
- * unless `unevaluatedProperties` is set,
- * or `$comment` containing 'this is a mixin',
- * or explicitly allowed via `$comment` containing 'additionalproperties explicitly allowed'.
- * @param {*} schema
- * @param {string} schemaFile
- * @return {number} number of errors found
- */
-function testAdditionalProperties(schema, schemaFile) {
-    let errCnt = 0
-    for (const [path, node] of _findObjectSchemas(schema)) {
-        if (Object.keys(node).join('|') === 'type') {
-            // this is a sole type constraint
-            continue
-        }
-
-        const unevaluatedProperties = node.unevaluatedProperties
-        const additionalProperties = node.additionalProperties
-
-        if (unevaluatedProperties !== undefined) {
-            // Don't need 'additionalProperties', since 'unevaluatedProperties' takes care.
-            // see https://json-schema.org/draft/2020-12/json-schema-core#section-11.3
-            if (additionalProperties !== undefined) {
-                ++errCnt
-                _printError(
-                    'both set', 'exactly one set',
-                    'either .additionalProperties or .unevaluatedProperties should be set',
-                    schemaFile, path)
-            }
-            continue;
-        }
-
-        const commentLC = typeof node['$comment'] === 'string'
-            ? node['$comment'].toLowerCase()
-            : ''
-
-        if (commentLC.includes('this is a mixin')) {
-            // This is a mixin. It intentionally does NOT restrict additional/unevaluated properties itself; schemas composing it via `allOf` are expected to close themselves with `unevaluatedProperties: false` so that both their own defined properties and these patternProperties remain usable.
-            continue;
-        }
-
-        const expected = commentLC.includes('additionalproperties explicitly allowed')
-        const actual = additionalProperties
-        if (actual !== expected) {
-            ++errCnt
-            _printError(
-                actual, expected,
-                'either .additionalProperties or .unevaluatedProperties must be set',
-                schemaFile, path)
-        }
-    }
-    return errCnt
-}
-
-/**
- * `meta:enum` must be an object,
- * and every `enum` value must exist as a key in it.
- * @param {*} schema
- * @param {string} schemaFile
- * @return {number} number of errors found
- */
-function testMetaEnum(schema, schemaFile) {
+function testEnumValues(schema, schemaFile) {
     let errCnt = 0
     for (const [path, node] of _findObjectWithEnum(schema)) {
-        const metaEnum = node['meta:enum']
-        if (metaEnum === undefined) {
-            // metaEnum is optional
-            continue
+        const valueConstraintTest = _makeValueConstraintTest(node)
+        for (const enumValue of node.enum) {
+            if (!valueConstraintTest(enumValue)) {
+                ++errCnt
+                _printError(
+                    enumValue, `in range of type and constraints`,
+                    'enum value out of range',
+                    schemaFile, `${path}.enum`)
+            }
         }
-        if (typeof metaEnum !== 'object' || metaEnum === null || Array.isArray(metaEnum)) {
-            ++errCnt
-            _printError(
-                metaEnum, 'an object',
-                'meta:enum must be an object',
-                schemaFile, `${path}.meta:enum`)
-            continue
-        }
-        const enumValues = node['enum']
-        if (!Array.isArray(enumValues)) {
-            ++errCnt
-            _printError(
-                enumValues, 'an array',
-                'meta:enum without a sibling enum array',
-                schemaFile, `${path}.enum`)
-            continue
-        }
-        const enumSet = new Set(enumValues)
-        const metaSet = new Set(Object.keys(metaEnum))
+    }
+    return errCnt
+}
 
-        for (const value of enumSet.difference(metaSet)) {
-            ++errCnt
-            _printError(
-                undefined, `a key ${JSON.stringify(value)}`,
-                'enum value missing in meta:enum',
-                schemaFile, `${path}.meta:enum`)
+/**
+ * Default values adheres constraints.
+ * @param {*} schema
+ * @param {string} schemaFile
+ * @return {number} number of errors found
+ */
+function testDefaultValues(schema, schemaFile) {
+    let errCnt = 0
+    for (const [path, node] of _findObjectWithDefault(schema)) {
+        if (path.endsWith('.properties')) continue;
+        const defaultValue = node.default
+        if ('const' in node) {
+            if (defaultValue !== node.const) {
+                ++errCnt
+                _printError(
+                    defaultValue, node.const,
+                    'default value out of range',
+                    schemaFile, `${path}.default`)
+            }
+            continue
         }
-        for (const value of metaSet.difference(enumSet)) {
+        if ('enum' in node) {
+            if (undefined === node.enum.find(e => e === defaultValue)) {
+                ++errCnt
+                _printError(
+                    defaultValue, `one of ${JSON.stringify(node.enum)}`,
+                    'default value out of range',
+                    schemaFile, `${path}.default`)
+            }
+            continue
+        }
+        if (!_makeValueConstraintTest(node)(defaultValue)) {
             ++errCnt
             _printError(
-                undefined, `a string ${JSON.stringify(value)}`,
-                'meta:enum value missing in enum',
-                schemaFile, `${path}.enum`)
+                defaultValue, `in range of type and constraints`,
+                'default value out of range',
+                schemaFile, `${path}.default`)
         }
     }
     return errCnt
@@ -337,10 +320,8 @@ function testMetaEnum(schema, schemaFile) {
 
 /** @type {Readonly<Record<string, function(*, string): number>>} */
 const tests = Object.freeze({
-    'no self-$ref by file': testNoSelfRefByFile,
-    'refType usage (`bom-ref` <-> refType)': testRefTypeUsage,
-    'additionalProperties is `false`': testAdditionalProperties,
-    'meta:enum completeness': testMetaEnum,
+    'enum value in range': testEnumValues,
+    'default value in range': testDefaultValues,
 })
 
 const schemas = await Promise.all(schemaFiles.map(

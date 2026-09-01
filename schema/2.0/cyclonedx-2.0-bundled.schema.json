@@ -1024,8 +1024,7 @@
                       "properties": {
                         "ordinal": true
                       },
-                      "additionalProperties": true,
-                      "$comment": "additionalProperties explicitly allowed - this is just a minimal constraint",
+                      "$comment": "This is a mixin - this is just a minimal constraint",
                       "type": "object"
                     }
                   }
@@ -3951,6 +3950,7 @@
                 "patent-assertion",
                 "citation",
                 "swid-tag",
+                "gs1-digital-link",
                 "other"
               ],
               "meta:enum": {
@@ -4002,6 +4002,7 @@
                 "patent-assertion": "References assertions made regarding patents associated with a component or service. Assertions distinguish between ownership, licensing, and other relevant interactions with patents.",
                 "citation": "A reference to external citations applicable to the object identified by this BOM entry or the BOM itself. When used with a BOM-Link, this allows offloading citations into a separate CycloneDX BOM.",
                 "swid-tag": "A Software Identification (SWID) tag document conforming to ISO/IEC 19770-2. The reference resolves to the XML SoftwareIdentity document itself, including all of its metadata (entities, evidence, payload, links, and meta elements). This is distinct from the `swid` identifier scheme, which carries only the tagId of a SWID tag.",
+                "gs1-digital-link": "A [GS1 Digital Link URI](https://ref.gs1.org/standards/digital-link/uri-syntax/) that connects the component's GS1 identification key, such as a GTIN, to online sources of information, including product data, safety documentation, digital product passports, and recall status. The URI may include key qualifiers, such as a batch or serial number, enabling identification at the class, batch, or individual item level. Component identity shall be derived from the component's identifiers, not from keys embedded in this URI.",
                 "other": "Use this if no other types accurately describe the purpose of the external reference."
               }
             },
@@ -4363,7 +4364,7 @@
             "propertyObject": {
               "type": "object",
               "title": "Extensible Property Object",
-              "$comment": "Internal helper for extensibleProperties. Not part of the public schema API — do not reference externally; may change without notice.\n\nadditionalProperties explicitly allowed for extensibility reasons.",
+              "$comment": "Internal helper for extensibleProperties. Not part of the public schema API — do not reference externally; may change without notice.\n\nThis is a mixin.",
               "required": [
                 "$schema"
               ],
@@ -4372,8 +4373,7 @@
                   "type": "string",
                   "format": "uri"
                 }
-              },
-              "additionalProperties": true
+              }
             },
             "propertyValue": {
               "title": "Extensible Property Value",
@@ -4398,6 +4398,7 @@
                   "type": [
                     "string",
                     "number",
+                    "integer",
                     "boolean",
                     "null"
                   ]
@@ -9124,8 +9125,7 @@
             },
             {
               "type": "object",
-              "additionalProperties": true,
-              "$comment": "additionalProperties explicitly allowed - it is controlled by the other `allOf`",
+              "$comment": "This is a mixin - it is controlled by the other `allOf`",
               "properties": {
                 "technique": {
                   "not": {
@@ -9156,8 +9156,7 @@
             },
             {
               "type": "object",
-              "additionalProperties": true,
-              "$comment": "additionalProperties explicitly allowed - it is controlled by the other `allOf`",
+              "$comment": "This is a mixin - it is controlled by the other `allOf`",
               "properties": {
                 "technique": {
                   "not": {
@@ -10542,7 +10541,7 @@
         "signatureObject": {
           "title": "Signature Object",
           "description": "A JSS signature object as defined in ITU-T X.590 clause 6.2. Captures the hashing algorithm, signing algorithm, public key material (in one of four forms), the base64URL-encoded digital signature value, and optional metadata. May nest a child 'signature' property to form a counter-signature chain.",
-          "$comment": "unevaluatedProperties: true is intentional. ITU-T X.590 clause 6.2 explicitly states that implementers MAY add additional properties to satisfy meta-data requirements for their application. The clause 6.3 properties (type, id, related_to, etc.) are themselves defined as non-exhaustive examples of such extensions.",
+          "$comment": "This is a mixin: ITU-T X.590 clause 6.2 explicitly states that implementers MAY add additional properties to satisfy meta-data requirements for their application. The clause 6.3 properties (type, id, related_to, etc.) are themselves defined as non-exhaustive examples of such extensions.",
           "type": "object",
           "properties": {
             "hash_algorithm": {
@@ -17631,7 +17630,11 @@
                         "status": {
                           "title": "Status",
                           "description": "The vulnerability status for the version or range of versions.",
-                          "$ref": "#/$defs/cyclonedx-vulnerability-2.0/$defs/affectedStatus",
+                          "allOf": [
+                            {
+                              "$ref": "#/$defs/cyclonedx-vulnerability-2.0/$defs/affectedStatus"
+                            }
+                          ],
                           "default": "affected"
                         }
                       }
@@ -18016,8 +18019,7 @@
                           }
                         }
                       },
-                      "additionalProperties": true,
-                      "$comment": "additionalProperties explicitly allowed - this is just a minimal constraint",
+                      "$comment": "This is a mixin - this is just a minimal constraint",
                       "type": "object"
                     }
                   }
