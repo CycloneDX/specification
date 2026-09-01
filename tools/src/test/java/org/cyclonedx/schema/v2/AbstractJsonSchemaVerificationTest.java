@@ -45,6 +45,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestReporter;
 
 /**
  * Verifies a CycloneDX 2.x JSON schema against its JSON test data.
@@ -138,7 +139,7 @@ abstract class AbstractJsonSchemaVerificationTest {
     }
 
     @TestFactory
-    Collection<DynamicTest> verifyTestData() throws Exception {
+    Collection<DynamicTest> verifyTestData(final TestReporter reporter) throws Exception {
         final List<DynamicTest> dynamicTests = new ArrayList<>();
         for (final String resource : getVersionResources()) {
             final String resourceName = StringUtils.substringAfterLast(resource, "/");
@@ -146,20 +147,19 @@ abstract class AbstractJsonSchemaVerificationTest {
                 continue;
             }
             if (resourceName.startsWith("valid")) {
-                dynamicTests.add(resourceTest(resource, true));
+                dynamicTests.add(resourceTest(reporter, resource, true));
             } else if (resourceName.startsWith("invalid")) {
-                dynamicTests.add(resourceTest(resource, false));
+                dynamicTests.add(resourceTest(reporter, resource, false));
             }
         }
         assertFalse(dynamicTests.isEmpty(), "no JSON test data found for schema version " + version);
         return dynamicTests;
     }
 
-    /** Creates a test that validates the resource and logs which resource is being processed. */
-    private DynamicTest resourceTest(final String resource, final boolean expectValid) {
+    /** Creates a test that validates the resource, reporting progress via the JUnit platform. */
+    private DynamicTest resourceTest(final TestReporter reporter, final String resource, final boolean expectValid) {
         return DynamicTest.dynamicTest(resource, () -> {
-            System.out.println("[schema " + version + "] validating (expect "
-                + (expectValid ? "pass" : "fail") + "): " + resource);
+            reporter.publishEntry("validating", resource + " (expect " + (expectValid ? "pass" : "fail") + ")");
             if (expectValid) {
                 assertTrue(isValid(resource), resource);
             } else {

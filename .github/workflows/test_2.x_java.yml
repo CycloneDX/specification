@@ -55,3 +55,6 @@ jobs:
           || { echo "::error::No Maven profile 'schema-v${SCHEMA_VERSION}-tests' in tools/pom.xml"; \
                exit 1; }
         mvn clean test -P "schema-v${SCHEMA_VERSION}-tests"
+    - name: Print report
+      if: ${{ failure() }}
+      run: cat ./target/surefire-reports/*
