@@ -1,12 +1,12 @@
 /**
  * CycloneDX Schema Linter - Core Engine
- * 
+ *
  * A modular linter for CycloneDX 2.0 JSON schemas, enforcing:
  * - ISO House Style conventions
  * - Oxford English spelling for descriptions
  * - American English for property names
  * - Consistent formatting and structure
- * 
+ *
  * @license Apache-2.0
  */
 
@@ -160,10 +160,11 @@ export class LintCheck {
    * Run the check against a schema
    * @param {object} schema - The parsed JSON schema
    * @param {string} rawContent - The raw file content (for formatting checks)
-   * @param {object} config - Configuration options for this check
+   * @param {object} [config] - Configuration options for this check
+   * @param {string|null} [filePath] - The parsed file's path
    * @returns {LintIssue[]} Array of issues found
    */
-  async run(schema, rawContent, config = {}) {
+  async run(schema, rawContent, config = {}, filePath = null) {
     throw new Error('LintCheck.run() must be implemented by subclass');
   }
 
@@ -171,8 +172,8 @@ export class LintCheck {
    * Create an issue with this check's ID
    * @param {string} message
    * @param {string} path
-   * @param {object} context
-   * @param {string} [severity]
+   * @param {object} [context]
+   * @param {string|null} [severity]
    */
   createIssue(message, path, context = {}, severity = null) {
     return new LintIssue(
@@ -236,10 +237,10 @@ export class SchemaLinter {
    */
   async lintFile(filePath) {
     const result = new LintResult(filePath);
-    
+
     let rawContent;
     let schema;
-    
+
     try {
       rawContent = readFileSync(filePath, 'utf-8');
     } catch (err) {
@@ -251,7 +252,7 @@ export class SchemaLinter {
       ));
       return result.finalise();
     }
-    
+
     try {
       schema = JSON.parse(rawContent);
     } catch (err) {
@@ -264,16 +265,10 @@ export class SchemaLinter {
       return result.finalise();
     }
 
-    // Run all applicable checks
-    const checks = this.getApplicableChecks();
-    
-    for (const check of checks) {
+    // Run all enabled checks
+    for (const check of this.getEnabledChecks()) {
       const checkConfig = this.config.checks[check.id] || {};
-      
-      if (checkConfig.enabled === false) {
-        continue;
-      }
-      
+
       try {
         const issues = await check.run(schema, rawContent, checkConfig, filePath);
         issues.forEach(issue => result.addIssue(issue));
@@ -300,9 +295,9 @@ export class SchemaLinter {
    */
   async lintString(content, virtualPath = '<string>') {
     const result = new LintResult(virtualPath);
-    
+
     let schema;
-    
+
     try {
       schema = JSON.parse(content);
     } catch (err) {
@@ -315,16 +310,10 @@ export class SchemaLinter {
       return result.finalise();
     }
 
-    // Run all applicable checks
-    const checks = this.getApplicableChecks();
-    
-    for (const check of checks) {
+    // Run all enabled checks
+    for (const check of this.getEnabledChecks()) {
       const checkConfig = this.config.checks[check.id] || {};
-      
-      if (checkConfig.enabled === false) {
-        continue;
-      }
-      
+
       try {
         const issues = await check.run(schema, content, checkConfig);
         issues.forEach(issue => result.addIssue(issue));
@@ -362,38 +351,70 @@ export class SchemaLinter {
    */
   getApplicableChecks() {
     const allChecks = Array.from(checkRegistry.values());
-    
+
     let checks = allChecks;
-    
+
     // Filter to only included checks if specified
     if (this.config.includeChecks) {
       checks = checks.filter(c => this.config.includeChecks.includes(c.id));
     }
-    
+
     // Exclude specified checks
     if (this.config.excludeChecks.length > 0) {
       checks = checks.filter(c => !this.config.excludeChecks.includes(c.id));
     }
-    
+
     return checks;
   }
+
+  getEnabledChecks() {
+    return this.getApplicableChecks().filter(
+      c => this.config.checks[c.id]?.enabled !== false
+    )
+  }
+
 }
 
 /**
- * Utility to traverse a JSON schema and call a visitor function
- * @param {object} schema - The schema to traverse
- * @param {function} visitor - Function called for each node: (node, path, key, parent)
- * @param {string} [path] - Current path (used internally)
- * @param {string} [key] - Current key (used internally)
- * @param {object} [parent] - Parent node (used internally)
+ * Visitor invoked for each node during schema traversal.
+ *
+ * All arguments are to be treated as read-only:
+ * visitors must NOT modify the schema, nodes, or parents — traversal is
+ * for inspection only. Mutating during traversal leads to undefined behaviour.
+ *
+ * @callback SchemaVisitor
+ * @param {Readonly<*>} node - The current value (object, array, or primitive). Do not modify.
+ * @param {string} path - JSON-path-like location, e.g. `$.properties.foo[0]`
+ * @param {string|number|null} key - The property name or array index of `node` in its parent, `null` at the root
+ * @param {Readonly<object>|null} parent - The parent object/array, `null` at the root. Do not modify.
+ * @returns {boolean|void} Return `false` to skip traversal of this node's children; any other value continues.
+ */
+
+/**
+ * Utility to traverse a JSON schema depth-first and call a visitor function for each node.
+ *
+ * The visitor is invoked before descending into a node's children.
+ * If the visitor returns `false`, the node's children are not traversed
+ * (the subtree is pruned); any other return value (including `undefined`)
+ * continues the traversal.
+ *
+ * The traversed schema is treated as immutable: visitors must not mutate it.
+ *
+ * @param {Readonly<*>} schema - The schema (or sub-schema/value) to traverse. Not modified.
+ * @param {SchemaVisitor} visitor - Function called for each node with `(node, path, key, parent)`
+ * @param {string} [path='$'] - Current path (used internally)
+ * @param {string|number|null} [key=null] - Current key (used internally)
+ * @param {object|null} [parent=null] - Parent node (used internally)
  */
 export function traverseSchema(schema, visitor, path = '$', key = null, parent = null) {
-  visitor(schema, path, key, parent);
-  
+  if (visitor(schema, path, key, parent) === false) {
+    return; // visitor pruned this subtree
+  }
+
   if (typeof schema !== 'object' || schema === null) {
     return;
   }
-  
+
   if (Array.isArray(schema)) {
     schema.forEach((item, index) => {
       traverseSchema(item, visitor, `${path}[${index}]`, index, schema);
