@@ -12,17 +12,28 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-defaults:
-  run:
-    working-directory: tools/src/test/php/schema-v2
 
 # https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token
 permissions: {}
 
+defaults:
+  run:
+    working-directory: tools/src/test/php/schema-v2
+
+env:
+  PHP_VERSION: "8.5"
+
 jobs:
+  discover-schema:
+    uses: ./.github/workflows/discover_2.x_schemas.yml
   test_php:
     timeout-minutes: 30
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        schema_version: ${{ fromJSON(needs.discover-schema.outputs.versions) }}
+    name: test ${{ matrix.schema_version }}
     steps:
       - name: Checkout
         # see https://github.com/actions/checkout
@@ -33,9 +44,11 @@ jobs:
         # see https://github.com/shivammathur/setup-php
         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240  # 2.37.2
         with:
-          php-version: "8.5"
+          php-version: ${{ env.PHP_VERSION }}
           tools: composer:v2
       - name: Install Dependencies
         run: composer install
       - name: Run test
-        run: composer run test
+        env:
+          SCHEMA_VERSION: ${{ matrix.schema_version }}
+        run: composer run "test:v$SCHEMA_VERSION"
