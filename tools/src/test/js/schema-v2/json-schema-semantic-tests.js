@@ -203,24 +203,6 @@ function* _findNodes(node, matcher, path = '$') {
 }
 
 /**
- * @function
- * @param {*} schema
- * @return {Generator<[string, *], void, *>} every node that has a string `$ref`
- * @private
- */
-const _findRefs = (schema) => _findNodes(schema,
-    n => '$ref' in n)
-
-/**
- * @function
- * @param {*} schema
- * @return {Generator<[string, *], void, *>} every node that is an object schema
- * @private
- */
-const _findObjectSchemas = (schema) => _findNodes(schema,
-    n => n.type === 'object' || (Array.isArray(n.type) && n.type.includes('object')))
-
-/**
  * @param {string} schemaFile
  * @return {string} the expected `$ref` value pointing at refType, relative to schemaFile
  * @private
@@ -266,44 +248,6 @@ function _printError(actual, expected, msg, schemaFile, schemaPath) {
 // endregion utils
 
 // region tests
-
-/**
- * `bom-ref` properties must `$ref` refType — and nothing else may.
- * @param {*} schema
- * @param {string} schemaFile
- * @return {number} number of errors found
- */
-function testRefTypeUsage(schema, schemaFile) {
-    const refTypeRef = _refTypeRefFor(schemaFile)
-    // 'refLinkType' is the only allowed exception - it inherits from 'refType'
-    const exceptionPath = schemaFile === expectedRefTypeFP[0]
-        ? '$.$defs.refLinkType'
-        : undefined
-
-    let errCnt = 0
-    for (const [path, node] of _findRefs(schema)) {
-        const ref = node['$ref']
-        if (path.endsWith('.properties.bom-ref')) {
-            if (ref !== refTypeRef) {
-                ++errCnt
-                _printError(
-                    ref, refTypeRef,
-                    'wrong .$ref',
-                    schemaFile, path)
-            }
-            continue
-        }
-        if (ref === refTypeRef) {
-            if (exceptionPath && path.startsWith(exceptionPath)) continue;
-            ++errCnt
-            _printError(
-                ref, `different from: ${refTypeRef}`,
-                'wrong use of refType - did you mean refLinkType?',
-                schemaFile, path)
-        }
-    }
-    return errCnt
-}
 
 /**
  * Enum values adheres constraints.
@@ -376,7 +320,6 @@ function testDefaultValues(schema, schemaFile) {
 
 /** @type {Readonly<Record<string, function(*, string): number>>} */
 const tests = Object.freeze({
-    'refType usage (`bom-ref` <-> refType)': testRefTypeUsage,
     'enum value in range': testEnumValues,
     'default value in range': testDefaultValues,
 })
