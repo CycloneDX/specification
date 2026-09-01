@@ -1,0 +1,42 @@
+
+name: CT CDX-2.x Lint
+
+on:
+  workflow_call:
+    outputs:
+      versions:
+        description: 'JSON array of discovered versions'
+        value: ${{ jobs.discover.outputs.versions }}
+
+# https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token
+permissions: {}
+
+jobs:
+  discover:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    outputs:
+      versions: ${{ steps.discover.outputs.versions }}
+    steps:
+      - name: Checkout repository
+        # see https://github.com/actions/checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Discover schema versions
+        id: discover
+        run: |
+          mapfile -d '' -t dirs < <(
+            find schema \
+              -mindepth 1 -maxdepth 1 \
+              -type d \
+              -name '2.*' \
+              -printf '%f\0' \
+            | sort -z
+          )
+          if [ ${#dirs[@]} -eq 0 ]; then
+            echo 'No schema/2.* directories found' >&2
+            exit 1
+          fi
+          printf 'versions=' >> "$GITHUB_OUTPUT"
+          printf '%s\n' "${dirs[@]}" | jq -R . | jq -c -s . >> "$GITHUB_OUTPUT"
