@@ -41,8 +41,10 @@ import java.util.Collection;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * Verifies a CycloneDX 2.x JSON schema against its JSON test data.
@@ -50,6 +52,7 @@ import org.junit.jupiter.api.TestFactory;
  * Subclass once per schema version, passing the version to the constructor
  * and adding the appropriate {@code @Tag} annotations for test filtering.
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class AbstractJsonSchemaVerificationTest {
 
     private static final ObjectMapper MAPPER = new JsonMapper();
@@ -59,10 +62,21 @@ abstract class AbstractJsonSchemaVerificationTest {
     private static final String BEHAVIOR_TAXONOMY_NAMESPACE = "cyclonedx.org/schema/behavior-taxonomy.schema.json";
 
     private final String version;
-    private final JsonSchema schema;
+
+    /** Compiled lazily in {@link #compileSchema()} for clear failure attribution. */
+    private JsonSchema schema;
 
     protected AbstractJsonSchemaVerificationTest(final String version) {
         this.version = version;
+    }
+
+    /**
+     * Compiles the schema before any test runs. A broken schema fails here,
+     * clearly attributed to this lifecycle step, instead of surfacing as an
+     * opaque test-instantiation error.
+     */
+    @BeforeAll
+    void compileSchema() {
         this.schema = buildSchema(version);
     }
 
