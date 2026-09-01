@@ -50,11 +50,10 @@ jobs:
     - name: test with Maven
       env:
         SCHEMA_VERSION: ${{ matrix.schema_version }}
-      run: |
-        mvn help:all-profiles | grep -q "Profile Id: schema-v${SCHEMA_VERSION}-tests" \
-        || { echo "::error::No Maven profile 'schema-v${SCHEMA_VERSION}-tests' in tools/pom.xml"; \
-             exit 1; }
-        mvn clean test -P "schema-v${SCHEMA_VERSION}-tests"
+      run: >-
+        mvn clean test
+        -D "surefire.includeTags=schema-v${SCHEMA_VERSION}"
+        -D failIfNoTests=true
     - name: Print report
       if: ${{ failure() }}
       run: cat ./target/surefire-reports/*
