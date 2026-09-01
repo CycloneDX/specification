@@ -248,7 +248,7 @@ function findJsonFiles(dir) {
 /**
  * Format output in stylish format (similar to ESLint)
  */
-function formatStylish(results, options) {
+function formatStylish(results, options, linter) {
   let output = '';
   let totalErrors = 0;
   let totalWarnings = 0;
@@ -341,8 +341,10 @@ function formatStylish(results, options) {
 /**
  * Format output as JSON
  */
-function formatJson(results, options) {
+function formatJson(results, options, linter) {
   const output = {
+    linterConfig: linter.config,
+    enabledChecks: linter.getEnabledChecks().map(c => c.id),
     results: results.map(r => ({
       filePath: r.filePath,
       issues: options.quiet
@@ -364,7 +366,7 @@ function formatJson(results, options) {
 /**
  * Format output in compact format
  */
-function formatCompact(results, options) {
+function formatCompact(results, options, linter) {
   let output = '';
 
   for (const result of results) {
@@ -430,26 +432,31 @@ async function main() {
     process.exit(1);
   }
 
-  if (options.verbose) {
-    console.log(`Linting ${files.length} file(s)...`);
-  }
-
   // Create linter and run
   const linter = new SchemaLinter(config);
+  if (options.verbose) {
+    const ec = linter.getEnabledChecks();
+    if (ec.length > 0) {
+      console.log(`Enabled Checks: ${ec.map(c => c.id).join(', ')}`);
+    } else {
+      console.warn('WARNING: no checks enabled')
+    }
+    console.log(`Linting ${files.length} file(s)...`);
+  }
   const results = await linter.lintFiles(files);
 
   // Format and output results
   let output;
   switch (options.format) {
     case 'json':
-      output = formatJson(results, options);
+      output = formatJson(results, options, linter);
       break;
     case 'compact':
-      output = formatCompact(results, options);
+      output = formatCompact(results, options, linter);
       break;
     case 'stylish':
     default:
-      output = formatStylish(results, options);
+      output = formatStylish(results, options, linter);
   }
 
   console.log(output);
