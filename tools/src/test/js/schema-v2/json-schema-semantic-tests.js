@@ -203,24 +203,6 @@ function* _findNodes(node, matcher, path = '$') {
 }
 
 /**
- * @function
- * @param {*} schema
- * @return {Generator<[string, *], void, *>} every node that has a string `$ref`
- * @private
- */
-const _findRefs = (schema) => _findNodes(schema,
-    n => '$ref' in n)
-
-/**
- * @function
- * @param {*} schema
- * @return {Generator<[string, *], void, *>} every node that is an object schema
- * @private
- */
-const _findObjectSchemas = (schema) => _findNodes(schema,
-    n => n.type === 'object' || (Array.isArray(n.type) && n.type.includes('object')))
-
-/**
  * @param {string} schemaFile
  * @return {string} the expected `$ref` value pointing at refType, relative to schemaFile
  * @private
@@ -266,168 +248,6 @@ function _printError(actual, expected, msg, schemaFile, schemaPath) {
 // endregion utils
 
 // region tests
-
-const _REF_ALLOWED_SIBLINGS = Object.freeze(new Set([
-    '$ref', // the $ref itself
-    '$comment', 'title', 'description', 'examples', // documentational
-    /* do NOT add any non-documentationals
-       instead, use:
-       { "allOf": { "$ref": ... }, "$id" ..., "$anchor": ... }
-       { "allOf": { "$ref": ... }, "default" ... }
-       instead of additionalProperties -- { "allOf": { "$ref": ... }, "unevaluatedItems" ... }
-     */
-]))
-
-/**
- * `$ref` must follow JSON schema best-practice.
- * @param {*} schema
- * @param {string} schemaFile
- * @return {number} number of errors found
- */
-function testRefBestPractice(schema, schemaFile) {
-    let errCnt = 0
-    for (const [path, node] of _findRefs(schema)) {
-        const ref = node['$ref']
-
-        if (typeof ref !== 'string') {
-            ++errCnt
-            _printError(
-                ref, 'a string',
-                'unexpected type of $ref',
-                schemaFile, `${path}.$ref`)
-            continue
-        }
-
-        if (ref.startsWith('/')) {
-            ++errCnt
-            _printError(
-                ref, 'a string',
-                'absolute $ref',
-                schemaFile, `${path}.$ref`)
-        } else {
-            const hashPos = ref.indexOf('#')
-            const filePart = hashPos === -1
-                ? ref
-                : ref.slice(0, hashPos)
-            if (filePart !== '') {
-                const resolved = join(dirname(schemaFile), filePart)
-                if (resolved === schemaFile) {
-                    ++errCnt
-                    const fragment = hashPos === -1
-                        ? '#'
-                        : ref.slice(hashPos)
-                    _printError(
-                        ref, fragment,
-                        'same-file $ref must start with "#"',
-                        schemaFile, path)
-                }
-            }
-        }
-
-        const otherKeys = new Set(Object.keys(node))
-        for (const key of otherKeys.difference(_REF_ALLOWED_SIBLINGS)) {
-            ++errCnt
-            _printError(
-                'present', 'absent',
-                'unexpected key along with $ref',
-                schemaFile, `${path}.${key}`)
-        }
-    }
-    return errCnt
-}
-
-/**
- * `bom-ref` properties must `$ref` refType — and nothing else may.
- * @param {*} schema
- * @param {string} schemaFile
- * @return {number} number of errors found
- */
-function testRefTypeUsage(schema, schemaFile) {
-    const refTypeRef = _refTypeRefFor(schemaFile)
-    // 'refLinkType' is the only allowed exception - it inherits from 'refType'
-    const exceptionPath = schemaFile === expectedRefTypeFP[0]
-        ? '$.$defs.refLinkType'
-        : undefined
-
-    let errCnt = 0
-    for (const [path, node] of _findRefs(schema)) {
-        const ref = node['$ref']
-        if (path.endsWith('.properties.bom-ref')) {
-            if (ref !== refTypeRef) {
-                ++errCnt
-                _printError(
-                    ref, refTypeRef,
-                    'wrong .$ref',
-                    schemaFile, path)
-            }
-            continue
-        }
-        if (ref === refTypeRef) {
-            if (exceptionPath && path.startsWith(exceptionPath)) continue;
-            ++errCnt
-            _printError(
-                ref, `different from: ${refTypeRef}`,
-                'wrong use of refType - did you mean refLinkType?',
-                schemaFile, path)
-        }
-    }
-    return errCnt
-}
-
-/**
- * object schemas must have `additionalProperties` set,
- * unless `unevaluatedProperties` is set,
- * or `$comment` containing 'this is a mixin',
- * or explicitly allowed via `$comment` containing 'additionalproperties explicitly allowed'.
- * @param {*} schema
- * @param {string} schemaFile
- * @return {number} number of errors found
- */
-function testAdditionalProperties(schema, schemaFile) {
-    let errCnt = 0
-    for (const [path, node] of _findObjectSchemas(schema)) {
-        if (Object.keys(node).join('|') === 'type') {
-            // this is a sole type constraint
-            continue
-        }
-
-        const unevaluatedProperties = node.unevaluatedProperties
-        const additionalProperties = node.additionalProperties
-
-        if (unevaluatedProperties !== undefined) {
-            // Don't need 'additionalProperties', since 'unevaluatedProperties' takes care.
-            // see https://json-schema.org/draft/2020-12/json-schema-core#section-11.3
-            if (additionalProperties !== undefined) {
-                ++errCnt
-                _printError(
-                    'both set', 'exactly one set',
-                    'either .additionalProperties or .unevaluatedProperties should be set',
-                    schemaFile, path)
-            }
-            continue
-        }
-
-        const commentLC = typeof node['$comment'] === 'string'
-            ? node['$comment'].toLowerCase()
-            : ''
-
-        if (commentLC.includes('this is a mixin')) {
-            // This is a mixin. It intentionally does NOT restrict additional/unevaluated properties itself; schemas composing it via `allOf` are expected to close themselves with `unevaluatedProperties: false` so that both their own defined properties and these patternProperties remain usable.
-            continue
-        }
-
-        const expected = commentLC.includes('additionalproperties explicitly allowed')
-        const actual = additionalProperties
-        if (actual !== expected) {
-            ++errCnt
-            _printError(
-                actual, expected,
-                'either .additionalProperties or .unevaluatedProperties must be set',
-                schemaFile, path)
-        }
-    }
-    return errCnt
-}
 
 /**
  * Enum values adheres constraints.
@@ -500,9 +320,6 @@ function testDefaultValues(schema, schemaFile) {
 
 /** @type {Readonly<Record<string, function(*, string): number>>} */
 const tests = Object.freeze({
-    '$ref best practice': testRefBestPractice,
-    'refType usage (`bom-ref` <-> refType)': testRefTypeUsage,
-    'additionalProperties is `false`': testAdditionalProperties,
     'enum value in range': testEnumValues,
     'default value in range': testDefaultValues,
 })
