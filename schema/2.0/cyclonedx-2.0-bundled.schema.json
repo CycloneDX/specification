@@ -193,16 +193,7 @@
                         "additionalProperties": false,
                         "properties": {
                           "ref": {
-                            "anyOf": [
-                              {
-                                "title": "Ref",
-                                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
-                              },
-                              {
-                                "title": "BOM-Link Element",
-                                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/bomLinkElementType"
-                              }
-                            ],
+                            "$ref": "#/$defs/cyclonedx-common-2.0/$defs/elementLink",
                             "title": "Reference",
                             "type": "string",
                             "description": "References a data component by the components bom-ref attribute"
@@ -714,16 +705,7 @@
               "type": "array",
               "uniqueItems": true,
               "items": {
-                "anyOf": [
-                  {
-                    "title": "Ref",
-                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
-                  },
-                  {
-                    "title": "BOM-Link Element",
-                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/bomLinkElementType"
-                  }
-                ]
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/elementLink"
               },
               "title": "Subjects",
               "description": "The object in the BOM identified by its bom-ref. This is often a component or service, but may be any object type supporting bom-refs."
@@ -3719,10 +3701,10 @@
       "title": "CycloneDX Common Model",
       "$defs": {
         "refType": {
-          "description": "Identifier for referable and therefore interlinkable elements.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+          "description": "Identifier for referable and therefore interlinkable elements.\nValue shall not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
           "type": "string",
           "minLength": 1,
-          "$comment": "TODO (breaking change): add a format constraint that prevents the value from staring with 'urn:cdx:'"
+          "pattern": "^(?!urn:cdx:)"
         },
         "refLinkType": {
           "description": "Descriptor for an element identified by the attribute 'bom-ref' in the same BOM document.\nIn contrast to `bomLinkElementType`.",
@@ -3755,6 +3737,20 @@
             {
               "title": "BOM-Link Document",
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/bomLinkDocumentType"
+            },
+            {
+              "title": "BOM-Link Element",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/bomLinkElementType"
+            }
+          ]
+        },
+        "elementLink": {
+          "title": "Referenced Element",
+          "description": "Reference using bom-link or bom-ref to an element.",
+          "anyOf": [
+            {
+              "title": "Ref",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
             },
             {
               "title": "BOM-Link Element",
@@ -5575,16 +5571,7 @@
               "type": "array",
               "uniqueItems": true,
               "items": {
-                "anyOf": [
-                  {
-                    "title": "Ref",
-                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
-                  },
-                  {
-                    "title": "BOM-Link Element",
-                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/bomLinkElementType"
-                  }
-                ]
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/elementLink"
               },
               "title": "BOM References",
               "description": "The object in the BOM identified by its bom-ref. This is often a component or service but may be any object type supporting bom-refs. Tools used for analysis should already be defined in the BOM, either in the metadata/tools, components, or formulation."
@@ -5920,16 +5907,7 @@
               "type": "array",
               "uniqueItems": true,
               "items": {
-                "anyOf": [
-                  {
-                    "title": "Ref",
-                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
-                  },
-                  {
-                    "title": "BOM-Link Element",
-                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/bomLinkElementType"
-                  }
-                ]
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/elementLink"
               },
               "title": "BOM references",
               "description": "The bom-ref identifiers of the components or services being described. Assemblies refer to nested relationships whereby a constituent part may include other constituent parts. References do not cascade to child parts. References are explicit for the specified constituent part only."
@@ -10278,16 +10256,7 @@
             "ref": {
               "title": "BOM Reference",
               "description": "References an object by its bom-ref attribute",
-              "anyOf": [
-                {
-                  "title": "Ref",
-                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
-                },
-                {
-                  "title": "BOM-Link Element",
-                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/bomLinkElementType"
-                }
-              ]
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/elementLink"
             },
             "externalReference": {
               "title": "External reference",
@@ -11784,7 +11753,7 @@
               "title": "Address"
             },
             "affiliation": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/elementLink",
               "title": "Affiliation",
               "description": "Reference using bom-link or bom-ref to an organization party with which the person is affiliated."
             }
@@ -12150,7 +12119,7 @@
               "title": "Expiration Date"
             },
             "issuer": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/elementLink",
               "title": "Issuer",
               "description": "Reference using bom-link or bom-ref to the party that issued the identifier."
             }
@@ -17578,16 +17547,7 @@
                 "additionalProperties": false,
                 "properties": {
                   "ref": {
-                    "anyOf": [
-                      {
-                        "title": "Ref",
-                        "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
-                      },
-                      {
-                        "title": "BOM-Link Element",
-                        "$ref": "#/$defs/cyclonedx-common-2.0/$defs/bomLinkElementType"
-                      }
-                    ],
+                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/elementLink",
                     "title": "Reference",
                     "description": "References a component or service by the objects bom-ref"
                   },
@@ -18141,118 +18101,6 @@
           ]
         }
       }
-    },
-    "cyclonedx-2.0": {
-      "type": "object",
-      "title": "CycloneDX Transparency Expression Language",
-      "required": [
-        "specFormat",
-        "specVersion"
-      ],
-      "properties": {
-        "$schema": {
-          "type": "string"
-        },
-        "$comment": {
-          "type": "string"
-        },
-        "specFormat": {
-          "type": "string",
-          "title": "Specification Format",
-          "description": "Specifies the format. This value shall be \"CycloneDX\".",
-          "enum": [
-            "CycloneDX"
-          ]
-        },
-        "specVersion": {
-          "type": "string",
-          "title": "Specification Version",
-          "description": "The version of the CycloneDX specification the BOM conforms to.",
-          "examples": [
-            "2.0"
-          ]
-        },
-        "serialNumber": {
-          "type": "string",
-          "title": "BOM Serial Number",
-          "description": "Every BOM generated SHOULD have a unique serial number, even if the contents of the BOM have not changed over time. If specified, the serial number must conform to [RFC 4122](https://www.ietf.org/rfc/rfc4122.html). Use of serial numbers is recommended.",
-          "examples": [
-            "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79"
-          ],
-          "pattern": "^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
-        },
-        "version": {
-          "type": "integer",
-          "title": "BOM Version",
-          "description": "Whenever an existing BOM is modified, either manually or through automated processes, the version of the BOM SHOULD be incremented by 1. When a system is presented with multiple BOMs with identical serial numbers, the system SHOULD use the most recent version of the BOM. The default version is '1'.",
-          "minimum": 1,
-          "default": 1
-        },
-        "metadata": {
-          "$ref": "#/$defs/cyclonedx-metadata-2.0/$defs/metadata"
-        },
-        "components": {
-          "$ref": "#/$defs/cyclonedx-component-2.0/$defs/components",
-          "description": "A collection of components. When a metadata component is present, this array represents the inventory of components associated with that subject, forming a bill of materials. When the metadata component is omitted, the array provides component data for interchange purposes without establishing a compositional relationship."
-        },
-        "dependencies": {
-          "$ref": "#/$defs/cyclonedx-dependency-2.0/$defs/dependencies"
-        },
-        "compositions": {
-          "$ref": "#/$defs/cyclonedx-composition-2.0/$defs/compositions"
-        },
-        "vulnerabilities": {
-          "$ref": "#/$defs/cyclonedx-vulnerability-2.0/$defs/vulnerabilities"
-        },
-        "threats": {
-          "$ref": "#/$defs/cyclonedx-threat-2.0/$defs/threats"
-        },
-        "risks": {
-          "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/risks"
-        },
-        "controls": {
-          "$ref": "#/$defs/cyclonedx-control-2.0/$defs/controls"
-        },
-        "annotations": {
-          "$ref": "#/$defs/cyclonedx-annotation-2.0/$defs/annotations"
-        },
-        "formulation": {
-          "$ref": "#/$defs/cyclonedx-formulation-2.0/$defs/formulation"
-        },
-        "declarations": {
-          "$ref": "#/$defs/cyclonedx-declaration-2.0/$defs/declarations"
-        },
-        "definitions": {
-          "$ref": "#/$defs/cyclonedx-definition-2.0/$defs/definitions"
-        },
-        "blueprints": {
-          "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/blueprints"
-        },
-        "profiles": {
-          "$ref": "#/$defs/cyclonedx-profile-2.0/$defs/profiles"
-        },
-        "citations": {
-          "$ref": "#/$defs/cyclonedx-citation-2.0/$defs/citations"
-        },
-        "perspectives": {
-          "$ref": "#/$defs/cyclonedx-perspective-2.0/$defs/perspectives"
-        },
-        "properties": {
-          "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
-        },
-        "externalReferences": {
-          "$ref": "#/$defs/cyclonedx-common-2.0/$defs/externalReferences"
-        },
-        "signatures": {
-          "$ref": "#/$defs/cyclonedx-common-2.0/$defs/signatures"
-        }
-      },
-      "allOf": [
-        {
-          "$ref": "#/$defs/cyclonedx-common-2.0/$defs/extensibleProperties"
-        }
-      ],
-      "unevaluatedProperties": false
     }
   }
 }
