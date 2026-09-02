@@ -97,13 +97,13 @@
     "mediaType": {
       "type": "string",
       "title": "Media Type",
-      "description": "The media type of the object. The media type can provide additional context about the kind of data being represented, such as an image, font, or executable.",
+      "description": "The media type of the object, optionally including media type parameters. The media type can provide additional context about the kind of data being represented, such as an image, font, or executable.",
       "examples": [
-        "text/plain",
         "application/json",
-        "image/png"
+        "image/png",
+        "text/html; charset=utf-8"
       ],
-      "pattern": "^[-+a-z0-9.]+/[-+a-z0-9.]+$"
+      "pattern": "^[-+a-z0-9.]+/[-+a-z0-9.]+(\\s*;\\s*[a-zA-Z0-9!#$&^_.+-]+=(\"[^\"]*\"|[^\\s;\"]+))*$"
     },
     "attachment": {
       "type": "object",
@@ -255,7 +255,7 @@
             "log": "A record of events that occurred in a computer system or application, such as problems, errors, or information on current operations.",
             "configuration": "Parameters or settings that may be used by other components or services.",
             "evidence": "Information used to substantiate a claim.",
-            "formulation": "Describes the formulation of any referencable object within the BOM, including components, services, metadata, declarations, or the BOM itself.",
+            "formulation": "Describes the formulation of any referencable object within the CycloneDX artifact or payload, including components, services, metadata, declarations, or the CycloneDX artifact or payload itself.",
             "attestation": "Human or machine-readable statements containing facts, evidence, or testimony.",
             "threat-model": "An enumeration of identified weaknesses, threats, and countermeasures, dataflow diagram (DFD), attack tree, and other supporting documentation in human-readable or machine-readable format.",
             "adversary-model": "The defined assumptions, goals, and capabilities of an adversary.",
@@ -279,7 +279,7 @@
             "patent": "References information about patents which may be defined in human-readable documents or in machine-readable formats such as CycloneDX or ST.96. For detailed patent information or to reference the information provided directly by patent offices, it is recommended to leverage standards from the World Intellectual Property Organization (WIPO) such as [ST.96](https://www.wipo.int/standards/en/st96).",
             "patent-family": "References information about a patent family which may be defined in human-readable documents or in machine-readable formats such as CycloneDX or ST.96. A patent family is a group of related patent applications or granted patents that cover the same or similar invention. For detailed patent family information or to reference the information provided directly by patent offices, it is recommended to leverage standards from the World Intellectual Property Organization (WIPO) such as [ST.96](https://www.wipo.int/standards/en/st96).",
             "patent-assertion" : "References assertions made regarding patents associated with a component or service. Assertions distinguish between ownership, licensing, and other relevant interactions with patents.",
-            "citation": "A reference to external citations applicable to the object identified by this BOM entry or the BOM itself. When used with a BOM-Link, this allows offloading citations into a separate CycloneDX BOM.",
+            "citation": "A reference to external citations applicable to the object identified in a CycloneDX artifact or payload or the CycloneDX artifact or payload itself. When used with a BOM-Link, this allows offloading citations into a separate CycloneDX artifacts or payloads.",
             "swid-tag": "A Software Identification (SWID) tag document conforming to ISO/IEC 19770-2. The reference resolves to the XML SoftwareIdentity document itself, including all of its metadata (entities, evidence, payload, links, and meta elements). This is distinct from the `swid` identifier scheme, which carries only the tagId of a SWID tag.",
             "gs1-digital-link": "A [GS1 Digital Link URI](https://ref.gs1.org/standards/digital-link/uri-syntax/) that connects the component's GS1 identification key, such as a GTIN, to online sources of information, including product data, safety documentation, digital product passports, and recall status. The URI may include key qualifiers, such as a batch or serial number, enabling identification at the class, batch, or individual item level. Component identity shall be derived from the component's identifiers, not from keys embedded in this URI.",
             "other": "Use this if no other types accurately describe the purpose of the external reference."
@@ -793,6 +793,11 @@
       ],
       "additionalProperties": false,
       "properties": {
+        "bom-ref": {
+          "$ref": "#/$defs/refType",
+          "title": "BOM Reference",
+          "description": "An identifier which can be used to reference the patch elsewhere in the document, such as from an annotation. Every `bom-ref` shall be unique within the document."
+        },
         "type": {
           "type": "string",
           "enum": [
@@ -817,9 +822,38 @@
         },
         "resolves": {
           "type": "array",
-          "items": {"$ref": "#/$defs/issue"},
+          "items": {
+            "oneOf": [
+              {"$ref": "#/$defs/issue"},
+              {
+                "type": "object",
+                "title": "Resolved Reference",
+                "description": "A reference to the item the patch resolves, such as a weakness, vulnerability, use case, requirement, or threat declared elsewhere.",
+                "required": [
+                  "ref"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "ref": {
+                    "title": "Reference",
+                    "description": "Reference using bom-link or bom-ref to the resolved item.",
+                    "anyOf": [
+                      {
+                        "title": "Ref",
+                        "$ref": "#/$defs/refLinkType"
+                      },
+                      {
+                        "title": "BOM-Link Element",
+                        "$ref": "#/$defs/bomLinkElementType"
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          },
           "title": "Resolves",
-          "description": "A collection of issues the patch resolves"
+          "description": "A collection of items the patch resolves. Each entry is an inline issue or a reference to the weakness, vulnerability, use case, requirement, or threat that the patch resolves."
         }
       }
     },

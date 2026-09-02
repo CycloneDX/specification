@@ -7,6 +7,7 @@
   "$defs": {
     "certifications": {
       "type": "array",
+      "uniqueItems": true,
       "title": "Certifications",
       "description": "Certifications held by or applicable to the subject.",
       "items": { "$ref": "#/$defs/certification" }
@@ -95,6 +96,31 @@
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "certificationReference": {
+      "type": "object",
+      "title": "Certification Reference",
+      "description": "A reference to a certification defined elsewhere, such as in the definitions or in another document via BOM-Link. A reference includes the referenced certification exactly as defined: every position that references the same certification includes an identical certification.",
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "title": "Reference",
+          "description": "Reference using bom-link or bom-ref to the certification.",
+          "anyOf": [
+            {
+              "title": "Ref",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+            },
+            {
+              "title": "BOM-Link Element",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+            }
+          ]
         }
       }
     }

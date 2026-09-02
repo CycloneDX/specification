@@ -7,7 +7,7 @@
   "$defs": {
     "components": {
       "type": "array",
-      "items": {"$ref": "#/$defs/componentOrChoice"},
+      "items": {"$ref": "#/$defs/componentEntry"},
       "uniqueItems": true,
       "title": "Components"
     },
@@ -60,12 +60,8 @@
           "description": "Specifies the type of component. For software components, classify as application if no more specific appropriate classification is available or cannot be determined for the component.",
           "examples": ["library"]
         },
-        "mime-type": {
-          "type": "string",
-          "title": "Mime-Type",
-          "description": "The mime-type of the component. When used on file components, the mime-type can provide additional context about the kind of file being represented, such as an image, font, or executable. Some library or framework components may also have an associated mime-type.",
-          "examples": ["image/jpeg"],
-          "pattern": "^[-+a-z0-9.]+/[-+a-z0-9.]+$"
+        "mediaType": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/mediaType"
         },
         "bom-ref": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
@@ -107,7 +103,7 @@
         "isExternal": {
           "type": "boolean",
           "title": "Component Is External",
-          "description": "Determine whether this component is external.\nAn external component is one that is not part of an assembly, but is expected to be provided by the environment, regardless of the component's `.scope`. This setting can be useful for distinguishing which components are bundled with the product and which can be relied upon to be present in the deployment environment.\nThis may be set to `true` for runtime components only. For `$.metadata.component`, it must be set to `false`.",
+          "description": "Determine whether this component is external.\nAn external component is one that is not part of an assembly, but is expected to be provided by the environment, regardless of the component's `.scope`. This setting can be useful for distinguishing which components are bundled with the product and which can be relied upon to be present in the deployment environment.\nThis may be set to `true` for runtime components only. For the subject of an inventory statement, it shall be `false`.",
           "default": false
         },
         "description": {
@@ -169,19 +165,34 @@
               "type": "array",
               "title": "Ancestors",
               "description": "Describes zero or more components in which a component is derived from. This is commonly used to describe forks from existing projects where the forked version contains an ancestor node containing the original component it was forked from. For example, Component A is the original component. Component B is the component being used and documented in the BOM. However, Component B contains a pedigree node with a single ancestor documenting Component A - the original component from which Component B is derived from.",
-              "items": {"$ref": "#/$defs/component"}
+              "items": {
+                "oneOf": [
+                  {"$ref": "#/$defs/component"},
+                  {"$ref": "#/$defs/componentReference"}
+                ]
+              }
             },
             "descendants": {
               "type": "array",
               "title": "Descendants",
               "description": "Descendants are the exact opposite of ancestors. This provides a way to document all forks (and their forks) of an original or root component.",
-              "items": {"$ref": "#/$defs/component"}
+              "items": {
+                "oneOf": [
+                  {"$ref": "#/$defs/component"},
+                  {"$ref": "#/$defs/componentReference"}
+                ]
+              }
             },
             "variants": {
               "type": "array",
               "title": "Variants",
               "description": "Variants describe relations where the relationship between the components is not known. For example, if Component A contains nearly identical code to Component B. They are both related, but it is unclear if one is derived from the other, or if they share a common ancestor.",
-              "items": {"$ref": "#/$defs/component"}
+              "items": {
+                "oneOf": [
+                  {"$ref": "#/$defs/component"},
+                  {"$ref": "#/$defs/componentReference"}
+                ]
+              }
             },
             "commits": {
               "type": "array",
@@ -194,20 +205,15 @@
               "title": "Patches",
               "description": ">A list of zero or more patches describing how the component deviates from an ancestor, descendant, or variant. Patches may be complementary to commits or may be used in place of commits.",
               "items": {"$ref": "cyclonedx-common-2.0.schema.json#/$defs/patch"}
-            },
-            "notes": {
-              "type": "string",
-              "title": "Notes",
-              "description": "Notes, observations, and other non-structured commentary describing the components pedigree."
             }
           }
         },
         "components": {
           "type": "array",
-          "items": {"$ref": "#/$defs/componentOrChoice"},
+          "items": {"$ref": "#/$defs/componentEntry"},
           "uniqueItems": true,
           "title": "Components",
-          "description": "A list of components included in the parent component, including software, hardware, and services. Entries may be concrete components or component-choice wrappers expressing conditional or alternate relationships. This is not a dependency tree. It provides a way to specify a hierarchical representation of component assemblies, similar to system &#8594; subsystem &#8594; parts assembly in physical supply chains."
+          "description": "A list of entries included in the parent component, including software, hardware, and services. Entries may be concrete components, references to components declared elsewhere, or component-choice wrappers expressing conditional or alternate relationships. This is not a dependency tree. It provides a way to specify a hierarchical representation of component assemblies, similar to system &#8594; subsystem &#8594; parts assembly in physical supply chains."
         },
         "evidence": {
           "$ref": "#/$defs/componentEvidence",
@@ -215,9 +221,16 @@
           "description": "Provides the ability to document evidence collected through various forms of extraction or analysis."
         },
         "releaseNotes": {
-          "$ref": "cyclonedx-release-notes-2.0.schema.json#/$defs/releaseNotes",
-          "title": "Release notes",
-          "description": "Specifies release notes."
+          "title": "Release Notes",
+          "description": "The release notes for the component. Either inline release notes or a reference using bom-link or bom-ref to release notes defined elsewhere, such as in the definitions.",
+          "oneOf": [
+            {
+              "$ref": "cyclonedx-release-notes-2.0.schema.json#/$defs/releaseNotes"
+            },
+            {
+              "$ref": "cyclonedx-release-notes-2.0.schema.json#/$defs/releaseNotesReference"
+            }
+          ]
         },
         "modelCard": {
           "$ref": "cyclonedx-ai-modelcard-2.0.schema.json#/$defs/modelCard",
@@ -267,9 +280,20 @@
           "description": "The quantity of the item in the context in which it is declared, such as the number of identical parts within the enclosing assembly or the amount of material in the described lot. This object may only be specified for components of type `device` or `material` and shall not be specified for other component types."
         },
         "certifications": {
-          "$ref": "cyclonedx-certification-2.0.schema.json#/$defs/certifications",
+          "type": "array",
+          "uniqueItems": true,
           "title": "Certifications",
-          "description": "Certifications held by or applicable to the component. Applicable to components of any type, hardware and software alike."
+          "description": "Certifications held by or applicable to the component. Each entry is either an inline certification or a reference using bom-link or bom-ref to a certification defined elsewhere, such as in the definitions. Applicable to components of any type, hardware and software alike.",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "cyclonedx-certification-2.0.schema.json#/$defs/certification"
+              },
+              {
+                "$ref": "cyclonedx-certification-2.0.schema.json#/$defs/certificationReference"
+              }
+            ]
+          }
         },
         "endpoints": {
           "type": "array",
@@ -286,7 +310,7 @@
           "uniqueItems": true,
           "items": {"$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataProfileChoice"},
           "title": "Data Profiles",
-          "description": "The data handled by the service, characterized by data profiles. Each entry is either an inline profile object or a reference using bom-link or bom-ref to a previously declared profile, typically declared in the root profiles catalogue. May only be used for components of type `service`. Data movement is intentionally not expressed here: flow direction, sources, destinations, authentication, and boundary crossings are modelled via blueprint flows, assets, and boundaries, which reference this component by bom-ref."
+          "description": "The data handled by the service, characterized by data profiles. Each entry is either an inline profile object or a reference using bom-link or bom-ref to a previously declared profile, typically declared in the definitions. May only be used for components of type `service`. Data movement is intentionally not expressed here: flow direction, sources, destinations, authentication, and boundary crossings are modelled via blueprint flows, assets, and boundaries, which reference this component by bom-ref."
         },
         "tags": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/tags",
@@ -380,11 +404,12 @@
         }
       ]
     },
-    "componentOrChoice": {
-      "title": "Component or Component Choice",
-      "description": "An entry in a components array. May be a concrete component, or a component-choice wrapper that expresses a conditional or alternate relationship between two or more components. The discriminator is the `type` property: when `type` is `component-choice`, the entry shall conform to the `componentChoice` schema; otherwise it shall conform to the `component` schema.",
+    "componentEntry": {
+      "title": "Component Entry",
+      "description": "An entry in a components array. A concrete component, a reference to a component declared elsewhere, or a component-choice wrapper that expresses a conditional or alternate relationship between two or more entries. An entry with a `ref` property is a reference; an entry whose `type` is `component-choice` is a choice; any other entry is a component.",
       "oneOf": [
         { "$ref": "#/$defs/component" },
+        { "$ref": "#/$defs/componentReference" },
         { "$ref": "#/$defs/componentChoice" }
       ]
     },
@@ -440,7 +465,7 @@
           "type": "array",
           "minItems": 2,
           "uniqueItems": true,
-          "items": { "$ref": "#/$defs/componentOrChoice" },
+          "items": { "$ref": "#/$defs/componentEntry" },
           "title": "Components",
           "description": "Two or more alternate or grouped entries. Each entry may itself be a component-choice to express nested alternates, such as a choice between kits."
         },
@@ -704,7 +729,7 @@
             ]
           },
           "title": "BOM References",
-          "description": "The object in the BOM identified by its bom-ref. This is often a component or service but may be any object type supporting bom-refs. Tools used for analysis should already be defined in the BOM, either in the metadata/tools, components, or formulation."
+          "description": "The object in the BOM identified by its bom-ref. This is often a component or service but may be any object type supporting bom-refs. Tools used for analysis should already be defined in the BOM, such as in the metadata tools, an inventory, the definitions, or formulation."
         },
         "assertion": {
           "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/assertion",
@@ -993,6 +1018,78 @@
       "minLength": 1,
       "title": "Identifier Value",
       "description": "The value of an identifier."
+    },
+    "componentReference": {
+      "type": "object",
+      "title": "Component Reference",
+      "description": "A reference to a component declared elsewhere, such as in the definitions registry, in another position of the same document, or in another document via BOM-Link. A reference includes the referenced component exactly as declared: every position that references the same component includes an identical component. Where the inclusion context differs, such as a different scope or quantity, declare the component inline instead.",
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "title": "Reference",
+          "description": "Reference using bom-link or bom-ref to the component.",
+          "anyOf": [
+            {
+              "title": "Ref",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+            },
+            {
+              "title": "BOM-Link Element",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+            }
+          ]
+        }
+      }
+    },
+    "inventories": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/inventory"},
+      "uniqueItems": true,
+      "title": "Inventories",
+      "description": "The inventories of the subjects that the document describes. Each entry declares one subject and lists the entries included in it."
+    },
+    "inventory": {
+      "type": "object",
+      "title": "Inventory",
+      "description": "The declared inventory of one subject: the entries included in the subject. The completeness of the list is asserted through compositions.",
+      "required": [
+        "subject",
+        "components"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "BOM Reference",
+          "description": "An identifier which can be used to reference the inventory elsewhere in the document. Every `bom-ref` shall be unique within the document."
+        },
+        "subject": {
+          "title": "Subject",
+          "description": "The subject whose inventory this statement declares. Either a concrete component or a reference using bom-link or bom-ref to a component declared elsewhere, such as in the definitions.",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/component"
+            },
+            {
+              "$ref": "#/$defs/componentReference"
+            }
+          ]
+        },
+        "components": {
+          "$ref": "#/$defs/components",
+          "description": "The entries included in the subject. Entries may be concrete components, references to components declared elsewhere, or component-choice wrappers."
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        },
+        "signatures": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/signatures",
+          "description": "Enveloped signatures over the inventory statement. A signature binds reference entries by their identifiers; the content of a referenced component is covered by the hashes or signatures on the referenced component itself."
+        }
+      }
     }
   }
 }

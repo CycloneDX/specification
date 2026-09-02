@@ -13,6 +13,11 @@
       ],
       "additionalProperties": false,
       "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "BOM Reference",
+          "description": "An identifier which can be used to reference the release notes elsewhere in the document. Every `bom-ref` shall be unique within the document."
+        },
         "type": {
           "$ref": "#/$defs/releaseType",
           "title": "Type",
@@ -107,6 +112,31 @@
           "title": "Release note content",
           "description": "Specifies the full content of the release note.",
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/attachment"
+        }
+      }
+    },
+    "releaseNotesReference": {
+      "type": "object",
+      "title": "Release Notes Reference",
+      "description": "A reference to release notes defined elsewhere, such as in the definitions or in another document via BOM-Link. A reference includes the referenced release notes exactly as defined: every position that references the same release notes includes identical release notes.",
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "title": "Reference",
+          "description": "Reference using bom-link or bom-ref to the release notes.",
+          "anyOf": [
+            {
+              "title": "Ref",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+            },
+            {
+              "title": "BOM-Link Element",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+            }
+          ]
         }
       }
     }

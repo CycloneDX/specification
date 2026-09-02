@@ -10,13 +10,16 @@
       "items": {"$ref": "#/$defs/composition"},
       "uniqueItems": true,
       "title": "Compositions",
-      "description": "Compositions describe constituent parts (including components, services, and dependency relationships) and their completeness. The completeness of vulnerabilities expressed in a BOM may also be described."
+      "description": "Completeness assertions for enumerations in the document, such as the components of a subject, the dependencies of a component, or the vulnerability disclosure for a subject."
     },
     "composition": {
       "type": "object",
-      "title": "Compositions",
+      "title": "Composition",
+      "description": "A completeness assertion: for each target, the enumeration named by `kind` is as complete as `aggregate` states.",
       "required": [
-        "aggregate"
+        "kind",
+        "aggregate",
+        "targets"
       ],
       "additionalProperties": false,
       "properties": {
@@ -25,13 +28,55 @@
           "title": "BOM Reference",
           "description": "An identifier which can be used to reference the composition elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
+        "kind": {
+          "title": "Kind",
+          "description": "The enumeration the completeness assertion applies to. Either a predefined kind or a custom kind described by name and description.",
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "components",
+                "dependencies",
+                "vulnerabilities"
+              ],
+              "meta:enum": {
+                "components": "The components included in each target: the entries of an inventory statement or of a nested assembly. The assertion does not cascade to the assemblies of nested entries.",
+                "dependencies": "The direct dependencies of each target. The assertion does not cascade to transitive dependencies.",
+                "vulnerabilities": "The vulnerability disclosure for each target."
+              }
+            },
+            {
+              "type": "object",
+              "title": "Custom Kind",
+              "description": "A custom completeness kind not represented in the predefined taxonomy.",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom kind."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom kind."
+                }
+              }
+            }
+          ]
+        },
         "aggregate": {
           "$ref": "#/$defs/aggregateType",
           "title": "Aggregate",
-          "description": "Specifies an aggregate type that describes how complete a relationship is."
+          "description": "Specifies an aggregate type that describes how complete the relationship is."
         },
-        "assemblies": {
+        "targets": {
           "type": "array",
+          "minItems": 1,
           "uniqueItems": true,
           "items": {
             "anyOf": [
@@ -42,29 +87,15 @@
               {
                 "title": "BOM-Link Element",
                 "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+              },
+              {
+                "title": "BOM-Link Document",
+                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkDocumentType"
               }
             ]
           },
-          "title": "BOM references",
-          "description": "The bom-ref identifiers of the components or services being described. Assemblies refer to nested relationships whereby a constituent part may include other constituent parts. References do not cascade to child parts. References are explicit for the specified constituent part only."
-        },
-        "dependencies": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "type": "string"
-          },
-          "title": "BOM references",
-          "description": "The bom-ref identifiers of the components or services being described. Dependencies refer to a relationship whereby an independent constituent part requires another independent constituent part. References do not cascade to transitive dependencies. References are explicit for the specified dependency only."
-        },
-        "vulnerabilities": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "type": "string"
-          },
-          "title": "BOM references",
-          "description": "The bom-ref identifiers of the vulnerabilities being described."
+          "title": "Targets",
+          "description": "References using bom-link or bom-ref to the objects whose enumeration the assertion describes. The document itself may be a target, referenced by a BOM-Link document reference."
         },
         "signatures": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/signatures"
@@ -73,30 +104,30 @@
     },
     "aggregateType": {
       "type": "string",
-      "default": "not_specified",
+      "default": "not-specified",
       "enum": [
         "complete",
         "incomplete",
-        "incomplete_first_party_only",
-        "incomplete_first_party_proprietary_only",
-        "incomplete_first_party_opensource_only",
-        "incomplete_third_party_only",
-        "incomplete_third_party_proprietary_only",
-        "incomplete_third_party_opensource_only",
+        "incomplete-first-party-only",
+        "incomplete-first-party-proprietary-only",
+        "incomplete-first-party-opensource-only",
+        "incomplete-third-party-only",
+        "incomplete-third-party-proprietary-only",
+        "incomplete-third-party-opensource-only",
         "unknown",
-        "not_specified"
+        "not-specified"
       ],
       "meta:enum": {
-        "complete": "The relationship is complete. No further relationships including constituent components, services, or dependencies are known to exist.",
-        "incomplete": "The relationship is incomplete. Additional relationships exist and may include constituent components, services, or dependencies.",
-        "incomplete_first_party_only": "The relationship is incomplete. Only relationships for first-party components, services, or their dependencies are represented.",
-        "incomplete_first_party_proprietary_only": "The relationship is incomplete. Only relationships for first-party components, services, or their dependencies are represented, limited specifically to those that are proprietary.",
-        "incomplete_first_party_opensource_only": "The relationship is incomplete. Only relationships for first-party components, services, or their dependencies are represented, limited specifically to those that are opensource.",
-        "incomplete_third_party_only": "The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented.",
-        "incomplete_third_party_proprietary_only": "The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented, limited specifically to those that are proprietary.",
-        "incomplete_third_party_opensource_only": "The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented, limited specifically to those that are opensource.",
-        "unknown": "The relationship may be complete or incomplete. This usually signifies a 'best-effort' to obtain constituent components, services, or dependencies but the completeness is inconclusive.",
-        "not_specified": "The relationship completeness is not specified."
+        "complete": "The enumeration is complete. No additional items are known to exist.",
+        "incomplete": "The enumeration is incomplete. Additional items are known or expected to exist.",
+        "incomplete-first-party-only": "The enumeration is incomplete. Only first-party items are represented.",
+        "incomplete-first-party-proprietary-only": "The enumeration is incomplete. Only first-party items are represented, limited specifically to those that are proprietary.",
+        "incomplete-first-party-opensource-only": "The enumeration is incomplete. Only first-party items are represented, limited specifically to those that are open source.",
+        "incomplete-third-party-only": "The enumeration is incomplete. Only third-party items are represented.",
+        "incomplete-third-party-proprietary-only": "The enumeration is incomplete. Only third-party items are represented, limited specifically to those that are proprietary.",
+        "incomplete-third-party-opensource-only": "The enumeration is incomplete. Only third-party items are represented, limited specifically to those that are open source.",
+        "unknown": "The enumeration may be complete or incomplete. This usually signifies a best-effort attempt whose completeness is inconclusive.",
+        "not-specified": "The completeness is not specified."
       }
     }
   }
