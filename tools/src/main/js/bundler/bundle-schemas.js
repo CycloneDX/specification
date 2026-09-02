@@ -305,12 +305,32 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
             cleanedDefinitions[makeSchemaName(schemaPath)] = stripTopLevelKeys(defSchema, keysToStripFromDefs);
         }
 
+        // The root schema's own definition entry is emitted only when
+        // something references it: its content already forms the top level of
+        // the bundle, so an unreferenced copy is dead weight that downstream
+        // tools (e.g. schema documentation generators) render as a duplicate
+        // of the document root.
+        const rootDefName = makeSchemaName(absoluteRootPath);
+        const rootDefEntry = cleanedDefinitions[rootDefName];
+        delete cleanedDefinitions[rootDefName];
+
         // Build the final schema with root schema properties at the top level
         const finalSchema = {
             ...rootSchemaRewritten,
             "$schema": schemaVersion,
             [defsKeyword]: cleanedDefinitions
         };
+
+        const rootDefPointer = `#/${defsKeyword}/${rootDefName}`;
+        const rootDefRefs = collectRefKeywords(
+            finalSchema,
+            ['$ref', '$dynamicRef', '$recursiveRef'],
+            (v) => v === rootDefPointer || v.startsWith(`${rootDefPointer}/`)
+        );
+        if (rootDefRefs.length > 0) {
+            console.log(`Keeping ${defsKeyword} entry '${rootDefName}' (referenced ${rootDefRefs.length}x)`);
+            finalSchema[defsKeyword][rootDefName] = rootDefEntry;
+        }
 
         // Post-check: ensure all internal JSON Pointer refs resolve in the final bundle
         console.log('Validating internal ref pointers ($ref, $dynamicRef, $recursiveRef)...');
