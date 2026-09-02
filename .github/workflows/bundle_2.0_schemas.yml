@@ -1,62 +1,73 @@
-name: Bundle CycloneDX 2.0 JSON Schemas
+name: Bundle CDX-2.0
 
 on:
   push:
     branches:
-      - 2.0-dev
-      - 2.0-dev-threatmodeling
+      - 'master'
+      - 'main'
+      - '2.0-dev'
     paths:
+      - '.github/workflows/bundle_2.0_schemas.yml' # self
+      - 'tools/src/main/js/bundler/**'
+      - 'schema/2.0/cyclonedx-2.0.schema.json'
       - 'schema/2.0/**/*.schema.json'
-      - 'tools/src/main/js/bundle-schemas.js'
   workflow_dispatch:  # Allows manual trigger
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token
+permissions: {}
 
 jobs:
   bundle-schemas:
+    name: Bundle Schemas
     runs-on: ubuntu-latest
-
+    timeout-minutes: 30
     permissions:
       contents: write  # Required to push changes
-
+    env:
+      MODEL_DIR: schema/2.0/model
+      SOURCE_FILE: schema/2.0/cyclonedx-2.0.schema.json
+      BUNDLED_FILE: schema/2.0/cyclonedx-2.0-bundled.schema.json
+      MINIFIED_FILE: schema/2.0/cyclonedx-2.0-bundled.min.schema.json
     steps:
       - name: Checkout repository
         # see https://github.com/actions/checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-
       - name: Setup Node.js
         # see https://github.com/actions/setup-node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: '20'
-
+          node-version: '24.x'
       - name: Install dependencies
-        working-directory: tools/src/main/js
+        working-directory: tools/src/main/js/bundler
         run: npm install
-
       - name: Bundle schemas
-        working-directory: tools/src/main/js
         run: |
-          node bundle-schemas.js \
-            ../../../../schema/2.0/model \
-            ../../../../schema/2.0/cyclonedx-2.0.schema.json
-
+          set -eux
+          node tools/src/main/js/bundler/bundle-schemas.js \
+            "$MODEL_DIR" "$SOURCE_FILE"
       - name: Check for changes and commit
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          BUNDLED_FILE="schema/2.0/cyclonedx-2.0-bundled.schema.json"
-          
-          # Add the file (works for both new and modified files)
-          git add "$BUNDLED_FILE"
-          
+          set -eu
+
+          # Add both files (works for both new and modified files)
+          git add "$BUNDLED_FILE" "$MINIFIED_FILE"
+
           # Check if there are staged changes
-          if git diff --staged --quiet; then
-            echo "No changes to bundled schema"
+          if git diff --staged --quiet
+          then
+            echo "No changes to bundled schemas"
           else
             echo "Committing bundled schema changes"
             git config --local user.email "github-actions[bot]@users.noreply.github.com"
             git config --local user.name "github-actions[bot]"
-            git commit -m "chore: update bundled schema [skip ci]"
+            git commit -m "chore: update bundled schemas [skip ci]"
             git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           fi
