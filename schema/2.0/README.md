@@ -32,6 +32,6 @@ These are provided for convenience and do not supersede the authoritative pre-de
 
 ## Related Resources
 
-- CycloneDX Website: [https://cyclonedx.org](https://cyclonedx.org)
-- ECMA-424 Publication: [https://ecma-international.org/publications-and-standards/standards/ecma-424/](https://ecma-international.org/publications-and-standards/standards/ecma-424/)
-- Model Definitions: See [`model/README.md`](./model/README.md)
+- CycloneDX Website: <https://cyclonedx.org>
+- ECMA-424 Publication: <https://ecma-international.org/publications-and-standards/standards/ecma-424/>
+- Model Definitions: See [`model/README.md`](model/README.md)
