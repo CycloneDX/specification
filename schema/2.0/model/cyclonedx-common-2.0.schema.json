@@ -16,6 +16,62 @@
       "allOf": [{ "$ref": "#/$defs/refType" }],
       "$comment": "value-range is same as 'refType'"
     },
+    "modelScope": {
+      "type": "object",
+      "title": "Model Scope",
+      "description": "Specifies what is included and excluded from a model or analysis, establishing the boundaries within which it is performed.",
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "minLength": 1,
+          "description": "Name of the scope."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "Description of what is included and excluded from the model."
+        },
+        "boundaries": {
+          "type": "array",
+          "title": "Boundaries",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Explicit boundaries of the model."
+        },
+        "includedComponents": {
+          "type": "array",
+          "title": "Included Components",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to components explicitly included."
+        },
+        "excludedComponents": {
+          "type": "array",
+          "title": "Excluded Components",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to components explicitly excluded."
+        },
+        "properties": {
+          "$ref": "#/$defs/properties"
+        }
+      }
+    },
     "bomLinkDocumentType": {
       "title": "BOM-Link Document",
       "description": "Descriptor for another BOM document. See https://cyclonedx.org/capabilities/bomlink/",

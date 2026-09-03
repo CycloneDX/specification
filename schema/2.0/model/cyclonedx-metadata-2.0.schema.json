@@ -47,6 +47,14 @@
           "description": "The component that the BOM describes.",
           "$ref": "cyclonedx-component-2.0.schema.json#/$defs/component"
         },
+        "scope": {
+          "description": "The scope of the analysis represented by this BOM, including what is in and out of scope.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/modelScope"
+        },
+        "modelLifecycle": {
+          "description": "Lifecycle metadata for the model represented by this BOM.",
+          "$ref": "#/$defs/modelLifecycle"
+        },
         "supplier": {
           "title": "Supplier",
           "description": " The organization that supplied the component that the BOM describes. The supplier may often be the manufacturer, but may also be a distributor or repackager.",
@@ -64,6 +72,47 @@
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
         }
       }
+    },
+    "modelLifecycle": {
+      "type": "object",
+      "title": "Model Lifecycle",
+      "description": "Version, release, review, and freeze information for the model represented by this BOM.",
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+(\\.\\d+)*$",
+          "description": "The structured version of the model."
+        },
+        "frozen": {
+          "type": "boolean",
+          "description": "Whether the model is frozen and must be versioned before modification."
+        },
+        "releasedAt": {
+          "$ref": "#/$defs/dateOrDateTime",
+          "description": "When the model was released."
+        },
+        "productReleaseDate": {
+          "$ref": "#/$defs/dateOrDateTime",
+          "description": "When the product release modeled by this BOM was released."
+        },
+        "reviewedAt": {
+          "$ref": "#/$defs/dateOrDateTime",
+          "description": "When the model was last reviewed."
+        }
+      }
+    },
+    "dateOrDateTime": {
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "date"
+        },
+        {
+          "type": "string",
+          "format": "date-time"
+        }
+      ]
     },
     "distributionConstraints": {
       "title": "Distribution Constraints",
