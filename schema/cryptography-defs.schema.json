@@ -1,9 +1,9 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "http://cyclonedx.org/schema/cryptography-defs.schema.json",
-  "$comment": "2026-03-05T14:27:50Z",
-  "title": "Cryptographic Algorithm Family Definitions",
-  "description": "Enumerates cryptographic algorithm families and their specific metadata.",
+  "$comment": "2026-08-20T12:04:10Z",
+  "title": "Cryptographic Definitions",
+  "description": "Enumerates cryptographic algorithm families, elliptic curves, and protocols with their specific metadata.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
@@ -229,6 +229,76 @@
           "curves"
         ]
       }
+    },
+    "protocols": {
+      "type": "array",
+      "title": "Protocol Families",
+      "description": "An array of cryptographic protocol family definitions.",
+      "items": {
+        "type": "object",
+        "title": "Protocol Family",
+        "description": "Defines a cryptographic protocol family and its metadata.",
+        "additionalProperties": false,
+        "properties": {
+          "family": {
+            "$ref": "#/definitions/protocolFamiliesEnum",
+            "title": "Protocol Family",
+            "description": "The name of the cryptographic protocol family."
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "title": "Description",
+            "description": "A description of the protocol family."
+          },
+          "standard": {
+            "$ref": "#/definitions/standardRefs",
+            "title": "Standards",
+            "description": "List of standards defining or relating to the protocol family."
+          },
+          "version": {
+            "type": "array",
+            "title": "Versions",
+            "description": "List of versions of the protocol family, each with its algorithm composition.",
+            "items": {
+              "type": "object",
+              "title": "Protocol Version",
+              "description": "Defines a specific protocol version and its algorithm composition.",
+              "additionalProperties": false,
+              "properties": {
+                "version": {
+                  "type": "string",
+                  "title": "Version",
+                  "description": "The version identifier of the protocol."
+                },
+                "standard": {
+                  "$ref": "#/definitions/standardRefs",
+                  "title": "Standards",
+                  "description": "List of standards defining or relating to this protocol version."
+                },
+                "composition": {
+                  "type": "array",
+                  "title": "Composition",
+                  "description": "The algorithm composition of this protocol version, as a list of functional slots that all apply together.",
+                  "items": {
+                    "$ref": "#/definitions/compositionSlot"
+                  }
+                }
+              },
+              "required": [
+                "version",
+                "composition"
+              ]
+            }
+          }
+        },
+        "required": [
+          "family",
+          "version"
+        ]
+      }
     }
   },
   "required": [
@@ -247,6 +317,7 @@
         "A5/1",
         "A5/2",
         "AES",
+        "ANSI-KDF",
         "ARIA",
         "Argon2",
         "Ascon",
@@ -302,6 +373,7 @@
         "RC5",
         "RC6",
         "RIPEMD",
+        "RSA-X931",
         "RSAES-OAEP",
         "RSAES-PKCS1",
         "RSASSA-PKCS1",
@@ -317,13 +389,16 @@
         "SM9",
         "SNOW3G",
         "SP800-108",
+        "SP800-56C",
         "SPAKE2",
         "SPAKE2PLUS",
         "SRP",
+        "SSH-KDF",
         "Salsa20",
         "Serpent",
         "SipHash",
         "Skipjack",
+        "TLS-PRF",
         "TUAK",
         "Twofish",
         "UMAC",
@@ -587,6 +662,191 @@
         "x963/ansit571k1",
         "x963/ansit571r1"
       ]
+    },
+    "protocolFamiliesEnum": {
+      "type": "string",
+      "title": "Protocol Families",
+      "description": "An enum for the protocol families.",
+      "enum": [
+        "5g-aka",
+        "ah",
+        "dtls",
+        "eap-aka",
+        "eap-aka-prime",
+        "esp",
+        "ike",
+        "ipsec",
+        "prins",
+        "quic",
+        "ssh",
+        "sstp",
+        "tls",
+        "wpa"
+      ],
+      "meta:enum": {
+        "5g-aka": "Authentication and Key Agreement for 5G",
+        "ah": "Authentication Header",
+        "dtls": "Datagram Transport Layer Security",
+        "eap-aka": "Extensible Authentication Protocol variant",
+        "eap-aka-prime": "Enhanced version of EAP-AKA",
+        "esp": "Encapsulating Security Payload",
+        "ike": "Internet Key Exchange",
+        "ipsec": "Internet Protocol Security",
+        "prins": "Protection of Inter-Network Signaling",
+        "quic": "Quick UDP Internet Connections",
+        "ssh": "Secure Shell",
+        "sstp": "Secure Socket Tunneling Protocol",
+        "tls": "Transport Layer Security",
+        "wpa": "Wi-Fi Protected Access"
+      }
+    },
+    "standardRefs": {
+      "type": "array",
+      "title": "Standards",
+      "description": "List of references to standards or registries.",
+      "items": {
+        "type": "object",
+        "title": "Standard Reference",
+        "description": "Reference to a standard or registry, including its name and URL.",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Standard Name",
+            "description": "The name or identifier of the standard."
+          },
+          "url": {
+            "type": "string",
+            "format": "iri-reference",
+            "title": "Standard URL",
+            "description": "A URL pointing to the standard's official documentation."
+          }
+        },
+        "required": [
+          "name",
+          "url"
+        ]
+      }
+    },
+    "compositionSlot": {
+      "type": "object",
+      "title": "Composition Slot",
+      "description": "A functional slot of a protocol, holding the set of algorithms that can fill it. All slots of a composition apply together; within a slot, the selection states how many algorithms of the set are used at runtime.",
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "type": "string",
+          "title": "Role",
+          "description": "The functional role this slot fills within the protocol.",
+          "examples": [
+            "authentication",
+            "cert-chain-signature",
+            "encryption",
+            "integrity",
+            "kdf",
+            "key-exchange",
+            "prf",
+            "signature"
+          ]
+        },
+        "selection": {
+          "type": "string",
+          "title": "Selection",
+          "description": "Specifies how many algorithms of the set are used at runtime: all of them together (all-of), one or more, possibly simultaneously (any-of), or exactly one (one-of).",
+          "enum": [
+            "all-of",
+            "any-of",
+            "one-of"
+          ]
+        },
+        "selectedBy": {
+          "type": "string",
+          "title": "Selected By",
+          "description": "Specifies the mechanism by which the algorithms used at runtime are selected from the set.",
+          "enum": [
+            "build-time",
+            "configuration",
+            "hardware",
+            "negotiation",
+            "server-selected",
+            "unknown"
+          ]
+        },
+        "algorithmSet": {
+          "$ref": "#/definitions/algorithmSet",
+          "title": "Algorithm Set",
+          "description": "The set of algorithms that can fill this slot."
+        }
+      },
+      "required": [
+        "role",
+        "selection",
+        "algorithmSet"
+      ]
+    },
+    "algorithmSet": {
+      "type": "array",
+      "title": "Algorithm Set",
+      "description": "The set of algorithms that can fill a composition slot. How many of them are used at runtime is stated by the slot's selection. Each member is the concrete name of an algorithm, a named bundle of algorithms, or a reference to a sub-protocol.",
+      "items": {
+        "title": "Algorithm Set Member",
+        "description": "A member of an algorithm set: an algorithm name, a named bundle, or a sub-protocol reference.",
+        "oneOf": [
+          {
+            "type": "string",
+            "title": "Algorithm Name",
+            "description": "The concrete algorithm name, matching a variant pattern of an algorithm family defined in this document."
+          },
+          {
+            "type": "object",
+            "title": "Named Bundle",
+            "description": "A named bundle of algorithms, such as a cipher suite or a hybrid key exchange group: it is selected as one unit, and all bundled algorithms are used together.",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "title": "Bundle Name",
+                "description": "The common name of the bundle."
+              },
+              "algorithms": {
+                "type": "array",
+                "title": "Bundled Algorithms",
+                "description": "The concrete names of the algorithms composing this bundle, each matching a variant pattern of an algorithm family defined in this document.",
+                "items": {
+                  "type": "string",
+                  "title": "Algorithm Name",
+                  "description": "The concrete algorithm name, matching a variant pattern of an algorithm family defined in this document."
+                }
+              }
+            },
+            "required": [
+              "name",
+              "algorithms"
+            ]
+          },
+          {
+            "type": "object",
+            "title": "Sub-Protocol Reference",
+            "description": "A reference to a sub-protocol, by protocol family and optionally version. The composition of the sub-protocol is given by its own protocol entry in this document, which may itself reference further sub-protocols.",
+            "additionalProperties": false,
+            "properties": {
+              "protocol": {
+                "$ref": "#/definitions/protocolFamiliesEnum",
+                "title": "Protocol Family",
+                "description": "The protocol family of the referenced sub-protocol."
+              },
+              "version": {
+                "type": "string",
+                "title": "Version",
+                "description": "The version of the referenced sub-protocol."
+              }
+            },
+            "required": [
+              "protocol"
+            ]
+          }
+        ]
+      }
     }
   }
 }
