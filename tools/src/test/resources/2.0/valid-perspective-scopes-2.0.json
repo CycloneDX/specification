@@ -1,0 +1,178 @@
+{
+  "$schema": "https://cyclonedx.org/schema/2.0/cyclonedx-2.0.schema.json",
+  "specFormat": "CycloneDX",
+  "specVersion": "2.0",
+  "serialNumber": "urn:uuid:3c1f7d2e-8a4b-4c9d-9e1f-5b6a7c8d9e0f",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-09-04T12:00:00Z"
+  },
+  "definitions": {
+    "perspectives": [
+      {
+        "bom-ref": "def-crypto-in-use",
+        "name": "Cryptography in Use",
+        "description": "A reusable perspective definition, applied below at two scopes.",
+        "domains": [
+          "cryptographic-security"
+        ],
+        "mappings": [
+          {
+            "expression": "$.components[?(@.type=='cryptographic-asset')]",
+            "via": [
+              {
+                "dependencies": "depends-on",
+                "transitive": true
+              },
+              {
+                "dependencies": "provides"
+              }
+            ],
+            "nativeName": "Algorithms in Use",
+            "relevance": "required"
+          }
+        ]
+      }
+    ]
+  },
+  "components": [
+    {
+      "bom-ref": "model-vision",
+      "type": "machine-learning-model",
+      "name": "vision-v3",
+      "version": "3.0.0"
+    },
+    {
+      "bom-ref": "model-text-a",
+      "type": "machine-learning-model",
+      "group": "text",
+      "name": "text-a",
+      "version": "1.2.0"
+    },
+    {
+      "bom-ref": "model-text-b",
+      "type": "machine-learning-model",
+      "group": "text",
+      "name": "text-b",
+      "version": "2.0.0"
+    },
+    {
+      "bom-ref": "ds-imagenet",
+      "type": "data",
+      "name": "ImageNet"
+    },
+    {
+      "bom-ref": "lib-openssl",
+      "type": "library",
+      "name": "openssl",
+      "version": "3.3.0"
+    },
+    {
+      "bom-ref": "alg-aes-256-gcm",
+      "type": "cryptographic-asset",
+      "name": "AES-256-GCM"
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "lib-openssl",
+      "provides": [
+        "alg-aes-256-gcm"
+      ]
+    },
+    {
+      "ref": "model-vision",
+      "dependsOn": [
+        "lib-openssl"
+      ]
+    }
+  ],
+  "perspectives": [
+    {
+      "bom-ref": "card-vision",
+      "predefined": "cdx:perspectives:model-card",
+      "predefinedVersion": 1,
+      "scopes": [
+        {
+          "bom-ref": "scope-vision",
+          "name": "Vision model",
+          "targets": [
+            "model-vision"
+          ]
+        },
+        {
+          "bom-ref": "scope-text",
+          "name": "Text models",
+          "description": "Both text models, evaluated as one card.",
+          "expressions": [
+            "$.components[?(@.type=='machine-learning-model' && @.group=='text')]"
+          ]
+        }
+      ]
+    },
+    {
+      "bom-ref": "crypto-in-use",
+      "name": "Cryptography in Use",
+      "description": "An inline perspective scoped to one component, reaching related data through traversal steps.",
+      "domains": [
+        "cryptographic-security"
+      ],
+      "scopes": [
+        {
+          "name": "Vision model stack",
+          "targets": [
+            "model-vision"
+          ],
+          "expressions": [
+            "$.components[?(@['bom-ref']=='lib-openssl')]"
+          ]
+        }
+      ],
+      "mappings": [
+        {
+          "expression": "$.components[?(@.type=='cryptographic-asset')]",
+          "via": [
+            {
+              "dependencies": "depends-on",
+              "transitive": true
+            },
+            {
+              "dependencies": "provides"
+            }
+          ],
+          "nativeName": "Algorithms in Use",
+          "relevance": "required",
+          "weight": 1.0
+        },
+        {
+          "expression": "$.components[?(@.type=='data')]",
+          "via": [
+            {
+              "refs": "$.components[?(@.type=='machine-learning-model')].modelProperties.training.datasets[*]"
+            }
+          ],
+          "nativeName": "Training Data",
+          "relevance": "recommended"
+        }
+      ]
+    },
+    {
+      "bom-ref": "crypto-per-model",
+      "ref": "def-crypto-in-use",
+      "scopes": [
+        {
+          "name": "Vision model",
+          "targets": [
+            "model-vision"
+          ]
+        },
+        {
+          "name": "Text models",
+          "expressions": [
+            "$.components[?(@.type=='machine-learning-model' && @.group=='text')]"
+          ]
+        }
+      ]
+    }
+  ]
+}
