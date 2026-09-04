@@ -230,16 +230,6 @@ export class SchemaLinter {
     };
   }
 
-  * getEnabledChecks () {
-    const checks = this.getApplicableChecks();
-    for (const check of checks) {
-      const checkConfig = this.config.checks[check.id] || {};
-      if (checkConfig.enabled !== false) {
-        yield check
-      }
-    }
-  }
-
   /**
    * Lint a schema file
    * @param {string} filePath - Path to the schema file
@@ -376,18 +366,50 @@ export class SchemaLinter {
 
     return checks;
   }
+
+  getEnabledChecks() {
+    return this.getApplicableChecks().filter(
+      c => this.config.checks[c.id]?.enabled !== false
+    )
+  }
+
 }
 
 /**
- * Utility to traverse a JSON schema and call a visitor function
- * @param {object} schema - The schema to traverse
- * @param {function} visitor - Function called for each node: (node, path, key, parent)
- * @param {string} [path] - Current path (used internally)
- * @param {string} [key] - Current key (used internally)
- * @param {object} [parent] - Parent node (used internally)
+ * Visitor invoked for each node during schema traversal.
+ *
+ * All arguments are to be treated as read-only:
+ * visitors must NOT modify the schema, nodes, or parents — traversal is
+ * for inspection only. Mutating during traversal leads to undefined behaviour.
+ *
+ * @callback SchemaVisitor
+ * @param {Readonly<*>} node - The current value (object, array, or primitive). Do not modify.
+ * @param {string} path - JSON-path-like location, e.g. `$.properties.foo[0]`
+ * @param {string|number|null} key - The property name or array index of `node` in its parent, `null` at the root
+ * @param {Readonly<object>|null} parent - The parent object/array, `null` at the root. Do not modify.
+ * @returns {boolean|void} Return `false` to skip traversal of this node's children; any other value continues.
+ */
+
+/**
+ * Utility to traverse a JSON schema depth-first and call a visitor function for each node.
+ *
+ * The visitor is invoked before descending into a node's children.
+ * If the visitor returns `false`, the node's children are not traversed
+ * (the subtree is pruned); any other return value (including `undefined`)
+ * continues the traversal.
+ *
+ * The traversed schema is treated as immutable: visitors must not mutate it.
+ *
+ * @param {Readonly<*>} schema - The schema (or sub-schema/value) to traverse. Not modified.
+ * @param {SchemaVisitor} visitor - Function called for each node with `(node, path, key, parent)`
+ * @param {string} [path='$'] - Current path (used internally)
+ * @param {string|number|null} [key=null] - Current key (used internally)
+ * @param {object|null} [parent=null] - Parent node (used internally)
  */
 export function traverseSchema(schema, visitor, path = '$', key = null, parent = null) {
-  visitor(schema, path, key, parent);
+  if (visitor(schema, path, key, parent) === false) {
+    return; // visitor pruned this subtree
+  }
 
   if (typeof schema !== 'object' || schema === null) {
     return;
