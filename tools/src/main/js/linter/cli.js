@@ -344,7 +344,7 @@ function formatStylish(results, options, linter) {
 function formatJson(results, options, linter) {
   const output = {
     linterConfig: linter.config,
-    enabledChecks: [...linter.getEnabledChecks().map(c => c.id)],
+    enabledChecks: linter.getEnabledChecks().map(c => c.id),
     results: results.map(r => ({
       filePath: r.filePath,
       issues: options.quiet
@@ -432,12 +432,17 @@ async function main() {
     process.exit(1);
   }
 
-  if (options.verbose) {
-    console.log(`Linting ${files.length} file(s)...`);
-  }
-
   // Create linter and run
   const linter = new SchemaLinter(config);
+  if (options.verbose) {
+    const ec = linter.getEnabledChecks();
+    if (ec.length > 0) {
+      console.log(`Enabled Checks: ${ec.map(c => c.id).join(', ')}`);
+    } else {
+      console.warn('WARNING: no checks enabled')
+    }
+    console.log(`Linting ${files.length} file(s)...`);
+  }
   const results = await linter.lintFiles(files);
 
   // Format and output results
