@@ -1,0 +1,125 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://cyclonedx.org/schema/perspectives-defs.schema.json",
+  "$comment": "2026-09-04T00:00:00Z",
+  "title": "CycloneDX Pre-Defined Perspectives Registry",
+  "description": "Governs the registry of well-known, pre-defined perspectives (perspectives-defs.json) and declares their reserved identities (preDefinedPerspectivesEnum, referenced by the specification's perspective schema). The identity enum is maintained by hand. The catalog document defining `cdx:perspectives:<name>` is `perspectives/<name>-perspective.json` in the repository, by naming convention; its `version` is the perspective version selected by `predefinedVersion`. The registry data is generated: it records every published version of each perspective with the sha256 of the catalog document's canonical JSON and the commit that introduced it. Once registered, a version's content is immutable; changing a catalog document requires incrementing its `version` by 1. The registry is maintained independently of the CycloneDX specification release cycle.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "perspectives"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "lastUpdated": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Last Updated",
+      "description": "The date and time (timestamp) of the most recently registered version."
+    },
+    "perspectives": {
+      "type": "array",
+      "title": "Pre-Defined Perspectives",
+      "description": "The registered pre-defined perspectives, one entry per identity that has a published catalog document. Identities in the enum without an entry are reserved and not published yet.",
+      "items": {
+        "$ref": "#/definitions/registeredPerspective"
+      }
+    }
+  },
+  "definitions": {
+    "preDefinedPerspectivesEnum": {
+      "type": "string",
+      "title": "Pre-Defined Perspective Identities",
+      "description": "The reserved identities of well-known, pre-defined perspectives, using the reserved cdx:perspectives: namespace path. The catalog document defining `cdx:perspectives:<name>` is `perspectives/<name>-perspective.json`. Referenced by the specification's perspective schema.",
+      "enum": [
+        "cdx:perspectives:model-card",
+        "cdx:perspectives:pqc-readiness"
+      ],
+      "meta:enum": {
+        "cdx:perspectives:model-card": "A transparency view for machine learning models following the industry-standard model card structure, covering model details, intended use, training data and procedure, quantitative analysis, technical limitations, and ethical and environmental considerations.",
+        "cdx:perspectives:pqc-readiness": "A view for assessing readiness for the post-quantum cryptography migration, covering cryptographic inventory, quantum resistance of the cryptography in use, and cryptographic agility."
+      }
+    },
+    "registeredPerspective": {
+      "type": "object",
+      "title": "Registered Pre-Defined Perspective",
+      "additionalProperties": false,
+      "required": [
+        "predefined",
+        "file",
+        "versions"
+      ],
+      "properties": {
+        "predefined": {
+          "$ref": "#/definitions/preDefinedPerspectivesEnum",
+          "title": "Pre-Defined Perspective Identity",
+          "description": "The reserved identity of the perspective. Matches the `predefined` field of a perspective in a CycloneDX document."
+        },
+        "file": {
+          "type": "string",
+          "title": "Catalog Document",
+          "description": "Path, relative to the repository root, of the catalog document defining this perspective, as given by the naming convention.",
+          "pattern": "^perspectives/[a-z0-9]+(-[a-z0-9]+)*-perspective\\.json$"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name of the perspective, as declared by its catalog document at the latest registered version."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "The description of the perspective, as declared by its catalog document at the latest registered version."
+        },
+        "versions": {
+          "type": "array",
+          "title": "Registered Versions",
+          "description": "Every published version of the perspective, in ascending order, contiguous from 1.",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/registeredVersion"
+          }
+        }
+      }
+    },
+    "registeredVersion": {
+      "type": "object",
+      "title": "Registered Version",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "sha256",
+        "commit",
+        "date"
+      ],
+      "properties": {
+        "version": {
+          "type": "integer",
+          "title": "Version",
+          "description": "The `version` of the catalog document that published this revision; the value a reference selects via `predefinedVersion`.",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "title": "Content Hash",
+          "description": "Lowercase hex SHA-256 of the catalog document's canonical JSON (object keys sorted, no insignificant whitespace) at this version. A catalog document whose hash differs from the one registered for its `version` has changed without a version bump.",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "commit": {
+          "type": "string",
+          "title": "Commit",
+          "description": "The commit that introduced this version of the catalog document, for provenance.",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Date",
+          "description": "The date and time (timestamp) of that commit."
+        }
+      }
+    }
+  }
+}
