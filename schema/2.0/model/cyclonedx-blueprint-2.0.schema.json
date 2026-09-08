@@ -52,7 +52,7 @@
           }
         },
         "scope": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/modelScope"
+          "$ref": "#/$defs/scope"
         },
         "assets": {
           "type": "array",
@@ -308,6 +308,10 @@
         "ordinalVersion": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/ordinalVersion"
         },
+        "frozen": {
+          "type": "boolean",
+          "description": "Whether the blueprint is frozen and must be versioned before modification."
+        },
         "lifecycles": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/lifecycles"
         },
@@ -341,6 +345,68 @@
           "description": "ISO 8601 duration for review frequency (e.g., P3M for quarterly)."
         }
       }
+    },
+    "scope": {
+      "type": "object",
+      "title": "Scope",
+      "description": "Specifies what is included and excluded from the blueprint model, establishing the boundaries within which the modelling and analysis is performed.",
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "minLength": 1,
+          "description": "Name of the scope."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "Description of what is included and excluded from the model."
+        },
+        "boundaries": {
+          "type": "array",
+          "title": "Boundaries",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Explicit boundaries of the model."
+        },
+        "includedComponents": {
+          "type": "array",
+          "title": "Included Components",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to components explicitly included."
+        },
+        "excludedComponents": {
+          "type": "array",
+          "title": "Excluded Components",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to components explicitly excluded."
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "inScope": {
+      "type": "boolean",
+      "title": "In Scope",
+      "description": "Whether this element is within the scope of the model.",
+      "default": true
     },
     "asset": {
       "type": "object",
@@ -457,6 +523,9 @@
           "type": "string",
           "title": "Description",
           "description": "Description of the asset's role and purpose."
+        },
+        "inScope": {
+          "$ref": "#/$defs/inScope"
         },
         "zone": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
@@ -589,6 +658,9 @@
           "type": "string",
           "title": "Description",
           "description": "Purpose and contents of the store."
+        },
+        "inScope": {
+          "$ref": "#/$defs/inScope"
         },
         "type": {
           "title": "Type",
@@ -1384,6 +1456,9 @@
           "title": "Description",
           "description": "Detailed description of what flows and why."
         },
+        "inScope": {
+          "$ref": "#/$defs/inScope"
+        },
         "type": {
           "title": "Type",
           "description": "The type of flow. Use the custom option for types not covered by the enumeration.",
@@ -1550,6 +1625,9 @@
           "type": "string",
           "title": "Description",
           "description": "A narrative describing this actor's role within the modelled system, distinct from the party's identity-level description. Use to record context-specific framing such as why this actor is in scope or how it interacts with the assets in this blueprint."
+        },
+        "inScope": {
+          "$ref": "#/$defs/inScope"
         },
         "permissions": {
           "type": "array",
