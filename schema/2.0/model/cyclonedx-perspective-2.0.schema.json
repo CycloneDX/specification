@@ -274,7 +274,7 @@
         "via": {
           "type": "array",
           "title": "Traversal Steps",
-          "description": "Steps that follow references from the scoped part of the document to related objects before the expression is evaluated, in order. Use this for data that is related to the scope rather than contained in it, such as the datasets a model was trained on, or the algorithms a library provides.",
+          "description": "Steps that follow references from the scoped part of the document to related objects before the expression is evaluated, in order. Use this for data that is related to the scope rather than contained in it, such as the datasets a model was trained on, the risks that affect a model, or the algorithms a library provides.",
           "minItems": 1,
           "items": {
             "$ref": "#/$defs/perspectiveTraversalStep"
@@ -316,12 +316,13 @@
     "perspectiveTraversalStep": {
       "type": "object",
       "title": "Perspective Traversal Step",
-      "description": "One step that transforms the set of nodes a mapping is evaluated against by following references, so that a mapping can select data related to the scoped part of the document rather than contained in it. A step either resolves reference values found at a path, or walks the dependency graph. Steps are applied in order, each to the result of the previous one; the first step is applied to the scope, or to the whole document when the perspective declares no scopes. The mapping's expression is then restricted to the subtrees of the nodes the last step produced.",
+      "description": "One step that transforms the set of nodes a mapping is evaluated against by following references, so that a mapping can select data related to the scoped part of the document rather than contained in it. A step either resolves reference values found at a path (`refs`), selects the objects that hold a reference to the current nodes (`referrers`), or walks the dependency graph (`dependencies`). Steps are applied in order, each to the result of the previous one; the first step is applied to the scope, or to the whole document when the perspective declares no scopes. The mapping's expression is then restricted to the subtrees of the nodes the last step produced.",
       "additionalProperties": false,
       "oneOf": [
         {
           "properties": {
             "refs": true,
+            "referrers": false,
             "dependencies": false,
             "transitive": false
           },
@@ -331,8 +332,20 @@
         },
         {
           "properties": {
+            "referrers": true,
+            "refs": false,
+            "dependencies": false,
+            "transitive": false
+          },
+          "required": [
+            "referrers"
+          ]
+        },
+        {
+          "properties": {
             "dependencies": true,
-            "refs": false
+            "refs": false,
+            "referrers": false
           },
           "required": [
             "dependencies"
@@ -346,6 +359,14 @@
           "description": "A [JSONPath](https://datatracker.ietf.org/doc/html/rfc9535) expression, evaluated from the document root and restricted to the current set of nodes, whose results are reference values (bom-ref or bom-link). The step produces the objects within this document those values identify; BOM-Links to other documents are not followed.",
           "examples": [
             "$..[?(@.type=='machine-learning-model')].modelProperties.training.datasets[*]"
+          ]
+        },
+        "referrers": {
+          "type": "string",
+          "title": "Referrer Path",
+          "description": "A [JSONPath](https://datatracker.ietf.org/doc/html/rfc9535) expression, evaluated from the document root, whose results are reference values (bom-ref or bom-link). The step produces the objects that hold such a value identifying a node in the current set: the object owning the property, or, when the value sits in an array, the object holding the array. This is the inverse of `refs`, for relationships that point towards the scoped nodes, such as a risk's `affects`. When the current set is the whole document the step produces the whole document, so an unscoped perspective is not narrowed to referenced nodes.",
+          "examples": [
+            "$.risks.risks[*].affects[*]"
           ]
         },
         "dependencies": {

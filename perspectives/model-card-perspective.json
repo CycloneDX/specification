@@ -4,7 +4,7 @@
   "specVersion": "2.0",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-09-04T12:00:00Z"
+    "timestamp": "2026-09-08T12:00:00Z"
   },
   "perspectives": [
     {
@@ -210,19 +210,29 @@
         },
         {
           "expression": "$.risks.risks[?(@.domains[?(@.type=='ethical')])]",
+          "via": [
+            {
+              "referrers": "$.risks.risks[*].affects[*]"
+            }
+          ],
           "nativeName": "Ethical Considerations",
           "nativeDescription": "Risks in the ethical domain associated with the model, including affected parties, benefits, harms, and mitigations.",
           "relevance": "required",
           "weight": 0.9,
-          "rationale": "Ethical considerations are expressed as entries in the document's risk model rather than as card-local prose, gaining structured likelihood, impact, and response data. Risks reference the components they affect, not the other way round, so this mapping is evaluated over the whole document rather than through a traversal step; tooling may narrow it to risks whose `affects` include the scoped model."
+          "rationale": "Ethical considerations are expressed as entries in the document's risk model rather than as card-local prose, gaining structured likelihood, impact, and response data. Risks reference the models they affect through `affects`, so the referrers step selects, for a scoped model, exactly the risks that name it; unscoped, every matching risk is selected."
         },
         {
           "expression": "$.risks.risks[?(@.inherentRisk.impact.categories[?(@=='fairness' || @=='bias')])]",
+          "via": [
+            {
+              "referrers": "$.risks.risks[*].affects[*]"
+            }
+          ],
           "nativeName": "Fairness Assessments",
           "nativeDescription": "Risks whose impact is categorized as fairness or bias, describing groups at risk and observed disparities.",
           "relevance": "recommended",
           "weight": 0.6,
-          "rationale": "Fairness assessments identify demographic or group-level performance disparities; slice-level evaluation metrics provide their quantitative backing. Risks reference the components they affect, not the other way round, so this mapping is evaluated over the whole document rather than through a traversal step; tooling may narrow it to risks whose `affects` include the scoped model."
+          "rationale": "Fairness assessments identify demographic or group-level performance disparities; slice-level evaluation metrics provide their quantitative backing. Risks reference the models they affect through `affects`, so the referrers step selects, for a scoped model, exactly the risks that name it; unscoped, every matching risk is selected."
         },
         {
           "expression": "$..[?(@.type=='machine-learning-model')].modelProperties.environmental",
