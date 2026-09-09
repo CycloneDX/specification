@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "http://cyclonedx.org/schema/cryptography-defs.schema.json",
-  "$comment": "2026-08-20T12:04:10Z",
+  "$comment": "2026-09-09T11:45:42Z",
   "title": "Cryptographic Definitions",
   "description": "Enumerates cryptographic algorithm families, elliptic curves, and protocols with their specific metadata.",
   "type": "object",
@@ -233,7 +233,7 @@
     "protocols": {
       "type": "array",
       "title": "Protocol Families",
-      "description": "An array of cryptographic protocol family definitions.",
+      "description": "An array of cryptographic protocol family definitions. Each protocol family shall appear at most once, and each version at most once within its family.",
       "items": {
         "type": "object",
         "title": "Protocol Family",
@@ -271,7 +271,7 @@
                 "version": {
                   "type": "string",
                   "title": "Version",
-                  "description": "The version identifier of the protocol."
+                  "description": "The version identifier of the protocol. Together with the protocol family, it identifies this entry: a BOM references it by exact match of protocolProperties.type and protocolProperties.version."
                 },
                 "standard": {
                   "$ref": "#/definitions/standardRefs",
@@ -762,14 +762,25 @@
         "selectedBy": {
           "type": "string",
           "title": "Selected By",
-          "description": "Specifies the mechanism by which the algorithms used at runtime are selected from the set.",
+          "description": "Specifies the mechanism by which the algorithms used at runtime are selected from the set: fixed by the protocol specification itself (protocol-fixed), fixed when the software is built (build-time), chosen by configuration (configuration), agreed between the parties at runtime (negotiation), or not known (unknown).",
           "enum": [
             "build-time",
             "configuration",
-            "hardware",
             "negotiation",
-            "server-selected",
+            "protocol-fixed",
             "unknown"
+          ]
+        },
+        "selectingParty": {
+          "type": "string",
+          "title": "Selecting Party",
+          "description": "The party of the protocol that makes the selection, named by its role in the protocol.",
+          "examples": [
+            "client",
+            "server",
+            "initiator",
+            "responder",
+            "group-creator"
           ]
         },
         "algorithmSet": {
@@ -795,7 +806,7 @@
           {
             "type": "string",
             "title": "Algorithm Name",
-            "description": "The concrete algorithm name, matching a variant pattern of an algorithm family defined in this document."
+            "description": "The concrete algorithm name. The name shall match at least one variant pattern of an algorithm family defined in this document; a name matching no variant pattern does not resolve against this registry."
           },
           {
             "type": "object",
@@ -815,7 +826,7 @@
                 "items": {
                   "type": "string",
                   "title": "Algorithm Name",
-                  "description": "The concrete algorithm name, matching a variant pattern of an algorithm family defined in this document."
+                  "description": "The concrete algorithm name. The name shall match at least one variant pattern of an algorithm family defined in this document; a name matching no variant pattern does not resolve against this registry."
                 }
               }
             },
