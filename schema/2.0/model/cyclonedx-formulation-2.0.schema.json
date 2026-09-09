@@ -872,16 +872,18 @@
     },
     "environmentVars": {
       "title": "Environment variables",
-      "description": "A map of environment variable names to their values.  \nEach value must be a `string` or `null`. Only a value `null` means the variable is absent or unset; an empty string (`\"\"`) is a valid value and does not indicate absence.",
+      "description": "A map of environment variable names to values.\n\nKeys are environment variable names and are intentionally unconstrained by this schema (including names that may be empty or start with non-alphabetic characters).\n\nValues must be either a `string` or `null`:\n- `null` means the variable is absent/unset.\n- `\"\"` (empty string) is a valid, explicit value and does not mean absent.",
+      "$comment": "While some systems may have restrictions on env var names, others may have not. See this test: `env '=empty-name' '0trust=starts-with-number' python -c 'import os;print(repr(os.environ))'`",
       "type": "object",
       "additionalProperties": {
-        "description": "Only a value `null` means the variable is absent or unset; an empty string (`\"\"`) is a valid value and does not indicate absence.",
+        "description": "Values must be either a `string` or `null`:\n- `null` means the variable is absent/unset.\n- `\"\"` (empty string) is a valid, explicit value and does not mean absent.",
         "type": ["string", "null"]
       },
       "examples": [
         { "LC_ALL": null, "LANG": "en_US.UTF-8" },
+        { "MY_FLAG": "1" },
         { "0TRUST": "true" },
-        { "MY_FLAG": "" }
+        { "": "" }
       ]
     }
   }
