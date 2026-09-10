@@ -46,14 +46,14 @@
             "container": "A packaging and/or runtime format, not specific to any particular technology, which isolates software inside the container from software outside of a container through virtualization technology. Refer to [https://en.wikipedia.org/wiki/OS-level_virtualization](https://en.wikipedia.org/wiki/OS-level_virtualization).",
             "platform": "A runtime environment that interprets or executes software. This may include runtimes such as those that execute bytecode, just-in-time compilers, interpreters, or low-code/no-code application platforms.",
             "operating-system": "A software operating system without regard to deployment model (i.e. installed on physical hardware, virtual machine, image, etc) Refer to [https://en.wikipedia.org/wiki/Operating_system](https://en.wikipedia.org/wiki/Operating_system).",
-            "device": "A hardware device such as a processor or chip-set. A hardware device containing firmware SHOULD include a component for the physical hardware itself and another component of type 'firmware' or 'operating-system' (whichever is relevant), describing information about the software running on the device. See also the list of [known device properties](https://github.com/CycloneDX/cyclonedx-property-taxonomy/blob/main/cdx/device.md).",
+            "device": "A hardware device such as a processor or chip-set. A hardware device containing firmware SHOULD include a component for the physical hardware itself and another component with `type=\"firmware\"` or `type=\"operating-system\"` (whichever is relevant), describing information about the software running on the device. See also the list of [known device properties](https://github.com/CycloneDX/cyclonedx-property-taxonomy/blob/main/cdx/device.md).",
             "device-driver": "A special type of software that operates or controls a particular type of device. Refer to [https://en.wikipedia.org/wiki/Device_driver](https://en.wikipedia.org/wiki/Device_driver).",
             "firmware": "A special type of software that provides low-level control over a device's hardware. Refer to [https://en.wikipedia.org/wiki/Firmware](https://en.wikipedia.org/wiki/Firmware).",
             "file": "A computer file. Refer to [https://en.wikipedia.org/wiki/Computer_file](https://en.wikipedia.org/wiki/Computer_file) for information about files.",
             "machine-learning-model": "A model based on training data that can make predictions or decisions without being explicitly programmed to do so.",
             "data": "A collection of discrete values that convey information.",
             "cryptographic-asset": "A cryptographic asset including algorithms, protocols, certificates, keys, tokens, and secrets.",
-            "material": "A physical substance in raw or processed form that is used to make, maintain, or repair an item, such as a metal, alloy, polymer, chemical, or other matter. Materials are commonly tracked for sourcing, provenance, and regulatory compliance. A finished physical item should be classified as 'device' instead.",
+            "material": "A physical substance in raw or processed form that is used to make, maintain, or repair an item, such as a metal, alloy, polymer, chemical, or other matter. Materials are commonly tracked for sourcing, provenance, and regulatory compliance. A finished physical item should be classified with `type=\"device\"` instead.",
             "service": "A service, including microservices, function-as-a-service, and other types of network or intra-process services. Service-specific attributes, endpoints and the data profiles characterizing the data the service handles, apply exclusively to this component type."
           },
           "title": "Component Type",
@@ -91,23 +91,23 @@
         "name": {
           "type": "string",
           "title": "Component Name",
-          "description": "The name of the component. This will often be a shortened, single name of the component. Examples: commons-lang3 and jquery",
+          "description": "The name of the component. This will often be a shortened, single name of the component. Examples: `\"commons-lang3\"` and `\"jquery\"`.",
           "examples": ["tomcat-catalina"]
         },
         "version": {
           "$ref": "#/$defs/version",
           "title": "Component Version",
-          "description": "The component version. The version should ideally comply with semantic versioning but is not enforced.\nMust be used exclusively, either 'version' or 'versionRange', but not both."
+          "description": "The component version. The version should ideally comply with semantic versioning but is not enforced.\nMust be used exclusively, either `version` or `versionRange`, but not both."
         },
         "versionRange": {
           "$ref": "#/$defs/versionRange",
           "title": "Component Version Range",
-          "description": "For an external component, this specifies the accepted version range.\nThe value must adhere to the Package URL Version Range syntax (vers), as defined at <https://github.com/package-url/vers-spec\nMay only be used if `.isExternal` is set to `true`.\nMust be used exclusively, either 'version' or 'versionRange', but not both."
+          "description": "For an external component, this specifies the accepted version range.\nThe value must adhere to the Package URL Version Range syntax (vers), as defined at <https://github.com/package-url/vers-spec\nMay only be used if `isExternal=true`.\nMust be used exclusively, either `version` or `versionRange`, but not both."
         },
         "isExternal": {
           "type": "boolean",
           "title": "Component Is External",
-          "description": "Determine whether this component is external.\nAn external component is one that is not part of an assembly, but is expected to be provided by the environment, regardless of the component's `.scope`. This setting can be useful for distinguishing which components are bundled with the product and which can be relied upon to be present in the deployment environment.\nThis may be set to `true` for runtime components only. For `$.metadata.component`, it must be set to `false`.",
+          "description": "Determine whether this component is external.\nAn external component is one that is not part of an assembly, but is expected to be provided by the environment, regardless of the component's `scope`. This setting can be useful for distinguishing which components are bundled with the product and which can be relied upon to be present in the deployment environment.\nThis may be set to `true` for runtime components only. For `$.metadata.component`, it must be set to `false`.",
           "default": false
         },
         "description": {
@@ -124,11 +124,11 @@
           ],
           "meta:enum": {
             "required": "The component is required for runtime",
-            "optional": "The component is optional at runtime. Optional components are components that are not capable of being called due to them not being installed or otherwise accessible by any means. Components that are installed but due to configuration or other restrictions are prohibited from being called must be scoped as 'required'.",
+            "optional": "The component is optional at runtime. Optional components are components that are not capable of being called due to them not being installed or otherwise accessible by any means. Components that are installed but due to configuration or other restrictions are prohibited from being called must be scoped as `\"required\"`.",
             "excluded": "Components that are excluded provide the ability to document component usage for test and other non-runtime purposes. Excluded components are not reachable within a call graph at runtime."
           },
           "title": "Component Scope",
-          "description": "Specifies the scope of the component. If scope is not specified, 'required' scope SHOULD be assumed by the consumer of the BOM.",
+          "description": "Specifies the scope of the component. If scope is not specified, `\"required\"` scope SHOULD be assumed by the consumer of the BOM.",
           "default": "required"
         },
         "hashes": {
@@ -207,7 +207,7 @@
           "items": {"$ref": "#/$defs/componentOrChoice"},
           "uniqueItems": true,
           "title": "Components",
-          "description": "A list of components included in the parent component, including software, hardware, and services. Entries may be concrete components or component-choice wrappers expressing conditional or alternate relationships. This is not a dependency tree. It provides a way to specify a hierarchical representation of component assemblies, similar to system &#8594; subsystem &#8594; parts assembly in physical supply chains."
+          "description": "A list of components included in the parent component, including software, hardware, and services. Entries may be concrete components or component-choice wrappers expressing conditional or alternate relationships. This is not a dependency tree. It provides a way to specify a hierarchical representation of component assemblies, similar to system → subsystem → parts assembly in physical supply chains."
         },
         "evidence": {
           "$ref": "#/$defs/componentEvidence",
@@ -227,7 +227,7 @@
           "type": "array",
           "items": {"$ref": "#/$defs/componentData"},
           "title": "Data",
-          "description": "This object SHOULD be specified for any component of type `data` and must not be specified for other component types."
+          "description": "This object SHOULD be specified for any component with `type=\"data\"` and must not be specified for other component types."
         },
         "cryptoProperties": {
           "$ref": "cyclonedx-cryptography-2.0.schema.json#/$defs/cryptoProperties",
@@ -239,32 +239,32 @@
         "classification": {
           "$ref": "cyclonedx-physical-2.0.schema.json#/$defs/classification",
           "title": "Classification",
-          "description": "Hierarchical classification of the item, with optional taxonomy codes from external standards. This object may only be specified for components of type `device` or `material` and shall not be specified for other component types."
+          "description": "Hierarchical classification of the item, with optional taxonomy codes from external standards. This object may only be specified for components with `type=\"device\"` or `type=\"material\"`, and shall not be specified for other component types."
         },
         "boardLocation": {
           "$ref": "cyclonedx-physical-2.0.schema.json#/$defs/boardLocation",
           "title": "Board Location",
-          "description": "Placement of the item on a printed circuit board, panel, or assembly. This object may only be specified for components of type `device` and shall not be specified for other component types."
+          "description": "Placement of the item on a printed circuit board, panel, or assembly. This object may only be specified for components with `type=\"device\"` and shall not be specified for other component types."
         },
         "deviceType": {
           "$ref": "cyclonedx-physical-2.0.schema.json#/$defs/deviceType",
           "title": "Device Type",
-          "description": "Package or mounting style of the physical item, expressed as a predefined device type or a custom device type. This object may only be specified for components of type `device` and shall not be specified for other component types."
+          "description": "Package or mounting style of the physical item, expressed as a predefined device type or a custom device type. This object may only be specified for components with `type=\"device\"` and shall not be specified for other component types."
         },
         "leadTime": {
           "$ref": "cyclonedx-physical-2.0.schema.json#/$defs/leadTime",
           "title": "Lead Time",
-          "description": "Supplier lead time for procuring the item. This object may only be specified for components of type `device` or `material` and shall not be specified for other component types."
+          "description": "Supplier lead time for procuring the item. This object may only be specified for components with `type=\"device\"` or `type=\"material\"`, and shall not be specified for other component types."
         },
         "materialForm": {
           "$ref": "cyclonedx-physical-2.0.schema.json#/$defs/materialForm",
           "title": "Material Form",
-          "description": "Physical form in which the material is supplied, expressed as a predefined material form or a custom material form. This object may only be specified for components of type `material` and shall not be specified for other component types."
+          "description": "Physical form in which the material is supplied, expressed as a predefined material form or a custom material form. This object may only be specified for components with `type=\"material\"` and shall not be specified for other component types."
         },
         "quantity": {
           "$ref": "cyclonedx-physical-2.0.schema.json#/$defs/quantity",
           "title": "Quantity",
-          "description": "The quantity of the item in the context in which it is declared, such as the number of identical parts within the enclosing assembly or the amount of material in the described lot. This object may only be specified for components of type `device` or `material` and shall not be specified for other component types."
+          "description": "The quantity of the item in the context in which it is declared, such as the number of identical parts within the enclosing assembly or the amount of material in the described lot. This object may only be specified for components with `type=\"device\"` or `type=\"material\"`, and shall not be specified for other component types."
         },
         "certifications": {
           "$ref": "cyclonedx-certification-2.0.schema.json#/$defs/certifications",
@@ -278,7 +278,7 @@
             "format": "iri-reference"
           },
           "title": "Endpoints",
-          "description": "The endpoint URIs of the service. Multiple endpoints are allowed. May only be used for components of type `service`.",
+          "description": "The endpoint URIs of the service. Multiple endpoints are allowed. May only be used for components with `type=\"service\"`.",
           "examples": ["https://example.com/api/v1/ticker"]
         },
         "dataProfiles": {
@@ -286,7 +286,7 @@
           "uniqueItems": true,
           "items": {"$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataProfileChoice"},
           "title": "Data Profiles",
-          "description": "The data handled by the service, characterized by data profiles. Each entry is either an inline profile object or a reference using bom-link or bom-ref to a previously declared profile, typically declared in the root profiles catalogue. May only be used for components of type `service`. Data movement is intentionally not expressed here: flow direction, sources, destinations, authentication, and boundary crossings are modelled via blueprint flows, assets, and boundaries, which reference this component by bom-ref."
+          "description": "The data handled by the service, characterized by data profiles. Each entry is either an inline profile object or a reference using bom-link or bom-ref to a previously declared profile, typically declared in the root profiles catalogue. May only be used for components with `type=\"service\"`. Data movement is intentionally not expressed here: flow direction, sources, destinations, authentication, and boundary crossings are modelled via blueprint flows, assets, and boundaries, which reference this component by bom-ref."
         },
         "tags": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/tags",
@@ -311,7 +311,7 @@
           }
         },
         {
-          "description": "Requirement: 'versionRange' must not be present when 'isExternal' is `false`.",
+          "description": "Requirement: `versionRange` must not be present when `isExternal=false`.",
           "if": {
             "properties": { "isExternal": { "const": false } }
           },
@@ -321,7 +321,7 @@
           "else": true
         },
         {
-          "description": "Requirement: `classification`, `leadTime`, and `quantity` may only be present when `type` is `device` or `material`.",
+          "description": "Requirement: `classification`, `leadTime`, and `quantity` may only be present when `type=\"device\"` or `type=\"material\"`.",
           "if": {
             "properties": { "type": { "enum": ["device", "material"] } },
             "required": ["type"]
@@ -336,7 +336,7 @@
           }
         },
         {
-          "description": "Requirement: `boardLocation` and `deviceType` may only be present when `type` is `device`.",
+          "description": "Requirement: `boardLocation` and `deviceType` may only be present when `type=\"device\"`.",
           "if": {
             "properties": { "type": { "const": "device" } },
             "required": ["type"]
@@ -350,7 +350,7 @@
           }
         },
         {
-          "description": "Requirement: `materialForm` may only be present when `type` is `material`.",
+          "description": "Requirement: `materialForm` may only be present when `type=\"material\"`.",
           "if": {
             "properties": { "type": { "const": "material" } },
             "required": ["type"]
@@ -364,7 +364,7 @@
         },
         {
           "title": "Service Requirement",
-          "description": "Requirement: endpoints and dataProfiles may only be used for components of type `service`.",
+          "description": "Requirement: endpoints and dataProfiles may only be used for components with `type=\"service\"`.",
           "if": {
             "properties": { "type": { "const": "service" } }
           },
@@ -382,7 +382,7 @@
     },
     "componentOrChoice": {
       "title": "Component or Component Choice",
-      "description": "An entry in a components array. May be a concrete component, or a component-choice wrapper that expresses a conditional or alternate relationship between two or more components. The discriminator is the `type` property: when `type` is `component-choice`, the entry shall conform to the `componentChoice` schema; otherwise it shall conform to the `component` schema.",
+      "description": "An entry in a components array. May be a concrete component, or a component-choice wrapper that expresses a conditional or alternate relationship between two or more components. The discriminator is the `type` property: when `type=\"component-choice\"`, the entry shall conform to the `componentChoice` schema; otherwise it shall conform to the `component` schema.",
       "oneOf": [
         { "$ref": "#/$defs/component" },
         { "$ref": "#/$defs/componentChoice" }
@@ -403,7 +403,7 @@
           "type": "string",
           "const": "component-choice",
           "title": "Type",
-          "description": "Discriminator for a component-choice entry. The value shall be the literal string `component-choice`."
+          "description": "Discriminator for a component-choice entry. The value shall be the literal string `\"component-choice\"`."
         },
         "bom-ref": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
@@ -562,7 +562,7 @@
           "minimum": 0,
           "maximum": 1,
           "title": "Confidence",
-          "description": "The overall confidence of the detection from 0 to 1, where 1 is 100% confidence."
+          "description": "The overall confidence of the detection from `0` to `1`, where `1` is 100% confidence."
         },
         "methods": {
           "type": "array",
@@ -622,7 +622,7 @@
           "minimum": 0,
           "maximum": 1,
           "title": "Confidence",
-          "description": "The overall confidence of the detection from 0 to 1, where 1 is 100% confidence."
+          "description": "The overall confidence of the detection from `0` to `1`, where `1` is 100% confidence."
         },
         "methods": {
           "type": "array",
@@ -675,7 +675,7 @@
           "minimum": 0,
           "maximum": 1,
           "title": "Confidence",
-          "description": "The overall confidence of the evidence from 0 - 1, where 1 is 100% confidence."
+          "description": "The overall confidence of the evidence from `0` to `1`, where `1` is 100% confidence."
         },
         "concludedValue": {
           "type": "string",
@@ -808,12 +808,12 @@
         "configurationRef": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "title": "Configuration Reference",
-          "description": "The bom-ref of the configuration that determines this component's configuration. Typically points to a component of type 'data' whose data type is 'configuration'."
+          "description": "The bom-ref of the configuration that determines this component's configuration. Typically points to a component with `type=\"data\"` and `data.type=\"configuration\"`."
         },
         "changeMechanism": {
           "type": "array",
           "title": "Change Mechanism",
-          "description": "The step or steps required to apply a change to this component's configuration. When more than one value is present, all are required (for example, a software update followed by a restart). Values are roughly ordered from least to most disruptive. Use a single value of 'not-possible' when the configuration cannot be changed.",
+          "description": "The step or steps required to apply a change to this component's configuration. When more than one value is present, all are required (for example, a software update followed by a restart). Values are roughly ordered from least to most disruptive. Use a single value of `\"not-possible\"` when the configuration cannot be changed.",
           "uniqueItems": true,
           "items": {
             "type": "string",
