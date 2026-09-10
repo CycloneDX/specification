@@ -135,6 +135,225 @@
         }
       }
     },
+    "safetyIntegrityLevel": {
+      "type": "object",
+      "title": "Safety Integrity Level",
+      "description": "A safety integrity classification drawn from a functional safety scheme. The scheme determines the permitted level values. The level expresses the degree of rigour the scheme requires, such as an Automotive Safety Integrity Level, a Safety Integrity Level, a Design Assurance Level, or a software safety class.",
+      "additionalProperties": false,
+      "required": [
+        "scheme",
+        "level"
+      ],
+      "properties": {
+        "scheme": {
+          "title": "Scheme",
+          "description": "The functional safety scheme that the level is drawn from. Use the custom option for schemes not covered by the enumeration.",
+          "oneOf": [
+            {
+              "type": "string",
+              "title": "Predefined Scheme",
+              "enum": [
+                "ISO-26262",
+                "IEC-61508",
+                "DO-178C",
+                "IEC-62304",
+                "EN-50128"
+              ],
+              "meta:enum": {
+                "ISO-26262": "Road vehicles functional safety. Levels are Automotive Safety Integrity Levels, from QM to ASIL D.",
+                "IEC-61508": "Functional safety of electrical, electronic, and programmable electronic safety-related systems. Levels are Safety Integrity Levels 1 to 4.",
+                "DO-178C": "Software considerations in airborne systems and equipment certification. Levels are Design Assurance Levels A to E.",
+                "IEC-62304": "Medical device software life cycle processes. Levels are software safety classes A to C.",
+                "EN-50128": "Railway applications software for railway control and protection systems. Levels are Software Safety Integrity Levels 0 to 4."
+              }
+            },
+            {
+              "type": "object",
+              "title": "Custom Scheme",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom scheme."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom scheme."
+                }
+              }
+            }
+          ]
+        },
+        "level": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Level",
+          "description": "The level within the scheme. The permitted values are determined by the scheme."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "scheme"
+            ],
+            "properties": {
+              "scheme": {
+                "const": "ISO-26262"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "level": {
+                "enum": [
+                  "qm",
+                  "asil-a",
+                  "asil-b",
+                  "asil-c",
+                  "asil-d"
+                ],
+                "meta:enum": {
+                  "qm": "Quality management. The hazard analysis and risk assessment determined that no ASIL is required.",
+                  "asil-a": "Automotive Safety Integrity Level A, the lowest ASIL.",
+                  "asil-b": "Automotive Safety Integrity Level B.",
+                  "asil-c": "Automotive Safety Integrity Level C.",
+                  "asil-d": "Automotive Safety Integrity Level D, the highest ASIL, for hazards that may cause life-threatening or fatal injury."
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "scheme"
+            ],
+            "properties": {
+              "scheme": {
+                "const": "IEC-61508"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "level": {
+                "enum": [
+                  "sil-1",
+                  "sil-2",
+                  "sil-3",
+                  "sil-4"
+                ],
+                "meta:enum": {
+                  "sil-1": "Safety Integrity Level 1, the lowest level of risk reduction.",
+                  "sil-2": "Safety Integrity Level 2.",
+                  "sil-3": "Safety Integrity Level 3.",
+                  "sil-4": "Safety Integrity Level 4, the highest level of risk reduction."
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "scheme"
+            ],
+            "properties": {
+              "scheme": {
+                "const": "DO-178C"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "level": {
+                "enum": [
+                  "dal-a",
+                  "dal-b",
+                  "dal-c",
+                  "dal-d",
+                  "dal-e"
+                ],
+                "meta:enum": {
+                  "dal-a": "Design Assurance Level A, for software whose anomalous behaviour may cause or contribute to a catastrophic failure condition.",
+                  "dal-b": "Design Assurance Level B, corresponding to a hazardous failure condition.",
+                  "dal-c": "Design Assurance Level C, corresponding to a major failure condition.",
+                  "dal-d": "Design Assurance Level D, corresponding to a minor failure condition.",
+                  "dal-e": "Design Assurance Level E, for software with no effect on safety."
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "scheme"
+            ],
+            "properties": {
+              "scheme": {
+                "const": "IEC-62304"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "level": {
+                "enum": [
+                  "class-a",
+                  "class-b",
+                  "class-c"
+                ],
+                "meta:enum": {
+                  "class-a": "Software safety class A. No injury or damage to health is possible.",
+                  "class-b": "Software safety class B. Non-serious injury is possible.",
+                  "class-c": "Software safety class C. Death or serious injury is possible."
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "scheme"
+            ],
+            "properties": {
+              "scheme": {
+                "const": "EN-50128"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "level": {
+                "enum": [
+                  "sil-0",
+                  "sil-1",
+                  "sil-2",
+                  "sil-3",
+                  "sil-4"
+                ],
+                "meta:enum": {
+                  "sil-0": "Software Safety Integrity Level 0, for software with no safety impact.",
+                  "sil-1": "Software Safety Integrity Level 1.",
+                  "sil-2": "Software Safety Integrity Level 2.",
+                  "sil-3": "Software Safety Integrity Level 3.",
+                  "sil-4": "Software Safety Integrity Level 4, the highest software safety integrity level."
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
     "behaviorGraph": {
       "type": "object",
       "title": "Behavior Graph",
