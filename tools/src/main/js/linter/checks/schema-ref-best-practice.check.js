@@ -20,8 +20,13 @@ import { LintCheck, registerCheck, Severity, traverseSchema } from '../index.js'
  */
 const REF_ALLOWED_SIBLINGS = Object.freeze(new Set([
   '$ref', // the $ref itself
-  '$comment', 'title', 'description', 'examples', 'default', // documentational
-  /* do NOT add any non-documentationals
+  '$comment', // documentational
+  // annotations - see https://json-schema.org/understanding-json-schema/reference/annotations
+  'title', 'description',
+  'default', 'examples',
+  'readOnly', 'writeOnly',
+  'deprecated',
+  /* do NOT add any non-annotations here
      instead, use:
      { "allOf": { "$ref": ... }, "$id" ..., "$anchor": ... }
      instead of additionalProperties -- { "allOf": { "$ref": ... }, "unevaluatedItems" ... }
@@ -33,7 +38,8 @@ const REF_ALLOWED_SIBLINGS = Object.freeze(new Set([
  */
 const SKIP_KEYS = Object.freeze(new Set([
   'enum', 'const', // values
-  'default', 'examples', 'meta:enum', // documentational
+  'default', 'examples', // annotations
+  'meta:enum', // documentational
 ]));
 
 

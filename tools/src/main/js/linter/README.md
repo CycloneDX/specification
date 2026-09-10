@@ -46,7 +46,7 @@ node cli.js schema.json
 | `schema-draft` | Validates `$schema` is `https://json-schema.org/draft/2020-12/schema` |
 | `schema-id-pattern` | Validates `$id` matches CycloneDX URL pattern |
 | `schema-id-filepath` | Validates `$id` property matches the expected file path |
-| `schema-ref-best-practice` | `$ref` usage must follow JSON Schema best practice: is string value, not absolute references, same-file references start with `#`, and no non-documentational siblings alongside `$ref`exist |
+| `schema-ref-best-practice` | `$ref` usage must follow JSON Schema best practice: is string value, not absolute references, same-file references start with `#`, and no non-annotation siblings alongside `$ref`exist |
 | `schema-comment` | Validates `$comment` contains required OWASP/Ecma standard notice |
 | `additional-properties-consistency` | TODO |
 | `model-property-order` | Validates model schemas have properties in order: `$schema`, `$id`, `type`, `title`, `$comment`, `$defs` |
