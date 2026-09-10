@@ -44,7 +44,7 @@ class SchemaCommentCheck extends LintCheck {
     }
 
     const comment = schema.$comment;
-    if (!typeof comment !== 'string') {
+    if (typeof comment !== 'string') {
       issues.push(this.createIssue(
         'Schema $comment is not string.',
         '$.$comment',
