@@ -18,7 +18,7 @@ class EnumValueNoOtherCheck extends LintCheck {
     super(
       'enum-value-no-other',
       'Enum Value No Other',
-      'Validates that enum values are not literal "other".',
+      'Validates that enum values are not literal "other"; use custom-object style instead',
       Severity.ERROR
     );
   }
