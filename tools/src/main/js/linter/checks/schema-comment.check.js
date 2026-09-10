@@ -48,7 +48,10 @@ class SchemaCommentCheck extends LintCheck {
       issues.push(this.createIssue(
         'Schema $comment is not string.',
         '$.$comment',
-        { expected: 'any string' }
+        {
+          actual: comment,
+          expected: 'any string'
+        }
       ));
       return issues;
     }
@@ -58,7 +61,7 @@ class SchemaCommentCheck extends LintCheck {
       // Check if $comment matches required pattern
       if (!requiredCommentRE.test(comment)) {
         issues.push(this.createIssue(
-          '$comment does not match the required standard notice.',
+          '$comment does not match the required standard notice pattern.',
           '$.$comment',
           {
             actual: comment,
