@@ -10,11 +10,6 @@
 import { LintCheck, registerCheck, Severity } from '../index.js';
 
 /**
- * A regex that matches a regular expression literal on best effort.
- */
-const RegexLiteralMatcher = /^\/(?<pattern>.*)\/(?<flags>[dgimsuvy]*)$/;
-
-/**
  * Required $comment text
  */
 const REQUIRED_COMMENT = 'OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.';
@@ -36,7 +31,7 @@ class SchemaCommentCheck extends LintCheck {
     const issues = [];
 
     const requiredComment = config.requiredComment ?? REQUIRED_COMMENT;
-    const requiredCommentRE = config.requiredCommentRE;
+    const requiredCommentPattern = config.requiredCommentPattern;
 
     // Check if $comment exists at root level
     if (!('$comment' in schema)) {
@@ -58,17 +53,16 @@ class SchemaCommentCheck extends LintCheck {
       return issues;
     }
 
-    if (typeof requiredCommentRE === 'string') {
-      const {pattern, flags} = requiredCommentRE.match(RegexLiteralMatcher).groups;
-      const requiredCommentRegEep = new RegExp(pattern, flags);
+    if (typeof requiredCommentPattern === 'string') {
+      const requiredCommentRE = new RegExp(requiredCommentPattern);
       // Check if $comment matches required pattern
-      if (!requiredCommentRegEep.test(comment)) {
+      if (!requiredCommentRE.test(comment)) {
         issues.push(this.createIssue(
           '$comment does not match the required standard notice.',
           '$.$comment',
           {
             actual: comment,
-            expected: `matches ${requiredCommentRegEep.toString()}`
+            expected: `matches ${requiredCommentRE.toString()}`
           }
         ));
       }
