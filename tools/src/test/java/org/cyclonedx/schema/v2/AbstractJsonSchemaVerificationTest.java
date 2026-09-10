@@ -61,6 +61,7 @@ abstract class AbstractJsonSchemaVerificationTest {
     private static final String SPDX_NAMESPACE = "cyclonedx.org/schema/spdx.schema.json";
     private static final String CRYPTO_DEF_NAMESPACE = "cyclonedx.org/schema/cryptography-defs.schema.json";
     private static final String BEHAVIOR_TAXONOMY_NAMESPACE = "cyclonedx.org/schema/behavior-taxonomy.schema.json";
+    private static final String PERSPECTIVES_DEFS_NAMESPACE = "cyclonedx.org/schema/perspectives-defs.schema.json";
 
     private final String version;
 
@@ -107,6 +108,8 @@ abstract class AbstractJsonSchemaVerificationTest {
                 .mapPrefix("http://" + CRYPTO_DEF_NAMESPACE, "classpath:cryptography-defs.schema.json")
                 .mapPrefix("http://" + BEHAVIOR_TAXONOMY_NAMESPACE, "classpath:behavior-taxonomy.schema.json")
                 .mapPrefix("https://" + BEHAVIOR_TAXONOMY_NAMESPACE, "classpath:behavior-taxonomy.schema.json")
+                .mapPrefix("http://" + PERSPECTIVES_DEFS_NAMESPACE, "classpath:perspectives-defs.schema.json")
+                .mapPrefix("https://" + PERSPECTIVES_DEFS_NAMESPACE, "classpath:perspectives-defs.schema.json")
             ).build();
         SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
             // in 2020-12, "format" is annotation-only unless asserted

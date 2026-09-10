@@ -9,6 +9,7 @@ const DEFAULT_REF_EXCEPTION_FILES = [
     'spdx.schema.json',
     'behavior-taxonomy.schema.json',
     'cryptography-defs.schema.json',
+    'perspectives-defs.schema.json',
     'jsf-0.82.schema.json'
 ];
 

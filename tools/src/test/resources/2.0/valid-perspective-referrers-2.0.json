@@ -1,0 +1,109 @@
+{
+  "$schema": "https://cyclonedx.org/schema/2.0/cyclonedx-2.0.schema.json",
+  "specFormat": "CycloneDX",
+  "specVersion": "2.0",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-09-08T12:00:00Z"
+  },
+  "components": [
+    {
+      "bom-ref": "model-a",
+      "type": "machine-learning-model",
+      "name": "model-a",
+      "version": "1.0"
+    },
+    {
+      "bom-ref": "model-b",
+      "type": "machine-learning-model",
+      "name": "model-b",
+      "version": "1.0"
+    }
+  ],
+  "risks": {
+    "risks": [
+      {
+        "bom-ref": "risk-a",
+        "name": "Fairness risk A",
+        "statement": "Model A may perform differently across groups.",
+        "domains": [
+          {
+            "type": "ethical"
+          }
+        ],
+        "affects": [
+          "model-a"
+        ],
+        "inherentRisk": {
+          "impact": {
+            "level": "moderate",
+            "categories": [
+              "fairness"
+            ]
+          }
+        }
+      },
+      {
+        "bom-ref": "risk-b",
+        "name": "Fairness risk B",
+        "statement": "Model B may perform differently across groups.",
+        "domains": [
+          {
+            "type": "ethical"
+          }
+        ],
+        "affects": [
+          "model-b"
+        ],
+        "inherentRisk": {
+          "impact": {
+            "level": "moderate",
+            "categories": [
+              "fairness"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "perspectives": [
+    {
+      "bom-ref": "card-a",
+      "predefined": "cdx:perspectives:model-card",
+      "predefinedVersion": 1,
+      "scopes": [
+        {
+          "name": "Model A",
+          "targets": [
+            "model-a"
+          ]
+        }
+      ]
+    },
+    {
+      "bom-ref": "risks-per-model",
+      "name": "Risks per model",
+      "description": "An inline perspective selecting, for the scoped model, the risks that name it in their affects.",
+      "scopes": [
+        {
+          "name": "Model B",
+          "targets": [
+            "model-b"
+          ]
+        }
+      ],
+      "mappings": [
+        {
+          "expression": "$.risks.risks[*]",
+          "via": [
+            {
+              "referrers": "$.risks.risks[*].affects[*]"
+            }
+          ],
+          "nativeName": "Risks affecting this model",
+          "relevance": "required"
+        }
+      ]
+    }
+  ]
+}
