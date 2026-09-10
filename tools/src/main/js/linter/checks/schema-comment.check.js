@@ -12,7 +12,7 @@ import { LintCheck, registerCheck, Severity } from '../index.js';
 /**
  * A regex that matches a regular expression literal on best effort.
  */
-const regexLiteralMatcher = /^\/(?<pattern>.*)\/(?<flags>[dgimsuvy]*)$/;
+const RegexLiteralMatcher = /^\/(?<pattern>.*)\/(?<flags>[dgimsuvy]*)$/;
 
 /**
  * Required $comment text
@@ -36,6 +36,7 @@ class SchemaCommentCheck extends LintCheck {
     const issues = [];
 
     const requiredComment = config.requiredComment ?? REQUIRED_COMMENT;
+    const requiredCommentRE = config.requiredCommentRE;
 
     // Check if $comment exists at root level
     if (!('$comment' in schema)) {
@@ -47,30 +48,38 @@ class SchemaCommentCheck extends LintCheck {
       return issues;
     }
 
-    const requiredCommentREmatch = requiredComment.match(regexLiteralMatcher);
-    if (requiredCommentREmatch) {
-      const requiredCommentRE = new RegExp(
-        requiredCommentREmatch.groups.pattern,
-        requiredCommentREmatch.groups.flags);
+    const comment = schema.$comment;
+    if (!typeof comment !== 'string') {
+      issues.push(this.createIssue(
+        'Schema $comment is not string.',
+        '$.$comment',
+        { expected: 'any string' }
+      ));
+      return issues;
+    }
+
+    if (typeof requiredCommentRE === 'string') {
+      const {pattern, flags} = requiredCommentRE.match(RegexLiteralMatcher).groups;
+      const requiredCommentRegEep = new RegExp(pattern, flags);
       // Check if $comment matches required pattern
-      if (!requiredCommentRE.test(schema.$comment)) {
+      if (!requiredCommentRegEep.test(comment)) {
         issues.push(this.createIssue(
           '$comment does not match the required standard notice.',
           '$.$comment',
           {
-            actual: schema.$comment,
-            expected: `matches ${requiredCommentRE.toString()}`
+            actual: comment,
+            expected: `matches ${requiredCommentRegEep.toString()}`
           }
         ));
       }
     }
     // Check if $comment exactly matches required value
-    else if (schema.$comment !== requiredComment) {
+    else if (comment !== requiredComment) {
       issues.push(this.createIssue(
         '$comment does not match the required standard notice.',
         '$.$comment',
         {
-          actual: schema.$comment,
+          actual: comment,
           expected: requiredComment
         }
       ));
