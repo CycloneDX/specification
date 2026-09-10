@@ -1,13 +1,18 @@
 /**
  * CycloneDX Schema Linter - Schema Comment Check
- * 
+ *
  * Validates that the root $comment property contains the required
  * OWASP CycloneDX standard notice.
- * 
+ *
  * @license Apache-2.0
  */
 
 import { LintCheck, registerCheck, Severity } from '../index.js';
+
+/**
+ * A regex that matches a regular expression literal on best effort.
+ */
+const regexLiteralMatcher = /^\/(?<pattern>.*)\/(?<flags>[dgimsuvy]*)$/;
 
 /**
  * Required $comment text
@@ -29,9 +34,9 @@ class SchemaCommentCheck extends LintCheck {
 
   async run(schema, rawContent, config = {}) {
     const issues = [];
-    
+
     const requiredComment = config.requiredComment ?? REQUIRED_COMMENT;
-    
+
     // Check if $comment exists at root level
     if (!('$comment' in schema)) {
       issues.push(this.createIssue(
@@ -41,9 +46,26 @@ class SchemaCommentCheck extends LintCheck {
       ));
       return issues;
     }
-    
-    // Check if $comment matches required value
-    if (schema.$comment !== requiredComment) {
+
+    const requiredCommentREmatch = requiredComment.match(regexLiteralMatcher);
+    if (requiredCommentREmatch) {
+      const requiredCommentRE = new RegExp(
+        requiredCommentREmatch.groups.pattern,
+        requiredCommentREmatch.groups.flags);
+      // Check if $comment matches required pattern
+      if (!requiredCommentRE.test(schema.$comment)) {
+        issues.push(this.createIssue(
+          '$comment does not match the required standard notice.',
+          '$.$comment',
+          {
+            actual: schema.$comment,
+            expected: `matches ${requiredCommentRE.toString()}`
+          }
+        ));
+      }
+    }
+    // Check if $comment exactly matches required value
+    else if (schema.$comment !== requiredComment) {
       issues.push(this.createIssue(
         '$comment does not match the required standard notice.',
         '$.$comment',
@@ -53,7 +75,7 @@ class SchemaCommentCheck extends LintCheck {
         }
       ));
     }
-    
+
     return issues;
   }
 }
