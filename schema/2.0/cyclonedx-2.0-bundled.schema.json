@@ -113,264 +113,1143 @@
     }
   ],
   "$defs": {
-    "cyclonedx-ai-modelcard-2.0": {
+    "cyclonedx-ai-ml-2.0": {
       "type": "null",
-      "title": "CycloneDX AI Model Card",
+      "title": "CycloneDX AI/ML Model",
       "$defs": {
-        "modelCard": {
-          "$comment": "Model card support in CycloneDX is derived from TensorFlow Model Card Toolkit released under the Apache 2.0 license and available from https://github.com/tensorflow/model-card-toolkit/blob/main/model_card_toolkit/schema/v0.0.2/model_card.schema.json. In addition, CycloneDX model card support includes portions of VerifyML, also released under the Apache 2.0 license and available from https://github.com/cylynx/verifyml/blob/main/verifyml/model_card_toolkit/schema/v0.0.4/model_card.schema.json.",
+        "modelProperties": {
           "type": "object",
-          "title": "Model Card",
-          "description": "A model card describes the intended uses of a machine learning model and potential limitations, including biases and ethical considerations. Model cards typically contain the training parameters, which datasets were used to train the model, performance metrics, and other relevant data useful for ML transparency. This object SHOULD be specified for any component of type `machine-learning-model` and must not be specified for other component types.",
+          "title": "AI/ML Model Properties",
+          "description": "Intrinsic technical characteristics of a machine learning model. This object SHOULD be specified for any component of type `machine-learning-model` and shall not be specified for other component types. Contextual and subjective aspects of a model, including ethical and fairness considerations, potential harms, groups at risk, and impact assessments, are expressed with the risk model and reference the model component. Views of this data tailored to a specific audience, such as a model card, are expressed with perspectives.",
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "title": "BOM Reference",
-              "description": "An identifier which can be used to reference the model card elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
-            },
-            "modelParameters": {
-              "type": "object",
-              "title": "Model Parameters",
-              "description": "Hyper-parameters for construction of the model.",
-              "additionalProperties": false,
-              "properties": {
-                "approach": {
-                  "type": "object",
-                  "title": "Approach",
-                  "description": "The overall approach to learning used by the model for problem solving.",
-                  "additionalProperties": false,
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "title": "Learning Type",
-                      "description": "Learning types describing the learning problem or hybrid learning problem.",
-                      "enum": [
-                        "supervised",
-                        "unsupervised",
-                        "reinforcement-learning",
-                        "semi-supervised",
-                        "self-supervised"
-                      ],
-                      "meta:enum": {
-                        "supervised": "Supervised machine learning involves training an algorithm on labeled data to predict or classify new data based on the patterns learned from the labeled examples.",
-                        "unsupervised": "Unsupervised machine learning involves training algorithms on unlabeled data to discover patterns, structures, or relationships without explicit guidance, allowing the model to identify inherent structures or clusters within the data.",
-                        "reinforcement-learning": "Reinforcement learning is a type of machine learning where an agent learns to make decisions by interacting with an environment to maximize cumulative rewards, through trial and error.",
-                        "semi-supervised": "Semi-supervised machine learning utilizes a combination of labeled and unlabeled data during training to improve model performance, leveraging the benefits of both supervised and unsupervised learning techniques.",
-                        "self-supervised": "Self-supervised machine learning involves training models to predict parts of the input data from other parts of the same data, without requiring external labels, enabling learning from large amounts of unlabeled data."
-                      }
-                    }
-                  }
-                },
-                "task": {
-                  "type": "string",
-                  "title": "Task",
-                  "description": "Directly influences the input and/or output. Examples include classification, regression, clustering, etc."
-                },
-                "architectureFamily": {
-                  "type": "string",
-                  "title": "Architecture Family",
-                  "description": "The model architecture family such as transformer network, convolutional neural network, residual neural network, LSTM neural network, etc."
-                },
-                "modelArchitecture": {
-                  "type": "string",
-                  "title": "Model Architecture",
-                  "description": "The specific architecture of the model such as GPT-1, ResNet-50, YOLOv3, etc."
-                },
-                "datasets": {
-                  "type": "array",
-                  "title": "Datasets",
-                  "description": "The datasets used to train and evaluate the model.",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "title": "Inline Data Information",
-                        "$ref": "#/$defs/cyclonedx-component-2.0/$defs/componentData"
-                      },
-                      {
-                        "type": "object",
-                        "title": "Data Reference",
-                        "additionalProperties": false,
-                        "properties": {
-                          "ref": {
-                            "anyOf": [
-                              {
-                                "title": "Ref",
-                                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
-                              },
-                              {
-                                "title": "BOM-Link Element",
-                                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/bomLinkElementType"
-                              }
-                            ],
-                            "title": "Reference",
-                            "type": "string",
-                            "description": "References a data component by the components bom-ref attribute"
-                          }
-                        }
-                      }
-                    ]
-                  }
-                },
-                "inputs": {
-                  "type": "array",
-                  "title": "Inputs",
-                  "description": "The input format(s) of the model",
-                  "items": {
-                    "$ref": "#/$defs/cyclonedx-ai-modelcard-2.0/$defs/inputOutputMLParameters"
-                  }
-                },
-                "outputs": {
-                  "type": "array",
-                  "title": "Outputs",
-                  "description": "The output format(s) from the model",
-                  "items": {
-                    "$ref": "#/$defs/cyclonedx-ai-modelcard-2.0/$defs/inputOutputMLParameters"
-                  }
-                }
+            "learningTypes": {
+              "type": "array",
+              "title": "Learning Types",
+              "description": "The learning paradigms applied when training the model. A model may combine several paradigms, for example self-supervised pre-training followed by supervised fine-tuning and reinforcement learning based alignment.",
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/cyclonedx-ai-ml-2.0/$defs/learningType"
               }
             },
-            "quantitativeAnalysis": {
-              "type": "object",
-              "title": "Quantitative Analysis",
-              "description": "A quantitative analysis of the model",
-              "additionalProperties": false,
-              "properties": {
-                "performanceMetrics": {
-                  "type": "array",
-                  "title": "Performance Metrics",
-                  "description": "The model performance metrics being reported. Examples may include accuracy, F1 score, precision, top-3 error rates, MSC, etc.",
-                  "items": {
-                    "$ref": "#/$defs/cyclonedx-ai-modelcard-2.0/$defs/performanceMetric"
-                  }
-                },
-                "graphics": {
-                  "$ref": "#/$defs/cyclonedx-ai-modelcard-2.0/$defs/graphicsCollection"
-                }
+            "tasks": {
+              "type": "array",
+              "title": "Tasks",
+              "description": "The machine learning tasks the model is designed to perform. Tasks directly influence the intended use, the input and output characteristics, and the applicable evaluation metrics of the model. A model may support multiple tasks.",
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/cyclonedx-ai-ml-2.0/$defs/modelTask"
               }
             },
-            "considerations": {
-              "type": "object",
-              "title": "Considerations",
-              "description": "What considerations should be taken into account regarding the model's construction, training, and application?",
-              "additionalProperties": false,
-              "properties": {
-                "users": {
-                  "type": "array",
-                  "title": "Users",
-                  "description": "Who are the intended users of the model?",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "useCases": {
-                  "type": "array",
-                  "title": "Use Cases",
-                  "description": "What are the intended use cases of the model?",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "technicalLimitations": {
-                  "type": "array",
-                  "title": "Technical Limitations",
-                  "description": "What are the known technical limitations of the model? E.g. What kind(s) of data should the model be expected not to perform well on? What are the factors that might degrade model performance?",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "performanceTradeoffs": {
-                  "type": "array",
-                  "title": "Performance Tradeoffs",
-                  "description": "What are the known tradeoffs in accuracy/performance of the model?",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "ethicalConsiderations": {
-                  "type": "array",
-                  "title": "Ethical Considerations",
-                  "description": "What are the ethical risks involved in the application of this model?",
-                  "items": {
-                    "$ref": "#/$defs/cyclonedx-ai-modelcard-2.0/$defs/risk"
-                  }
-                },
-                "environmentalConsiderations": {
-                  "$ref": "#/$defs/cyclonedx-ai-modelcard-2.0/$defs/environmentalConsiderations",
-                  "title": "Environmental Considerations",
-                  "description": "What are the various environmental impacts the corresponding machine learning model has exhibited across its lifecycle?"
-                },
-                "fairnessAssessments": {
-                  "type": "array",
-                  "title": "Fairness Assessments",
-                  "description": "How does the model affect groups at risk of being systematically disadvantaged? What are the harms and benefits to the various affected groups?",
-                  "items": {
-                    "$ref": "#/$defs/cyclonedx-ai-modelcard-2.0/$defs/fairnessAssessment"
-                  }
-                }
+            "architecture": {
+              "title": "Architecture",
+              "description": "The architecture of the model.",
+              "$ref": "#/$defs/cyclonedx-ai-ml-2.0/$defs/modelArchitecture"
+            },
+            "parameterCount": {
+              "type": "integer",
+              "title": "Parameter Count",
+              "description": "The total number of trainable parameters of the model.",
+              "minimum": 0
+            },
+            "quantization": {
+              "title": "Quantization",
+              "description": "The quantization applied to the model weights as distributed. Quantization of individual input and output tensors is expressed on the model parameters.",
+              "$ref": "#/$defs/cyclonedx-ai-ml-2.0/$defs/quantization"
+            },
+            "inputs": {
+              "type": "array",
+              "title": "Model Inputs",
+              "description": "The input parameters accepted by the model.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-ai-ml-2.0/$defs/modelParameter"
+              }
+            },
+            "outputs": {
+              "type": "array",
+              "title": "Model Outputs",
+              "description": "The output parameters produced by the model.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-ai-ml-2.0/$defs/modelParameter"
+              }
+            },
+            "training": {
+              "title": "Training",
+              "description": "Information about how the model was trained.",
+              "$ref": "#/$defs/cyclonedx-ai-ml-2.0/$defs/training"
+            },
+            "evaluation": {
+              "title": "Evaluation",
+              "description": "A quantitative evaluation of the model.",
+              "$ref": "#/$defs/cyclonedx-ai-ml-2.0/$defs/evaluation"
+            },
+            "limitations": {
+              "type": "array",
+              "title": "Limitations",
+              "description": "Known technical limitations of the model, including constraints on accuracy, reasoning, scalability, and appropriate use. Limitations that expose users or other parties to potential harm should also be documented with the risk model.",
+              "items": {
+                "type": "string"
+              }
+            },
+            "useCases": {
+              "type": "array",
+              "title": "Use Cases",
+              "description": "References to use cases, defined elsewhere in the BOM, that describe the intended uses of the model.",
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
+              }
+            },
+            "environmental": {
+              "title": "Environmental Impact",
+              "description": "Measured environmental impacts of the model across its lifecycle activities.",
+              "$ref": "#/$defs/cyclonedx-ai-ml-2.0/$defs/environmental"
+            },
+            "externalReferences": {
+              "type": "array",
+              "title": "External References",
+              "description": "External references to resources that are relevant to the model but are not included with the BOM.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/externalReference"
               }
             },
             "properties": {
+              "title": "Properties",
+              "description": "Provides the ability to document name-value pairs for the model. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
             }
           }
         },
-        "inputOutputMLParameters": {
-          "type": "object",
-          "title": "Input and Output Parameters",
-          "additionalProperties": false,
-          "properties": {
-            "format": {
-              "title": "Input/Output Format",
-              "description": "The data format for input/output to the model.",
+        "learningType": {
+          "title": "Learning Type",
+          "description": "A learning paradigm applied when training a machine learning model. Use the custom option for paradigms not covered by the predefined values.",
+          "oneOf": [
+            {
+              "title": "Predefined Learning Type",
               "type": "string",
-              "examples": [
-                "string",
-                "image",
-                "time-series"
-              ]
+              "enum": [
+                "supervised",
+                "unsupervised",
+                "semi-supervised",
+                "self-supervised",
+                "reinforcement-learning"
+              ],
+              "meta:enum": {
+                "supervised": "The model learns from labelled data to map inputs to known outputs.",
+                "unsupervised": "The model learns patterns and structure from unlabelled data.",
+                "semi-supervised": "The model learns from a combination of labelled and unlabelled data.",
+                "self-supervised": "The model learns from supervisory signals derived automatically from the data itself.",
+                "reinforcement-learning": "The model learns a policy by acting in an environment and receiving reward signals, including reward signals derived from human or automated feedback."
+              }
+            },
+            {
+              "type": "object",
+              "title": "Custom Learning Type",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "title": "Name",
+                  "description": "The name of the custom learning paradigm."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom learning paradigm."
+                }
+              }
             }
-          }
+          ]
         },
-        "environmentalConsiderations": {
+        "modelTask": {
+          "title": "Model Task",
+          "description": "A machine learning task that a model is designed to perform. Use the custom option for tasks not covered by the predefined values.",
+          "oneOf": [
+            {
+              "title": "Predefined Task",
+              "type": "string",
+              "enum": [
+                "text-generation",
+                "text-classification",
+                "token-classification",
+                "question-answering",
+                "summarization",
+                "translation",
+                "text-to-text",
+                "fill-mask",
+                "sentence-similarity",
+                "text-to-image",
+                "text-to-video",
+                "text-to-audio",
+                "text-to-speech",
+                "image-classification",
+                "image-segmentation",
+                "object-detection",
+                "image-to-image",
+                "image-to-text",
+                "depth-estimation",
+                "video-classification",
+                "audio-classification",
+                "automatic-speech-recognition",
+                "audio-to-audio",
+                "voice-activity-detection",
+                "tabular-classification",
+                "tabular-regression",
+                "time-series-forecasting",
+                "reinforcement-learning",
+                "robotics",
+                "graph-ml",
+                "feature-extraction",
+                "embedding",
+                "zero-shot-classification",
+                "few-shot-learning"
+              ],
+              "meta:enum": {
+                "text-generation": "Generate coherent text continuations from prompts.",
+                "text-classification": "Classify text into predefined categories, for example sentiment analysis or topic classification.",
+                "token-classification": "Classify individual tokens in text, for example named entity recognition or part-of-speech tagging.",
+                "question-answering": "Answer questions based on context or knowledge, using extractive or generative approaches.",
+                "summarization": "Generate concise summaries of longer text documents.",
+                "translation": "Translate text from one language to another.",
+                "text-to-text": "Transform text from one form to another, for example paraphrasing or style transfer.",
+                "fill-mask": "Predict masked tokens in text, as in masked language modelling.",
+                "sentence-similarity": "Compute semantic similarity between text sequences.",
+                "text-to-image": "Generate images from text descriptions.",
+                "text-to-video": "Generate video content from text descriptions.",
+                "text-to-audio": "Generate audio or music from text descriptions.",
+                "text-to-speech": "Convert text to spoken audio through speech synthesis.",
+                "image-classification": "Classify images into predefined categories.",
+                "image-segmentation": "Segment images into regions or objects using semantic or instance segmentation.",
+                "object-detection": "Detect and localize objects in images.",
+                "image-to-image": "Transform images, for example style transfer, super-resolution, or inpainting.",
+                "image-to-text": "Generate text descriptions from images, for example image captioning.",
+                "depth-estimation": "Estimate depth information from images.",
+                "video-classification": "Classify video content into categories.",
+                "audio-classification": "Classify audio into categories, for example sound event detection.",
+                "automatic-speech-recognition": "Transcribe spoken audio to text.",
+                "audio-to-audio": "Transform audio, for example noise reduction or voice conversion.",
+                "voice-activity-detection": "Detect the presence of speech in audio streams.",
+                "tabular-classification": "Classify structured tabular data.",
+                "tabular-regression": "Predict continuous values from structured tabular data.",
+                "time-series-forecasting": "Predict future values in time series data.",
+                "reinforcement-learning": "Learn optimal actions through interaction with an environment.",
+                "robotics": "Control and decision making for robotic systems.",
+                "graph-ml": "Machine learning tasks on graph structured data.",
+                "feature-extraction": "Extract meaningful features or representations from data.",
+                "embedding": "Generate dense vector representations of data.",
+                "zero-shot-classification": "Classify data without task specific training examples.",
+                "few-shot-learning": "Learn from very few examples per class."
+              }
+            },
+            {
+              "type": "object",
+              "title": "Custom Task",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "title": "Name",
+                  "description": "The name of the custom machine learning task."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom machine learning task."
+                }
+              }
+            }
+          ],
+          "examples": [
+            "text-generation",
+            "image-classification",
+            "object-detection",
+            "automatic-speech-recognition"
+          ]
+        },
+        "architectureFamily": {
+          "title": "Architecture Family",
+          "description": "The core structural family of a model. Use the custom option for families not covered by the predefined values.",
+          "oneOf": [
+            {
+              "title": "Predefined Architecture Family",
+              "type": "string",
+              "enum": [
+                "transformer",
+                "cnn",
+                "rnn",
+                "lstm",
+                "gru",
+                "gan",
+                "vae",
+                "mamba",
+                "ssm",
+                "gnn",
+                "mlp",
+                "rwkv",
+                "snn",
+                "kan",
+                "diffusion",
+                "flow-matching",
+                "rbm",
+                "capsnet",
+                "neuromorphic",
+                "hybrid"
+              ],
+              "meta:enum": {
+                "transformer": "Architecture based on self-attention mechanisms for processing sequential or spatial data.",
+                "cnn": "Convolutional neural network using convolutional layers for processing grid structured data.",
+                "rnn": "Recurrent neural network with recurrent connections for sequential data processing.",
+                "lstm": "Long short-term memory network, a recurrent variant with gating mechanisms for long-term dependencies.",
+                "gru": "Gated recurrent unit network, a recurrent variant with simplified gating.",
+                "gan": "Generative adversarial network, a dual network framework containing a generator and a discriminator.",
+                "vae": "Variational autoencoder, a probabilistic encoder and decoder architecture mapping to a latent space.",
+                "mamba": "State space model architecture with selective mechanisms for efficient sequence modelling.",
+                "ssm": "State space model based on continuous or discrete state space representations.",
+                "gnn": "Graph neural network optimized for processing graph structured data.",
+                "mlp": "Multilayer perceptron, a feedforward architecture composed entirely of fully connected layers.",
+                "rwkv": "Receptance weighted key value architecture combining parallelizable training with recurrent inference.",
+                "snn": "Spiking neural network, a neuromorphic architecture utilizing discrete, time dependent spiking activations.",
+                "kan": "Kolmogorov-Arnold network featuring learnable activation functions on edges rather than nodes.",
+                "diffusion": "Denoising diffusion model that iteratively refines noise into data.",
+                "flow-matching": "Continuous normalizing flow trained with flow matching or rectified flow objectives.",
+                "rbm": "Restricted Boltzmann machine, an energy based generative model with stochastic hidden units.",
+                "capsnet": "Capsule network using dynamic routing between capsule groups to preserve spatial hierarchies.",
+                "neuromorphic": "Architecture designed for deployment on neuromorphic hardware.",
+                "hybrid": "Explicit combination of two or more distinct architecture families."
+              }
+            },
+            {
+              "type": "object",
+              "title": "Custom Architecture Family",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "title": "Name",
+                  "description": "The name of the custom architecture family."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom architecture family."
+                }
+              }
+            }
+          ]
+        },
+        "architectureFeature": {
+          "title": "Architecture Feature",
+          "description": "A structural feature or mechanism present in a model, including macro level layouts, attention variants, and parameter efficient adaptation mechanisms. Use the custom option for features not covered by the predefined values.",
+          "oneOf": [
+            {
+              "title": "Predefined Architecture Feature",
+              "type": "string",
+              "enum": [
+                "decoder-only",
+                "encoder-only",
+                "encoder-decoder",
+                "mixture-of-experts",
+                "vae-bottleneck",
+                "u-net",
+                "residual-connections",
+                "dual-encoders",
+                "cross-attention",
+                "siamese-network",
+                "hybrid-backbone",
+                "vision-encoder",
+                "adapter-layers",
+                "projector-layers",
+                "gated-linear-units",
+                "speculative-decoding",
+                "rotary-position-embedding",
+                "grouped-query-attention",
+                "sliding-window-attention",
+                "retrieval-augmented",
+                "memory-augmented",
+                "multimodal-fusion",
+                "reranker"
+              ],
+              "meta:enum": {
+                "decoder-only": "Autoregressive layout that attends to prior positions only.",
+                "encoder-only": "Bidirectional layout that processes complete sequences simultaneously.",
+                "encoder-decoder": "Sequence to sequence structure mapping an input representation to an output sequence.",
+                "mixture-of-experts": "Sparse routing mechanism activating specific expert subnetworks per token.",
+                "vae-bottleneck": "Symmetric compression bottleneck utilizing mean and variance latent vectors.",
+                "u-net": "Symmetric contracting and expanding layout featuring skip connections between corresponding scales.",
+                "residual-connections": "Explicit skip or identity shortcuts bypassing one or more structural layers.",
+                "dual-encoders": "Parallel feature extraction pipelines mapping different inputs into a shared space.",
+                "cross-attention": "Mechanism that conditions one feature stream on another through attention.",
+                "siamese-network": "Twin subnetworks sharing identical weights to compute similarity metrics.",
+                "hybrid-backbone": "Direct cascading combination of distinct architecture families, for example a convolutional feature extractor feeding a transformer.",
+                "vision-encoder": "Vision encoding component for processing image inputs in multimodal architectures.",
+                "adapter-layers": "Parameter efficient fine-tuning layers inserted into otherwise frozen models.",
+                "projector-layers": "Projection components bridging different modalities.",
+                "gated-linear-units": "Gated activation mechanisms using element-wise multiplication.",
+                "speculative-decoding": "Pairing of a small draft model with a larger verifier model to accelerate autoregressive generation.",
+                "rotary-position-embedding": "Positional encoding applied through rotation matrices.",
+                "grouped-query-attention": "Attention variant sharing key and value heads across groups of query heads.",
+                "sliding-window-attention": "Attention mechanism restricting the receptive field to a local sliding window.",
+                "retrieval-augmented": "Retrieval component prepended to or integrated into the model.",
+                "memory-augmented": "External or persistent memory bank integrated into the forward pass.",
+                "multimodal-fusion": "Layer or block that fuses representations across more than one modality.",
+                "reranker": "Separate scoring or reranking head applied after an initial retrieval or generation step."
+              }
+            },
+            {
+              "type": "object",
+              "title": "Custom Architecture Feature",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "title": "Name",
+                  "description": "The name of the custom architecture feature."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom architecture feature."
+                }
+              }
+            }
+          ]
+        },
+        "architectureTopology": {
+          "title": "Architecture Topology",
+          "description": "The runtime parameter activation and connection structure of a model. Use the custom option for topologies not covered by the predefined values.",
+          "oneOf": [
+            {
+              "title": "Predefined Architecture Topology",
+              "type": "string",
+              "enum": [
+                "dense",
+                "sparse",
+                "dynamic",
+                "liquid",
+                "mixture-of-depths",
+                "early-exit",
+                "recurrent-hybrid"
+              ],
+              "meta:enum": {
+                "dense": "All or most parameters are active during inference with full connectivity between layers.",
+                "sparse": "Only a subset of parameters is active during inference with selective connectivity.",
+                "dynamic": "Parameter activation and connectivity patterns change based on input or runtime conditions.",
+                "liquid": "Continuously adaptive network structure with time varying connections and activations.",
+                "mixture-of-depths": "Tokens are routed to different computational depths rather than to different expert modules.",
+                "early-exit": "Inference exits at the earliest layer that meets a confidence threshold, reducing compute for easy inputs.",
+                "recurrent-hybrid": "Static layer layout that alternates between global attention and recurrent or state space layers."
+              }
+            },
+            {
+              "type": "object",
+              "title": "Custom Architecture Topology",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "title": "Name",
+                  "description": "The name of the custom topology."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom topology."
+                }
+              }
+            }
+          ]
+        },
+        "modelArchitecture": {
           "type": "object",
-          "title": "Environmental Considerations",
-          "description": "Describes various environmental impact metrics.",
+          "title": "Model Architecture",
+          "description": "The architecture of a machine learning model, including its structural family, notable features, and topology.",
           "additionalProperties": false,
           "properties": {
-            "energyConsumptions": {
-              "title": "Energy Consumptions",
-              "description": "Describes energy consumption information incurred for one or more component lifecycle activities.",
+            "name": {
+              "type": "string",
+              "title": "Name",
+              "description": "The identifying name of the model architecture, typically a well known architecture variant.",
+              "examples": [
+                "ResNet-50",
+                "BERT-base",
+                "U-Net",
+                "ViT-B/16"
+              ]
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the architecture, including key characteristics, design decisions, and architectural innovations."
+            },
+            "family": {
+              "title": "Family",
+              "description": "The core structural family of the model.",
+              "$ref": "#/$defs/cyclonedx-ai-ml-2.0/$defs/architectureFamily"
+            },
+            "features": {
               "type": "array",
+              "title": "Features",
+              "description": "Structural features and mechanisms present in the model.",
+              "uniqueItems": true,
               "items": {
-                "$ref": "#/$defs/cyclonedx-ai-modelcard-2.0/$defs/energyConsumption"
+                "$ref": "#/$defs/cyclonedx-ai-ml-2.0/$defs/architectureFeature"
+              }
+            },
+            "topology": {
+              "title": "Topology",
+              "description": "The runtime parameter activation and connection structure of the model.",
+              "$ref": "#/$defs/cyclonedx-ai-ml-2.0/$defs/architectureTopology"
+            },
+            "externalReferences": {
+              "type": "array",
+              "title": "External References",
+              "description": "External references to resources that are relevant to the model architecture but are not included with the BOM.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/externalReference"
               }
             },
             "properties": {
-              "type": "array",
               "title": "Properties",
-              "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
-              "items": {
-                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/property"
-              }
+              "description": "Provides the ability to document name-value pairs for the model architecture. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
             }
           }
         },
-        "energyConsumption": {
-          "title": "Energy consumption",
-          "description": "Describes energy consumption information incurred for the specified lifecycle activity.",
+        "modality": {
+          "title": "Modality",
+          "description": "The type of data a model parameter carries. Use the custom option for modalities not covered by the predefined values.",
+          "oneOf": [
+            {
+              "title": "Predefined Modality",
+              "type": "string",
+              "enum": [
+                "text",
+                "image",
+                "audio",
+                "video",
+                "multimodal",
+                "embedding",
+                "logits"
+              ],
+              "meta:enum": {
+                "text": "Natural language text input or output.",
+                "image": "Visual image data input or output.",
+                "audio": "Audio or speech data input or output.",
+                "video": "Video data input or output.",
+                "multimodal": "Combined multiple modalities, for example text and image.",
+                "embedding": "Dense vector representations in a continuous space.",
+                "logits": "Raw unnormalized model outputs before activation functions."
+              }
+            },
+            {
+              "type": "object",
+              "title": "Custom Modality",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "title": "Name",
+                  "description": "The name of the custom modality."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom modality."
+                }
+              }
+            }
+          ]
+        },
+        "quantization": {
           "type": "object",
-          "required": [
-            "activity",
-            "energyProviders",
-            "activityEnergyCost"
-          ],
+          "title": "Quantization",
+          "description": "The quantization applied to a model parameter. The scheme parameters recorded here describe how quantized values relate to real values. The scale and zero point tensors themselves are model data and are distributed with the model artefact, not with the BOM. Additional scheme specific details may be recorded in the `properties` of the model parameter.",
           "additionalProperties": false,
           "properties": {
-            "activity": {
+            "method": {
               "type": "string",
-              "title": "Activity",
-              "description": "The type of activity that is part of a machine learning model development or operational lifecycle.",
+              "title": "Method",
+              "description": "The quantization method or algorithm applied.",
+              "examples": [
+                "gptq",
+                "awq",
+                "rtn",
+                "k-quant"
+              ]
+            },
+            "bits": {
+              "type": "number",
+              "title": "Bits",
+              "description": "The nominal bit width per value. Fractional widths are permitted, for example 1.58 for ternary quantization.",
+              "exclusiveMinimum": 0,
+              "examples": [
+                8,
+                4,
+                1.58
+              ]
+            },
+            "scheme": {
+              "title": "Scheme",
+              "description": "The mapping between quantized values and real values.",
+              "oneOf": [
+                {
+                  "title": "Predefined Quantization Scheme",
+                  "type": "string",
+                  "enum": [
+                    "affine",
+                    "symmetric"
+                  ],
+                  "meta:enum": {
+                    "affine": "Asymmetric mapping using a scale and a zero point.",
+                    "symmetric": "Symmetric mapping using a scale with the zero point fixed at zero."
+                  }
+                },
+                {
+                  "type": "object",
+                  "title": "Custom Quantization Scheme",
+                  "required": [
+                    "name"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "title": "Name",
+                      "description": "The name of the custom quantization scheme."
+                    },
+                    "description": {
+                      "type": "string",
+                      "title": "Description",
+                      "description": "A description of the custom quantization scheme."
+                    }
+                  }
+                }
+              ]
+            },
+            "granularity": {
+              "title": "Granularity",
+              "description": "The level at which scales and zero points are assigned.",
+              "oneOf": [
+                {
+                  "title": "Predefined Quantization Granularity",
+                  "type": "string",
+                  "enum": [
+                    "per-tensor",
+                    "per-channel",
+                    "per-group"
+                  ],
+                  "meta:enum": {
+                    "per-tensor": "One scale and zero point applies to the entire tensor.",
+                    "per-channel": "Scales and zero points are assigned along one tensor axis.",
+                    "per-group": "Scales and zero points are assigned to fixed size groups of elements along one tensor axis."
+                  }
+                },
+                {
+                  "type": "object",
+                  "title": "Custom Quantization Granularity",
+                  "required": [
+                    "name"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "title": "Name",
+                      "description": "The name of the custom quantization granularity."
+                    },
+                    "description": {
+                      "type": "string",
+                      "title": "Description",
+                      "description": "A description of the custom quantization granularity."
+                    }
+                  }
+                }
+              ]
+            },
+            "groupSize": {
+              "type": "integer",
+              "title": "Group Size",
+              "description": "The number of elements sharing one scale and zero point when the granularity is `per-group`.",
+              "minimum": 1,
+              "examples": [
+                32,
+                64,
+                128
+              ]
+            },
+            "axis": {
+              "type": "integer",
+              "title": "Axis",
+              "description": "The tensor axis along which scales and zero points are assigned when the granularity is `per-channel` or `per-group`.",
+              "minimum": 0
+            }
+          }
+        },
+        "modelParameter": {
+          "type": "object",
+          "title": "Model Parameter",
+          "description": "A single input or output parameter of a machine learning model. Parameter specific details not covered by the predefined fields may be recorded in `properties`.",
+          "additionalProperties": false,
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Name",
+              "description": "The name of the parameter.",
+              "examples": [
+                "prompt",
+                "image",
+                "audio",
+                "logits",
+                "embeddings"
+              ]
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the parameter and its purpose."
+            },
+            "modality": {
+              "title": "Modality",
+              "description": "The type of data this parameter carries.",
+              "$ref": "#/$defs/cyclonedx-ai-ml-2.0/$defs/modality"
+            },
+            "dataType": {
+              "type": "string",
+              "title": "Data Type",
+              "description": "The numeric or symbolic data type of the parameter values.",
+              "examples": [
+                "string",
+                "float32",
+                "float16",
+                "bfloat16",
+                "int64",
+                "uint8"
+              ]
+            },
+            "mimeType": {
+              "title": "MIME Type",
+              "description": "The media type of the parameter data.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/mediaType"
+            },
+            "quantization": {
+              "title": "Quantization",
+              "description": "The quantization applied to the parameter values.",
+              "$ref": "#/$defs/cyclonedx-ai-ml-2.0/$defs/quantization"
+            },
+            "shape": {
+              "type": "array",
+              "title": "Shape",
+              "description": "The dimensional shape of the parameter, for example tensor dimensions. A dynamic dimension is expressed as null or -1.",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "integer",
+                    "minimum": -1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "examples": [
+                [
+                  1,
+                  512
+                ],
+                [
+                  null,
+                  3,
+                  224,
+                  224
+                ],
+                [
+                  -1,
+                  768
+                ]
+              ]
+            },
+            "processingStage": {
+              "type": "string",
+              "title": "Processing Stage",
+              "description": "The processing stage of the parameter relative to tokenization or encoding.",
+              "enum": [
+                "pre-tokenizer",
+                "post-tokenizer",
+                "pre-encoder",
+                "post-encoder",
+                "pre-processing",
+                "post-processing",
+                "raw"
+              ],
+              "meta:enum": {
+                "pre-tokenizer": "Data before tokenization, for example a raw text string.",
+                "post-tokenizer": "Data after tokenization, for example token identifiers.",
+                "pre-encoder": "Data before an encoding transformation.",
+                "post-encoder": "Data after an encoding transformation.",
+                "pre-processing": "Data before any processing pipeline has been applied.",
+                "post-processing": "Data after all processing steps have been applied.",
+                "raw": "Raw unprocessed data."
+              }
+            },
+            "required": {
+              "type": "boolean",
+              "title": "Required",
+              "description": "Indicates whether this parameter is required.",
+              "default": false
+            },
+            "defaultValue": {
+              "type": "string",
+              "title": "Default Value",
+              "description": "The default value for the parameter when a value is not provided."
+            },
+            "constraints": {
+              "title": "Constraints",
+              "description": "Constraints on the parameter values.",
+              "$ref": "#/$defs/cyclonedx-ai-ml-2.0/$defs/parameterConstraints"
+            },
+            "externalReferences": {
+              "type": "array",
+              "title": "External References",
+              "description": "External references to resources that are relevant to the parameter but are not included with the BOM.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/externalReference"
+              }
+            },
+            "properties": {
+              "title": "Properties",
+              "description": "Provides the ability to document name-value pairs for the parameter. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
+            }
+          }
+        },
+        "parameterConstraints": {
+          "type": "object",
+          "title": "Parameter Constraints",
+          "description": "Constraints on the values of a model parameter.",
+          "additionalProperties": false,
+          "properties": {
+            "minLength": {
+              "type": "integer",
+              "title": "Minimum Length",
+              "description": "The minimum length for text or sequence parameters.",
+              "minimum": 0
+            },
+            "maxLength": {
+              "type": "integer",
+              "title": "Maximum Length",
+              "description": "The maximum length for text or sequence parameters.",
+              "minimum": 0
+            },
+            "minValue": {
+              "type": "number",
+              "title": "Minimum Value",
+              "description": "The minimum numeric value."
+            },
+            "maxValue": {
+              "type": "number",
+              "title": "Maximum Value",
+              "description": "The maximum numeric value."
+            },
+            "allowedValues": {
+              "type": "array",
+              "title": "Allowed Values",
+              "description": "The list of permitted values for the parameter.",
+              "items": {
+                "type": "string"
+              }
+            },
+            "pattern": {
+              "type": "string",
+              "title": "Pattern",
+              "description": "A regular expression pattern that string values of the parameter match."
+            }
+          }
+        },
+        "datasetChoice": {
+          "title": "Dataset Choice",
+          "description": "A reference to a dataset documented as a component of type `data`, either within this BOM by `bom-ref` or in another BOM by BOM-Link.",
+          "anyOf": [
+            {
+              "title": "Dataset Reference",
+              "description": "A reference to a component of type `data` within this BOM.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
+            },
+            {
+              "title": "Dataset BOM-Link Reference",
+              "description": "A BOM-Link reference to a component of type `data` in another BOM.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/bomLinkElementType"
+            }
+          ],
+          "examples": [
+            "training-dataset-1",
+            "urn:cdx:f08a6ccd-4dce-4759-bd84-c626675d60a7/1#openwebtext-subset"
+          ]
+        },
+        "training": {
+          "type": "object",
+          "title": "Training",
+          "description": "Information about how a model was trained, including references to the datasets used and to the formula that captures the training process. Detailed training and data preparation workflows, including their inputs, outputs, and processing steps, are expressed with formulation and referenced from here.",
+          "additionalProperties": false,
+          "properties": {
+            "formula": {
+              "title": "Formula Reference",
+              "description": "References a formula, defined in formulation, that describes how the model was trained, for example as sequenced phases of pre-training, supervised fine-tuning, and alignment tuning.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
+            },
+            "datasets": {
+              "type": "array",
+              "title": "Training Datasets",
+              "description": "References to the datasets used for training or fine-tuning the model.",
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/cyclonedx-ai-ml-2.0/$defs/datasetChoice"
+              }
+            },
+            "properties": {
+              "title": "Properties",
+              "description": "Provides the ability to document name-value pairs for the training process. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
+            }
+          }
+        },
+        "evaluation": {
+          "type": "object",
+          "title": "Evaluation",
+          "description": "A quantitative evaluation of a model, including performance metrics and supporting graphics such as confusion matrices and calibration plots.",
+          "additionalProperties": false,
+          "properties": {
+            "metrics": {
+              "type": "array",
+              "title": "Performance Metrics",
+              "description": "The performance metrics being reported, for example accuracy, F1 score, precision, or benchmark scores.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-ai-ml-2.0/$defs/performanceMetric"
+              }
+            },
+            "graphics": {
+              "title": "Graphics",
+              "description": "A collection of graphics that represent various measurements.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/graphicsCollection"
+            },
+            "properties": {
+              "title": "Properties",
+              "description": "Provides the ability to document name-value pairs for the evaluation. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
+            }
+          }
+        },
+        "performanceMeasure": {
+          "title": "Performance Measure",
+          "description": "A measure of model performance with a value and a unit. The unit is constrained to the predefined unit sets for time, throughput, compute, memory, and ratio measurements.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/measure"
+            },
+            {
+              "required": [
+                "unit"
+              ],
+              "properties": {
+                "unit": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/cyclonedx-common-2.0/$defs/timeUnits"
+                    },
+                    {
+                      "$ref": "#/$defs/cyclonedx-common-2.0/$defs/throughputUnits"
+                    },
+                    {
+                      "$ref": "#/$defs/cyclonedx-common-2.0/$defs/computeUnits"
+                    },
+                    {
+                      "$ref": "#/$defs/cyclonedx-common-2.0/$defs/memoryUnits"
+                    },
+                    {
+                      "$ref": "#/$defs/cyclonedx-common-2.0/$defs/ratioUnits"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "performanceMetric": {
+          "type": "object",
+          "title": "Performance Metric",
+          "description": "A reported performance metric of a model. Benchmarks and evaluation methodologies evolve rapidly, so the metric type and benchmark name are open strings; external references and evaluation dataset references establish the identity, version, and provenance of the evaluation.",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "measure"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "title": "Metric Type",
+              "description": "The type of performance metric being reported.",
+              "examples": [
+                "accuracy",
+                "f1",
+                "pass@1",
+                "mean-average-precision",
+                "perplexity",
+                "latency",
+                "throughput",
+                "elo"
+              ]
+            },
+            "benchmark": {
+              "type": "string",
+              "title": "Benchmark",
+              "description": "The name of the benchmark or evaluation suite that produced the metric, if any.",
+              "examples": [
+                "mmlu-pro",
+                "humaneval",
+                "imagenet-1k"
+              ]
+            },
+            "measure": {
+              "title": "Measure",
+              "description": "The measured value of the performance metric with its unit.",
+              "$ref": "#/$defs/cyclonedx-ai-ml-2.0/$defs/performanceMeasure"
+            },
+            "slice": {
+              "type": "string",
+              "title": "Slice",
+              "description": "The name of the data slice on which the metric was computed, for example a demographic group, a language, or a domain. When absent, the metric applies to the entire evaluation population. Slice level metrics provide the quantitative evidence for fairness and bias risks documented with the risk model.",
+              "examples": [
+                "overall",
+                "age:18-34",
+                "language:fr",
+                "region:sub-saharan-africa"
+              ]
+            },
+            "confidenceInterval": {
+              "type": "object",
+              "title": "Confidence Interval",
+              "description": "The confidence interval of the metric.",
+              "additionalProperties": false,
+              "properties": {
+                "lowerBound": {
+                  "type": "number",
+                  "title": "Lower Bound",
+                  "description": "The lower bound of the confidence interval."
+                },
+                "upperBound": {
+                  "type": "number",
+                  "title": "Upper Bound",
+                  "description": "The upper bound of the confidence interval."
+                }
+              }
+            },
+            "evaluationDatasets": {
+              "type": "array",
+              "title": "Evaluation Datasets",
+              "description": "References to the datasets or dataset subsets used to compute this performance metric.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-ai-ml-2.0/$defs/datasetChoice"
+              }
+            },
+            "externalReferences": {
+              "type": "array",
+              "title": "External References",
+              "description": "External references to resources that are relevant to the metric, such as benchmark definitions, leaderboards, or evaluation methodologies but are not included with the BOM.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/externalReference"
+              }
+            },
+            "properties": {
+              "title": "Properties",
+              "description": "Provides the ability to document name-value pairs for the metric. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
+            }
+          },
+          "examples": [
+            {
+              "type": "accuracy",
+              "benchmark": "mmlu-pro",
+              "measure": {
+                "value": 58.2,
+                "unit": "%"
+              },
+              "confidenceInterval": {
+                "lowerBound": 57.5,
+                "upperBound": 58.9
+              }
+            },
+            {
+              "type": "latency",
+              "measure": {
+                "value": 127,
+                "unit": "ms"
+              },
+              "properties": [
+                {
+                  "name": "percentile",
+                  "value": "p95"
+                }
+              ]
+            },
+            {
+              "type": "accuracy",
+              "benchmark": "imagenet-1k",
+              "slice": "top-5",
+              "measure": {
+                "value": 94.7,
+                "unit": "%"
+              }
+            }
+          ]
+        },
+        "environmental": {
+          "type": "object",
+          "title": "Environmental Impact",
+          "description": "Measured environmental impacts of a model across its lifecycle activities. This object captures factual measurements. Environmental risks informed by these measurements are expressed with the risk model and reference the model component.",
+          "additionalProperties": false,
+          "properties": {
+            "energyConsumptions": {
+              "type": "array",
+              "title": "Energy Consumptions",
+              "description": "The energy consumption incurred for one or more lifecycle activities of the model.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-ai-ml-2.0/$defs/energyConsumption"
+              }
+            },
+            "properties": {
+              "title": "Properties",
+              "description": "Provides the ability to document name-value pairs for environmental impact. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
+            }
+          }
+        },
+        "modelActivity": {
+          "title": "Model Activity",
+          "description": "An activity that is part of the development or operational lifecycle of a machine learning model. Use the custom option for activities not covered by the predefined values.",
+          "oneOf": [
+            {
+              "title": "Predefined Activity",
+              "type": "string",
               "enum": [
                 "design",
                 "data-collection",
@@ -379,138 +1258,105 @@
                 "fine-tuning",
                 "validation",
                 "deployment",
-                "inference",
-                "other"
+                "inference"
               ],
               "meta:enum": {
-                "design": "A model design including problem framing, goal definition and algorithm selection.",
-                "data-collection": "Model data acquisition including search, selection and transfer.",
-                "data-preparation": "Model data preparation including data cleaning, labeling and conversion.",
-                "training": "Model building, training and generalized tuning.",
+                "design": "Model design, including problem framing, goal definition, and algorithm selection.",
+                "data-collection": "Model data acquisition, including search, selection, and transfer.",
+                "data-preparation": "Model data preparation, including data cleaning, labelling, and conversion.",
+                "training": "Model building, training, and generalized tuning.",
                 "fine-tuning": "Refining a trained model to produce desired outputs for a given problem space.",
-                "validation": "Model validation including model output evaluation and testing.",
-                "deployment": "Explicit model deployment to a target hosting infrastructure.",
-                "inference": "Generating an output response from a hosted model from a set of inputs.",
-                "other": "A lifecycle activity type whose description does not match currently defined values."
+                "validation": "Model validation, including model output evaluation and testing.",
+                "deployment": "Model deployment to a target hosting infrastructure.",
+                "inference": "Generating an output response from a hosted model from a set of inputs."
               }
             },
+            {
+              "type": "object",
+              "title": "Custom Activity",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "title": "Name",
+                  "description": "The name of the custom activity."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom activity."
+                }
+              }
+            }
+          ]
+        },
+        "energyConsumption": {
+          "type": "object",
+          "title": "Energy Consumption",
+          "description": "The energy consumption incurred for a specific lifecycle activity of a model.",
+          "additionalProperties": false,
+          "required": [
+            "activity",
+            "activityEnergyCost"
+          ],
+          "properties": {
+            "activity": {
+              "title": "Activity",
+              "description": "The lifecycle activity that incurred the energy consumption.",
+              "$ref": "#/$defs/cyclonedx-ai-ml-2.0/$defs/modelActivity"
+            },
+            "formula": {
+              "title": "Formula Reference",
+              "description": "References a formula, defined in formulation, that captures the process which incurred this energy consumption, for example a training workflow.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
+            },
             "energyProviders": {
-              "title": "Energy Providers",
-              "description": "The provider(s) of the energy consumed by the associated model development lifecycle activity.",
               "type": "array",
+              "title": "Energy Providers",
+              "description": "The providers of the energy consumed by the activity.",
               "items": {
-                "$ref": "#/$defs/cyclonedx-ai-modelcard-2.0/$defs/energyProvider"
+                "$ref": "#/$defs/cyclonedx-ai-ml-2.0/$defs/energyProvider"
               }
             },
             "activityEnergyCost": {
               "title": "Activity Energy Cost",
-              "description": "The total energy cost associated with the model lifecycle activity.",
-              "$ref": "#/$defs/cyclonedx-ai-modelcard-2.0/$defs/energyMeasure"
+              "description": "The total energy cost associated with the activity.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/energyMeasure"
             },
             "co2CostEquivalent": {
               "title": "CO2 Equivalent Cost",
-              "description": "The CO2 cost (debit) equivalent to the total energy cost.",
-              "$ref": "#/$defs/cyclonedx-ai-modelcard-2.0/$defs/co2Measure"
+              "description": "The carbon dioxide equivalent cost of the total energy cost.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/co2Measure"
             },
             "co2CostOffset": {
               "title": "CO2 Cost Offset",
-              "description": "The CO2 offset (credit) for the CO2 equivalent cost.",
-              "$ref": "#/$defs/cyclonedx-ai-modelcard-2.0/$defs/co2Measure"
+              "description": "The carbon dioxide offset credited against the carbon dioxide equivalent cost.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/co2Measure"
+            },
+            "externalReferences": {
+              "type": "array",
+              "title": "External References",
+              "description": "External references to resources that are relevant to the energy consumption but are not included with the BOM.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/externalReference"
+              }
             },
             "properties": {
-              "type": "array",
               "title": "Properties",
-              "description": "Provides the ability to document properties in a name-value store. This provides flexibility to include data not officially supported in the standard without having to use additional namespaces or create extensions. Unlike key-value stores, properties support duplicate names, each potentially having different values. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
-              "items": {
-                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/property"
-              }
+              "description": "Provides the ability to document name-value pairs for the energy consumption. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
             }
           }
         },
-        "energyMeasure": {
-          "type": "object",
-          "title": "Energy Measure",
-          "description": "A measure of energy.",
-          "required": [
-            "value",
-            "unit"
-          ],
-          "additionalProperties": false,
-          "properties": {
-            "value": {
-              "type": "number",
-              "title": "Value",
-              "description": "Quantity of energy."
-            },
-            "unit": {
-              "type": "string",
-              "enum": [
-                "kWh"
-              ],
-              "title": "Unit",
-              "description": "Unit of energy.",
-              "meta:enum": {
-                "kWh": "Kilowatt-hour (kWh) is the energy delivered by one kilowatt (kW) of power for one hour (h)."
-              }
-            }
-          }
-        },
-        "co2Measure": {
-          "type": "object",
-          "title": "CO2 Measure",
-          "description": "A measure of carbon dioxide (CO2).",
-          "required": [
-            "value",
-            "unit"
-          ],
-          "additionalProperties": false,
-          "properties": {
-            "value": {
-              "type": "number",
-              "title": "Value",
-              "description": "Quantity of carbon dioxide (CO2)."
-            },
-            "unit": {
-              "type": "string",
-              "enum": [
-                "tCO2eq"
-              ],
-              "title": "Unit",
-              "description": "Unit of carbon dioxide (CO2).",
-              "meta:enum": {
-                "tCO2eq": "Tonnes (t) of carbon dioxide (CO2) equivalent (eq)."
-              }
-            }
-          }
-        },
-        "energyProvider": {
-          "type": "object",
-          "title": "Energy Provider",
-          "description": "Describes the physical provider of energy used for model development or operations.",
-          "required": [
-            "organization",
-            "energySource",
-            "energyProvided"
-          ],
-          "additionalProperties": false,
-          "properties": {
-            "bom-ref": {
-              "title": "BOM Reference",
-              "description": "An identifier which can be used to reference the energy provider elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
-            },
-            "description": {
-              "type": "string",
-              "title": "Description",
-              "description": "A description of the energy provider."
-            },
-            "organization": {
-              "type": "object",
-              "title": "Organization",
-              "description": "The organization that provides energy.",
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/organizationalEntity"
-            },
-            "energySource": {
+        "energySource": {
+          "title": "Energy Source",
+          "description": "The source of the energy provided by an energy provider. Use the custom option for sources not covered by the predefined values.",
+          "oneOf": [
+            {
+              "title": "Predefined Energy Source",
               "type": "string",
               "enum": [
                 "coal",
@@ -522,160 +1368,97 @@
                 "geothermal",
                 "hydropower",
                 "biofuel",
-                "unknown",
-                "other"
+                "biomass",
+                "hydrogen",
+                "tidal",
+                "unknown"
               ],
               "meta:enum": {
-                "coal": "Energy produced by types of coal.",
-                "oil": "Petroleum products (primarily crude oil and its derivative fuel oils).",
-                "natural-gas": "Hydrocarbon gas liquids (HGL) that occur as gases at atmospheric pressure and as liquids under higher pressures including Natural gas (C5H12 and heavier), Ethane (C2H6), Propane (C3H8), etc.",
-                "nuclear": "Energy produced from the cores of atoms (i.e., through nuclear fission or fusion).",
+                "coal": "Energy produced from coal.",
+                "oil": "Energy produced from petroleum products, primarily crude oil and its derivative fuel oils.",
+                "natural-gas": "Energy produced from hydrocarbon gases, including natural gas, ethane, and propane.",
+                "nuclear": "Energy produced from the cores of atoms through nuclear fission or fusion.",
                 "wind": "Energy produced from moving air.",
-                "solar": "Energy produced from the sun (i.e., solar radiation).",
+                "solar": "Energy produced from solar radiation.",
                 "geothermal": "Energy produced from heat within the earth.",
                 "hydropower": "Energy produced from flowing water.",
-                "biofuel": "Liquid fuels produced from biomass feedstocks (i.e., organic materials such as plants or animals).",
-                "unknown": "The energy source is unknown.",
-                "other": "An energy source that is not listed."
-              },
-              "title": "Energy Source",
-              "description": "The energy source for the energy provider."
-            },
-            "energyProvided": {
-              "$ref": "#/$defs/cyclonedx-ai-modelcard-2.0/$defs/energyMeasure",
-              "title": "Energy Provided",
-              "description": "The energy provided by the energy source for an associated activity."
-            },
-            "externalReferences": {
-              "type": "array",
-              "items": {
-                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/externalReference"
-              },
-              "title": "External References",
-              "description": "External references provide a way to document systems, sites, and information that may be relevant but are not included with the BOM. They may also establish specific relationships within or external to the BOM."
-            }
-          }
-        },
-        "graphicsCollection": {
-          "type": "object",
-          "title": "Graphics Collection",
-          "description": "A collection of graphics that represent various measurements.",
-          "additionalProperties": false,
-          "properties": {
-            "description": {
-              "title": "Description",
-              "description": "A description of this collection of graphics.",
-              "type": "string"
-            },
-            "collection": {
-              "title": "Collection",
-              "description": "A collection of graphics.",
-              "type": "array",
-              "items": {
-                "$ref": "#/$defs/cyclonedx-ai-modelcard-2.0/$defs/graphic"
+                "biofuel": "Energy produced from liquid fuels derived from biomass feedstocks.",
+                "biomass": "Energy produced from solid organic materials such as wood, agricultural crops, or organic waste.",
+                "hydrogen": "Energy produced from hydrogen fuel in fuel cells or combustion.",
+                "tidal": "Energy produced from the rise and fall of ocean tides and tidal currents.",
+                "unknown": "The energy source is unknown."
               }
-            }
-          }
-        },
-        "graphic": {
-          "type": "object",
-          "title": "Graphic",
-          "additionalProperties": false,
-          "properties": {
-            "name": {
-              "title": "Name",
-              "description": "The name of the graphic.",
-              "type": "string"
             },
-            "image": {
-              "title": "Graphic Image",
-              "description": "The graphic (vector or raster). Base64 encoding must be specified for binary images.",
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/attachment"
-            }
-          }
-        },
-        "performanceMetric": {
-          "type": "object",
-          "title": "Performance Metric",
-          "additionalProperties": false,
-          "properties": {
-            "type": {
-              "title": "Type",
-              "description": "The type of performance metric.",
-              "type": "string"
-            },
-            "value": {
-              "title": "Value",
-              "description": "The value of the performance metric.",
-              "type": "string"
-            },
-            "slice": {
-              "title": "Slice",
-              "description": "The name of the slice this metric was computed on. By default, assume this metric is not sliced.",
-              "type": "string"
-            },
-            "confidenceInterval": {
-              "title": "Confidence Interval",
-              "description": "The confidence interval of the metric.",
+            {
               "type": "object",
+              "title": "Custom Energy Source",
+              "required": [
+                "name"
+              ],
               "additionalProperties": false,
               "properties": {
-                "lowerBound": {
-                  "title": "Lower Bound",
-                  "description": "The lower bound of the confidence interval.",
-                  "type": "string"
+                "name": {
+                  "type": "string",
+                  "title": "Name",
+                  "description": "The name of the custom energy source."
                 },
-                "upperBound": {
-                  "title": "Upper Bound",
-                  "description": "The upper bound of the confidence interval.",
-                  "type": "string"
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom energy source."
                 }
               }
             }
-          }
+          ]
         },
-        "risk": {
+        "energyProvider": {
           "type": "object",
-          "title": "Risk",
+          "title": "Energy Provider",
+          "description": "The provider of energy consumed during model development or operations.",
           "additionalProperties": false,
+          "required": [
+            "provider",
+            "energySource",
+            "energyProvided"
+          ],
           "properties": {
-            "name": {
-              "title": "Name",
-              "description": "The name of the risk.",
-              "type": "string"
+            "bom-ref": {
+              "title": "BOM Reference",
+              "description": "An identifier which can be used to reference the energy provider elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
             },
-            "mitigationStrategy": {
-              "title": "Mitigation Strategy",
-              "description": "Strategy used to address this risk.",
-              "type": "string"
-            }
-          }
-        },
-        "fairnessAssessment": {
-          "type": "object",
-          "title": "Fairness Assessment",
-          "description": "Information about the benefits and harms of the model to an identified at risk group.",
-          "additionalProperties": false,
-          "properties": {
-            "groupAtRisk": {
+            "description": {
               "type": "string",
-              "title": "Group at Risk",
-              "description": "The groups or individuals at risk of being systematically disadvantaged by the model."
+              "title": "Description",
+              "description": "A description of the energy provider."
             },
-            "benefits": {
-              "type": "string",
-              "title": "Benefits",
-              "description": "Expected benefits to the identified groups."
+            "provider": {
+              "title": "Provider",
+              "description": "The party that provides the consumed energy, typically an organization.",
+              "$ref": "#/$defs/cyclonedx-party-2.0/$defs/partyChoice"
             },
-            "harms": {
-              "type": "string",
-              "title": "Harms",
-              "description": "Expected harms to the identified groups."
+            "energySource": {
+              "title": "Energy Source",
+              "description": "The source of the provided energy.",
+              "$ref": "#/$defs/cyclonedx-ai-ml-2.0/$defs/energySource"
             },
-            "mitigationStrategy": {
-              "type": "string",
-              "title": "Mitigation Strategy",
-              "description": "With respect to the benefits and harms outlined, please describe any mitigation strategy implemented."
+            "energyProvided": {
+              "title": "Energy Provided",
+              "description": "The energy provided by the energy source for the associated activity.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/energyMeasure"
+            },
+            "externalReferences": {
+              "type": "array",
+              "title": "External References",
+              "description": "External references to resources that are relevant to the energy provider but are not included with the BOM.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/externalReference"
+              }
+            },
+            "properties": {
+              "title": "Properties",
+              "description": "Provides the ability to document name-value pairs for the energy provider. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
             }
           }
         }
@@ -4626,6 +5409,232 @@
           "$ref": "#/$defs/cyclonedx-jss_X590_2023_10-2.0/$defs/signatures",
           "title": "Signatures",
           "description": "Enveloped signatures in [JSON Signature Scheme (JSS/ITU-T X.590)](https://www.itu.int/epublications/publication/itu-t-x-590-2023-10-json-signature-scheme-jss)."
+        },
+        "measure": {
+          "type": "object",
+          "title": "Measure",
+          "description": "A measurement expressed as a numeric value and a unit. Contexts that use this definition may constrain the permitted units. When the unit is omitted, the value represents a count.",
+          "additionalProperties": false,
+          "required": [
+            "value"
+          ],
+          "properties": {
+            "value": {
+              "type": "number",
+              "title": "Value",
+              "description": "The numeric value of the measurement.",
+              "examples": [
+                127,
+                0.87,
+                2500,
+                52.3
+              ]
+            },
+            "unit": {
+              "type": "string",
+              "title": "Unit",
+              "description": "The unit of measure.",
+              "examples": [
+                "ms",
+                "%",
+                "tokens/s",
+                "GiB",
+                "kWh",
+                "tCO2eq"
+              ]
+            }
+          }
+        },
+        "timeUnits": {
+          "title": "Time Units",
+          "description": "Units of time for duration and latency measurements.",
+          "enum": [
+            "ns",
+            "us",
+            "ms",
+            "s",
+            "min",
+            "h"
+          ],
+          "meta:enum": {
+            "ns": "Nanoseconds, commonly used for high precision timing measurements.",
+            "us": "Microseconds, commonly used for fine grained latency measurements.",
+            "ms": "Milliseconds, commonly used for latency measurements.",
+            "s": "Seconds, commonly used for latency and duration measurements.",
+            "min": "Minutes, commonly used for duration measurements.",
+            "h": "Hours, commonly used for duration measurements."
+          }
+        },
+        "throughputUnits": {
+          "title": "Throughput Units",
+          "description": "Units of throughput for rate measurements.",
+          "enum": [
+            "tokens/s",
+            "requests/s",
+            "ops/s"
+          ],
+          "meta:enum": {
+            "tokens/s": "Tokens per second, commonly used for language model throughput measurements.",
+            "requests/s": "Requests per second, commonly used for API and service throughput measurements.",
+            "ops/s": "Operations per second, commonly used for general throughput measurements."
+          }
+        },
+        "computeUnits": {
+          "title": "Compute Units",
+          "description": "Units of computational work and computational rate.",
+          "enum": [
+            "FLOP",
+            "FLOPS",
+            "GFLOPS",
+            "TFLOPS",
+            "PFLOPS"
+          ],
+          "meta:enum": {
+            "FLOP": "Total floating point operations, commonly used to express cumulative training compute.",
+            "FLOPS": "Floating point operations per second.",
+            "GFLOPS": "Billion floating point operations per second.",
+            "TFLOPS": "Trillion floating point operations per second.",
+            "PFLOPS": "Quadrillion floating point operations per second."
+          }
+        },
+        "memoryUnits": {
+          "title": "Memory Units",
+          "description": "Units of digital information for memory and storage measurements.",
+          "enum": [
+            "B",
+            "KB",
+            "MB",
+            "GB",
+            "TB",
+            "PB",
+            "KiB",
+            "MiB",
+            "GiB",
+            "TiB",
+            "PiB"
+          ],
+          "meta:enum": {
+            "B": "Bytes.",
+            "KB": "Kilobytes.",
+            "MB": "Megabytes.",
+            "GB": "Gigabytes.",
+            "TB": "Terabytes.",
+            "PB": "Petabytes.",
+            "KiB": "Kibibytes.",
+            "MiB": "Mebibytes.",
+            "GiB": "Gibibytes.",
+            "TiB": "Tebibytes.",
+            "PiB": "Pebibytes."
+          }
+        },
+        "ratioUnits": {
+          "title": "Ratio Units",
+          "description": "Units for dimensionless ratio measurements.",
+          "enum": [
+            "%",
+            "ppm"
+          ],
+          "meta:enum": {
+            "%": "Percentage, commonly used for accuracy, precision, recall, and other ratio based metrics.",
+            "ppm": "Parts per million, a dimensionless unit expressing the ratio of one part per million parts."
+          }
+        },
+        "energyUnits": {
+          "title": "Energy Units",
+          "description": "Units of energy.",
+          "enum": [
+            "kWh"
+          ],
+          "meta:enum": {
+            "kWh": "Kilowatt hour, the energy delivered by one kilowatt of power for one hour."
+          }
+        },
+        "co2Units": {
+          "title": "CO2 Units",
+          "description": "Units of carbon dioxide equivalent.",
+          "enum": [
+            "tCO2eq"
+          ],
+          "meta:enum": {
+            "tCO2eq": "Tonnes of carbon dioxide equivalent."
+          }
+        },
+        "energyMeasure": {
+          "title": "Energy Measure",
+          "description": "A measure of energy. The unit is constrained to a standardized energy unit for accurate comparison and reporting.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/measure"
+            },
+            {
+              "required": [
+                "unit"
+              ],
+              "properties": {
+                "unit": {
+                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/energyUnits"
+                }
+              }
+            }
+          ]
+        },
+        "co2Measure": {
+          "title": "CO2 Measure",
+          "description": "A measure of carbon dioxide equivalent. The unit is constrained to a standardized unit for accurate environmental impact reporting.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/measure"
+            },
+            {
+              "required": [
+                "unit"
+              ],
+              "properties": {
+                "unit": {
+                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/co2Units"
+                }
+              }
+            }
+          ]
+        },
+        "graphic": {
+          "type": "object",
+          "title": "Graphic",
+          "description": "A named graphic, such as a chart, plot, or diagram.",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Name",
+              "description": "The name of the graphic."
+            },
+            "image": {
+              "title": "Graphic Image",
+              "description": "The graphic, which may be a vector or raster image. Base64 encoding shall be specified for binary images.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/attachment"
+            }
+          }
+        },
+        "graphicsCollection": {
+          "type": "object",
+          "title": "Graphics Collection",
+          "description": "A collection of graphics that represent various measurements.",
+          "additionalProperties": false,
+          "properties": {
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of this collection of graphics."
+            },
+            "collection": {
+              "type": "array",
+              "title": "Collection",
+              "description": "A collection of graphics.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/graphic"
+              }
+            }
+          }
         }
       }
     },
@@ -4873,9 +5882,10 @@
               "title": "Release notes",
               "description": "Specifies release notes."
             },
-            "modelCard": {
-              "$ref": "#/$defs/cyclonedx-ai-modelcard-2.0/$defs/modelCard",
-              "title": "AI/ML Model Card"
+            "modelProperties": {
+              "$ref": "#/$defs/cyclonedx-ai-ml-2.0/$defs/modelProperties",
+              "title": "AI/ML Model Properties",
+              "description": "Intrinsic technical characteristics of a machine learning model. This object SHOULD be specified for any component of type `machine-learning-model` and shall not be specified for other component types."
             },
             "data": {
               "type": "array",
@@ -5527,7 +6537,7 @@
               }
             },
             "graphics": {
-              "$ref": "#/$defs/cyclonedx-ai-modelcard-2.0/$defs/graphicsCollection"
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/graphicsCollection"
             },
             "description": {
               "title": "Dataset Description",
@@ -8631,6 +9641,9 @@
           "description": "A collection of reusable objects that are defined and may be used elsewhere in the BOM.",
           "additionalProperties": false,
           "properties": {
+            "weaknesses": {
+              "$ref": "#/$defs/cyclonedx-weakness-2.0/$defs/weaknesses"
+            },
             "standards": {
               "$ref": "#/$defs/cyclonedx-standard-2.0/$defs/standards"
             },
@@ -13614,6 +14627,7 @@
                     "ethical",
                     "societal",
                     "human-rights",
+                    "fairness",
                     "health",
                     "legal"
                   ],
@@ -13633,6 +14647,7 @@
                     "ethical": "Ethical risks, including the responsible use of automated decision-making and artificial intelligence.",
                     "societal": "Risks to society, communities, or democratic and civic processes.",
                     "human-rights": "Risks to fundamental human rights, including discrimination and loss of autonomy.",
+                    "fairness": "Risks to the fair and equitable treatment of individuals and groups, as an objective that a risk may undermine or advance.",
                     "health": "Risks to physical or mental health and wellbeing.",
                     "legal": "Legal exposure, including liability and contractual risks."
                   }
@@ -14241,7 +15256,6 @@
                 "privacy",
                 "operational",
                 "strategic",
-                "bias",
                 "discrimination",
                 "fairness",
                 "human-rights",
@@ -14260,9 +15274,8 @@
                 "regulatory": "Regulatory compliance impact.",
                 "safety": "Human safety impact.",
                 "privacy": "Privacy violation impact.",
-                "operational": "Operational disruption.",
+                "operational": "Operational disruption, including degraded performance, reliability, or correctness of a system or its outputs.",
                 "strategic": "Strategic business impact.",
-                "bias": "Systematic bias in automated outputs or decisions.",
                 "discrimination": "Unfair treatment of individuals or groups, including on the basis of protected attributes.",
                 "fairness": "Impact on the fair and equitable treatment of affected groups.",
                 "human-rights": "Impact on fundamental human rights, including autonomy and dignity.",
@@ -15602,7 +16615,7 @@
             },
             "weaknesses": {
               "$ref": "#/$defs/cyclonedx-weakness-2.0/$defs/weaknesses",
-              "description": "The weaknesses, such as CWE classifications, that this threat exploits."
+              "description": "The weaknesses that this threat exploits."
             },
             "relatedVulnerabilities": {
               "type": "array",
@@ -17135,7 +18148,7 @@
             },
             "weaknesses": {
               "$ref": "#/$defs/cyclonedx-weakness-2.0/$defs/weaknesses",
-              "description": "The weaknesses, such as CWE classifications, that give rise to this vulnerability."
+              "description": "The weaknesses that give rise to this vulnerability."
             },
             "description": {
               "type": "string",
@@ -17827,60 +18840,265 @@
           "items": {
             "$ref": "#/$defs/cyclonedx-weakness-2.0/$defs/weakness"
           },
-          "description": "A collection of weaknesses, such as CWE classifications, that classify an underlying flaw."
+          "description": "A collection of weaknesses. Each weakness records a source of risk: a flaw, hazard, bias, or other predisposing condition of a subject or its context."
         },
         "weakness": {
+          "type": "object",
           "title": "Weakness",
-          "description": "A classification of an underlying weakness, given either by a Common Weakness Enumeration (CWE) identifier or by a free-text name with an optional description.\n The exploitability and the affected scope are expressed by the vulnerability or threat that references the weakness, not on the weakness itself.",
-          "oneOf": [
+          "description": "A source of risk: a flaw, hazard, bias, or other predisposing condition of a subject or its context that, under certain circumstances, can contribute to a vulnerability, to a threat being realized, or to an adverse or beneficial outcome. A weakness records the condition itself. It may be identified in an external registry, classified by external taxonomies, or named, and at least a name or an identifier shall be provided. What the condition leads to, how likely that is, who or what is affected, and the consequences are not recorded on the weakness. They are expressed by the vulnerability, threat, or risk that references the weakness; for a risk, the consequences are recorded in its impact categories. For example, a bias in data, design, or outputs is recorded as a weakness, and the discrimination or unfair treatment it can cause is recorded in the impact categories of the risk that references it.",
+          "additionalProperties": false,
+          "anyOf": [
             {
-              "type": "object",
-              "title": "CWE Weakness",
-              "description": "A weakness identified by its CWE identifier.",
-              "additionalProperties": false,
-              "required": [
-                "cweId"
-              ],
-              "properties": {
-                "bom-ref": {
-                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-                  "description": "An optional identifier which can be used to reference the weakness elsewhere using a bom-ref or bom-link."
-                },
-                "cweId": {
-                  "type": "integer",
-                  "minimum": 1,
-                  "title": "CWE Identifier",
-                  "description": "The Common Weakness Enumeration (CWE) identifier that classifies this weakness."
-                }
-              }
-            },
-            {
-              "type": "object",
-              "title": "Named Weakness",
-              "description": "A weakness identified by a free-text name, used where no CWE classification applies.",
-              "additionalProperties": false,
               "required": [
                 "name"
-              ],
-              "properties": {
-                "bom-ref": {
-                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-                  "description": "An optional identifier which can be used to reference the weakness elsewhere using a bom-ref or bom-link."
-                },
-                "name": {
+              ]
+            },
+            {
+              "required": [
+                "identifiers"
+              ]
+            }
+          ],
+          "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "description": "An optional identifier which can be used to reference the weakness elsewhere using a bom-ref or bom-link."
+            },
+            "kind": {
+              "title": "Kind",
+              "description": "The kind of source this weakness is. The kind separates a flaw in the subject, an intrinsic hazard, a systematic bias, and a circumstantial predisposing condition, so that weaknesses of one kind can be selected, for example the biases that inform the risks of a machine learning model.",
+              "oneOf": [
+                {
+                  "title": "Pre-Defined Kind",
                   "type": "string",
-                  "minLength": 1,
-                  "title": "Name",
-                  "description": "The name of the weakness."
+                  "enum": [
+                    "flaw",
+                    "hazard",
+                    "bias",
+                    "predisposing-condition"
+                  ],
+                  "meta:enum": {
+                    "flaw": "An imperfection in the design, implementation, manufacture, or configuration of the subject, such as a CWE weakness or a weld imperfection. A flaw is a property of the subject that a vulnerability or threat can exploit.",
+                    "hazard": "An intrinsic property of a material, energy source, or process that can cause harm, such as a toxic substance or a moving part. A hazard exists regardless of any flaw; the risk arises from exposure to it.",
+                    "bias": "A systematic deviation in data, models, measurements, or human judgement that favours some outcomes or groups over others. A bias is a source of risk; its consequences, such as discrimination or unfair treatment, are recorded in the impact categories of the risk that references it.",
+                    "predisposing-condition": "A circumstance of the subject or its context that increases the likelihood or the consequence of an adverse event without itself being a flaw, hazard, or bias, such as a single-source supplier, an obsolete part, or an unsupported dependency."
+                  }
                 },
-                "description": {
+                {
+                  "title": "Custom Kind",
+                  "type": "object",
+                  "required": [
+                    "name"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "The name of the custom kind."
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "A description of the custom kind."
+                    }
+                  }
+                }
+              ]
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Name",
+              "description": "A short name for the weakness. A name is required when no identifier is given, and is recommended beside an identifier whose registry is not freely readable."
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the weakness: the condition itself, where it arises in the subject or its context, and the evidence for it. Likelihood, affected parties, and consequences belong to the vulnerability, threat, or risk that references the weakness."
+            },
+            "identifiers": {
+              "type": "array",
+              "title": "Identifiers",
+              "uniqueItems": true,
+              "minItems": 1,
+              "description": "Identifiers of this weakness in external registries that assign a stable identifier to each entry, such as a CWE identifier. A weakness may carry identifiers from several registries when they describe the same condition.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-weakness-2.0/$defs/weaknessIdentifier"
+              }
+            },
+            "categories": {
+              "type": "array",
+              "title": "Categories",
+              "uniqueItems": true,
+              "description": "Classifications of this weakness in taxonomies that name categories without assigning identifiers to entries, such as the NIST SP 1270 categories of bias. Categories complement identifiers; a weakness identified in one registry may also be classified by several taxonomies.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-weakness-2.0/$defs/weaknessCategory"
+              }
+            }
+          }
+        },
+        "weaknessIdentifier": {
+          "type": "object",
+          "title": "Weakness Identifier",
+          "description": "An identifier of a weakness in an external registry, given by the scheme of the registry and the value the registry assigns.",
+          "required": [
+            "scheme",
+            "value"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scheme": {
+              "title": "Scheme",
+              "description": "The registry that assigns the identifier.",
+              "oneOf": [
+                {
+                  "title": "Pre-Defined Scheme",
                   "type": "string",
-                  "title": "Description",
-                  "description": "A description of the weakness."
+                  "enum": [
+                    "cwe",
+                    "imdrf-aet",
+                    "hfacs",
+                    "sot",
+                    "ghs",
+                    "iso-6520",
+                    "iso-iec-24772"
+                  ],
+                  "meta:enum": {
+                    "cwe": "Identifiers of the [Common Weakness Enumeration](https://cwe.mitre.org/), a community-developed list of software, hardware, and service weakness types.",
+                    "imdrf-aet": "Investigation conclusion codes of Annex D of the [IMDRF Adverse Event Terminology](https://www.imdrf.org/documents/terminologies-categorized-adverse-event-reporting-aer-terms-terminology-and-codes), which classify the root cause of a medical device adverse event.",
+                    "hfacs": "Codes of the [Department of Defense Human Factors Analysis and Classification System](https://navalsafetycommand.navy.mil/portals/100/documents/HF-Enc2-HFACS.pdf), which classify the human and organizational conditions that contribute to mishaps.",
+                    "sot": "Risk category and risk factor identifiers of the [MITRE System of Trust](https://sot.mitre.org/), which classify conditions of suppliers, supplies, and services that affect supply chain risk.",
+                    "ghs": "Hazard statement codes of the [Globally Harmonized System of Classification and Labelling of Chemicals](https://unece.org/about-ghs), which identify the physical, health, and environmental hazards of a substance or mixture.",
+                    "iso-6520": "Reference numbers of [ISO 6520-1](https://www.iso.org/standard/40229.html), which classify geometric imperfections in fusion-welded metallic materials.",
+                    "iso-iec-24772": "Vulnerability codes of [ISO/IEC 24772-1](https://www.iso.org/standard/83629.html), a language-independent catalogue of programming language vulnerabilities."
+                  }
+                },
+                {
+                  "title": "Custom Scheme",
+                  "type": "object",
+                  "required": [
+                    "name"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "The name of the custom scheme."
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "A description of the custom scheme."
+                    },
+                    "url": {
+                      "type": "string",
+                      "format": "iri-reference",
+                      "description": "URL of the scheme registry or specification."
+                    }
+                  }
+                }
+              ]
+            },
+            "schemeVersion": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Scheme Version",
+              "description": "The version or edition of the registry that issued the identifier, for example 4.20 for CWE or 8.0 for HFACS."
+            },
+            "value": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Value",
+              "description": "The identifier value as issued by the registry, for example CWE-502."
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "scheme": {
+                    "const": "cwe"
+                  }
+                },
+                "required": [
+                  "scheme"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "value": {
+                    "pattern": "^CWE-[1-9][0-9]*$"
+                  }
                 }
               }
             }
           ]
+        },
+        "weaknessCategory": {
+          "type": "object",
+          "title": "Weakness Category",
+          "description": "A classification of a weakness within a taxonomy, given by the taxonomy and the category named or numbered within it.",
+          "required": [
+            "taxonomy",
+            "category"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "taxonomy": {
+              "title": "Taxonomy",
+              "description": "The taxonomy that the category is drawn from.",
+              "oneOf": [
+                {
+                  "title": "Pre-Defined Taxonomy",
+                  "type": "string",
+                  "enum": [
+                    "nist-sp-1270",
+                    "iso-iec-tr-24027",
+                    "orx-cause",
+                    "hfacs",
+                    "nist-sp-800-30"
+                  ],
+                  "meta:enum": {
+                    "nist-sp-1270": "Categories of bias in artificial intelligence defined by [NIST SP 1270](https://doi.org/10.6028/NIST.SP.1270).",
+                    "iso-iec-tr-24027": "Sources of unwanted bias in AI systems and AI-aided decision making defined by [ISO/IEC TR 24027](https://www.iso.org/standard/77607.html).",
+                    "orx-cause": "Cause categories of the [ORX Reference Taxonomy](https://orx.org/operational-risk-reference-taxonomy) for operational and non-financial risk.",
+                    "hfacs": "Causal levels of the [Human Factors Analysis and Classification System](https://www.faa.gov/sites/faa.gov/files/data_research/research/med_humanfacs/oamtechreports/00_07.pdf).",
+                    "nist-sp-800-30": "Types of predisposing condition defined by [NIST SP 800-30 Revision 1](https://doi.org/10.6028/NIST.SP.800-30r1)."
+                  }
+                },
+                {
+                  "title": "Custom Taxonomy",
+                  "type": "object",
+                  "required": [
+                    "name"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "The name of the custom taxonomy."
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "A description of the custom taxonomy."
+                    },
+                    "url": {
+                      "type": "string",
+                      "format": "iri-reference",
+                      "description": "URL of the taxonomy specification."
+                    }
+                  }
+                }
+              ]
+            },
+            "category": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Category",
+              "description": "The category within the taxonomy, as named or numbered by the taxonomy."
+            }
+          }
         }
       }
     },

@@ -306,6 +306,29 @@
           "party-clinicians"
         ]
       }
+    ],
+    "weaknesses": [
+      {
+        "bom-ref": "weakness-age-representation",
+        "kind": "bias",
+        "name": "Representation bias in training data",
+        "description": "Notes describing patients aged 65 and over are under-represented in the training corpus.",
+        "identifiers": [
+          {
+            "scheme": {
+              "name": "avid",
+              "url": "https://avidml.org/taxonomy/"
+            },
+            "value": "E0101"
+          }
+        ],
+        "categories": [
+          {
+            "taxonomy": "nist-sp-1270",
+            "category": "statistical-computational"
+          }
+        ]
+      }
     ]
   },
   "risks": {
@@ -326,6 +349,9 @@
           "model-1",
           "party-elderly-users"
         ],
+        "relatedWeaknesses": [
+          "weakness-age-representation"
+        ],
         "inherentRisk": {
           "likelihood": {
             "level": "high"
@@ -334,7 +360,6 @@
             "level": "major",
             "polarity": "harm",
             "categories": [
-              "bias",
               "fairness",
               "health"
             ]
@@ -349,7 +374,6 @@
             "level": "moderate",
             "polarity": "harm",
             "categories": [
-              "bias",
               "fairness"
             ]
           }
@@ -510,6 +534,13 @@
           "expression": "$.risks.risks[?(@.domains[?(@.type=='ethical')])]",
           "nativeName": "Ethical Considerations",
           "nativeDescription": "Risks documenting potential harms, affected groups, and mitigations.",
+          "relevance": "required",
+          "weight": 0.9
+        },
+        {
+          "expression": "$.definitions.weaknesses[?(@.kind=='bias')]",
+          "nativeName": "Bias",
+          "nativeDescription": "Biases in data, design, or outputs recorded as weaknesses; their consequences are recorded in the risks that reference them.",
           "relevance": "required",
           "weight": 0.9
         },
