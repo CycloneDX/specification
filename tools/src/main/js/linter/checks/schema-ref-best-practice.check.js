@@ -20,11 +20,10 @@ import { LintCheck, registerCheck, Severity, traverseSchema } from '../index.js'
  */
 const REF_ALLOWED_SIBLINGS = Object.freeze(new Set([
   '$ref', // the $ref itself
-  '$comment', 'title', 'description', 'examples', // documentational
+  '$comment', 'title', 'description', 'examples', 'default', // documentational
   /* do NOT add any non-documentationals
      instead, use:
      { "allOf": { "$ref": ... }, "$id" ..., "$anchor": ... }
-     { "allOf": { "$ref": ... }, "default" ... }
      instead of additionalProperties -- { "allOf": { "$ref": ... }, "unevaluatedItems" ... }
    */
 ]));
@@ -33,8 +32,8 @@ const REF_ALLOWED_SIBLINGS = Object.freeze(new Set([
  * Keys whose values aren't schemas - their entire subtrees are pruned
  */
 const SKIP_KEYS = Object.freeze(new Set([
-  'enum', 'const', 'default', // values
-  'examples', 'meta:enum', // documentational
+  'enum', 'const', // values
+  'default', 'examples', 'meta:enum', // documentational
 ]));
 
 
@@ -72,10 +71,10 @@ function makeSameFileTest(schema, filePath) {
 /**
  * Check that validates `$ref` best practice.
  */
-class RefBestPracticeCheck extends LintCheck {
+class SchemaRefBestPracticeCheck extends LintCheck {
   constructor() {
     super(
-      'ref-best-practice',
+      'schema-ref-best-practice',
       '$ref Best Practice',
       'Validates that $ref usage follows JSON Schema best practice.',
       Severity.ERROR
@@ -146,8 +145,8 @@ class RefBestPracticeCheck extends LintCheck {
 }
 
 // Create and register the check
-const check = new RefBestPracticeCheck();
+const check = new SchemaRefBestPracticeCheck();
 registerCheck(check);
 
-export { RefBestPracticeCheck };
+export { SchemaRefBestPracticeCheck };
 export default check;
