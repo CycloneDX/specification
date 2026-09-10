@@ -686,21 +686,8 @@
         },
         "environmentVars": {
           "title": "Environment variables",
-          "description": "Inputs that have the form of parameters with names and values.",
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "oneOf": [
-              {
-                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/property"
-              },
-              {
-                "type": "string",
-                "title": "String-Based Environment Variables",
-                "description": "In addition to the more common key–value pair format, some environment variables may consist of a single string without an explicit value assignment. These string-based environment variables typically act as flags or signals to software, indicating that a feature should be enabled, a mode should be activated, or a specific condition is present. Their presence alone conveys meaning."
-              }
-            ]
-          }
+          "description": "Inputs that have the form of environment variables.",
+          "$ref": "#/$defs/environmentVars"
         },
         "data": {
           "title": "Data",
@@ -772,20 +759,7 @@
         "environmentVars": {
           "title": "Environment variables",
           "description": "Outputs that have the form of environment variables.",
-          "type": "array",
-          "items": {
-            "oneOf": [
-              {
-                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/property"
-              },
-              {
-                "type": "string",
-                "title": "String-Based Environment Variables",
-                "description": "In addition to the more common key–value pair format, some environment variables may consist of a single string without an explicit value assignment. These string-based environment variables typically act as flags or signals to software, indicating that a feature should be enabled, a mode should be activated, or a specific condition is present. Their presence alone conveys meaning."
-              }
-            ]
-          },
-          "uniqueItems": true
+          "$ref": "#/$defs/environmentVars"
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
@@ -895,6 +869,22 @@
           "type": "string"
         }
       }
+    },
+    "environmentVars": {
+      "title": "Environment variables",
+      "description": "A map of environment variable names to values.\n\nKeys are environment variable names and are intentionally unconstrained by this schema (including names that may be empty or start with non-alphabetic characters).\n\nValues must be either a `string` or `null`:\n- `null` means the variable is absent/unset.\n- `\"\"` (empty string) is a valid, explicit value and does not mean absent.",
+      "$comment": "While some systems may have restrictions on env var names, others may have not. See this test: `env '=empty-name' '0trust=starts-with-number' python -c 'import os;print(repr(os.environ))'`",
+      "type": "object",
+      "additionalProperties": {
+        "description": "Values must be either a `string` or `null`:\n- `null` means the variable is absent/unset.\n- `\"\"` (empty string) is a valid, explicit value and does not mean absent.",
+        "type": ["string", "null"]
+      },
+      "examples": [
+        { "LC_ALL": null, "LANG": "en_US.UTF-8" },
+        { "MY_FLAG": "1" },
+        { "0TRUST": "true" },
+        { "": "" }
+      ]
     }
   }
 }
