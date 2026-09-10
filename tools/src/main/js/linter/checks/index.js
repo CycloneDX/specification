@@ -7,9 +7,9 @@
  * @license Apache-2.0
  */
 
-import {readdirSync} from 'fs';
-import {dirname, join} from 'path';
-import {fileURLToPath} from 'url';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import { readdirSync } from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
