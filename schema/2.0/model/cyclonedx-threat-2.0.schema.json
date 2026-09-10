@@ -230,12 +230,13 @@
                 "type": "string",
                 "title": "Taxonomy",
                 "description": "The threat classification taxonomy that the category is drawn from.",
-                "enum": ["STRIDE", "LINDDUN", "MAESTRO", "MITRE-ATTACK"],
+                "enum": ["STRIDE", "LINDDUN", "MAESTRO", "MITRE-ATTACK", "ATLAS"],
                 "meta:enum": {
                   "STRIDE": "Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, and Elevation of Privilege.",
                   "LINDDUN": "Linkability, Identifiability, Non-repudiation, Detectability, Disclosure of information, Unawareness, and Non-compliance.",
                   "MAESTRO": "Multi-Agent Environment, Security, Threat, Risk, and Outcome, whose categories are its seven architectural layers.",
-                  "MITRE-ATTACK": "The MITRE ATT&CK framework, whose categories are its Enterprise tactics."
+                  "MITRE-ATTACK": "The MITRE ATT&CK framework, whose categories are its Enterprise tactics.",
+                  "ATLAS": "The MITRE ATLAS framework for AI system threats, whose categories are its tactics."
                 }
               },
               "category": {
@@ -320,6 +321,37 @@
                   "properties": {
                     "category": {
                       "enum": ["reconnaissance", "resource-development", "initial-access", "execution", "persistence", "privilege-escalation", "defense-evasion", "credential-access", "discovery", "lateral-movement", "collection", "command-and-control", "exfiltration", "impact"]
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "required": ["taxonomy"],
+                  "properties": { "taxonomy": { "const": "ATLAS" } }
+                },
+                "then": {
+                  "properties": {
+                    "category": {
+                      "enum": ["reconnaissance", "resource-development", "initial-access", "ai-model-access", "execution", "persistence", "privilege-escalation", "defense-evasion", "credential-access", "discovery", "lateral-movement", "collection", "ai-attack-staging", "command-and-control", "exfiltration", "impact"],
+                      "meta:enum": {
+                        "reconnaissance": "Gathering information about the target AI system to plan future operations.",
+                        "resource-development": "Establishing resources to support operations against AI systems.",
+                        "initial-access": "Gaining an initial foothold in an AI system or its operating environment.",
+                        "ai-model-access": "Gaining access to an AI model or the context needed to interact with it.",
+                        "execution": "Running adversary-controlled code through AI artifacts or supporting software.",
+                        "persistence": "Maintaining a foothold using AI artifacts, software, or related infrastructure.",
+                        "privilege-escalation": "Gaining higher-level permissions in an AI system or environment.",
+                        "defense-evasion": "Avoiding detection by AI-enabled security software or related controls.",
+                        "credential-access": "Obtaining account names, passwords, tokens, or similar credentials.",
+                        "discovery": "Learning about the AI environment and surrounding systems.",
+                        "lateral-movement": "Moving through an AI environment to reach other systems or components.",
+                        "collection": "Gathering AI artifacts or related information relevant to the adversary's objective.",
+                        "ai-attack-staging": "Tailoring or preparing an attack using knowledge of the target AI system.",
+                        "command-and-control": "Communicating with compromised AI systems or infrastructure to control them.",
+                        "exfiltration": "Stealing AI artifacts or other information about the AI system.",
+                        "impact": "Manipulating, interrupting, eroding confidence in, or destroying AI systems or data."
+                      }
                     }
                   }
                 }
