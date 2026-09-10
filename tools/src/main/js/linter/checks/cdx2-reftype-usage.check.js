@@ -86,14 +86,14 @@ function relativeUrl(from, to) {
 }
 
 /**
- * Check that `bom-ref` properties `$ref` refType — and nothing else does.
+ * CycloneDX2-specific: Check that `bom-ref` properties ref the `refType` — and nothing else does.
  */
-class RefTypeUsageCheck extends LintCheck {
+class Cdx2RefTypeUsageCheck extends LintCheck {
   constructor() {
     super(
-      'cdx2-ref-type-usage',
+      'cdx2-reftype-usage',
       'RefType Usage',
-      'CycloneDX2-specific: validates that `bom-ref` properties `$ref` the shared refType definition, and that refType is not referenced anywhere else (except refLinkType).',
+      'CycloneDX2-specific: validates that `bom-ref` properties `$ref` the shared `refType` definition, and that `refType` is not referenced anywhere else (except `refLinkType`).',
       Severity.ERROR
     );
   }
@@ -250,8 +250,8 @@ class RefTypeUsageCheck extends LintCheck {
 }
 
 // Create and register the check
-const check = new RefTypeUsageCheck();
+const check = new Cdx2RefTypeUsageCheck();
 registerCheck(check);
 
-export { RefTypeUsageCheck };
+export { Cdx2RefTypeUsageCheck };
 export default check;
