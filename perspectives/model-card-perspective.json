@@ -222,17 +222,17 @@
           "rationale": "Ethical considerations are expressed as entries in the document's risk model rather than as card-local prose, gaining structured likelihood, impact, and response data. Risks reference the models they affect through `affects`, so the referrers step selects, for a scoped model, exactly the risks that name it; unscoped, every matching risk is selected."
         },
         {
-          "expression": "$.risks.risks[?(@.inherentRisk.impact.categories[?(@=='fairness' || @=='bias')])]",
+          "expression": "$.risks.risks[?(@.domains[?(@.type=='fairness')])]",
           "via": [
             {
               "referrers": "$.risks.risks[*].affects[*]"
             }
           ],
           "nativeName": "Fairness Assessments",
-          "nativeDescription": "Risks whose impact is categorized as fairness or bias, describing groups at risk and observed disparities.",
+          "nativeDescription": "Risks in the fairness domain associated with the model, describing groups at risk and observed disparities.",
           "relevance": "recommended",
           "weight": 0.6,
-          "rationale": "Fairness assessments identify demographic or group-level performance disparities; slice-level evaluation metrics provide their quantitative backing. Risks reference the models they affect through `affects`, so the referrers step selects, for a scoped model, exactly the risks that name it; unscoped, every matching risk is selected."
+          "rationale": "Fairness assessments identify demographic or group-level performance disparities; slice-level evaluation metrics provide their quantitative backing. Fairness is selected as a risk domain, mirroring ethical considerations, so the mapping does not depend on how a methodology categorizes impact. Bias is a weakness kind rather than an impact category, reachable from a risk through `relatedWeaknesses`; selecting those weaknesses needs its own mapping, because a traversal step replaces the set of nodes the expression is evaluated against. Risks reference the models they affect through `affects`, so the referrers step selects, for a scoped model, exactly the risks that name it; unscoped, every matching risk is selected."
         },
         {
           "expression": "$..[?(@.type=='machine-learning-model')].modelProperties.environmental",
