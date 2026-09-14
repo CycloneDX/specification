@@ -58,10 +58,11 @@ console.debug('DEBUG | testdataDir = ', testdataDir);
 
 // region validator
 
-const [spdxSchema, cryptoDefsSchema, behaviorTaxonomySchema, bomSchema, bomSchemaModules] = await Promise.all([
+const [spdxSchema, cryptoDefsSchema, behaviorTaxonomySchema, perspectivesDefsSchema, bomSchema, bomSchemaModules] = await Promise.all([
     readFile(join(schemaRootDir, 'spdx.schema.json'), 'utf-8').then(JSON.parse),
     readFile(join(schemaRootDir, 'cryptography-defs.schema.json'), 'utf-8').then(JSON.parse),
     readFile(join(schemaRootDir, 'behavior-taxonomy.schema.json'), 'utf-8').then(JSON.parse),
+    readFile(join(schemaRootDir, 'perspectives-defs.schema.json'), 'utf-8').then(JSON.parse),
     readFile(schemaFile, 'utf-8').then(JSON.parse),
     glob(join(schemaModelDir, schemaGlob)).then(fs => Promise.all(fs.map(
         f => readFile(f, 'utf-8').then(s => [basename(f), JSON.parse(s)])
@@ -80,6 +81,7 @@ ajv.addMetaSchema(draft7MetaSchema);
 ajv.addSchema(spdxSchema, 'https://cyclonedx.org/schema/spdx.schema.json')
 ajv.addSchema(cryptoDefsSchema, 'https://cyclonedx.org/schema/cryptography-defs.schema.json')
 ajv.addSchema(behaviorTaxonomySchema, 'https://cyclonedx.org/schema/behavior-taxonomy.schema.json')
+ajv.addSchema(perspectivesDefsSchema, 'https://cyclonedx.org/schema/perspectives-defs.schema.json')
 for (const [f, s] of bomSchemaModules) {
     ajv.addSchema(s, `https://cyclonedx.org/schema/${testschemaVersion}/model/${f}`)
 }
