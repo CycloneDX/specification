@@ -31,7 +31,7 @@ class ConstEnumNoTypeCheck extends LintCheck {
     const issues = [];
 
     traverseSchema(schema, (node, path, key) => {
-      if (key in SKIP_KEYS ) {
+      if (SKIP_KEYS.has(key)) {
         // Prune literal values before inspecting them.
         return false;
       }
