@@ -3161,6 +3161,7 @@ pre {
                   <xsl:when test="xsd:simpleType">
                      <xsl:apply-templates select="xsd:simpleType" mode="sample">
                         <xsl:with-param name="schemaLoc" select="$schemaLoc"/>
+                        <xsl:with-param name="margin" select="$margin"/>
                      </xsl:apply-templates>
                   </xsl:when>
                   <xsl:otherwise>
