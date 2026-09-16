@@ -1,3 +1,3 @@
 
-- Unclear which version of `xs3p.xls` was used asa  base.  
+- Unclear which version of `xs3p.xsl` was used asa  base.  
   To be researched!!1
