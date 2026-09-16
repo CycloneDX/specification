@@ -8225,17 +8225,16 @@ was not specified in the links file, <xsl:value-of select="$linksFile"/>.
          <xsl:text> comes from list: {</xsl:text>
 
          <xsl:for-each select="$simpleRestrict/xsd:enumeration">
-            <xsl:if test="position() != last()
-                and $breakEnumListAfterN > 0
-                and position() mod $breakEnumListAfterN = 0">
-               <xsl:text>&#10;</xsl:text>
-               <xsl:call-template name="Repeat">
-                  <xsl:with-param name="content"><xsl:text> </xsl:text></xsl:with-param>
-                  <xsl:with-param name="count" select="number($margin) + number($ELEM_INDENT)"/>
-               </xsl:call-template>
-            </xsl:if>
             <xsl:if test="position()!=1">
-                <wbr/><xsl:text>|</xsl:text>
+               <xsl:if test="$breakEnumListAfterN > 0
+                             and (position() - 1) mod $breakEnumListAfterN = 0">
+                  <xsl:text>&#10;</xsl:text>
+                  <xsl:call-template name="Repeat">
+                     <xsl:with-param name="content"><xsl:text> </xsl:text></xsl:with-param>
+                     <xsl:with-param name="count" select="number($margin) + number($ELEM_INDENT)"/>
+                  </xsl:call-template>
+               </xsl:if>
+               <wbr/><xsl:text>|</xsl:text>
             </xsl:if>
             <xsl:text>'</xsl:text>
             <xsl:value-of select="@value"/>
