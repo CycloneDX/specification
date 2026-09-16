@@ -699,7 +699,7 @@
      -->
    <xsl:template name="SectionFooter">
       <!-- Link to top of page-->
-      <div style="text-align: right; clear: both;"><a href="#top" title="Go to top of page"><i class="bi bi-chevron-up"><xsl:text> </xsl:text></i></a></div>
+      <div style="text-align: right; clear: both;"><a href="#top" title="Go to top of page"><i class="bi bi-chevron-up hide-content"><xsl:text>&#9650;</xsl:text></i></a></div>
       <hr/>
    </xsl:template>
 
@@ -908,6 +908,18 @@ pre {
     background: none repeat scroll 0% 0% transparent;
     line-height: 1;
     font-size: 12px;
+}
+.bi.hide-content {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    overflow: hidden;
+    text-indent: 100%;
+    white-space: nowrap;
+}
+.bi.hide-content:before {
+    display: block;
+    text-indent: 0;
 }
 
 .unpre {
@@ -4104,7 +4116,7 @@ pre {
          </xsl:variable>
 
          <xsl:text> </xsl:text>
-         <button title="Show documentation for {$component/@name}" class="btn btn-link btn-doc" data-bs-toggle="modal" data-bs-target="#{$documentation}-popup"><i class="bi bi-info-circle"><xsl:text> </xsl:text></i></button>
+         <button title="Show documentation for {$component/@name}" class="btn btn-link btn-doc" data-bs-toggle="modal" data-bs-target="#{$documentation}-popup"><i class="bi bi-info-circle hide-content"><xsl:text>i</xsl:text></i></button>
       </xsl:if>
    </xsl:template>
 
@@ -7245,7 +7257,7 @@ pre {
                <xsl:if test="$help != ''">
                   <span class="float-end xs3p-panel-help">
                      <button type="button" class="btn btn-doc" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="left" data-bs-html="true" data-bs-content="{$help}">
-                     <i class="bi bi-question-circle"><xsl:text> </xsl:text></i>
+                     <i class="bi bi-question-circle hide-content"><xsl:text>?</xsl:text></i>
                      </button>
                   </span>
                </xsl:if>
@@ -8209,10 +8221,6 @@ was not specified in the links file, <xsl:value-of select="$linksFile"/>.
          <xsl:for-each select="$simpleRestrict/xsd:enumeration">
             <xsl:if test="position()!=1">
                <xsl:text>|</xsl:text>
-            </xsl:if>
-            <xsl:if test="count($simpleRestrict/xsd:enumeration)>5">
-               <xsl:text>
-    </xsl:text>
             </xsl:if>
             <xsl:text>'</xsl:text>
             <xsl:value-of select="@value"/>
