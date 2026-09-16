@@ -165,6 +165,12 @@
 
    <xsl:param name="cycloneDxVersion">0.0</xsl:param>
 
+   <!-- After how many items shall a enum list have a break?
+        Integer value.
+        If set to <=0, then no breaks are done.
+   -->
+   <xsl:param name="breakEnumListAfterN">5</xsl:param>
+
 
    <!-- ******** Constants ******** -->
 
@@ -3971,11 +3977,13 @@ pre {
      -->
    <xsl:template match="xsd:simpleType" mode="sample">
       <xsl:param name="schemaLoc">this</xsl:param>
+      <xsl:param name="margin">0</xsl:param>
 
       <span class="constraint">
          <xsl:call-template name="PrintSampleSimpleConstraints">
             <xsl:with-param name="simpleContent" select="."/>
             <xsl:with-param name="schemaLoc" select="$schemaLoc"/>
+            <xsl:with-param name="margin" select="$margin"/>
          </xsl:call-template>
       </span>
    </xsl:template>
@@ -4353,6 +4361,7 @@ pre {
          <xsl:when test="$element/@name and $element/xsd:simpleType">
             <xsl:apply-templates select="$element/xsd:simpleType" mode="sample">
                <xsl:with-param name="schemaLoc" select="$schemaLoc"/>
+               <xsl:with-param name="margin" select="$margin"/>
             </xsl:apply-templates>
          </xsl:when>
          <xsl:otherwise>
@@ -5326,6 +5335,7 @@ pre {
       <xsl:param name="simpleContent"/>
       <xsl:param name="schemaLoc">this</xsl:param>
       <xsl:param name="typeList"/>
+      <xsl:param name="margin">0</xsl:param>
 
       <xsl:choose>
          <!-- Derivation by restriction -->
@@ -5334,6 +5344,7 @@ pre {
                <xsl:with-param name="restriction" select="$simpleContent/xsd:restriction"/>
                <xsl:with-param name="schemaLoc" select="$schemaLoc"/>
                <xsl:with-param name="typeList" select="$typeList"/>
+                <xsl:with-param name="margin" select="$margin"/>
             </xsl:call-template>
          </xsl:when>
          <!-- Derivation by list -->
@@ -5405,6 +5416,7 @@ pre {
       <xsl:param name="restriction"/>
       <xsl:param name="schemaLoc">this</xsl:param>
       <xsl:param name="typeList"/>
+      <xsl:param name="margin">0</xsl:param>
 
       <xsl:variable name="typeName" select="$restriction/parent::xsd:simpleType/@name"/>
 
@@ -5474,6 +5486,7 @@ pre {
          <xsl:text> (</xsl:text>
          <xsl:call-template name="PrintEnumFacets">
             <xsl:with-param name="simpleRestrict" select="$restriction"/>
+            <xsl:with-param name="margin" select="$margin"/>
          </xsl:call-template>
          <xsl:text>)</xsl:text>
       </xsl:if>
@@ -8213,6 +8226,7 @@ was not specified in the links file, <xsl:value-of select="$linksFile"/>.
      -->
    <xsl:template name="PrintEnumFacets">
       <xsl:param name="simpleRestrict"/>
+      <xsl:param name="margin">0</xsl:param>
 
       <xsl:if test="$simpleRestrict/xsd:enumeration">
          <em>value</em>
@@ -8220,7 +8234,16 @@ was not specified in the links file, <xsl:value-of select="$linksFile"/>.
 
          <xsl:for-each select="$simpleRestrict/xsd:enumeration">
             <xsl:if test="position()!=1">
-               <xsl:text>|</xsl:text>
+               <xsl:text>|</xsl:text><wbr/>
+            </xsl:if>
+            <xsl:if test="$breakEnumListAfterN > 0
+                and position() mod $breakEnumListAfterN = 0
+                and position() != last()">
+               <xsl:text>&#10;</xsl:text>
+               <xsl:call-template name="Repeat">
+                  <xsl:with-param name="content"><xsl:text> </xsl:text></xsl:with-param>
+                  <xsl:with-param name="count" select="number($margin) + number($ELEM_INDENT)"/>
+               </xsl:call-template>
             </xsl:if>
             <xsl:text>'</xsl:text>
             <xsl:value-of select="@value"/>
