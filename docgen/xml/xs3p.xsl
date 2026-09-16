@@ -165,9 +165,8 @@
 
    <xsl:param name="cycloneDxVersion">0.0</xsl:param>
 
-   <!-- After how many items shall a enum list have a break?
-        Integer value.
-        If set to <=0, then no breaks are done.
+   <!-- After how many items shall an enum list have a break? Only afects <pre> wrapped docs.
+        Integer value. If set to <=0, then no breaks are done.
    -->
    <xsl:param name="breakEnumListAfterN">5</xsl:param>
 
@@ -8224,9 +8223,6 @@ was not specified in the links file, <xsl:value-of select="$linksFile"/>.
          <xsl:text> comes from list: {</xsl:text>
 
          <xsl:for-each select="$simpleRestrict/xsd:enumeration">
-            <xsl:if test="position()!=1">
-                <wbr/><xsl:text>|</xsl:text>
-            </xsl:if>
             <xsl:if test="position() != last()
                 and $breakEnumListAfterN > 0
                 and position() mod $breakEnumListAfterN = 0">
@@ -8235,6 +8231,9 @@ was not specified in the links file, <xsl:value-of select="$linksFile"/>.
                   <xsl:with-param name="content"><xsl:text> </xsl:text></xsl:with-param>
                   <xsl:with-param name="count" select="number($margin) + number($ELEM_INDENT)"/>
                </xsl:call-template>
+            </xsl:if>
+            <xsl:if test="position()!=1">
+                <wbr/><xsl:text>|</xsl:text>
             </xsl:if>
             <xsl:text>'</xsl:text>
             <xsl:value-of select="@value"/>
