@@ -438,6 +438,7 @@
                   obj.querySelectorAll('code,pre').forEach(function(block) {
                      block.innerHTML = block.textContent;
                   });
+                  rawEl.className += ' docs-hidden';
                });
 
                // Sidebar scroll handling
@@ -938,6 +939,8 @@ pre {
 .codehilite .s   {color: #D2322D;}
 .codehilite a       {color: inherit !important; text-decoration: underline !important;}
 .codehilite a:hover {opacity: 0.7 !important;}
+
+.docs-hidden {display:none;}
 
 @media (min-width: 992px) {
     .xs3p-sidebar {
@@ -2667,7 +2670,7 @@ pre {
          <xsl:for-each select="$component/xsd:annotation/xsd:documentation">
             <xsl:if test="position()!=1"><br/><br/></xsl:if>
             <div class="annotation documentation" id="wdoc-{generate-id(.)}{$suffix}">
-               <div class="hidden" id="{generate-id(.)}{$suffix}-doc-raw">
+               <div id="{generate-id(.)}{$suffix}-doc-raw">
                   <xsl:value-of select="text()"/>
                   <xsl:if test="./@source">
                      Linked documentation: <xsl:value-of select="./@source"/>
