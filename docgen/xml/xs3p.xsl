@@ -5344,7 +5344,7 @@ pre {
                <xsl:with-param name="restriction" select="$simpleContent/xsd:restriction"/>
                <xsl:with-param name="schemaLoc" select="$schemaLoc"/>
                <xsl:with-param name="typeList" select="$typeList"/>
-                <xsl:with-param name="margin" select="$margin"/>
+               <xsl:with-param name="margin" select="$margin"/>
             </xsl:call-template>
          </xsl:when>
          <!-- Derivation by list -->
