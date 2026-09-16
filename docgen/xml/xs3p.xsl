@@ -165,7 +165,8 @@
 
    <xsl:param name="cycloneDxVersion">0.0</xsl:param>
 
-   <!-- After how many items shall an enum list have a break? Only afects <pre> wrapped docs.
+   <!-- After how many items shall an enum list have a break?
+        Only affects <pre> wrapped docs; non-pre may wrap automatically based on content-box.
         Integer value. If set to <=0, then no breaks are done.
    -->
    <xsl:param name="breakEnumListAfterN">5</xsl:param>
