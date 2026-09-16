@@ -8225,7 +8225,7 @@ was not specified in the links file, <xsl:value-of select="$linksFile"/>.
 
          <xsl:for-each select="$simpleRestrict/xsd:enumeration">
             <xsl:if test="position()!=1">
-               <xsl:text>|</xsl:text><wbr/>
+                <wbr/><xsl:text>|</xsl:text>
             </xsl:if>
             <xsl:if test="position() != last()
                 and $breakEnumListAfterN > 0
