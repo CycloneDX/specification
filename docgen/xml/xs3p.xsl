@@ -8236,9 +8236,9 @@ was not specified in the links file, <xsl:value-of select="$linksFile"/>.
             <xsl:if test="position()!=1">
                <xsl:text>|</xsl:text><wbr/>
             </xsl:if>
-            <xsl:if test="$breakEnumListAfterN > 0
-                and position() mod $breakEnumListAfterN = 0
-                and position() != last()">
+            <xsl:if test="position() != last()
+                and $breakEnumListAfterN > 0
+                and position() mod $breakEnumListAfterN = 0">
                <xsl:text>&#10;</xsl:text>
                <xsl:call-template name="Repeat">
                   <xsl:with-param name="content"><xsl:text> </xsl:text></xsl:with-param>
