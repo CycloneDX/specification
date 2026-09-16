@@ -16,8 +16,7 @@ These models are compiled into the schemas in the parent directory, ensuring con
 
 | Schema File                                                                                        | Purpose                                                                                                 |
 |----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
-| [`cyclonedx-ai-model-parameters-2.0.schema.json`](./cyclonedx-ai-model-parameters-2.0.schema.json) | Defines configuration and metadata for AI/ML training, evaluation, and deployment parameters.           |
-| [`cyclonedx-ai-modelcard-2.0.schema.json`](./cyclonedx-ai-modelcard-2.0.schema.json)               | Describes AI/ML model cards including intended use, limitations, and ethical considerations.            |
+| [`cyclonedx-ai-ml-2.0.schema.json`](./cyclonedx-ai-ml-2.0.schema.json)                             | Describes machine learning model properties: learning types, tasks, architecture, parameters, training, limitations, and performance metrics. |
 | [`cyclonedx-annotation-2.0.schema.json`](./cyclonedx-annotation-2.0.schema.json)                   | Represents human or automated comments about BOM elements, such as components.              |
 | [`cyclonedx-common-2.0.schema.json`](./cyclonedx-common-2.0.schema.json)                           | Provides common types and base definitions used across all other schemas.                               |
 | [`cyclonedx-component-2.0.schema.json`](./cyclonedx-component-2.0.schema.json)                     | Models hardware, software, data, cryptographic, AI, and service components and their attributes.                 |

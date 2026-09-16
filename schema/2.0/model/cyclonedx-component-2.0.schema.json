@@ -137,6 +137,10 @@
           "description": "The hashes of the component.",
           "items": {"$ref": "cyclonedx-common-2.0.schema.json#/$defs/hash"}
         },
+        "measurements": {
+          "$ref": "#/$defs/measurements",
+          "title": "Component Measurements"
+        },
         "licenses": {
           "$ref": "cyclonedx-license-2.0.schema.json#/$defs/licenseChoice",
           "title": "Component License(s)"
@@ -993,6 +997,259 @@
       "minLength": 1,
       "title": "Identifier Value",
       "description": "The value of an identifier."
+    },
+    "measurements": {
+      "type": "array",
+      "title": "Measurements",
+      "uniqueItems": true,
+      "description": "Measured quantities of the component. An energy consumption records the energy consumed by a lifecycle activity of the component together with its providers and carbon dioxide equivalent. A performance metric records a benchmark or evaluation result of the component. Each record may carry graphics that support it.",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/energyConsumption"
+          },
+          {
+            "$ref": "cyclonedx-ai-ml-2.0.schema.json#/$defs/performanceMetric"
+          }
+        ]
+      }
+    },
+    "lifecycleActivity": {
+      "title": "Lifecycle Activity",
+      "description": "An activity in the lifecycle of a component that consumes energy, such as the manufacture of a device or the training of a model. Use the custom option for activities not covered by the predefined values.",
+      "oneOf": [
+        {
+          "title": "Predefined Activity",
+          "type": "string",
+          "enum": [
+            "design",
+            "data-collection",
+            "data-preparation",
+            "training",
+            "fine-tuning",
+            "validation",
+            "manufacturing",
+            "transport",
+            "deployment",
+            "operation",
+            "inference",
+            "end-of-life"
+          ],
+          "meta:enum": {
+            "design": "Design, including problem framing, goal definition, and algorithm or architecture selection.",
+            "data-collection": "Data acquisition, including search, selection, and transfer.",
+            "data-preparation": "Data preparation, including data cleaning, labelling, and conversion.",
+            "training": "Model building, training, and generalized tuning.",
+            "fine-tuning": "Refining a trained model to produce desired outputs for a given problem space.",
+            "validation": "Validation, including output evaluation and testing.",
+            "manufacturing": "Manufacture of a physical item, including fabrication and assembly.",
+            "transport": "Transport of a physical item between sites.",
+            "deployment": "Deployment to a target hosting infrastructure or site.",
+            "operation": "Operation of a deployed component over a stated period.",
+            "inference": "Generating an output response from a hosted model from a set of inputs.",
+            "end-of-life": "Decommissioning, recycling, or disposal of a component."
+          }
+        },
+        {
+          "type": "object",
+          "title": "Custom Activity",
+          "required": [
+            "name"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Name",
+              "description": "The name of the custom activity."
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the custom activity."
+            }
+          }
+        }
+      ]
+    },
+    "energyConsumption": {
+      "type": "object",
+      "title": "Energy Consumption",
+      "description": "The energy consumption incurred for a specific lifecycle activity of the component.",
+      "additionalProperties": false,
+      "required": [
+        "activity",
+        "activityEnergyCost"
+      ],
+      "properties": {
+        "activity": {
+          "title": "Activity",
+          "description": "The lifecycle activity that incurred the energy consumption.",
+          "$ref": "#/$defs/lifecycleActivity"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the energy consumption, including its scope and how it was measured or estimated."
+        },
+        "formula": {
+          "title": "Formula Reference",
+          "description": "References using bom-link or bom-ref a formula, workflow, or task, defined in formulation, that captures the process which incurred this energy consumption, for example a training workflow or a manufacturing run.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+        },
+        "energyProviders": {
+          "type": "array",
+          "title": "Energy Providers",
+          "description": "The providers of the energy consumed by the activity.",
+          "items": {
+            "$ref": "#/$defs/energyProvider"
+          }
+        },
+        "activityEnergyCost": {
+          "title": "Activity Energy Cost",
+          "description": "The total energy cost associated with the activity.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/energyMeasure"
+        },
+        "co2CostEquivalent": {
+          "title": "CO2 Equivalent Cost",
+          "description": "The carbon dioxide equivalent cost of the total energy cost.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/co2Measure"
+        },
+        "co2CostOffset": {
+          "title": "CO2 Cost Offset",
+          "description": "The carbon dioxide offset credited against the carbon dioxide equivalent cost.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/co2Measure"
+        },
+        "graphics": {
+          "title": "Graphics",
+          "description": "Graphics that support the energy consumption, such as a load profile or a meter reading.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/graphics"
+        },
+        "externalReferences": {
+          "type": "array",
+          "title": "External References",
+          "description": "External references to resources that are relevant to the energy consumption but are not included with the BOM.",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference"
+          }
+        },
+        "properties": {
+          "title": "Properties",
+          "description": "Provides the ability to document name-value pairs for the energy consumption. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "energySource": {
+      "title": "Energy Source",
+      "description": "The source of the energy provided by an energy provider. Use the custom option for sources not covered by the predefined values.",
+      "oneOf": [
+        {
+          "title": "Predefined Energy Source",
+          "type": "string",
+          "enum": [
+            "coal",
+            "oil",
+            "natural-gas",
+            "nuclear",
+            "wind",
+            "solar",
+            "geothermal",
+            "hydropower",
+            "biofuel",
+            "biomass",
+            "hydrogen",
+            "tidal",
+            "unknown"
+          ],
+          "meta:enum": {
+            "coal": "Energy produced from coal.",
+            "oil": "Energy produced from petroleum products, primarily crude oil and its derivative fuel oils.",
+            "natural-gas": "Energy produced from hydrocarbon gases, including natural gas, ethane, and propane.",
+            "nuclear": "Energy produced from the cores of atoms through nuclear fission or fusion.",
+            "wind": "Energy produced from moving air.",
+            "solar": "Energy produced from solar radiation.",
+            "geothermal": "Energy produced from heat within the earth.",
+            "hydropower": "Energy produced from flowing water.",
+            "biofuel": "Energy produced from liquid fuels derived from biomass feedstocks.",
+            "biomass": "Energy produced from solid organic materials such as wood, agricultural crops, or organic waste.",
+            "hydrogen": "Energy produced from hydrogen fuel in fuel cells or combustion.",
+            "tidal": "Energy produced from the rise and fall of ocean tides and tidal currents.",
+            "unknown": "The energy source is unknown."
+          }
+        },
+        {
+          "type": "object",
+          "title": "Custom Energy Source",
+          "required": [
+            "name"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Name",
+              "description": "The name of the custom energy source."
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the custom energy source."
+            }
+          }
+        }
+      ]
+    },
+    "energyProvider": {
+      "type": "object",
+      "title": "Energy Provider",
+      "description": "The provider of energy consumed by a lifecycle activity of the component.",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "energySource",
+        "energyProvided"
+      ],
+      "properties": {
+        "bom-ref": {
+          "title": "BOM Reference",
+          "description": "An optional identifier which can be used to reference the energy provider elsewhere using a bom-ref or bom-link.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the energy provider."
+        },
+        "provider": {
+          "title": "Provider",
+          "description": "The party that provides the consumed energy, typically an organization.",
+          "$ref": "cyclonedx-party-2.0.schema.json#/$defs/partyChoice"
+        },
+        "energySource": {
+          "title": "Energy Source",
+          "description": "The source of the provided energy.",
+          "$ref": "#/$defs/energySource"
+        },
+        "energyProvided": {
+          "title": "Energy Provided",
+          "description": "The energy provided by the energy source for the associated activity.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/energyMeasure"
+        },
+        "externalReferences": {
+          "type": "array",
+          "title": "External References",
+          "description": "External references to resources that are relevant to the energy provider but are not included with the BOM.",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference"
+          }
+        },
+        "properties": {
+          "title": "Properties",
+          "description": "Provides the ability to document name-value pairs for the energy provider. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
     }
   }
 }

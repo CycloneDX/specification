@@ -14,7 +14,7 @@
         "learningTypes": {
           "type": "array",
           "title": "Learning Types",
-          "description": "The learning paradigms applied when training the model. A model may combine several paradigms, for example self-supervised pre-training followed by supervised fine-tuning and reinforcement learning based alignment.",
+          "description": "The learning paradigms applied when training the model. A model may combine several paradigms, for example self-supervised pre-training followed by supervised fine-tuning and reinforcement learning based alignment. Training objectives that are not learning paradigms, such as autoregressive, masked, contrastive, or diffusion objectives, are recorded as custom learning types.",
           "uniqueItems": true,
           "items": {
             "$ref": "#/$defs/learningType"
@@ -66,11 +66,6 @@
           "description": "Information about how the model was trained.",
           "$ref": "#/$defs/training"
         },
-        "evaluation": {
-          "title": "Evaluation",
-          "description": "A quantitative evaluation of the model.",
-          "$ref": "#/$defs/evaluation"
-        },
         "limitations": {
           "type": "array",
           "title": "Limitations",
@@ -78,20 +73,6 @@
           "items": {
             "type": "string"
           }
-        },
-        "useCases": {
-          "type": "array",
-          "title": "Use Cases",
-          "description": "References to use cases, defined elsewhere in the BOM, that describe the intended uses of the model.",
-          "uniqueItems": true,
-          "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
-          }
-        },
-        "environmental": {
-          "title": "Environmental Impact",
-          "description": "Measured environmental impacts of the model across its lifecycle activities.",
-          "$ref": "#/$defs/environmental"
         },
         "externalReferences": {
           "type": "array",
@@ -351,8 +332,11 @@
             "residual-connections",
             "dual-encoders",
             "cross-attention",
+            "cross-attention-gated",
             "siamese-network",
             "hybrid-backbone",
+            "state-space-model",
+            "flow-matching",
             "vision-encoder",
             "adapter-layers",
             "projector-layers",
@@ -376,8 +360,11 @@
             "residual-connections": "Explicit skip or identity shortcuts bypassing one or more structural layers.",
             "dual-encoders": "Parallel feature extraction pipelines mapping different inputs into a shared space.",
             "cross-attention": "Mechanism that conditions one feature stream on another through attention.",
+            "cross-attention-gated": "Cross attention whose contribution is controlled by a learned gate, as used to fuse a frozen language model with visual features.",
             "siamese-network": "Twin subnetworks sharing identical weights to compute similarity metrics.",
             "hybrid-backbone": "Direct cascading combination of distinct architecture families, for example a convolutional feature extractor feeding a transformer.",
+            "state-space-model": "State space model blocks built into the primary structure, for example selective state space layers interleaved with attention layers.",
+            "flow-matching": "Flow matching components built into the primary structure, for example a flow matching head on a transformer backbone.",
             "vision-encoder": "Vision encoding component for processing image inputs in multimodal architectures.",
             "adapter-layers": "Parameter efficient fine-tuning layers inserted into otherwise frozen models.",
             "projector-layers": "Projection components bridging different modalities.",
@@ -921,71 +908,10 @@
         }
       }
     },
-    "evaluation": {
-      "type": "object",
-      "title": "Evaluation",
-      "description": "A quantitative evaluation of a model, including performance metrics and supporting graphics such as confusion matrices and calibration plots.",
-      "additionalProperties": false,
-      "properties": {
-        "metrics": {
-          "type": "array",
-          "title": "Performance Metrics",
-          "description": "The performance metrics being reported, for example accuracy, F1 score, precision, or benchmark scores.",
-          "items": {
-            "$ref": "#/$defs/performanceMetric"
-          }
-        },
-        "graphics": {
-          "title": "Graphics",
-          "description": "A collection of graphics that represent various measurements.",
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/graphicsCollection"
-        },
-        "properties": {
-          "title": "Properties",
-          "description": "Provides the ability to document name-value pairs for the evaluation. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
-        }
-      }
-    },
-    "performanceMeasure": {
-      "title": "Performance Measure",
-      "description": "A measure of model performance with a value and a unit. The unit is constrained to the predefined unit sets for time, throughput, compute, memory, and ratio measurements.",
-      "allOf": [
-        {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/measure"
-        },
-        {
-          "required": [
-            "unit"
-          ],
-          "properties": {
-            "unit": {
-              "anyOf": [
-                {
-                  "$ref": "cyclonedx-common-2.0.schema.json#/$defs/timeUnits"
-                },
-                {
-                  "$ref": "cyclonedx-common-2.0.schema.json#/$defs/throughputUnits"
-                },
-                {
-                  "$ref": "cyclonedx-common-2.0.schema.json#/$defs/computeUnits"
-                },
-                {
-                  "$ref": "cyclonedx-common-2.0.schema.json#/$defs/memoryUnits"
-                },
-                {
-                  "$ref": "cyclonedx-common-2.0.schema.json#/$defs/ratioUnits"
-                }
-              ]
-            }
-          }
-        }
-      ]
-    },
     "performanceMetric": {
       "type": "object",
       "title": "Performance Metric",
-      "description": "A reported performance metric of a model. Benchmarks and evaluation methodologies evolve rapidly, so the metric type and benchmark name are open strings; external references and evaluation dataset references establish the identity, version, and provenance of the evaluation.",
+      "description": "A reported performance metric of a component, such as a model, a service, or a device, recorded as a measurement. Benchmarks and evaluation methodologies evolve rapidly, so the metric type and benchmark name are open strings; external references and evaluation dataset references establish the identity, version, and provenance of the evaluation.",
       "additionalProperties": false,
       "required": [
         "type",
@@ -1003,8 +929,7 @@
             "mean-average-precision",
             "perplexity",
             "latency",
-            "throughput",
-            "elo"
+            "throughput"
           ]
         },
         "benchmark": {
@@ -1019,45 +944,36 @@
         },
         "measure": {
           "title": "Measure",
-          "description": "The measured value of the performance metric with its unit.",
-          "$ref": "#/$defs/performanceMeasure"
+          "description": "The measured value of the performance metric with its unit. A dimensionless score uses the unit one, written as 1.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/measure"
         },
         "slice": {
           "type": "string",
           "title": "Slice",
           "description": "The name of the data slice on which the metric was computed, for example a demographic group, a language, or a domain. When absent, the metric applies to the entire evaluation population. Slice level metrics provide the quantitative evidence for fairness and bias risks documented with the risk model.",
           "examples": [
-            "overall",
             "age:18-34",
             "language:fr",
             "region:sub-saharan-africa"
           ]
         },
         "confidenceInterval": {
-          "type": "object",
           "title": "Confidence Interval",
-          "description": "The confidence interval of the metric.",
-          "additionalProperties": false,
-          "properties": {
-            "lowerBound": {
-              "type": "number",
-              "title": "Lower Bound",
-              "description": "The lower bound of the confidence interval."
-            },
-            "upperBound": {
-              "type": "number",
-              "title": "Upper Bound",
-              "description": "The upper bound of the confidence interval."
-            }
-          }
+          "description": "The confidence interval of the metric, expressed in the unit of the measure.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bounds"
         },
         "evaluationDatasets": {
           "type": "array",
           "title": "Evaluation Datasets",
-          "description": "References to the datasets or dataset subsets used to compute this performance metric.",
+          "description": "References to the datasets or dataset subsets used to compute the metric.",
           "items": {
             "$ref": "#/$defs/datasetChoice"
           }
+        },
+        "graphics": {
+          "title": "Graphics",
+          "description": "Graphics that support the metric, such as a confusion matrix or a calibration plot.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/graphics"
         },
         "externalReferences": {
           "type": "array",
@@ -1109,246 +1025,6 @@
           }
         }
       ]
-    },
-    "environmental": {
-      "type": "object",
-      "title": "Environmental Impact",
-      "description": "Measured environmental impacts of a model across its lifecycle activities. This object captures factual measurements. Environmental risks informed by these measurements are expressed with the risk model and reference the model component.",
-      "additionalProperties": false,
-      "properties": {
-        "energyConsumptions": {
-          "type": "array",
-          "title": "Energy Consumptions",
-          "description": "The energy consumption incurred for one or more lifecycle activities of the model.",
-          "items": {
-            "$ref": "#/$defs/energyConsumption"
-          }
-        },
-        "properties": {
-          "title": "Properties",
-          "description": "Provides the ability to document name-value pairs for environmental impact. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
-        }
-      }
-    },
-    "modelActivity": {
-      "title": "Model Activity",
-      "description": "An activity that is part of the development or operational lifecycle of a machine learning model. Use the custom option for activities not covered by the predefined values.",
-      "oneOf": [
-        {
-          "title": "Predefined Activity",
-          "type": "string",
-          "enum": [
-            "design",
-            "data-collection",
-            "data-preparation",
-            "training",
-            "fine-tuning",
-            "validation",
-            "deployment",
-            "inference"
-          ],
-          "meta:enum": {
-            "design": "Model design, including problem framing, goal definition, and algorithm selection.",
-            "data-collection": "Model data acquisition, including search, selection, and transfer.",
-            "data-preparation": "Model data preparation, including data cleaning, labelling, and conversion.",
-            "training": "Model building, training, and generalized tuning.",
-            "fine-tuning": "Refining a trained model to produce desired outputs for a given problem space.",
-            "validation": "Model validation, including model output evaluation and testing.",
-            "deployment": "Model deployment to a target hosting infrastructure.",
-            "inference": "Generating an output response from a hosted model from a set of inputs."
-          }
-        },
-        {
-          "type": "object",
-          "title": "Custom Activity",
-          "required": [
-            "name"
-          ],
-          "additionalProperties": false,
-          "properties": {
-            "name": {
-              "type": "string",
-              "title": "Name",
-              "description": "The name of the custom activity."
-            },
-            "description": {
-              "type": "string",
-              "title": "Description",
-              "description": "A description of the custom activity."
-            }
-          }
-        }
-      ]
-    },
-    "energyConsumption": {
-      "type": "object",
-      "title": "Energy Consumption",
-      "description": "The energy consumption incurred for a specific lifecycle activity of a model.",
-      "additionalProperties": false,
-      "required": [
-        "activity",
-        "activityEnergyCost"
-      ],
-      "properties": {
-        "activity": {
-          "title": "Activity",
-          "description": "The lifecycle activity that incurred the energy consumption.",
-          "$ref": "#/$defs/modelActivity"
-        },
-        "formula": {
-          "title": "Formula Reference",
-          "description": "References a formula, defined in formulation, that captures the process which incurred this energy consumption, for example a training workflow.",
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
-        },
-        "energyProviders": {
-          "type": "array",
-          "title": "Energy Providers",
-          "description": "The providers of the energy consumed by the activity.",
-          "items": {
-            "$ref": "#/$defs/energyProvider"
-          }
-        },
-        "activityEnergyCost": {
-          "title": "Activity Energy Cost",
-          "description": "The total energy cost associated with the activity.",
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/energyMeasure"
-        },
-        "co2CostEquivalent": {
-          "title": "CO2 Equivalent Cost",
-          "description": "The carbon dioxide equivalent cost of the total energy cost.",
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/co2Measure"
-        },
-        "co2CostOffset": {
-          "title": "CO2 Cost Offset",
-          "description": "The carbon dioxide offset credited against the carbon dioxide equivalent cost.",
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/co2Measure"
-        },
-        "externalReferences": {
-          "type": "array",
-          "title": "External References",
-          "description": "External references to resources that are relevant to the energy consumption but are not included with the BOM.",
-          "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference"
-          }
-        },
-        "properties": {
-          "title": "Properties",
-          "description": "Provides the ability to document name-value pairs for the energy consumption. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
-        }
-      }
-    },
-    "energySource": {
-      "title": "Energy Source",
-      "description": "The source of the energy provided by an energy provider. Use the custom option for sources not covered by the predefined values.",
-      "oneOf": [
-        {
-          "title": "Predefined Energy Source",
-          "type": "string",
-          "enum": [
-            "coal",
-            "oil",
-            "natural-gas",
-            "nuclear",
-            "wind",
-            "solar",
-            "geothermal",
-            "hydropower",
-            "biofuel",
-            "biomass",
-            "hydrogen",
-            "tidal",
-            "unknown"
-          ],
-          "meta:enum": {
-            "coal": "Energy produced from coal.",
-            "oil": "Energy produced from petroleum products, primarily crude oil and its derivative fuel oils.",
-            "natural-gas": "Energy produced from hydrocarbon gases, including natural gas, ethane, and propane.",
-            "nuclear": "Energy produced from the cores of atoms through nuclear fission or fusion.",
-            "wind": "Energy produced from moving air.",
-            "solar": "Energy produced from solar radiation.",
-            "geothermal": "Energy produced from heat within the earth.",
-            "hydropower": "Energy produced from flowing water.",
-            "biofuel": "Energy produced from liquid fuels derived from biomass feedstocks.",
-            "biomass": "Energy produced from solid organic materials such as wood, agricultural crops, or organic waste.",
-            "hydrogen": "Energy produced from hydrogen fuel in fuel cells or combustion.",
-            "tidal": "Energy produced from the rise and fall of ocean tides and tidal currents.",
-            "unknown": "The energy source is unknown."
-          }
-        },
-        {
-          "type": "object",
-          "title": "Custom Energy Source",
-          "required": [
-            "name"
-          ],
-          "additionalProperties": false,
-          "properties": {
-            "name": {
-              "type": "string",
-              "title": "Name",
-              "description": "The name of the custom energy source."
-            },
-            "description": {
-              "type": "string",
-              "title": "Description",
-              "description": "A description of the custom energy source."
-            }
-          }
-        }
-      ]
-    },
-    "energyProvider": {
-      "type": "object",
-      "title": "Energy Provider",
-      "description": "The provider of energy consumed during model development or operations.",
-      "additionalProperties": false,
-      "required": [
-        "provider",
-        "energySource",
-        "energyProvided"
-      ],
-      "properties": {
-        "bom-ref": {
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference the energy provider elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
-        },
-        "description": {
-          "type": "string",
-          "title": "Description",
-          "description": "A description of the energy provider."
-        },
-        "provider": {
-          "title": "Provider",
-          "description": "The party that provides the consumed energy, typically an organization.",
-          "$ref": "cyclonedx-party-2.0.schema.json#/$defs/partyChoice"
-        },
-        "energySource": {
-          "title": "Energy Source",
-          "description": "The source of the provided energy.",
-          "$ref": "#/$defs/energySource"
-        },
-        "energyProvided": {
-          "title": "Energy Provided",
-          "description": "The energy provided by the energy source for the associated activity.",
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/energyMeasure"
-        },
-        "externalReferences": {
-          "type": "array",
-          "title": "External References",
-          "description": "External references to resources that are relevant to the energy provider but are not included with the BOM.",
-          "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference"
-          }
-        },
-        "properties": {
-          "title": "Properties",
-          "description": "Provides the ability to document name-value pairs for the energy provider. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
-        }
-      }
     }
   }
 }

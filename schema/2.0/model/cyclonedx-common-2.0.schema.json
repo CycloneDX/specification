@@ -534,6 +534,12 @@
           "pattern": "^[A-Z]{2}(-[A-Z0-9]{1,3})?$",
           "examples": [ "CA", "US-CA" ]
         },
+        "value": {
+          "type": "number",
+          "title": "Value",
+          "description": "The amount of the whole attributable to this region, expressed on the basis of the origin, for example a number of parts, a net weight, or a manufacturing cost. The values of all entries in a distribution sum to the whole, and each percentage is the value divided by that sum.",
+          "minimum": 0
+        },
         "percentage": {
           "type": "number",
           "title": "Percentage",
@@ -925,66 +931,75 @@
     "measure": {
       "type": "object",
       "title": "Measure",
-      "description": "A measurement expressed as a numeric value and a unit. Contexts that use this definition may constrain the permitted units. When the unit is omitted, the value represents a count.",
+      "description": "A quantity expressed as a numeric value and a unit. Contexts that use this definition may constrain the permitted units, as the energy and carbon dioxide equivalent measures do. Dimensionless quantities and counts use the unit one, written as 1.",
       "additionalProperties": false,
-      "required": ["value"],
+      "required": ["value", "unit"],
       "properties": {
         "value": {
           "type": "number",
           "title": "Value",
-          "description": "The numeric value of the measurement.",
+          "description": "The numeric value of the quantity.",
           "examples": [127, 0.87, 2500, 52.3]
         },
         "unit": {
-          "type": "string",
           "title": "Unit",
-          "description": "The unit of measure.",
-          "examples": ["ms", "%", "tokens/s", "GiB", "kWh", "tCO2eq"]
+          "description": "The unit of the quantity, given as a predefined unit symbol or as a custom unit.",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/unitSymbol"
+            },
+            {
+              "$ref": "#/$defs/customUnit"
+            }
+          ]
         }
       }
     },
-    "timeUnits": {
-      "title": "Time Units",
-      "description": "Units of time for duration and latency measurements.",
-      "enum": ["ns", "us", "ms", "s", "min", "h"],
+    "unitSymbol": {
+      "title": "Unit Symbol",
+      "description": "A predefined unit symbol. The symbols cover time, data size, throughput, compute, energy, carbon dioxide equivalent, and ratio quantities. The unit one, written as 1, is used for counts and dimensionless quantities. Where a symbol differs from its UCUM code, the code is noted in its definition.",
+      "type": "string",
+      "enum": [
+        "ns",
+        "us",
+        "ms",
+        "s",
+        "min",
+        "h",
+        "B",
+        "KB",
+        "MB",
+        "GB",
+        "TB",
+        "PB",
+        "KiB",
+        "MiB",
+        "GiB",
+        "TiB",
+        "PiB",
+        "requests/s",
+        "ops/s",
+        "tokens/s",
+        "FLOP",
+        "FLOPS",
+        "GFLOPS",
+        "TFLOPS",
+        "PFLOPS",
+        "kWh",
+        "tCO2eq",
+        "1",
+        "%",
+        "ppm"
+      ],
       "meta:enum": {
         "ns": "Nanoseconds, commonly used for high precision timing measurements.",
         "us": "Microseconds, commonly used for fine grained latency measurements.",
         "ms": "Milliseconds, commonly used for latency measurements.",
         "s": "Seconds, commonly used for latency and duration measurements.",
         "min": "Minutes, commonly used for duration measurements.",
-        "h": "Hours, commonly used for duration measurements."
-      }
-    },
-    "throughputUnits": {
-      "title": "Throughput Units",
-      "description": "Units of throughput for rate measurements.",
-      "enum": ["tokens/s", "requests/s", "ops/s"],
-      "meta:enum": {
-        "tokens/s": "Tokens per second, commonly used for language model throughput measurements.",
-        "requests/s": "Requests per second, commonly used for API and service throughput measurements.",
-        "ops/s": "Operations per second, commonly used for general throughput measurements."
-      }
-    },
-    "computeUnits": {
-      "title": "Compute Units",
-      "description": "Units of computational work and computational rate.",
-      "enum": ["FLOP", "FLOPS", "GFLOPS", "TFLOPS", "PFLOPS"],
-      "meta:enum": {
-        "FLOP": "Total floating point operations, commonly used to express cumulative training compute.",
-        "FLOPS": "Floating point operations per second.",
-        "GFLOPS": "Billion floating point operations per second.",
-        "TFLOPS": "Trillion floating point operations per second.",
-        "PFLOPS": "Quadrillion floating point operations per second."
-      }
-    },
-    "memoryUnits": {
-      "title": "Memory Units",
-      "description": "Units of digital information for memory and storage measurements.",
-      "enum": ["B", "KB", "MB", "GB", "TB", "PB", "KiB", "MiB", "GiB", "TiB", "PiB"],
-      "meta:enum": {
+        "h": "Hours, commonly used for duration measurements.",
         "B": "Bytes.",
-        "KB": "Kilobytes.",
+        "KB": "Kilo bytes.",
         "MB": "Megabytes.",
         "GB": "Gigabytes.",
         "TB": "Terabytes.",
@@ -993,32 +1008,150 @@
         "MiB": "Mebibytes.",
         "GiB": "Gibibytes.",
         "TiB": "Tebibytes.",
-        "PiB": "Pebibytes."
+        "PiB": "Pebibytes.",
+        "requests/s": "Requests per second, commonly used for API and service throughput measurements, UCUM {request}/s.",
+        "ops/s": "Operations per second, commonly used for general throughput measurements, UCUM {operation}/s.",
+        "tokens/s": "Tokens per second, commonly used for language model throughput measurements, UCUM {token}/s.",
+        "FLOP": "Total floating point operations, commonly used to express cumulative training compute, UCUM {FLOP}.",
+        "FLOPS": "Floating point operations per second, UCUM {FLOP}/s.",
+        "GFLOPS": "Billion floating point operations per second, UCUM G{FLOP}/s.",
+        "TFLOPS": "Trillion floating point operations per second, UCUM T{FLOP}/s.",
+        "PFLOPS": "Quadrillion floating point operations per second, UCUM P{FLOP}/s.",
+        "kWh": "Kilowatt hour, the energy delivered by one kilowatt of power for one hour, UCUM kW.h.",
+        "tCO2eq": "Tonnes of carbon dioxide equivalent, UCUM t{CO2eq}.",
+        "1": "The unit one, used for counts and for dimensionless quantities such as scores, fractions, and ratings.",
+        "%": "Percentage, commonly used for accuracy, precision, recall, availability, and other ratio based metrics.",
+        "ppm": "Parts per million, a dimensionless unit expressing the ratio of one part per million parts, UCUM [ppm]."
       }
     },
-    "ratioUnits": {
-      "title": "Ratio Units",
-      "description": "Units for dimensionless ratio measurements.",
-      "enum": ["%", "ppm"],
-      "meta:enum": {
-        "%": "Percentage, commonly used for accuracy, precision, recall, and other ratio based metrics.",
-        "ppm": "Parts per million, a dimensionless unit expressing the ratio of one part per million parts."
-      }
+    "customUnit": {
+      "type": "object",
+      "title": "Custom Unit",
+      "description": "A unit that the predefined unit symbols do not cover. Use a predefined unit symbol where one exists. A custom unit should be identified by its code in an established unit system, such as UCUM, UN/ECE Recommendation 20, or QUDT, so that consumers can validate and convert it.",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Name",
+          "description": "The name or symbol of the custom unit."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the custom unit."
+        },
+        "system": {
+          "title": "Unit System",
+          "description": "The unit system or code list in which the code is defined.",
+          "oneOf": [
+            {
+              "title": "Predefined Unit System",
+              "type": "string",
+              "enum": ["ucum", "unece-rec20", "qudt"],
+              "meta:enum": {
+                "ucum": "The [Unified Code for Units of Measure](https://ucum.org/), whose codes are case-sensitive strings such as kg, By, or {token}/s.",
+                "unece-rec20": "[UN/ECE Recommendation 20](https://unece.org/trade/uncefact/cl-recommendations), whose codes are two or three character strings such as KWH or C26.",
+                "qudt": "The [QUDT](https://qudt.org/) unit vocabulary, whose codes are the unit identifiers in IRI form."
+              }
+            },
+            {
+              "title": "Custom Unit System",
+              "type": "object",
+              "required": ["name"],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "The name of the custom unit system."
+                },
+                "description": {
+                  "type": "string",
+                  "description": "A description of the custom unit system."
+                },
+                "url": {
+                  "type": "string",
+                  "format": "iri-reference",
+                  "description": "URL of the specification or registry that defines the unit system."
+                }
+              }
+            }
+          ]
+        },
+        "code": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Code",
+          "description": "The code of the unit in the unit system."
+        },
+        "url": {
+          "type": "string",
+          "format": "iri-reference",
+          "title": "URL",
+          "description": "URL of the definition of the unit."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["system"]
+          },
+          "then": {
+            "required": ["code"]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "system": {
+                "const": "unece-rec20"
+              }
+            },
+            "required": ["system"]
+          },
+          "then": {
+            "properties": {
+              "code": {
+                "pattern": "^[A-Z0-9]{2,3}$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "system": {
+                "const": "qudt"
+              }
+            },
+            "required": ["system"]
+          },
+          "then": {
+            "properties": {
+              "code": {
+                "format": "iri"
+              }
+            }
+          }
+        }
+      ]
     },
     "energyUnits": {
       "title": "Energy Units",
-      "description": "Units of energy.",
+      "description": "Units of energy. A single unit is defined so that energy figures are comparable without conversion.",
       "enum": ["kWh"],
       "meta:enum": {
-        "kWh": "Kilowatt hour, the energy delivered by one kilowatt of power for one hour."
+        "kWh": "Kilowatt hour, the energy delivered by one kilowatt of power for one hour, UCUM kW.h."
       }
     },
     "co2Units": {
       "title": "CO2 Units",
-      "description": "Units of carbon dioxide equivalent.",
+      "description": "Units of carbon dioxide equivalent. A single unit is defined so that emission figures are comparable without conversion.",
       "enum": ["tCO2eq"],
       "meta:enum": {
-        "tCO2eq": "Tonnes of carbon dioxide equivalent."
+        "tCO2eq": "Tonnes of carbon dioxide equivalent, UCUM t{CO2eq}."
       }
     },
     "energyMeasure": {
@@ -1027,6 +1160,7 @@
       "allOf": [
         {"$ref": "#/$defs/measure"},
         {
+          "type": "object",
           "required": ["unit"],
           "properties": {
             "unit": {"$ref": "#/$defs/energyUnits"}
@@ -1040,6 +1174,7 @@
       "allOf": [
         {"$ref": "#/$defs/measure"},
         {
+          "type": "object",
           "required": ["unit"],
           "properties": {
             "unit": {"$ref": "#/$defs/co2Units"}
@@ -1047,22 +1182,79 @@
         }
       ]
     },
+    "bounds": {
+      "type": "object",
+      "title": "Bounds",
+      "description": "A pair of bounds on a numeric quantity, expressed in the unit of the quantity they accompany. At least one bound shall be given.",
+      "additionalProperties": false,
+      "anyOf": [
+        {"required": ["lowerBound"]},
+        {"required": ["upperBound"]}
+      ],
+      "properties": {
+        "lowerBound": {
+          "type": "number",
+          "title": "Lower Bound",
+          "description": "The lower bound."
+        },
+        "upperBound": {
+          "type": "number",
+          "title": "Upper Bound",
+          "description": "The upper bound."
+        }
+      }
+    },
     "graphic": {
       "type": "object",
       "title": "Graphic",
       "description": "A named graphic, such as a chart, plot, or diagram.",
+      "required": ["image"],
       "additionalProperties": false,
       "properties": {
+        "bom-ref": {
+          "$ref": "#/$defs/refType",
+          "description": "An optional identifier which can be used to reference the graphic elsewhere using a bom-ref or bom-link."
+        },
         "name": {
           "type": "string",
           "title": "Name",
           "description": "The name of the graphic."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the graphic, such as what it depicts and how it was produced."
         },
         "image": {
           "title": "Graphic Image",
           "description": "The graphic, which may be a vector or raster image. Base64 encoding shall be specified for binary images.",
           "$ref": "#/$defs/attachment"
         }
+      }
+    },
+    "graphicReference": {
+      "type": "object",
+      "title": "Graphic Reference",
+      "description": "A reference to a graphic defined elsewhere. A reference denotes an identical graphic.",
+      "required": ["ref"],
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "$ref": "#/$defs/refLinkType",
+          "description": "Reference using bom-link or bom-ref to the graphic."
+        }
+      }
+    },
+    "graphics": {
+      "type": "array",
+      "title": "Graphics",
+      "uniqueItems": true,
+      "description": "Graphics that support the record they are attached to, such as a chart, plot, or diagram. A graphic is attached to the record it supports; a graphic shared by several records is defined once and referenced.",
+      "items": {
+        "oneOf": [
+          {"$ref": "#/$defs/graphic"},
+          {"$ref": "#/$defs/graphicReference"}
+        ]
       }
     },
     "graphicsCollection": {
