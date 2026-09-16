@@ -5350,6 +5350,7 @@ pre {
                   <xsl:call-template name="PrintSampleSimpleConstraints">
                      <xsl:with-param name="simpleContent" select="$simpleContent/xsd:list/xsd:simpleType"/>
                      <xsl:with-param name="schemaLoc" select="$schemaLoc"/>
+                     <xsl:with-param name="margin" select="$margin"/>
                   </xsl:call-template>
                   <xsl:text> ]</xsl:text>
                </xsl:otherwise>
@@ -5380,6 +5381,7 @@ pre {
                <xsl:call-template name="PrintSampleSimpleConstraints">
                   <xsl:with-param name="simpleContent" select="."/>
                   <xsl:with-param name="schemaLoc" select="$schemaLoc"/>
+                  <xsl:with-param name="margin" select="$margin"/>
                </xsl:call-template>
                <xsl:text> ]</xsl:text>
             </xsl:for-each>
@@ -5427,6 +5429,7 @@ pre {
                <xsl:with-param name="simpleContent" select="$restriction/xsd:simpleType"/>
                <xsl:with-param name="schemaLoc" select="$schemaLoc"/>
                <xsl:with-param name="typeList" select="$typeList"/>
+               <xsl:with-param name="margin" select="$margin"/>
             </xsl:call-template>
          </xsl:when>
          <!-- Base type reference -->
