@@ -1,7 +1,7 @@
 /**
  * CycloneDX Schema Linter - RefType Usage Check
  *
- * CycloneDX2-specific: validates that every `bom-ref` property `$ref`s the
+ * CycloneDX2-specific: validates that every `refId` property `$ref`s the
  * shared `refType` definition — and that nothing else references `refType`
  * (with the sole exception of `refLinkType`, which inherits from it).
  *
@@ -86,14 +86,14 @@ function relativeUrl(from, to) {
 }
 
 /**
- * CycloneDX2-specific: Check that `bom-ref` properties ref the `refType` — and nothing else does.
+ * CycloneDX2-specific: Check that `refId` properties ref the `refType` — and nothing else does.
  */
 class Cdx2RefTypeUsageCheck extends LintCheck {
   constructor() {
     super(
       'cdx2-reftype-usage',
       'RefType Usage',
-      'CycloneDX2-specific: validates that `bom-ref` properties `$ref` the shared `refType` definition, and that `refType` is not referenced anywhere else (except `refLinkType`).',
+      'CycloneDX2-specific: validates that `refId` properties `$ref` the shared `refType` definition, and that `refType` is not referenced anywhere else (except `refLinkType`).',
       Severity.ERROR
     );
   }
@@ -121,10 +121,10 @@ class Cdx2RefTypeUsageCheck extends LintCheck {
         return;
       }
 
-      if (path.endsWith('.properties.bom-ref')) {
+      if (path.endsWith('.properties.refId')) {
         if (refTypeRef !== null && ref !== refTypeRef) {
           issues.push(this.createIssue(
-            `"bom-ref" property must $ref refType. Got: "${ref}" instead of "${refTypeRef}"`,
+            `"refId" property must $ref refType. Got: "${ref}" instead of "${refTypeRef}"`,
             `${path}.$ref`,
             {
               actual: ref,

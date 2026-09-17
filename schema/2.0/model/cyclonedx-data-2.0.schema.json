@@ -8,7 +8,7 @@
     "dataProfiles": {
       "type": "array",
       "title": "Data Profiles",
-      "description": "A catalogue of reusable data profile definitions. Each entry is a complete inline data profile carrying its own bom-ref so other objects may reference it.",
+      "description": "A catalogue of reusable data profile definitions. Each entry is a complete inline data profile carrying its own refId so other objects may reference it.",
       "uniqueItems": true,
       "items": {
         "$ref": "#/$defs/dataProfile"
@@ -23,7 +23,7 @@
       ],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
+        "refId": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
           "description": "Unique identifier for this data profile."
         },
@@ -249,7 +249,7 @@
     },
     "dataProfileChoice": {
       "title": "Data Profile Choice",
-      "description": "A data profile represented either as a complete inline object or as a reference to a previously declared profile. References use bom-link or bom-ref to point at a profile declared in the root profiles catalogue or elsewhere in the document.",
+      "description": "A data profile represented either as a complete inline object or as a reference to a previously declared profile. References use bom-link or refId to point at a profile declared in the root profiles catalogue or elsewhere in the document.",
       "oneOf": [
         {
           "$ref": "#/$defs/dataProfile"
@@ -257,7 +257,7 @@
         {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "title": "Reference",
-          "description": "Reference using bom-link or bom-ref to a previously declared data profile."
+          "description": "Reference using bom-link or refId to a previously declared data profile."
         }
       ]
     },
@@ -270,7 +270,7 @@
       ],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
+        "refId": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
           "description": "Unique identifier for this data object."
         },
@@ -293,7 +293,7 @@
         "profile": {
           "$ref": "#/$defs/dataProfileChoice",
           "title": "Profile",
-          "description": "The data profile that governs this object's classification, information types, and lifecycle requirements. May be an inline profile object or a reference using bom-link or bom-ref to a previously declared profile."
+          "description": "The data profile that governs this object's classification, information types, and lifecycle requirements. May be an inline profile object or a reference using bom-link or refId to a previously declared profile."
         },
         "informationTypes": {
           "type": "array",
@@ -388,7 +388,7 @@
       ],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
+        "refId": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
           "description": "Unique identifier for this attribute, enabling it to be referenced as a key target."
         },
@@ -441,7 +441,7 @@
         "references": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "title": "References",
-          "description": "For a foreign key, a reference using bom-link or bom-ref to the data object or attribute it refers to."
+          "description": "For a foreign key, a reference using bom-link or refId to the data object or attribute it refers to."
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
@@ -458,7 +458,7 @@
         "cardinality"
       ],
       "properties": {
-        "bom-ref": {
+        "refId": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
         },
         "name": {
@@ -474,7 +474,7 @@
         "target": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "title": "Target",
-          "description": "Reference using bom-link or bom-ref to the related data object."
+          "description": "Reference using bom-link or refId to the related data object."
         },
         "cardinality": {
           "title": "Cardinality",
@@ -495,7 +495,7 @@
         "sourceAttributes": {
           "type": "array",
           "title": "Source Attributes",
-          "description": "References using bom-link or bom-ref to the attributes on this data object that participate in the relationship, such as the foreign key columns.",
+          "description": "References using bom-link or refId to the attributes on this data object that participate in the relationship, such as the foreign key columns.",
           "uniqueItems": true,
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
@@ -504,7 +504,7 @@
         "targetAttributes": {
           "type": "array",
           "title": "Target Attributes",
-          "description": "References using bom-link or bom-ref to the attributes on the target data object that the relationship refers to, such as the primary key columns.",
+          "description": "References using bom-link or refId to the attributes on the target data object that the relationship refers to, such as the primary key columns.",
           "uniqueItems": true,
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
@@ -518,7 +518,7 @@
     "subject": {
       "type": "object",
       "title": "Subject",
-      "description": "An entity, group, category, or thing that the data is about or pertains to. Subjects identify who or what the data describes, which is critical for determining applicable regulations, privacy obligations, and handling requirements. A subject is identified in one of three ways: inline by `name` and `type`, by an inline `party` object, or by `ref` pointing at any bom-ref'd element declared elsewhere in the document (a party, component, service, asset, dataset, or other element). At least one of these forms shall be supplied. Subject-context attributes such as protected-class status, applicable jurisdictions, and applicable regulations are carried here regardless of which identification form is used.",
+      "description": "An entity, group, category, or thing that the data is about or pertains to. Subjects identify who or what the data describes, which is critical for determining applicable regulations, privacy obligations, and handling requirements. A subject is identified in one of three ways: inline by `name` and `type`, by an inline `party` object, or by `ref` pointing at any element carrying a refId declared elsewhere in the document (a party, component, service, asset, dataset, or other element). At least one of these forms shall be supplied. Subject-context attributes such as protected-class status, applicable jurisdictions, and applicable regulations are carried here regardless of which identification form is used.",
       "additionalProperties": false,
       "anyOf": [
         {
@@ -599,7 +599,7 @@
         "ref": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "title": "Reference",
-          "description": "Reference using bom-link or bom-ref to any element declared elsewhere in the document that identifies the subject, such as a party, component, service, asset, dataset, or other bom-ref'd element. Use this when the subject is already represented elsewhere and you want to point at it rather than redeclare it."
+          "description": "Reference using bom-link or refId to any element declared elsewhere in the document that identifies the subject, such as a party, component, service, asset, dataset, or other element carrying a refId. Use this when the subject is already represented elsewhere and you want to point at it rather than redeclare it."
         },
         "protectedClass": {
           "type": "boolean",
