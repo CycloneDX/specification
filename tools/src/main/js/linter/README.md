@@ -43,7 +43,7 @@ node cli.js schema.json
 
 | Check | Description |
 |-------|-------------|
-| `cdx2-reftype-usage` | CycloneDX-specific: `refId` properties must `$ref` the shared `refType` definition; nothing else may reference `refType` (except `refLinkType`, which inherits from it) |
+| `cdx2-reftype-usage` | CycloneDX-specific: `refId` properties must `$ref` the shared `refIdType` definition; nothing else may reference `refIdType` (except `refLinkType`, which inherits from it) |
 | `const-enum-no-type` | Objects declaring `const` or `enum` must not also declare `type`. | 
 | `description-full-stop` | Descriptions must end with a full stop |
 | `description-oxford-english` | Descriptions must use Oxford English spelling (British with -ize) |
