@@ -1,0 +1,219 @@
+{
+  "specFormat": "CycloneDX",
+  "specVersion": "2.0",
+  "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
+  "version": 1,
+  "profiles": {
+    "threatProfiles": [
+      {
+        "bom-ref": "tp-apt",
+        "name": "Advanced persistent threat",
+        "sophistication": "advanced",
+        "resources": "substantial",
+        "skillSet": [
+          "malware-development",
+          "spear-phishing"
+        ]
+      }
+    ]
+  },
+  "threats": {
+    "methodologies": [ "STRIDE", "attack-tree" ],
+    "threats": [
+      {
+        "bom-ref": "threat-credential-theft",
+        "name": "Credential theft",
+        "description": "An adversary steals operator credentials to reach protected data.",
+        "source": "Internal threat-modelling workshop",
+        "categories": [
+          {
+            "taxonomy": "STRIDE",
+            "category": "spoofing"
+          },
+          {
+            "taxonomy": "MITRE-ATTACK",
+            "category": "credential-access"
+          }
+        ],
+        "weaknesses": [
+          {
+            "bom-ref": "wk-auth",
+            "name": "Single-factor operator authentication",
+            "description": "Operators authenticate to the console with a single factor."
+          }
+        ],
+        "attackPatterns": [
+          "ap-phishing"
+        ],
+        "attackTrees": [
+          "at-exfil"
+        ],
+        "abuseCases": [
+          "abuse-enumeration"
+        ],
+        "killChainPhase": "delivery",
+        "relatedVulnerabilities": [
+          "vuln-weak-auth"
+        ],
+        "affectedAssets": [
+          "asset-datastore"
+        ],
+        "relatedBusinessObjectives": [
+          "obj-protect-data"
+        ],
+        "mitigations": [
+          "req-mfa"
+        ]
+      }
+    ],
+    "scenarios": [
+      {
+        "bom-ref": "ts-credential-theft",
+        "name": "APT credential theft via spear phishing",
+        "description": "An advanced persistent threat phishes an operator to steal credentials and reach the data store.",
+        "threats": [
+          "threat-credential-theft"
+        ],
+        "actor": "party-attacker",
+        "threatProfile": "tp-apt",
+        "motivation": [
+          "financial",
+          "espionage"
+        ],
+        "intent": "targeted",
+        "accessLevel": "external",
+        "attackVector": {
+          "type": "network",
+          "complexity": "low",
+          "privileges": "none",
+          "userInteraction": "required"
+        },
+        "riskAttributes": [
+          "confidentiality",
+          "authentication"
+        ],
+        "affectedAssets": [
+          "asset-datastore"
+        ],
+        "relatedRisks": [
+          "risk-account-takeover"
+        ]
+      }
+    ],
+    "attackPatterns": [
+      {
+        "bom-ref": "ap-phishing",
+        "capecId": 98,
+        "name": "Phishing",
+        "description": "An adversary tricks a victim into performing an action or revealing information.",
+        "techniques": [
+          {
+            "id": "T1566",
+            "name": "Phishing",
+            "tactic": "initial-access"
+          }
+        ]
+      }
+    ],
+    "attackTrees": [
+      {
+        "bom-ref": "at-exfil",
+        "name": "Exfiltrate customer data",
+        "root": "atn-root",
+        "nodes": [
+          {
+            "bom-ref": "atn-root",
+            "name": "Exfiltrate customer PII",
+            "operator": "or",
+            "children": [
+              "atn-creds",
+              "atn-injection"
+            ]
+          },
+          {
+            "bom-ref": "atn-creds",
+            "name": "Steal operator credentials",
+            "operator": "or",
+            "skill": "intermediate",
+            "children": [
+              "atn-phishing",
+              "atn-stuffing"
+            ]
+          },
+          {
+            "bom-ref": "atn-phishing",
+            "name": "Spear phishing",
+            "attackPattern": "ap-phishing",
+            "cost": "low",
+            "detectability": "moderate"
+          },
+          {
+            "bom-ref": "atn-stuffing",
+            "name": "Credential stuffing",
+            "cost": "low",
+            "detectability": "high"
+          },
+          {
+            "bom-ref": "atn-injection",
+            "name": "Exploit injection",
+            "operator": "and",
+            "children": [
+              "atn-reach",
+              "atn-waf"
+            ]
+          },
+          {
+            "bom-ref": "atn-reach",
+            "name": "Reach the endpoint"
+          },
+          {
+            "bom-ref": "atn-waf",
+            "name": "Bypass the web application firewall"
+          }
+        ]
+      }
+    ],
+    "abuseCases": [
+      {
+        "bom-ref": "abuse-enumeration",
+        "name": "Bulk account enumeration",
+        "description": "The adversary enumerates valid accounts through repeated login attempts.",
+        "abuser": "party-attacker",
+        "realizes": [
+          "threat-credential-theft"
+        ],
+        "mainFlow": [
+          {
+            "number": 1,
+            "description": "The attacker submits many login attempts with candidate usernames."
+          }
+        ]
+      }
+    ],
+    "trustBoundaries": [
+      {
+        "bom-ref": "tb-internet-dmz",
+        "name": "Internet to DMZ",
+        "boundary": "boundary-internet-dmz",
+        "trustLevel": "untrusted"
+      }
+    ]
+  },
+  "definitions": {
+    "businessObjectives": [
+      {
+        "bom-ref": "obj-protect-data",
+        "name": "Protect customer data",
+        "criticality": "high"
+      }
+    ],
+    "requirements": [
+      {
+        "bom-ref": "req-mfa",
+        "id": "REQ-MFA-001",
+        "name": "Require multi-factor authentication for operators",
+        "priority": "high"
+      }
+    ]
+  }
+}

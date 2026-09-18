@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-certification-2.0.schema.json",
+  "type": "null",
+  "title": "CycloneDX Certification Model",
+  "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
+  "$defs": {
+    "certifications": {
+      "type": "array",
+      "title": "Certifications",
+      "description": "Certifications held by or applicable to the subject.",
+      "items": { "$ref": "#/$defs/certification" }
+    },
+    "certification": {
+      "type": "object",
+      "title": "Certification",
+      "description": "A certification, accreditation, or compliance mark applied to a subject. The subject may be a person, an organization, a system, a product, a service, or any other component. The certification names the standard or scheme, optionally records the certificate identifier, issuer, validity dates, scope, and jurisdiction.",
+      "required": [ "standard" ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "title": "BOM Reference",
+          "description": "An optional identifier that can be used to reference the certification from elsewhere. Every bom-ref shall be unique within the containing instance. The value should not start with the prefix `urn:cdx:` to avoid conflicts with BOM-Link identifiers."
+        },
+        "standard": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Standard",
+          "description": "The certification standard, regulatory scheme, or compliance mark.",
+          "examples": [ "ISO 9001:2015", "IATF 16949:2016", "ISO/IEC 27001:2022", "AS9100D", "FCC Part 15", "CE", "UKCA", "RCM", "Common Criteria (ISO/IEC 15408)", "FIPS 140-3", "SOC 2 Type II" ]
+        },
+        "identifier": {
+          "type": "string",
+          "title": "Identifier",
+          "description": "Certificate, registration, filing, or scheme identifier issued by the authority."
+        },
+        "issuer": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "title": "Issuer",
+          "description": "Reference using bom-link or bom-ref to the party that issued the certification. Typically a certification body, accreditation organization, or regulatory authority."
+        },
+        "issuedDate": {
+          "type": "string",
+          "format": "date",
+          "title": "Issued Date",
+          "description": "Date on which the certification was issued."
+        },
+        "expirationDate": {
+          "type": "string",
+          "format": "date",
+          "title": "Expiration Date",
+          "description": "Date on which the certification expires or requires renewal."
+        },
+        "scope": {
+          "type": "string",
+          "title": "Scope",
+          "description": "Description of the activities, facilities, products, services, or operations covered by the certification."
+        },
+        "jurisdiction": {
+          "type": "string",
+          "title": "Jurisdiction",
+          "description": "ISO 3166-1 alpha-2 country code, ISO 3166-2 subdivision, or supranational identifier such as `EU`, where the certification applies.",
+          "examples": [ "US", "EU", "GB", "AU", "US-CA" ]
+        },
+        "level": {
+          "type": "string",
+          "title": "Level",
+          "description": "The level, class, or grade achieved within the certification scheme, where the scheme defines one.",
+          "examples": [ "EAL4+", "Level 2", "Class B" ]
+        },
+        "url": {
+          "type": "string",
+          "format": "iri-reference",
+          "title": "URL",
+          "description": "URL to the certificate record, filing, or supporting documentation."
+        },
+        "relatedClaims": {
+          "type": "array",
+          "uniqueItems": true,
+          "title": "Related Claims",
+          "description": "References using bom-link or bom-ref to CycloneDX Attestations (CDXA) claims that substantiate the certification, such as the claims, evidence, and counter evidence assembled during the conformity assessment.",
+          "items": {
+            "anyOf": [
+              {
+                "title": "Ref",
+                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+              },
+              {
+                "title": "BOM-Link Element",
+                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+              }
+            ]
+          }
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    }
+  }
+}

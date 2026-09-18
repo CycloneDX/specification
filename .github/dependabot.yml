@@ -25,7 +25,25 @@ updates:
       prefix: 'chore'   ## prefix maximum string length of 15
       include: 'scope'
     open-pull-requests-limit: 999
-  - package-ecosystem: 'maven'
+  # region docs
+  - # docs v1
+    package-ecosystem: 'pip'
+    directories:
+      - '/docgen/*'
+    schedule:
+      interval: 'weekly'
+      day: 'saturday'
+    cooldown:
+      default-days: 7
+    labels: [ 'dependencies' ]
+    commit-message:
+      prefix: 'chore'   ## prefix maximum string length of 15
+      include: 'scope'
+    open-pull-requests-limit: 999
+  # endregion docs
+  # region tools
+  - # tools Java
+    package-ecosystem: 'maven'
     directory: '/tools'
     schedule:
       interval: 'weekly'
@@ -37,8 +55,9 @@ updates:
       prefix: 'chore'   ## prefix maximum string length of 15
       include: 'scope'
     open-pull-requests-limit: 999
-  - package-ecosystem: 'composer'
-    directory: '/tools/src/test/php'
+  - # tools JS: bundler
+    package-ecosystem: 'npm'
+    directory: '/tools/src/main/js/bundler'
     schedule:
       interval: 'weekly'
       day: 'saturday'
@@ -49,8 +68,13 @@ updates:
       prefix: 'chore'   ## prefix maximum string length of 15
       include: 'scope'
     open-pull-requests-limit: 999
-  - package-ecosystem: 'npm'
-    directory: '/tools/src/test/js'
+    groups:
+      all-deps:  # we have a lockfile - we want all deps updates in one PR
+        applies-to: 'version-updates'
+        patterns: [ '*' ]
+  - # tools JS: linter
+    package-ecosystem: 'npm'
+    directory: '/tools/src/main/js/linter'
     schedule:
       interval: 'weekly'
       day: 'saturday'
@@ -61,8 +85,13 @@ updates:
       prefix: 'chore'   ## prefix maximum string length of 15
       include: 'scope'
     open-pull-requests-limit: 999
-  - package-ecosystem: 'pip'
-    directory: '/docgen/json'
+    groups:
+      all-deps:   # we have a lockfile - we want all deps updates in one PR
+        applies-to: 'version-updates'
+        patterns: [ '*' ]
+  - # tools python
+    package-ecosystem: 'pip'
+    directory: '/tools/src/main/python'
     schedule:
       interval: 'weekly'
       day: 'saturday'
@@ -73,3 +102,32 @@ updates:
       prefix: 'chore'   ## prefix maximum string length of 15
       include: 'scope'
     open-pull-requests-limit: 999
+  - # tests PHP
+    package-ecosystem: 'composer'
+    directories:
+      - '/tools/src/test/php/*'
+    schedule:
+      interval: 'weekly'
+      day: 'saturday'
+    cooldown:
+      default-days: 7
+    labels: [ 'dependencies' ]
+    commit-message:
+      prefix: 'chore'   ## prefix maximum string length of 15
+      include: 'scope'
+    open-pull-requests-limit: 999
+  - # tests JS
+    package-ecosystem: 'npm'
+    directories:
+      - '/tools/src/test/js/*'
+    schedule:
+      interval: 'weekly'
+      day: 'saturday'
+    cooldown:
+      default-days: 7
+    labels: [ 'dependencies' ]
+    commit-message:
+      prefix: 'chore'   ## prefix maximum string length of 15
+      include: 'scope'
+    open-pull-requests-limit: 999
+  # endregion tools

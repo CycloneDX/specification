@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cyclonedx.org/schema/2.0/model/cyclonedx-business-objective-2.0.schema.json",
+  "type": "null",
+  "title": "CycloneDX Business Objective Model",
+  "$comment": "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
+  "$defs": {
+    "businessObjectives": {
+      "type": "array",
+      "title": "Business Objectives",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/businessObjective"
+      },
+      "description": "A collection of reusable business objectives that other elements may reference."
+    },
+    "businessObjective": {
+      "type": "object",
+      "title": "Business Objective",
+      "description": "A business goal that a subject supports and that threats, risks, use cases, and requirements can be traced back to. Business objectives anchor risk-centric analysis, such as the first stage of PASTA, where threats and risks are evaluated against what the organization is trying to achieve.",
+      "required": [
+        "bom-ref",
+        "name"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Name",
+          "description": "The name of the business objective."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the business objective."
+        },
+        "criticality": {
+          "$ref": "cyclonedx-risk-2.0.schema.json#/$defs/criticality",
+          "description": "The business criticality of the objective."
+        },
+        "owner": {
+          "$ref": "cyclonedx-party-2.0.schema.json#/$defs/partyChoice",
+          "description": "The party accountable for this objective. May be an inline party object or a reference to a previously declared party."
+        },
+        "externalReferences": {
+          "type": "array",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference"
+          }
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    }
+  }
+}
