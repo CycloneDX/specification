@@ -66,10 +66,10 @@
           "examples": ["image/jpeg"],
           "pattern": "^[-+a-z0-9.]+/[-+a-z0-9.]+$"
         },
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference the component elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the component elsewhere in the BOM. Every `refId` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "parties": {
           "$ref": "cyclonedx-party-2.0.schema.json#/$defs/parties"
@@ -284,7 +284,7 @@
           "uniqueItems": true,
           "items": {"$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataProfileChoice"},
           "title": "Data Profiles",
-          "description": "The data handled by the service, characterized by data profiles. Each entry is either an inline profile object or a reference using bom-link or bom-ref to a previously declared profile, typically declared in the root profiles catalogue. May only be used for components of type `service`. Data movement is intentionally not expressed here: flow direction, sources, destinations, authentication, and boundary crossings are modelled via blueprint flows, assets, and boundaries, which reference this component by bom-ref."
+          "description": "The data handled by the service, characterized by data profiles. Each entry is either an inline profile object or a reference using bom-link or refId to a previously declared profile, typically declared in the root profiles catalogue. May only be used for components of type `service`. Data movement is intentionally not expressed here: flow direction, sources, destinations, authentication, and boundary crossings are modelled via blueprint flows, assets, and boundaries, which reference this component by refId."
         },
         "tags": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/tags",
@@ -402,10 +402,10 @@
           "title": "Type",
           "description": "Discriminator for a component-choice entry. The value shall be the literal string `component-choice`."
         },
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference the component-choice elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the component-choice elsewhere in the BOM. Every `refId` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "name": {
           "type": "string",
@@ -526,10 +526,10 @@
       ],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference this license evidence elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference this license evidence elsewhere in the BOM. Every `refId` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "license": {
           "allOf": [
@@ -570,7 +570,7 @@
           "type": "array",
           "uniqueItems": true,
           "title": "Tools",
-          "description": "The tools that detected the license, referenced by `bom-ref`.",
+          "description": "The tools that detected the license, referenced by `refId`.",
           "items": {
             "anyOf": [
               { "title": "Ref", "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType" },
@@ -603,10 +603,10 @@
       "required": [ "text" ],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference this copyright evidence elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference this copyright evidence elsewhere in the BOM. Every `refId` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "text": {
           "type": "string",
@@ -630,7 +630,7 @@
           "type": "array",
           "uniqueItems": true,
           "title": "Tools",
-          "description": "The tools that detected the copyright statement, referenced by `bom-ref`.",
+          "description": "The tools that detected the copyright statement, referenced by `refId`.",
           "items": {
             "anyOf": [
               { "title": "Ref", "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType" },
@@ -691,7 +691,7 @@
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/elementLink"
           },
           "title": "BOM References",
-          "description": "The object in the BOM identified by its bom-ref. This is often a component or service but may be any object type supporting bom-refs. Tools used for analysis should already be defined in the BOM, either in the metadata/tools, components, or formulation."
+          "description": "The object in the BOM identified by its refId. This is often a component or service but may be any object type supporting refIds. Tools used for analysis should already be defined in the BOM, either in the metadata/tools, components, or formulation."
         },
         "assertion": {
           "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/assertion",
@@ -712,10 +712,10 @@
         "type"
       ],
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference the dataset elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the dataset elsewhere in the BOM. Every `refId` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "type": {
           "title": "Type of Data",
@@ -802,7 +802,7 @@
         "configurationRef": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "title": "Configuration Reference",
-          "description": "The bom-ref of the configuration that determines this component's configuration. Typically points to a component of type 'data' whose data type is 'configuration'."
+          "description": "The refId of the configuration that determines this component's configuration. Typically points to a component of type 'data' whose data type is 'configuration'."
         },
         "changeMechanism": {
           "type": "array",
@@ -853,13 +853,13 @@
       ],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType"
         },
         "party": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "title": "Asserting Party",
-          "description": "Reference using bom-link or bom-ref to the party making the identity assertion."
+          "description": "Reference using bom-link or refId to the party making the identity assertion."
         },
         "identities": {
           "type": "array",

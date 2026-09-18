@@ -123,10 +123,10 @@
           "description": "A model card describes the intended uses of a machine learning model and potential limitations, including biases and ethical considerations. Model cards typically contain the training parameters, which datasets were used to train the model, performance metrics, and other relevant data useful for ML transparency. This object SHOULD be specified for any component of type `machine-learning-model` and must not be specified for other component types.",
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "title": "BOM Reference",
-              "description": "An identifier which can be used to reference the model card elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "title": "Reference Identifier",
+              "description": "An identifier which can be used to reference the model card elsewhere in the BOM. Every `refId` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
             },
             "modelParameters": {
               "type": "object",
@@ -193,7 +193,7 @@
                           "ref": {
                             "$ref": "#/$defs/cyclonedx-common-2.0/$defs/elementLink",
                             "title": "Reference",
-                            "description": "References a data component by the components bom-ref attribute"
+                            "description": "References a data component by the components refId attribute"
                           }
                         }
                       }
@@ -479,10 +479,10 @@
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "title": "BOM Reference",
-              "description": "An identifier which can be used to reference the energy provider elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "title": "Reference Identifier",
+              "description": "An identifier which can be used to reference the energy provider elsewhere in the BOM. Every `refId` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "description": {
               "type": "string",
@@ -675,7 +675,7 @@
           },
           "uniqueItems": true,
           "title": "Annotations",
-          "description": "Comments made by people, organizations, or tools about any object with a bom-ref, such as components, services, vulnerabilities, or the BOM itself. Unlike inventory information, annotations may contain opinions or commentary from various stakeholders. Annotations may be inline (with inventory) or externalized via BOM-Link and may optionally be signed."
+          "description": "Comments made by people, organizations, or tools about any object with a refId, such as components, services, vulnerabilities, or the BOM itself. Unlike inventory information, annotations may contain opinions or commentary from various stakeholders. Annotations may be inline (with inventory) or externalized via BOM-Link and may optionally be signed."
         },
         "annotation": {
           "type": "object",
@@ -689,10 +689,10 @@
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "title": "BOM Reference",
-              "description": "An identifier which can be used to reference the annotation elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "title": "Reference Identifier",
+              "description": "An identifier which can be used to reference the annotation elsewhere in the BOM. Every `refId` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
             },
             "subjects": {
               "type": "array",
@@ -701,7 +701,7 @@
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/elementLink"
               },
               "title": "Subjects",
-              "description": "The object in the BOM identified by its bom-ref. This is often a component or service, but may be any object type supporting bom-refs."
+              "description": "The object in the BOM identified by its refId. This is often a component or service, but may be any object type supporting refIds."
             },
             "annotator": {
               "type": "object",
@@ -803,12 +803,12 @@
           "description": "A behavior performed by one or more objects within the BOM.",
           "additionalProperties": false,
           "required": [
-            "bom-ref",
+            "refId",
             "behavior"
           ],
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "behavior": {
               "$ref": "../behavior-taxonomy.schema.json",
@@ -824,7 +824,7 @@
             "actors": {
               "type": "array",
               "title": "Actors",
-              "description": "References using bom-link or bom-ref to objects that perform this behavior.",
+              "description": "References using bom-link or refId to objects that perform this behavior.",
               "uniqueItems": true,
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
@@ -833,7 +833,7 @@
             "targets": {
               "type": "array",
               "title": "Targets",
-              "description": "References using bom-link or bom-ref to objects affected by this behavior.",
+              "description": "References using bom-link or refId to objects affected by this behavior.",
               "uniqueItems": true,
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
@@ -907,12 +907,12 @@
           "description": "A graph of nodes joined by transitions that models behaviour over time. A node may be an activity, a state, an event, a gateway, or a start or end point, so the same construct expresses an activity or process flow (where the nodes are activities), a state machine (where the nodes are states), or a mixture of the two.",
           "additionalProperties": false,
           "required": [
-            "bom-ref",
+            "refId",
             "nodes"
           ],
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "name": {
               "type": "string",
@@ -941,7 +941,7 @@
             "subject": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Subject",
-              "description": "Reference using bom-link or bom-ref to the object whose behaviour this graph describes."
+              "description": "Reference using bom-link or refId to the object whose behaviour this graph describes."
             },
             "acknowledgment": {
               "$ref": "#/$defs/cyclonedx-behavior-2.0/$defs/acknowledgment"
@@ -1010,12 +1010,12 @@
           "description": "A single node in a behavior graph. The kind determines what the node represents and which additional properties apply.",
           "additionalProperties": false,
           "required": [
-            "bom-ref",
+            "refId",
             "kind"
           ],
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "kind": {
               "title": "Kind",
@@ -1071,7 +1071,7 @@
             "actors": {
               "type": "array",
               "title": "Actors",
-              "description": "References using bom-link or bom-ref to objects that perform this node.",
+              "description": "References using bom-link or refId to objects that perform this node.",
               "uniqueItems": true,
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
@@ -1080,7 +1080,7 @@
             "targets": {
               "type": "array",
               "title": "Targets",
-              "description": "References using bom-link or bom-ref to objects affected by this node.",
+              "description": "References using bom-link or refId to objects affected by this node.",
               "uniqueItems": true,
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
@@ -1176,8 +1176,8 @@
             "target"
           ],
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "name": {
               "type": "string",
@@ -1244,8 +1244,8 @@
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "name": {
               "type": "string",
@@ -1387,7 +1387,7 @@
                     "items": {
                       "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
                     },
-                    "description": "References using bom-link or bom-ref to the blueprint assets that are involved in or exercised by this use case."
+                    "description": "References using bom-link or refId to the blueprint assets that are involved in or exercised by this use case."
                   },
                   "flows": {
                     "type": "array",
@@ -1396,7 +1396,7 @@
                     "items": {
                       "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
                     },
-                    "description": "References using bom-link or bom-ref to the blueprint flows that are triggered or traversed during the execution of this use case."
+                    "description": "References using bom-link or refId to the blueprint flows that are triggered or traversed during the execution of this use case."
                   },
                   "requirements": {
                     "type": "array",
@@ -1405,7 +1405,7 @@
                     "items": {
                       "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
                     },
-                    "description": "References using bom-link or bom-ref to the requirements that are implemented, validated, or addressed by this use case."
+                    "description": "References using bom-link or refId to the requirements that are implemented, validated, or addressed by this use case."
                   }
                 }
               },
@@ -1417,7 +1417,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the requirements, declared in definitions, that are derived from or related to this model."
+              "description": "References using bom-link or refId to the requirements, declared in definitions, that are derived from or related to this model."
             },
             "externalReferences": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/externalReferences"
@@ -1570,8 +1570,8 @@
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "name": {
               "type": "string",
@@ -1601,7 +1601,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to components explicitly included."
+              "description": "References using bom-link or refId to components explicitly included."
             },
             "excludedComponents": {
               "type": "array",
@@ -1610,7 +1610,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to components explicitly excluded."
+              "description": "References using bom-link or refId to components explicitly excluded."
             },
             "properties": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
@@ -1623,17 +1623,17 @@
           "description": "A component, service, data store, actor, or other element included in the blueprint model. An actor asset references a party, since a party such as a person, persona, system, or organization may itself be an asset, including a person in the intelligence sense of a human source.",
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
               "description": "Unique identifier for the asset."
             },
             "componentRef": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
-              "description": "Reference using bom-link or bom-ref to the component this asset represents, including components of type `service`."
+              "description": "Reference using bom-link or refId to the component this asset represents, including components of type `service`."
             },
             "partyRef": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
-              "description": "Reference using bom-link or bom-ref to the party this asset represents, such as a person, persona, system, or organization. Used when the asset is an actor."
+              "description": "Reference using bom-link or refId to the party this asset represents, such as a person, persona, system, or organization. Used when the asset is an actor."
             },
             "type": {
               "title": "Asset Type",
@@ -1734,7 +1734,7 @@
             },
             "zone": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
-              "description": "Reference using bom-link or bom-ref to the zone containing this asset."
+              "description": "Reference using bom-link or refId to the zone containing this asset."
             },
             "classification": {
               "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/assetClassification"
@@ -1768,7 +1768,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to use case objects that describe how actors interact with this asset, including the specific goals, sequences of steps, alternative and exception flows, and any requirements that govern its usage."
+              "description": "References using bom-link or refId to use case objects that describe how actors interact with this asset, including the specific goals, sequences of steps, alternative and exception flows, and any requirements that govern its usage."
             },
             "authentication": {
               "type": "array",
@@ -1803,11 +1803,11 @@
               "title": "Component Reference Asset",
               "description": "An asset defined by reference to a component declared elsewhere in the BOM.",
               "required": [
-                "bom-ref",
+                "refId",
                 "componentRef"
               ],
               "properties": {
-                "bom-ref": true,
+                "refId": true,
                 "componentRef": true
               }
             },
@@ -1815,11 +1815,11 @@
               "title": "Party Reference Asset",
               "description": "An asset defined by reference to a party declared elsewhere in the BOM, such as a person, persona, system, or organization that is itself an asset.",
               "required": [
-                "bom-ref",
+                "refId",
                 "partyRef"
               ],
               "properties": {
-                "bom-ref": true,
+                "refId": true,
                 "partyRef": true
               }
             },
@@ -1827,12 +1827,12 @@
               "title": "Inline Asset",
               "description": "An asset defined inline within the blueprint with an explicit type and name.",
               "required": [
-                "bom-ref",
+                "refId",
                 "type",
                 "name"
               ],
               "properties": {
-                "bom-ref": true,
+                "refId": true,
                 "type": true,
                 "name": true
               }
@@ -1844,14 +1844,14 @@
           "title": "Data Store",
           "description": "A persistent storage system used within the modelled system to hold, retrieve, or manage data.",
           "required": [
-            "bom-ref",
+            "refId",
             "name",
             "type"
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "name": {
               "type": "string",
@@ -1966,7 +1966,7 @@
             },
             "zone": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
-              "description": "Reference using bom-link or bom-ref to the zone where the asset resides."
+              "description": "Reference using bom-link or refId to the zone where the asset resides."
             },
             "location": {
               "type": "string",
@@ -1989,7 +1989,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to data sets stored here."
+              "description": "References using bom-link or refId to data sets stored here."
             },
             "authorization": {
               "type": "array",
@@ -2010,14 +2010,14 @@
           "title": "Data Set",
           "description": "A logical collection of related data managed within the modelled system, including its classification, ownership, and storage placements.",
           "required": [
-            "bom-ref",
+            "refId",
             "name",
             "description"
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "name": {
               "type": "string",
@@ -2034,7 +2034,7 @@
             "dataProfiles": {
               "type": "array",
               "title": "Data Profiles",
-              "description": "Data profiles that govern the dataset. Each entry is either an inline profile object or a reference using bom-link or bom-ref to a previously declared profile, typically declared in the root profiles catalogue.",
+              "description": "Data profiles that govern the dataset. Each entry is either an inline profile object or a reference using bom-link or refId to a previously declared profile, typically declared in the root profiles catalogue.",
               "uniqueItems": true,
               "items": {
                 "$ref": "#/$defs/cyclonedx-data-2.0/$defs/dataProfileChoice"
@@ -2087,7 +2087,7 @@
                 "properties": {
                   "dataStore": {
                     "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
-                    "description": "Reference using bom-link or bom-ref to the store holding this dataset."
+                    "description": "Reference using bom-link or refId to the store holding this dataset."
                   },
                   "encrypted": {
                     "type": "boolean",
@@ -2205,14 +2205,14 @@
           "title": "Zone",
           "description": "A grouping of assets that share a common characteristic, security posture, or administrative control, so they can be reasoned about as a unit. A zone may be logical, physical, network, trust, or another kind, may nest within a parent zone, and is connected to or separated from other zones by boundaries.",
           "required": [
-            "bom-ref",
+            "refId",
             "name",
             "type"
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "name": {
               "type": "string",
@@ -2287,7 +2287,7 @@
             },
             "parent": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
-              "description": "Reference using bom-link or bom-ref to the parent zone if this is a sub-zone."
+              "description": "Reference using bom-link or refId to the parent zone if this is a sub-zone."
             },
             "characteristics": {
               "type": "array",
@@ -2317,13 +2317,13 @@
           "title": "Boundary",
           "description": "An edge that separates or connects two or more zones, marking a point where security controls, policies, or trust levels change. The controls expected when data or actors cross it are captured in crossingRequirements, and the threat model's trust boundary extends a boundary with trust semantics.",
           "required": [
-            "bom-ref",
+            "refId",
             "zones"
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "name": {
               "type": "string",
@@ -2387,7 +2387,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the zones this boundary connects or separates."
+              "description": "References using bom-link or refId to the zones this boundary connects or separates."
             },
             "crossingRequirements": {
               "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/crossingRequirements"
@@ -2603,7 +2603,7 @@
             "ref": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Reference",
-              "description": "Reference using bom-link or bom-ref to the subject element of the relationship."
+              "description": "Reference using bom-link or refId to the subject element of the relationship."
             },
             "aggregates": {
               "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/relationshipTargets",
@@ -2683,7 +2683,7 @@
         "relationshipTargets": {
           "type": "array",
           "title": "Relationship Targets",
-          "description": "References using bom-link or bom-ref to the target elements of a relationship.",
+          "description": "References using bom-link or refId to the target elements of a relationship.",
           "minItems": 1,
           "uniqueItems": true,
           "items": {
@@ -2695,7 +2695,7 @@
           "title": "Flow",
           "description": "Represents a data, control, or process flow between two assets, capturing the direction, type, protocols, and security controls that govern the exchange.",
           "required": [
-            "bom-ref",
+            "refId",
             "name",
             "source",
             "destination",
@@ -2703,8 +2703,8 @@
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "name": {
               "type": "string",
@@ -2771,11 +2771,11 @@
             },
             "source": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
-              "description": "Reference using bom-link or bom-ref to the source of the flow. The source may be either an asset (such as a component, service, data store, or other element in the blueprint) or an actor that originates the exchange."
+              "description": "Reference using bom-link or refId to the source of the flow. The source may be either an asset (such as a component, service, data store, or other element in the blueprint) or an actor that originates the exchange."
             },
             "destination": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
-              "description": "Reference using bom-link or bom-ref to the destination of the flow. The destination may be either an asset (such as a component, service, data store, or other element in the blueprint) or an actor that receives the exchange."
+              "description": "Reference using bom-link or refId to the destination of the flow. The destination may be either an asset (such as a component, service, data store, or other element in the blueprint) or an actor that receives the exchange."
             },
             "bidirectional": {
               "type": "boolean",
@@ -2815,7 +2815,7 @@
             "dataProfiles": {
               "type": "array",
               "title": "Data Profiles",
-              "description": "Data profiles that govern the data carried by this flow. A flow may carry data governed by multiple profiles, for example a payment submission carrying both payment card data and customer personally identifiable information. Each entry is either an inline profile object or a reference using bom-link or bom-ref to a previously declared profile.",
+              "description": "Data profiles that govern the data carried by this flow. A flow may carry data governed by multiple profiles, for example a payment submission carrying both payment card data and customer personally identifiable information. Each entry is either an inline profile object or a reference using bom-link or refId to a previously declared profile.",
               "uniqueItems": true,
               "items": {
                 "$ref": "#/$defs/cyclonedx-data-2.0/$defs/dataProfileChoice"
@@ -2864,19 +2864,19 @@
           "title": "Actor",
           "description": "An actor is a contextual binding between a party and the modelled system. The party identifies who or what is acting (an organisation, person, system, or persona). The actor layer adds properties that are meaningful only within the blueprint, such as the permissions the actor holds in this system and the trust zone in which the actor operates. Identity, roles, archetype, and inter-party relations such as delegation are carried by the wrapped party and shall not be duplicated on the actor.",
           "required": [
-            "bom-ref",
+            "refId",
             "party"
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
               "description": "Unique identifier for this actor binding. References to actors from other parts of the blueprint, such as use cases or flows, use this identifier."
             },
             "party": {
               "$ref": "#/$defs/cyclonedx-party-2.0/$defs/partyChoice",
               "title": "Party",
-              "description": "The party that this actor binds to the modelled system. May be an inline party object declaring identity and roles in place, or a bom-link or bom-ref to a party declared elsewhere in the document."
+              "description": "The party that this actor binds to the modelled system. May be an inline party object declaring identity and roles in place, or a bom-link or refId to a party declared elsewhere in the document."
             },
             "description": {
               "type": "string",
@@ -2895,7 +2895,7 @@
             "zone": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Zone",
-              "description": "Reference using bom-link or bom-ref to the trust zone in which the actor operates."
+              "description": "Reference using bom-link or refId to the trust zone in which the actor operates."
             },
             "properties": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
@@ -2911,8 +2911,8 @@
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "description": {
               "type": "string",
@@ -2975,7 +2975,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the assets that are directly affected by or dependent on this assumption, enabling impact analysis when the assumption's validity changes."
+              "description": "References using bom-link or refId to the assets that are directly affected by or dependent on this assumption, enabling impact analysis when the assumption's validity changes."
             },
             "validity": {
               "title": "Validity",
@@ -3026,8 +3026,8 @@
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "name": {
               "type": "string",
@@ -3075,7 +3075,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to elements shown in this visualization."
+              "description": "References using bom-link or refId to elements shown in this visualization."
             },
             "interactive": {
               "type": "boolean",
@@ -3391,13 +3391,13 @@
           "title": "Business Objective",
           "description": "A business goal that a subject supports and that threats, risks, use cases, and requirements can be traced back to. Business objectives anchor risk-centric analysis, such as the first stage of PASTA, where threats and risks are evaluated against what the organization is trying to achieve.",
           "required": [
-            "bom-ref",
+            "refId",
             "name"
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "name": {
               "type": "string",
@@ -3452,10 +3452,10 @@
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "title": "BOM Reference",
-              "description": "An optional identifier that can be used to reference the certification from elsewhere. Every bom-ref shall be unique within the containing instance. The value should not start with the prefix `urn:cdx:` to avoid conflicts with BOM-Link identifiers."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "title": "Reference Identifier",
+              "description": "An optional identifier that can be used to reference the certification from elsewhere. Every refId shall be unique within the containing instance. The value should not start with the prefix `urn:cdx:` to avoid conflicts with BOM-Link identifiers."
             },
             "standard": {
               "type": "string",
@@ -3484,7 +3484,7 @@
             "issuer": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Issuer",
-              "description": "Reference using bom-link or bom-ref to the party that issued the certification. Typically a certification body, accreditation organization, or regulatory authority."
+              "description": "Reference using bom-link or refId to the party that issued the certification. Typically a certification body, accreditation organization, or regulatory authority."
             },
             "issuedDate": {
               "type": "string",
@@ -3535,7 +3535,7 @@
               "type": "array",
               "uniqueItems": true,
               "title": "Related Claims",
-              "description": "References using bom-link or bom-ref to CycloneDX Attestations (CDXA) claims that substantiate the certification, such as the claims, evidence, and counter evidence assembled during the conformity assessment.",
+              "description": "References using bom-link or refId to CycloneDX Attestations (CDXA) claims that substantiate the certification, such as the claims, evidence, and counter evidence assembled during the conformity assessment.",
               "items": {
                 "anyOf": [
                   {
@@ -3575,9 +3575,9 @@
           "description": "Details a specific attribution of data within the BOM to a contributing entity or process.",
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "title": "BOM Reference"
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "title": "Reference Identifier"
             },
             "pointers": {
               "type": "array",
@@ -3610,12 +3610,12 @@
             "attributedTo": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Attributed To",
-              "description": "The `bom-ref` of an object, such as a component, service, tool, organisational entity, or person that supplied the cited information.\nAt least one of the \"attributedTo\" or \"process\" elements must be present."
+              "description": "The `refId` of an object, such as a component, service, tool, organisational entity, or person that supplied the cited information.\nAt least one of the \"attributedTo\" or \"process\" elements must be present."
             },
             "process": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Process Reference",
-              "description": "The `bom-ref` to a process (such as a formula, workflow, task, or step) defined in the `formulation` section that executed or generated the attributed data.\nAt least one of the \"attributedTo\" or \"process\" elements must be present."
+              "description": "The `refId` to a process (such as a formula, workflow, task, or step) defined in the `formulation` section that executed or generated the attributed data.\nAt least one of the \"attributedTo\" or \"process\" elements must be present."
             },
             "note": {
               "type": "string",
@@ -3674,20 +3674,20 @@
       "type": "null",
       "title": "CycloneDX Common Model",
       "$defs": {
-        "refType": {
+        "refIdType": {
           "description": "Identifier for referable and therefore interlinkable elements.\nValue shall not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
           "type": "string",
           "minLength": 1,
           "pattern": "^(?!urn:cdx:)"
         },
         "refLinkType": {
-          "description": "Descriptor for an element identified by the attribute 'bom-ref' in the same BOM document.\nIn contrast to `bomLinkElementType`.",
+          "description": "Descriptor for an element identified by the attribute 'refId' in the same BOM document.\nIn contrast to `bomLinkElementType`.",
           "allOf": [
             {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             }
           ],
-          "$comment": "value-range is same as 'refType'"
+          "$comment": "value-range is same as 'refIdType'"
         },
         "bomLinkDocumentType": {
           "title": "BOM-Link Document",
@@ -3720,7 +3720,7 @@
         },
         "elementLink": {
           "title": "Referenced Element",
-          "description": "Reference using bom-link or bom-ref to an element.",
+          "description": "Reference using bom-link or refId to an element.",
           "anyOf": [
             {
               "title": "Ref",
@@ -3992,10 +3992,10 @@
           "description": "An address used to identify a contactable location.",
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "title": "BOM Reference",
-              "description": "An optional identifier which can be used to reference the address elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "title": "Reference Identifier",
+              "description": "An optional identifier which can be used to reference the address elsewhere in the BOM. Every refId must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "country": {
               "type": "string",
@@ -4049,10 +4049,10 @@
           "title": "Organizational Entity",
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "title": "BOM Reference",
-              "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "title": "Reference Identifier",
+              "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every refId must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
             },
             "name": {
               "type": "string",
@@ -4103,10 +4103,10 @@
           "title": "Organizational Contact",
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "title": "BOM Reference",
-              "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "title": "Reference Identifier",
+              "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every refId must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
             },
             "name": {
               "type": "string",
@@ -4774,10 +4774,10 @@
               ],
               "pattern": "^[-+a-z0-9.]+/[-+a-z0-9.]+$"
             },
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "title": "BOM Reference",
-              "description": "An identifier which can be used to reference the component elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "title": "Reference Identifier",
+              "description": "An identifier which can be used to reference the component elsewhere in the BOM. Every `refId` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
             },
             "parties": {
               "$ref": "#/$defs/cyclonedx-party-2.0/$defs/parties"
@@ -5018,7 +5018,7 @@
                 "$ref": "#/$defs/cyclonedx-data-2.0/$defs/dataProfileChoice"
               },
               "title": "Data Profiles",
-              "description": "The data handled by the service, characterized by data profiles. Each entry is either an inline profile object or a reference using bom-link or bom-ref to a previously declared profile, typically declared in the root profiles catalogue. May only be used for components of type `service`. Data movement is intentionally not expressed here: flow direction, sources, destinations, authentication, and boundary crossings are modelled via blueprint flows, assets, and boundaries, which reference this component by bom-ref."
+              "description": "The data handled by the service, characterized by data profiles. Each entry is either an inline profile object or a reference using bom-link or refId to a previously declared profile, typically declared in the root profiles catalogue. May only be used for components of type `service`. Data movement is intentionally not expressed here: flow direction, sources, destinations, authentication, and boundary crossings are modelled via blueprint flows, assets, and boundaries, which reference this component by refId."
             },
             "tags": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/tags",
@@ -5193,10 +5193,10 @@
               "title": "Type",
               "description": "Discriminator for a component-choice entry. The value shall be the literal string `component-choice`."
             },
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "title": "BOM Reference",
-              "description": "An identifier which can be used to reference the component-choice elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "title": "Reference Identifier",
+              "description": "An identifier which can be used to reference the component-choice elsewhere in the BOM. Every `refId` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
             },
             "name": {
               "type": "string",
@@ -5346,10 +5346,10 @@
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "title": "BOM Reference",
-              "description": "An identifier which can be used to reference this license evidence elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "title": "Reference Identifier",
+              "description": "An identifier which can be used to reference this license evidence elsewhere in the BOM. Every `refId` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
             },
             "license": {
               "allOf": [
@@ -5392,7 +5392,7 @@
               "type": "array",
               "uniqueItems": true,
               "title": "Tools",
-              "description": "The tools that detected the license, referenced by `bom-ref`.",
+              "description": "The tools that detected the license, referenced by `refId`.",
               "items": {
                 "anyOf": [
                   {
@@ -5435,10 +5435,10 @@
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "title": "BOM Reference",
-              "description": "An identifier which can be used to reference this copyright evidence elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "title": "Reference Identifier",
+              "description": "An identifier which can be used to reference this copyright evidence elsewhere in the BOM. Every `refId` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
             },
             "text": {
               "type": "string",
@@ -5464,7 +5464,7 @@
               "type": "array",
               "uniqueItems": true,
               "title": "Tools",
-              "description": "The tools that detected the copyright statement, referenced by `bom-ref`.",
+              "description": "The tools that detected the copyright statement, referenced by `refId`.",
               "items": {
                 "anyOf": [
                   {
@@ -5537,7 +5537,7 @@
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/elementLink"
               },
               "title": "BOM References",
-              "description": "The object in the BOM identified by its bom-ref. This is often a component or service but may be any object type supporting bom-refs. Tools used for analysis should already be defined in the BOM, either in the metadata/tools, components, or formulation."
+              "description": "The object in the BOM identified by its refId. This is often a component or service but may be any object type supporting refIds. Tools used for analysis should already be defined in the BOM, either in the metadata/tools, components, or formulation."
             },
             "assertion": {
               "$ref": "#/$defs/cyclonedx-evidence-2.0/$defs/assertion",
@@ -5558,10 +5558,10 @@
             "type"
           ],
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "title": "BOM Reference",
-              "description": "An identifier which can be used to reference the dataset elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "title": "Reference Identifier",
+              "description": "An identifier which can be used to reference the dataset elsewhere in the BOM. Every `refId` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
             },
             "type": {
               "title": "Type of Data",
@@ -5650,7 +5650,7 @@
             "configurationRef": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Configuration Reference",
-              "description": "The bom-ref of the configuration that determines this component's configuration. Typically points to a component of type 'data' whose data type is 'configuration'."
+              "description": "The refId of the configuration that determines this component's configuration. Typically points to a component of type 'data' whose data type is 'configuration'."
             },
             "changeMechanism": {
               "type": "array",
@@ -5701,13 +5701,13 @@
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "party": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Asserting Party",
-              "description": "Reference using bom-link or bom-ref to the party making the identity assertion."
+              "description": "Reference using bom-link or refId to the party making the identity assertion."
             },
             "identities": {
               "type": "array",
@@ -5852,10 +5852,10 @@
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "title": "BOM Reference",
-              "description": "An identifier which can be used to reference the composition elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "title": "Reference Identifier",
+              "description": "An identifier which can be used to reference the composition elsewhere in the BOM. Every `refId` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
             },
             "aggregate": {
               "$ref": "#/$defs/cyclonedx-composition-2.0/$defs/aggregateType",
@@ -5869,7 +5869,7 @@
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/elementLink"
               },
               "title": "BOM references",
-              "description": "The bom-ref identifiers of the components or services being described. Assemblies refer to nested relationships whereby a constituent part may include other constituent parts. References do not cascade to child parts. References are explicit for the specified constituent part only."
+              "description": "The refIds of the components or services being described. Assemblies refer to nested relationships whereby a constituent part may include other constituent parts. References do not cascade to child parts. References are explicit for the specified constituent part only."
             },
             "dependencies": {
               "type": "array",
@@ -5878,7 +5878,7 @@
                 "type": "string"
               },
               "title": "BOM references",
-              "description": "The bom-ref identifiers of the components or services being described. Dependencies refer to a relationship whereby an independent constituent part requires another independent constituent part. References do not cascade to transitive dependencies. References are explicit for the specified dependency only."
+              "description": "The refIds of the components or services being described. Dependencies refer to a relationship whereby an independent constituent part requires another independent constituent part. References do not cascade to transitive dependencies. References are explicit for the specified dependency only."
             },
             "vulnerabilities": {
               "type": "array",
@@ -5887,7 +5887,7 @@
                 "type": "string"
               },
               "title": "BOM references",
-              "description": "The bom-ref identifiers of the vulnerabilities being described."
+              "description": "The refIds of the vulnerabilities being described."
             },
             "signatures": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/signatures"
@@ -5941,14 +5941,14 @@
           "title": "Control",
           "description": "A safeguard or countermeasure that protects systems, data, or operations. A control binds the elements that implement it to the requirements it satisfies, and records its implementation status and assessed effectiveness.",
           "required": [
-            "bom-ref",
+            "refId",
             "name"
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "description": "An identifier which can be used to reference the control elsewhere using a bom-ref or bom-link."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "description": "An identifier which can be used to reference the control elsewhere using a refId or bom-link."
             },
             "name": {
               "type": "string",
@@ -6020,7 +6020,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the elements the control protects, such as components, services, zones, or boundaries. A control without this property applies to the organization or system as a whole."
+              "description": "References using bom-link or refId to the elements the control protects, such as components, services, zones, or boundaries. A control without this property applies to the organization or system as a whole."
             },
             "implementedBy": {
               "type": "array",
@@ -6030,7 +6030,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the components, services, formulation workflows, or parties that implement the control."
+              "description": "References using bom-link or refId to the components, services, formulation workflows, or parties that implement the control."
             },
             "satisfies": {
               "type": "array",
@@ -6040,7 +6040,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the requirements the control satisfies, including requirements defined within standards."
+              "description": "References using bom-link or refId to the requirements the control satisfies, including requirements defined within standards."
             },
             "effectiveness": {
               "title": "Effectiveness",
@@ -7032,7 +7032,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
                 "title": "Algorithm reference",
-                "description": "The bom-ref to algorithm cryptographic asset."
+                "description": "The refId to algorithm cryptographic asset."
               }
             },
             "identifiers": {
@@ -7102,7 +7102,7 @@
             "algorithm": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Algorithm reference",
-              "description": "The bom-ref to algorithm cryptographic asset."
+              "description": "The refId to algorithm cryptographic asset."
             }
           }
         },
@@ -7123,7 +7123,7 @@
             "algorithm": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Algorithm reference",
-              "description": "The bom-ref to algorithm cryptographic asset."
+              "description": "The refId to algorithm cryptographic asset."
             }
           }
         },
@@ -7144,7 +7144,7 @@
             "algorithm": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Algorithm reference",
-              "description": "The bom-ref to algorithm cryptographic asset."
+              "description": "The refId to algorithm cryptographic asset."
             }
           }
         },
@@ -7162,7 +7162,7 @@
             "algorithm": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Algorithm reference",
-              "description": "The bom-ref to algorithm cryptographic asset."
+              "description": "The refId to algorithm cryptographic asset."
             }
           }
         },
@@ -7180,7 +7180,7 @@
             "algorithm": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Algorithm reference",
-              "description": "The bom-ref to algorithm cryptographic asset."
+              "description": "The refId to algorithm cryptographic asset."
             }
           }
         },
@@ -7301,7 +7301,7 @@
             "ref": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Reference to cryptographic asset",
-              "description": "The bom-ref to cryptographic asset."
+              "description": "The refId to cryptographic asset."
             }
           }
         },
@@ -7372,7 +7372,7 @@
             "algorithmRef": {
               "type": "array",
               "title": "References",
-              "description": "The bom-refs to the assets securing this asset (e.g., algorithms, hardware, keys).",
+              "description": "The refIds to the assets securing this asset (e.g., algorithms, hardware, keys).",
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               }
@@ -7388,7 +7388,7 @@
         "dataProfiles": {
           "type": "array",
           "title": "Data Profiles",
-          "description": "A catalogue of reusable data profile definitions. Each entry is a complete inline data profile carrying its own bom-ref so other objects may reference it.",
+          "description": "A catalogue of reusable data profile definitions. Each entry is a complete inline data profile carrying its own refId so other objects may reference it.",
           "uniqueItems": true,
           "items": {
             "$ref": "#/$defs/cyclonedx-data-2.0/$defs/dataProfile"
@@ -7403,8 +7403,8 @@
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
               "description": "Unique identifier for this data profile."
             },
             "name": {
@@ -7629,7 +7629,7 @@
         },
         "dataProfileChoice": {
           "title": "Data Profile Choice",
-          "description": "A data profile represented either as a complete inline object or as a reference to a previously declared profile. References use bom-link or bom-ref to point at a profile declared in the root profiles catalogue or elsewhere in the document.",
+          "description": "A data profile represented either as a complete inline object or as a reference to a previously declared profile. References use bom-link or refId to point at a profile declared in the root profiles catalogue or elsewhere in the document.",
           "oneOf": [
             {
               "$ref": "#/$defs/cyclonedx-data-2.0/$defs/dataProfile"
@@ -7637,7 +7637,7 @@
             {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Reference",
-              "description": "Reference using bom-link or bom-ref to a previously declared data profile."
+              "description": "Reference using bom-link or refId to a previously declared data profile."
             }
           ]
         },
@@ -7650,8 +7650,8 @@
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
               "description": "Unique identifier for this data object."
             },
             "name": {
@@ -7673,7 +7673,7 @@
             "profile": {
               "$ref": "#/$defs/cyclonedx-data-2.0/$defs/dataProfileChoice",
               "title": "Profile",
-              "description": "The data profile that governs this object's classification, information types, and lifecycle requirements. May be an inline profile object or a reference using bom-link or bom-ref to a previously declared profile."
+              "description": "The data profile that governs this object's classification, information types, and lifecycle requirements. May be an inline profile object or a reference using bom-link or refId to a previously declared profile."
             },
             "informationTypes": {
               "type": "array",
@@ -7768,8 +7768,8 @@
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
               "description": "Unique identifier for this attribute, enabling it to be referenced as a key target."
             },
             "name": {
@@ -7821,7 +7821,7 @@
             "references": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "References",
-              "description": "For a foreign key, a reference using bom-link or bom-ref to the data object or attribute it refers to."
+              "description": "For a foreign key, a reference using bom-link or refId to the data object or attribute it refers to."
             },
             "properties": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
@@ -7838,8 +7838,8 @@
             "cardinality"
           ],
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "name": {
               "type": "string",
@@ -7854,7 +7854,7 @@
             "target": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Target",
-              "description": "Reference using bom-link or bom-ref to the related data object."
+              "description": "Reference using bom-link or refId to the related data object."
             },
             "cardinality": {
               "title": "Cardinality",
@@ -7875,7 +7875,7 @@
             "sourceAttributes": {
               "type": "array",
               "title": "Source Attributes",
-              "description": "References using bom-link or bom-ref to the attributes on this data object that participate in the relationship, such as the foreign key columns.",
+              "description": "References using bom-link or refId to the attributes on this data object that participate in the relationship, such as the foreign key columns.",
               "uniqueItems": true,
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
@@ -7884,7 +7884,7 @@
             "targetAttributes": {
               "type": "array",
               "title": "Target Attributes",
-              "description": "References using bom-link or bom-ref to the attributes on the target data object that the relationship refers to, such as the primary key columns.",
+              "description": "References using bom-link or refId to the attributes on the target data object that the relationship refers to, such as the primary key columns.",
               "uniqueItems": true,
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
@@ -7898,7 +7898,7 @@
         "subject": {
           "type": "object",
           "title": "Subject",
-          "description": "An entity, group, category, or thing that the data is about or pertains to. Subjects identify who or what the data describes, which is critical for determining applicable regulations, privacy obligations, and handling requirements. A subject is identified in one of three ways: inline by `name` and `type`, by an inline `party` object, or by `ref` pointing at any bom-ref'd element declared elsewhere in the document (a party, component, service, asset, dataset, or other element). At least one of these forms shall be supplied. Subject-context attributes such as protected-class status, applicable jurisdictions, and applicable regulations are carried here regardless of which identification form is used.",
+          "description": "An entity, group, category, or thing that the data is about or pertains to. Subjects identify who or what the data describes, which is critical for determining applicable regulations, privacy obligations, and handling requirements. A subject is identified in one of three ways: inline by `name` and `type`, by an inline `party` object, or by `ref` pointing at any element carrying a refId declared elsewhere in the document (a party, component, service, asset, dataset, or other element). At least one of these forms shall be supplied. Subject-context attributes such as protected-class status, applicable jurisdictions, and applicable regulations are carried here regardless of which identification form is used.",
           "additionalProperties": false,
           "anyOf": [
             {
@@ -7999,7 +7999,7 @@
             "ref": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Reference",
-              "description": "Reference using bom-link or bom-ref to any element declared elsewhere in the document that identifies the subject, such as a party, component, service, asset, dataset, or other bom-ref'd element. Use this when the subject is already represented elsewhere and you want to point at it rather than redeclare it."
+              "description": "Reference using bom-link or refId to any element declared elsewhere in the document that identifies the subject, such as a party, component, service, asset, dataset, or other element carrying a refId. Use this when the subject is already represented elsewhere and you want to point at it rather than redeclare it."
             },
             "protectedClass": {
               "type": "boolean",
@@ -8305,10 +8305,10 @@
                 "description": "The assessor who evaluates claims and determines conformance to requirements and confidence in that assessment.",
                 "additionalProperties": false,
                 "properties": {
-                  "bom-ref": {
-                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-                    "title": "BOM Reference",
-                    "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
+                  "refId": {
+                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+                    "title": "Reference Identifier",
+                    "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `refId` must be unique within the BOM."
                   },
                   "thirdParty": {
                     "type": "boolean",
@@ -8340,7 +8340,7 @@
                   "assessor": {
                     "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
                     "title": "Assessor",
-                    "description": "The `bom-ref` to the assessor asserting the attestation."
+                    "description": "The `refId` to the assessor asserting the attestation."
                   },
                   "map": {
                     "type": "array",
@@ -8354,12 +8354,12 @@
                         "requirement": {
                           "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
                           "title": "Requirement",
-                          "description": "The `bom-ref` to the requirement being attested to."
+                          "description": "The `refId` to the requirement being attested to."
                         },
                         "claims": {
                           "type": "array",
                           "title": "Claims",
-                          "description": "The list of `bom-ref` to the claims being attested to.",
+                          "description": "The list of `refId` to the claims being attested to.",
                           "items": {
                             "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
                           }
@@ -8367,7 +8367,7 @@
                         "counterClaims": {
                           "type": "array",
                           "title": "Counter Claims",
-                          "description": "The list of  `bom-ref` to the counter claims being attested to.",
+                          "description": "The list of  `refId` to the counter claims being attested to.",
                           "items": {
                             "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
                           }
@@ -8393,7 +8393,7 @@
                             "mitigationStrategies": {
                               "type": "array",
                               "title": "Mitigation Strategies",
-                              "description": "References using bom-link or bom-ref to the controls that mitigate identified gaps in conformance with the requirement. Each mitigation strategy should be substantiated by evidence.",
+                              "description": "References using bom-link or refId to the controls that mitigate identified gaps in conformance with the requirement. Each mitigation strategy should be substantiated by evidence.",
                               "items": {
                                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
                               }
@@ -8438,15 +8438,15 @@
                 "title": "Claim",
                 "additionalProperties": false,
                 "properties": {
-                  "bom-ref": {
-                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-                    "title": "BOM Reference",
-                    "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
+                  "refId": {
+                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+                    "title": "Reference Identifier",
+                    "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `refId` must be unique within the BOM."
                   },
                   "target": {
                     "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
                     "title": "Target",
-                    "description": "Reference using bom-link or bom-ref to the target of the claim, such as a control, system, application, module, team, person, process, or business unit."
+                    "description": "Reference using bom-link or refId to the target of the claim, such as a control, system, application, module, team, person, process, or business unit."
                   },
                   "predicate": {
                     "type": "string",
@@ -8456,7 +8456,7 @@
                   "mitigationStrategies": {
                     "type": "array",
                     "title": "Mitigation Strategies",
-                    "description": "References using bom-link or bom-ref to the controls that mitigate identified weaknesses in the evidence supporting the claim. Each mitigation strategy should be substantiated by evidence.",
+                    "description": "References using bom-link or refId to the controls that mitigate identified weaknesses in the evidence supporting the claim. Each mitigation strategy should be substantiated by evidence.",
                     "items": {
                       "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
                     }
@@ -8469,7 +8469,7 @@
                   "evidence": {
                     "type": "array",
                     "title": "Evidence",
-                    "description": "The list of `bom-ref` to evidence that supports this claim.",
+                    "description": "The list of `refId` to evidence that supports this claim.",
                     "items": {
                       "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
                     }
@@ -8477,7 +8477,7 @@
                   "counterEvidence": {
                     "type": "array",
                     "title": "Counter Evidence",
-                    "description": "The list of `bom-ref` to counterEvidence that supports this claim.",
+                    "description": "The list of `refId` to counterEvidence that supports this claim.",
                     "items": {
                       "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
                     }
@@ -8500,10 +8500,10 @@
                 "title": "Evidence",
                 "additionalProperties": false,
                 "properties": {
-                  "bom-ref": {
-                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-                    "title": "BOM Reference",
-                    "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
+                  "refId": {
+                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+                    "title": "Reference Identifier",
+                    "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `refId` must be unique within the BOM."
                   },
                   "propertyName": {
                     "type": "string",
@@ -8737,7 +8737,7 @@
             "ref": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Reference",
-              "description": "References a component by its bom-ref attribute"
+              "description": "References a component by its refId attribute"
             },
             "dependsOn": {
               "type": "array",
@@ -8746,7 +8746,7 @@
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
               "title": "Depends On",
-              "description": "The bom-ref identifiers of the components that are dependencies of this dependency object."
+              "description": "The refIds of the components that are dependencies of this dependency object."
             },
             "provides": {
               "type": "array",
@@ -8755,7 +8755,7 @@
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
               "title": "Provides",
-              "description": "The bom-ref identifiers of the components that define a given specification or standard, which are provided or implemented by this dependency object.\nFor example, a cryptographic library which implements a cryptographic algorithm. A component which implements another component does not imply that the implementation is in use."
+              "description": "The refIds of the components that define a given specification or standard, which are provided or implemented by this dependency object.\nFor example, a cryptographic library which implements a cryptographic algorithm. A component which implements another component does not imply that the implementation is in use."
             }
           }
         }
@@ -8774,10 +8774,10 @@
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "title": "BOM Reference",
-              "description": "An identifier which can be used to reference the occurrence elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "title": "Reference Identifier",
+              "description": "An identifier which can be used to reference the occurrence elsewhere in the BOM. Every `refId` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
             },
             "location": {
               "type": "string",
@@ -8850,10 +8850,10 @@
           "description": "A single call stack or data flow path by which the subject is reached.",
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "title": "BOM Reference",
-              "description": "An identifier which can be used to reference this call stack elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "title": "Reference Identifier",
+              "description": "An identifier which can be used to reference this call stack elsewhere in the BOM. Every `refId` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
             },
             "name": {
               "type": "string",
@@ -8975,10 +8975,10 @@
           "description": "A rule, policy, or query that identified a finding, for example a static or dynamic analysis rule, a policy, or a query. The scanner, engine, and ruleset are versioned components referenced from `tools`; this object identifies the specific rule and binds it to that ruleset.",
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "title": "BOM Reference",
-              "description": "An identifier which can be used to reference the rule elsewhere in the BOM, for example when the same rule produces many findings. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "title": "Reference Identifier",
+              "description": "An identifier which can be used to reference the rule elsewhere in the BOM, for example when the same rule produces many findings. Every `refId` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
             },
             "id": {
               "type": "string",
@@ -9007,7 +9007,7 @@
                 }
               ],
               "title": "Ruleset",
-              "description": "A reference, by `bom-ref`, to the ruleset or policy bundle that contains this rule, typically modelled as a versioned component or service in `tools`."
+              "description": "A reference, by `refId`, to the ruleset or policy bundle that contains this rule, typically modelled as a versioned component or service in `tools`."
             },
             "text": {
               "type": "string",
@@ -9234,7 +9234,7 @@
                 }
               ],
               "title": "Reference",
-              "description": "An optional reference, by `bom-ref`, to the specific determination this material corroborates, for example a presence evidence entry. This links proof to a particular claim and perspective rather than leaving it pooled and unattributed."
+              "description": "An optional reference, by `refId`, to the specific determination this material corroborates, for example a presence evidence entry. This links proof to a particular claim and perspective rather than leaving it pooled and unattributed."
             },
             "type": {
               "$ref": "#/$defs/cyclonedx-evidence-2.0/$defs/evidenceDataType",
@@ -9350,10 +9350,10 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "title": "BOM Reference",
-              "description": "An identifier which can be used to reference the formula elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "title": "Reference Identifier",
+              "description": "An identifier which can be used to reference the formula elsewhere in the BOM. Every `refId` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "components": {
               "title": "Components",
@@ -9385,16 +9385,16 @@
           "$comment": "Workflow are as task themselves and can trigger other workflow tasks.  These relationships can be modeled in the taskDependencies graph.",
           "type": "object",
           "required": [
-            "bom-ref",
+            "refId",
             "uid",
             "taskTypes"
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "title": "BOM Reference",
-              "description": "An identifier which can be used to reference the workflow elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "title": "Reference Identifier",
+              "description": "An identifier which can be used to reference the workflow elsewhere in the BOM. Every `refId` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "uid": {
               "title": "Unique Identifier (UID)",
@@ -9528,16 +9528,16 @@
           "$comment": "Tasks are building blocks for constructing assemble CI/CD workflows or pipelines.",
           "type": "object",
           "required": [
-            "bom-ref",
+            "refId",
             "uid",
             "taskTypes"
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "title": "BOM Reference",
-              "description": "An identifier which can be used to reference the task elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "title": "Reference Identifier",
+              "description": "An identifier which can be used to reference the task elsewhere in the BOM. Every `refId` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "uid": {
               "title": "Unique Identifier (UID)",
@@ -9693,15 +9693,15 @@
           "description": "A named filesystem or data resource shareable by workflow tasks.",
           "type": "object",
           "required": [
-            "bom-ref",
+            "refId",
             "uid"
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "title": "BOM Reference",
-              "description": "An identifier which can be used to reference the workspace elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "title": "Reference Identifier",
+              "description": "An identifier which can be used to reference the workspace elsewhere in the BOM. Every `refId` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "uid": {
               "title": "Unique Identifier (UID)",
@@ -9845,14 +9845,14 @@
           "additionalProperties": false,
           "required": [
             "type",
-            "bom-ref",
+            "refId",
             "uid"
           ],
           "properties": {
-            "bom-ref": {
-              "title": "BOM Reference",
-              "description": "An identifier which can be used to reference the trigger elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "title": "Reference Identifier",
+              "description": "An identifier which can be used to reference the trigger elsewhere in the BOM. Every `refId` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "uid": {
               "title": "Unique Identifier (UID)",
@@ -10041,8 +10041,8 @@
               "title": "Resource",
               "description": "A reference to an independent resource provided as an input to a task by the workflow runtime.",
               "examples": [
-                "a reference to a configuration file in a repository (i.e., a bom-ref)",
-                "a reference to a scanning service used in a task (i.e., a bom-ref)"
+                "a reference to a configuration file in a repository (i.e., a refId)",
+                "a reference to a scanning service used in a task (i.e., a refId)"
               ],
               "$ref": "#/$defs/cyclonedx-formulation-2.0/$defs/resourceReferenceChoice"
             },
@@ -10178,14 +10178,14 @@
         },
         "resourceReferenceChoice": {
           "title": "Resource reference choice",
-          "description": "A reference to a locally defined resource (e.g., a bom-ref) or an externally accessible resource.",
-          "$comment": "Enables reference to a resource that participates in a workflow; using either internal (bom-ref) or external (externalReference) types.",
+          "description": "A reference to a locally defined resource (e.g., a refId) or an externally accessible resource.",
+          "$comment": "Enables reference to a resource that participates in a workflow; using either internal (refId) or external (externalReference) types.",
           "type": "object",
           "additionalProperties": false,
           "properties": {
             "ref": {
               "title": "BOM Reference",
-              "description": "References an object by its bom-ref attribute",
+              "description": "References an object by its refId attribute",
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/elementLink"
             },
             "externalReference": {
@@ -10653,10 +10653,10 @@
                             "LicenseRef-my-custom-license"
                           ]
                         },
-                        "bom-ref": {
-                          "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-                          "title": "BOM Reference",
-                          "description": "An identifier which can be used to reference the license elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+                        "refId": {
+                          "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+                          "title": "Reference Identifier",
+                          "description": "An identifier which can be used to reference the license elsewhere in the BOM. Every `refId` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
                         },
                         "text": {
                           "title": "License texts",
@@ -10679,10 +10679,10 @@
                   "acknowledgement": {
                     "$ref": "#/$defs/cyclonedx-license-2.0/$defs/licenseAcknowledgementEnumeration"
                   },
-                  "bom-ref": {
-                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-                    "title": "BOM Reference",
-                    "description": "An identifier which can be used to reference the license elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+                  "refId": {
+                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+                    "title": "Reference Identifier",
+                    "description": "An identifier which can be used to reference the license elsewhere in the BOM. Every `refId` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
                   },
                   "licensing": {
                     "$ref": "#/$defs/cyclonedx-license-2.0/$defs/licensing"
@@ -10719,10 +10719,10 @@
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "title": "BOM Reference",
-              "description": "An identifier which can be used to reference the license elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "title": "Reference Identifier",
+              "description": "An identifier which can be used to reference the license elsewhere in the BOM. Every `refId` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
             },
             "id": {
               "$ref": "../spdx.schema.json",
@@ -11075,8 +11075,8 @@
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "roles": {
               "type": "array",
@@ -11678,7 +11678,7 @@
             "affiliation": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/elementLink",
               "title": "Affiliation",
-              "description": "Reference using bom-link or bom-ref to an organization party with which the person is affiliated."
+              "description": "Reference using bom-link or refId to an organization party with which the person is affiliated."
             }
           }
         },
@@ -11747,7 +11747,7 @@
             "ref": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Reference",
-              "description": "Reference to any bom-ref'd object that represents this system. The referenced object provides the underlying identity (component, service, blueprint asset, or other object type). Use to associate the party with its concrete representation declared elsewhere."
+              "description": "Reference to any object carrying a refId that represents this system. The referenced object provides the underlying identity (component, service, blueprint asset, or other object type). Use to associate the party with its concrete representation declared elsewhere."
             },
             "identifiers": {
               "type": "array",
@@ -12040,7 +12040,7 @@
             "issuer": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/elementLink",
               "title": "Issuer",
-              "description": "Reference using bom-link or bom-ref to the party that issued the identifier."
+              "description": "Reference using bom-link or refId to the party that issued the identifier."
             }
           }
         },
@@ -12050,10 +12050,10 @@
           "description": "An address used to identify a contactable or operational location.",
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
               "title": "Reference Identifier",
-              "description": "An optional identifier that can be used to reference the address from elsewhere. Every bom-ref shall be unique within the containing instance. The value should not start with the prefix 'urn:cdx:' to avoid conflicts with BOM-Link identifiers."
+              "description": "An optional identifier that can be used to reference the address from elsewhere. Every refId shall be unique within the containing instance. The value should not start with the prefix 'urn:cdx:' to avoid conflicts with BOM-Link identifiers."
             },
             "country": {
               "type": "string",
@@ -12188,10 +12188,10 @@
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "title": "BOM Reference",
-              "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "title": "Reference Identifier",
+              "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `refId` must be unique within the BOM."
             },
             "patentNumber": {
               "type": "string",
@@ -12311,10 +12311,10 @@
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "title": "BOM Reference",
-              "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `bom-ref` must be unique within the BOM. \n\nFor a patent, it might be a good idea to use a patent number as the BOM reference ID."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "title": "Reference Identifier",
+              "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `refId` must be unique within the BOM. \n\nFor a patent, it might be a good idea to use a patent number as the BOM reference ID."
             },
             "familyId": {
               "type": "string",
@@ -12327,11 +12327,11 @@
             "members": {
               "type": "array",
               "title": "Family Members",
-              "description": "A collection of patents or applications that belong to this family, each identified by a `bom-ref` pointing to a patent object defined elsewhere in the BOM.",
+              "description": "A collection of patents or applications that belong to this family, each identified by a `refId` pointing to a patent object defined elsewhere in the BOM.",
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
                 "title": "BOM Reference",
-                "description": "A `bom-ref` linking to a patent or application object within the BOM."
+                "description": "A `refId` linking to a patent or application object within the BOM."
               }
             },
             "externalReferences": {
@@ -12353,10 +12353,10 @@
             ],
             "additionalProperties": false,
             "properties": {
-              "bom-ref": {
-                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-                "title": "BOM Reference",
-                "description": "A reference to the patent or patent family object within the BOM. This must match the `bom-ref` of a `patent` or `patentFamily` object."
+              "refId": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+                "title": "Reference Identifier",
+                "description": "A reference to the patent or patent family object within the BOM. This must match the `refId` of a `patent` or `patentFamily` object."
               },
               "assertionType": {
                 "title": "Assertion Type",
@@ -12385,7 +12385,7 @@
               "patentRefs": {
                 "type": "array",
                 "title": "Patent References",
-                "description": "A list of BOM references (`bom-ref`) linking to patents or patent families associated with this assertion.",
+                "description": "A list of BOM references (`refId`) linking to patents or patent families associated with this assertion.",
                 "items": {
                   "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
                 }
@@ -12403,7 +12403,7 @@
                   {
                     "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
                     "title": "Reference",
-                    "description": "A reference to a previously defined `organizationalContact` or `organizationalEntity` object in the BOM. The value must be a valid `bom-ref` pointing to one of these objects."
+                    "description": "A reference to a previously defined `organizationalContact` or `organizationalEntity` object in the BOM. The value must be a valid `refId` pointing to one of these objects."
                   }
                 ]
               },
@@ -12488,8 +12488,8 @@
             "mappings"
           ],
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "name": {
               "type": "string",
@@ -13194,7 +13194,7 @@
         "profiles": {
           "type": "object",
           "title": "Profiles",
-          "description": "A registry of reusable, named characterizations of how a subject behaves or is governed within a domain.\n Profiles separate characterization from identity: identity describes who or what the subject is; the profile describes the durable attributes that characterize it.\n A profile is referenced by its bom-ref from the elements it characterizes, so a single profile can be reused by many subjects.",
+          "description": "A registry of reusable, named characterizations of how a subject behaves or is governed within a domain.\n Profiles separate characterization from identity: identity describes who or what the subject is; the profile describes the durable attributes that characterize it.\n A profile is referenced by its refId from the elements it characterizes, so a single profile can be reused by many subjects.",
           "additionalProperties": false,
           "properties": {
             "dataProfiles": {
@@ -13342,12 +13342,12 @@
           "title": "Requirement",
           "description": "A requirement represents a specific need, constraint, or capability that must be met.",
           "required": [
-            "bom-ref"
+            "refId"
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "id": {
               "type": "string",
@@ -13421,7 +13421,7 @@
             "parent": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Parent BOM Reference",
-              "description": "Optional reference using bom-link or bom-ref to a parent requirement. Establishes a hierarchy of requirements."
+              "description": "Optional reference using bom-link or refId to a parent requirement. Establishes a hierarchy of requirements."
             },
             "rationale": {
               "type": "string",
@@ -13614,10 +13614,10 @@
             ],
             "additionalProperties": false,
             "properties": {
-              "bom-ref": {
-                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-                "title": "BOM Reference",
-                "description": "An identifier which can be used to reference the assertion elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
+              "refId": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+                "title": "Reference Identifier",
+                "description": "An identifier which can be used to reference the assertion elsewhere in the BOM. Every `refId` must be unique within the BOM."
               },
               "assertionType": {
                 "title": "Assertion Type",
@@ -13859,14 +13859,14 @@
         "risk": {
           "type": "object",
           "required": [
-            "bom-ref",
+            "refId",
             "name",
             "statement"
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "name": {
               "type": "string",
@@ -13893,7 +13893,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the subjects this risk concerns. A subject may be a component, service, dataset, or model, or a party such as a person, persona, or organization, including a group at risk of being systematically disadvantaged."
+              "description": "References using bom-link or refId to the subjects this risk concerns. A subject may be a component, service, dataset, or model, or a party such as a person, persona, or organization, including a group at risk of being systematically disadvantaged."
             },
             "relatedThreats": {
               "type": "array",
@@ -13901,7 +13901,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the threats or threat scenarios from a threat model that inform this risk. A reference may point to a discrete threat or to a threat scenario."
+              "description": "References using bom-link or refId to the threats or threat scenarios from a threat model that inform this risk. A reference may point to a discrete threat or to a threat scenario."
             },
             "relatedVulnerabilities": {
               "type": "array",
@@ -13909,7 +13909,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the vulnerabilities that inform this risk."
+              "description": "References using bom-link or refId to the vulnerabilities that inform this risk."
             },
             "relatedWeaknesses": {
               "type": "array",
@@ -13917,7 +13917,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the weaknesses that inform this risk."
+              "description": "References using bom-link or refId to the weaknesses that inform this risk."
             },
             "relatedRequirements": {
               "type": "array",
@@ -13925,7 +13925,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the requirements whose absence or non-conformance gives rise to this risk, such as a requirement that is unmet or only partially met."
+              "description": "References using bom-link or refId to the requirements whose absence or non-conformance gives rise to this risk, such as a requirement that is unmet or only partially met."
             },
             "relatedStandards": {
               "type": "array",
@@ -13933,7 +13933,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the standards whose non-conformance gives rise to this risk."
+              "description": "References using bom-link or refId to the standards whose non-conformance gives rise to this risk."
             },
             "relatedClaims": {
               "type": "array",
@@ -13941,7 +13941,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the conformance claims that give rise to this risk, such as a [CycloneDX Attestations](https://cyclonedx.org/capabilities/attestations/) claim recording that a requirement is unmet or only partially met. The degree of conformance is carried by the claim, not by the risk."
+              "description": "References using bom-link or refId to the conformance claims that give rise to this risk, such as a [CycloneDX Attestations](https://cyclonedx.org/capabilities/attestations/) claim recording that a requirement is unmet or only partially met. The degree of conformance is carried by the claim, not by the risk."
             },
             "relatedBusinessObjectives": {
               "type": "array",
@@ -13949,7 +13949,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the business objectives this risk threatens."
+              "description": "References using bom-link or refId to the business objectives this risk threatens."
             },
             "inherentRisk": {
               "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/rating",
@@ -14599,14 +14599,14 @@
           "title": "Risk Response",
           "description": "An action taken to modify a risk, pairing the chosen strategy with the controls that implement it. Covers the full set of dispositions, from avoiding or reducing a risk to accepting it or, for a positive risk, pursuing it.",
           "required": [
-            "bom-ref",
+            "refId",
             "strategy"
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "description": "An identifier which can be used to reference this response elsewhere using a bom-ref or bom-link."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "description": "An identifier which can be used to reference this response elsewhere using a refId or bom-link."
             },
             "strategy": {
               "title": "Strategy",
@@ -14639,7 +14639,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the controls that implement this response."
+              "description": "References using bom-link or refId to the controls that implement this response."
             },
             "status": {
               "title": "Status",
@@ -14685,7 +14685,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the items this response addresses, such as a threat, vulnerability, weakness, or another risk."
+              "description": "References using bom-link or refId to the items this response addresses, such as a threat, vulnerability, weakness, or another risk."
             },
             "externalReferences": {
               "type": "array",
@@ -14701,15 +14701,15 @@
         "assessment": {
           "type": "object",
           "required": [
-            "bom-ref",
+            "refId",
             "type",
             "cadence",
             "timestamp"
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "name": {
               "type": "string",
@@ -14904,7 +14904,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to risk entries evaluated in this assessment."
+              "description": "References using bom-link or refId to risk entries evaluated in this assessment."
             },
             "overallRisk": {
               "type": "object",
@@ -14992,7 +14992,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the risk appetites, declared under the risks collection, that applied for this assessment."
+              "description": "References using bom-link or refId to the risk appetites, declared under the risks collection, that applied for this assessment."
             },
             "externalReferences": {
               "type": "array",
@@ -15065,8 +15065,8 @@
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
               "description": "An identifier which can be used to reference this risk appetite elsewhere, such as from an assessment."
             },
             "party": {
@@ -15152,10 +15152,10 @@
           "description": "A standard may consist of regulations, industry or organizational-specific standards, maturity models, best practices, or any other requirements which can be evaluated against or attested to.",
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "title": "BOM Reference",
-              "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "title": "Reference Identifier",
+              "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `refId` must be unique within the BOM."
             },
             "name": {
               "type": "string",
@@ -15204,15 +15204,15 @@
           "title": "Requirement",
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "title": "BOM Reference",
-              "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "title": "Reference Identifier",
+              "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `refId` must be unique within the BOM."
             },
             "identifier": {
               "type": "string",
               "title": "Identifier",
-              "description": "The unique identifier used in the standard to identify a specific requirement. This should match what is in the standard and should not be the requirements bom-ref."
+              "description": "The unique identifier used in the standard to identify a specific requirement. This should match what is in the standard and should not be the requirements refId."
             },
             "title": {
               "type": "string",
@@ -15247,7 +15247,7 @@
             "parent": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Parent BOM Reference",
-              "description": "The `bom-ref` to a parent requirement. This establishes a hierarchy of requirements. Top-level requirements must not define a parent. Only child requirements should define parents."
+              "description": "The `refId` to a parent requirement. This establishes a hierarchy of requirements. Top-level requirements must not define a parent. Only child requirements should define parents."
             },
             "properties": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
@@ -15270,10 +15270,10 @@
           "title": "Level",
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "title": "BOM Reference",
-              "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "title": "Reference Identifier",
+              "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `refId` must be unique within the BOM."
             },
             "identifier": {
               "type": "string",
@@ -15293,7 +15293,7 @@
             "requirements": {
               "type": "array",
               "title": "Requirements",
-              "description": "The list of requirement `bom-ref`s that comprise the level.",
+              "description": "The list of requirement `refId`s that comprise the level.",
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               }
@@ -15447,13 +15447,13 @@
           "description": "A documented threat, describing what can go wrong independent of any specific actor or occurrence. A threat can be catalogued on its own; a threat scenario references it to describe a specific realization.",
           "additionalProperties": false,
           "required": [
-            "bom-ref",
+            "refId",
             "name"
           ],
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "description": "An identifier which can be used to reference the threat elsewhere using a bom-ref or bom-link."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "description": "An identifier which can be used to reference the threat elsewhere using a refId or bom-link."
             },
             "name": {
               "type": "string",
@@ -15705,7 +15705,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the vulnerabilities that this threat exploits or that inform it."
+              "description": "References using bom-link or refId to the vulnerabilities that this threat exploits or that inform it."
             },
             "attackPatterns": {
               "type": "array",
@@ -15714,7 +15714,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the attack patterns by which this threat is carried out."
+              "description": "References using bom-link or refId to the attack patterns by which this threat is carried out."
             },
             "attackTrees": {
               "type": "array",
@@ -15723,7 +15723,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the attack trees that decompose this threat."
+              "description": "References using bom-link or refId to the attack trees that decompose this threat."
             },
             "abuseCases": {
               "type": "array",
@@ -15732,7 +15732,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the abuse cases that illustrate how this threat can be exercised."
+              "description": "References using bom-link or refId to the abuse cases that illustrate how this threat can be exercised."
             },
             "killChainPhase": {
               "$ref": "#/$defs/cyclonedx-threat-2.0/$defs/killChainPhase",
@@ -15745,7 +15745,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the declared behaviors that constitute the intent of this threat, drawn from the behavior taxonomy."
+              "description": "References using bom-link or refId to the declared behaviors that constitute the intent of this threat, drawn from the behavior taxonomy."
             },
             "indicators": {
               "$ref": "#/$defs/cyclonedx-threat-2.0/$defs/indicators"
@@ -15757,7 +15757,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the kinds of assets this threat affects."
+              "description": "References using bom-link or refId to the kinds of assets this threat affects."
             },
             "relatedBusinessObjectives": {
               "type": "array",
@@ -15765,7 +15765,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the business objectives this threat endangers."
+              "description": "References using bom-link or refId to the business objectives this threat endangers."
             },
             "mitigations": {
               "type": "array",
@@ -15774,7 +15774,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the controls that mitigate this threat."
+              "description": "References using bom-link or refId to the controls that mitigate this threat."
             },
             "externalReferences": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/externalReferences"
@@ -15790,14 +15790,14 @@
           "description": "A specific realization of a threat, in which an actor seeks to cause harm. The scenario references the threat it realizes, supplies the actor by reference to a party, and carries the scenario-specific traits and risk assessment, such as motivation, intent, access level, likelihood, and impact.",
           "additionalProperties": false,
           "required": [
-            "bom-ref",
+            "refId",
             "name",
             "threats"
           ],
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "description": "An identifier which can be used to reference the threat scenario elsewhere using a bom-ref or bom-link."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "description": "An identifier which can be used to reference the threat scenario elsewhere using a refId or bom-link."
             },
             "name": {
               "type": "string",
@@ -15818,15 +15818,15 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the threats that this scenario realizes. A scenario realizes one or more threats."
+              "description": "References using bom-link or refId to the threats that this scenario realizes. A scenario realizes one or more threats."
             },
             "actor": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
-              "description": "Reference using bom-link or bom-ref to the party that is the actor in this scenario. Named adversary groups are organizations and abstract attacker classes are personas."
+              "description": "Reference using bom-link or refId to the party that is the actor in this scenario. Named adversary groups are organizations and abstract attacker classes are personas."
             },
             "threatProfile": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
-              "description": "Reference using bom-link or bom-ref to a reusable threat profile that describes the durable capabilities of the actor."
+              "description": "Reference using bom-link or refId to a reusable threat profile that describes the durable capabilities of the actor."
             },
             "motivation": {
               "type": "array",
@@ -15929,7 +15929,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the assets affected in this scenario."
+              "description": "References using bom-link or refId to the assets affected in this scenario."
             },
             "relatedRisks": {
               "type": "array",
@@ -15938,7 +15938,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the risks that this scenario contributes to."
+              "description": "References using bom-link or refId to the risks that this scenario contributes to."
             },
             "relatedVulnerabilities": {
               "type": "array",
@@ -15946,7 +15946,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the vulnerabilities exploited in this scenario."
+              "description": "References using bom-link or refId to the vulnerabilities exploited in this scenario."
             },
             "externalReferences": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/externalReferences"
@@ -15971,12 +15971,12 @@
           "description": "A durable, actor-level characterization of the capability to pose a threat, capturing attributes that persist across scenarios. Scenario-specific attributes, such as motivation, intent, and access level, belong on a threat scenario rather than on this profile.",
           "additionalProperties": false,
           "required": [
-            "bom-ref"
+            "refId"
           ],
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "description": "An identifier which can be used to reference this threat profile elsewhere using a bom-ref or bom-link."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "description": "An identifier which can be used to reference this threat profile elsewhere using a refId or bom-link."
             },
             "name": {
               "type": "string",
@@ -16119,13 +16119,13 @@
           "description": "A description of the common attributes and approach of an attack, typically aligned with CAPEC. Techniques are aligned with MITRE ATT&CK.",
           "additionalProperties": false,
           "required": [
-            "bom-ref",
+            "refId",
             "name"
           ],
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "description": "An identifier which can be used to reference the attack pattern elsewhere using a bom-ref or bom-link."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "description": "An identifier which can be used to reference the attack pattern elsewhere using a refId or bom-link."
             },
             "capecId": {
               "type": "integer",
@@ -16169,7 +16169,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the controls that mitigate this attack pattern."
+              "description": "References using bom-link or refId to the controls that mitigate this attack pattern."
             },
             "examples": {
               "type": "array",
@@ -16216,13 +16216,13 @@
           "description": "A decomposition of an attacker goal into sub-goals and techniques, expressed as a flat collection of nodes. Each node lists its child nodes by reference together with an operator that says how those children combine, so the tree is expressed without nesting. One node is the root, representing the attacker goal.",
           "additionalProperties": false,
           "required": [
-            "bom-ref",
+            "refId",
             "nodes"
           ],
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "description": "An identifier which can be used to reference the attack tree elsewhere using a bom-ref or bom-link."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "description": "An identifier which can be used to reference the attack tree elsewhere using a refId or bom-link."
             },
             "name": {
               "type": "string",
@@ -16237,7 +16237,7 @@
             "root": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Root BOM Reference",
-              "description": "Optional reference using bom-link or bom-ref to the root node within nodes, representing the attacker goal. When omitted, the root is the node that no other node lists as a child."
+              "description": "Optional reference using bom-link or refId to the root node within nodes, representing the attacker goal. When omitted, the root is the node that no other node lists as a child."
             },
             "nodes": {
               "type": "array",
@@ -16256,13 +16256,13 @@
           "description": "A node in an attack tree, representing an attacker goal, sub-goal, or technique. A node references its child nodes and carries an operator that says how those children combine. The hierarchy is expressed by these references rather than by nesting.",
           "additionalProperties": false,
           "required": [
-            "bom-ref",
+            "refId",
             "name"
           ],
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "description": "An identifier which can be used to reference the node elsewhere using a bom-ref or bom-link."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "description": "An identifier which can be used to reference the node elsewhere using a refId or bom-link."
             },
             "name": {
               "type": "string",
@@ -16294,15 +16294,15 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the child nodes that decompose this node. Each child node is a separate entry in the same nodes array, so the hierarchy is expressed without nesting. A child node may be shared by more than one parent."
+              "description": "References using bom-link or refId to the child nodes that decompose this node. Each child node is a separate entry in the same nodes array, so the hierarchy is expressed without nesting. A child node may be shared by more than one parent."
             },
             "attackPattern": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
-              "description": "Reference using bom-link or bom-ref to the attack pattern that this node represents."
+              "description": "Reference using bom-link or refId to the attack pattern that this node represents."
             },
             "weakness": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
-              "description": "Reference using bom-link or bom-ref to the weakness that this node exploits."
+              "description": "Reference using bom-link or refId to the weakness that this node exploits."
             },
             "cost": {
               "title": "Cost",
@@ -16363,7 +16363,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the controls that mitigate this node."
+              "description": "References using bom-link or refId to the controls that mitigate this node."
             }
           }
         },
@@ -16373,13 +16373,13 @@
           "description": "A description of how an adversary can misuse the system to achieve a malicious goal. An abuse case is the security counterpart of a use case and reuses its flow structure.",
           "additionalProperties": false,
           "required": [
-            "bom-ref",
+            "refId",
             "name"
           ],
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "description": "An identifier which can be used to reference the abuse case elsewhere using a bom-ref or bom-link."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "description": "An identifier which can be used to reference the abuse case elsewhere using a refId or bom-link."
             },
             "name": {
               "type": "string",
@@ -16394,7 +16394,7 @@
             },
             "abuser": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
-              "description": "Reference using bom-link or bom-ref to the party that abuses the system, typically an attacker persona."
+              "description": "Reference using bom-link or refId to the party that abuses the system, typically an attacker persona."
             },
             "realizes": {
               "type": "array",
@@ -16403,7 +16403,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the threats that this abuse case realizes."
+              "description": "References using bom-link or refId to the threats that this abuse case realizes."
             },
             "preconditions": {
               "type": "array",
@@ -16430,7 +16430,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the assets or flows targeted in this abuse case."
+              "description": "References using bom-link or refId to the assets or flows targeted in this abuse case."
             },
             "detectionOpportunities": {
               "type": "array",
@@ -16448,7 +16448,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the controls that mitigate this abuse case."
+              "description": "References using bom-link or refId to the controls that mitigate this abuse case."
             }
           }
         },
@@ -16613,17 +16613,17 @@
           "description": "A security annotation marking an architectural boundary as one across which trust changes. It references a boundary defined in a blueprint, where the zones, type, and crossing requirements already live, and adds only the trust differential and the threats and controls at that boundary.",
           "additionalProperties": false,
           "required": [
-            "bom-ref",
+            "refId",
             "boundary"
           ],
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "description": "An identifier which can be used to reference the trust boundary elsewhere using a bom-ref or bom-link."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "description": "An identifier which can be used to reference the trust boundary elsewhere using a refId or bom-link."
             },
             "boundary": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
-              "description": "Reference using bom-link or bom-ref to the blueprint boundary that this trust boundary annotates."
+              "description": "Reference using bom-link or refId to the blueprint boundary that this trust boundary annotates."
             },
             "name": {
               "type": "string",
@@ -16658,7 +16658,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the threats that could exploit this boundary."
+              "description": "References using bom-link or refId to the threats that could exploit this boundary."
             },
             "controlsAtBoundary": {
               "type": "array",
@@ -16667,7 +16667,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the controls in place at this boundary. Intended primarily for referencing externally defined controls. Where the control and boundary are declared together, prefer the control's appliesTo property."
+              "description": "References using bom-link or refId to the controls in place at this boundary. Intended primarily for referencing externally defined controls. Where the control and boundary are declared together, prefer the control's appliesTo property."
             },
             "properties": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
@@ -16705,8 +16705,8 @@
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "name": {
               "type": "string",
@@ -16725,7 +16725,7 @@
             },
             "attackPattern": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
-              "description": "Reference using bom-link or bom-ref to the attack pattern applied in this step."
+              "description": "Reference using bom-link or refId to the attack pattern applied in this step."
             },
             "killChainPhase": {
               "$ref": "#/$defs/cyclonedx-threat-2.0/$defs/killChainPhase",
@@ -16733,15 +16733,15 @@
             },
             "source": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
-              "description": "Reference using bom-link or bom-ref to the element or zone from which this step originates."
+              "description": "Reference using bom-link or refId to the element or zone from which this step originates."
             },
             "destination": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
-              "description": "Reference using bom-link or bom-ref to the element or zone this step reaches."
+              "description": "Reference using bom-link or refId to the element or zone this step reaches."
             },
             "boundaryCrossed": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
-              "description": "Reference using bom-link or bom-ref to the trust boundary this step crosses."
+              "description": "Reference using bom-link or refId to the trust boundary this step crosses."
             },
             "exploits": {
               "type": "array",
@@ -16749,7 +16749,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the weaknesses or vulnerabilities this step exploits."
+              "description": "References using bom-link or refId to the weaknesses or vulnerabilities this step exploits."
             },
             "mitigations": {
               "type": "array",
@@ -16757,7 +16757,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the controls that detect or prevent this step."
+              "description": "References using bom-link or refId to the controls that detect or prevent this step."
             },
             "properties": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
@@ -16769,14 +16769,14 @@
           "title": "Attack Path",
           "description": "An ordered sequence of steps that an adversary follows to progress from initial access toward an objective, crossing elements and trust boundaries. An attack path complements an attack tree: the tree decomposes a goal into alternatives, whereas the path expresses the temporal progression of a single attack, including lateral movement.",
           "required": [
-            "bom-ref",
+            "refId",
             "name",
             "steps"
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "name": {
               "type": "string",
@@ -16796,7 +16796,7 @@
             },
             "actor": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
-              "description": "Reference using bom-link or bom-ref to the adversary that follows this path."
+              "description": "Reference using bom-link or refId to the adversary that follows this path."
             },
             "steps": {
               "type": "array",
@@ -16813,7 +16813,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the threats that this path realizes."
+              "description": "References using bom-link or refId to the threats that this path realizes."
             },
             "relatedRisks": {
               "type": "array",
@@ -16821,7 +16821,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the risks that this path contributes to."
+              "description": "References using bom-link or refId to the risks that this path contributes to."
             },
             "externalReferences": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/externalReferences"
@@ -16851,13 +16851,13 @@
           "title": "Use Case",
           "description": "A structured description of how one or more actors interact with the system to achieve a specific goal, including the primary flow, alternative paths, and exception scenarios.",
           "required": [
-            "bom-ref",
+            "refId",
             "name"
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "name": {
               "type": "string",
@@ -16877,7 +16877,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the actors that participate in this use case, representing anyone or anything that initiates or interacts with the described flow."
+              "description": "References using bom-link or refId to the actors that participate in this use case, representing anyone or anything that initiates or interacts with the described flow."
             },
             "preconditions": {
               "type": "array",
@@ -16940,7 +16940,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the requirements that are implemented, validated, or addressed by this use case."
+              "description": "References using bom-link or refId to the requirements that are implemented, validated, or addressed by this use case."
             },
             "businessObjectives": {
               "type": "array",
@@ -16949,7 +16949,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the business objectives this use case supports."
+              "description": "References using bom-link or refId to the business objectives this use case supports."
             },
             "notes": {
               "type": "array",
@@ -16989,7 +16989,7 @@
             },
             "actor": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
-              "description": "Reference using bom-link or bom-ref to the actor who initiates or performs this step, which may be a human user, an external system, or the system under design."
+              "description": "Reference using bom-link or refId to the actor who initiates or performs this step, which may be a human user, an external system, or the system under design."
             }
           }
         },
@@ -17079,10 +17079,10 @@
             ],
             "additionalProperties": false,
             "properties": {
-              "bom-ref": {
-                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-                "title": "BOM Reference",
-                "description": "An identifier which can be used to reference the assertion elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
+              "refId": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+                "title": "Reference Identifier",
+                "description": "An identifier which can be used to reference the assertion elsewhere in the BOM. Every `refId` must be unique within the BOM."
               },
               "assertionType": {
                 "title": "Assertion Type",
@@ -17150,10 +17150,10 @@
           "description": "Defines a weakness in a component or service that could be exploited or triggered by a threat source.",
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "title": "BOM Reference",
-              "description": "An identifier which can be used to reference the vulnerability elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "title": "Reference Identifier",
+              "description": "An identifier which can be used to reference the vulnerability elsewhere in the BOM. Every `refId` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
             },
             "id": {
               "type": "string",
@@ -17349,7 +17349,7 @@
                   "items": {
                     "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
                   },
-                  "description": "References using bom-link or bom-ref to the controls that prevent or reduce the exploitability or impact of the vulnerability. Substantiates justifications such as protected_by_mitigating_control, protected_at_perimeter, and protected_at_runtime."
+                  "description": "References using bom-link or refId to the controls that prevent or reduce the exploitability or impact of the vulnerability. Substantiates justifications such as protected_by_mitigating_control, protected_at_perimeter, and protected_at_runtime."
                 },
                 "response": {
                   "type": "array",
@@ -17408,7 +17408,7 @@
                   "ref": {
                     "$ref": "#/$defs/cyclonedx-common-2.0/$defs/elementLink",
                     "title": "Reference",
-                    "description": "References a component or service by the objects bom-ref"
+                    "description": "References a component or service by the objects refId"
                   },
                   "versions": {
                     "type": "array",
@@ -17701,10 +17701,10 @@
           ],
           "additionalProperties": false,
           "properties": {
-            "bom-ref": {
-              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-              "title": "BOM Reference",
-              "description": "An identifier which can be used to reference this evidence elsewhere in the BOM, for example from an attestation claim that relies upon it. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+            "refId": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+              "title": "Reference Identifier",
+              "description": "An identifier which can be used to reference this evidence elsewhere in the BOM, for example from an attestation claim that relies upon it. Every `refId` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
             },
             "ref": {
               "anyOf": [
@@ -17718,7 +17718,7 @@
                 }
               ],
               "title": "Reference",
-              "description": "References the affected component or service, by `bom-ref`, to which this determination applies. The reference should correspond to an entry in `affects`. When omitted, the determination applies to the vulnerability generally."
+              "description": "References the affected component or service, by `refId`, to which this determination applies. The reference should correspond to an entry in `affects`. When omitted, the determination applies to the vulnerability generally."
             },
             "status": {
               "$ref": "#/$defs/cyclonedx-vulnerability-2.0/$defs/affectedStatus",
@@ -17761,7 +17761,7 @@
               "type": "array",
               "uniqueItems": true,
               "title": "Tools",
-              "description": "The tools that produced this evidence, referenced by `bom-ref`.",
+              "description": "The tools that produced this evidence, referenced by `refId`.",
               "items": {
                 "anyOf": [
                   {
@@ -17912,9 +17912,9 @@
                 "cweId"
               ],
               "properties": {
-                "bom-ref": {
-                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-                  "description": "An optional identifier which can be used to reference the weakness elsewhere using a bom-ref or bom-link."
+                "refId": {
+                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+                  "description": "An optional identifier which can be used to reference the weakness elsewhere using a refId or bom-link."
                 },
                 "cweId": {
                   "type": "integer",
@@ -17933,9 +17933,9 @@
                 "name"
               ],
               "properties": {
-                "bom-ref": {
-                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-                  "description": "An optional identifier which can be used to reference the weakness elsewhere using a bom-ref or bom-link."
+                "refId": {
+                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
+                  "description": "An optional identifier which can be used to reference the weakness elsewhere using a refId or bom-link."
                 },
                 "name": {
                   "type": "string",
