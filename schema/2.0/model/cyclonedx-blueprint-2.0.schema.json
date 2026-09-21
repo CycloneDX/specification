@@ -1910,6 +1910,15 @@
         "criticality": {
           "$ref": "cyclonedx-risk-2.0.schema.json#/$defs/criticality"
         },
+        "safetyIntegrityLevels": {
+          "type": "array",
+          "title": "Safety Integrity Levels",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/safetyIntegrityLevel"
+          },
+          "description": "The safety integrity classifications of this asset in the context of the blueprint. An asset may carry classifications from more than one scheme, for example where an element classified under IEC 61508 is also mapped to an automotive ASIL. The classification identifies the safety significance of the context so that the impact of a change on it can be assessed."
+        },
         "classification": {
           "$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataClassification"
         },
@@ -1926,6 +1935,74 @@
             "type": "string"
           },
           "description": "Tags for classification and search."
+        }
+      }
+    },
+    "safetyIntegrityLevel": {
+      "type": "object",
+      "title": "Safety Integrity Level",
+      "description": "A safety integrity classification drawn from a functional safety scheme, such as an Automotive Safety Integrity Level, a Safety Integrity Level, a Design Assurance Level, or a software safety class. The classification describes the safety significance of the context; a level that an authority has attested the subject achieved is recorded as a certification.",
+      "required": [
+        "scheme",
+        "level"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "scheme": {
+          "title": "Scheme",
+          "description": "The functional safety scheme from which the level is drawn. Use the custom option for schemes not covered by the enumeration.",
+          "oneOf": [
+            {
+              "title": "Predefined Safety Scheme",
+              "enum": [
+                "ISO-26262",
+                "IEC-61508",
+                "DO-178C",
+                "IEC-62304",
+                "EN-50128"
+              ],
+              "meta:enum": {
+                "ISO-26262": "Road vehicles functional safety. Levels are Automotive Safety Integrity Levels, from QM to ASIL D.",
+                "IEC-61508": "Functional safety of electrical, electronic, and programmable electronic safety-related systems. Levels are Safety Integrity Levels 1 to 4.",
+                "DO-178C": "Software considerations in airborne systems and equipment certification. Levels are Design Assurance Levels A to E.",
+                "IEC-62304": "Medical device software life cycle processes. Levels are software safety classes A to C.",
+                "EN-50128": "Railway applications software for railway control and protection systems. Levels are Software Safety Integrity Levels 0 to 4."
+              }
+            },
+            {
+              "type": "object",
+              "title": "Custom Safety Scheme",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom scheme."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom scheme."
+                }
+              }
+            }
+          ]
+        },
+        "level": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Integrity Level",
+          "description": "The level within the scheme, using the designation the scheme defines. Lowercase kebab-case tokens are recommended so that levels compare reliably across documents.",
+          "examples": [
+            "asil-d",
+            "sil-3",
+            "dal-a",
+            "class-c"
+          ]
         }
       }
     },

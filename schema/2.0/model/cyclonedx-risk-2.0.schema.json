@@ -260,6 +260,14 @@
           },
           "description": "References using bom-link or bom-ref to the weaknesses that inform this risk."
         },
+        "relatedBehaviors": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the declared or observed behaviours that inform this risk. Any behaviour can give rise to a risk depending on context and expectation, for example an observed behaviour that defeats a declared safety behaviour."
+        },
         "relatedRequirements": {
           "type": "array",
           "uniqueItems": true,
@@ -1184,6 +1192,15 @@
           "title": "Scope",
           "description": "The scope of the assessment, including the systems, boundaries, and what is in or out of scope."
         },
+        "triggeredBy": {
+          "type": "array",
+          "title": "Triggered By",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the objects that occasioned this assessment, such as a vulnerability, a threat scenario, a component, a release note, or an annotation that records an incident or a change. Typically used when the cadence is triggered."
+        },
         "status": {
           "title": "Status",
           "description": "The lifecycle status of the assessment. Use the custom option for a status specific to an organization's process.",
@@ -1306,6 +1323,46 @@
             }
           },
           "description": "The aggregated risk result for this assessment."
+        },
+        "conclusion": {
+          "title": "Conclusion",
+          "description": "The conclusion of the assessment for decision-making, such as a release decision. The conclusion states whether the assessed risks are acceptable against the applicable risk appetite, whereas `overallRisk` carries the aggregated score. Use the custom option for a conclusion specific to an organization's process.",
+          "oneOf": [
+            {
+              "title": "Predefined Assessment Conclusion",
+              "enum": [
+                "acceptable",
+                "unacceptable",
+                "inconclusive"
+              ],
+              "meta:enum": {
+                "acceptable": "The assessed risks are within the applicable risk appetite.",
+                "unacceptable": "One or more assessed risks exceed the applicable risk appetite.",
+                "inconclusive": "The assessment could not determine whether the assessed risks are within the applicable risk appetite, for example because evidence is incomplete."
+              }
+            },
+            {
+              "title": "Custom Assessment Conclusion",
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom conclusion."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom conclusion."
+                }
+              }
+            }
+          ]
         },
         "assumptions": {
           "type": "array",
