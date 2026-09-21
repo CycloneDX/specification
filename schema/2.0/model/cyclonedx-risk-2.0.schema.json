@@ -20,6 +20,15 @@
           },
           "description": "The documented risks identified through risk analysis."
         },
+        "damageScenarios": {
+          "type": "array",
+          "title": "Damage Scenarios",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/damageScenario"
+          },
+          "description": "The damage scenarios identified through risk analysis. A damage scenario describes an adverse consequence for the subjects it affects, independent of any particular cause, and is rated per impact category."
+        },
         "assessments": {
           "type": "array",
           "title": "Assessments",
@@ -243,6 +252,14 @@
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
           "description": "References using bom-link or bom-ref to the threats or threat scenarios from a threat model that inform this risk. A reference may point to a discrete threat or to a threat scenario."
+        },
+        "relatedDamageScenarios": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the damage scenarios that this risk realizes. A risk typically pairs a threat scenario, which supplies the likelihood, with a damage scenario, which supplies the impact."
         },
         "relatedVulnerabilities": {
           "type": "array",
@@ -679,6 +696,10 @@
         "description": {
           "type": "string",
           "description": "A description of the potential impact."
+        },
+        "methodology": {
+          "$ref": "#/$defs/riskMethodology",
+          "description": "The methodology used to derive this impact rating, where the impact is rated on its own, for example on a damage scenario before any risk is scored."
         }
       }
     },
@@ -894,54 +915,58 @@
           "description": "A textual representation of the metric values used to derive the score, in the format defined by the methodology."
         },
         "methodology": {
-          "title": "Methodology",
-          "description": "The risk rating methodology used to derive this score. Only methodologies that define a scoring calculation are listed; governance frameworks such as [ISO 31000](https://www.iso.org/iso-31000-risk-management.html) are recorded as standards rather than as a score methodology. Use the custom option for methodologies not listed.",
-          "oneOf": [
-            {
-              "title": "Predefined Risk Methodology",
-              "enum": [
-                "dread",
-                "fair",
-                "fmea",
-                "nist-sp-800-30",
-                "octave",
-                "owasp-risk-rating",
-                "qualitative-matrix"
-              ],
-              "meta:enum": {
-                "dread": "[DREAD](https://en.wikipedia.org/wiki/DREAD_%28risk_assessment_model%29) risk rating model, the average of five ratings (damage, reproducibility, exploitability, affected users, discoverability) each scored 1 to 10.",
-                "fair": "[Factor Analysis of Information Risk (FAIR)](https://www.fairinstitute.org/), a quantitative methodology expressing risk as loss event frequency multiplied by loss magnitude.",
-                "fmea": "[Failure Mode and Effects Analysis (FMEA)](https://asq.org/quality-resources/fmea), using a risk priority number of severity multiplied by occurrence multiplied by detection.",
-                "nist-sp-800-30": "[NIST SP 800-30](https://csrc.nist.gov/pubs/sp/800/30/r1/final) guide for conducting risk assessments, using its exemplary likelihood and impact scales.",
-                "octave": "[OCTAVE Allegro](https://www.sei.cmu.edu/documents/786/2007_005_001_14885.pdf), using its relative risk score.",
-                "owasp-risk-rating": "[OWASP Risk Rating](https://owasp.org/www-community/OWASP_Risk_Rating_Methodology), averaging likelihood and impact factors each scored 0 to 9.",
-                "qualitative-matrix": "A qualitative risk matrix that derives a risk level by plotting a likelihood band against an impact band, such as a five by five matrix producing a score from 1 to 25."
-              }
-            },
-            {
-              "title": "Custom Risk Methodology",
-              "type": "object",
-              "required": [
-                "name"
-              ],
-              "additionalProperties": false,
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "minLength": 1,
-                  "title": "Name",
-                  "description": "The name of the custom risk methodology."
-                },
-                "description": {
-                  "type": "string",
-                  "title": "Description",
-                  "description": "A description of the custom risk methodology."
-                }
-              }
-            }
-          ]
+          "$ref": "#/$defs/riskMethodology",
+          "description": "The risk rating methodology used to derive this score. Only methodologies that define a scoring calculation are listed; governance frameworks such as [ISO 31000](https://www.iso.org/iso-31000-risk-management.html) are recorded as standards rather than as a score methodology. Use the custom option for methodologies not listed."
         }
       }
+    },
+    "riskMethodology": {
+      "title": "Risk Methodology",
+      "description": "A risk rating methodology that defines a scoring calculation. Use the custom option for methodologies not listed.",
+      "oneOf": [
+        {
+          "title": "Predefined Risk Methodology",
+          "enum": [
+            "dread",
+            "fair",
+            "fmea",
+            "nist-sp-800-30",
+            "octave",
+            "owasp-risk-rating",
+            "qualitative-matrix"
+          ],
+          "meta:enum": {
+            "dread": "[DREAD](https://en.wikipedia.org/wiki/DREAD_%28risk_assessment_model%29) risk rating model, the average of five ratings (damage, reproducibility, exploitability, affected users, discoverability) each scored 1 to 10.",
+            "fair": "[Factor Analysis of Information Risk (FAIR)](https://www.fairinstitute.org/), a quantitative methodology expressing risk as loss event frequency multiplied by loss magnitude.",
+            "fmea": "[Failure Mode and Effects Analysis (FMEA)](https://asq.org/quality-resources/fmea), using a risk priority number of severity multiplied by occurrence multiplied by detection.",
+            "nist-sp-800-30": "[NIST SP 800-30](https://csrc.nist.gov/pubs/sp/800/30/r1/final) guide for conducting risk assessments, using its exemplary likelihood and impact scales.",
+            "octave": "[OCTAVE Allegro](https://www.sei.cmu.edu/documents/786/2007_005_001_14885.pdf), using its relative risk score.",
+            "owasp-risk-rating": "[OWASP Risk Rating](https://owasp.org/www-community/OWASP_Risk_Rating_Methodology), averaging likelihood and impact factors each scored 0 to 9.",
+            "qualitative-matrix": "A qualitative risk matrix that derives a risk level by plotting a likelihood band against an impact band, such as a five by five matrix producing a score from 1 to 25."
+          }
+        },
+        {
+          "title": "Custom Risk Methodology",
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Name",
+              "description": "The name of the custom risk methodology."
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the custom risk methodology."
+            }
+          }
+        }
+      ]
     },
     "riskResponse": {
       "type": "object",
@@ -1041,6 +1066,56 @@
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference"
           }
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "damageScenario": {
+      "type": "object",
+      "title": "Damage Scenario",
+      "description": "An adverse consequence for one or more subjects, described independently of the threat or event that could cause it. A damage scenario carries an impact per category, such as safety, financial, operational, or privacy, so that the same consequence can be paired with several causes. In ISO/SAE 21434 terms, for example, the damage scenario is the harm to a road user, the threat scenario is the cause, and the risk pairs the two.",
+      "required": [
+        "bom-ref",
+        "name"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Name",
+          "description": "A short name for the damage scenario."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the adverse consequence and the circumstances in which it occurs."
+        },
+        "affects": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+          },
+          "description": "References using bom-link or bom-ref to the subjects harmed in this damage scenario, such as the functions, assets, or components involved and the parties harmed, for example a road user or a patient."
+        },
+        "impacts": {
+          "type": "array",
+          "title": "Impacts",
+          "uniqueItems": true,
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/impact"
+          },
+          "description": "The impact of the damage scenario, one entry per impact category or group of categories, each with its own level. For example, a single damage scenario may be catastrophic for safety and moderate for finance."
+        },
+        "externalReferences": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReferences"
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
