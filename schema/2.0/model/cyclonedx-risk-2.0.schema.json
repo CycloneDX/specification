@@ -70,9 +70,9 @@
                 "privacy",
                 "operational",
                 "financial",
-                "compliance",
+                "regulatory",
                 "strategic",
-                "reputational",
+                "reputation",
                 "safety",
                 "environmental",
                 "supply-chain",
@@ -89,9 +89,9 @@
                 "privacy": "Data protection and privacy risks.",
                 "operational": "Business operations and continuity risks.",
                 "financial": "Financial loss and economic impact risks.",
-                "compliance": "Regulatory and legal compliance risks.",
+                "regulatory": "Regulatory and legal compliance risks.",
                 "strategic": "Strategic business and market risks.",
-                "reputational": "Brand and reputation damage risks.",
+                "reputation": "Brand and reputation damage risks.",
                 "safety": "Human safety and physical security risks.",
                 "environmental": "Environmental impact and sustainability risks.",
                 "supply-chain": "Supply chain and third-party risks.",
@@ -338,24 +338,22 @@
         },
         "status": {
           "title": "Status",
-          "description": "The lifecycle status of the risk. Use the custom option for a status specific to an organization's risk process.",
+          "description": "The lifecycle status of the risk. The status tracks progress through the risk process; the disposition chosen, such as reduce, share, or accept, is recorded on the responses. Use the custom option for a status specific to an organization's risk process.",
           "oneOf": [
             {
               "title": "Predefined Risk Status",
               "enum": [
                 "identified",
                 "assessed",
-                "mitigated",
-                "accepted",
-                "transferred",
+                "treated",
+                "monitored",
                 "retired"
               ],
               "meta:enum": {
-                "identified": "Risk has been identified but not yet evaluated.",
-                "assessed": "Risk has been assessed and prioritized.",
-                "mitigated": "Responses are in place reducing this risk.",
-                "accepted": "Risk has been formally accepted.",
-                "transferred": "Risk has been transferred to another party.",
+                "identified": "The risk has been identified and recorded.",
+                "assessed": "The risk has been analysed and rated.",
+                "treated": "Responses to the risk have been decided and are being applied. The disposition, such as reduce or accept, is recorded on the responses.",
+                "monitored": "The risk and its responses are under ongoing monitoring and review.",
                 "retired": "Risk no longer applies."
               }
             },
@@ -420,6 +418,23 @@
             "description": {
               "type": "string",
               "description": "A narrative explanation of the detectability assessment."
+            }
+          }
+        },
+        "controllability": {
+          "type": "object",
+          "title": "Controllability",
+          "additionalProperties": false,
+          "description": "The ability of the people involved to avoid the harm once the event occurs, used as a third axis by functional safety methodologies such as the hazard analysis and risk assessment of [ISO 26262](https://www.iso.org/standard/68383.html), which derives an integrity level from severity, exposure, and controllability.",
+          "properties": {
+            "score": {
+              "type": "number",
+              "minimum": 0,
+              "description": "The controllability value on the scale defined by the methodology. For ISO 26262, a higher class indicates that the harm is harder to avoid."
+            },
+            "description": {
+              "type": "string",
+              "description": "A narrative explanation of the controllability assessment."
             }
           }
         },
@@ -532,8 +547,11 @@
                 "control-effectiveness",
                 "detectability",
                 "discoverability",
+                "elapsed-time",
+                "equipment",
                 "exploit-maturity",
                 "exposure",
+                "knowledge",
                 "motivation",
                 "opportunity",
                 "targeting",
@@ -546,8 +564,11 @@
                 "control-effectiveness": "Strength, reliability, and coverage of existing preventive, detective, or corrective controls that reduce the probability of successful exploitation. Corresponds to resistance strength in FAIR.",
                 "detectability": "Likelihood that the activity is detected before the risk is realized. Lower detectability increases the chance of a successful action. Aligns with the OWASP Risk Rating intrusion detection factor and the FMEA detection axis.",
                 "discoverability": "Ease with which the weakness or opportunity can be found by a potential actor. Aligns with the OWASP Risk Rating ease of discovery factor.",
+                "elapsed-time": "The time an attacker needs to identify and exploit the weakness, one of the attack potential factors of [ISO/IEC 18045](https://www.iso.org/standard/72889.html) used by attack feasibility ratings such as ISO/SAE 21434.",
+                "equipment": "The equipment an attacker needs, from standard to bespoke, one of the attack potential factors of [ISO/IEC 18045](https://www.iso.org/standard/72889.html).",
                 "exploit-maturity": "Availability, reliability, and sophistication of known exploits, attack toolkits, or proof-of-concept code targeting the identified weakness.",
                 "exposure": "Degree to which the target asset, system, or service is visible, discoverable, or reachable by potential threat actors.",
+                "knowledge": "The knowledge of the target an attacker needs, from public to critical, one of the attack potential factors of [ISO/IEC 18045](https://www.iso.org/standard/72889.html).",
                 "motivation": "Level of incentive, intent, or determination driving the threat actor to pursue exploitation, including financial gain, ideology, or competitive advantage.",
                 "opportunity": "Availability of the conditions, timing, or circumstances required for the threat actor to act, including access windows, environmental factors, and resource availability.",
                 "targeting": "Degree to which the threat actor specifically selects this asset or organization rather than acting opportunistically. Aligns with the NIST SP 800-30 targeting factor.",
@@ -705,14 +726,11 @@
     },
     "impactCategory": {
       "title": "Impact Category",
-      "description": "A category of impact, including harms relevant to AI and societal risk. Use the custom option for categories specific to an organization's risk taxonomy.",
+      "description": "A category of impact, including harms relevant to AI and societal risk. The security and privacy attributes compromised, such as confidentiality or integrity, are recorded as risk attributes rather than as impact categories. Use the custom option for categories specific to an organization's risk taxonomy.",
       "oneOf": [
         {
           "title": "Predefined Impact Category",
           "enum": [
-            "confidentiality",
-            "integrity",
-            "availability",
             "financial",
             "reputation",
             "regulatory",
@@ -731,9 +749,6 @@
             "health"
           ],
           "meta:enum": {
-            "confidentiality": "Impact on data confidentiality.",
-            "integrity": "Impact on data or system integrity.",
-            "availability": "Impact on service availability.",
             "financial": "Financial loss or impact.",
             "reputation": "Reputational damage.",
             "regulatory": "Regulatory compliance impact.",
@@ -890,7 +905,7 @@
       "properties": {
         "level": {
           "enum": [
-            "info",
+            "negligible",
             "low",
             "medium",
             "high",
@@ -898,7 +913,7 @@
           ],
           "description": "The overall qualitative risk level.",
           "meta:enum": {
-            "info": "Informational.",
+            "negligible": "Negligible risk.",
             "low": "Low risk.",
             "medium": "Medium risk.",
             "high": "High risk.",
@@ -988,7 +1003,7 @@
           "enum": [
             "avoid",
             "reduce",
-            "transfer",
+            "share",
             "accept",
             "exploit",
             "enhance"
@@ -996,7 +1011,7 @@
           "meta:enum": {
             "avoid": "Eliminate the risk by removing its source or not proceeding with the activity.",
             "reduce": "Lower the likelihood or impact of the risk through controls.",
-            "transfer": "Shift the risk to another party, for example through insurance or contract.",
+            "share": "Share the risk with another party, for example through insurance, contract, or outsourcing. Some frameworks call this transfer.",
             "accept": "Take no further action and retain the risk.",
             "exploit": "Pursue an opportunity so that a positive risk occurs.",
             "enhance": "Increase the likelihood or benefit of a positive risk."
@@ -1013,7 +1028,7 @@
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "References using bom-link or bom-ref to the controls that implement this response."
+          "description": "References using bom-link or bom-ref to the controls that implement this response. Where a control is declared in the same document, its appliesTo property may also record the relationship."
         },
         "status": {
           "title": "Status",
