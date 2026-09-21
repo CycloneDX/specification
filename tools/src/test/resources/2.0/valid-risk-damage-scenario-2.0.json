@@ -34,6 +34,10 @@
                 "scheme": "ISO-26262",
                 "level": "asil-b"
               }
+            ],
+            "riskAttributes": [
+              "integrity",
+              "availability"
             ]
           }
         },
@@ -77,12 +81,12 @@
             "category": "spoofing"
           }
         ],
-        "affectedAssets": [
+        "affects": [
           "asset-light-control"
         ]
       }
     ],
-    "scenarios": [
+    "threatScenarios": [
       {
         "bom-ref": "ts-can-spoof",
         "name": "Attacker injects light control frames from a compromised body ECU",
@@ -97,16 +101,33 @@
         },
         "likelihood": {
           "level": "medium",
-          "rationale": "Attack feasibility rated medium: hours of elapsed time, proficient expertise, public CAN knowledge, standard equipment."
+          "rationale": "Attack feasibility rated medium: hours of elapsed time, proficient expertise, public CAN knowledge, standard equipment.",
+          "factors": [
+            {
+              "name": "Elapsed time",
+              "type": "elapsed-time",
+              "level": "medium",
+              "description": "Hours."
+            },
+            {
+              "name": "Knowledge of the item",
+              "type": "knowledge",
+              "level": "low",
+              "description": "Public CAN protocol knowledge."
+            },
+            {
+              "name": "Equipment",
+              "type": "equipment",
+              "level": "low",
+              "description": "Standard tools."
+            }
+          ]
         },
-        "affectedAssets": [
+        "affects": [
           "asset-light-control"
         ],
         "damageScenarios": [
           "ds-road-users-blinded"
-        ],
-        "relatedRisks": [
-          "risk-can-spoof-blinding"
         ]
       }
     ]
@@ -207,7 +228,11 @@
               "description": "Clause 15 risk value from impact rating and attack feasibility rating."
             }
           },
-          "rationale": "Medium feasibility combined with severe safety impact."
+          "rationale": "Medium feasibility combined with severe safety impact.",
+          "controllability": {
+            "score": 3,
+            "description": "Drivers cannot readily counter sudden loss of low beam at speed; ISO 26262 class C3."
+          }
         },
         "responses": [
           {
