@@ -91,7 +91,7 @@ function relativeUrl(from, to) {
 class Cdx2RefIdTypeUsageCheck extends LintCheck {
   constructor() {
     super(
-      'cdx2-reftype-usage',
+      'cdx2-refidtype-usage',
       'RefIdType Usage',
       'CycloneDX2-specific: validates that `refId` properties `$ref` the shared `refIdType` definition, and that `refIdType` is not referenced anywhere else (except `refLinkType`).',
       Severity.ERROR

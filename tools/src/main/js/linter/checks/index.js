@@ -35,7 +35,7 @@ export async function loadAllChecks() {
 }
 
 // Export individual check modules for registration and direct access if needed
-export * from './cdx2-reftype-usage.check.js';
+export * from './cdx2-refidtype-usage.check.js';
 export * from './const-enum-no-type.check.js';
 export * from './description-full-stop.check.js';
 export * from './description-oxford-english.check.js';
