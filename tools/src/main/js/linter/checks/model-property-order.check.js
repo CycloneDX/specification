@@ -1,20 +1,25 @@
 /**
  * CycloneDX Schema Linter - Model Property Order Check
  *
- * Validates that model schemas have top-level properties in the required order:
- * $schema, $id, type, title, $comment, $defs
+ * Validates that model schemas have top-level properties (some optional) in the required order:
+ * $schema, $id, type, title, $comment, [description], $defs
  *
  * A model schema is identified by having "/model/" in its $id URL.
  *
  * @license Apache-2.0
  */
 
+import assert from 'node:assert/strict';
 import { LintCheck, registerCheck, Severity } from '../index.js';
 
 /**
- * Required property order for model schemas
+ * Property order for model schemas
  */
-const REQUIRED_ORDER = ['$schema', '$id', 'type', 'title', '$comment', '$defs'];
+const ORDER = ['$schema', '$id', 'type', 'title', '$comment', 'description', '$defs'];
+/**
+ * Which of the ordered properties are optional.
+ */
+const OPTIONALS = ['description'];
 
 /**
  * Check that validates model property ordering
@@ -24,7 +29,7 @@ class ModelPropertyOrderCheck extends LintCheck {
     super(
       'model-property-order',
       'Model Property Order',
-      'Validates that model schemas have top-level properties in the required order.',
+      'Validates that model schemas have top-level properties (some optional) in the required order.',
       Severity.ERROR
     );
   }
@@ -32,58 +37,83 @@ class ModelPropertyOrderCheck extends LintCheck {
   async run(schema, rawContent, config = {}) {
     const issues = [];
 
-    const requiredOrder = config.requiredOrder ?? REQUIRED_ORDER;
-
     // Check if this is a model schema
     const schemaId = schema.$id || '';
     if (!schemaId.includes('/model/')) {
       return issues; // Not a model schema, skip
     }
 
+    const order = config.order ?? ORDER;
+    const known = new Set(order);
+    if (order.length !== known.size) {
+      throw new Error(`duplicate order items in ${order.join(', ')}`);
+    }
+    const optionals = new Set(config.optionals ?? OPTIONALS).intersection(known);
+    const required = known.difference(optionals);
+
+    const expectedOrderStr = order.map(p => optionals.has(p) ? `[${p}]` : p).join(', ');
+
     // Parse the raw content to get actual property order
     const actualOrder = this.extractPropertyOrder(rawContent);
-    if (actualOrder.length === 0) {
+    const actualSet = new Set(actualOrder);
+
+    // 0. actualOrder contains duplicates
+    if (actualOrder.length !== actualSet.size) {
+      issues.push(this.createIssue(
+        `Model schema has duplicate root-level properties in: ${actualOrder.join(', ')}.`,
+        '$',
+        { actual: actualOrder },
+        Severity.ERROR
+      ));
       return issues;
     }
 
-    // Check that all required properties exist
-    for (const prop of requiredOrder) {
-      if (!actualOrder.includes(prop)) {
+    // 1. actual properties that are unknown
+    const extraProps = actualSet.difference(known);
+    if (extraProps.size > 0) {
+      // Unknown properties are okay - just warn.
+      issues.push(this.createIssue(
+        `Model schema has unexpected root-level properties: ${[...extraProps].join(', ')}. Only ${expectedOrderStr} are allowed.`,
+        '$',
+        { unexpected: [...extraProps], allowed: [...known] },
+        Severity.WARNING
+      ));
+    }
+
+    // 2. required properties missing from actual
+    const missing = required.difference(actualSet);
+    if (missing.size > 0) {
+      const requiredList = [...required];
+      missing.forEach(prop => {
         issues.push(this.createIssue(
           `Model schema is missing required property "${prop}".`,
           `$.${prop}`,
-          { expected: requiredOrder }
+          { expected: requiredList }
         ));
-      }
+      });
+      // There are missing properties - can not assert order anyway.
+      return issues;
     }
 
-    // Check order of properties that exist
-    const filteredActual = actualOrder.filter(p => requiredOrder.includes(p));
-    const filteredRequired = requiredOrder.filter(p => actualOrder.includes(p));
-
-    for (let i = 0; i < filteredRequired.length; i++) {
-      if (filteredActual[i] !== filteredRequired[i]) {
+    // 3. actualOrder elements that are out of order (optionals may be skipped)
+    const actualOrderKnown = actualOrder.filter(p => known.has(p));
+    // Prerequisite: all required are in actual - see step 2.
+    const expectedOrder = order.filter(p => required.has(p) || actualSet.has(p));
+    // This should be impossible from the prerequisites - assert anyway.
+    assert.equal(actualOrderKnown.length, expectedOrder.length,
+      `Unexpected state: actualOrderKnown/expectedOrder unequal length - ` +
+      `${actualOrderKnown.length} !== ${expectedOrder.length} ` +
+      `(actualOrderKnown=${JSON.stringify(actualOrderKnown)}, expectedOrder=${JSON.stringify(expectedOrder)})`);
+    for (const [pos, expectedProp] of expectedOrder.entries()) {
+      const prop = actualOrderKnown[pos];
+      if (prop !== expectedProp) {
         issues.push(this.createIssue(
-          `Property "${filteredActual[i]}" is in wrong position. Expected order: ${requiredOrder.join(', ')}.`,
-          `$.${filteredActual[i]}`,
-          {
-            actual: actualOrder.filter(p => requiredOrder.includes(p)),
-            expected: filteredRequired
-          }
+          `Property "${prop}" is in wrong position. Expected order: ${expectedOrderStr}.`,
+          `$.${prop}`,
+          { actual: actualOrderKnown, expected: expectedOrder }
         ));
         break; // Only report first ordering issue
       }
-    }
-
-    // Check for extra properties at root level (not in required order)
-    const extraProps = actualOrder.filter(p => !requiredOrder.includes(p));
-    if (extraProps.length > 0) {
-      issues.push(this.createIssue(
-        `Model schema has unexpected root-level properties: ${extraProps.join(', ')}. Only ${requiredOrder.join(', ')} are allowed.`,
-        '$',
-        { unexpected: extraProps, allowed: requiredOrder },
-        Severity.WARNING
-      ));
     }
 
     return issues;
@@ -149,5 +179,5 @@ class ModelPropertyOrderCheck extends LintCheck {
 const check = new ModelPropertyOrderCheck();
 registerCheck(check);
 
-export { ModelPropertyOrderCheck, REQUIRED_ORDER };
+export { ModelPropertyOrderCheck, ORDER, OPTIONALS };
 export default check;
