@@ -1,11 +1,11 @@
 /**
  * CycloneDX Schema Linter - Model Property Order Check
- * 
+ *
  * Validates that model schemas have top-level properties in the required order:
  * $schema, $id, type, title, $comment, $defs
- * 
+ *
  * A model schema is identified by having "/model/" in its $id URL.
- * 
+ *
  * @license Apache-2.0
  */
 
@@ -31,22 +31,21 @@ class ModelPropertyOrderCheck extends LintCheck {
 
   async run(schema, rawContent, config = {}) {
     const issues = [];
-    
+
     const requiredOrder = config.requiredOrder ?? REQUIRED_ORDER;
-    
+
     // Check if this is a model schema
     const schemaId = schema.$id || '';
     if (!schemaId.includes('/model/')) {
       return issues; // Not a model schema, skip
     }
-    
+
     // Parse the raw content to get actual property order
     const actualOrder = this.extractPropertyOrder(rawContent);
-    
     if (actualOrder.length === 0) {
       return issues;
     }
-    
+
     // Check that all required properties exist
     for (const prop of requiredOrder) {
       if (!actualOrder.includes(prop)) {
@@ -57,11 +56,11 @@ class ModelPropertyOrderCheck extends LintCheck {
         ));
       }
     }
-    
+
     // Check order of properties that exist
     const filteredActual = actualOrder.filter(p => requiredOrder.includes(p));
     const filteredRequired = requiredOrder.filter(p => actualOrder.includes(p));
-    
+
     for (let i = 0; i < filteredRequired.length; i++) {
       if (filteredActual[i] !== filteredRequired[i]) {
         issues.push(this.createIssue(
@@ -75,7 +74,7 @@ class ModelPropertyOrderCheck extends LintCheck {
         break; // Only report first ordering issue
       }
     }
-    
+
     // Check for extra properties at root level (not in required order)
     const extraProps = actualOrder.filter(p => !requiredOrder.includes(p));
     if (extraProps.length > 0) {
@@ -86,10 +85,10 @@ class ModelPropertyOrderCheck extends LintCheck {
         Severity.WARNING
       ));
     }
-    
+
     return issues;
   }
-  
+
   /**
    * Extract the order of top-level properties from raw JSON content
    */
@@ -99,35 +98,37 @@ class ModelPropertyOrderCheck extends LintCheck {
     let depth = 0;
     let inString = false;
     let escapeNext = false;
-    
+
     for (const line of lines) {
+      let depthChange = 0;
+
       for (let i = 0; i < line.length; i++) {
         const char = line[i];
-        
+
         if (escapeNext) {
           escapeNext = false;
           continue;
         }
-        
+
         if (char === '\\' && inString) {
           escapeNext = true;
           continue;
         }
-        
+
         if (char === '"' && !escapeNext) {
           inString = !inString;
           continue;
         }
-        
+
         if (inString) continue;
-        
+
         if (char === '{' || char === '[') {
-          depth++;
+          depthChange += 1;
         } else if (char === '}' || char === ']') {
-          depth--;
+          depthChange -= 1;
         }
       }
-      
+
       // Only look at depth 1 (inside root object)
       if (depth === 1) {
         // Match property key at start of line (with indentation)
@@ -136,8 +137,10 @@ class ModelPropertyOrderCheck extends LintCheck {
           order.push(match[1]);
         }
       }
+
+      depth += depthChange;
     }
-    
+
     return order;
   }
 }
