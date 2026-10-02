@@ -99,6 +99,20 @@
         "remote": {
           "$comment": "Absolute URI -> external by definition; left untouched and not checked for existence.",
           "$ref": "https://example.com/remote.schema.json#/$defs/thing"
+        },
+        "inArray": {
+          "$comment": "Refs nested inside an array (allOf) exercise the array branch of rewriteRefs: internal, bundled-file and external-file refs must all be rewritten there too.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/used-whole/$defs/inner"
+            },
+            {
+              "$ref": "#/$defs/used-subdefs-only/$defs/keptTransitively"
+            },
+            {
+              "$ref": "externals/not-bundled.schema.json#/$defs/licenseId"
+            }
+          ]
         }
       },
       "$defs": {
