@@ -74,6 +74,8 @@ function collectRefKeywords(obj, keys, predicate, pathStack = []) {
     return result;
 }
 
+const FILE_REF_RE = /^(.+\.schema\.json)(#.*)?$/;
+
 /**
  * make schema name from schema file
  * @param file
@@ -105,7 +107,7 @@ function rewriteRefs(obj, defsKeyword, currentSchemaName, currentSchemaDir, targ
     for (const [key, value] of Object.entries(obj)) {
         if (key === '$ref' && typeof value === 'string') {
             // Absolute URIs (https://..., urn:...) are never file refs: skip the file match for them
-            const fileMatch = isAbsoluteUri(value) ? null : value.match(/^(.+\.schema\.json)(#.*)?$/);
+            const fileMatch = isAbsoluteUri(value) ? null : value.match(FILE_REF_RE);
             // Case 1: Reference to another schema file by relative path
             if (fileMatch) {
                 const filename = fileMatch[1];
@@ -278,11 +280,9 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
         for (const [schemaPath, schema] of Object.entries(schemas)) {
             const schemaDir = path.dirname(schemaPath);
             // Only $ref can be external; $dynamicRef/$recursiveRef are JSON Pointers by spec
-            const refs = collectRefKeywords(schema, ['$ref'], (v) => !isAbsoluteUri(v) && /^(.+\.schema\.json)(#.*)?$/.test(v));
+            const refs = collectRefKeywords(schema, ['$ref'], (v) => !isAbsoluteUri(v) && FILE_REF_RE.test(v));
             for (const { ref, key, path: refPath } of refs) {
-                const m = ref.match(/^(.+\.schema\.json)(#.*)?$/);
-                if (!m) continue;
-                const target = m[1];
+                const target = ref.match(FILE_REF_RE)[1];
                 const resolvedPath = path.resolve(schemaDir, target);
                 if (bundledSchemaPaths.has(resolvedPath)) continue;
                 if (isInsideDir(resolvedPath, absoluteModelsDir)) {
