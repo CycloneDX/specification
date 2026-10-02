@@ -33,17 +33,6 @@
         }
       }
     },
-    "spdx": {
-      "$defs": {
-        "licenseId": {
-          "type": "string",
-          "enum": [
-            "Apache-2.0",
-            "MIT"
-          ]
-        }
-      }
-    },
     "unused": {
       "title": "Unused",
       "type": "object",
@@ -104,8 +93,12 @@
           "$ref": "#/$defs/used-whole/$defs/inner"
         },
         "license": {
-          "$comment": "spdx.schema.json is in the ref-exception list -> rewired to a path relative to the root schema, not bundled.",
-          "$ref": "modules/spdx.schema.json#/$defs/licenseId"
+          "$comment": "Target is outside the models dir -> not bundled; rewired to a path relative to the root schema.",
+          "$ref": "externals/not-bundled.schema.json#/$defs/licenseId"
+        },
+        "remote": {
+          "$comment": "Absolute URI -> external by definition; left untouched and not checked for existence.",
+          "$ref": "https://example.com/remote.schema.json#/$defs/thing"
         }
       },
       "$defs": {

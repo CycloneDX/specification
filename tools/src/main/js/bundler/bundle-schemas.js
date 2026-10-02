@@ -3,17 +3,24 @@
 const fs = require('fs').promises;
 const path = require('path');
 
-// Default list of external schema files to bypass for validation and rewriting.
-// This constant is used as the default value for ref exceptions; can be overridden via options.refExceptions.
-const DEFAULT_REF_EXCEPTION_FILES = [
-    'spdx.schema.json',
-    'behavior-taxonomy.schema.json',
-    'cryptography-defs.schema.json',
-    'jsf-0.82.schema.json'
-];
-
 function isObject(value) {
     return typeof value === 'object' && value !== null;
+}
+
+/**
+ * Whether `filePath` lives (at any depth) inside `dirPath`. Both must be absolute.
+ */
+function isInsideDir(filePath, dirPath) {
+    const rel = path.relative(dirPath, filePath);
+    return rel !== '' && !rel.startsWith('..') && !path.isAbsolute(rel);
+}
+
+/**
+ * Whether `ref` is an absolute URI (has a scheme, e.g. `https://...`, `urn:`).
+ * Such refs always point to external schemas: they are never bundled, rewritten nor checked.
+ */
+function isAbsoluteUri(ref) {
+    return /^[a-z][a-z0-9+.-]*:/i.test(ref);
 }
 
 /**
@@ -78,9 +85,14 @@ function makeSchemaName(file)
 }
 
 /**
- * Recursively walks through an object and rewrites $ref paths
+ * Recursively walks through an object and rewrites $ref paths.
+ *
+ * Relative file refs are resolved against `currentSchemaDir`:
+ *  - if the resolved path is in `bundledSchemaPaths`, the ref is pointed into the bundle's definitions;
+ *  - otherwise the file stays external and the ref is rewired relative to `targetSchemaDir`
+ *    (the directory the bundle is written to).
  */
-function rewriteRefs(obj, defsKeyword, currentSchemaName, currentSchemaDir, targetSchemaDir, refExceptionSet) {
+function rewriteRefs(obj, defsKeyword, currentSchemaName, currentSchemaDir, targetSchemaDir, bundledSchemaPaths) {
     if (typeof obj !== 'object' || obj === null) {
         return obj;
     }
@@ -92,25 +104,17 @@ function rewriteRefs(obj, defsKeyword, currentSchemaName, currentSchemaDir, targ
     const newObj = {};
     for (const [key, value] of Object.entries(obj)) {
         if (key === '$ref' && typeof value === 'string') {
-            // Case 1: Reference to another schema file (external reference)
-            const fileMatch = value.match(/^(.+\.schema\.json)(#.*)?$/);
+            // Absolute URIs (https://..., urn:...) are never file refs: skip the file match for them
+            const fileMatch = isAbsoluteUri(value) ? null : value.match(/^(.+\.schema\.json)(#.*)?$/);
+            // Case 1: Reference to another schema file by relative path
             if (fileMatch) {
                 const filename = fileMatch[1];
                 const fragment = fileMatch[2] || '';
+                const resolvedPath = path.resolve(currentSchemaDir, filename);
 
-                const basename = path.basename(filename);
-                const schemaName = makeSchemaName(basename);
-
-                // If the target file is in the exception list, rewire the ref
-                if (refExceptionSet && refExceptionSet.has(basename.toLowerCase())) {
-                    const filenameRewired = path.relative(
-                        targetSchemaDir,
-                        path.resolve(currentSchemaDir, filename)
-                    );
-                    newObj[key] = `${filenameRewired}${fragment}`;
-                }
-                // The target file shall be bundled
-                else {
+                // The target file is bundled -> point into the bundle's definitions
+                if (bundledSchemaPaths.has(resolvedPath)) {
+                    const schemaName = makeSchemaName(resolvedPath);
                     // Normalize fragment: drop leading '#' and optional leading '/'
                     let fragPath = '';
                     if (fragment) {
@@ -123,18 +127,26 @@ function rewriteRefs(obj, defsKeyword, currentSchemaName, currentSchemaDir, targ
                         ? `#/${defsKeyword}/${schemaName}/${fragPath}`
                         : `#/${defsKeyword}/${schemaName}`;
                 }
+                // The target file is not bundled -> rewire the ref relative to where the bundle is written
+                else {
+                    const filenameRewired = path
+                        .relative(targetSchemaDir, resolvedPath)
+                        .split(path.sep)
+                        .join('/');
+                    newObj[key] = `${filenameRewired}${fragment}`;
+                }
             }
             // Case 2: Internal reference within the same schema (starts with #)
             else if (value.startsWith('#')) {
                 // Rewrite to be relative to the current schema's location in the bundle
                 newObj[key] = `#/${defsKeyword}/${currentSchemaName}${value.substring(1)}`;
             }
-            // Case 3: Other references (URLs, etc.) - leave as-is
+            // Case 3: Absolute URIs (https://..., urn:...) and anything else -> external, left as-is
             else {
                 newObj[key] = value;
             }
         } else {
-            newObj[key] = rewriteRefs(value, defsKeyword, currentSchemaName, currentSchemaDir, targetSchemaDir,  refExceptionSet);
+            newObj[key] = rewriteRefs(value, defsKeyword, currentSchemaName, currentSchemaDir, targetSchemaDir, bundledSchemaPaths);
         }
     }
     return newObj;
@@ -255,33 +267,32 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
         console.log(`\nUsing schema version: ${schemaVersion}`);
         console.log(`Using keyword: ${defsKeyword}`);
 
-        // Build exception set for external refs not to check or rewrite
-        const refExceptionSet = new Set((options.refExceptions || DEFAULT_REF_EXCEPTION_FILES).map(s => s.toLowerCase()));
+        // Everything read from the models directory (plus the root schema) is bundled.
+        // Any other file a $ref points to stays external and is only checked for existence.
+        const bundledSchemaPaths = new Set(Object.keys(schemas));
 
-        // Pre-check: external file $ref targets must exist among loaded schemas
+        // Pre-check: every relative file $ref target must either be bundled or exist on disk.
+        // A target inside the models directory that was NOT loaded is an error (missing or filtered file).
+        // Absolute URIs (https://...) are external by definition and are not checked.
         console.log('Validating external $ref targets...');
-        const allowedFiles = new Set([...schemaFiles, rootSchemaFilename]);
         for (const [schemaPath, schema] of Object.entries(schemas)) {
             const schemaDir = path.dirname(schemaPath);
             // Only $ref can be external; $dynamicRef/$recursiveRef are JSON Pointers by spec
-            const refs = collectRefKeywords(schema, ['$ref'], (v) => /^(\.?.*\.schema\.json)(#.*)?$/.test(v));
+            const refs = collectRefKeywords(schema, ['$ref'], (v) => !isAbsoluteUri(v) && /^(.+\.schema\.json)(#.*)?$/.test(v));
             for (const { ref, key, path: refPath } of refs) {
                 const m = ref.match(/^(.+\.schema\.json)(#.*)?$/);
                 if (!m) continue;
                 const target = m[1];
-                const base = path.basename(target);
-                if (refExceptionSet.has(base.toLowerCase()))
-                {
-                    try {
-                        await fs.access(path.resolve(schemaDir, target));
-                    } catch (err) {
-                        throw new Error(`Missing external ${key} target file '${target}' referenced from schema '${schemaPath}' at '${refPath}'`,
-                            {cause: err});
-                    }
-                    continue;
-                }
-                if (!allowedFiles.has(base)) {
+                const resolvedPath = path.resolve(schemaDir, target);
+                if (bundledSchemaPaths.has(resolvedPath)) continue;
+                if (isInsideDir(resolvedPath, absoluteModelsDir)) {
                     throw new Error(`Unresolved external ${key} target file '${target}' referenced from schema '${schemaPath}' at '${refPath}'`);
+                }
+                try {
+                    await fs.access(resolvedPath);
+                } catch (err) {
+                    throw new Error(`Missing external ${key} target file '${target}' referenced from schema '${schemaPath}' at '${refPath}'`,
+                        {cause: err});
                 }
             }
         }
@@ -292,7 +303,7 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
         const rewrittenDefinitions = {};
         for (const [schemaPath, schema] of Object.entries(schemas)) {
             console.log(`  Rewriting refs in ${schemaPath}...`);
-            rewrittenDefinitions[schemaPath] = rewriteRefs(schema, defsKeyword, makeSchemaName(schemaPath), path.dirname(schemaPath), rootSchemaDir, refExceptionSet);
+            rewrittenDefinitions[schemaPath] = rewriteRefs(schema, defsKeyword, makeSchemaName(schemaPath), path.dirname(schemaPath), rootSchemaDir, bundledSchemaPaths);
         }
 
         // Get the rewritten root schema

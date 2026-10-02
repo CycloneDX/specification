@@ -7,9 +7,10 @@ Minimal snapshot test for `../bundle-schemas.js`. No test framework required —
 ```text
 .
 ├── run.js            # test runner
-├── fixtures/         # input schemas (root + modules), never modified by a run
+├── fixtures/         # input schemas, never modified by a run
 │   ├── main.schema.json
-│   └── modules/*.schema.json
+│   ├── modules/*.schema.json    # the models directory -> everything here is bundled
+│   └── externals/*.schema.json  # outside the models directory -> never bundled, refs are rewired
 └── snapshot/         # expected bundler output, committed
     ├── main-bundled.schema.json
     └── main-bundled.min.schema.json
@@ -19,7 +20,9 @@ The runner copies `fixtures/` to a temporary directory, bundles `main.schema.jso
 with `modules/` there, and compares the two generated files byte-for-byte against `snapshot/`.
 
 Each module file name states the edge case it covers (`used-whole`, `used-subdefs-only`,
-`unused`, `dynamic-anchor`, `spdx`); the `$comment` fields inside explain the expected behaviour.
+`unused`, `dynamic-anchor`); `externals/not-bundled` covers a file outside the models directory,
+and the `remote` property in `used-whole` covers an absolute `https://` ref. The `$comment`
+fields inside explain the expected behaviour.
 
 ## Run
 
