@@ -100,7 +100,7 @@ function rewriteRefs(obj, defsKeyword, currentSchemaName, currentSchemaDir, targ
     }
 
     if (Array.isArray(obj)) {
-        return obj.map(item => rewriteRefs(item, defsKeyword, currentSchemaName, currentSchemaDir, targetSchemaDir,  refExceptionSet));
+        return obj.map(item => rewriteRefs(item, defsKeyword, currentSchemaName, currentSchemaDir, targetSchemaDir, bundledSchemaPaths));
     }
 
     const newObj = {};

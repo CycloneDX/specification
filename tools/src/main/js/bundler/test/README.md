@@ -21,8 +21,9 @@ with `modules/` there, and compares the two generated files byte-for-byte agains
 
 Each module file name states the edge case it covers (`used-whole`, `used-subdefs-only`,
 `unused`, `dynamic-anchor`); `externals/not-bundled` covers a file outside the models directory,
-and the `remote` property in `used-whole` covers an absolute `https://` ref. The `$comment`
-fields inside explain the expected behaviour.
+the `remote` property in `used-whole` covers an absolute `https://` ref, and `inArray` in
+`used-whole` covers refs nested inside an array (`allOf`). The `$comment` fields inside explain
+the expected behaviour.
 
 ## Run
 
