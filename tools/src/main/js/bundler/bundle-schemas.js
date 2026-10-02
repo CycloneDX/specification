@@ -81,7 +81,7 @@ function collectRefKeywords(obj, keys, predicate, pathStack = []) {
     return result;
 }
 
-const FILE_REF_RE = /^(.+\.schema\.json)(#.*)?$/;
+const FILE_REF_RE = Object.freeze(/^(.+\.schema\.json)(#.*)?$/);
 
 /**
  * make schema name from schema file
