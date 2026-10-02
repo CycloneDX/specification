@@ -8,7 +8,7 @@
     "threats": {
       "type": "object",
       "title": "Threats",
-      "description": "Threat-modelling content, including the documented threats, the scenarios that realize them, the attack patterns and attack trees that describe how they are carried out, and the trust boundaries they cross.",
+      "description": "Threat-modelling content, including the documented threats, the threat scenarios that realize them, the attack patterns and attack trees that describe how they are carried out, and the trust boundaries they cross. Control references throughout this model point at controls that mitigate the referencing element. Where a control is declared in the same document, its appliesTo property may also record the relationship; the reference here is intended primarily for controls defined elsewhere.",
       "additionalProperties": false,
       "properties": {
         "threats": {
@@ -20,9 +20,9 @@
           },
           "description": "The documented threats. Each describes what can go wrong, independent of any specific actor or occurrence."
         },
-        "scenarios": {
+        "threatScenarios": {
           "type": "array",
-          "title": "Scenarios",
+          "title": "Threat Scenarios",
           "uniqueItems": true,
           "items": {
             "$ref": "#/$defs/threatScenario"
@@ -36,7 +36,7 @@
           "items": {
             "$ref": "#/$defs/attackPattern"
           },
-          "description": "A library of attack patterns, typically aligned with CAPEC, that threats and scenarios can reference."
+          "description": "A library of attack patterns, typically aligned with CAPEC, that threats and threat scenarios can reference."
         },
         "attackTrees": {
           "type": "array",
@@ -379,14 +379,14 @@
         "indicators": {
           "$ref": "#/$defs/indicators"
         },
-        "affectedAssets": {
+        "affects": {
           "type": "array",
-          "title": "Affected Assets",
+          "title": "Affects",
           "uniqueItems": true,
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "References using bom-link or bom-ref to the kinds of assets this threat affects."
+          "description": "References using bom-link or bom-ref to the assets that this threat can affect."
         },
         "relatedBusinessObjectives": {
           "type": "array",
@@ -416,7 +416,7 @@
     "threatScenario": {
       "type": "object",
       "title": "Threat Scenario",
-      "description": "A specific realization of a threat, in which an actor seeks to cause harm. The scenario references the threat it realizes, supplies the actor by reference to a party, and carries the scenario-specific traits and risk assessment, such as motivation, intent, access level, likelihood, and impact.",
+      "description": "A specific realization of a threat, in which an actor seeks to cause harm. The scenario references the threats it realizes, supplies the actor by reference to a party, and carries the scenario-specific traits, such as motivation, intent, access level, and likelihood. The consequence is expressed by the damage scenarios it leads to, and the resulting risk is documented under risks, referencing both.",
       "additionalProperties": false,
       "required": [
         "bom-ref",
@@ -534,13 +534,8 @@
           "$ref": "#/$defs/exploitability"
         },
         "likelihood": {
-          "$ref": "cyclonedx-risk-2.0.schema.json#/$defs/likelihood"
-        },
-        "impact": {
-          "$ref": "cyclonedx-risk-2.0.schema.json#/$defs/impact"
-        },
-        "riskScore": {
-          "$ref": "cyclonedx-risk-2.0.schema.json#/$defs/riskScore"
+          "$ref": "cyclonedx-risk-2.0.schema.json#/$defs/likelihood",
+          "description": "The likelihood that this scenario is realized, which in attack terms is its feasibility. The consequence is carried by the damage scenarios the scenario leads to, and the paired rating by the risk that references both."
         },
         "riskAttributes": {
           "type": "array",
@@ -551,23 +546,23 @@
           },
           "description": "The security and privacy attributes that this threat would compromise if realized."
         },
-        "affectedAssets": {
+        "affects": {
           "type": "array",
-          "title": "Affected Assets",
+          "title": "Affects",
           "uniqueItems": true,
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
           "description": "References using bom-link or bom-ref to the assets affected in this scenario."
         },
-        "relatedRisks": {
+        "damageScenarios": {
           "type": "array",
-          "title": "Related Risks",
+          "title": "Damage Scenarios",
           "uniqueItems": true,
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "References using bom-link or bom-ref to the risks that this scenario contributes to."
+          "description": "References using bom-link or bom-ref to the damage scenarios, declared under the risks collection, that this scenario can lead to."
         },
         "relatedVulnerabilities": {
           "type": "array",
@@ -980,7 +975,7 @@
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "References using bom-link or bom-ref to the controls that mitigate this node."
+          "description": "References using bom-link or bom-ref to the controls that mitigate this attack tree node."
         }
       }
     },
@@ -1076,20 +1071,8 @@
       "additionalProperties": false,
       "properties": {
         "level": {
-          "title": "Level",
-          "description": "The maturity of available exploitation capability.",
-          "enum": [
-            "theoretical",
-            "proof-of-concept",
-            "functional",
-            "weaponized"
-          ],
-          "meta:enum": {
-            "theoretical": "Exploitation is theoretically possible but has not been demonstrated.",
-            "proof-of-concept": "A proof of concept exists.",
-            "functional": "A functional exploit exists.",
-            "weaponized": "A weaponized exploit is in use."
-          }
+          "$ref": "cyclonedx-vulnerability-2.0.schema.json#/$defs/exploitMaturity",
+          "description": "The maturity of available exploitation capability, using the same scale as vulnerability exploit maturity."
         },
         "complexity": {
           "title": "Complexity",
@@ -1284,7 +1267,7 @@
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "References using bom-link or bom-ref to the controls in place at this boundary. Intended primarily for referencing externally defined controls. Where the control and boundary are declared together, prefer the control's appliesTo property."
+          "description": "References using bom-link or bom-ref to the controls that mitigate threats at this trust boundary."
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
@@ -1374,7 +1357,7 @@
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "References using bom-link or bom-ref to the controls that detect or prevent this step."
+          "description": "References using bom-link or bom-ref to the controls that mitigate this attack path step, by preventing or detecting it."
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
@@ -1431,14 +1414,6 @@
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
           "description": "References using bom-link or bom-ref to the threats that this path realizes."
-        },
-        "relatedRisks": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
-          },
-          "description": "References using bom-link or bom-ref to the risks that this path contributes to."
         },
         "externalReferences": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReferences"
