@@ -233,7 +233,8 @@ function parseBundleRef(ref, defsKeyword) {
  *
  * Granularity:
  *  - a pointer to `#/<defs>/X` (or into X outside of its defs container) keeps X whole;
- *  - a pointer to `#/<defs>/X/<defs>/Y` keeps only X.<defs>.Y — the rest of X is dropped;
+ *  - a pointer to `#/<defs>/X/<defs>/Y` keeps only X.<defs>.Y — the rest of X is replaced
+ *    by `type: null`, so the hollowed-out container never validates anything by accident;
  *  - X not reached at all is dropped.
  *
  * @param {object} schema - the bundled schema; mutated
@@ -305,7 +306,7 @@ function treeShakeBundle(schema, defsKeyword) {
         }
         if (usage === usedWhole) continue;
         // Only sub-definitions are referenced: drop the schema body entirely,
-        // keep nothing but the referenced sub-definitions.
+        // keep nothing but the referenced sub-definitions, and mark the container as not usable at all.
         const keptSubDefs = {};
         for (const [name, body] of Object.entries(defSchema[defsKeyword] || {})) {
             if (usage.has(name)) {
@@ -315,7 +316,14 @@ function treeShakeBundle(schema, defsKeyword) {
                 removedSubDefs++;
             }
         }
-        defs[schemaName] = { [defsKeyword]: keptSubDefs };
+        // `not: {}` rejects every instance, so the hollowed-out container is unusable on its own;
+        // unlike `false` it can still hold `$defs`, and unlike `not: true` it is valid in draft-04.
+        defs[schemaName] = {
+            not: {},
+            title: defSchema.title,
+            description: defSchema.description,
+            [defsKeyword]: keptSubDefs
+        };
     }
     console.log(`  ${defsKeyword}: ${before} -> ${Object.keys(defs).length} entries, ${removedSubDefs} sub-definitions removed`);
 }
