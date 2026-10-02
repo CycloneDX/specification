@@ -22,8 +22,15 @@ with `modules/` there, and compares the two generated files byte-for-byte agains
 Each module file name states the edge case it covers (`used-whole`, `used-subdefs-only`,
 `unused`, `dynamic-anchor`); `externals/not-bundled` covers a file outside the models directory,
 the `remote` property in `used-whole` covers an absolute `https://` ref, and `inArray` in
-`used-whole` covers refs nested inside an array (`allOf`). The `$comment` fields inside explain
-the expected behaviour.
+`used-whole` covers refs nested inside an array (`allOf`).
+
+Inside the fixtures, the annotation keywords have distinct roles:
+
+- `$comment` carries test intent: the top-level one (prefixed `FIXTURE:`) states the purpose of
+  the file, nested ones explain the expected behaviour of the surrounding construct. The bundler
+  strips top-level `$comment` from embedded modules and all non-root `$comment` from the minified output.
+- `title` and `description` are plain, user-facing schema documentation, present on every (sub-)schema.
+  They carry no test intent and must pass through the bundler untouched, in both outputs.
 
 ## Run
 
