@@ -316,13 +316,13 @@ function treeShakeBundle(schema, defsKeyword) {
                 removedSubDefs++;
             }
         }
-        // `not: {}` rejects every instance, so the hollowed-out container is unusable on its own;
-        // unlike `false` it can still hold `$defs`, and unlike `not: true` it is valid in draft-04.
         defs[schemaName] = {
-            not: {},
             title: defSchema.title,
             description: defSchema.description,
-            [defsKeyword]: keptSubDefs
+            [defsKeyword]: keptSubDefs,
+            // `not: {}` rejects every instance, so the hollowed-out container is unusable on its own;
+            // unlike `false` it can still hold `$defs`, and unlike `not: true` it is valid in draft-04.
+            not: {}
         };
     }
     console.log(`  ${defsKeyword}: ${before} -> ${Object.keys(defs).length} entries, ${removedSubDefs} sub-definitions removed`);
