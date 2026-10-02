@@ -27,9 +27,9 @@ const schemaModelDir = join(schemaDir, `model`)
 
 const schemaGlob = '*.schema.json'
 
-const expectedRefTypeFP = Object.freeze([
+const expectedRefIdTypeFP = Object.freeze([
     join(schemaModelDir, `cyclonedx-common-${testschemaVersion}.schema.json`),
-    '#/$defs/refType'
+    '#/$defs/refIdType'
 ])
 
 if (testschemaVersion.length === 0) {
@@ -42,10 +42,10 @@ if (!await stat(schemaModelDir).then(s => s.isDirectory()).catch(() => false)) {
 }
 console.debug('DEBUG | schemaModelDir = ', schemaModelDir);
 
-if (!await stat(expectedRefTypeFP[0]).then(s => s.isFile()).catch(() => false)) {
-    throw new Error(`missing expectedRefTypeFP file: ${expectedRefTypeFP[0]}`);
+if (!await stat(expectedRefIdTypeFP[0]).then(s => s.isFile()).catch(() => false)) {
+    throw new Error(`missing expectedRefIdTypeFP file: ${expectedRefIdTypeFP[0]}`);
 }
-console.debug('DEBUG | expectedRefTypeFP = ', expectedRefTypeFP);
+console.debug('DEBUG | expectedRefIdTypeFP = ', expectedRefIdTypeFP);
 
 const schemaFiles = Object.freeze([
     // test only the source schema, not the bundled for now ...
@@ -204,15 +204,15 @@ function* _findNodes(node, matcher, path = '$') {
 
 /**
  * @param {string} schemaFile
- * @return {string} the expected `$ref` value pointing at refType, relative to schemaFile
+ * @return {string} the expected `$ref` value pointing at refIdType, relative to schemaFile
  * @private
  */
-function _refTypeRefFor(schemaFile) {
+function _refIdTypeRefFor(schemaFile) {
     return (
-        schemaFile === expectedRefTypeFP[0]
+        schemaFile === expectedRefIdTypeFP[0]
             ? ''
-            : relative(dirname(schemaFile), expectedRefTypeFP[0])
-    ) + expectedRefTypeFP[1]
+            : relative(dirname(schemaFile), expectedRefIdTypeFP[0])
+    ) + expectedRefIdTypeFP[1]
 }
 
 /**

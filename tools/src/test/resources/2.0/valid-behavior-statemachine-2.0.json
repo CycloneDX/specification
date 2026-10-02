@@ -5,14 +5,14 @@
   "version": 1,
   "blueprints": [
     {
-      "bom-ref": "bp-connection-behavioral",
+      "refId": "bp-connection-behavioral",
       "name": "Client connection lifecycle",
       "modelTypes": [
         "behavioral"
       ],
       "assets": [
         {
-          "bom-ref": "asset-client",
+          "refId": "asset-client",
           "type": "service",
           "name": "Client application"
         }
@@ -20,61 +20,61 @@
       "behaviors": {
         "graphs": [
           {
-            "bom-ref": "sm-connection",
+            "refId": "sm-connection",
             "name": "Connection lifecycle",
             "kind": "state-machine",
             "subject": "asset-client",
             "nodes": [
               {
-                "bom-ref": "s-idle",
+                "refId": "s-idle",
                 "kind": "initial"
               },
               {
-                "bom-ref": "s-connecting",
+                "refId": "s-connecting",
                 "kind": "state",
                 "name": "Connecting"
               },
               {
-                "bom-ref": "s-connected",
+                "refId": "s-connected",
                 "kind": "state",
                 "name": "Connected"
               },
               {
-                "bom-ref": "s-closed",
+                "refId": "s-closed",
                 "kind": "final",
                 "name": "Closed"
               }
             ],
             "transitions": [
               {
-                "bom-ref": "t-open",
+                "refId": "t-open",
                 "source": "s-idle",
                 "target": "s-connecting",
                 "trigger": "user-initiated"
               },
               {
-                "bom-ref": "t-established",
+                "refId": "t-established",
                 "source": "s-connecting",
                 "target": "s-connected",
                 "trigger": "event-driven",
                 "guard": "handshake.complete == true"
               },
               {
-                "bom-ref": "t-failed",
+                "refId": "t-failed",
                 "source": "s-connecting",
                 "target": "s-idle",
                 "trigger": "event-driven",
                 "guard": "handshake.complete == false"
               },
               {
-                "bom-ref": "t-reconnect",
+                "refId": "t-reconnect",
                 "source": "s-connected",
                 "target": "s-connecting",
                 "trigger": "signal",
                 "guard": "heartbeat.lost == true"
               },
               {
-                "bom-ref": "t-close",
+                "refId": "t-close",
                 "source": "s-connected",
                 "target": "s-closed",
                 "trigger": "user-initiated"
