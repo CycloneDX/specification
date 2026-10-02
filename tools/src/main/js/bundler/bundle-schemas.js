@@ -432,8 +432,11 @@ if (require.main === module) {
         process.exit(1);
     }
 
-    bundleSchemas(modelsDirectory, rootSchemaPath, { validate: true })
-        .catch(err => process.exit(1));
+    bundleSchemas(modelsDirectory, rootSchemaPath, {validate: true})
+        .catch(err => {
+            console.error(err);
+            process.exit(1);
+        });
 }
 
 module.exports = { bundleSchemas };
