@@ -234,7 +234,7 @@ function parseBundleRef(ref, defsKeyword) {
  * Granularity:
  *  - a pointer to `#/<defs>/X` (or into X outside of its defs container) keeps X whole;
  *  - a pointer to `#/<defs>/X/<defs>/Y` keeps only X.<defs>.Y — the rest of X is replaced
- *    by `type: null`, so the hollowed-out container never validates anything by accident;
+ *    by `not: {}`, so the hollowed-out container never validates anything by accident;
  *  - X not reached at all is dropped.
  *
  * @param {object} schema - the bundled schema; mutated
@@ -453,32 +453,15 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
             cleanedDefinitions[makeSchemaName(schemaPath)] = stripTopLevelKeys(defSchema, keysToStripFromDefs);
         }
 
-        // The root schema's own definition entry is emitted only when
-        // something references it: its content already forms the top level of
-        // the bundle, so an unreferenced copy is dead weight that downstream
-        // tools (e.g. schema documentation generators) render as a duplicate
-        // of the document root.
-        const rootDefName = makeSchemaName(absoluteRootPath);
-        const rootDefEntry = cleanedDefinitions[rootDefName];
-        delete cleanedDefinitions[rootDefName];
-
         // Build the final schema with root schema properties at the top level
+        // The root schema's own entry in `cleanedDefinitions` is handled by the
+        // tree-shaker below like any other module: dropped when unreferenced,
+        // hollowed out to its referenced sub-definitions otherwise.
         const finalSchema = {
             ...rootSchemaRewritten,
             "$schema": schemaVersion,
             [defsKeyword]: cleanedDefinitions
         };
-
-        const rootDefPointer = `#/${defsKeyword}/${rootDefName}`;
-        const rootDefRefs = collectRefKeywords(
-            finalSchema,
-            REF_KEYWORDS,
-            (v) => v === rootDefPointer || v.startsWith(`${rootDefPointer}/`)
-        );
-        if (rootDefRefs.length > 0) {
-            console.log(`Keeping ${defsKeyword} entry '${rootDefName}' (referenced ${rootDefRefs.length}x)`);
-            finalSchema[defsKeyword][rootDefName] = rootDefEntry;
-        }
 
         // Tree-shake: drop every definition not reachable from the root
         console.log('Tree-shaking unused definitions...');
