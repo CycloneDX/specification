@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "http://example.com/test/modules/used-whole.schema.json",
+  "$comment": "Top-level $comment/$id/$schema are stripped when embedded as a def.",
+  "title": "Used whole",
+  "type": "object",
+  "properties": {
+    "name": { "type": "string" },
+    "inner": {
+      "$comment": "Internal ref -> rewritten to #/$defs/used-whole/$defs/inner.",
+      "$ref": "#/$defs/inner"
+    },
+    "license": {
+      "$comment": "spdx.schema.json is in the ref-exception list -> rewired to a path relative to the root schema, not bundled.",
+      "$ref": "spdx.schema.json#/$defs/licenseId"
+    }
+  },
+  "$defs": {
+    "inner": {
+      "type": "integer"
+    },
+    "unusedButKept": {
+      "$comment": "Not referenced anywhere, but kept because the module is used as a whole.",
+      "type": "boolean"
+    },
+    "sharedByOther": {
+      "$comment": "Cross-referenced from used-subdefs-only#/$defs/kept.",
+      "type": "number"
+    }
+  }
+}
