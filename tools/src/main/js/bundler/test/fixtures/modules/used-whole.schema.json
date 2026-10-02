@@ -11,8 +11,26 @@
       "$ref": "#/$defs/inner"
     },
     "license": {
-      "$comment": "spdx.schema.json is in the ref-exception list -> rewired to a path relative to the root schema, not bundled.",
-      "$ref": "spdx.schema.json#/$defs/licenseId"
+      "$comment": "Target is outside the models dir -> not bundled; rewired to a path relative to the root schema.",
+      "$ref": "../externals/not-bundled.schema.json#/$defs/licenseId"
+    },
+    "remote": {
+      "$comment": "Absolute URI -> external by definition; left untouched and not checked for existence.",
+      "$ref": "https://example.com/remote.schema.json#/$defs/thing"
+    },
+    "inArray": {
+      "$comment": "Refs nested inside an array (allOf) exercise the array branch of rewriteRefs: internal, bundled-file and external-file refs must all be rewritten there too.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/inner"
+        },
+        {
+          "$ref": "used-subdefs-only.schema.json#/$defs/keptTransitively"
+        },
+        {
+          "$ref": "../externals/not-bundled.schema.json#/$defs/licenseId"
+        }
+      ]
     }
   },
   "$defs": {
