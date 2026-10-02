@@ -24,6 +24,13 @@ function isAbsoluteUri(ref) {
 }
 
 /**
+ * Unescape a single JSON Pointer (RFC6901) reference token.
+ */
+function unescapeJsonPointerToken(token) {
+    return token.replace(/~1/g, '/').replace(/~0/g, '~');
+}
+
+/**
  * Resolve a JSON Pointer (RFC6901) against an object. Returns { ok: boolean, value?: any, error?: string }
  */
 function resolveJsonPointer(root, pointer) {
@@ -36,7 +43,7 @@ function resolveJsonPointer(root, pointer) {
     if (!p.startsWith('/')) {
         return { ok: false, error: `Pointer must start with '/': ${pointer}` };
     }
-    const parts = p.split('/').slice(1).map(seg => seg.replace(/~1/g, '/').replace(/~0/g, '~'));
+    const parts = p.split('/').slice(1).map(unescapeJsonPointerToken);
     let current = root;
     for (const key of parts) {
         if (!isObject(current) && !Array.isArray(current)) {
@@ -191,6 +198,128 @@ function stripTopLevelKeys(obj, keysToRemove = []) {
     return clone;
 }
 
+const REF_KEYWORDS = Object.freeze(['$ref', '$dynamicRef', '$recursiveRef']);
+const DYNAMIC_ANCHOR_KEYWORDS = Object.freeze(['$dynamicAnchor', '$recursiveAnchor']);
+
+/**
+ * Whether a sub-tree contains a dynamic anchor. Such schemas may be targeted by
+ * $dynamicRef/$recursiveRef via anchor name instead of JSON Pointer, so they
+ * cannot be shaken away safely.
+ */
+function containsDynamicAnchor(obj) {
+    if (!isObject(obj)) return false;
+    if (Array.isArray(obj)) return obj.some(containsDynamicAnchor);
+    return Object.entries(obj).some(([k, v]) =>
+        DYNAMIC_ANCHOR_KEYWORDS.includes(k) || containsDynamicAnchor(v));
+}
+
+/**
+ * Parse a bundle-internal pointer
+ *   `#/<defsKeyword>/<schemaName>[/<defsKeyword>/<subName>][/...]`
+ * @return {null|{schemaName: string, subName: null|string}}
+ */
+function parseBundleRef(ref, defsKeyword) {
+    if (typeof ref !== 'string' || !ref.startsWith(`#/${defsKeyword}/`)) return null;
+    const segs = ref.slice(2).split('/').map(unescapeJsonPointerToken);
+    const schemaName = segs[1];
+    if (!schemaName) return null;
+    const subName = (segs[2] === defsKeyword && segs[3]) ? segs[3] : null;
+    return { schemaName, subName };
+}
+
+/**
+ * Remove, in place, every embedded definition of `schema[defsKeyword]` that is
+ * not transitively reachable from the schema root via $ref / $dynamicRef / $recursiveRef.
+ *
+ * Granularity:
+ *  - a pointer to `#/<defs>/X` (or into X outside of its defs container) keeps X whole;
+ *  - a pointer to `#/<defs>/X/<defs>/Y` keeps only X.<defs>.Y — the rest of X is dropped;
+ *  - X not reached at all is dropped.
+ *
+ * @param {object} schema - the bundled schema; mutated
+ * @param {string} defsKeyword
+ */
+function treeShakeBundle(schema, defsKeyword) {
+    const defs = schema[defsKeyword];
+    if (!isObject(defs)) return;
+
+    /** Marker: an embedded definition is used as a whole, not just some of its sub-definitions. */
+    const usedWhole = Symbol('used-whole');
+    /** @type {Map<string, typeof usedWhole|Set<string>>} schemaName -> usedWhole | set of used sub-def names */
+    const used = new Map();
+    const queue = [];
+
+    const enqueue = (node) => {
+        collectRefKeywords(node, REF_KEYWORDS).forEach(({ref}) => { queue.push(ref) });
+    };
+
+    const markWhole = (schemaName) => {
+        if (used.get(schemaName) === usedWhole) return;
+        used.set(schemaName, usedWhole);
+        if (schemaName in defs) enqueue(defs[schemaName]);
+    };
+
+    const markSub = (schemaName, subName) => {
+        const current = used.get(schemaName);
+        if (current === usedWhole) return;
+        const set = current || new Set();
+        if (set.has(subName)) return;
+        set.add(subName);
+        used.set(schemaName, set);
+        const target = defs[schemaName]?.[defsKeyword]?.[subName];
+        if (target === undefined) {
+            // Dangling pointer: keep schema whole and let the post-check report it.
+            markWhole(schemaName);
+        } else {
+            enqueue(target);
+        }
+    };
+
+    // Seeds: the root document (without its defs) ...
+    enqueue(stripTopLevelKeys(schema, [defsKeyword]));
+    // ... and every schema that can be reached dynamically by anchor name.
+    for (const [schemaName, defSchema] of Object.entries(defs)) {
+        if (containsDynamicAnchor(defSchema)) markWhole(schemaName);
+    }
+
+    // Worklist fixpoint
+    while (queue.length > 0) {
+        const parsed = parseBundleRef(queue.pop(), defsKeyword);
+        if (!parsed) continue; // external files, URLs, plain anchors: nothing to keep here
+        if (parsed.subName) {
+            markSub(parsed.schemaName, parsed.subName);
+        } else {
+            markWhole(parsed.schemaName);
+        }
+    }
+
+    // Prune in place
+    const before = Object.keys(defs).length;
+    let removedSubDefs = 0;
+    for (const [schemaName, defSchema] of Object.entries(defs)) {
+        const usage = used.get(schemaName);
+        if (!usage) {
+            console.log(`  Removed unused ${defsKeyword} entry '${schemaName}'`);
+            delete defs[schemaName];
+            continue;
+        }
+        if (usage === usedWhole) continue;
+        // Only sub-definitions are referenced: drop the schema body entirely,
+        // keep nothing but the referenced sub-definitions.
+        const keptSubDefs = {};
+        for (const [name, body] of Object.entries(defSchema[defsKeyword] || {})) {
+            if (usage.has(name)) {
+                keptSubDefs[name] = body;
+            } else {
+                console.log(`  Removed unused sub-definition '${schemaName}/${defsKeyword}/${name}'`);
+                removedSubDefs++;
+            }
+        }
+        defs[schemaName] = { [defsKeyword]: keptSubDefs };
+    }
+    console.log(`  ${defsKeyword}: ${before} -> ${Object.keys(defs).length} entries, ${removedSubDefs} sub-definitions removed`);
+}
+
 async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
     try {
         const absoluteModelsDir = path.resolve(modelsDirectory);
@@ -335,7 +464,7 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
         const rootDefPointer = `#/${defsKeyword}/${rootDefName}`;
         const rootDefRefs = collectRefKeywords(
             finalSchema,
-            ['$ref', '$dynamicRef', '$recursiveRef'],
+            REF_KEYWORDS,
             (v) => v === rootDefPointer || v.startsWith(`${rootDefPointer}/`)
         );
         if (rootDefRefs.length > 0) {
@@ -343,11 +472,15 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
             finalSchema[defsKeyword][rootDefName] = rootDefEntry;
         }
 
+        // Tree-shake: drop every definition not reachable from the root
+        console.log('Tree-shaking unused definitions...');
+        treeShakeBundle(finalSchema, defsKeyword);
+
         // Post-check: ensure all internal JSON Pointer refs resolve in the final bundle
         console.log('Validating internal ref pointers ($ref, $dynamicRef, $recursiveRef)...');
         const internalRefs = collectRefKeywords(
             finalSchema,
-            ['$ref', '$dynamicRef', '$recursiveRef'],
+            REF_KEYWORDS,
             (v) => typeof v === 'string' && v.startsWith('#')
         );
         for (const { ref, key, path: refPath } of internalRefs) {
