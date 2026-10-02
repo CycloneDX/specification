@@ -45,31 +45,9 @@
         }
       }
     },
-    "unused": {
-      "title": "Unused",
-      "description": "A module that nothing reachable refers to.",
-      "type": "object",
-      "properties": {
-        "pullsNothingIn": {
-          "$comment": "Even though this refs a module, it is itself unreachable and must not influence shaking.",
-          "title": "Pulls nothing in",
-          "description": "A flag defined by another module.",
-          "$ref": "#/$defs/used-whole/$defs/unusedButKept"
-        }
-      }
-    },
     "used-subdefs-only": {
       "title": "Used sub-defs only",
       "description": "A module of which only individual definitions are referenced.",
-      "type": "object",
-      "properties": {
-        "body": {
-          "$comment": "Lives in the dropped body, so this ref must NOT make unused.schema.json reachable.",
-          "title": "Body",
-          "description": "The body of this module.",
-          "$ref": "#/$defs/unused"
-        }
-      },
       "$defs": {
         "kept": {
           "$comment": "Reached from main. Exercises three ref flavours.",
@@ -102,14 +80,9 @@
           "title": "Kept transitively",
           "description": "A string value.",
           "type": "string"
-        },
-        "dropped": {
-          "$comment": "Not reachable -> shaken away.",
-          "title": "Dropped",
-          "description": "A definition nothing reachable refers to.",
-          "type": "null"
         }
-      }
+      },
+      "not": {}
     },
     "used-whole": {
       "title": "Used whole",
@@ -179,41 +152,15 @@
     "main": {
       "title": "Main",
       "description": "Root document of the bundler test fixtures.",
-      "type": "object",
-      "properties": {
-        "whole": {
-          "$comment": "External ref without fragment -> module is kept as a whole.",
-          "title": "Whole",
-          "description": "A module referenced in its entirety.",
-          "$ref": "#/$defs/used-whole"
-        },
-        "sub": {
-          "$comment": "External ref into a sub-def -> only that sub-def (and what it reaches) is kept.",
-          "title": "Sub",
-          "description": "A single definition of another module.",
-          "$ref": "#/$defs/used-subdefs-only/$defs/kept"
-        },
-        "local": {
-          "$comment": "Internal ref -> rewritten to #/$defs/main/$defs/mainLocal, so the root's own def entry must be emitted.",
-          "title": "Local",
-          "description": "A definition of this very schema.",
-          "$ref": "#/$defs/main/$defs/mainLocal"
-        }
-      },
       "$defs": {
         "mainLocal": {
           "$comment": "Referenced from main itself and from used-subdefs-only.",
           "title": "Main local",
           "description": "A local string definition of the root schema.",
           "type": "string"
-        },
-        "mainUnused": {
-          "$comment": "Never referenced -> shaken away from #/$defs/main/$defs.",
-          "title": "Main unused",
-          "description": "A definition nothing refers to.",
-          "type": "null"
         }
-      }
+      },
+      "not": {}
     }
   }
 }
