@@ -15,7 +15,7 @@ import { LintCheck, registerCheck, Severity } from '../index.js';
 /**
  * Property order for model schemas
  */
-const ORDER = ['$schema', '$id', 'type', 'title', '$comment', 'description', '$defs'];
+const ORDER = ['$schema', '$id', 'not', 'title', '$comment', 'description', '$defs'];
 /**
  * Which of the ordered properties are optional.
  */
