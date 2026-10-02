@@ -1,0 +1,77 @@
+name: Generate Perspectives Registry
+
+on:
+  push:
+    branches:
+      - 'master'
+      - 'main'
+      - '2.0-dev'
+    paths:
+      - '.github/workflows/generate_perspectives_registry.yml' # self
+      - 'tools/src/main/js/perspectives-registry/**'
+      - 'schema/perspectives-defs.schema.json'
+      - 'perspectives/**'
+  workflow_dispatch:  # Allows manual trigger
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token
+permissions: {}
+
+jobs:
+  generate-registry:
+    name: Generate Registry
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write  # Required to push the update branch
+      pull-requests: write  # Required to open the pull request
+    env:
+      REGISTRY_FILE: schema/perspectives-defs.json
+      BASE_BRANCH: ${{ github.ref_name }}
+      UPDATE_BRANCH: update-perspectives-registry/${{ github.ref_name }}
+    steps:
+      - name: Checkout repository
+        # see https://github.com/actions/checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup Node.js
+        # see https://github.com/actions/setup-node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24.x'
+      - name: Generate registry
+        # registers catalog document versions that are not registered yet;
+        # fails if a catalog document changed without a version bump
+        run: |
+          set -eux
+          node tools/src/main/js/perspectives-registry/generate-perspectives-registry.js
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -eu
+
+          if git diff --quiet -- "$REGISTRY_FILE"
+          then
+            echo "No changes to the perspectives registry"
+            exit 0
+          fi
+
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+          git checkout -b "$UPDATE_BRANCH"
+          git add "$REGISTRY_FILE"
+          git commit -m "chore: update perspectives registry"
+
+          git push -u "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$UPDATE_BRANCH" --force
+
+          gh pr create \
+            --title "chore: update perspectives registry" \
+            --body "This PR updates \`${REGISTRY_FILE}\` with the catalog document versions registered by \`tools/src/main/js/perspectives-registry/generate-perspectives-registry.js\` for \`${BASE_BRANCH}\`." \
+            --base "$BASE_BRANCH" \
+            --head "$UPDATE_BRANCH" || echo "Pull request already exists"
