@@ -56,10 +56,11 @@ console.debug('DEBUG | schemaModelDir = ', schemaModelDir);
 
 // endregion config
 
-const [spdxSchema, cryptoDefsSchema, behaviorTaxonomySchema, schemas, schemaModules] = await Promise.all([
+const [spdxSchema, cryptoDefsSchema, behaviorTaxonomySchema, perspectivesDefsSchema, schemas, schemaModules] = await Promise.all([
     readFile(join(schemaRootDir, 'spdx.schema.json'), 'utf-8').then(JSON.parse),
     readFile(join(schemaRootDir, 'cryptography-defs.schema.json'), 'utf-8').then(JSON.parse),
     readFile(join(schemaRootDir, 'behavior-taxonomy.schema.json'), 'utf-8').then(JSON.parse),
+    readFile(join(schemaRootDir, 'perspectives-defs.schema.json'), 'utf-8').then(JSON.parse),
     Promise.all(schemaFiles.map(
         f => readFile(f, 'utf-8').then(s => [f, JSON.parse(s)])
     )),
@@ -95,6 +96,7 @@ function getAjv(bundled) {
     ajv.addSchema(spdxSchema, 'https://cyclonedx.org/schema/spdx.schema.json')
     ajv.addSchema(cryptoDefsSchema, 'https://cyclonedx.org/schema/cryptography-defs.schema.json')
     ajv.addSchema(behaviorTaxonomySchema, 'https://cyclonedx.org/schema/behavior-taxonomy.schema.json')
+    ajv.addSchema(perspectivesDefsSchema, 'https://cyclonedx.org/schema/perspectives-defs.schema.json')
     if (!bundled) {
         for (const [f, s] of schemaModules) {
             ajv.addSchema(s, `https://cyclonedx.org/schema/${testschemaVersion}/model/${f}`)
