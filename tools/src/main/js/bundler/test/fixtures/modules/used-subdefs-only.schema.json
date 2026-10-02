@@ -1,40 +1,55 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "http://example.com/test/modules/used-subdefs-only.schema.json",
-  "$comment": "Only sub-defs of this module are referenced -> everything but the referenced $defs is dropped.",
+  "$comment": "FIXTURE: only sub-defs of this module are referenced -> everything but the referenced $defs is dropped. The top-level title/description live in the dropped body and must not appear in the snapshots.",
   "title": "Used sub-defs only",
+  "description": "A module of which only individual definitions are referenced.",
   "type": "object",
   "properties": {
     "body": {
       "$comment": "Lives in the dropped body, so this ref must NOT make unused.schema.json reachable.",
+      "title": "Body",
+      "description": "The body of this module.",
       "$ref": "unused.schema.json"
     }
   },
   "$defs": {
     "kept": {
       "$comment": "Reached from main. Exercises three ref flavours.",
+      "title": "Kept",
+      "description": "A definition that is reached directly from the root schema.",
       "type": "object",
       "properties": {
         "shared": {
           "$comment": "Cross-module ref into another module's sub-def.",
+          "title": "Shared",
+          "description": "A value defined by another module.",
           "$ref": "used-whole.schema.json#/$defs/sharedByOther"
         },
         "fromMain": {
           "$comment": "Ref back into the root schema -> #/$defs/main/$defs/mainLocal.",
+          "title": "From main",
+          "description": "A value defined by the root schema.",
           "$ref": "../main.schema.json#/$defs/mainLocal"
         },
         "chain": {
           "$comment": "Internal ref -> transitively keeps keptTransitively.",
+          "title": "Chain",
+          "description": "A value defined further down in this module.",
           "$ref": "#/$defs/keptTransitively"
         }
       }
     },
     "keptTransitively": {
       "$comment": "Only reachable via kept.chain.",
+      "title": "Kept transitively",
+      "description": "A string value.",
       "type": "string"
     },
     "dropped": {
       "$comment": "Not reachable -> shaken away.",
+      "title": "Dropped",
+      "description": "A definition nothing reachable refers to.",
       "type": "null"
     }
   }
