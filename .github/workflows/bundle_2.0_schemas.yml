@@ -28,7 +28,7 @@ jobs:
     permissions:
       contents: write  # Required to push changes
     env:
-      MODEL_DIR: schema/2.0/model
+      MODULES_DIR: schema/2.0/modules
       SOURCE_FILE: schema/2.0/cyclonedx-2.0.schema.json
       BUNDLED_FILE: schema/2.0/cyclonedx-2.0-bundled.schema.json
       MINIFIED_FILE: schema/2.0/cyclonedx-2.0-bundled.min.schema.json
@@ -50,7 +50,7 @@ jobs:
         run: |
           set -eux
           node tools/src/main/js/bundler/bundle-schemas.js \
-            "$MODEL_DIR" "$SOURCE_FILE"
+            "$MODULES_DIR" "$SOURCE_FILE"
       - name: Check for changes and commit
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

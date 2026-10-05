@@ -23,12 +23,12 @@ const _thisDir = dirname(fileURLToPath(import.meta.url))
 const testschemaVersion = (parseArgs({options: {v: {type: 'string', short: 'v'}}}).values.v ?? '').trim()
 const schemaRootDir = join(_thisDir, '..', '..', '..', '..', '..', 'schema')
 const schemaDir = join(schemaRootDir, testschemaVersion)
-const schemaModelDir = join(schemaDir, `model`)
+const schemaModulesDir = join(schemaDir, `modules`)
 
 const schemaGlob = '*.schema.json'
 
 const expectedRefIdTypeFP = Object.freeze([
-    join(schemaModelDir, `cyclonedx-common-${testschemaVersion}.schema.json`),
+    join(schemaModulesDir, `cyclonedx-common-${testschemaVersion}.schema.json`),
     '#/$defs/refIdType'
 ])
 
@@ -37,10 +37,10 @@ if (testschemaVersion.length === 0) {
 }
 console.debug('DEBUG | testschemaVersion = ', testschemaVersion);
 
-if (!await stat(schemaModelDir).then(s => s.isDirectory()).catch(() => false)) {
-    throw new Error(`missing schemaModelDir: ${schemaModelDir}`);
+if (!await stat(schemaModulesDir).then(s => s.isDirectory()).catch(() => false)) {
+    throw new Error(`missing schemaModulesDir: ${schemaModulesDir}`);
 }
-console.debug('DEBUG | schemaModelDir = ', schemaModelDir);
+console.debug('DEBUG | schemaModulesDir = ', schemaModulesDir);
 
 if (!await stat(expectedRefIdTypeFP[0]).then(s => s.isFile()).catch(() => false)) {
     throw new Error(`missing expectedRefIdTypeFP file: ${expectedRefIdTypeFP[0]}`);
@@ -50,7 +50,7 @@ console.debug('DEBUG | expectedRefIdTypeFP = ', expectedRefIdTypeFP);
 const schemaFiles = Object.freeze([
     // test only the source schema, not the bundled for now ...
     join(schemaDir, `cyclonedx-${testschemaVersion}.schema.json`),
-    ...(await glob(join(schemaDir, `model`, schemaGlob))).sort(alphaSort)
+    ...(await glob(join(schemaDir, `modules`, schemaGlob))).sort(alphaSort)
 ])
 for (const schemaFile of schemaFiles) {
     if (!await stat(schemaFile).then(s => s.isFile()).catch(() => false)) {
