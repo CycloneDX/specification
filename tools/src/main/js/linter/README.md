@@ -53,8 +53,8 @@ node cli.js schema.json
 | `enum-value-no-other` | Enum values must not be literal "other"; use custom-object style instead |
 | `formatting-indent` | Validates 2-space indentation, no tabs, no trailing whitespace, LF line endings |
 | `meta-enum-full-stop` | `meta:enum` values must end with a full stop |
-| `model-property-order` | Validates model schemas have (optional) properties in order: `$schema`, `$id`, `type`, `title`, `$comment`, \[`description`\], `$defs` |
-| `model-structure` | Validates model schemas have `type: "null"`, `$defs`, and no `properties` |
+| `model-property-order` | Validates module schemas have (optional) properties in order: `$schema`, `$id`, `type`, `title`, `$comment`, \[`description`\], `$defs` |
+| `model-structure` | Validates module schemas have `type: "null"`, `$defs`, and no `properties` |
 | `no-deprecated` | No deprecated schemas (`deprecated: true`); optionally (default: on) no deprecation marker (configurable regex) in docs keys (configurable, default `$comment`/`title`/`description`) or `meta:enum` docs |
 | `no-must-word` | Use "shall" instead of "must" per ISO House Style |
 | `no-todos` | No TODO markers in the schema |
