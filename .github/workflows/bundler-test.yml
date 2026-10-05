@@ -1,0 +1,49 @@
+name: Test Bundler
+
+on:
+  push:
+    branches:
+      - 'master'
+      - 'main'
+      - '2.0-dev'
+    paths:
+      - '.github/workflows/test_bundler.yml' # self
+      - 'tools/src/main/js/bundler/**'
+  pull_request:
+    paths:
+      - '.github/workflows/test_bundler.yml' # self
+      - 'tools/src/main/js/bundler/**'
+  workflow_dispatch:  # Allows manual trigger
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token
+permissions: {}
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: tools/src/main/js/bundler
+    steps:
+      - name: Checkout repository
+        # see https://github.com/actions/checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup Node.js
+        # see https://github.com/actions/setup-node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24.x'
+      - name: Install dependencies
+        run: npm ci --no-fund --no-audit
+      - name: Run tests
+        run: npm test

@@ -36,6 +36,7 @@ export async function loadAllChecks() {
 
 // Export individual check modules for registration and direct access if needed
 export * from './cdx2-reftype-usage.check.js';
+export * from './const-enum-no-type.check.js';
 export * from './description-full-stop.check.js';
 export * from './description-oxford-english.check.js';
 export * from './duplicate-content.check.js';
@@ -44,8 +45,8 @@ export * from './enum-value-formatting.check.js';
 export * from './enum-value-no-other.check.js';
 export * from './formatting-indent.check.js';
 export * from './meta-enum-full-stop.check.js';
-export * from './model-property-order.check.js';
-export * from './model-structure.check.js';
+export * from './module-property-order.check.js';
+export * from './module-structure.check.js';
 export * from './no-deprecated.check.js';
 export * from './no-must-word.check.js';
 export * from './no-todos.check.js';
