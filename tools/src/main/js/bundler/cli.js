@@ -30,7 +30,7 @@ const main = async (entryFile, includeDir) => {
     const minifiedFile = toMinifiedName(bundledFile);
 
     const {schema, ...bundled} = await bundle(entryFile, includeDir);
-    schema.$id = toBundledName(schema.$id);
+    schema.$id = (schema.$id);
 
     const shaken = treeShake(schema);
 

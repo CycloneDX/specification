@@ -21,10 +21,6 @@ const FIXTURES_DIR = fileURLToPath(new URL("./fixtures", import.meta.url));
 const SNAPSHOT_DIR = fileURLToPath(new URL("./snapshot", import.meta.url));
 const ROOT_SCHEMA = 'main.schema.json';
 const MODULES_DIR = 'modules';
-const OUTPUT_FILES = [
-    'main-bundled.schema.json',
-    'main-bundled.min.schema.json'
-];
 
 async function main() {
     // Work on a copy so the bundler's output never lands in fixtures/
@@ -32,10 +28,13 @@ async function main() {
     try {
         fs.cpSync(FIXTURES_DIR, workDir, {recursive: true});
 
-        const report = await cliMain(
+        const {bundledFile, minifiedFile, ...report} = await cliMain(
             path.join(workDir, ROOT_SCHEMA),
             path.join(workDir, MODULES_DIR),
         );
+
+        const reportFile = path.join(workDir, 'report.json');
+        fs.writeFileSync(reportFile, JSON.stringify(report, null, 2), 'utf8');
 
         console.log(`\n--- ${UPDATE_SNAPSHOTS ? 'Updating' : 'Checking'} snapshots ---`);
         if (UPDATE_SNAPSHOTS) {
@@ -43,9 +42,9 @@ async function main() {
         }
 
         let failures = 0;
-        for (const file of OUTPUT_FILES) {
-            const actual = fs.readFileSync(path.join(workDir, file), 'utf8');
-            const snapshotPath = path.join(SNAPSHOT_DIR, file);
+        for (const file of [bundledFile, minifiedFile, reportFile]) {
+            const actual = fs.readFileSync(file, 'utf8');
+            const snapshotPath = path.join(SNAPSHOT_DIR, path.basename(file));
 
             if (UPDATE_SNAPSHOTS) {
                 fs.writeFileSync(snapshotPath, actual);

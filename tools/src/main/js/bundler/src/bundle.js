@@ -5,12 +5,11 @@ export async function bundle(entryFile, includeDir) {
     const external = [];
 
     const schema = JSON.parse(await readFile(entryFile, 'utf8'));
-
-    // TODO
+    // TODO bundling - exclude everything that is not in `includeDir` or has a schema - `https?:...`
 
     return {
-        embedded,
-        external,
         schema,
+        embedded: Object.freeze(embedded.sort()),
+        external: Object.freeze(external.sort()),
     };
 }
