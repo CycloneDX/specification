@@ -5,6 +5,8 @@ const HOLLOW_COMMENT =
 /**
  * Tree-shake a schema in place.
  *
+ * Supports references only, no support for anchors, yet.
+ *
  * Removes non-reachable definitions.
  * Hollows non-reachable definitions, when sub-definitions are kept.
  *   Hollowed schemas are marked with `"not": { "$comment": HOLLOW_COMMENT }"`.

@@ -2,6 +2,9 @@ import { readFile } from 'node:fs/promises';
 
 /**
  * Load and bundle a schema.
+ *
+ * Supports references only, no support for anchors, yet.
+ *
  * @param {string} entryFile
  * @param {string} includeDir
  * @return {Promise<{schema: any, embedded: ReadonlyArray<string>, external: ReadonlyArray<string>}>}
