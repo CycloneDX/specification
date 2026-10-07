@@ -1,9 +1,9 @@
 /**
  * CycloneDX Schema Linter - Schema Comment Check
- * 
+ *
  * Validates that the root $comment property contains the required
  * OWASP CycloneDX standard notice.
- * 
+ *
  * @license Apache-2.0
  */
 
@@ -29,9 +29,10 @@ class SchemaCommentCheck extends LintCheck {
 
   async run(schema, rawContent, config = {}) {
     const issues = [];
-    
+
     const requiredComment = config.requiredComment ?? REQUIRED_COMMENT;
-    
+    const requiredCommentPattern = config.requiredCommentPattern;
+
     // Check if $comment exists at root level
     if (!('$comment' in schema)) {
       issues.push(this.createIssue(
@@ -41,19 +42,46 @@ class SchemaCommentCheck extends LintCheck {
       ));
       return issues;
     }
-    
-    // Check if $comment matches required value
-    if (schema.$comment !== requiredComment) {
+
+    const comment = schema.$comment;
+    if (typeof comment !== 'string') {
+      issues.push(this.createIssue(
+        'Schema $comment is not string.',
+        '$.$comment',
+        {
+          actual: comment,
+          expected: 'any string'
+        }
+      ));
+      return issues;
+    }
+
+    if (typeof requiredCommentPattern === 'string') {
+      const requiredCommentRE = new RegExp(requiredCommentPattern);
+      // Check if $comment matches required pattern
+      if (!requiredCommentRE.test(comment)) {
+        issues.push(this.createIssue(
+          '$comment does not match the required standard notice pattern.',
+          '$.$comment',
+          {
+            actual: comment,
+            expected: `matches ${requiredCommentRE.toString()}`
+          }
+        ));
+      }
+    }
+    // Check if $comment exactly matches required value
+    else if (comment !== requiredComment) {
       issues.push(this.createIssue(
         '$comment does not match the required standard notice.',
         '$.$comment',
         {
-          actual: schema.$comment,
+          actual: comment,
           expected: requiredComment
         }
       ));
     }
-    
+
     return issues;
   }
 }
