@@ -9,7 +9,7 @@
 
 /**
  * Stack of unescaped JSON Pointer tokens.
- * @typedef  {string[]} JsonPointerStack
+ * @typedef {string[]} JsonPointerStack
  */
 
 
@@ -38,7 +38,7 @@ export function jsonPointer4stack(s) {
 
 
 /**
- * Escape a JSON Pointer token..
+ * Escape a JSON Pointer token.
  * @param {string} p
  * @return {string}
  */
