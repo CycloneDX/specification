@@ -1,6 +1,9 @@
+import {JSON_SCHEMA_RE} from './common.js'
+
 /**
  * CycloneDX specifics.
  */
+
 
 const CDX_MODULE_NAME_RE = Object.freeze(/^cyclonedx-(.+)-\d\.\d.schema.json$/);
 
@@ -12,6 +15,7 @@ const CDX_MODULE_NAME_RE = Object.freeze(/^cyclonedx-(.+)-\d\.\d.schema.json$/);
  */
 export function makeModuleName(s) {
     const match = s.match(CDX_MODULE_NAME_RE);
-    if (match === null) { throw new Error(`Failed making module name from "${s}"`); }
-    return match[1];
+    return match === null
+        ? s.replace(JSON_SCHEMA_RE, '')
+        : match[1];
 }

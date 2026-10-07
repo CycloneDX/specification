@@ -1,34 +1,59 @@
 #!/usr/bin/env node
 
-import {writeFile, stat} from 'node:fs/promises';
+import {glob, stat, writeFile} from 'node:fs/promises';
+import {join} from 'node:path'
 
 import {bundle} from './src/bundle.js';
 import {dropCommentsExceptRoot} from './src/cleanup.js';
 import {treeShake} from './src/tree-shake.js';
-import {EXT_JSON, EXT_SCHEMA_RE} from './src/helpers/common.js';
+import {JSON_SCHEMA_RE, JSON_SCHEMA_EXT} from './src/helpers/common.js';
 
-/** `…/foo.schema.json` -> `…/foo-bundled.schema.json` */
+/**
+ * Suffix basename with `-bundled`.
+ *
+ *  `…/foo.schema.json` -> `…/foo-bundled.schema.json`
+ *
+ * @param {string} s
+ * @return {string}
+ */
 const toBundledName = (s) => {
-    if (!s.endsWith(EXT_JSON)) {
-        throw new Error(`expected "*${EXT_JSON}", got ${s}`);
+    if (!s.endsWith(JSON_SCHEMA_EXT)) {
+        throw new Error(`expected "*${JSON_SCHEMA_EXT}", got ${s}`);
     }
-    return s.replace(EXT_SCHEMA_RE, '-bundled$&');
+    return s.replace(JSON_SCHEMA_RE, '-bundled$&');
 };
 
-/** `…/foo.schema.json` -> `…/foo.min.schema.json` */
+/**
+ * Suffix basename with `.min`.
+ *
+ * `…/foo.schema.json` -> `…/foo.min.schema.json`
+ *
+ * @param {string} s
+ * @return {string}
+ */
 const toMinifiedName = (s) => {
-    if (!s.endsWith(EXT_JSON)) {
-        throw new Error(`expected "*${EXT_JSON}", got ${s}`);
+    if (!s.endsWith(JSON_SCHEMA_EXT)) {
+        throw new Error(`expected "*${JSON_SCHEMA_EXT}", got ${s}`);
     }
-    return s.replace(EXT_SCHEMA_RE, '.min$&');
+    return s.replace(JSON_SCHEMA_RE, '.min$&');
 };
 
+/**
+ *
+ * @param {string} entryFile
+ * @param {string} includeDir
+ */
 const main = async (entryFile, includeDir) => {
     const bundledFile = toBundledName(entryFile);
     const minifiedFile = toMinifiedName(bundledFile);
 
-    const {schema, ...bundled} = await bundle(entryFile, includeDir);
-    schema.$id = (schema.$id);
+    const {schema, ...bundled} = await bundle(
+        entryFile,
+        (await Array.fromAsync(
+            glob(join(includeDir, `**${JSON_SCHEMA_EXT}`))
+        )).sort(),
+        bundledFile);
+    schema.$id = toBundledName(schema.$id);
 
     const shaken = treeShake(schema);
 
@@ -53,17 +78,17 @@ export default main;
 if (import.meta.main) {
     const E_INVALID = 1;
     const E_ERROR = 2;
-
     const [, , includeDir, entryFile] = process.argv;
     if (!includeDir || !entryFile) {
-        const entry = './schema/2.0/cyclonedx-2.0.schema.json';
+        const modules = join('schema', '2.0', 'modules');
+        const entry = join('schema', '2.0', 'cyclonedx-2.0.schema.json');
         const bundled = toBundledName(entry);
         const minified = toMinifiedName(bundled);
         console.log('Usage: node cli.js <modules-directory> <root-schema-path>');
         console.log('');
         console.log('Example:');
         console.log(`  node cli.js \\`);
-        console.log('    ./schema/2.0/modules \\');
+        console.log(`    ${modules} \\`);
         console.log(`    ${entry}`);
         console.log('');
         console.log('This will create:');

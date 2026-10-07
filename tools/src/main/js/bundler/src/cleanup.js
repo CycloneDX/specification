@@ -1,8 +1,6 @@
 
 import { DATA_KEYWORDS } from './helpers/json-schema-spec.js';
 
-const DATA_KEYWORDS_SET = Object.freeze(new Set(DATA_KEYWORDS));
-
 /**
  * Remove $comment in place - except from schema root.
  * @param {*} schema
@@ -12,7 +10,7 @@ export function dropCommentsExceptRoot(schema) {
         throw new Error('expected a schema');
     }
     for (const [k, v] of Object.entries(schema)) {
-        if (DATA_KEYWORDS_SET.has(k)) { continue; }
+        if (DATA_KEYWORDS.has(k)) { continue; }
         dropComments(v);
     }
 }
@@ -31,7 +29,7 @@ export function dropComments(schema) {
     }
     delete schema.$comment;
     for (const [k, v] of Object.entries(schema)) {
-        if (DATA_KEYWORDS_SET.has(k)) { continue; }
+        if (DATA_KEYWORDS.has(k)) { continue; }
         dropComments(v);
     }
 }

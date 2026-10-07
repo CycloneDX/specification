@@ -2,12 +2,23 @@
  * Common constants and functions.
  */
 
-/**
- * File extension for JSON files.
- */
-export const EXT_JSON = '.json';
+import {readFile} from 'node:fs/promises';
 
 /**
- * Regex matching json schema files.
+ * File extension for JSON schema files.
  */
-export const EXT_SCHEMA_RE = Object.freeze(/(?:\.schema)?\.json$/);
+export const JSON_SCHEMA_EXT = '.schema.json';
+
+/**
+ * Regex matching JSON schema files.
+ */
+export const JSON_SCHEMA_RE = Object.freeze(new RegExp(`${RegExp.escape(JSON_SCHEMA_EXT)}$`));
+
+/**
+ * Get JSON file.
+ * @param {string} file
+ * @return {Promise<any>}
+ */
+export async function getJsonfile (file) {
+    return JSON.parse(await readFile(file, 'utf8'));
+}
