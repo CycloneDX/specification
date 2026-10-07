@@ -5,196 +5,202 @@
   "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
   "version": 1,
   "metadata": {
-    "timestamp": "2021-01-10T12:00:00Z",
-    "component": {
-      "bom-ref": "acme-stock-application",
-      "type": "application",
-      "name": "Acme SaaSBOM Example",
-      "version": "2022-1"
+    "timestamp": "2021-01-10T12:00:00Z"
+  },
+  "definitions": {
+    "profiles": {
+      "dataProfiles": [
+        {
+          "bom-ref": "profile-customer",
+          "name": "Customer Data",
+          "classification": "confidential",
+          "informationTypes": [
+            "pii"
+          ],
+          "subjects": [
+            {
+              "name": "Acme Customers",
+              "type": "group",
+              "regulations": [
+                "GDPR",
+                "CCPA"
+              ]
+            }
+          ]
+        },
+        {
+          "bom-ref": "profile-pii",
+          "name": "Personally Identifiable Information",
+          "classification": "confidential",
+          "informationTypes": [
+            "pii"
+          ]
+        },
+        {
+          "bom-ref": "profile-pifi",
+          "name": "Personally Identifiable Financial Information",
+          "classification": "confidential",
+          "informationTypes": [
+            "pii",
+            "financial"
+          ]
+        },
+        {
+          "bom-ref": "profile-public",
+          "name": "Public Market Data",
+          "classification": "public"
+        }
+      ]
     }
   },
-  "profiles": {
-    "dataProfiles": [
-      {
-        "bom-ref": "profile-customer",
-        "name": "Customer Data",
-        "classification": "confidential",
-        "informationTypes": [
-          "pii"
-        ],
-        "subjects": [
-          {
-            "name": "Acme Customers",
-            "type": "group",
-            "regulations": [
-              "GDPR",
-              "CCPA"
-            ]
-          }
-        ]
-      },
-      {
-        "bom-ref": "profile-pii",
-        "name": "Personally Identifiable Information",
-        "classification": "confidential",
-        "informationTypes": [
-          "pii"
-        ]
-      },
-      {
-        "bom-ref": "profile-pifi",
-        "name": "Personally Identifiable Financial Information",
-        "classification": "confidential",
-        "informationTypes": [
-          "pii",
-          "financial"
-        ]
-      },
-      {
-        "bom-ref": "profile-public",
-        "name": "Public Market Data",
-        "classification": "public"
-      }
-    ]
-  },
-  "components": [
+  "inventories": [
     {
-      "bom-ref": "stock-ticker-service",
-      "type": "service",
-      "parties": [
-        {
-          "bom-ref": "party-acme",
-          "roles": [
-            {
-              "role": "provider"
-            }
-          ],
-          "organization": {
-            "name": "Acme Inc",
-            "url": [
-              {
-                "name": "homepage",
-                "url": "https://example.com"
-              }
-            ]
-          }
-        }
-      ],
-      "group": "com.example",
-      "name": "Stock Ticker Service",
-      "version": "2022-1",
-      "endpoints": [
-        "https://example.com/",
-        "https://example.com/app"
-      ],
-      "dataProfiles": [
-        "profile-customer",
-        "profile-pii",
-        "profile-pifi",
-        "profile-public"
-      ],
-      "externalReferences": [
-        {
-          "type": "documentation",
-          "url": "https://example.com/app/swagger"
-        }
-      ],
+      "subject": {
+        "bom-ref": "acme-stock-application",
+        "type": "application",
+        "name": "Acme SaaSBOM Example",
+        "version": "2022-1"
+      },
       "components": [
         {
-          "bom-ref": "ms-1.example.com",
+          "bom-ref": "stock-ticker-service",
           "type": "service",
           "parties": [
-            "party-acme"
-          ],
-          "group": "com.example",
-          "name": "Microservice 1",
-          "version": "2022-1",
-          "description": "Example Microservice",
-          "endpoints": [
-            "https://ms-1.example.com"
-          ],
-          "dataProfiles": [
-            "profile-pii"
-          ],
-          "externalReferences": [
             {
-              "type": "documentation",
-              "url": "https://ms-1.example.com/swagger"
+              "bom-ref": "party-acme",
+              "roles": [
+                {
+                  "role": "provider"
+                }
+              ],
+              "organization": {
+                "name": "Acme Inc",
+                "url": [
+                  {
+                    "name": "homepage",
+                    "url": "https://example.com"
+                  }
+                ]
+              }
             }
-          ]
-        },
-        {
-          "bom-ref": "ms-2.example.com",
-          "type": "service",
-          "parties": [
-            "party-acme"
           ],
           "group": "com.example",
-          "name": "Microservice 2",
+          "name": "Stock Ticker Service",
           "version": "2022-1",
-          "description": "Example Microservice",
           "endpoints": [
-            "https://ms-2.example.com"
+            "https://example.com/",
+            "https://example.com/app"
           ],
           "dataProfiles": [
-            "profile-pifi"
-          ],
-          "externalReferences": [
-            {
-              "type": "documentation",
-              "url": "https://ms-2.example.com/swagger"
-            }
-          ]
-        },
-        {
-          "bom-ref": "ms-3.example.com",
-          "type": "service",
-          "parties": [
-            "party-acme"
-          ],
-          "group": "com.example",
-          "name": "Microservice 3",
-          "version": "2022-1",
-          "description": "Example Microservice",
-          "endpoints": [
-            "https://ms-3.example.com"
-          ],
-          "dataProfiles": [
+            "profile-customer",
+            "profile-pii",
+            "profile-pifi",
             "profile-public"
           ],
           "externalReferences": [
             {
               "type": "documentation",
-              "url": "https://ms-3.example.com/swagger"
+              "url": "https://example.com/app/swagger"
             }
-          ]
-        },
-        {
-          "bom-ref": "ms-1-pgsql.example.com",
-          "type": "service",
-          "group": "org.postgresql",
-          "name": "Postgres",
-          "version": "14.1",
-          "description": "Postgres database for Microservice #1",
-          "endpoints": [
-            "https://ms-1-pgsql.example.com:5432"
           ],
-          "dataProfiles": [
-            "profile-pii"
-          ]
-        },
-        {
-          "bom-ref": "s3-example.amazon.com",
-          "type": "service",
-          "isExternal": true,
-          "group": "com.amazon",
-          "name": "S3",
-          "description": "S3 bucket",
-          "endpoints": [
-            "https://s3-example.amazon.com"
-          ],
-          "dataProfiles": [
-            "profile-public"
+          "components": [
+            {
+              "bom-ref": "ms-1.example.com",
+              "type": "service",
+              "parties": [
+                "party-acme"
+              ],
+              "group": "com.example",
+              "name": "Microservice 1",
+              "version": "2022-1",
+              "description": "Example Microservice",
+              "endpoints": [
+                "https://ms-1.example.com"
+              ],
+              "dataProfiles": [
+                "profile-pii"
+              ],
+              "externalReferences": [
+                {
+                  "type": "documentation",
+                  "url": "https://ms-1.example.com/swagger"
+                }
+              ]
+            },
+            {
+              "bom-ref": "ms-2.example.com",
+              "type": "service",
+              "parties": [
+                "party-acme"
+              ],
+              "group": "com.example",
+              "name": "Microservice 2",
+              "version": "2022-1",
+              "description": "Example Microservice",
+              "endpoints": [
+                "https://ms-2.example.com"
+              ],
+              "dataProfiles": [
+                "profile-pifi"
+              ],
+              "externalReferences": [
+                {
+                  "type": "documentation",
+                  "url": "https://ms-2.example.com/swagger"
+                }
+              ]
+            },
+            {
+              "bom-ref": "ms-3.example.com",
+              "type": "service",
+              "parties": [
+                "party-acme"
+              ],
+              "group": "com.example",
+              "name": "Microservice 3",
+              "version": "2022-1",
+              "description": "Example Microservice",
+              "endpoints": [
+                "https://ms-3.example.com"
+              ],
+              "dataProfiles": [
+                "profile-public"
+              ],
+              "externalReferences": [
+                {
+                  "type": "documentation",
+                  "url": "https://ms-3.example.com/swagger"
+                }
+              ]
+            },
+            {
+              "bom-ref": "ms-1-pgsql.example.com",
+              "type": "service",
+              "group": "org.postgresql",
+              "name": "Postgres",
+              "version": "14.1",
+              "description": "Postgres database for Microservice #1",
+              "endpoints": [
+                "https://ms-1-pgsql.example.com:5432"
+              ],
+              "dataProfiles": [
+                "profile-pii"
+              ]
+            },
+            {
+              "bom-ref": "s3-example.amazon.com",
+              "type": "service",
+              "isExternal": true,
+              "group": "com.amazon",
+              "name": "S3",
+              "description": "S3 bucket",
+              "endpoints": [
+                "https://s3-example.amazon.com"
+              ],
+              "dataProfiles": [
+                "profile-public"
+              ]
+            }
           ]
         }
       ]
