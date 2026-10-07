@@ -1,10 +1,11 @@
 
-import { DATA_KEYWORDS } from './json-schema-spec.js';
+import { DATA_KEYWORDS } from './helpers/json-schema-spec.js';
 
 const DATA_KEYWORDS_SET = Object.freeze(new Set(DATA_KEYWORDS));
 
 /**
- * Remove $comment in place - except from root
+ * Remove $comment in place - except from schema root.
+ * @param {*} schema
  */
 export function dropCommentsExceptRoot(schema) {
     if (typeof schema !== 'object' || schema === null || Array.isArray(schema)) {
@@ -18,8 +19,9 @@ export function dropCommentsExceptRoot(schema) {
 
 /**
  * Remove $comment in place
+ * @param {*} schema
  */
-function dropComments(schema) {
+export function dropComments(schema) {
     if (typeof schema !== 'object' || schema === null) {
         return;
     }
