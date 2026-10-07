@@ -1,0 +1,56 @@
+{
+  "specFormat": "CycloneDX",
+  "specVersion": "2.0",
+  "serialNumber": "urn:uuid:a1b2c3d4-0002-4abc-8def-1122334455bb",
+  "version": 1,
+  "blueprints": [
+    {
+      "bom-ref": "bp-request-pipeline",
+      "name": "API request handling pipeline",
+      "modelTypes": [
+        "process"
+      ],
+      "behaviors": {
+        "graphs": [
+          {
+            "bom-ref": "pg-request",
+            "name": "Request handling pipeline",
+            "kind": "activity",
+            "ordering": "sequential",
+            "trigger": "api-call",
+            "nodes": [
+              {
+                "bom-ref": "n-receive",
+                "kind": "activity",
+                "ordinal": 1,
+                "behavior": "data:ingestion:receivesRequest",
+                "name": "Receive request"
+              },
+              {
+                "bom-ref": "n-authenticate",
+                "kind": "activity",
+                "ordinal": 2,
+                "behavior": "security:authentication:authenticatesUser",
+                "name": "Authenticate caller"
+              },
+              {
+                "bom-ref": "n-backend",
+                "kind": "activity",
+                "ordinal": 3,
+                "behavior": "network:connection:establishesConnection",
+                "name": "Call backend service"
+              },
+              {
+                "bom-ref": "n-log",
+                "kind": "activity",
+                "ordinal": 4,
+                "behavior": "security:auditing:logsEvent",
+                "name": "Log the transaction"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
