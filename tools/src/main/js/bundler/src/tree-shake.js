@@ -7,7 +7,7 @@ const HOLLOW_COMMENT =
  *
  * Removes non-reachable definitions.
  * Hollows non-reachable definitions, when sub-definitions are kept.
- *   Hollowed schemas are marked with `"not: { "$comment": HOLLOW_COMMENT }"`.
+ *   Hollowed schemas are marked with `"not": { "$comment": HOLLOW_COMMENT }"`.
  *
  * @param {*} schema
  */

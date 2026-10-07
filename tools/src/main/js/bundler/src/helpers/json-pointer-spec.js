@@ -1,3 +1,8 @@
+/**
+ * Constants and function related to JSON Pointer Schema Specification (RFC 6901).
+ */
+
+
 
 /**
  * Escape a JSON Pointer (RFC 6901).

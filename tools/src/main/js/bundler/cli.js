@@ -1,20 +1,18 @@
 #!/usr/bin/env node
 
-import {writeFile, stat} from "node:fs/promises";
+import {writeFile, stat} from 'node:fs/promises';
 
-import {bundle} from "./src/bundle.js";
-import {dropCommentsExceptRoot} from "./src/cleanup.js";
-import {treeShake} from "./src/tree-shake.js";
-
-const EXT_JSON = '.json';
-const EXT_SCHEMA_RE = Object.freeze(/(?:\.schema)?\.json$/);
+import {bundle} from './src/bundle.js';
+import {dropCommentsExceptRoot} from './src/cleanup.js';
+import {treeShake} from './src/tree-shake.js';
+import {EXT_JSON, EXT_SCHEMA_RE} from './src/helpers/common.js';
 
 /** `…/foo.schema.json` -> `…/foo-bundled.schema.json` */
 const toBundledName = (s) => {
     if (!s.endsWith(EXT_JSON)) {
         throw new Error(`expected "*${EXT_JSON}", got ${s}`);
     }
-    return s.replace(EXT_SCHEMA_RE, "-bundled$&");
+    return s.replace(EXT_SCHEMA_RE, '-bundled$&');
 };
 
 /** `…/foo.schema.json` -> `…/foo.min.schema.json` */
@@ -22,7 +20,7 @@ const toMinifiedName = (s) => {
     if (!s.endsWith(EXT_JSON)) {
         throw new Error(`expected "*${EXT_JSON}", got ${s}`);
     }
-    return s.replace(EXT_SCHEMA_RE, ".min$&");
+    return s.replace(EXT_SCHEMA_RE, '.min$&');
 };
 
 const main = async (entryFile, includeDir) => {
