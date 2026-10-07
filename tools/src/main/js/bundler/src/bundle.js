@@ -15,6 +15,7 @@ import {DATA_KEYWORDS, DEFS_KEYWORDS, REF_KEYWORDS, refSplit} from './helpers/js
  */
 export async function bundle(entryFile, includeFiles, targetFile) {
     const entryDir = dirname(entryFile);
+    const targetDir = dirname(targetFile);
     const includeFileSet = Object.freeze(new Set(includeFiles));
 
     const external = new Set();
@@ -29,26 +30,28 @@ export async function bundle(entryFile, includeFiles, targetFile) {
             if (REF_KEYWORDS.has(k)) {
                 if (typeof v !== 'string') continue;
                 const vSplit = refSplit(v);
-                if (vSplit.frag && !vSplit.frag.startsWith('/')) {
-                    throw new Error(`Malformed ref: ${v}`);
-                }
-                if (vSplit.path.includes(':')) {
+                if (vSplit.path && (vSplit.path.includes(':') || vSplit.path.startsWith('/'))) {
                     // absolute (url) path -> external
                     external.add(v);
                     continue;
                 }
-                const refFile = vSplit.path === ''
-                    ? source
-                    : resolve(dirname(source), ...vSplit.path.split('/'));
+                if (vSplit.frag && !vSplit.frag.startsWith('/')) {
+                    // currently dont support anchors - only defs.
+                    throw new Error(`Unexpected ref fragment: ${v}`);
+                }
+                const refFile = vSplit.path
+                    ? resolve(dirname(source), ...vSplit.path.split('/'))
+                    : source;
                 if (refFile === entryFile) {
                     schema[k] = `#${vSplit.frag ?? ''}`;
                 } else if (includeFileSet.has(refFile)) {
-                    schema[k] = `#/${DEFS_KEYWORDS}/${makeModuleName(basename(refFile))}${vSplit.frag ?? ''}`;
+                    const moduleName = makeModuleName(basename(refFile));
+                    schema[k] = `#/${DEFS_KEYWORDS}/${moduleName}${vSplit.frag ?? ''}`;
                 } else {
-                    schema[k] = relative(dirname(targetFile), refFile)
-                    + (vSplit.frag === undefined ? '' : `#${vSplit.frag}`);
+                    schema[k] = relative(targetDir, refFile).replace(sep, '/')
+                        + (vSplit.frag ? `#${vSplit.frag}` : '');
                     // not rewired to bundled -> external
-                    external.add(refFile);
+                    external.add(schema[k]);
                 }
                 continue;
             }

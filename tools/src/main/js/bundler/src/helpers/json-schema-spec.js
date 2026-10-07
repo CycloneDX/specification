@@ -12,16 +12,17 @@ export const DATA_KEYWORDS = Object.freeze(new Set(['enum', 'const', 'examples',
 
 /**
  *
- * @param {string} s
- * @return {{path: string, frag: string?}}
+ * @param {string} r
+ * @return {{path: string|null, frag: string|null}}
  */
-export function refSplit(s) {
-    const split = s.split('#');
+export function refSplit(r) {
+    const split = r.split('#');
     if (split.length > 2) {
-        throw new Error(`unexpected amount of "#" in ${s}`);
+        throw new Error(`unexpected amount of "#" in ${r}`);
     }
     return {
-        path: split[0],
-        frag: split[1],
+        path: split[0] || null,
+        frag: split[1] || null,
     }
 }
+
