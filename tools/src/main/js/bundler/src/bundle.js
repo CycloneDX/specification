@@ -83,6 +83,12 @@ export async function bundle(entryFile, includeFiles, targetFile) {
     const schemaDefsOrig = schema[DEFS_KEYWORDS];
     rewireRefs(schema, entryFile);
     schema[DEFS_KEYWORDS] = {};
+    if (URL.canParse(schema.$id)) {
+        schema.$id = new URL(
+            relative(entryDir, targetFile).replace(sep, '/'),
+            schema.$id
+        ).toString();
+    }
 
     for (const [includeFile, moduleName] of fileModuleNames.entries()) {
         if (seen.has(includeFile)) continue;

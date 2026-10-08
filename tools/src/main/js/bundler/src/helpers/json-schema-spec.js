@@ -39,13 +39,12 @@ export function isSchemaObject(o) {
  */
 export function* subschemas(s) {
     for (const [k, v] of Object.entries(s)) {
-        if (DATA_KEYWORDS.has(k)) continue;
         if (SINGLE_SCHEMA.has(k)) {
-            yield v;
+            if(isSchemaObject(v)) yield v;
         } else if (SCHEMA_ARRAY.has(k)) {
-            if (Array.isArray(v)) yield* v;
+            if (Array.isArray(v)) yield* v.filter(isSchemaObject);
         } else if (SCHEMA_MAP.has(k)) {
-            if (isSchemaObject(v)) yield* Object.values(v);
+            if (isSchemaObject(v)) yield* Object.values(v).filter(isSchemaObject);
         }
     }
 }

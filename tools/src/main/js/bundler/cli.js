@@ -54,14 +54,12 @@ const main = async (entryFile, includeDir) => {
             glob(join(includeDir, `**${JSON_SCHEMA_EXT}`))
         )).sort(),
         bundledFile);
-    schema.$id = toBundledName(schema.$id);
 
     const shaken = treeShake(schema);
 
-    subschemas(schema).forEach(s => dropComments(s));
-
     await writeFile(bundledFile, JSON.stringify(schema, null, 2));
 
+    subschemas(schema).forEach(s => dropComments(s));
     await writeFile(minifiedFile, JSON.stringify({
         ...schema,
         $id: toMinifiedName(schema.$id)
