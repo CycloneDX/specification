@@ -76,9 +76,7 @@ export function refSplit(r) {
 
 
 /**
- * Split a ref in path and fragment.
- *
- * Return values are either non-empty strings or `null`.
+ * Join a ref path and fragment.
  *
  * @param {RefSplit} rs refSplit
  * @return {string}
@@ -87,7 +85,7 @@ export function refJoin({path, frag}) {
     if (path && frag) return `${path}#${frag}`;
     if (path) return path;
     if (frag) return `#${frag}`;
-    return '#'; // this entire  document
+    return '#'; // the entire schema
 }
 
 
