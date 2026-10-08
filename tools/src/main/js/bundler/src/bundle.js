@@ -85,7 +85,7 @@ export async function bundle(entryFile, includeFiles, targetFile) {
     schema[DEFS_KEYWORDS] = {};
     if (URL.canParse(schema.$id)) {
         schema.$id = new URL(
-            relative(entryDir, targetFile).replace(sep, '/'),
+            relative(entryDir, targetFile).replaceAll(sep, '/'),
             schema.$id
         ).toString();
     }
