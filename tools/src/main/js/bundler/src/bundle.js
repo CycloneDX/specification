@@ -7,7 +7,7 @@ import {escapeJsonPointer} from "./helpers/json-pointer-spec.js";
 import {
     DEFS_KEYWORDS, REF_KEYWORDS,
     subschemas,
-    refIsAbsolute, refSplit
+    refIsAbsolute, refSplit, refJoin
 } from './helpers/json-schema-spec.js';
 
 const HOLLOW_COMMENT =
@@ -16,6 +16,14 @@ const HOLLOW_COMMENT =
 
 
 const FRAG_DEFS_PREFIX = `/${DEFS_KEYWORDS}/`;
+
+/**
+ * @typedef BundleResult
+ * @property {*} schema
+ * @property {ReadonlyArray<string>} external external refs
+ * @property {ReadonlyArray<string>} embedded embedded schema files
+ * @property {ReadonlyArray<string>} rewired required refs
+ */
 
 /**
  * Load and bundle a schema.
@@ -30,7 +38,7 @@ const FRAG_DEFS_PREFIX = `/${DEFS_KEYWORDS}/`;
  * @param {string} entryFile Absolute path to entry point schema file.
  * @param {Iterable<string>} includeFiles Absolute path to schema files that shall be bundled.
  * @param {string} targetFile Absolute path to target schema file.
- * @return {Promise<{schema: *, external: ReadonlyArray<string>, embedded: ReadonlyArray<string>}>}
+ * @return {Promise<BundleResult>}
  */
 export async function bundle(entryFile, includeFiles, targetFile) {
     const targetDir = dirname(targetFile);
@@ -41,7 +49,8 @@ export async function bundle(entryFile, includeFiles, targetFile) {
     ));
     const entryModuleName = fileModuleNames.get(entryFile);
 
-    const external = new Set();
+    const externals = new Set();
+    const rewiredMap = new Map();
 
     /**
      * @param {*} schema
@@ -53,33 +62,35 @@ export async function bundle(entryFile, includeFiles, targetFile) {
             const v = schema[k];
             if (typeof v !== 'string') continue;
             if (refIsAbsolute(v)) {
-                external.add(v);
+                externals.add(v);
                 continue;
             }
+            let rewired
             const {path, frag} = refSplit(v);
             const refFile = path
                 ? resolve(dirname(sourceFile), ...path.split('/'))
                 : sourceFile;
             const moduleName = fileModuleNames.get(refFile);
-            if (!moduleName) {
+            if (moduleName) {
+                if (frag && !frag.startsWith('/')) {
+                    // currently dont support anchors - only defs.
+                    throw new Error(`Unsupported ref fragment: ${v}`);
+                }
+                rewired = (
+                    refFile === entryFile && !frag?.startsWith(FRAG_DEFS_PREFIX)
+                        ? '#'
+                        : `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`
+                ) + (frag ?? '');
+            } else {
                 if (!(await stat(refFile)).isFile()) {
                     throw new Error(`Not a file: ${refFile}`);
                 }
-                schema[k] = unixPath(relative(targetDir, refFile))
-                    + (frag ? `#${frag}` : '');
+                rewired = unixPath(relative(targetDir, refFile)) + `#${frag ?? ''}`;
                 // not rewired to bundled -> external
-                external.add(schema[k]);
-                continue
+                externals.add(rewired);
             }
-            if (frag && !frag.startsWith('/')) {
-                // currently dont support anchors - only defs.
-                throw new Error(`Unsupported ref fragment: ${v}`);
-            }
-            schema[k] = (
-                refFile === entryFile && !frag?.startsWith(FRAG_DEFS_PREFIX)
-                    ? '#'
-                    : `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`
-            ) + (frag ?? '');
+            schema[k] = rewired;
+            rewiredMap.set(refJoin({path: refFile, frag}), rewired);
         }
         await Promise.all(
             subschemas(schema).map(s => rewireRefs(s, sourceFile))
@@ -98,7 +109,7 @@ export async function bundle(entryFile, includeFiles, targetFile) {
     schema[DEFS_KEYWORDS] = Object.fromEntries( // deterministic order
         [...fileModuleNames.values()].sort().map(m => [m, undefined]));
 
-    const embedded = new Map();
+    const embeddedMap = new Map();
     await Promise.all(
         fileModuleNames.entries().filter(([f,]) => f !== entryFile).map(
             async ([includeFile, moduleName]) => {
@@ -108,7 +119,7 @@ export async function bundle(entryFile, includeFiles, targetFile) {
                 delete includeSchema.$comment;
                 await rewireRefs(includeSchema, includeFile);
                 schema[DEFS_KEYWORDS][moduleName] = includeSchema;
-                embedded.set(includeFile, `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`);
+                embeddedMap.set(includeFile, `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`);
             }
         )
     );
@@ -117,16 +128,22 @@ export async function bundle(entryFile, includeFiles, targetFile) {
             [DEFS_KEYWORDS]: schemaDefsOrig,
             not: {$comment: HOLLOW_COMMENT}
         };
-        embedded.set(`${entryFile}#${FRAG_DEFS_PREFIX}`, `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(entryModuleName)}`);
+        embeddedMap.set(`${entryFile}#${FRAG_DEFS_PREFIX}`, `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(entryModuleName)}`);
     } else {
         delete schema[DEFS_KEYWORDS][entryModuleName];
     }
 
     return {
         schema,
-        external: Object.freeze([...external].sort()),
-        embedded: Object.freeze(Array.from(embedded.entries(),
+        external: Object.freeze([...externals].sort()),
+        embedded: Object.freeze(Array.from(embeddedMap.entries(),
             ([f, d]) => `${unixPath(relative(entryDir, f))} -> ${d}`
-        ).sort())
+        ).sort()),
+        rewired: Object.freeze(Array.from(rewiredMap.entries(),
+            ([f, t]) => {
+                const {path, frag} = refSplit(f);
+                return `${unixPath(relative(entryDir, path))}#${frag??''} -> ${t}`;
+            }
+        ).sort()),
     };
 }

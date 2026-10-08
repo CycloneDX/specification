@@ -50,12 +50,18 @@ export function* subschemas(s) {
 }
 
 /**
+ * @typedef RefSplit
+ * @property {string|null} path
+ * @property {string|null} frag
+ */
+
+/**
  * Split a ref in path and fragment.
  *
  * Return values are either non-empty strings or `null`.
  *
  * @param {string} r ref
- * @return {{path: string|null, frag: string|null}}
+ * @return {RefSplit}
  */
 export function refSplit(r) {
     const split = r.split('#');
@@ -66,6 +72,22 @@ export function refSplit(r) {
         path: split[0] || null,
         frag: split[1] || null,
     }
+}
+
+
+/**
+ * Split a ref in path and fragment.
+ *
+ * Return values are either non-empty strings or `null`.
+ *
+ * @param {RefSplit} rs refSplit
+ * @return {string}
+ */
+export function refJoin({path, frag}) {
+    if (path && frag) return `${path}#${frag}`;
+    if (path) return path;
+    if (frag) return `#${frag}`;
+    return '';
 }
 
 
