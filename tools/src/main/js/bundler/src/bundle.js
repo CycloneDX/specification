@@ -96,9 +96,7 @@ export async function bundle(entryFile, includeFiles, targetFile) {
         const includeSchema = await getJsonfile(includeFile);
         delete includeSchema.$schema;
         delete includeSchema.$id;
-        if (includeSchema.$comment === schema.$comment) {
-            delete includeSchema.$comment;
-        }
+        delete includeSchema.$comment;
         rewireRefs(includeSchema, includeFile);
         schema[DEFS_KEYWORDS][moduleName] = includeSchema;
         embedded.push(includeFile);
