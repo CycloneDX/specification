@@ -1,9 +1,8 @@
-import {stat} from 'node:fs/promises';
 import {basename, dirname, relative, resolve} from 'node:path'
 
-import {getJsonfile, unixPath, objectHasOwnPath} from './helpers/common.js';
+import {getJsonfile, unixPath} from './helpers/common.js';
 import {makeModuleName} from './helpers/cyclonedx.js';
-import {escapeJsonPointer, jsonPointer2stack, unescapeJsonPointer} from "./helpers/json-pointer-spec.js";
+import {escapeJsonPointer} from "./helpers/json-pointer-spec.js";
 import {
     DEFS_KEYWORDS, REF_KEYWORDS,
     subschemas,
@@ -92,7 +91,9 @@ export async function bundle(entryFile, includeFiles, targetFile) {
             rewiredMap.set(
                 refJoin({path: refFile, frag}),
                 schema[k] = refJoin(rewired));
-            if (rewired.path) { externals.add(schema[k]); }
+            if (rewired.path) {
+                externals.add(schema[k]);
+            }
         }
         await Promise.all(
             subschemas(schema).map(s => rewireRefs(s, sourceFile))
