@@ -1,9 +1,9 @@
 import {stat} from 'node:fs/promises';
 import {basename, dirname, relative, resolve} from 'node:path'
 
-import {getJsonfile, unixPath} from './helpers/common.js';
+import {getJsonfile, unixPath, objectHasOwnPath} from './helpers/common.js';
 import {makeModuleName} from './helpers/cyclonedx.js';
-import {escapeJsonPointer} from "./helpers/json-pointer-spec.js";
+import {escapeJsonPointer, jsonPointer2stack, unescapeJsonPointer} from "./helpers/json-pointer-spec.js";
 import {
     DEFS_KEYWORDS, REF_KEYWORDS,
     subschemas,
@@ -76,21 +76,23 @@ export async function bundle(entryFile, includeFiles, targetFile) {
                     // currently dont support anchors - only defs.
                     throw new Error(`Unsupported ref fragment: ${v}`);
                 }
-                rewired = (
-                    refFile === entryFile && !frag?.startsWith(FRAG_DEFS_PREFIX)
-                        ? '#'
-                        : `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`
-                ) + (frag ?? '');
+                rewired = {
+                    path: null,
+                    frag: (refFile === entryFile && !frag?.startsWith(FRAG_DEFS_PREFIX)
+                            ? ''
+                            : `${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`
+                    ) + (frag ?? '')
+                };
             } else {
-                if (!(await stat(refFile)).isFile()) {
-                    throw new Error(`Not a file: ${refFile}`);
-                }
-                rewired = unixPath(relative(targetDir, refFile)) + `#${frag ?? ''}`;
-                // not rewired to bundled -> external
-                externals.add(rewired);
+                rewired = {
+                    path: unixPath(relative(targetDir, refFile)),
+                    frag
+                };
             }
-            schema[k] = rewired;
-            rewiredMap.set(refJoin({path: refFile, frag}), rewired);
+            rewiredMap.set(
+                refJoin({path: refFile, frag}),
+                schema[k] = refJoin(rewired));
+            if (rewired.path) { externals.add(schema[k]); }
         }
         await Promise.all(
             subschemas(schema).map(s => rewireRefs(s, sourceFile))
@@ -138,14 +140,18 @@ export async function bundle(entryFile, includeFiles, targetFile) {
 
     return {
         schema,
+        // sort for reproducibility, freeze for immutability.
         external: Object.freeze([...externals].sort()),
         embedded: Object.freeze(Array.from(embeddedMap.entries(),
             ([f, d]) => `${unixPath(relative(entryDir, f))} -> ${d}`
         ).sort()),
         rewired: Object.freeze(Array.from(rewiredMap.entries(),
             ([f, t]) => {
-                const {path, frag} = refSplit(f);
-                return `${unixPath(relative(entryDir, path))}#${frag??''} -> ${t}`;
+                if (!f.startsWith('#')) {
+                    const {path, frag} = refSplit(f);
+                    f = refJoin({path: unixPath(relative(entryDir, path)), frag});
+                }
+                return `${f} -> ${t}`;
             }
         ).sort()),
     };

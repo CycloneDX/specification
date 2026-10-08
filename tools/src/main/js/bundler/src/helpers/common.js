@@ -27,3 +27,18 @@ export async function getJsonfile (file) {
 export function unixPath(p) {
     return p.replaceAll(sep, '/');
 }
+
+
+/**
+ * @param {*} o
+ * @param {string[]} pathStack
+ * @return {boolean}
+ */
+export function objectHasOwnPath(o, pathStack) {
+    let c = o;
+    for (const s of pathStack) {
+        if (!Object.hasOwn(c, s)) return false;
+        c = c[s];
+    }
+    return true;
+}
