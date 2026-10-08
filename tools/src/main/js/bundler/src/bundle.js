@@ -131,22 +131,19 @@ export async function bundle(entryFile, includeFiles, targetFile) {
         delete schema[DEFS_KEYWORDS][entryModuleName];
     }
 
-    await Promise.all(
-        fileModuleNames.entries().filter(([f,]) => f !== entryFile).map(
-            async ([includeFile, moduleName]) => {
-                const includeSchema = await getJsonfile(includeFile);
-                delete includeSchema.$schema;
-                delete includeSchema.$id;
-                delete includeSchema.$comment;
-                await rewireRefs(includeSchema, includeFile);
-                if (schema[DEFS_KEYWORDS][moduleName]) {
-                    throw new Error(`Collision: ${moduleName}`);
-                }
-                schema[DEFS_KEYWORDS][moduleName] = includeSchema;
-                embeddedMap.set(includeFile, `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`);
-            }
-        )
-    );
+    for (const [includeFile, moduleName] of fileModuleNames.entries()) {
+        if (includeFile === entryFile) continue;
+        if (schema[DEFS_KEYWORDS][moduleName]) {
+            throw new Error(`Collision: ${moduleName}`);
+        }
+        const includeSchema = await getJsonfile(includeFile);
+        delete includeSchema.$schema;
+        delete includeSchema.$id;
+        delete includeSchema.$comment;
+        await rewireRefs(includeSchema, includeFile);
+        schema[DEFS_KEYWORDS][moduleName] = includeSchema;
+        embeddedMap.set(includeFile, `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`);
+    }
 
     return {
         schema,
