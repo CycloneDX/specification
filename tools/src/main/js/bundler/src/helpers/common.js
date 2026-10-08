@@ -25,5 +25,5 @@ export async function getJsonfile (file) {
 }
 
 export function unixPath(p) {
-    return p.replace(sep, '/');
+    return p.replaceAll(sep, '/');
 }

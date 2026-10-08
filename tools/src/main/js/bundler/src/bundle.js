@@ -118,6 +118,9 @@ export async function bundle(entryFile, includeFiles, targetFile) {
                 delete includeSchema.$id;
                 delete includeSchema.$comment;
                 await rewireRefs(includeSchema, includeFile);
+                if (schema[DEFS_KEYWORDS][moduleName]) {
+                    throw new Error(`Collision: ${moduleName}`);
+                }
                 schema[DEFS_KEYWORDS][moduleName] = includeSchema;
                 embeddedMap.set(includeFile, `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`);
             }
