@@ -64,8 +64,7 @@ export async function bundle(entryFile, includeFiles, targetFile) {
         for (const k of ANCHOR_KEYWORDS) {
             const v = schema[k];
             if (typeof v !== 'string') continue;
-            // currently dont support anchors - only JSON pointer.
-            // TODO
+            // TODO: support anchors.
         }
         for (const k of REF_KEYWORDS) {
             const v = schema[k];
