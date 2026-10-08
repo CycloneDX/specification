@@ -1,5 +1,4 @@
 import {basename, dirname, relative, resolve, sep} from 'node:path'
-import {HOLLOW_COMMENT} from "./cleanup.js";
 
 import {getJsonfile} from './helpers/common.js';
 import {makeModuleName} from './helpers/cyclonedx.js';
@@ -9,6 +8,11 @@ import {
     subschemas,
     refIsAbsolute, refSplit
 } from './helpers/json-schema-spec.js';
+
+const HOLLOW_COMMENT =
+    "This schema is hollow: it remains as a container for definitions. " +
+    "Itself must not be used for validation.";
+
 
 const FRAG_DEFS_PREFIX = `/${DEFS_KEYWORDS}/`;
 
