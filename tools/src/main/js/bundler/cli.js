@@ -50,7 +50,7 @@ const main = async (entryFile, includeDir) => {
 
     const {schema, ...bundled} = await bundle(
         entryFile,
-        (await Array.fromAsync(glob(join(includeDir, `**${JSON_SCHEMA_EXT}`)))),
+        (await Array.fromAsync(glob(join(includeDir, `**/*${JSON_SCHEMA_EXT}`)))),
         bundledFile);
 
     const shaken = treeShake(schema);
@@ -60,7 +60,7 @@ const main = async (entryFile, includeDir) => {
     subschemas(schema).forEach(s => dropComments(s));
     await writeFile(minifiedFile, JSON.stringify({
         ...schema,
-        $id: toMinifiedName(schema.$id)
+        $id: schema.$id ? toMinifiedName(schema.$id) : undefined
     }));
 
     return {

@@ -87,7 +87,7 @@ export function refJoin({path, frag}) {
     if (path && frag) return `${path}#${frag}`;
     if (path) return path;
     if (frag) return `#${frag}`;
-    return '';
+    return '#'; // this entire  document
 }
 
 
