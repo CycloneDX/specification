@@ -8,6 +8,8 @@ export const DEFS_KEYWORDS = '$defs';
 
 export const REF_KEYWORDS = Object.freeze(new Set(['$ref', '$recursiveRef', '$dynamicRef']));
 
+export const ANCHOR_KEYWORDS = Object.freeze(new Set(['$anchor', '$dynamicAnchor', '$recursiveAnchor']));
+
 export const DATA_KEYWORDS = Object.freeze(new Set(['enum', 'const', 'examples', 'default']));
 
 export const SINGLE_SCHEMA = Object.freeze(new Set([

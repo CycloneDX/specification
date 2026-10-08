@@ -5,7 +5,7 @@ import {escapeJsonPointer} from "./helpers/json-pointer-spec.js";
 import {
     DEFS_KEYWORDS, REF_KEYWORDS,
     subschemas,
-    refIsAbsolute, refSplit, refJoin
+    refIsAbsolute, refSplit, refJoin, ANCHOR_KEYWORDS
 } from './helpers/json-schema-spec.js';
 
 const HOLLOW_COMMENT =
@@ -31,7 +31,9 @@ const FRAG_DEFS_PREFIX = `/${DEFS_KEYWORDS}/`;
  * References are rewired.
  * - Absolutes are kept untouched and treated as externals.
  * - External file paths become relative to `targetFile`.
- * - Bundled support JSON pointers only, no support for anchors, yet.
+ * - Bundled support JSON pointers.
+ * - Bundler does not support anchors.
+ * - Bundler is not aware of IDs.
  *
  * The bundler does not check if the old references existed in the first place, ant therefore it does not check if th rewired ones exist either.
  *
@@ -49,6 +51,7 @@ export async function bundle(entryFile, includeFiles, targetFile) {
     ));
     const entryModuleName = fileModuleNames.get(entryFile);
 
+    const embeddedMap = new Map();
     const externals = new Set();
     const rewiredMap = new Map();
 
@@ -58,6 +61,12 @@ export async function bundle(entryFile, includeFiles, targetFile) {
      * @return {Promise<void>}
      */
     async function rewireRefs(schema, sourceFile) {
+        for (const k of ANCHOR_KEYWORDS) {
+            const v = schema[k];
+            if (typeof v !== 'string') continue;
+            // currently dont support anchors - only JSON pointer.
+            // TODO
+        }
         for (const k of REF_KEYWORDS) {
             const v = schema[k];
             if (typeof v !== 'string') continue;
@@ -73,7 +82,7 @@ export async function bundle(entryFile, includeFiles, targetFile) {
             const moduleName = fileModuleNames.get(refFile);
             if (moduleName) {
                 if (frag && !frag.startsWith('/')) {
-                    // currently dont support anchors - only defs.
+                    // currently dont support anchors - only JSON pointer.
                     throw new RangeError(`Unsupported ref fragment: ${v}`);
                 }
                 rewired = {
@@ -122,7 +131,6 @@ export async function bundle(entryFile, includeFiles, targetFile) {
         delete schema[DEFS_KEYWORDS][entryModuleName];
     }
 
-    const embeddedMap = new Map();
     await Promise.all(
         fileModuleNames.entries().filter(([f,]) => f !== entryFile).map(
             async ([includeFile, moduleName]) => {
