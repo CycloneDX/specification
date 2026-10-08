@@ -4,6 +4,7 @@
 
 import {readFile} from 'node:fs/promises';
 import {sep} from "node:path";
+import * as tty from "node:tty";
 
 /**
  * File extension for JSON schema files.
@@ -37,7 +38,11 @@ export function unixPath(p) {
 export function objectHasOwnPath(o, pathStack) {
     let c = o;
     for (const s of pathStack) {
-        if (!Object.hasOwn(c, s)) return false;
+        try {
+            if (!Object.hasOwn(c, s)) return false;
+        } catch { // TypeErrors and such.
+            return false;
+        }
         c = c[s];
     }
     return true;

@@ -66,7 +66,7 @@ export function* subschemas(s) {
 export function refSplit(r) {
     const split = r.split('#');
     if (split.length > 2) {
-        throw new Error(`unexpected amount of "#" in ${r}`);
+        throw new RangeError(`Unexpected amount of "#" in ${r}`);
     }
     return {
         path: split[0] || null,

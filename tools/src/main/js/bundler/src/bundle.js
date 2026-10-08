@@ -74,7 +74,7 @@ export async function bundle(entryFile, includeFiles, targetFile) {
             if (moduleName) {
                 if (frag && !frag.startsWith('/')) {
                     // currently dont support anchors - only defs.
-                    throw new Error(`Unsupported ref fragment: ${v}`);
+                    throw new RangeError(`Unsupported ref fragment: ${v}`);
                 }
                 rewired = {
                     path: null,
