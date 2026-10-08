@@ -112,7 +112,7 @@ export async function bundle(entryFile, includeFiles, targetFile) {
             [DEFS_KEYWORDS]: schemaDefsOrig,
             not: {$comment: HOLLOW_COMMENT}
         };
-        embedded.set(`${entryFile}#${FRAG_DEFS_PREFIX}`, `#${FRAG_DEFS_PREFIX}${moduleName}`);
+        embedded.set(`${entryFile}#${FRAG_DEFS_PREFIX}`, `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`);
     }
     schema[DEFS_KEYWORDS]['not'] = {$comment: HOLLOW_COMMENT};
 
