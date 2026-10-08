@@ -11,6 +11,9 @@ export const DEFS_KEYWORDS = '$defs';
 export const DATA_KEYWORDS = Object.freeze(new Set(['enum', 'const', 'examples', 'default']));
 
 /**
+ * Split a ref in path and fragment.
+ *
+ * Return values are either non-empty strings or `null`.
  *
  * @param {string} r
  * @return {{path: string|null, frag: string|null}}
@@ -26,3 +29,15 @@ export function refSplit(r) {
     }
 }
 
+
+/**
+ * Weather a ref is absolute.
+ * @param {string} r
+ * @return {boolean}
+ */
+export function refIsAbsolute(r) {
+    if (r.startsWith('#')) return false;
+    return r.startsWith('/')  // Unix-like absolute path
+        || r.startsWith('\\')  // UNC-like absolute path
+        || r.search(':') > 0; // Windows-like absolute path or a form of <schema>:<rest>
+}

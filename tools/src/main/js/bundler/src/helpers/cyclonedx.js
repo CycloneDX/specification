@@ -10,6 +10,10 @@ const CDX_MODULE_NAME_RE = Object.freeze(/^cyclonedx-(.+)-\d\.\d.schema.json$/);
 
 /**
  * Make a module name from a file name.
+ *
+ * If  file matches `CDX_MODULE_NAME_RE`, then derive module name from it,
+ * otherwise tit is the JSON schema file's base name.
+ *
  * @param {string} s
  * @return {string}
  */

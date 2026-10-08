@@ -4,18 +4,24 @@ import {HOLLOW_COMMENT} from "./cleanup.js";
 import {getJsonfile} from './helpers/common.js';
 import {makeModuleName} from './helpers/cyclonedx.js';
 import {escapeJsonPointer} from "./helpers/json-pointer-spec.js";
-import {DATA_KEYWORDS, DEFS_KEYWORDS, REF_KEYWORDS, refSplit} from './helpers/json-schema-spec.js';
+import {DATA_KEYWORDS, DEFS_KEYWORDS, REF_KEYWORDS, refIsAbsolute, refSplit} from './helpers/json-schema-spec.js';
 
 const FRAG_DEFS_PREFIX = `/${DEFS_KEYWORDS}/`;
 
 /**
  * Load and bundle a schema.
  *
- * Supports references only, no support for anchors, yet.
+ * Does not convert between meta-schemas.
+ * Bundles ALL `includeFiles`.
+ * References are rewired.
+ * - Absolutes are kept untouched and treated as externals.
+ * - External file paths become relative to `targetFile`.
+ * - Bundled support JSON pointers only, no support for anchors, yet.
  *
  * @param {string} entryFile Absolute entry point schema file.
  * @param {Iterable<string>} includeFiles Absolute dir to schema files that shall be bundled.
  * @param {string} targetFile Absolute target schema file.
+ * @return {Promise<{schema: *, external: ReadonlyArray<string>, embedded: ReadonlyArray<string>}>}
  */
 export async function bundle(entryFile, includeFiles, targetFile) {
     const targetDir = dirname(targetFile);
@@ -27,44 +33,49 @@ export async function bundle(entryFile, includeFiles, targetFile) {
 
     const external = new Set();
 
-    function rewireRefs(schema, source) {
+    /**
+     * @param {*} schema
+     * @param {string} sourceFile
+     * @return {void}
+     */
+    function rewireRefs(schema, sourceFile) {
         if (typeof schema !== 'object' || schema === null) return;
         if (Array.isArray(schema)) {
-            return schema.forEach(v => rewireRefs(v, source));
+            schema.forEach(v => rewireRefs(v, sourceFile));
+            return;
         }
         for (const [k, v] of Object.entries(schema)) {
             if (DATA_KEYWORDS.has(k)) continue;
             if (REF_KEYWORDS.has(k)) {
                 if (typeof v !== 'string') continue;
-                const vSplit = refSplit(v);
-                if (vSplit.path && (vSplit.path.includes(':') || vSplit.path.startsWith('/'))) {
-                    // absolute (url) path -> external
+                if (refIsAbsolute(v)) {
                     external.add(v);
                     continue;
                 }
-                const refFile = vSplit.path
-                    ? resolve(dirname(source), ...vSplit.path.split('/'))
-                    : source;
+                const {path, frag} = refSplit(v);
+                const refFile = path
+                    ? resolve(dirname(sourceFile), ...path.split('/'))
+                    : sourceFile;
                 const moduleName = fileModuleNames.get(refFile);
                 if (!moduleName) {
                     schema[k] = relative(targetDir, refFile).replace(sep, '/')
-                        + (vSplit.frag ? `#${vSplit.frag}` : '');
+                        + (frag ? `#${frag}` : '');
                     // not rewired to bundled -> external
                     external.add(schema[k]);
                     continue
                 }
-                if (vSplit.frag && !vSplit.frag.startsWith('/')) {
+                if (frag && !frag.startsWith('/')) {
                     // currently dont support anchors - only defs.
-                    throw new Error(`Unexpected ref fragment: ${v}`);
+                    throw new Error(`Unsupported ref fragment: ${v}`);
                 }
                 schema[k] = (
-                    refFile === entryFile && !vSplit.frag?.startsWith(FRAG_DEFS_PREFIX)
+                    refFile === entryFile && !frag?.startsWith(FRAG_DEFS_PREFIX)
                         ? '#'
                         : `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`
-                ) + (vSplit.frag ?? '');
+                ) + (frag ?? '');
                 continue;
             }
-            rewireRefs(v, source);
+            rewireRefs(v, sourceFile);
         }
     }
 
@@ -94,12 +105,13 @@ export async function bundle(entryFile, includeFiles, targetFile) {
             not: {$comment: HOLLOW_COMMENT}
         };
     }
+    schema[DEFS_KEYWORDS]['not'] = {$comment: HOLLOW_COMMENT};
 
     return {
         schema,
         external: Object.freeze([...external].sort()),
-        embedded: Object.freeze(embedded.sort().map(
+        embedded: Object.freeze(embedded.map(
             e => relative(entryDir, e).replaceAll(sep, '/')
-        )),
+        ).sort())
     };
 }

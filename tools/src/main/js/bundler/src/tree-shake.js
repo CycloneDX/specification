@@ -1,14 +1,16 @@
 import {HOLLOW_COMMENT} from './cleanup.js'
+
 /**
  * Tree-shake a schema in place.
  *
- * Supports references only, no support for anchors, yet.
+ * References support JSON pointer only, no support for anchors, yet.
  *
- * Removes non-reachable definitions.
- * Hollows non-reachable definitions, when sub-definitions are kept.
- *   Hollowed schemas are marked with `"not": { "$comment": HOLLOW_COMMENT }"`.
+ * Removes non-reached definitions.
+ * Hollows non-reached definitions, when sub-definitions are kept.
+ * - Hollowed schemas are marked with `"not":{"$comment":HOLLOW_COMMENT}`.
  *
  * @param {*} schema
+ * @return {{hollowed: ReadonlyArray<string>, removed: ReadonlyArray<string>}}
  */
 export function treeShake(schema) {
     const removed = [];
