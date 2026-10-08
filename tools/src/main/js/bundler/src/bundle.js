@@ -19,8 +19,8 @@ const FRAG_DEFS_PREFIX = `/${DEFS_KEYWORDS}/`;
 /**
  * @typedef BundleResult
  * @property {*} schema
- * @property {ReadonlyArray<string>} external external refs
  * @property {ReadonlyArray<string>} embedded embedded schema files
+ * @property {ReadonlyArray<string>} external external refs
  * @property {ReadonlyArray<string>} rewired required refs
  */
 
@@ -33,6 +33,8 @@ const FRAG_DEFS_PREFIX = `/${DEFS_KEYWORDS}/`;
  * - Absolutes are kept untouched and treated as externals.
  * - External file paths become relative to `targetFile`.
  * - Bundled support JSON pointers only, no support for anchors, yet.
+ *
+ * The bundler does not check if the old references existed in the first place, ant therefore it does not check if th rewired ones exist either.
  *
  * @param {string} entryFile Absolute path to entry point schema file.
  * @param {Iterable<string>} includeFiles Absolute path to schema files that shall be bundled.

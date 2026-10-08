@@ -110,7 +110,7 @@ if (import.meta.main) {
             console.log(`wrote ${minifiedFile} (${minifiedSize} bytes)`);
 
             const minifiedDiff = bundledSize - minifiedSize;
-            console.info(`minification saved ${minifiedDiff} bytes ~ ${((bundledSize / minifiedDiff) * 100).toFixed(2)} %`);
+            console.info(`minification saved ${minifiedDiff} bytes ~ ${((minifiedDiff / bundledSize) * 100).toFixed(2)} %`);
         })
         .catch(err => {
             console.error(err);
