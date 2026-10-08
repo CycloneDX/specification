@@ -8,6 +8,7 @@ import {
     refIsAbsolute, refSplit, refJoin, ANCHOR_KEYWORDS
 } from './helpers/json-schema-spec.js';
 
+
 const HOLLOW_COMMENT =
     "This schema is hollow: it remains as a container for definitions. " +
     "Itself must not be used for validation.";

@@ -4,7 +4,6 @@
 
 import {readFile} from 'node:fs/promises';
 import {sep} from "node:path";
-import * as tty from "node:tty";
 
 /**
  * File extension for JSON schema files.
