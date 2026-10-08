@@ -21,7 +21,7 @@ const FRAG_DEFS_PREFIX = `/${DEFS_KEYWORDS}/`;
  * @property {*} schema
  * @property {ReadonlyArray<string>} embedded embedded schema files
  * @property {ReadonlyArray<string>} external external refs
- * @property {ReadonlyArray<string>} rewired required refs
+ * @property {ReadonlyArray<string>} rewired rewired refs
  */
 
 /**
@@ -36,7 +36,7 @@ const FRAG_DEFS_PREFIX = `/${DEFS_KEYWORDS}/`;
  * - Bundler does not support anchors.
  * - Bundler is not aware of IDs.
  *
- * The bundler does not check if the old references existed in the first place, ant therefore it does not check if th rewired ones exist either.
+ * The bundler does not check if the old references existed in the first place, and therefore it does not check if th rewired ones exist either.
  *
  * @param {string} entryFile Absolute path to entry point schema file.
  * @param {Iterable<string>} includeFiles Absolute path to schema files that shall be bundled.
