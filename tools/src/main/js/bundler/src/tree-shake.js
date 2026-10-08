@@ -1,7 +1,4 @@
-const HOLLOW_COMMENT =
-    "This schema is hollow: it was not referenced and only remains as a container " +
-    "for definitions that are still in use. It must not be used for validation.";
-
+import {HOLLOW_COMMENT} from './cleanup.js'
 /**
  * Tree-shake a schema in place.
  *

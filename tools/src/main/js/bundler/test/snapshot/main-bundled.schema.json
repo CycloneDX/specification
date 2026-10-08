@@ -22,22 +22,10 @@
       "$comment": "Internal ref -> rewritten to #/$defs/main/$defs/mainLocal, so the root's own def entry must be emitted.",
       "title": "Local",
       "description": "A definition of this very schema.",
-      "$ref": "#/$defs/mainLocal"
+      "$ref": "#/$defs/main/$defs/mainLocal"
     }
   },
   "$defs": {
-    "mainLocal": {
-      "$comment": "Referenced from main itself and from used-subdefs-only.",
-      "title": "Main local",
-      "description": "A local string definition of the root schema.",
-      "type": "string"
-    },
-    "mainUnused": {
-      "$comment": "Never referenced -> shaken away from #/$defs/main/$defs.",
-      "title": "Main unused",
-      "description": "A definition nothing refers to.",
-      "type": "null"
-    },
     "dynamic-anchor": {
       "$comment": "FIXTURE: not referenced by pointer, but carries a $dynamicAnchor -> conservatively kept whole. Top-level $comment is stripped; title/description survive.",
       "$dynamicAnchor": "node",
@@ -102,7 +90,7 @@
               "$comment": "Ref back into the root schema -> #/$defs/main/$defs/mainLocal.",
               "title": "From main",
               "description": "A value defined by the root schema.",
-              "$ref": "#/$defs/mainLocal"
+              "$ref": "#/$defs/main/$defs/mainLocal"
             },
             "chain": {
               "$comment": "Internal ref -> transitively keeps keptTransitively.",
@@ -190,6 +178,25 @@
           "description": "A numeric value shared across modules.",
           "type": "number"
         }
+      }
+    },
+    "main": {
+      "$defs": {
+        "mainLocal": {
+          "$comment": "Referenced from main itself and from used-subdefs-only.",
+          "title": "Main local",
+          "description": "A local string definition of the root schema.",
+          "type": "string"
+        },
+        "mainUnused": {
+          "$comment": "Never referenced -> shaken away from #/$defs/main/$defs.",
+          "title": "Main unused",
+          "description": "A definition nothing refers to.",
+          "type": "null"
+        }
+      },
+      "not": {
+        "$comment": "This schema is hollow: it was not referenced and only remains as a container for definitions that are still in use. Itself must not be used for validation."
       }
     }
   }
