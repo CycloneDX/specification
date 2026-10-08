@@ -7,19 +7,16 @@
   "type": "object",
   "properties": {
     "whole": {
-      "$comment": "External ref without fragment -> module is kept as a whole.",
       "title": "Whole",
       "description": "A module referenced in its entirety.",
       "$ref": "#/$defs/used-whole"
     },
     "sub": {
-      "$comment": "External ref into a sub-def -> only that sub-def (and what it reaches) is kept.",
       "title": "Sub",
       "description": "A single definition of another module.",
       "$ref": "#/$defs/used-subdefs-only/$defs/kept"
     },
     "local": {
-      "$comment": "Internal ref -> rewritten to #/$defs/main/$defs/mainLocal, so the root's own def entry must be emitted.",
       "title": "Local",
       "description": "A definition of this very schema.",
       "$ref": "#/$defs/main/$defs/mainLocal"
@@ -27,7 +24,6 @@
   },
   "$defs": {
     "dynamic-anchor": {
-      "$comment": "FIXTURE: not referenced by pointer, but carries a $dynamicAnchor -> conservatively kept whole. Top-level $comment is stripped; title/description survive.",
       "$dynamicAnchor": "node",
       "title": "Dynamic anchor",
       "description": "A recursive tree node, addressable via a dynamic anchor.",
@@ -38,7 +34,6 @@
           "description": "The child nodes of this node.",
           "type": "array",
           "items": {
-            "$comment": "Self-ref '#' -> rewritten to #/$defs/dynamic-anchor.",
             "title": "Child",
             "description": "A nested node.",
             "$ref": "#/$defs/dynamic-anchor"
@@ -47,13 +42,11 @@
       }
     },
     "unused": {
-      "$comment": "FIXTURE: never reachable from the root -> the whole def entry is removed. Its title/description must not appear in any snapshot.",
       "title": "Unused",
       "description": "A module that nothing reachable refers to.",
       "type": "object",
       "properties": {
         "pullsNothingIn": {
-          "$comment": "Even though this refs a module, it is itself unreachable and must not influence shaking.",
           "title": "Pulls nothing in",
           "description": "A flag defined by another module.",
           "$ref": "#/$defs/used-whole/$defs/unusedButKept"
@@ -61,13 +54,11 @@
       }
     },
     "used-subdefs-only": {
-      "$comment": "FIXTURE: only sub-defs of this module are referenced -> everything but the referenced $defs is dropped. The top-level title/description live in the dropped body and must not appear in the snapshots.",
       "title": "Used sub-defs only",
       "description": "A module of which only individual definitions are referenced.",
       "type": "object",
       "properties": {
         "body": {
-          "$comment": "Lives in the dropped body, so this ref must NOT make unused.schema.json reachable.",
           "title": "Body",
           "description": "The body of this module.",
           "$ref": "#/$defs/unused"
@@ -75,25 +66,21 @@
       },
       "$defs": {
         "kept": {
-          "$comment": "Reached from main. Exercises three ref flavours.",
           "title": "Kept",
           "description": "A definition that is reached directly from the root schema.",
           "type": "object",
           "properties": {
             "shared": {
-              "$comment": "Cross-module ref into another module's sub-def.",
               "title": "Shared",
               "description": "A value defined by another module.",
               "$ref": "#/$defs/used-whole/$defs/sharedByOther"
             },
             "fromMain": {
-              "$comment": "Ref back into the root schema -> #/$defs/main/$defs/mainLocal.",
               "title": "From main",
               "description": "A value defined by the root schema.",
               "$ref": "#/$defs/main/$defs/mainLocal"
             },
             "chain": {
-              "$comment": "Internal ref -> transitively keeps keptTransitively.",
               "title": "Chain",
               "description": "A value defined further down in this module.",
               "$ref": "#/$defs/used-subdefs-only/$defs/keptTransitively"
@@ -101,13 +88,11 @@
           }
         },
         "keptTransitively": {
-          "$comment": "Only reachable via kept.chain.",
           "title": "Kept transitively",
           "description": "A string value.",
           "type": "string"
         },
         "dropped": {
-          "$comment": "Not reachable -> shaken away.",
           "title": "Dropped",
           "description": "A definition nothing reachable refers to.",
           "type": "null"
@@ -115,7 +100,6 @@
       }
     },
     "used-whole": {
-      "$comment": "FIXTURE: referenced from main without a fragment -> embedded as a whole. Top-level $comment/$id/$schema are stripped when embedded as a def; title/description must survive, also in the minified output.",
       "title": "Used whole",
       "description": "A module that is referenced in its entirety.",
       "type": "object",
@@ -126,25 +110,21 @@
           "type": "string"
         },
         "inner": {
-          "$comment": "Internal ref -> rewritten to #/$defs/used-whole/$defs/inner.",
           "title": "Inner",
           "description": "Sibling annotations next to a $ref: title/description are kept, while the sibling $comment is removed in the minified output.",
           "$ref": "#/$defs/used-whole/$defs/inner"
         },
         "license": {
-          "$comment": "Target is outside the models dir -> not bundled; rewired to a path relative to the root schema.",
           "title": "License",
           "description": "The license of this item.",
           "$ref": "externals/not-bundled.schema.json#/$defs/licenseId"
         },
         "remote": {
-          "$comment": "Absolute URI -> external by definition; left untouched and not checked for existence.",
           "title": "Remote",
           "description": "A thing defined by a remote schema.",
           "$ref": "https://example.com/remote.schema.json#/$defs/thing"
         },
         "inArray": {
-          "$comment": "Refs nested inside an array (allOf) exercise the array branch of rewriteRefs: internal, bundled-file and external-file refs must all be rewritten there too.",
           "title": "In array",
           "description": "A composition of several referenced schemas.",
           "allOf": [
@@ -167,13 +147,11 @@
           "type": "integer"
         },
         "unusedButKept": {
-          "$comment": "Not referenced anywhere, but kept because the module is used as a whole.",
           "title": "Unused but kept",
           "description": "A flag.",
           "type": "boolean"
         },
         "sharedByOther": {
-          "$comment": "Cross-referenced from used-subdefs-only#/$defs/kept.",
           "title": "Shared by other",
           "description": "A numeric value shared across modules.",
           "type": "number"
@@ -183,24 +161,18 @@
     "main": {
       "$defs": {
         "mainLocal": {
-          "$comment": "Referenced from main itself and from used-subdefs-only.",
           "title": "Main local",
           "description": "A local string definition of the root schema.",
           "type": "string"
         },
         "mainUnused": {
-          "$comment": "Never referenced -> shaken away from #/$defs/main/$defs.",
           "title": "Main unused",
           "description": "A definition nothing refers to.",
           "type": "null"
         }
       },
-      "not": {
-        "$comment": "This schema is hollow: it was not referenced and only remains as a container for definitions that are still in use. Itself must not be used for validation."
-      }
+      "not": {}
     },
-    "not": {
-      "$comment": "This schema is hollow: it was not referenced and only remains as a container for definitions that are still in use. Itself must not be used for validation."
-    }
+    "not": {}
   }
 }

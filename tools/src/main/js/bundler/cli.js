@@ -58,9 +58,9 @@ const main = async (entryFile, includeDir) => {
 
     const shaken = treeShake(schema);
 
-    await writeFile(bundledFile, JSON.stringify(schema, null, 2));
-
     subschemas(schema).forEach(s => dropComments(s));
+
+    await writeFile(bundledFile, JSON.stringify(schema, null, 2));
 
     await writeFile(minifiedFile, JSON.stringify({
         ...schema,
