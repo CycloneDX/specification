@@ -112,6 +112,15 @@ export async function bundle(entryFile, includeFiles, targetFile) {
     const schemaDefsOrig = schema[DEFS_KEYWORDS];
     schema[DEFS_KEYWORDS] = Object.fromEntries( // deterministic order
         [...fileModuleNames.values()].sort().map(m => [m, undefined]));
+    if (schemaDefsOrig) {
+        schema[DEFS_KEYWORDS][entryModuleName] = {
+            [DEFS_KEYWORDS]: schemaDefsOrig,
+            not: {$comment: HOLLOW_COMMENT}
+        };
+        embeddedMap.set(`${entryFile}#${FRAG_DEFS_PREFIX}`, `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(entryModuleName)}`);
+    } else {
+        delete schema[DEFS_KEYWORDS][entryModuleName];
+    }
 
     const embeddedMap = new Map();
     await Promise.all(
@@ -130,15 +139,6 @@ export async function bundle(entryFile, includeFiles, targetFile) {
             }
         )
     );
-    if (schemaDefsOrig) {
-        schema[DEFS_KEYWORDS][entryModuleName] = {
-            [DEFS_KEYWORDS]: schemaDefsOrig,
-            not: {$comment: HOLLOW_COMMENT}
-        };
-        embeddedMap.set(`${entryFile}#${FRAG_DEFS_PREFIX}`, `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(entryModuleName)}`);
-    } else {
-        delete schema[DEFS_KEYWORDS][entryModuleName];
-    }
 
     return {
         schema,
