@@ -18,9 +18,9 @@ const FRAG_DEFS_PREFIX = `/${DEFS_KEYWORDS}/`;
  * - External file paths become relative to `targetFile`.
  * - Bundled support JSON pointers only, no support for anchors, yet.
  *
- * @param {string} entryFile Absolute entry point schema file.
- * @param {Iterable<string>} includeFiles Absolute dir to schema files that shall be bundled.
- * @param {string} targetFile Absolute target schema file.
+ * @param {string} entryFile Absolute path to entry point schema file.
+ * @param {Iterable<string>} includeFiles Absolute path to schema files that shall be bundled.
+ * @param {string} targetFile Absolute path to target schema file.
  * @return {Promise<{schema: *, external: ReadonlyArray<string>, embedded: ReadonlyArray<string>}>}
  */
 export async function bundle(entryFile, includeFiles, targetFile) {

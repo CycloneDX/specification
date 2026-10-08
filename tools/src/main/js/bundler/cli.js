@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import {glob, stat, writeFile} from 'node:fs/promises';
-import {join} from 'node:path'
+import {join, resolve} from 'node:path';
 
 import {bundle} from './src/bundle.js';
 import {dropCommentsExceptRoot} from './src/cleanup.js';
@@ -40,8 +40,8 @@ const toMinifiedName = (s) => {
 
 /**
  *
- * @param {string} entryFile
- * @param {string} includeDir
+ * @param {string} entryFile absolute path to entry file.
+ * @param {string} includeDir absolute path to include dir.
  */
 const main = async (entryFile, includeDir) => {
     const bundledFile = toBundledName(entryFile);
@@ -96,7 +96,7 @@ if (import.meta.main) {
         console.log(`  ${minified} (minified, root $comment only)`);
         process.exit(E_INVALID);
     }
-    main(entryFile, includeDir)
+    main(resolve(entryFile), resolve(includeDir))
         .then(async res => {
             const {bundled, shaken, bundledFile, minifiedFile} = res;
 
