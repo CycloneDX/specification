@@ -1,7 +1,7 @@
 import {stat} from 'node:fs/promises';
-import {basename, dirname, relative, resolve, sep} from 'node:path'
+import {basename, dirname, relative, resolve} from 'node:path'
 
-import {getJsonfile} from './helpers/common.js';
+import {getJsonfile, unixPath} from './helpers/common.js';
 import {makeModuleName} from './helpers/cyclonedx.js';
 import {escapeJsonPointer} from "./helpers/json-pointer-spec.js";
 import {
@@ -65,7 +65,7 @@ export async function bundle(entryFile, includeFiles, targetFile) {
                 if (!(await stat(refFile)).isFile()) {
                     throw new Error(`Not a file: ${refFile}`);
                 }
-                schema[k] = relative(targetDir, refFile).replace(sep, '/')
+                schema[k] = unixPath(relative(targetDir, refFile))
                     + (frag ? `#${frag}` : '');
                 // not rewired to bundled -> external
                 external.add(schema[k]);
@@ -89,7 +89,7 @@ export async function bundle(entryFile, includeFiles, targetFile) {
     const schema = await getJsonfile(entryFile);
     if (URL.canParse(schema.$id)) {
         schema.$id = new URL(
-            relative(entryDir, targetFile).replaceAll(sep, '/'),
+            unixPath(relative(entryDir, targetFile)),
             schema.$id
         ).toString();
     }
@@ -126,7 +126,7 @@ export async function bundle(entryFile, includeFiles, targetFile) {
         schema,
         external: Object.freeze([...external].sort()),
         embedded: Object.freeze(Array.from(embedded.entries(),
-            ([f, d]) => `${relative(entryDir, f).replaceAll(sep, '/')} -> ${d}`
+            ([f, d]) => `${unixPath(relative(entryDir, f))} -> ${d}`
         ).sort())
     };
 }

@@ -1,1 +1,3 @@
-TODO
+# JSON Schema bundler
+
+works best effort
