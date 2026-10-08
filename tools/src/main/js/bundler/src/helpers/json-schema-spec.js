@@ -92,7 +92,7 @@ export function refJoin({path, frag}) {
 
 
 /**
- * Weather a ref is absolute.
+ * Whether a ref is absolute.
  * @param {string} r ref
  * @return {boolean}
  */
