@@ -79,7 +79,7 @@ export async function bundle(entryFile, includeFiles, targetFile) {
         subschemas(schema).forEach(s => rewireRefs(s, sourceFile));
     }
 
-    const embedded = [];
+    const embedded = new Map();
     const seen = new Set();
 
     seen.add(entryFile);
@@ -103,7 +103,7 @@ export async function bundle(entryFile, includeFiles, targetFile) {
         delete includeSchema.$comment;
         rewireRefs(includeSchema, includeFile);
         schema[DEFS_KEYWORDS][moduleName] = includeSchema;
-        embedded.push(includeFile);
+        embedded.set(includeFile, `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`);
     }
 
     if (schemaDefsOrig) {
@@ -117,8 +117,8 @@ export async function bundle(entryFile, includeFiles, targetFile) {
     return {
         schema,
         external: Object.freeze([...external].sort()),
-        embedded: Object.freeze(embedded.map(
-            e => relative(entryDir, e).replaceAll(sep, '/')
+        embedded: Object.freeze(Array.from(embedded.entries(),
+            ([f, d]) => `${relative(entryDir, f).replaceAll(sep, '/')} -> ${d}`
         ).sort())
     };
 }
