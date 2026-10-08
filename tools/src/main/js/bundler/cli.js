@@ -4,7 +4,8 @@ import {glob, stat, writeFile} from 'node:fs/promises';
 import {join, resolve} from 'node:path';
 
 import {bundle} from './src/bundle.js';
-import {dropCommentsExceptRoot} from './src/cleanup.js';
+import {dropComments} from './src/cleanup.js';
+import {subschemas} from "./src/helpers/json-schema-spec.js";
 import {treeShake} from './src/tree-shake.js';
 import {JSON_SCHEMA_RE, JSON_SCHEMA_EXT} from './src/helpers/common.js';
 
@@ -59,7 +60,7 @@ const main = async (entryFile, includeDir) => {
 
     await writeFile(bundledFile, JSON.stringify(schema, null, 2));
 
-    dropCommentsExceptRoot(schema);
+    subschemas(schema).forEach(s => dropComments(s));
 
     await writeFile(minifiedFile, JSON.stringify({
         ...schema,

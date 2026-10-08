@@ -4,7 +4,11 @@ import {HOLLOW_COMMENT} from "./cleanup.js";
 import {getJsonfile} from './helpers/common.js';
 import {makeModuleName} from './helpers/cyclonedx.js';
 import {escapeJsonPointer} from "./helpers/json-pointer-spec.js";
-import {DATA_KEYWORDS, DEFS_KEYWORDS, REF_KEYWORDS, refIsAbsolute, refSplit} from './helpers/json-schema-spec.js';
+import {
+    DEFS_KEYWORDS, REF_KEYWORDS,
+    subschemas,
+    refIsAbsolute, refSplit
+} from './helpers/json-schema-spec.js';
 
 const FRAG_DEFS_PREFIX = `/${DEFS_KEYWORDS}/`;
 
@@ -39,44 +43,36 @@ export async function bundle(entryFile, includeFiles, targetFile) {
      * @return {void}
      */
     function rewireRefs(schema, sourceFile) {
-        if (typeof schema !== 'object' || schema === null) return;
-        if (Array.isArray(schema)) {
-            schema.forEach(v => rewireRefs(v, sourceFile));
-            return;
-        }
-        for (const [k, v] of Object.entries(schema)) {
-            if (DATA_KEYWORDS.has(k)) continue;
-            if (REF_KEYWORDS.has(k)) {
-                if (typeof v !== 'string') continue;
-                if (refIsAbsolute(v)) {
-                    external.add(v);
-                    continue;
-                }
-                const {path, frag} = refSplit(v);
-                const refFile = path
-                    ? resolve(dirname(sourceFile), ...path.split('/'))
-                    : sourceFile;
-                const moduleName = fileModuleNames.get(refFile);
-                if (!moduleName) {
-                    schema[k] = relative(targetDir, refFile).replace(sep, '/')
-                        + (frag ? `#${frag}` : '');
-                    // not rewired to bundled -> external
-                    external.add(schema[k]);
-                    continue
-                }
-                if (frag && !frag.startsWith('/')) {
-                    // currently dont support anchors - only defs.
-                    throw new Error(`Unsupported ref fragment: ${v}`);
-                }
-                schema[k] = (
-                    refFile === entryFile && !frag?.startsWith(FRAG_DEFS_PREFIX)
-                        ? '#'
-                        : `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`
-                ) + (frag ?? '');
+        for (const k of REF_KEYWORDS) {
+            const v = schema[k];
+            if (typeof v !== 'string') continue;
+            if (refIsAbsolute(v)) {
+                external.add(v);
                 continue;
             }
-            rewireRefs(v, sourceFile);
+            const {path, frag} = refSplit(v);
+            const refFile = path
+                ? resolve(dirname(sourceFile), ...path.split('/'))
+                : sourceFile;
+            const moduleName = fileModuleNames.get(refFile);
+            if (!moduleName) {
+                schema[k] = relative(targetDir, refFile).replace(sep, '/')
+                    + (frag ? `#${frag}` : '');
+                // not rewired to bundled -> external
+                external.add(schema[k]);
+                continue
+            }
+            if (frag && !frag.startsWith('/')) {
+                // currently dont support anchors - only defs.
+                throw new Error(`Unsupported ref fragment: ${v}`);
+            }
+            schema[k] = (
+                refFile === entryFile && !frag?.startsWith(FRAG_DEFS_PREFIX)
+                    ? '#'
+                    : `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`
+            ) + (frag ?? '');
         }
+        subschemas(schema).forEach(s => rewireRefs(s, sourceFile));
     }
 
     const embedded = [];

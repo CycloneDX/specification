@@ -1,20 +1,4 @@
-
-import { DATA_KEYWORDS } from './helpers/json-schema-spec.js';
-
-/**
- * Remove $comment in place - except from schema root.
- * @param {*} schema
- * @return {void}
- */
-export function dropCommentsExceptRoot(schema) {
-    if (typeof schema !== 'object' || schema === null || Array.isArray(schema)) {
-        throw new Error('expected a schema');
-    }
-    for (const [k, v] of Object.entries(schema)) {
-        if (DATA_KEYWORDS.has(k)) continue;
-        dropComments(v);
-    }
-}
+import {subschemas} from './helpers/json-schema-spec.js';
 
 /**
  * Remove $comment in place
@@ -22,16 +6,8 @@ export function dropCommentsExceptRoot(schema) {
  * @return {void}
  */
 export function dropComments(schema) {
-    if (typeof schema !== 'object' || schema === null) return;
-    if (Array.isArray(schema)) {
-        schema.forEach(dropComments);
-        return;
-    }
     delete schema.$comment;
-    for (const [k, v] of Object.entries(schema)) {
-        if (DATA_KEYWORDS.has(k)) continue;
-        dropComments(v);
-    }
+    subschemas(schema).forEach(s => dropComments(s));
 }
 
 export const HOLLOW_COMMENT =
