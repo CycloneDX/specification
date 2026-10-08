@@ -50,9 +50,7 @@ const main = async (entryFile, includeDir) => {
 
     const {schema, ...bundled} = await bundle(
         entryFile,
-        (await Array.fromAsync(
-            glob(join(includeDir, `**${JSON_SCHEMA_EXT}`))
-        )).sort(),
+        (await Array.fromAsync(glob(join(includeDir, `**${JSON_SCHEMA_EXT}`)))),
         bundledFile);
 
     const shaken = treeShake(schema);

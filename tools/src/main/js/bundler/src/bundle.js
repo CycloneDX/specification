@@ -1,3 +1,4 @@
+import {stat} from 'node:fs/promises';
 import {basename, dirname, relative, resolve, sep} from 'node:path'
 
 import {getJsonfile} from './helpers/common.js';
@@ -38,15 +39,16 @@ export async function bundle(entryFile, includeFiles, targetFile) {
     const fileModuleNames = Object.freeze(new Map(
         [entryFile, ...includeFiles].map(f => [f, makeModuleName(basename(f))])
     ));
+    const entryModuleName = fileModuleNames.get(entryFile);
 
     const external = new Set();
 
     /**
      * @param {*} schema
      * @param {string} sourceFile
-     * @return {void}
+     * @return {Promise<void>}
      */
-    function rewireRefs(schema, sourceFile) {
+    async function rewireRefs(schema, sourceFile) {
         for (const k of REF_KEYWORDS) {
             const v = schema[k];
             if (typeof v !== 'string') continue;
@@ -60,6 +62,9 @@ export async function bundle(entryFile, includeFiles, targetFile) {
                 : sourceFile;
             const moduleName = fileModuleNames.get(refFile);
             if (!moduleName) {
+                if (!(await stat(refFile)).isFile()) {
+                    throw new Error(`Not a file: ${refFile}`);
+                }
                 schema[k] = relative(targetDir, refFile).replace(sep, '/')
                     + (frag ? `#${frag}` : '');
                 // not rewired to bundled -> external
@@ -76,45 +81,46 @@ export async function bundle(entryFile, includeFiles, targetFile) {
                     : `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`
             ) + (frag ?? '');
         }
-        subschemas(schema).forEach(s => rewireRefs(s, sourceFile));
+        await Promise.all(
+            subschemas(schema).map(s => rewireRefs(s, sourceFile))
+        );
     }
 
-    const embedded = new Map();
-    const seen = new Set();
-
-    seen.add(entryFile);
     const schema = await getJsonfile(entryFile);
-    const schemaDefsOrig = schema[DEFS_KEYWORDS];
-    rewireRefs(schema, entryFile);
-    schema[DEFS_KEYWORDS] = {};
     if (URL.canParse(schema.$id)) {
         schema.$id = new URL(
             relative(entryDir, targetFile).replaceAll(sep, '/'),
             schema.$id
         ).toString();
     }
+    await rewireRefs(schema, entryFile);
+    const schemaDefsOrig = schema[DEFS_KEYWORDS];
+    schema[DEFS_KEYWORDS] = Object.fromEntries( // deterministic order
+        [...fileModuleNames.values()].sort().map(m => [m, undefined]));
 
-    for (const [includeFile, moduleName] of fileModuleNames.entries()) {
-        if (seen.has(includeFile)) continue;
-        seen.add(includeFile);
-        const includeSchema = await getJsonfile(includeFile);
-        delete includeSchema.$schema;
-        delete includeSchema.$id;
-        delete includeSchema.$comment;
-        rewireRefs(includeSchema, includeFile);
-        schema[DEFS_KEYWORDS][moduleName] = includeSchema;
-        embedded.set(includeFile, `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`);
-    }
-
+    const embedded = new Map();
+    await Promise.all(
+        fileModuleNames.entries().filter(([f,]) => f !== entryFile).map(
+            async ([includeFile, moduleName]) => {
+                const includeSchema = await getJsonfile(includeFile);
+                delete includeSchema.$schema;
+                delete includeSchema.$id;
+                delete includeSchema.$comment;
+                await rewireRefs(includeSchema, includeFile);
+                schema[DEFS_KEYWORDS][moduleName] = includeSchema;
+                embedded.set(includeFile, `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`);
+            }
+        )
+    );
     if (schemaDefsOrig) {
-        const moduleName = fileModuleNames.get(entryFile);
-        schema[DEFS_KEYWORDS][moduleName] = {
+        schema[DEFS_KEYWORDS][entryModuleName] = {
             [DEFS_KEYWORDS]: schemaDefsOrig,
             not: {$comment: HOLLOW_COMMENT}
         };
-        embedded.set(`${entryFile}#${FRAG_DEFS_PREFIX}`, `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`);
+        embedded.set(`${entryFile}#${FRAG_DEFS_PREFIX}`, `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(entryModuleName)}`);
+    } else {
+        delete schema[DEFS_KEYWORDS][entryModuleName];
     }
-    schema[DEFS_KEYWORDS]['not'] = {$comment: HOLLOW_COMMENT};
 
     return {
         schema,
