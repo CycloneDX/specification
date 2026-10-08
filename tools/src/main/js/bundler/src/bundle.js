@@ -107,10 +107,12 @@ export async function bundle(entryFile, includeFiles, targetFile) {
     }
 
     if (schemaDefsOrig) {
-        schema[DEFS_KEYWORDS][fileModuleNames.get(entryFile)] = {
+        const moduleName = fileModuleNames.get(entryFile);
+        schema[DEFS_KEYWORDS][moduleName] = {
             [DEFS_KEYWORDS]: schemaDefsOrig,
             not: {$comment: HOLLOW_COMMENT}
         };
+        embedded.set(`${entryFile}#${FRAG_DEFS_PREFIX}`, `#${FRAG_DEFS_PREFIX}${moduleName}`);
     }
     schema[DEFS_KEYWORDS]['not'] = {$comment: HOLLOW_COMMENT};
 
