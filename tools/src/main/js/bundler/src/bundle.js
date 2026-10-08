@@ -1,7 +1,6 @@
 import {basename, dirname, relative, resolve} from 'node:path'
 
-import {getJsonfile, unixPath} from './helpers/common.js';
-import {makeModuleName} from './helpers/cyclonedx.js';
+import {JSON_SCHEMA_RE, getJsonfile, unixPath} from './helpers/common.js';
 import {escapeJsonPointer} from "./helpers/json-pointer-spec.js";
 import {
     DEFS_KEYWORDS, REF_KEYWORDS,
@@ -158,4 +157,12 @@ export async function bundle(entryFile, includeFiles, targetFile) {
             }
         ).sort()),
     };
+}
+
+/**
+ * @param {string} s
+ * @return {string}
+ */
+function makeModuleName(s) {
+    return s.replace(JSON_SCHEMA_RE, '');
 }
