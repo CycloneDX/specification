@@ -38,6 +38,7 @@ export const treeShake = (schema) => {
     const hollowed = [];
 
     // TODO: tree-shake schema in place
+    // will be added in a dedicated PR later.
 
     return {
         // sort for reproducibility, freeze for immutability.
