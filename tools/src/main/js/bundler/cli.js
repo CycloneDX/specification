@@ -63,7 +63,7 @@ class ValidationError extends Error {
  * @typedef {object} MainResult
  * @property {import('./src/bundle.js').BundleResult} bundled
  * @property {import('./src/cleanup.js').TreeShakeResult} shaken
- * @property {import('./src/sanity.js').ValidationResult} validationWarnings
+ * @property {import('./src/sanity.js').ValidationResult.warnings} validationWarnings
  * @property {string} bundledFile
  * @property {string} minifiedFile
  */
