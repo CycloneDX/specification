@@ -7,8 +7,8 @@ import {isJsonPointer, jsonPointer2stack} from './helpers/json-pointer-spec.js'
 
 /**
  * @typedef {object} ValidationResult
- * @property {Array<string>} warnings
- * @property {Array<string>} errors
+ * @property {string[]} warnings
+ * @property {string[]} errors
  */
 
 
@@ -76,7 +76,11 @@ const validateRefs = (schema) => {
 export const validateSchema = (schema) => {
     const refs = validateRefs(schema)
     return {
-        warnings: refs.warnings, // add more in the future: [...refs.warnings, ...foo.warnings]
-        errors: refs.errors,
-    };
+        warnings: [
+            ...refs.warnings,
+        ],
+        errors: [
+            ...refs.errors,
+        ],
+    }
 };

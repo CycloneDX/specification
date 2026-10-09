@@ -5,9 +5,9 @@ import {COMMENT_KEYWORD, subschemas} from './helpers/json-schema-spec.js';
  * @param {*} schema
  * @return {void}
  */
-export function dropComments(schema) {
+export const dropComments = (schema) => {
     delete schema[COMMENT_KEYWORD];
-    subschemas(schema).forEach(s => dropComments(s));
+    subschemas(schema).forEach(dropComments);
 }
 
 export const HOLLOW_COMMENT =
@@ -17,8 +17,8 @@ export const HOLLOW_COMMENT =
 
 /**
  * @typedef {object} TreeShakeResult
- * @property {ReadonlyArray<string>} hollowed
- * @property {ReadonlyArray<string>} removed
+ * @property {string[]} hollowed
+ * @property {string[]} removed
  */
 
 /**
@@ -34,15 +34,13 @@ export const HOLLOW_COMMENT =
  * @return {TreeShakeResult}
  */
 export const treeShake = (schema) => {
+    /** @type {string[]} */
     const removed = [];
+    /** @type {string[]} */
     const hollowed = [];
 
     // TODO: tree-shake schema in place
     // will be added in a dedicated PR later.
 
-    return {
-        // sort for reproducibility, freeze for immutability.
-        hollowed: Object.freeze(hollowed.sort()),
-        removed: Object.freeze(removed.sort()),
-    };
+    return {hollowed, removed};
 };

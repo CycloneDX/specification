@@ -27,7 +27,7 @@ const makeModuleName = (f) =>
 /**
  * @typedef {object} BundleResult
  * @property {*} schema
- * @property {Array<string>} embedded embedded schema files
+ * @property {string[]} embedded embedded schema files
  * @property {Array<[string, string]>} external external refs
  * @property {Array<[string, string]>} rewired rewired refs
  */
