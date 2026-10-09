@@ -16,8 +16,7 @@ import {isJsonPointer, jsonPointer2stack} from './helpers/json-pointer-spec.js'
  * Validate a schema's refs.
  *
  * Check that all local refs are reachable.
- * - Absolutes are not checked.
- * - External file are not checked.
+ * - Checks only local refs.
  * - Validation support JSON pointers.
  * - Validation does not support anchors.
  * - Validation is not aware of IDs.
