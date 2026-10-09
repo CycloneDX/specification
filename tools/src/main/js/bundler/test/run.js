@@ -11,14 +11,14 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import assert from 'node:assert';
-import {fileURLToPath} from 'node:url';
+import url from 'node:url';
 
 import cliMain from '../cli.js';
 
 const UPDATE_SNAPSHOTS = process.env.UPDATE_SNAPSHOTS === '1';
 
-const FIXTURES_DIR = fileURLToPath(new URL('./fixtures', import.meta.url));
-const SNAPSHOT_DIR = fileURLToPath(new URL('./snapshot', import.meta.url));
+const FIXTURES_DIR = url.fileURLToPath(new URL('./fixtures', import.meta.url));
+const SNAPSHOT_DIR = url.fileURLToPath(new URL('./snapshot', import.meta.url));
 const ROOT_SCHEMA = 'main.schema.json';
 const MODULES_DIR = 'modules';
 

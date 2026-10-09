@@ -109,10 +109,14 @@ const main = async (entryFile, includeDir) => {
 };
 export default main;
 
+
+
 if (import.meta.main) {
     const E_INVALID = 1;
     const E_ERROR = 2;
+
     const [, , includeDir, entryFile] = process.argv;
+
     if (!includeDir || !entryFile) {
         const modules = join('schema', '2.0', 'modules');
         const entry = join('schema', '2.0', 'cyclonedx-2.0.schema.json');
@@ -130,6 +134,7 @@ if (import.meta.main) {
         console.log(`  ${minified} (minified, root $comment only)`);
         process.exit(E_INVALID);
     }
+
     main(resolve(entryFile), resolve(includeDir))
         .then(async res => {
             const {bundled, shaken, validationWarnings, bundledFile, minifiedFile} = res;
