@@ -4,9 +4,9 @@ import {glob, stat, writeFile} from 'node:fs/promises';
 import {join, resolve} from 'node:path';
 
 import {bundle} from './src/bundle.js';
-import {dropComments} from './src/cleanup.js';
-import {subschemas} from "./src/helpers/json-schema-spec.js";
-import {treeShake} from './src/tree-shake.js';
+import {dropComments, treeShake} from './src/cleanup.js';
+import {ID_KEYWORD, subschemas} from './src/helpers/json-schema-spec.js';
+import {validateSchema} from './src/sanity.js';
 import {JSON_SCHEMA_RE, JSON_SCHEMA_EXT} from './src/helpers/common.js';
 
 /**
@@ -19,7 +19,7 @@ import {JSON_SCHEMA_RE, JSON_SCHEMA_EXT} from './src/helpers/common.js';
  */
 const toBundledName = (s) => {
     if (!s.endsWith(JSON_SCHEMA_EXT)) {
-        throw new Error(`expected "*${JSON_SCHEMA_EXT}", got ${s}`);
+        throw new Error(`expected "*${JSON_SCHEMA_EXT}", got ${JSON.stringify(s)}`);
     }
     return s.replace(JSON_SCHEMA_RE, '-bundled$&');
 };
@@ -34,7 +34,7 @@ const toBundledName = (s) => {
  */
 const toMinifiedName = (s) => {
     if (!s.endsWith(JSON_SCHEMA_EXT)) {
-        throw new Error(`expected "*${JSON_SCHEMA_EXT}", got ${s}`);
+        throw new Error(`expected "*${JSON_SCHEMA_EXT}", got ${JSON.stringify(s)}`);
     }
     return s.replace(JSON_SCHEMA_RE, '.min$&');
 };
@@ -55,12 +55,20 @@ const main = async (entryFile, includeDir) => {
 
     const shaken = treeShake(schema);
 
+    const {errors} = validateSchema(schema, bundled.external);
+    if (errors.length) {
+        throw new Error('Validation errors:\n'
+            + errors.map(e => `  * ${e}`).join('\n'));
+    }
+
     await writeFile(bundledFile, JSON.stringify(schema, null, 2));
 
     subschemas(schema).forEach(s => dropComments(s));
     await writeFile(minifiedFile, JSON.stringify({
         ...schema,
-        $id: schema.$id ? toMinifiedName(schema.$id) : undefined
+        [ID_KEYWORD]: schema[ID_KEYWORD]
+            ? toMinifiedName(schema[ID_KEYWORD])
+            : undefined
     }));
 
     return {

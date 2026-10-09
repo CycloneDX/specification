@@ -4,19 +4,28 @@
  * This adheres to DRAFT 2020-12.
  */
 
+
+export const SCHEMA_KEYWORD = '$schema';
+
+export const ID_KEYWORD = '$id';
+
+export const COMMENT_KEYWORD = '$comment';
+
 export const DEFS_KEYWORDS = '$defs';
 
-export const REF_KEYWORDS = Object.freeze(new Set(['$ref', '$recursiveRef', '$dynamicRef']));
+export const REF_KEYWORDS = Object.freeze(new Set(['$ref', '$dynamicRef', '$recursiveRef']));
 
 export const ANCHOR_KEYWORDS = Object.freeze(new Set(['$anchor', '$dynamicAnchor', '$recursiveAnchor']));
 
 export const DATA_KEYWORDS = Object.freeze(new Set(['enum', 'const', 'examples', 'default']));
 
+export const NOT_KEYWORD = 'not';
+
 export const SINGLE_SCHEMA = Object.freeze(new Set([
     'additionalProperties', 'propertyNames',
     'items', 'contains',
     'unevaluatedProperties', 'unevaluatedItems',
-    'not', 'if', 'then', 'else',
+    'if', 'then', 'else', NOT_KEYWORD,
     'contentSchema',
 ]));
 
@@ -42,7 +51,7 @@ export function isSchemaObject(o) {
 export function* subschemas(s) {
     for (const [k, v] of Object.entries(s)) {
         if (SINGLE_SCHEMA.has(k)) {
-            if(isSchemaObject(v)) yield v;
+            if (isSchemaObject(v)) yield v;
         } else if (SCHEMA_ARRAY.has(k)) {
             if (Array.isArray(v)) yield* v.filter(isSchemaObject);
         } else if (SCHEMA_MAP.has(k)) {

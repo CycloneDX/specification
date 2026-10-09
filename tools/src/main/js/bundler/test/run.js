@@ -17,8 +17,8 @@ import cliMain from '../cli.js';
 
 const UPDATE_SNAPSHOTS = process.env.UPDATE_SNAPSHOTS === '1';
 
-const FIXTURES_DIR = fileURLToPath(new URL("./fixtures", import.meta.url));
-const SNAPSHOT_DIR = fileURLToPath(new URL("./snapshot", import.meta.url));
+const FIXTURES_DIR = fileURLToPath(new URL('./fixtures', import.meta.url));
+const SNAPSHOT_DIR = fileURLToPath(new URL('./snapshot', import.meta.url));
 const ROOT_SCHEMA = 'main.schema.json';
 const MODULES_DIR = 'modules';
 

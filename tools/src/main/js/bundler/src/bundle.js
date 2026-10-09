@@ -1,17 +1,17 @@
 import {basename, dirname, relative, resolve} from 'node:path'
 
 import {JSON_SCHEMA_RE, getJsonfile, unixPath} from './helpers/common.js';
-import {escapeJsonPointer} from "./helpers/json-pointer-spec.js";
+import {escapeJsonPointer} from './helpers/json-pointer-spec.js';
 import {
-    DEFS_KEYWORDS, REF_KEYWORDS,
+    ANCHOR_KEYWORDS, ID_KEYWORD, NOT_KEYWORD, SCHEMA_KEYWORD, COMMENT_KEYWORD, DEFS_KEYWORDS, REF_KEYWORDS,
     subschemas,
-    refIsAbsolute, refSplit, refJoin, ANCHOR_KEYWORDS
+    refIsAbsolute, refSplit, refJoin,
 } from './helpers/json-schema-spec.js';
 
 
 const HOLLOW_COMMENT =
-    "This schema is hollow: it remains as a container for definitions. " +
-    "Itself must not be used for validation.";
+    'This schema is hollow: it is as a container for definitions. ' +
+    'Itself must not be used for validation.';
 
 
 const FRAG_DEFS_PREFIX = `/${DEFS_KEYWORDS}/`;
@@ -19,9 +19,9 @@ const FRAG_DEFS_PREFIX = `/${DEFS_KEYWORDS}/`;
 /**
  * @typedef BundleResult
  * @property {*} schema
- * @property {ReadonlyArray<string>} embedded embedded schema files
- * @property {ReadonlyArray<string>} external external refs
- * @property {ReadonlyArray<string>} rewired rewired refs
+ * @property {Set<string>} embedded embedded schema files
+ * @property {Array<[string, string]>} external external refs
+ * @property {Array<[string, string]>} rewired rewired refs
  */
 
 /**
@@ -111,10 +111,10 @@ export async function bundle(entryFile, includeFiles, targetFile) {
     }
 
     const schema = await getJsonfile(entryFile);
-    if (URL.canParse(schema.$id)) {
-        schema.$id = new URL(
+    if (URL.canParse(schema[ID_KEYWORD])) {
+        schema[ID_KEYWORD] = new URL(
             unixPath(relative(entryDir, targetFile)),
-            schema.$id
+            schema[ID_KEYWORD]
         ).toString();
     }
     await rewireRefs(schema, entryFile);
@@ -124,7 +124,7 @@ export async function bundle(entryFile, includeFiles, targetFile) {
     if (schemaDefsOrig) {
         schema[DEFS_KEYWORDS][entryModuleName] = {
             [DEFS_KEYWORDS]: schemaDefsOrig,
-            not: {$comment: HOLLOW_COMMENT}
+            [NOT_KEYWORD]: {$comment: HOLLOW_COMMENT}
         };
         embeddedMap.set(`${entryFile}#${FRAG_DEFS_PREFIX}`, `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(entryModuleName)}`);
     } else {
@@ -133,13 +133,13 @@ export async function bundle(entryFile, includeFiles, targetFile) {
 
     for (const [includeFile, moduleName] of fileModuleNames.entries()) {
         if (includeFile === entryFile) continue;
-        if (schema[DEFS_KEYWORDS][moduleName]) {
+        if (schema[DEFS_KEYWORDS][moduleName] !== undefined) {
             throw new Error(`Collision: ${moduleName}`);
         }
         const includeSchema = await getJsonfile(includeFile);
-        delete includeSchema.$schema;
-        delete includeSchema.$id;
-        delete includeSchema.$comment;
+        delete includeSchema[SCHEMA_KEYWORD];
+        delete includeSchema[ID_KEYWORD];
+        delete includeSchema[COMMENT_KEYWORD];
         await rewireRefs(includeSchema, includeFile);
         schema[DEFS_KEYWORDS][moduleName] = includeSchema;
         embeddedMap.set(includeFile, `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`);
@@ -147,27 +147,25 @@ export async function bundle(entryFile, includeFiles, targetFile) {
 
     return {
         schema,
-        // sort for reproducibility, freeze for immutability.
-        external: Object.freeze([...externals].sort()),
-        embedded: Object.freeze(Array.from(embeddedMap.entries(),
-            ([f, d]) => `${unixPath(relative(entryDir, f))} -> ${d}`
-        ).sort()),
-        rewired: Object.freeze(Array.from(rewiredMap.entries(),
+        external: externals,
+        embedded: Array.from(embeddedMap.entries(),
+            ([f, d]) => [unixPath(relative(entryDir, f)), d]),
+        rewired: Array.from(rewiredMap.entries(),
             ([f, t]) => {
                 if (!f.startsWith('#')) {
                     const {path, frag} = refSplit(f);
                     f = refJoin({path: unixPath(relative(entryDir, path)), frag});
                 }
-                return `${f} -> ${t}`;
+                return [f, t];
             }
-        ).sort()),
+        ),
     };
 }
 
 /**
- * @param {string} s
+ * @param {string} f
  * @return {string}
  */
-function makeModuleName(s) {
-    return s.replace(JSON_SCHEMA_RE, '');
+function makeModuleName(f) {
+    return f.replace(JSON_SCHEMA_RE, '');
 }

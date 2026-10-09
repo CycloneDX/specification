@@ -3,7 +3,7 @@
  */
 
 import {readFile} from 'node:fs/promises';
-import {sep} from "node:path";
+import {sep} from 'node:path';
 
 /**
  * File extension for JSON schema files.
