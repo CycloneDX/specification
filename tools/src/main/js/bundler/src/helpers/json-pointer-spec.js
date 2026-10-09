@@ -13,28 +13,37 @@
  */
 
 
+const PREFIX = '/';
+const PREFIX_ESC = '~1';
+const TILDE = '~';
+const TILDE_ESC = '~0';
+
 /**
- * Delimiter in JSON Pointer.
+ * @param {string} s
+ * @return {boolean}
  */
-const JSON_POINTER_DELIM = '/';
+export const isJsonPointer = (s) =>
+    s.startsWith(PREFIX);
 
 /**
  * JSON Pointer to stack.
  * @param {JsonPointer} p
  * @return {JsonPointerStack}
  */
-export function jsonPointer2stack(p) {
-    return p.split(JSON_POINTER_DELIM);
-}
+export const jsonPointer2stack = (p) =>
+    p.split(PREFIX).slice(1).map(unescapeJsonPointer);
 
 /**
  * JSON Pointer for stack.
  * @param {JsonPointerStack} s
  * @return {JsonPointer}
  */
-export function jsonPointer4stack(s) {
-    return s.join(JSON_POINTER_DELIM);
-}
+export const jsonPointer4stack = (s) =>
+    PREFIX + s.map(escapeJsonPointer).join(PREFIX);
+
+
+
+
 
 
 /**
@@ -42,17 +51,15 @@ export function jsonPointer4stack(s) {
  * @param {string} p
  * @return {string}
  */
-export function escapeJsonPointer(p) {
-    return p.replaceAll('~', '~0').replaceAll('/', '~1');
-}
+export const escapeJsonPointer = (p) =>
+    p.replaceAll(TILDE, TILDE_ESC).replaceAll(PREFIX, PREFIX_ESC);
 
 /**
  * Unescape a JSON Pointer token.
  * @param {string} p
  * @return {string}
  */
-export function unescapeJsonPointer(p) {
-    return p.replaceAll('~1', '/').replaceAll('~0', '~');
-}
+export const unescapeJsonPointer = (p) =>
+    p.replaceAll(PREFIX_ESC, PREFIX).replaceAll(TILDE_ESC, TILDE);
 
 

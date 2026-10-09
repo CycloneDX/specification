@@ -16,7 +16,7 @@ export const HOLLOW_COMMENT =
     'Itself must not be used for validation.';
 
 /**
- * @typedef TreeShakeResult
+ * @typedef {object} TreeShakeResult
  * @property {ReadonlyArray<string>} hollowed
  * @property {ReadonlyArray<string>} removed
  */

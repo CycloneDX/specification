@@ -17,9 +17,9 @@ const HOLLOW_COMMENT =
 const FRAG_DEFS_PREFIX = `/${DEFS_KEYWORDS}/`;
 
 /**
- * @typedef BundleResult
+ * @typedef {object} BundleResult
  * @property {*} schema
- * @property {Set<string>} embedded embedded schema files
+ * @property {Array<string>} embedded embedded schema files
  * @property {Array<[string, string]>} external external refs
  * @property {Array<[string, string]>} rewired rewired refs
  */
@@ -52,8 +52,11 @@ export async function bundle(entryFile, includeFiles, targetFile) {
     ));
     const entryModuleName = fileModuleNames.get(entryFile);
 
+    /** @type {Map<string, string>} */
     const embeddedMap = new Map();
+    /** @type {Set<string>} */
     const externals = new Set();
+    /** @type {Map<string, string>} */
     const rewiredMap = new Map();
 
     /**
@@ -61,12 +64,7 @@ export async function bundle(entryFile, includeFiles, targetFile) {
      * @param {string} sourceFile
      * @return {Promise<void>}
      */
-    async function rewireRefs(schema, sourceFile) {
-        for (const k of ANCHOR_KEYWORDS) {
-            const v = schema[k];
-            if (typeof v !== 'string') continue;
-            // TODO: support anchors.
-        }
+    const rewireRefs = async (schema, sourceFile) => {
         for (const k of REF_KEYWORDS) {
             const v = schema[k];
             if (typeof v !== 'string') continue;
@@ -147,7 +145,7 @@ export async function bundle(entryFile, includeFiles, targetFile) {
 
     return {
         schema,
-        external: externals,
+        external: Array.from(externals),
         embedded: Array.from(embeddedMap.entries(),
             ([f, d]) => [unixPath(relative(entryDir, f)), d]),
         rewired: Array.from(rewiredMap.entries(),

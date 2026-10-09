@@ -39,10 +39,45 @@ const toMinifiedName = (s) => {
     return s.replace(JSON_SCHEMA_RE, '.min$&');
 };
 
+class ValidationError extends Error {
+    /** @type {ReadonlySet<string>} */
+    #errors;
+
+    /**
+     * @param {Iterable<string>} errors
+     * @param {ErrorOptions} [options]
+     */
+    constructor(errors, options) {
+        super(undefined, options);
+        delete this.message;
+        this.#errors = Object.freeze(new Set(errors));
+    }
+
+    get message() {
+        return 'Validation Errors:\n'
+            + Array.from(this.#errors, e => `- ${e}`).sort().join('\n');
+    }
+
+    /** @returns {ReadonlySet<Error>} */
+    get errors() {
+        return this.#errors;
+    }
+
+}
+
 /**
- *
+ * @typedef {object} MainResult
+ * @property {import('./src/bundle.js').BundleResult} bundled
+ * @property {import('./src/cleanup.js').TreeShakeResult} shaken
+ * @property {import('./src/sanity.js').ValidationResult} validationWarnings
+ * @property {string} bundledFile
+ * @property {string} minifiedFile
+ */
+
+/**
  * @param {string} entryFile absolute path to entry file.
  * @param {string} includeDir absolute path to include dir.
+ * @return {Promise<MainResult>}
  */
 const main = async (entryFile, includeDir) => {
     const bundledFile = toBundledName(entryFile);
@@ -55,10 +90,9 @@ const main = async (entryFile, includeDir) => {
 
     const shaken = treeShake(schema);
 
-    const {errors} = validateSchema(schema, bundled.external);
-    if (errors.length) {
-        throw new Error('Validation errors:\n'
-            + errors.map(e => `  * ${e}`).join('\n'));
+    const validationResult = validateSchema(schema);
+    if (validationResult.errors.length) {
+        throw new ValidationError(validationResult.errors);
     }
 
     await writeFile(bundledFile, JSON.stringify(schema, null, 2));
@@ -74,6 +108,7 @@ const main = async (entryFile, includeDir) => {
     return {
         bundled,
         shaken,
+        validationWarnings: validationResult.warnings,
         bundledFile,
         minifiedFile,
     };
@@ -103,13 +138,15 @@ if (import.meta.main) {
     }
     main(resolve(entryFile), resolve(includeDir))
         .then(async res => {
-            const {bundled, shaken, bundledFile, minifiedFile} = res;
+            const {bundled, shaken, validationWarnings, bundledFile, minifiedFile} = res;
 
             console.info(`bundler: embedded (${bundled.embedded.length}):`, bundled.embedded);
             console.info(`bundler: external (${bundled.external.length}):`, bundled.external);
 
             console.info(`tree-shake: removed (${shaken.removed.length}):`, shaken.removed);
             console.info(`tree-shake: hollowed (${shaken.hollowed.length}):`, shaken.hollowed);
+
+            console.warn(`validation warnings (${validationWarnings.length}):`, validationWarnings);
 
             const {size: bundledSize} = await stat(bundledFile);
             console.log(`wrote ${bundledFile} (${bundledSize} bytes)`);
