@@ -20,13 +20,15 @@ export const JSON_SCHEMA_RE = Object.freeze(new RegExp(`${RegExp.escape(JSON_SCH
  * @param {string} file
  * @return {Promise<any>}
  */
-export async function getJsonfile (file) {
-    return JSON.parse(await readFile(file, 'utf8'));
-}
+export const getJsonfile = async  (file) =>
+    JSON.parse(await readFile(file, 'utf8'));
 
-export function unixPath(p) {
-    return p.replaceAll(sep, '/');
-}
+/**
+ * @param {string} p
+ * @return {string}
+ */
+export const unixPath = (p) =>
+    p.replaceAll(sep, '/');
 
 
 /**
@@ -34,7 +36,7 @@ export function unixPath(p) {
  * @param {string[]} pathStack
  * @return {boolean}
  */
-export function objectHasOwnPath(o, pathStack) {
+export const objectHasOwnPath = (o, pathStack) => {
     let c = o;
     for (const s of pathStack) {
         try {
@@ -45,4 +47,4 @@ export function objectHasOwnPath(o, pathStack) {
         c = c[s];
     }
     return true;
-}
+};

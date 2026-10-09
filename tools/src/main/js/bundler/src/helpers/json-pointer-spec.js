@@ -42,10 +42,6 @@ export const jsonPointer4stack = (s) =>
     PREFIX + s.map(escapeJsonPointer).join(PREFIX);
 
 
-
-
-
-
 /**
  * Escape a JSON Pointer token.
  * @param {string} p
@@ -61,5 +57,3 @@ export const escapeJsonPointer = (p) =>
  */
 export const unescapeJsonPointer = (p) =>
     p.replaceAll(PREFIX_ESC, PREFIX).replaceAll(TILDE_ESC, TILDE);
-
-

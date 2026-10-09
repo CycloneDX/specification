@@ -17,6 +17,14 @@ const HOLLOW_COMMENT =
 const FRAG_DEFS_PREFIX = `/${DEFS_KEYWORDS}/`;
 
 /**
+ * @param {string} f
+ * @return {string}
+ */
+const makeModuleName = (f) =>
+    f.replace(JSON_SCHEMA_RE, '');
+
+
+/**
  * @typedef {object} BundleResult
  * @property {*} schema
  * @property {Array<string>} embedded embedded schema files
@@ -43,7 +51,7 @@ const FRAG_DEFS_PREFIX = `/${DEFS_KEYWORDS}/`;
  * @param {string} targetFile Absolute path to target schema file.
  * @return {Promise<BundleResult>}
  */
-export async function bundle(entryFile, includeFiles, targetFile) {
+export const bundle = async (entryFile, includeFiles, targetFile) => {
     const targetDir = dirname(targetFile);
     const entryDir = dirname(entryFile);
 
@@ -158,12 +166,4 @@ export async function bundle(entryFile, includeFiles, targetFile) {
             }
         ),
     };
-}
-
-/**
- * @param {string} f
- * @return {string}
- */
-function makeModuleName(f) {
-    return f.replace(JSON_SCHEMA_RE, '');
-}
+};

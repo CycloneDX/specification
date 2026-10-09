@@ -37,18 +37,17 @@ export const SCHEMA_MAP = Object.freeze(new Set([DEFS_KEYWORDS, 'properties', 'p
  * @param {unknown} o
  * @returns {o is Record<string, unknown>}
  */
-export function isSchemaObject(o) {
-    return o !== null
-        && typeof o === 'object'
-        && !Array.isArray(o);
-}
+export const isSchemaObject = (o) =>
+    o !== null
+    && typeof o === 'object'
+    && !Array.isArray(o);
 
 /**
  * Yield immediate subschemas, never property maps or literal data.
  * @param {*} s schema
  * @return {Generator<unknown, void, *>}
  */
-export function* subschemas(s) {
+export const subschemas = function* (s) {
     for (const [k, v] of Object.entries(s)) {
         if (SINGLE_SCHEMA.has(k)) {
             if (isSchemaObject(v)) yield v;
@@ -58,10 +57,10 @@ export function* subschemas(s) {
             if (isSchemaObject(v)) yield* Object.values(v).filter(isSchemaObject);
         }
     }
-}
+};
 
 /**
- * @typedef RefSplit
+ * @typedef {object} RefSplit
  * @property {string|null} path
  * @property {string|null} frag
  */
@@ -74,7 +73,7 @@ export function* subschemas(s) {
  * @param {string} r ref
  * @return {RefSplit}
  */
-export function refSplit(r) {
+export const refSplit = (r) => {
     const split = r.split('#');
     if (split.length > 2) {
         throw new RangeError(`Unexpected amount of "#" in ${r}`);
@@ -83,21 +82,21 @@ export function refSplit(r) {
         path: split[0] || null,
         frag: split[1] || null,
     }
-}
+};
 
 
 /**
  * Join a ref path and fragment.
  *
- * @param {RefSplit} rs refSplit
+ * @param {RefSplit} rs
  * @return {string}
  */
-export function refJoin({path, frag}) {
+export const refJoin = ({path, frag}) => {
     if (path && frag) return `${path}#${frag}`;
     if (path) return path;
     if (frag) return `#${frag}`;
     return '#'; // the entire schema
-}
+};
 
 
 /**
@@ -105,9 +104,9 @@ export function refJoin({path, frag}) {
  * @param {string} r ref
  * @return {boolean}
  */
-export function refIsAbsolute(r) {
+export const refIsAbsolute = (r) => {
     if (r.startsWith('#')) return false;
     return r.startsWith('/')  // Unix-like absolute path
         || r.startsWith('\\')  // UNC-like absolute path
         || r.search(':') > 0; // Windows-like absolute path or a form of <schema>:<rest>
-}
+};

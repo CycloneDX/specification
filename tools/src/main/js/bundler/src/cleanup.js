@@ -33,7 +33,7 @@ export const HOLLOW_COMMENT =
  * @param {*} schema
  * @return {TreeShakeResult}
  */
-export function treeShake(schema) {
+export const treeShake = (schema) => {
     const removed = [];
     const hollowed = [];
 
@@ -44,4 +44,4 @@ export function treeShake(schema) {
         hollowed: Object.freeze(hollowed.sort()),
         removed: Object.freeze(removed.sort()),
     };
-}
+};

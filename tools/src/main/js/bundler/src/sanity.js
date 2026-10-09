@@ -13,23 +13,6 @@ import {isJsonPointer, jsonPointer2stack} from './helpers/json-pointer-spec.js'
 
 
 /**
- * @param {Readonly<*>} schema
- * @return {ValidationResult}
- */
-export function validateSchema(schema) {
-    const refs = validateRefs(schema)
-    return {
-        warnings: [
-            ...refs.warnings,
-        ],
-        errors: [
-            ...refs.errors,
-        ],
-    };
-}
-
-
-/**
  * Validate a schema's refs.
  *
  * Check that all local refs are reachable.
@@ -42,7 +25,7 @@ export function validateSchema(schema) {
  * @param {Readonly<*>} schema
  * @return {ValidationResult}
  */
-function validateRefs (schema) {
+const validateRefs = (schema) => {
     /** @type {Set<string>} */
     const errors = new Set();
     /** @type {Set<string>} */
@@ -84,4 +67,16 @@ function validateRefs (schema) {
         warnings: Array.from(warnings),
         errors: Array.from(errors),
     };
-}
+};
+
+/**
+ * @param {Readonly<*>} schema
+ * @return {ValidationResult}
+ */
+export const validateSchema = (schema) => {
+    const refs = validateRefs(schema)
+    return {
+        warnings: refs.warnings, // add more in the future: [...refs.warnings, ...foo.warnings]
+        errors: refs.errors,
+    };
+};
