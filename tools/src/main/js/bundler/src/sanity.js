@@ -43,10 +43,10 @@ export function validateSchema(schema) {
  * @return {ValidationResult}
  */
 function validateRefs (schema) {
-    /** @type {string[]} */
-    const errors = [];
-    /** @type {string[]} */
-    const warnings = [];
+    /** @type {Set<string>} */
+    const errors = new Set();
+    /** @type {Set<string>} */
+    const warnings = new Set();
 
     /** @type {Set<string>} */
     const localRefs = new Set();
@@ -62,7 +62,7 @@ function validateRefs (schema) {
             if (v.startsWith('#')) {
                 localRefs.add(v.slice(1));
             } else {
-                warnings.push(`Unchecked remote ref: ${v}`);
+                warnings.add(`Unchecked external ref: ${v}`);
             }
         }
         subschemas(schema).forEach(gatherRefs);
@@ -73,12 +73,15 @@ function validateRefs (schema) {
     for (const ref of localRefs) {
         if (isJsonPointer(ref)) {
             if (!objectHasOwnPath(schema, jsonPointer2stack(ref))) {
-                errors.push(`Missing local ref: #${ref}`);
+                errors.add(`Missing local ref: #${ref}`);
             }
         } else {
-            warnings.push(`Unchecked local ref: #${ref}`);
+            warnings.add(`Unchecked local ref: #${ref}`);
         }
     }
 
-    return {warnings, errors};
+    return {
+        warnings: Array.from(warnings),
+        errors: Array.from(errors),
+    };
 }

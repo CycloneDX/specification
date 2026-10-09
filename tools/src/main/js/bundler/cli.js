@@ -40,8 +40,8 @@ const toMinifiedName = (s) => {
 };
 
 class ValidationError extends Error {
-    /** @type {ReadonlySet<string>} */
-    #errors;
+    /** @type {Array<string>} */
+    errors;
 
     /**
      * @param {Iterable<string>} errors
@@ -50,19 +50,13 @@ class ValidationError extends Error {
     constructor(errors, options) {
         super(undefined, options);
         delete this.message;
-        this.#errors = Object.freeze(new Set(errors));
+        this.errors = [...errors];
     }
 
     get message() {
         return 'Validation Errors:\n'
-            + Array.from(this.#errors, e => `- ${e}`).sort().join('\n');
+            + this.errors.map(e => `- ${e}`).sort().join('\n');
     }
-
-    /** @returns {ReadonlySet<Error>} */
-    get errors() {
-        return this.#errors;
-    }
-
 }
 
 /**
