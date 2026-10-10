@@ -23,6 +23,27 @@ const FRAG_DEFS_PREFIX = `/${DEFS_KEYWORDS}/`;
 const makeModuleName = (f) =>
     f.replace(JSON_SCHEMA_RE, '');
 
+class ModuleNameCollisionError extends Error {
+    /** @type {Map<string, string[]>} */
+    collisions;
+
+    /**
+     * @param {Map<string, string[]>} collisions
+     * @param {ErrorOptions} [options]
+     */
+    constructor(collisions, options) {
+        super(undefined, options);
+        delete this.message;
+        this.collisions = collisions;
+    }
+
+    get message() {
+        return 'ModuleName collisions:\n'
+            + Array.from(this.collisions,
+                ([m, ds]) => `- ${m} -> ${JSON.stringify(ds)}`
+            ).sort().join('\n');
+    }
+}
 
 /**
  * @typedef {object} BundleResult
@@ -61,7 +82,7 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
     ));
     const _dupModuleNames = findDuplicateValues(fileModuleNames)
     if (_dupModuleNames.size) {
-        throw new Error(`ModuleName collisions: ${JSON.stringify(Object.fromEntries(_dupModuleNames))}`);
+        throw new ModuleNameCollisionError(_dupModuleNames);
     }
 
     /** @type {Map<string, string>} */
