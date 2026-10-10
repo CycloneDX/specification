@@ -32,8 +32,8 @@ export const unixPath = (p) =>
 
 
 /**
- * @param {*} o
- * @param {string[]} pathStack
+ * @param {Readonly<*>} o
+ * @param {ReadonlyArray<string>} pathStack
  * @return {boolean}
  */
 export const objectHasOwnPath = (o, pathStack) => {

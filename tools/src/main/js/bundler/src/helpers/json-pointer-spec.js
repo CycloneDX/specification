@@ -35,7 +35,7 @@ export const jsonPointer2stack = (p) =>
 
 /**
  * JSON Pointer for stack.
- * @param {JsonPointerStack} s
+ * @param {Readonly<JsonPointerStack>} s
  * @return {JsonPointer}
  */
 export const jsonPointer4stack = (s) =>

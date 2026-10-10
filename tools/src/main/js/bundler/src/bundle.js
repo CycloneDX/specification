@@ -52,8 +52,8 @@ const makeModuleName = (f) =>
  * @return {Promise<BundleResult>}
  */
 export const bundle = async (entryFile, includeFiles, targetFile) => {
-    const targetDir = dirname(targetFile);
     const entryDir = dirname(entryFile);
+    const targetDir = dirname(targetFile);
 
     /** @type {ReadonlyMap<string, string>} */
     const fileModuleNames = Object.freeze(new Map(

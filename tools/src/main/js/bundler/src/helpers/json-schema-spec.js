@@ -44,7 +44,7 @@ export const isSchemaObject = (o) =>
 
 /**
  * Yield immediate subschemas, never property maps or literal data.
- * @param {*} s schema
+ * @param {Readonly<*>} s schema
  * @return {Generator<unknown, void, *>}
  */
 export const subschemas = function* (s) {
@@ -88,7 +88,7 @@ export const refSplit = (r) => {
 /**
  * Join a ref path and fragment.
  *
- * @param {RefSplit} rs
+ * @param {Readonly<RefSplit>} rs
  * @return {string}
  */
 export const refJoin = ({path, frag}) => {
