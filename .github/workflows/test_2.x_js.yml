@@ -52,13 +52,6 @@ jobs:
         run: npm install --no-fund --no-audit
       - name: Run test
         env:
-          VALIDATE_BUNDLED: >-
-            ${{ github.ref == 'refs/heads/master'
-             || github.ref == 'refs/heads/main'
-             || github.ref == 'refs/heads/2.0-dev'
-             || (  github.event_name == 'pull_request'
-                && github.base_ref == 'master'
-                )
-            }}
           SCHEMA_VERSION: ${{ matrix.schema_version }}
+          CTX_TEST_BUNDLED: true
         run: npm run "test:v$SCHEMA_VERSION"
