@@ -6,7 +6,7 @@
   "version": 1,
   "blueprints": [
     {
-      "bom-ref": "bp-operational",
+      "refId": "bp-operational",
       "name": "Service operations and incident response",
       "description": "On-call handling of a database alert, from acknowledgement through severity-based escalation to resolution.",
       "modelTypes": [
@@ -21,7 +21,7 @@
       ],
       "actors": [
         {
-          "bom-ref": "op-oncall",
+          "refId": "op-oncall",
           "party": {
             "roles": [
               {
@@ -38,7 +38,7 @@
           ]
         },
         {
-          "bom-ref": "op-commander",
+          "refId": "op-commander",
           "party": {
             "roles": [
               {
@@ -53,12 +53,12 @@
       ],
       "assets": [
         {
-          "bom-ref": "op-monitor",
+          "refId": "op-monitor",
           "type": "service",
           "name": "Monitoring platform"
         },
         {
-          "bom-ref": "op-pager",
+          "refId": "op-pager",
           "type": "tool",
           "name": "Paging system"
         }
@@ -66,17 +66,17 @@
       "behaviors": {
         "graphs": [
           {
-            "bom-ref": "rb-failover",
+            "refId": "rb-failover",
             "name": "Database failover runbook",
             "kind": "activity",
             "trigger": "event-driven",
             "nodes": [
               {
-                "bom-ref": "n-alert",
+                "refId": "n-alert",
                 "kind": "initial"
               },
               {
-                "bom-ref": "n-ack",
+                "refId": "n-ack",
                 "kind": "activity",
                 "behavior": "security:auditing:logsEvent",
                 "name": "Acknowledge alert",
@@ -88,13 +88,13 @@
                 ]
               },
               {
-                "bom-ref": "n-severity",
+                "refId": "n-severity",
                 "kind": "gateway",
                 "gatewayKind": "exclusive",
                 "name": "Severity?"
               },
               {
-                "bom-ref": "n-escalate",
+                "refId": "n-escalate",
                 "kind": "event",
                 "eventType": "on-demand",
                 "name": "Page incident commander",
@@ -103,12 +103,12 @@
                 ]
               },
               {
-                "bom-ref": "n-monitor",
+                "refId": "n-monitor",
                 "kind": "event",
                 "name": "Watch dashboards"
               },
               {
-                "bom-ref": "n-resolved",
+                "refId": "n-resolved",
                 "kind": "final",
                 "name": "Incident resolved"
               }
@@ -146,7 +146,7 @@
       },
       "assumptions": [
         {
-          "bom-ref": "asm-oncall",
+          "refId": "asm-oncall",
           "description": "An on-call engineer is available at all times under the follow-the-sun rota.",
           "topic": "operational",
           "validity": "verified"
