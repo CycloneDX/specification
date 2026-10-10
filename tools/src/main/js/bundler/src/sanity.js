@@ -53,6 +53,7 @@ const validateRefs = (schema) => {
     gatherRefs(schema);
 
     for (const ref of localRefs) {
+        if (ref === '') continue;
         if (isJsonPointer(ref)) {
             if (!objectHasOwnPath(schema, jsonPointer2stack(ref))) {
                 errors.add(`Missing local ref: #${ref}`);
