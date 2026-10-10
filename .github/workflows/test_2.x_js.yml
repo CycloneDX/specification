@@ -7,6 +7,11 @@ on:
     branches: ['master', 'main']
   pull_request:
   workflow_dispatch:
+    inputs:
+      test-bundled:
+        description: Force test of bundled schemas
+        type: boolean
+        default: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -22,6 +27,15 @@ defaults:
 
 env:
   NODE_VERSION: '24.x'
+  TEST_BUNDLED: >-
+    ${{ github.event.inputs.test-bundled
+     || github.ref == 'refs/heads/master'
+     || github.ref == 'refs/heads/main'
+     || github.ref == 'refs/heads/2.0-dev'
+     || (  github.event_name == 'pull_request'
+        && github.base_ref == 'master'
+        )
+    }}
 
 jobs:
   discover-schema:
@@ -52,13 +66,5 @@ jobs:
         run: npm install --no-fund --no-audit
       - name: Run test
         env:
-          VALIDATE_BUNDLED: >-
-            ${{ github.ref == 'refs/heads/master'
-             || github.ref == 'refs/heads/main'
-             || github.ref == 'refs/heads/2.0-dev'
-             || (  github.event_name == 'pull_request'
-                && github.base_ref == 'master'
-                )
-            }}
           SCHEMA_VERSION: ${{ matrix.schema_version }}
         run: npm run "test:v$SCHEMA_VERSION"
