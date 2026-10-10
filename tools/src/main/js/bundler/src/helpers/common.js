@@ -39,7 +39,6 @@ export const unixPath = (p) =>
 export const objectHasOwnPath = (o, pathStack) => {
     let c = o;
     for (const s of pathStack) {
-        if (s === '') continue; // `c` itself
         try {
             if (!Object.hasOwn(c, s)) return false;
         } catch { // TypeErrors and such.

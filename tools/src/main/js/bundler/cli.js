@@ -9,7 +9,6 @@ import {ID_KEYWORD, subschemas} from './src/helpers/json-schema-spec.js';
 import {validateSchema} from './src/sanity.js';
 import {JSON_SCHEMA_RE, JSON_SCHEMA_EXT} from './src/helpers/common.js';
 
-const SUFFIX_BUNDLED = '-bundled';
 
 /**
  * Suffix basename with `-bundled`.
@@ -23,10 +22,9 @@ const toBundledName = (s) => {
     if (!s.endsWith(JSON_SCHEMA_EXT)) {
         throw new Error(`expected "*${JSON_SCHEMA_EXT}", got ${JSON.stringify(s)}`);
     }
-    return s.replace(JSON_SCHEMA_RE, `${SUFFIX_BUNDLED}$&`);
+    return s.replace(JSON_SCHEMA_RE, '-bundled$&');
 };
 
-const SUFFIX_MINIFIED = '.min';
 
 /**
  * Suffix basename with `.min`.
@@ -40,7 +38,7 @@ const toMinifiedName = (s) => {
     if (!s.endsWith(JSON_SCHEMA_EXT)) {
         throw new Error(`expected "*${JSON_SCHEMA_EXT}", got ${JSON.stringify(s)}`);
     }
-    return s.replace(JSON_SCHEMA_RE, `${SUFFIX_MINIFIED}$&`);
+    return s.replace(JSON_SCHEMA_RE, '.min$&');
 };
 
 class ValidationError extends Error {
@@ -81,11 +79,12 @@ const main = async (entryFile, includeDir) => {
     const bundledFile = toBundledName(entryFile);
     const minifiedFile = toMinifiedName(bundledFile);
 
+    const _excludeFiles = Object.freeze(new Set([entryFile, bundledFile, minifiedFile]));
     const {schema, ...bundled} = await bundle(
         entryFile,
         (await Array.fromAsync(
             glob(join(includeDir, `**/*${JSON_SCHEMA_EXT}`)))
-        ).filter(f => !basename(f).includes(SUFFIX_BUNDLED)),
+        ).filter(f => !_excludeFiles.has(f)),
         bundledFile);
 
     const shaken = treeShake(schema);
