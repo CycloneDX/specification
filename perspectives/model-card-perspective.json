@@ -172,18 +172,18 @@
           "rationale": "Metrics, including slice-level results, substantiate capability claims and surface performance disparities between groups."
         },
         {
-          "expression": "$..[?(@.type=='machine-learning-model')].modelProperties.useCases",
+          "expression": "$..[?(@.type=='machine-learning-model')].useCaseAssertions[?(@.assertionType=='implements')].useCaseRefs",
           "nativeName": "Intended Use",
-          "nativeDescription": "References to the use cases the model is intended for.",
+          "nativeDescription": "References to use cases the model explicitly asserts that it implements.",
           "relevance": "required",
           "weight": 0.9,
-          "rationale": "Intended use separates in-scope application from misuse; it is the card section most consulted by adopters and assessors."
+          "rationale": "This mapping selects only implements assertions, whose relationship identifies the model as providing the use case's primary capability. Other assertion types retain their distinct meanings in the BOM and are not inferred to declare intended use by this mapping."
         },
         {
           "expression": "$.definitions.useCases[*]",
           "via": [
             {
-              "refs": "$..[?(@.type=='machine-learning-model')].modelProperties.useCases[*]"
+              "refs": "$..[?(@.type=='machine-learning-model')].useCaseAssertions[?(@.assertionType=='implements')].useCaseRefs[*]"
             }
           ],
           "nativeName": "Use Case Definitions",
