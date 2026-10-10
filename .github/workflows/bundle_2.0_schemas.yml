@@ -77,8 +77,6 @@ jobs:
       has_changes: ${{ steps.changes.outputs.has_changes }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    env:
-      TEST_BUNDLED: true
     steps:
       - name: Checkout repository
         # see https://github.com/actions/checkout
@@ -99,6 +97,8 @@ jobs:
       - name: Install Dependencies
         run: npm install --no-fund --no-audit
       - name: Run test
+        env:
+          CTX_TEST_BUNDLED: true
         run: npm run "test:v$SCHEMA_VERSION"
   push-schemas:
     name: Push Bundled Schemas

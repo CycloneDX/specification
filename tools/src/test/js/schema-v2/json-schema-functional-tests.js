@@ -30,7 +30,7 @@ const schemaModulesDir = join(schemaDir, `modules`)
 const testdataDir = join(_thisDir, '..', '..', 'resources', testschemaVersion)
 
 const schemaFiles = [join(schemaDir, `cyclonedx-${testschemaVersion}.schema.json`)]
-if (process.env['TEST_BUNDLED'] === 'true') {
+if (process.env['CTX_TEST_BUNDLED'] === 'true') {
     schemaFiles.push(
         join(schemaDir, `cyclonedx-${testschemaVersion}-bundled.schema.json`),
         join(schemaDir, `cyclonedx-${testschemaVersion}-bundled.min.schema.json`)
