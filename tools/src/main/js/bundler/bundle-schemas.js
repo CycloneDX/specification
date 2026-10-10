@@ -191,19 +191,19 @@ function stripTopLevelKeys(obj, keysToRemove = []) {
     return clone;
 }
 
-async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
+async function bundleSchemas(modulesDirectory, rootSchemaPath, options = {}) {
     try {
-        const absoluteModelsDir = path.resolve(modelsDirectory);
+        const absoluteModulesDir = path.resolve(modulesDirectory);
         const absoluteRootPath = path.resolve(rootSchemaPath);
 
         // Verify paths exist
-        await fs.access(absoluteModelsDir);
+        await fs.access(absoluteModulesDir);
         await fs.access(absoluteRootPath);
 
         const rootSchemaFilename = path.basename(absoluteRootPath);
         const rootSchemaDir = path.dirname(absoluteRootPath);
 
-        console.log(`Models directory: ${absoluteModelsDir}`);
+        console.log(`Modules directory: ${absoluteModulesDir}`);
         console.log(`Root schema: ${absoluteRootPath}`);
 
         // Generate output filenames
@@ -217,18 +217,18 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
         console.log(`Output (bundled): ${bundledPath}`);
         console.log(`Output (minified): ${minifiedPath}\n`);
 
-        // Read all schema files in the models directory
-        const files = await fs.readdir(absoluteModelsDir);
+        // Read all schema files in the modules directory
+        const files = await fs.readdir(absoluteModulesDir);
         const schemaFiles = files.filter(file => file.endsWith('.schema.json') && !file.includes('-bundled'));
 
-        console.log(`Found ${schemaFiles.length} schema files in models directory`);
+        console.log(`Found ${schemaFiles.length} schema files in modules directory`);
 
-        // Read all schemas from models directory
+        // Read all schemas from modules directory
         const schemas = {};
         let detectedSchemaVersion = null;
 
         for (const file of schemaFiles) {
-            const schemaPath = path.join(absoluteModelsDir, file);
+            const schemaPath = path.join(absoluteModulesDir, file);
             console.log(`  Reading ${file}...`);
 
             const content = await fs.readFile(schemaPath, 'utf8');
@@ -285,7 +285,7 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
                 const target = ref.match(FILE_REF_RE)[1];
                 const resolvedPath = path.resolve(schemaDir, target);
                 if (bundledSchemaPaths.has(resolvedPath)) continue;
-                if (isInsideDir(resolvedPath, absoluteModelsDir)) {
+                if (isInsideDir(resolvedPath, absoluteModulesDir)) {
                     throw new Error(`Unresolved external ${key} target file '${target}' referenced from schema '${schemaPath}' at '${refPath}'`);
                 }
                 try {
@@ -416,14 +416,14 @@ async function bundleSchemas(modelsDirectory, rootSchemaPath, options = {}) {
 
 // CLI usage
 if (require.main === module) {
-    const [,, modelsDirectory, rootSchemaPath] = process.argv;
+    const [,, modulesDirectory, rootSchemaPath] = process.argv;
 
-    if (!modelsDirectory || !rootSchemaPath) {
-        console.log('Usage: node bundle-schemas.js <models-directory> <root-schema-path>');
+    if (!modulesDirectory || !rootSchemaPath) {
+        console.log('Usage: node bundle-schemas.js <modules-directory> <root-schema-path>');
         console.log('');
         console.log('Example:');
         console.log('  node bundle-schemas.js \\');
-        console.log('    ./schema/2.0/model \\');
+        console.log('    ./schema/2.0/modules \\');
         console.log('    ./schema/2.0/cyclonedx-2.0.schema.json');
         console.log('');
         console.log('This will create:');
@@ -432,7 +432,7 @@ if (require.main === module) {
         process.exit(1);
     }
 
-    bundleSchemas(modelsDirectory, rootSchemaPath, {validate: true})
+    bundleSchemas(modulesDirectory, rootSchemaPath, { validate: true })
         .catch(err => {
             console.error(err);
             process.exit(1);

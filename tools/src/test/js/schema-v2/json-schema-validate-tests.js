@@ -32,7 +32,7 @@ if (process.env['VALIDATE_BUNDLED'] === 'true') {
 }
 
 const schemaFilesBundleMatcher = /-bundled/
-const schemaModelDir = join(schemaDir, `model`)
+const schemaModulesDir = join(schemaDir, `modules`)
 const testdataDir = join(_thisDir, '..', '..', 'resources', testschemaVersion)
 
 const schemaGlob = '*.schema.json'
@@ -49,10 +49,10 @@ for (const schemaFile of schemaFiles) {
 }
 console.debug('DEBUG | schemaFiles = ', schemaFiles);
 
-if (!await stat(schemaModelDir).then(s => s.isDirectory()).catch(() => false)) {
-    throw new Error(`missing schemaModelDir: ${schemaModelDir}`);
+if (!await stat(schemaModulesDir).then(s => s.isDirectory()).catch(() => false)) {
+    throw new Error(`missing schemaModulesDir: ${schemaModulesDir}`);
 }
-console.debug('DEBUG | schemaModelDir = ', schemaModelDir);
+console.debug('DEBUG | schemaModulesDir = ', schemaModulesDir);
 
 // endregion config
 
@@ -64,7 +64,7 @@ const [spdxSchema, cryptoDefsSchema, behaviorTaxonomySchema, perspectivesDefsSch
     Promise.all(schemaFiles.map(
         f => readFile(f, 'utf-8').then(s => [f, JSON.parse(s)])
     )),
-    glob(join(schemaModelDir, schemaGlob)).then(fs => Promise.all(fs.map(
+    glob(join(schemaModulesDir, schemaGlob)).then(fs => Promise.all(fs.map(
         f => readFile(f, 'utf-8').then(s => [f, JSON.parse(s)])
     )))
 ])
@@ -99,7 +99,7 @@ function getAjv(bundled) {
     ajv.addSchema(perspectivesDefsSchema, 'https://cyclonedx.org/schema/perspectives-defs.schema.json')
     if (!bundled) {
         for (const [f, s] of schemaModules) {
-            ajv.addSchema(s, `https://cyclonedx.org/schema/${testschemaVersion}/model/${f}`)
+            ajv.addSchema(s, `https://cyclonedx.org/schema/${testschemaVersion}/modules/${f}`)
         }
     }
     addFormats(ajv)
