@@ -48,3 +48,18 @@ export const objectHasOwnPath = (o, pathStack) => {
     }
     return true;
 };
+
+
+/**
+ * Find duplicate values in a map.
+ * @template K
+ * @template V
+ * @param {ReadonlyMap<K, V>} m
+ * @returns {Map<V, K[]>}
+ */
+export const findDuplicateValues = (m) => {
+    const vs = new Map(m.values().map(v => [v, []]));
+    m.forEach((v, k) => { vs.get(v).push(k); });
+    vs.forEach((ks, v) => { if (ks.length<2) vs.delete(v); });
+    return vs;
+};

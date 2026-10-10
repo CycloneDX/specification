@@ -1,9 +1,9 @@
 import {basename, dirname, relative, resolve} from 'node:path'
 
-import {JSON_SCHEMA_RE, getJsonfile, unixPath} from './helpers/common.js';
+import {JSON_SCHEMA_RE, getJsonfile, unixPath, findDuplicateValues} from './helpers/common.js';
 import {escapeJsonPointer} from './helpers/json-pointer-spec.js';
 import {
-    ANCHOR_KEYWORDS, ID_KEYWORD, NOT_KEYWORD, SCHEMA_KEYWORD, COMMENT_KEYWORD, DEFS_KEYWORDS, REF_KEYWORDS,
+    ID_KEYWORD, NOT_KEYWORD, SCHEMA_KEYWORD, COMMENT_KEYWORD, DEFS_KEYWORDS, REF_KEYWORDS,
     subschemas,
     refIsAbsolute, refSplit, refJoin,
 } from './helpers/json-schema-spec.js';
@@ -55,10 +55,14 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
     const targetDir = dirname(targetFile);
     const entryDir = dirname(entryFile);
 
+    /** @type {ReadonlyMap<string, string>} */
     const fileModuleNames = Object.freeze(new Map(
         [entryFile, ...includeFiles].map(f => [f, makeModuleName(basename(f))])
     ));
-    const entryModuleName = fileModuleNames.get(entryFile);
+    const _dupModuleNames = findDuplicateValues(fileModuleNames)
+    if (_dupModuleNames.size) {
+        throw new Error(`ModuleName collisions: ${JSON.stringify(Object.fromEntries(_dupModuleNames))}`);
+    }
 
     /** @type {Map<string, string>} */
     const embeddedMap = new Map();
@@ -127,6 +131,8 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
     const schemaDefsOrig = schema[DEFS_KEYWORDS];
     schema[DEFS_KEYWORDS] = Object.fromEntries( // deterministic order
         [...fileModuleNames.values()].sort().map(m => [m, undefined]));
+
+    const entryModuleName = fileModuleNames.get(entryFile);
     if (schemaDefsOrig) {
         schema[DEFS_KEYWORDS][entryModuleName] = {
             [DEFS_KEYWORDS]: schemaDefsOrig,
@@ -137,11 +143,8 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
         delete schema[DEFS_KEYWORDS][entryModuleName];
     }
 
-    for (const [includeFile, moduleName] of fileModuleNames.entries()) {
+    for (const [includeFile, moduleName] of fileModuleNames) {
         if (includeFile === entryFile) continue;
-        if (schema[DEFS_KEYWORDS][moduleName] !== undefined) {
-            throw new Error(`Collision: ${moduleName}`);
-        }
         const includeSchema = await getJsonfile(includeFile);
         delete includeSchema[SCHEMA_KEYWORD];
         delete includeSchema[ID_KEYWORD];
@@ -154,10 +157,10 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
     return {
         schema,
         external: Array.from(externals),
-        embedded: Array.from(embeddedMap.entries(),
-            ([f, d]) => [unixPath(relative(entryDir, f)), d]),
-        rewired: Array.from(rewiredMap.entries(),
-            ([f, t]) => {
+        embedded: Array.from(embeddedMap,
+            ([d, f]) => [unixPath(relative(entryDir, f)), d]),
+        rewired: Array.from(rewiredMap,
+            ([t, f]) => {
                 if (!f.startsWith('#')) {
                     const {path, frag} = refSplit(f);
                     f = refJoin({path: unixPath(relative(entryDir, path)), frag});
