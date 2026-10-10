@@ -6,6 +6,11 @@
   "description": "Root document of the bundler test fixtures.",
   "type": "object",
   "properties": {
+    "$comment": {
+      "$comment": "the comment property is expected to stay - but this comment might be removed.",
+      "type": "string",
+      "title": "Comment"
+    },
     "whole": {
       "$comment": "External ref without fragment -> module is kept as a whole.",
       "title": "Whole",
@@ -43,6 +48,25 @@
             "$ref": "#/$defs/dynamic-anchor"
           }
         }
+      }
+    },
+    "main": {
+      "$defs": {
+        "mainLocal": {
+          "$comment": "Referenced from main itself and from used-subdefs-only.",
+          "title": "Main local",
+          "description": "A local string definition of the root schema.",
+          "type": "string"
+        },
+        "mainUnused": {
+          "$comment": "Never referenced -> shaken away from #/$defs/main/$defs.",
+          "title": "Main unused",
+          "description": "A definition nothing refers to.",
+          "type": "null"
+        }
+      },
+      "not": {
+        "$comment": "This schema is hollow: it is as a container for definitions. Itself must not be used for validation."
       }
     },
     "unused": {
@@ -173,45 +197,6 @@
           "title": "Shared by other",
           "description": "A numeric value shared across modules.",
           "type": "number"
-        }
-      }
-    },
-    "main": {
-      "title": "Main",
-      "description": "Root document of the bundler test fixtures.",
-      "type": "object",
-      "properties": {
-        "whole": {
-          "$comment": "External ref without fragment -> module is kept as a whole.",
-          "title": "Whole",
-          "description": "A module referenced in its entirety.",
-          "$ref": "#/$defs/used-whole"
-        },
-        "sub": {
-          "$comment": "External ref into a sub-def -> only that sub-def (and what it reaches) is kept.",
-          "title": "Sub",
-          "description": "A single definition of another module.",
-          "$ref": "#/$defs/used-subdefs-only/$defs/kept"
-        },
-        "local": {
-          "$comment": "Internal ref -> rewritten to #/$defs/main/$defs/mainLocal, so the root's own def entry must be emitted.",
-          "title": "Local",
-          "description": "A definition of this very schema.",
-          "$ref": "#/$defs/main/$defs/mainLocal"
-        }
-      },
-      "$defs": {
-        "mainLocal": {
-          "$comment": "Referenced from main itself and from used-subdefs-only.",
-          "title": "Main local",
-          "description": "A local string definition of the root schema.",
-          "type": "string"
-        },
-        "mainUnused": {
-          "$comment": "Never referenced -> shaken away from #/$defs/main/$defs.",
-          "title": "Main unused",
-          "description": "A definition nothing refers to.",
-          "type": "null"
         }
       }
     }
