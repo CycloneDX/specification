@@ -95,9 +95,9 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
     /**
      * @param {*} schema
      * @param {string} sourceFile
-     * @return {Promise<void>}
+     * @return {void}
      */
-    const rewireRefs = async (schema, sourceFile) => {
+    const rewireRefs = (schema, sourceFile) => {
         for (const k of REF_KEYWORDS) {
             const v = schema[k];
             if (typeof v !== 'string') continue;
@@ -136,9 +136,7 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
                 externals.add(schema[k]);
             }
         }
-        await Promise.all(
-            subschemas(schema).map(s => rewireRefs(s, sourceFile))
-        );
+        subschemas(schema).forEach(s => rewireRefs(s, sourceFile));
     }
 
     const schema = await getJsonfile(entryFile);
@@ -148,7 +146,7 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
             schema[ID_KEYWORD]
         ).toString();
     }
-    await rewireRefs(schema, entryFile);
+    rewireRefs(schema, entryFile);
     const schemaDefsOrig = schema[DEFS_KEYWORDS];
     schema[DEFS_KEYWORDS] = Object.fromEntries( // deterministic order
         [...fileModuleNames.values()].sort().map(m => [m, undefined]));
@@ -170,7 +168,7 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
         delete includeSchema[SCHEMA_KEYWORD];
         delete includeSchema[ID_KEYWORD];
         delete includeSchema[COMMENT_KEYWORD];
-        await rewireRefs(includeSchema, includeFile);
+        rewireRefs(includeSchema, includeFile);
         schema[DEFS_KEYWORDS][moduleName] = includeSchema;
         embeddedMap.set(includeFile, `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`);
     }
