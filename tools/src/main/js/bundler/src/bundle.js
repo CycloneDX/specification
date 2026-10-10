@@ -98,6 +98,7 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
      * @return {void}
      */
     const rewireRefs = (schema, sourceFile) => {
+        const sourceDir = dirname(sourceFile);
         for (const k of REF_KEYWORDS) {
             const v = schema[k];
             if (typeof v !== 'string') continue;
@@ -108,7 +109,7 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
             let rewired
             const {path, frag} = refSplit(v);
             const refFile = path
-                ? resolve(dirname(sourceFile), ...path.split('/'))
+                ? resolve(sourceDir, ...path.split('/'))
                 : sourceFile;
             const moduleName = fileModuleNames.get(refFile);
             if (moduleName) {
