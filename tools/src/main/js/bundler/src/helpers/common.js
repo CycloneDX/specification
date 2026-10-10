@@ -20,7 +20,7 @@ export const JSON_SCHEMA_RE = Object.freeze(new RegExp(`${RegExp.escape(JSON_SCH
  * @param {string} file
  * @return {Promise<any>}
  */
-export const getJsonfile = async  (file) =>
+export const getJsonfile = async (file) =>
     JSON.parse(await readFile(file, 'utf8'));
 
 /**
@@ -33,12 +33,13 @@ export const unixPath = (p) =>
 
 /**
  * @param {Readonly<*>} o
- * @param {ReadonlyArray<string>} pathStack
+ * @param {Iterable<string>} pathStack
  * @return {boolean}
  */
 export const objectHasOwnPath = (o, pathStack) => {
     let c = o;
     for (const s of pathStack) {
+        if (s === '') continue; // `c` itself
         try {
             if (!Object.hasOwn(c, s)) return false;
         } catch { // TypeErrors and such.
@@ -59,7 +60,11 @@ export const objectHasOwnPath = (o, pathStack) => {
  */
 export const findDuplicateValues = (m) => {
     const vs = new Map(m.values().map(v => [v, []]));
-    m.forEach((v, k) => { vs.get(v).push(k); });
-    vs.forEach((ks, v) => { if (ks.length<2) vs.delete(v); });
+    m.forEach((v, k) => {
+        vs.get(v).push(k);
+    });
+    vs.forEach((ks, v) => {
+        if (ks.length < 2) vs.delete(v);
+    });
     return vs;
 };

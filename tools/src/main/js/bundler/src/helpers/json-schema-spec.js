@@ -11,6 +11,7 @@ export const ID_KEYWORD = '$id';
 
 export const COMMENT_KEYWORD = '$comment';
 
+/** Ignores the deprecated `definitions` - though it is still allowed... */
 export const DEFS_KEYWORDS = '$defs';
 
 export const REF_KEYWORDS = Object.freeze(new Set(['$ref', '$dynamicRef', '$recursiveRef']));
@@ -98,6 +99,10 @@ export const refJoin = ({path, frag}) => {
     return '#'; // the entire schema
 };
 
+/**
+ * Regex: URI scheme or Windows drive prefix
+ */
+const URI_OR_ABS_WIN_RE = Object.freeze(/^[a-z][a-z0-9+.-]*:/i);
 
 /**
  * Whether a ref is absolute.
@@ -108,5 +113,5 @@ export const refIsAbsolute = (r) => {
     if (r.startsWith('#')) return false;
     return r.startsWith('/')  // Unix-like absolute path
         || r.startsWith('\\')  // UNC-like absolute path
-        || r.search(':') > 0; // Windows-like absolute path or a form of <schema>:<rest>
+        || URI_OR_ABS_WIN_RE.test(r);
 };

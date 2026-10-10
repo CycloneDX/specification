@@ -181,11 +181,8 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
             ([f, d]) => [unixPath(relative(entryDir, f)), d]),
         rewired: Array.from(rewiredMap,
             ([f, t]) => {
-                if (!f.startsWith('#')) {
-                    const {path, frag} = refSplit(f);
-                    f = refJoin({path: unixPath(relative(entryDir, path)), frag});
-                }
-                return [f, t];
+                const {path, frag} = refSplit(f);
+                return [refJoin({path: unixPath(relative(entryDir, path)), frag}), t];
             }
         ),
     };

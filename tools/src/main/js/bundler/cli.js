@@ -1,13 +1,15 @@
 #!/usr/bin/env node
 
 import {glob, stat, writeFile} from 'node:fs/promises';
-import {join, resolve} from 'node:path';
+import {basename, join, resolve} from 'node:path';
 
 import {bundle} from './src/bundle.js';
 import {dropComments, treeShake} from './src/cleanup.js';
 import {ID_KEYWORD, subschemas} from './src/helpers/json-schema-spec.js';
 import {validateSchema} from './src/sanity.js';
 import {JSON_SCHEMA_RE, JSON_SCHEMA_EXT} from './src/helpers/common.js';
+
+const SUFFIX_BUNDLED = '-bundled';
 
 /**
  * Suffix basename with `-bundled`.
@@ -21,8 +23,10 @@ const toBundledName = (s) => {
     if (!s.endsWith(JSON_SCHEMA_EXT)) {
         throw new Error(`expected "*${JSON_SCHEMA_EXT}", got ${JSON.stringify(s)}`);
     }
-    return s.replace(JSON_SCHEMA_RE, '-bundled$&');
+    return s.replace(JSON_SCHEMA_RE, `${SUFFIX_BUNDLED}$&`);
 };
+
+const SUFFIX_MINIFIED = '.min';
 
 /**
  * Suffix basename with `.min`.
@@ -36,7 +40,7 @@ const toMinifiedName = (s) => {
     if (!s.endsWith(JSON_SCHEMA_EXT)) {
         throw new Error(`expected "*${JSON_SCHEMA_EXT}", got ${JSON.stringify(s)}`);
     }
-    return s.replace(JSON_SCHEMA_RE, '.min$&');
+    return s.replace(JSON_SCHEMA_RE, `${SUFFIX_MINIFIED}$&`);
 };
 
 class ValidationError extends Error {
@@ -79,7 +83,9 @@ const main = async (entryFile, includeDir) => {
 
     const {schema, ...bundled} = await bundle(
         entryFile,
-        (await Array.fromAsync(glob(join(includeDir, `**/*${JSON_SCHEMA_EXT}`)))),
+        (await Array.fromAsync(
+            glob(join(includeDir, `**/*${JSON_SCHEMA_EXT}`)))
+        ).filter(f => !basename(f).includes(SUFFIX_BUNDLED)),
         bundledFile);
 
     const shaken = treeShake(schema);
@@ -108,7 +114,6 @@ const main = async (entryFile, includeDir) => {
     };
 };
 export default main;
-
 
 
 if (import.meta.main) {
@@ -145,7 +150,9 @@ if (import.meta.main) {
             console.info(`tree-shake: removed (${shaken.removed.length}):`, shaken.removed);
             console.info(`tree-shake: hollowed (${shaken.hollowed.length}):`, shaken.hollowed);
 
-            console.warn(`validation warnings (${validationWarnings.length}):`, validationWarnings);
+            if (validationWarnings.length) {
+                console.warn(`validation warnings (${validationWarnings.length}):`, validationWarnings);
+            }
 
             const {size: bundledSize} = await stat(bundledFile);
             console.log(`wrote ${bundledFile} (${bundledSize} bytes)`);
