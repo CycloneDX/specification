@@ -26,10 +26,16 @@ const _thisDir = dirname(fileURLToPath(import.meta.url))
 const testschemaVersion = (parseArgs({options: {v: {type: 'string', short: 'v'}}}).values.v ?? '').trim()
 const schemaRootDir = join(_thisDir, '..', '..', '..', '..', '..', 'schema')
 const schemaDir = join(schemaRootDir, testschemaVersion)
-// test only the source schema, not the bundled for now ...
-const schemaFile = join(schemaDir, `cyclonedx-${testschemaVersion}.schema.json`)
 const schemaModulesDir = join(schemaDir, `modules`)
 const testdataDir = join(_thisDir, '..', '..', 'resources', testschemaVersion)
+
+const schemaFiles = [join(schemaDir, `cyclonedx-${testschemaVersion}.schema.json`)]
+if (process.env['TEST_BUNDLED'] === 'true') {
+    schemaFiles.push(
+        join(schemaDir, `cyclonedx-${testschemaVersion}-bundled.schema.json`),
+        join(schemaDir, `cyclonedx-${testschemaVersion}-bundled.min.schema.json`)
+    )
+}
 
 const schemaGlob = '*.schema.json'
 
@@ -38,108 +44,115 @@ if (testschemaVersion.length === 0) {
 }
 console.debug('DEBUG | testschemaVersion = ', testschemaVersion);
 
-if (!await stat(schemaFile).then(s => s.isFile()).catch(() => false)) {
-    throw new Error(`missing schemaFile: ${schemaFile}`);
-}
-console.debug('DEBUG | schemaFile = ', schemaFile);
-
-if (!await stat(schemaModulesDir).then(s => s.isDirectory()).catch(() => false)) {
-    throw new Error(`missing schemaModulesDir: ${schemaModulesDir}`);
-}
-console.debug('DEBUG | schemaModulesDir = ', schemaModulesDir);
-
-
-if (!await stat(testdataDir).then(s => s.isDirectory()).catch(() => false)) {
-    throw new Error(`missing testdataDir: ${testdataDir}`);
-}
-console.debug('DEBUG | testdataDir = ', testdataDir);
-
-// endregion config
-
-// region validator
-
-const [spdxSchema, cryptoDefsSchema, behaviorTaxonomySchema, bomSchema, bomSchemaModules] = await Promise.all([
-    readFile(join(schemaRootDir, 'spdx.schema.json'), 'utf-8').then(JSON.parse),
-    readFile(join(schemaRootDir, 'cryptography-defs.schema.json'), 'utf-8').then(JSON.parse),
-    readFile(join(schemaRootDir, 'behavior-taxonomy.schema.json'), 'utf-8').then(JSON.parse),
-    readFile(schemaFile, 'utf-8').then(JSON.parse),
-    glob(join(schemaModulesDir, schemaGlob)).then(fs => Promise.all(fs.map(
-        f => readFile(f, 'utf-8').then(s => [basename(f), JSON.parse(s)])
-    )))
-])
-
-const ajv = new Ajv2020({
-    verbose: true,
-    addUsedSchema: false,
-    // not running in strict - this is done in the linter-test already
-    strict: false,
-    validateFormats: true,
-});
-// some ref'd schemas mightbe draft-07
-ajv.addMetaSchema(draft7MetaSchema);
-ajv.addSchema(spdxSchema, 'https://cyclonedx.org/schema/spdx.schema.json')
-ajv.addSchema(cryptoDefsSchema, 'https://cyclonedx.org/schema/cryptography-defs.schema.json')
-ajv.addSchema(behaviorTaxonomySchema, 'https://cyclonedx.org/schema/behavior-taxonomy.schema.json')
-for (const [f, s] of bomSchemaModules) {
-    ajv.addSchema(s, `https://cyclonedx.org/schema/${testschemaVersion}/modules/${f}`)
-}
-
-addFormats(ajv)
-addFormats2019(ajv, {formats: ['idn-email']})
-// there is just no working implementation for format "iri-reference"
-// see https://github.com/luzlab/ajv-formats-draft2019/issues/22
-ajv.addFormat('iri-reference', true)
-
-const _ajvValidate = ajv.compile(bomSchema)
-
-
-/**
- * @param {string} file - file path to validate
- * @return {null|object}
- */
-async function validateFile(file) {
-    let parsed
-    try {
-        parsed = JSON.parse(await readFile(file, 'utf-8'))
-    } catch (err) {
-        throw new Error(`Failed parsing JSON file://${file}`, {cause: err})
+for (const schemaFile of schemaFiles) {
+    if (!await stat(schemaFile).then(s => s.isFile()).catch(() => false)) {
+        throw new Error(`missing schemaFile: ${schemaFile}`)
     }
-    return _ajvValidate(parsed)
-        ? null
-        : _ajvValidate.errors
 }
-
-// endregion validator
+console.debug('DEBUG | schemaFiles = ', schemaFiles)
 
 let errCnt = 0
+for (const schemaFile of schemaFiles) {
+    console.group('schema:', schemaFile)
 
-for (const file of (await glob(join(testdataDir, 'valid-*.json'))).sort(alphaSort)) {
-    console.log('\ntest', file, '...');
-    const validationErrors = await validateFile(file)
-    if (validationErrors === null) {
-        console.log('OK.')
-    } else {
-        ++errCnt;
-        console.error(
-            '!!! ERROR: Unexpected validation error',
-            '\n  for file:', `file://${file}`,
-            '\n     error:', validationErrors
-        );
+    if (!await stat(schemaModulesDir).then(s => s.isDirectory()).catch(() => false)) {
+        throw new Error(`missing schemaModulesDir: ${schemaModulesDir}`);
     }
-}
+    console.debug('DEBUG | schemaModulesDir = ', schemaModulesDir);
 
-for (const file of (await glob(join(testdataDir, 'invalid-*.json'))).sort(alphaSort)) {
-    console.log('\ntest', file, '...');
-    const validationErrors = await validateFile(file)
-    if (validationErrors === null) {
-        ++errCnt;
-        console.error(
-            '!!! ERROR: Missing expected validation error',
-            '\n  for file:', `file://${file}`,);
 
-    } else {
-        console.log('OK.')
+    if (!await stat(testdataDir).then(s => s.isDirectory()).catch(() => false)) {
+        throw new Error(`missing testdataDir: ${testdataDir}`);
     }
+    console.debug('DEBUG | testdataDir = ', testdataDir);
+
+    // endregion config
+
+    // region validator
+
+    const [spdxSchema, cryptoDefsSchema, behaviorTaxonomySchema, bomSchema, bomSchemaModules] = await Promise.all([
+        readFile(join(schemaRootDir, 'spdx.schema.json'), 'utf-8').then(JSON.parse),
+        readFile(join(schemaRootDir, 'cryptography-defs.schema.json'), 'utf-8').then(JSON.parse),
+        readFile(join(schemaRootDir, 'behavior-taxonomy.schema.json'), 'utf-8').then(JSON.parse),
+        readFile(schemaFile, 'utf-8').then(JSON.parse),
+        glob(join(schemaModulesDir, schemaGlob)).then(fs => Promise.all(fs.map(
+            f => readFile(f, 'utf-8').then(s => [basename(f), JSON.parse(s)])
+        )))
+    ])
+
+    const ajv = new Ajv2020({
+        verbose: true,
+        addUsedSchema: false,
+        // not running in strict - this is done in the linter-test already
+        strict: false,
+        validateFormats: true,
+    });
+    // some ref'd schemas mightbe draft-07
+    ajv.addMetaSchema(draft7MetaSchema);
+    ajv.addSchema(spdxSchema, 'https://cyclonedx.org/schema/spdx.schema.json')
+    ajv.addSchema(cryptoDefsSchema, 'https://cyclonedx.org/schema/cryptography-defs.schema.json')
+    ajv.addSchema(behaviorTaxonomySchema, 'https://cyclonedx.org/schema/behavior-taxonomy.schema.json')
+    for (const [f, s] of bomSchemaModules) {
+        ajv.addSchema(s, `https://cyclonedx.org/schema/${testschemaVersion}/modules/${f}`)
+    }
+
+    addFormats(ajv)
+    addFormats2019(ajv, {formats: ['idn-email']})
+    // there is just no working implementation for format "iri-reference"
+    // see https://github.com/luzlab/ajv-formats-draft2019/issues/22
+    ajv.addFormat('iri-reference', true)
+
+    const _ajvValidate = ajv.compile(bomSchema)
+
+
+    /**
+     * @param {string} file - file path to validate
+     * @return {null|object}
+     */
+    async function validateFile(file) {
+        let parsed
+        try {
+            parsed = JSON.parse(await readFile(file, 'utf-8'))
+        } catch (err) {
+            throw new Error(`Failed parsing JSON ${file}`, {cause: err})
+        }
+        return _ajvValidate(parsed)
+            ? null
+            : _ajvValidate.errors
+    }
+
+    // endregion validator
+
+    for (const file of (await glob(join(testdataDir, 'valid-*.json'))).sort(alphaSort)) {
+        console.log('\ntest', file, '...');
+        const validationErrors = await validateFile(file)
+        if (validationErrors === null) {
+            console.log('OK.')
+        } else {
+            ++errCnt;
+            console.error(
+                '!!! ERROR: Unexpected validation error',
+                '\n    schema:', schemaFile,
+                '\n  for file:', file,
+                '\n     error:', validationErrors
+            );
+        }
+    }
+
+    for (const file of (await glob(join(testdataDir, 'invalid-*.json'))).sort(alphaSort)) {
+        console.log('\ntest', file, '...');
+        const validationErrors = await validateFile(file)
+        if (validationErrors === null) {
+            ++errCnt;
+            console.error(
+                '!!! ERROR: Missing expected validation error',
+                '\n  for file:', file)
+        } else {
+            console.log('OK.')
+        }
+    }
+
+    console.groupEnd()
 }
 
 console.log('\n\n> found', errCnt, 'errors')

@@ -217,7 +217,7 @@ const _findObjectWithDefault = (schema) => _findNodes(schema,
 function _printError(actual, expected, msg, schemaFile, schemaPath) {
     console.error(
         '!!! ERROR:', msg,
-        '\n   in file:', `file://${schemaFile}`,
+        '\n   in file:', schemaFile,
         '\n  for path:', schemaPath,
         '\n    actual:', actual,
         '\n  expected:', expected
