@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import {glob, stat, writeFile} from 'node:fs/promises';
-import {basename, join, resolve} from 'node:path';
+import {join, resolve} from 'node:path';
 
 import {bundle} from './src/bundle.js';
 import {dropComments, treeShake} from './src/cleanup.js';
