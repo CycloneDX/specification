@@ -24,6 +24,6 @@ examples:
 ```shell
 export TEST_BUNDLED=true
 npm test # run all tests for all schemas
-npm run test test:v2.0 # run all tests for cyclonedx-2.0
+npm run test:v2.0 # run all tests for cyclonedx-2.0
 ```
 
