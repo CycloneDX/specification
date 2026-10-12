@@ -73,8 +73,9 @@ jobs:
           retention-days: 1
   test-schemas:
     name: Test Bundled Schemas
-    outputs:
-      has_changes: ${{ steps.changes.outputs.has_changes }}
+    needs:
+      - bundle-schemas
+    if: ${{ needs.bundle-schemas.outputs.has_changes == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
