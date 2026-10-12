@@ -7,6 +7,11 @@ on:
     branches: ['master', 'main']
   pull_request:
   workflow_dispatch:
+    inputs:
+      test_bundled:
+        description: weather to test bundled schemas
+        type: boolean
+        default: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -22,6 +27,8 @@ defaults:
 
 env:
   NODE_VERSION: '24.x'
+  TEST_BUNDLED: > # usually not required, since the bundler workflow does this already.
+    ${{ github.event.inputs.test_bundled }}
 
 jobs:
   discover-schema:
@@ -53,5 +60,4 @@ jobs:
       - name: Run test
         env:
           SCHEMA_VERSION: ${{ matrix.schema_version }}
-          CTX_TEST_BUNDLED: true
         run: npm run "test:v$SCHEMA_VERSION"
