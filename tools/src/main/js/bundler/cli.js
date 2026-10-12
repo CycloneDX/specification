@@ -97,6 +97,7 @@ const main = async (entryFile, includeDir) => {
     await writeFile(bundledFile, JSON.stringify(schema, null, 2));
 
     subschemas(schema).forEach(dropComments);
+
     await writeFile(minifiedFile, JSON.stringify({
         ...schema,
         [ID_KEYWORD]: schema[ID_KEYWORD]
