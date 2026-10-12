@@ -105,7 +105,8 @@ function getAjv(bundled) {
     ajv.addSchema(behaviorTaxonomySchema, 'https://cyclonedx.org/schema/behavior-taxonomy.schema.json')
     if (!bundled) {
         for (const [f, s] of schemaModules) {
-            ajv.addSchema(s, `https://cyclonedx.org/schema/${testschemaVersion}/modules/${f}`)
+            console.log(f)
+            ajv.addSchema(s, `https://cyclonedx.org/schema/${testschemaVersion}/modules/${basename(f)}`)
         }
     }
     addFormats(ajv)
