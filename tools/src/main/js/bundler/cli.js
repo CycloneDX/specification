@@ -80,6 +80,8 @@ const main = async (entryFile, includeDir) => {
     const minifiedFile = toMinifiedName(bundledFile);
 
     const _excludeFiles = Object.freeze(new Set([entryFile, bundledFile, minifiedFile]));
+
+    // 1. bundle schema
     const {schema, ...bundled} = await bundle(
         entryFile,
         (await Array.fromAsync(
@@ -87,8 +89,10 @@ const main = async (entryFile, includeDir) => {
         ).filter(f => !_excludeFiles.has(f)),
         bundledFile);
 
+    // 2. tree-shake schema
     const shaken = treeShake(schema);
 
+    // 3. validate modified schema
     const validationResult = validateSchema(schema);
     if (validationResult.errors.length) {
         throw new ValidationError(validationResult.errors);
@@ -96,6 +100,7 @@ const main = async (entryFile, includeDir) => {
 
     await writeFile(bundledFile, JSON.stringify(schema, null, 2));
 
+    // 4. minify schema
     subschemas(schema).forEach(dropComments);
 
     await writeFile(minifiedFile, JSON.stringify({
