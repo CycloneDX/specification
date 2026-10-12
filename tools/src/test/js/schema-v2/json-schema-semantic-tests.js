@@ -21,6 +21,14 @@ const _thisDir = dirname(fileURLToPath(import.meta.url))
 // region config
 
 const testschemaVersion = (parseArgs({options: {v: {type: 'string', short: 'v'}}}).values.v ?? '').trim()
+const testBundledOnly = process.env['TEST_BUNDLED_ONLY'] === 'true'
+const testBundled = testBundledOnly || process.env['TEST_BUNDLED'] === 'true'
+
+if (testBundledOnly) {
+    console.info('SKIPPED THIS TEST - it does not support bundled schema.')
+    process.exit()
+}
+
 const schemaRootDir = join(_thisDir, '..', '..', '..', '..', '..', 'schema')
 const schemaDir = join(schemaRootDir, testschemaVersion)
 const schemaModulesDir = join(schemaDir, `modules`)
