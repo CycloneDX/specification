@@ -85,8 +85,9 @@ const main = async (entryFile, includeDir) => {
     const {schema, ...bundled} = await bundle(
         entryFile,
         (await Array.fromAsync(
-            glob(join(includeDir, `**/*${JSON_SCHEMA_EXT}`)))
-        ).filter(f => !_excludeFiles.has(f)),
+            glob(`**/*${JSON_SCHEMA_EXT}`, {cwd: includeDir}),
+            f => resolve(includeDir, f)
+        )).filter(f => !_excludeFiles.has(f)),
         bundledFile);
 
     // 2. tree-shake schema
