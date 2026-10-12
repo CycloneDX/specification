@@ -17,12 +17,12 @@ npm install
 
 Regular set of npm tests scripts.
 
-Env var `CTX_TEST_BUNDLED` controls whether the bundled schemafiles shall be checked, too. 
-Value must be `true` to enable it.
+Env var `TEST_BUNDLED` controls whether the bundled schemafiles shall be checked, too. Value must be `true` to enable it.  
+Env var `TEST_BUNDLED_ONLY` controls whether only the bundled schemafiles shall be checked. Value must be `true` to enable it. Implies `TEST_BUNDLED=true`.
 
 examples:
 ```shell
-export CTX_TEST_BUNDLED=true
+export TEST_BUNDLED=true
 npm test # run all tests for all schemas
 npm run test test:v2.0 # run all tests for cyclonedx-2.0
 ```
