@@ -7,11 +7,6 @@ on:
     branches: ['master', 'main']
   pull_request:
   workflow_dispatch:
-    inputs:
-      test_bundled:
-        description: weather to test bundled schemas
-        type: boolean
-        default: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -27,8 +22,8 @@ defaults:
 
 env:
   NODE_VERSION: '24.x'
-  TEST_BUNDLED: >- # usually not required, since the bundler workflow does this already.
-    ${{ github.event.inputs.test_bundled }}
+  TEST_BUNDLED: true # for simplicity, always tests the bundled schema, too
+  TEST_BUNDLED_ONLY: false
 
 jobs:
   discover-schema:
