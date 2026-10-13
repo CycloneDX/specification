@@ -178,7 +178,10 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
         schema,
         external: Array.from(externals),
         embedded: Array.from(embeddedMap,
-            ([f, d]) => [unixPath(relative(entryDir, f)), d]),
+            ([f, d]) => {
+                const {path, frag} = refSplit(f);
+                return [refJoin({path: unixPath(relative(entryDir, path)), frag}), d];
+            }),
         rewired: Array.from(rewiredMap,
             ([f, t]) => {
                 const {path, frag} = refSplit(f);

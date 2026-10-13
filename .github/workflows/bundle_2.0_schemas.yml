@@ -59,9 +59,9 @@ jobs:
         id: changes
         run: |
           if git diff --quiet; then
-            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
           else
-            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
           fi
       - name: Upload modified
         if: ${{ steps.changes.outputs.has_changes == 'true' }}
@@ -103,7 +103,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           package-manager-cache: false
       - name: Install Dependencies
-        run: npm install --no-fund --no-audit
+        run: npm ci --no-fund --no-audit
       - name: Run test
         env:
           TEST_BUNDLED_ONLY: true
@@ -136,7 +136,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           package-manager-cache: false
       - name: Install Dependencies
-        run: npm install --no-fund --no-audit
+        run: npm ci --no-fund --no-audit
         working-directory: tools/src/main/js/linter
       - name: Lint schemas
         run: |
@@ -152,7 +152,7 @@ jobs:
         if: ${{ !cancelled() }}
         run: sed -i "s|${GITHUB_WORKSPACE}/||g" "$REPORT_FILE"
       - name: Print report
-        if: '!cancelled()'
+        if: ${{ !cancelled() }}
         run: cat "$REPORT_FILE"
   push-schemas:
     name: Push Bundled Schemas
