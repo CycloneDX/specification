@@ -123,14 +123,6 @@ jobs:
           if-no-files-found: error
           retention-days: 1
   lint-bundled:
-    if: >-
-      ${{ github.ref == 'refs/heads/master'
-      || github.ref == 'refs/heads/main'
-      || github.ref == 'refs/heads/2.0-dev'
-      || (  github.event_name == 'pull_request'
-         && github.base_ref == 'master'
-         )
-      }}
     needs:
       - discover-schema
     timeout-minutes: 10
@@ -175,10 +167,7 @@ jobs:
           mkdir -p "$(dirname "$REPORT_FILE")"
           # only run checks not carried over from source files
           node tools/src/main/js/linter/cli.js \
-            --include schema-draft \
-            --include schema-id-pattern \
-            --include schema-id-filepath \
-            --include schema-comment \
+            --config ".config/cyclonedx-${SCHEMA_VERSION}-bundled.cdxlint.json" \
             --format json \
             "${schemas[@]}" \
             > "$REPORT_FILE"

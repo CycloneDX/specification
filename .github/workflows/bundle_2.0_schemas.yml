@@ -108,11 +108,47 @@ jobs:
         env:
           TEST_BUNDLED_ONLY: true
         run: npm run "test:v$SCHEMA_VERSION"
+  lint-schemas:
+    name: Lint Bundled Schemas
+    needs:
+      - bundle-schemas
+    if: ${{ needs.bundle-schemas.outputs.has_changes == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        # see https://github.com/actions/checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Download modified
+        # see https://github.com/actions/download-artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: modified
+          path: ${{ env.SCHEMA_DIR }}
+      - name: Setup Node.js
+        # see https://github.com/actions/setup-node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          package-manager-cache: false
+      - name: Install Dependencies
+        run: npm install --no-fund --no-audit
+        working-directory: tools/src/main/js/linter
+      - name: Lint schemas
+        run: >
+          node tools/src/main/js/linter/cli.js
+          --config ".config/cyclonedx-${SCHEMA_VERSION}-bundled.cdxlint.json"
+          --format json
+          "$BUNDLED_FILE
+          "$MINIFIED_FILE"
   push-schemas:
     name: Push Bundled Schemas
     needs:
       - bundle-schemas
       - test-schemas
+      - lint-schemas
     if: ${{ needs.bundle-schemas.outputs.has_changes == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
