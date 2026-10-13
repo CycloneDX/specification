@@ -46,7 +46,7 @@ export const isSchemaObject = (o) =>
 /**
  * Yield immediate subschemas, never property maps or literal data.
  * @param {Readonly<*>} s schema
- * @return {Generator<unknown, void, *>}
+ * @yields {*}
  */
 export const subschemas = function* (s) {
     for (const [k, v] of Object.entries(s)) {
@@ -72,7 +72,7 @@ export const subschemas = function* (s) {
  * Return values are either non-empty strings or `null`.
  *
  * @param {string} r ref
- * @return {RefSplit}
+ * @returns {RefSplit}
  */
 export const refSplit = (r) => {
     const split = r.split('#');
@@ -90,7 +90,7 @@ export const refSplit = (r) => {
  * Join a ref path and fragment.
  *
  * @param {Readonly<RefSplit>} rs
- * @return {string}
+ * @returns {string}
  */
 export const refJoin = ({path, frag}) => {
     if (path && frag) return `${path}#${frag}`;
@@ -107,7 +107,7 @@ const URI_OR_ABS_WIN_RE = Object.freeze(/^[a-z][a-z0-9+.-]*:/i);
 /**
  * Whether a ref is absolute.
  * @param {string} r ref
- * @return {boolean}
+ * @returns {boolean}
  */
 export const refIsAbsolute = (r) => {
     if (r.startsWith('#')) return false;

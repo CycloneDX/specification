@@ -16,7 +16,7 @@ import {JSON_SCHEMA_RE, JSON_SCHEMA_EXT} from './src/helpers/common.js';
  *  `…/foo.schema.json` -> `…/foo-bundled.schema.json`
  *
  * @param {string} s
- * @return {string}
+ * @returns {string}
  */
 const toBundledName = (s) => {
     if (!s.endsWith(JSON_SCHEMA_EXT)) {
@@ -32,7 +32,7 @@ const toBundledName = (s) => {
  * `…/foo.schema.json` -> `…/foo.min.schema.json`
  *
  * @param {string} s
- * @return {string}
+ * @returns {string}
  */
 const toMinifiedName = (s) => {
     if (!s.endsWith(JSON_SCHEMA_EXT)) {
@@ -73,7 +73,7 @@ class ValidationError extends Error {
 /**
  * @param {string} entryFile absolute path to entry file.
  * @param {string} includeDir absolute path to include dir.
- * @return {Promise<MainResult>}
+ * @returns {Promise<MainResult>}
  */
 const main = async (entryFile, includeDir) => {
     const bundledFile = toBundledName(entryFile);

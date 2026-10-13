@@ -18,7 +18,7 @@ const FRAG_DEFS_PREFIX = `/${DEFS_KEYWORDS}/`;
 
 /**
  * @param {string} f
- * @return {string}
+ * @returns {string}
  */
 const makeModuleName = (f) =>
     f.replace(JSON_SCHEMA_RE, '');
@@ -70,7 +70,7 @@ class ModuleNameCollisionError extends Error {
  * @param {string} entryFile Absolute path to entry point schema file.
  * @param {Iterable<string>} includeFiles Absolute path to schema files that shall be bundled.
  * @param {string} targetFile Absolute path to target schema file.
- * @return {Promise<BundleResult>}
+ * @returns {Promise<BundleResult>}
  */
 export const bundle = async (entryFile, includeFiles, targetFile) => {
     const entryDir = dirname(entryFile);
@@ -95,7 +95,7 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
     /**
      * @param {*} schema
      * @param {string} sourceFile
-     * @return {void}
+     * @returns {void}
      */
     const rewireRefs = (schema, sourceFile) => {
         const sourceDir = dirname(sourceFile);

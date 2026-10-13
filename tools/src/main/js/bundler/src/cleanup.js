@@ -3,7 +3,7 @@ import {COMMENT_KEYWORD, subschemas} from './helpers/json-schema-spec.js';
 /**
  * Remove $comment in place
  * @param {*} schema
- * @return {void}
+ * @returns {void}
  */
 export const dropComments = (schema) => {
     delete schema[COMMENT_KEYWORD];
@@ -31,7 +31,7 @@ export const HOLLOW_COMMENT =
  * - Hollowed schemas are marked with `"not":{"$comment":HOLLOW_COMMENT}`.
  *
  * @param {*} schema
- * @return {TreeShakeResult}
+ * @returns {TreeShakeResult}
  */
 export const treeShake = (schema) => {
     /** @type {string[]} */

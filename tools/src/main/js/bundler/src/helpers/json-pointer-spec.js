@@ -20,7 +20,7 @@ const TILDE_ESC = '~0';
 
 /**
  * @param {string} s
- * @return {boolean}
+ * @returns {boolean}
  */
 export const isJsonPointer = (s) =>
     s.startsWith(PREFIX);
@@ -28,7 +28,7 @@ export const isJsonPointer = (s) =>
 /**
  * JSON Pointer to stack.
  * @param {JsonPointer} p
- * @return {JsonPointerStack}
+ * @returns {JsonPointerStack}
  */
 export const jsonPointer2stack = (p) =>
     p.split(PREFIX).slice(1).map(unescapeJsonPointer);
@@ -36,7 +36,7 @@ export const jsonPointer2stack = (p) =>
 /**
  * JSON Pointer for stack.
  * @param {JsonPointerStack} s
- * @return {JsonPointer}
+ * @returns {JsonPointer}
  */
 export const jsonPointer4stack = (s) =>
     PREFIX + s.map(escapeJsonPointer).join(PREFIX);
@@ -45,7 +45,7 @@ export const jsonPointer4stack = (s) =>
 /**
  * Escape a JSON Pointer token.
  * @param {string} p
- * @return {string}
+ * @returns {string}
  */
 export const escapeJsonPointer = (p) =>
     p.replaceAll(TILDE, TILDE_ESC).replaceAll(PREFIX, PREFIX_ESC);
@@ -53,7 +53,7 @@ export const escapeJsonPointer = (p) =>
 /**
  * Unescape a JSON Pointer token.
  * @param {string} p
- * @return {string}
+ * @returns {string}
  */
 export const unescapeJsonPointer = (p) =>
     p.replaceAll(PREFIX_ESC, PREFIX).replaceAll(TILDE_ESC, TILDE);

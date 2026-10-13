@@ -22,7 +22,7 @@ import {isJsonPointer, jsonPointer2stack} from './helpers/json-pointer-spec.js'
  * - Validation is not aware of IDs.
  *
  * @param {Readonly<*>} schema
- * @return {ValidationResult}
+ * @returns {ValidationResult}
  */
 const validateRefs = (schema) => {
     /** @type {Set<string>} */
@@ -35,7 +35,7 @@ const validateRefs = (schema) => {
 
     /**
      * @param {*} schema
-     * @return {void}
+     * @returns {void}
      */
     const gatherRefs = (schema) => {
         for (const k of REF_KEYWORDS) {
@@ -71,7 +71,7 @@ const validateRefs = (schema) => {
 
 /**
  * @param {Readonly<*>} schema
- * @return {ValidationResult}
+ * @returns {ValidationResult}
  */
 export const validateSchema = (schema) => {
     const refs = validateRefs(schema)

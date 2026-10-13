@@ -18,14 +18,14 @@ export const JSON_SCHEMA_RE = Object.freeze(new RegExp(`${RegExp.escape(JSON_SCH
 /**
  * Get JSON file.
  * @param {string} file
- * @return {Promise<any>}
+ * @returns {Promise<*>}
  */
 export const getJsonfile = async (file) =>
     JSON.parse(await readFile(file, 'utf8'));
 
 /**
  * @param {string} p
- * @return {string}
+ * @returns {string}
  */
 export const unixPath = (p) =>
     p.replaceAll(sep, '/');
@@ -34,7 +34,7 @@ export const unixPath = (p) =>
 /**
  * @param {Readonly<*>} o
  * @param {Iterable<string>} pathStack
- * @return {boolean}
+ * @returns {boolean}
  */
 export const objectHasOwnPath = (o, pathStack) => {
     let c = o;
