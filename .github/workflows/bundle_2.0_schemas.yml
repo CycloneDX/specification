@@ -187,7 +187,6 @@ jobs:
       - name: Check for changes and commit
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TARGET_BRANCH: ${{ github.ref_name }}
         run: |
           set -eu
           # Add both files (works for both new and modified files)
@@ -196,7 +195,7 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git commit -sm "chore: update bundled schemas"
-          echo "Pushing to ${TARGET_BRANCH}"
+          echo "Pushing to ${GITHUB_REF_NAME}"
           git push \
             "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
-            "HEAD:refs/heads/${TARGET_BRANCH}"
+            "HEAD:refs/heads/${GITHUB_REF_NAME}"
