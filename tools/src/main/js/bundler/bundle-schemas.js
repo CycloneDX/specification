@@ -285,7 +285,7 @@ async function bundleSchemas(modulesDirectory, rootSchemaPath, options = {}) {
                 const target = ref.match(FILE_REF_RE)[1];
                 const resolvedPath = path.resolve(schemaDir, target);
                 if (bundledSchemaPaths.has(resolvedPath)) continue;
-                if (isInsideDir(resolvedPath, absoluteModelsDir)) {
+                if (isInsideDir(resolvedPath, absoluteModulesDir)) {
                     throw new Error(`Unresolved external ${key} target file '${target}' referenced from schema '${schemaPath}' at '${refPath}'`);
                 }
                 try {
