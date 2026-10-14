@@ -7,6 +7,11 @@ on:
     branches: ['master', 'main']
   pull_request:
   workflow_dispatch:
+    inputs:
+      test_bundled:
+        description: 'Also test the committed bundled schema files'
+        type: boolean
+        default: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -22,7 +27,9 @@ defaults:
 
 env:
   NODE_VERSION: '24.x'
-  TEST_BUNDLED: true # for simplicity, always tests the bundled schema, too
+  # Bundled schemas are tested in `bundle_2.0_schemas.yml` right after they are (re)generated.
+  # Here they are opt-in only; `inputs.*` is empty for push/pull_request, so this yields 'false' there.
+  TEST_BUNDLED: ${{ inputs.test_bundled == true }}
   TEST_BUNDLED_ONLY: false
 
 jobs:
