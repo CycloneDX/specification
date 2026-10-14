@@ -27,17 +27,43 @@ defaults:
 
 env:
   NODE_VERSION: '24.x'
-  # Bundled schemas are tested in `bundle_2.0_schemas.yml` right after they are (re)generated.
-  # Here they are opt-in only; `inputs.*` is empty for push/pull_request, so this yields 'false' there.
-  TEST_BUNDLED: ${{ inputs.test_bundled == true }}
-  TEST_BUNDLED_ONLY: false
 
 jobs:
   discover-schema:
     uses: $/.github/workflows/discover_2.x_schema.yml
+  detect-bundled-changes:
+    # Bundled schemas are generated and tested by `bundle_2.0_schemas.yml`.
+    # Here they are only re-tested when a PR actually touches them.
+    name: Detect bundled schema changes
+    if: ${{ github.event_name == 'pull_request' }}
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.detect.outputs.changed }}
+    steps:
+      - name: Checkout
+        # see https://github.com/actions/checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+          # PR checkout is the merge commit; depth 2 brings in both parents,
+          # so `HEAD^1` is the base branch tip.
+          fetch-depth: 2
+      - name: Detect changes
+        id: detect
+        working-directory: ${{ github.workspace }}
+        run: |
+          if git diff --quiet HEAD^1 HEAD -- 'schema/*/*-bundled*.schema.json'; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+          else
+            echo 'changed=true' >> "$GITHUB_OUTPUT"
+          fi
   test_js:
     needs:
       - discover-schema
+      - detect-bundled-changes
+    # `detect-bundled-changes` is skipped for push/workflow_dispatch - still run the tests then
+    if: ${{ !cancelled() && !failure() }}
     timeout-minutes: 30
     runs-on: ubuntu-latest
     strategy:
@@ -62,4 +88,13 @@ jobs:
       - name: Run test
         env:
           SCHEMA_VERSION: ${{ matrix.schema_version }}
+          # dispatch: honor the input
+          # pull_request: only if bundled files changed
+          # push to master/main: always (rare, and that is where published bundles live)
+          TEST_BUNDLED: >-
+            ${{ inputs.test_bundled == true
+             || needs.detect-bundled-changes.outputs.changed == 'true'
+             || github.event_name == 'push'
+            }}
+          TEST_BUNDLED_ONLY: false
         run: npm run "test:v$SCHEMA_VERSION"
