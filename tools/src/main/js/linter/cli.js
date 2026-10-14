@@ -110,7 +110,7 @@ Configuration:
   {
     "checks": {
       "schema-id-pattern": {
-        "pattern": "^https://cyclonedx\\\\.org/schema/.*\\\\.schema\\\\.json$"
+        "pattern": "^https://cyclonedx\\\\.org/schema/.+\\\\.schema\\\\.json$"
       },
       "formatting-indent": {
         "spaces": 2
@@ -184,7 +184,11 @@ function loadConfig(configPath) {
     }
   }
 
-  if (configPath && existsSync(configPath)) {
+  if (configPath) {
+    if (!existsSync(configPath)) {
+      console.error(`Missing config file: ${configPath}`);
+      process.exit(1);
+    }
     try {
       return JSON.parse(readFileSync(configPath, 'utf-8'));
     } catch (err) {

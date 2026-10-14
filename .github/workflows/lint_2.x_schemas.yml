@@ -18,7 +18,7 @@ env:
 
 jobs:
   discover-schema:
-    uses: ./.github/workflows/discover_2.x_schema.yml
+    uses: $/.github/workflows/discover_2.x_schema.yml
   discover-linter:
     timeout-minutes: 5
     runs-on: ubuntu-latest
@@ -38,7 +38,7 @@ jobs:
           package-manager-cache: false
       - name: Install linter
         working-directory: tools/src/main/js/linter
-        run: npm install
+        run: npm ci --no-fund --no-audit
       - name: Discover linter tests
         id: discover
         run: |
@@ -83,7 +83,7 @@ jobs:
           package-manager-cache: false
       - name: Install linter
         working-directory: tools/src/main/js/linter
-        run: npm install
+        run: npm ci --no-fund --no-audit
       - name: Lint schemas
         env:
           SCHEMA_VERSION: ${{ matrix.schema_version }}
@@ -156,7 +156,7 @@ jobs:
           package-manager-cache: false
       - name: Install linter
         working-directory: tools/src/main/js/linter
-        run: npm install
+        run: npm ci --no-fund --no-audit
       - name: Lint schemas
         env:
           SCHEMA_VERSION: ${{ matrix.schema_version }}
@@ -186,7 +186,7 @@ jobs:
         if: ${{ !cancelled() }}
         run: sed -i "s|${GITHUB_WORKSPACE}/||g" "$REPORT_FILE"
       - name: Print report
-        if: '!cancelled()'
+        if: ${{ !cancelled() }}
         run: cat "$REPORT_FILE"
       - name: Artifact report
         if: ${{ !cancelled() }}

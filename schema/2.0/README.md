@@ -9,20 +9,20 @@ validation, tooling, and data exchange.
 
 | File                                                                                 | Description                                                                                                                                                                             |
 |--------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`cyclonedx-2.0.schema.json`](./cyclonedx-2.0.schema.json)                           | The normative schema for CycloneDX Bill of Materials (BOM) documents. This schema references modular models and defines the complete structure for expressing inventories and metadata. |
-| [`cyclonedx-2.0-bundled.schema.json`](./cyclonedx-2.0-bundled.schema.json)         | A fully resolved version of the BOM schema with all external model references inlined. Useful for systems that require a self-contained schema.                                         |
-| [`cyclonedx-api-2.0.schema.json`](./cyclonedx-api-2.0.schema.json)                   | The normative API-focused schema. It reuses CycloneDX models but is structured for compatibility with request/response patterns in service architectures.                               |
-| [`cyclonedx-api-2.0-bundled.schema.json`](./cyclonedx-api-2.0-bundled.schema.json) | The combined version of the API schema with all model definitions embedded. Suitable for use in tools or validators that do not support `$ref` resolution.                              |
+| [`cyclonedx-2.0.schema.json`](./cyclonedx-2.0.schema.json)                           | The normative schema for CycloneDX Bill of Materials (BOM) documents. This schema references modules and defines the complete structure for expressing inventories and metadata. |
+| [`cyclonedx-2.0-bundled.schema.json`](./cyclonedx-2.0-bundled.schema.json)         | A fully resolved version of the BOM schema with all module references inlined. Useful for systems that require a self-contained schema.                                         |
+| [`cyclonedx-api-2.0.schema.json`](./cyclonedx-api-2.0.schema.json)                   | The normative API-focused schema. It reuses CycloneDX modules but is structured for compatibility with request/response patterns in service architectures.                               |
+| [`cyclonedx-api-2.0-bundled.schema.json`](./cyclonedx-api-2.0-bundled.schema.json) | The combined version of the API schema with all module definitions embedded. Suitable for use in tools or validators that do not support `$ref` resolution.                              |
 
 ## Modularity and Model Composition
 
 CycloneDX 2.0 is defined as a modular specification. All core concepts—such as components, vulnerabilities, 
-licensing, and AI/ML metadata, are encapsulated in reusable model definitions located in the [`model/`](./model) directory.
+licensing, and AI/ML metadata, are encapsulated in reusable module definitions located in the [`modules/`](./modules) directory.
 
 This modular architecture promotes:
 
 - **Consistency** across multiple schema contexts
-- **Reusability** of models within and beyond CycloneDX
+- **Reusability** of modules within and beyond CycloneDX
 - **Clarity and maintainability** for implementers
 
 ## Bundled Schemas
@@ -34,4 +34,4 @@ These are provided for convenience and do not supersede the authoritative pre-de
 
 - CycloneDX Website: [https://cyclonedx.org](https://cyclonedx.org)
 - ECMA-424 Publication: [https://ecma-international.org/publications-and-standards/standards/ecma-424/](https://ecma-international.org/publications-and-standards/standards/ecma-424/)
-- Model Definitions: See [`model/README.md`](./model/README.md)
+- Module Definitions: See [`modules/README.md`](./modules/README.md)

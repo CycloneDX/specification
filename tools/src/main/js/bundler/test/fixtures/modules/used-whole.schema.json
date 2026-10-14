@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "http://example.com/test/modules/used-whole.schema.json",
+  "$comment": "FIXTURE: referenced from main without a fragment -> embedded as a whole. Top-level $comment/$id/$schema are stripped when embedded as a def; title/description must survive, also in the minified output.",
+  "title": "Used whole",
+  "description": "A module that is referenced in its entirety.",
+  "type": "object",
+  "properties": {
+    "name": {
+      "title": "Name",
+      "description": "A display name.",
+      "type": "string"
+    },
+    "inner": {
+      "$comment": "Internal ref -> rewritten to #/$defs/used-whole/$defs/inner.",
+      "title": "Inner",
+      "description": "Sibling annotations next to a $ref: title/description are kept, while the sibling $comment is removed in the minified output.",
+      "$ref": "#/$defs/inner"
+    },
+    "license": {
+      "$comment": "Target is outside the models dir -> not bundled; rewired to a path relative to the root schema.",
+      "title": "License",
+      "description": "The license of this item.",
+      "$ref": "../externals/not-bundled.schema.json#/$defs/licenseId"
+    },
+    "remote": {
+      "$comment": "Absolute URI -> external by definition; left untouched and not checked for existence.",
+      "title": "Remote",
+      "description": "A thing defined by a remote schema.",
+      "$ref": "https://example.com/remote.schema.json#/$defs/thing"
+    },
+    "inArray": {
+      "$comment": "Refs nested inside an array (allOf) exercise the array branch of rewriteRefs: internal, bundled-file and external-file refs must all be rewritten there too.",
+      "title": "In array",
+      "description": "A composition of several referenced schemas.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/inner"
+        },
+        {
+          "$ref": "used-subdefs-only.schema.json#/$defs/keptTransitively"
+        },
+        {
+          "$ref": "../externals/not-bundled.schema.json#/$defs/licenseId"
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "inner": {
+      "title": "Inner",
+      "description": "An integer value.",
+      "type": "integer"
+    },
+    "unusedButKept": {
+      "$comment": "Not referenced anywhere, but kept because the module is used as a whole.",
+      "title": "Unused but kept",
+      "description": "A flag.",
+      "type": "boolean"
+    },
+    "sharedByOther": {
+      "$comment": "Cross-referenced from used-subdefs-only#/$defs/kept.",
+      "title": "Shared by other",
+      "description": "A numeric value shared across modules.",
+      "type": "number"
+    }
+  }
+}
