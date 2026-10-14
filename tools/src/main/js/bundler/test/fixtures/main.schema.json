@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "http://example.com/test/main.schema.json",
+  "$comment": "FIXTURE: root schema; entry point of the bundle. This $comment is the only one that survives minification. The root title/description must survive in both outputs.",
+  "title": "Main",
+  "description": "Root document of the bundler test fixtures.",
+  "type": "object",
+  "properties": {
+    "whole": {
+      "$comment": "External ref without fragment -> module is kept as a whole.",
+      "title": "Whole",
+      "description": "A module referenced in its entirety.",
+      "$ref": "modules/used-whole.schema.json"
+    },
+    "sub": {
+      "$comment": "External ref into a sub-def -> only that sub-def (and what it reaches) is kept.",
+      "title": "Sub",
+      "description": "A single definition of another module.",
+      "$ref": "modules/used-subdefs-only.schema.json#/$defs/kept"
+    },
+    "local": {
+      "$comment": "Internal ref -> rewritten to #/$defs/main/$defs/mainLocal, so the root's own def entry must be emitted.",
+      "title": "Local",
+      "description": "A definition of this very schema.",
+      "$ref": "#/$defs/mainLocal"
+    }
+  },
+  "$defs": {
+    "mainLocal": {
+      "$comment": "Referenced from main itself and from used-subdefs-only.",
+      "title": "Main local",
+      "description": "A local string definition of the root schema.",
+      "type": "string"
+    },
+    "mainUnused": {
+      "$comment": "Never referenced -> shaken away from #/$defs/main/$defs.",
+      "title": "Main unused",
+      "description": "A definition nothing refers to.",
+      "type": "null"
+    }
+  }
+}

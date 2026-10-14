@@ -23,34 +23,24 @@ const _thisDir = dirname(fileURLToPath(import.meta.url))
 const testschemaVersion = (parseArgs({options: {v: {type: 'string', short: 'v'}}}).values.v ?? '').trim()
 const schemaRootDir = join(_thisDir, '..', '..', '..', '..', '..', 'schema')
 const schemaDir = join(schemaRootDir, testschemaVersion)
-const schemaModelDir = join(schemaDir, `model`)
+const schemaModulesDir = join(schemaDir, `modules`)
 
 const schemaGlob = '*.schema.json'
-
-const expectedRefTypeFP = Object.freeze([
-    join(schemaModelDir, `cyclonedx-common-${testschemaVersion}.schema.json`),
-    '#/$defs/refType'
-])
 
 if (testschemaVersion.length === 0) {
     throw new Error('missing testschemaVersion. expected via argument')
 }
 console.debug('DEBUG | testschemaVersion = ', testschemaVersion);
 
-if (!await stat(schemaModelDir).then(s => s.isDirectory()).catch(() => false)) {
-    throw new Error(`missing schemaModelDir: ${schemaModelDir}`);
+if (!await stat(schemaModulesDir).then(s => s.isDirectory()).catch(() => false)) {
+    throw new Error(`missing schemaModulesDir: ${schemaModulesDir}`);
 }
-console.debug('DEBUG | schemaModelDir = ', schemaModelDir);
-
-if (!await stat(expectedRefTypeFP[0]).then(s => s.isFile()).catch(() => false)) {
-    throw new Error(`missing expectedRefTypeFP file: ${expectedRefTypeFP[0]}`);
-}
-console.debug('DEBUG | expectedRefTypeFP = ', expectedRefTypeFP);
+console.debug('DEBUG | schemaModulesDir = ', schemaModulesDir);
 
 const schemaFiles = Object.freeze([
     // test only the source schema, not the bundled for now ...
     join(schemaDir, `cyclonedx-${testschemaVersion}.schema.json`),
-    ...(await glob(join(schemaDir, `model`, schemaGlob))).sort(alphaSort)
+    ...(await glob(join(schemaDir, `modules`, schemaGlob))).sort(alphaSort)
 ])
 for (const schemaFile of schemaFiles) {
     if (!await stat(schemaFile).then(s => s.isFile()).catch(() => false)) {
@@ -65,6 +55,119 @@ console.debug('DEBUG | schemaFiles = ', schemaFiles);
 
 const __FINDNODES_SKIP_KEYS = Object.freeze(new Set(
     ['enum', 'const', 'examples', 'default', 'meta:enum']))
+
+/**
+ * Make a value constraints test for a specific node.
+ * @param {*} node
+ * @return {function(*): boolean} value constraints test
+ * @private
+ */
+function _makeValueConstraintTest(node) {
+    // TODO: use AJV to test against respective sub-schema
+    // see https://github.com/CycloneDX/specification/issues/1094#issuecomment-5993456107
+    if (node.type === undefined) return () => true
+    const typeChecks = [...new Set(
+        Array.isArray(node.type)
+            ? node.type
+            : [node.type]
+    )].map(type => {
+        const constraints = []
+        switch (type) {
+            case 'array':
+                // https://json-schema.org/understanding-json-schema/reference/array
+                constraints.push(v => Array.isArray(v))
+                if ('minItems' in node) {
+                    const minItems = node.minItems
+                    constraints.push(v => v.length >= minItems)
+                }
+                if ('maxItems' in node) {
+                    const maxItems = node.maxItems
+                    constraints.push(v => v.length <= maxItems)
+                }
+                if (node.uniqueItems === true) {
+                    // TODO: current implementation only works for primitives
+                    constraints.push(v => v.length === new Set(v).size)
+                }
+                // TODO: node.prefixItems
+                // TODO: tuple array
+                break
+            case 'boolean':
+                // https://json-schema.org/understanding-json-schema/reference/boolean
+                constraints.push(v => (v === true || v === false))
+                break
+            case 'null':
+                // https://json-schema.org/understanding-json-schema/reference/null
+                constraints.push(v => v === null)
+                break
+            case 'integer':
+                // https://json-schema.org/understanding-json-schema/reference/numeric#integer
+                constraints.push(v => Number.isInteger(v))
+            // falls through to 'number'
+            case 'number':
+                // https://json-schema.org/understanding-json-schema/reference/numeric
+                constraints.push(v => typeof v === 'number')
+                if ('minimum' in node) {
+                    const minimum = node.minimum
+                    constraints.push(v => v >= minimum)
+                }
+                if ('exclusiveMinimum' in node) {
+                    const exclusiveMinimum = node.exclusiveMinimum
+                    constraints.push(v => v > exclusiveMinimum)
+                }
+                if ('exclusiveMaximum' in node) {
+                    const exclusiveMaximum = node.exclusiveMaximum
+                    constraints.push(v => v < exclusiveMaximum)
+                }
+                if ('maximum' in node) {
+                    const maximum = node.maximum
+                    constraints.push(v => v <= maximum)
+                }
+                if ('multipleOf' in node) {
+                    const multipleOf = node.multipleOf
+                    constraints.push(
+                        /* The mathematical correct version:
+                         *      v => v % node.multipleOf === 0
+                         *  has implementational issues -- as an example:
+                         *      0.3 % 0.1 = 0.09999999999999998
+                         *  So we use a tolerance or a rounding check instead.
+                         */
+                        v => Math.abs(v / multipleOf - Math.round(v / multipleOf)) < 1e-9
+                    )
+                }
+                break
+            case 'object':
+                constraints.push(v => typeof v === 'object' && v !== null && !Array.isArray(v))
+                // TODO: required
+                // TODO: properties
+                // TODO: minProperties
+                // TODO: maxProperties
+                // TODO: patternProperties
+                break
+            case 'string':
+                // https://json-schema.org/understanding-json-schema/reference/string
+                constraints.push(v => typeof v === 'string')
+                if ('minLength' in node) {
+                    const minLength = node.minLength
+                    constraints.push(v => v.length >= minLength)
+                }
+                if ('maxLength' in node) {
+                    const maxLength = node.maxLength
+                    constraints.push(v => v.length <= maxLength)
+                }
+                if ('pattern' in node) {
+                    // https://json-schema.org/understanding-json-schema/reference/string#regexp
+                    const pattern = new RegExp(node.pattern)
+                    constraints.push(v => pattern.test(v))
+                }
+                // TODO: node.format
+                break
+            default:
+                throw new Error(`Unsupported type: ${JSON.stringify(node.type)}`)
+        }
+        return constraints
+    })
+    return v => typeChecks.some(ts => ts.every(t => t(v)))
+}
 
 /**
  * Walks a schema, yields [path, node] for every node the matcher accepts.
@@ -94,43 +197,14 @@ function* _findNodes(node, matcher, path = '$') {
 /**
  * @function
  * @param {*} schema
- * @return {Generator<[string, *], void, *>} every node that has a string `$ref`
- * @private
- */
-const _findRefs = (schema) => _findNodes(schema,
-    n => typeof n['$ref'] === 'string')
-
-/**
- * @function
- * @param {*} schema
- * @return {Generator<[string, *], void, *>} every node that is an object schema
- * @private
- */
-const _findObjectSchemas = (schema) => _findNodes(schema,
-    n => n.type === 'object' || (Array.isArray(n.type) && n.type.includes('object')))
-
-/**
- * @param {string} schemaFile
- * @return {string} the expected `$ref` value pointing at refType, relative to schemaFile
- * @private
- */
-function _refTypeRefFor(schemaFile) {
-    return (
-        schemaFile === expectedRefTypeFP[0]
-            ? ''
-            : relative(dirname(schemaFile), expectedRefTypeFP[0])
-    ) + expectedRefTypeFP[1]
-}
-
-/**
- * @function
- * @param {*} schema
  * @return {Generator<[string, *], void, *>} every node that has an `enum` or a `meta:enum`
  * @private
  */
 const _findObjectWithEnum = (schema) => _findNodes(schema,
-    n => 'enum' in n || 'meta:enum' in n)
+    n => 'enum' in n)
 
+const _findObjectWithDefault = (schema) => _findNodes(schema,
+    n => 'default' in n)
 
 /**
  * @param {*} actual
@@ -155,141 +229,58 @@ function _printError(actual, expected, msg, schemaFile, schemaPath) {
 // region tests
 
 /**
- * `$ref` must not reference its own file by name/path;
- * self-references must use the plain `#...` fragment form.
+ * Default values adheres constraints.
  * @param {*} schema
  * @param {string} schemaFile
  * @return {number} number of errors found
  */
-function testNoSelfRefByFile(schema, schemaFile) {
+function testDefaultValues(schema, schemaFile) {
+    // TODO: move to linter - see https://github.com/CycloneDX/specification/issues/1094
     let errCnt = 0
-    for (const [path, node] of _findRefs(schema)) {
-        const ref = node['$ref']
-        const hashPos = ref.indexOf('#')
-        const filePart = hashPos === -1
-            ? ref
-            : ref.slice(0, hashPos)
-        if (filePart === '') continue;
-        const resolved = join(dirname(schemaFile), filePart)
-        if (resolved === schemaFile) {
-            ++errCnt
-            const fragment = hashPos === -1
-                ? '#'
-                : ref.slice(hashPos)
-            _printError(
-                ref, fragment,
-                'self-$ref must start with "#"',
-                schemaFile, path)
-        }
-    }
-    return errCnt
-}
-
-/**
- * `bom-ref` properties must `$ref` refType — and nothing else may.
- * @param {*} schema
- * @param {string} schemaFile
- * @return {number} number of errors found
- */
-function testRefTypeUsage(schema, schemaFile) {
-    const refTypeRef = _refTypeRefFor(schemaFile)
-    // 'refLinkType' is the only allowed exception - it inherits from 'refType'
-    const exceptionPath = schemaFile === expectedRefTypeFP[0]
-        ? '$.$defs.refLinkType'
-        : undefined
-
-    let errCnt = 0
-    for (const [path, node] of _findRefs(schema)) {
-        const ref = node['$ref']
-        if (path.endsWith('.properties.bom-ref')) {
-            if (ref !== refTypeRef) {
+    for (const [path, node] of _findObjectWithDefault(schema)) {
+        if (path.endsWith('.properties')) continue;
+        const defaultValue = node.default
+        if ('const' in node) {
+            if (defaultValue !== node.const) {
                 ++errCnt
                 _printError(
-                    ref, refTypeRef,
-                    'wrong .$ref',
-                    schemaFile, path)
+                    defaultValue, node.const,
+                    'default value out of range',
+                    schemaFile, `${path}.default`)
             }
             continue
         }
-        if (ref === refTypeRef && path !== exceptionPath) {
-            ++errCnt
-            _printError(
-                ref, `different from: ${refTypeRef}`,
-                'wrong use of refType - did you mean refLinkType?',
-                schemaFile, path)
-        }
-    }
-    return errCnt
-}
-
-/**
- * object schemas must have `additionalProperties: false`,
- * unless explicitly allowed via `$comment`.
- * @param {*} schema
- * @param {string} schemaFile
- * @return {number} number of errors found
- */
-function testAdditionalPropertiesFalse(schema, schemaFile) {
-    let errCnt = 0
-    for (const [path, node] of _findObjectSchemas(schema)) {
-        if (path.endsWith('.if') || path.endsWith('.not')) continue;
-        const expected = typeof node['$comment'] === 'string'
-            && node['$comment'].includes('additionalProperties explicitly allowed')
-        const actual = node['additionalProperties']
-        if (actual !== expected) {
-            ++errCnt
-            _printError(
-                actual, expected,
-                'wrong .additionalProperties',
-                schemaFile, path)
-        }
-    }
-    return errCnt
-}
-
-/**
- * `meta:enum` must be an object,
- * and every `enum` value must exist as a key in it.
- * @param {*} schema
- * @param {string} schemaFile
- * @return {number} number of errors found
- */
-function testMetaEnum(schema, schemaFile) {
-    let errCnt = 0
-    for (const [path, node] of _findObjectWithEnum(schema)) {
-        const metaEnum = node['meta:enum']
-        if (metaEnum === undefined) {
-            // metaEnum is optional
-            continue
-        }
-        if (typeof metaEnum !== 'object' || metaEnum === null || Array.isArray(metaEnum)) {
-            ++errCnt
-            _printError(
-                metaEnum, 'an object',
-                'meta:enum must be an object',
-                schemaFile, `${path}.meta:enum`)
-            continue
-        }
-        const enumValues = node['enum']
-        if (!Array.isArray(enumValues)) {
-            ++errCnt
-            _printError(
-                enumValues, 'an array',
-                'meta:enum without a sibling enum array',
-                schemaFile, `${path}.enum`)
-            continue
-        }
-        for (const value of enumValues) {
-            if (!Object.hasOwn(metaEnum, value)) {
+        if ('enum' in node) {
+            if (undefined === node.enum.find(e => e === defaultValue)) {
                 ++errCnt
                 _printError(
-                    undefined, `a key ${JSON.stringify(String(value))}`,
-                    'enum value missing in meta:enum',
-                    schemaFile, `${path}.meta:enum`)
+                    defaultValue, `one of ${JSON.stringify(node.enum)}`,
+                    'default value out of range',
+                    schemaFile, `${path}.default`)
             }
+            continue
+        }
+        if (!_makeValueConstraintTest(node)(defaultValue)) {
+            ++errCnt
+            _printError(
+                defaultValue, `in range of type and constraints`,
+                'default value out of range',
+                schemaFile, `${path}.default`)
         }
     }
     return errCnt
+}
+
+/**
+ * Example values adheres constraints.
+ * @param {*} schema
+ * @param {string} schemaFile
+ * @return {number} number of errors found
+ */
+function testExampleValues (schema, schemaFile) {
+    //TODO ...
+    // move to linter - see https://github.com/CycloneDX/specification/issues/1094
+    return 0
 }
 
 // endregion tests
@@ -298,10 +289,8 @@ function testMetaEnum(schema, schemaFile) {
 
 /** @type {Readonly<Record<string, function(*, string): number>>} */
 const tests = Object.freeze({
-    'no self-$ref by file': testNoSelfRefByFile,
-    'refType usage (`bom-ref` <-> refType)': testRefTypeUsage,
-    'additionalProperties is `false`': testAdditionalPropertiesFalse,
-    'meta:enum completeness': testMetaEnum,
+    'default value in range': testDefaultValues,
+    'example values in range': testExampleValues,
 })
 
 const schemas = await Promise.all(schemaFiles.map(

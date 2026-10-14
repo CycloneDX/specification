@@ -46,6 +46,9 @@
         <!-- Test tag filtering: empty = run all tests.
              Overridden by profiles or via -Dsurefire.includeTags=... -->
         <surefire.includeTags></surefire.includeTags>
+        <!-- Print test run output (System.out/logging of tests) to the console instead of report files.
+             Set to true to write to target/surefire-reports/*.txt instead. -->
+        <surefire.useFile>false</surefire.useFile>
         <!-- Maven Plugin Versions -->
         <maven.javadoc.plugin.version>2.10.4</maven.javadoc.plugin.version>
         <maven.source.plugin.version>3.0.1</maven.source.plugin.version>
@@ -179,6 +182,20 @@
                 <version>3.5.2</version>
                 <configuration>
                     <groups>${surefire.includeTags}</groups>
+                    <useFile>${surefire.useFile}</useFile>
+                    <!-- Use JUnit display names (e.g. the schema test-data resource path)
+                         instead of technical names like verifyTestData()[7] -->
+                    <statelessTestsetReporter implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5Xml30StatelessReporter">
+                        <usePhrasedTestCaseMethodName>true</usePhrasedTestCaseMethodName>
+                        <usePhrasedFileName>false</usePhrasedFileName>
+                        <usePhrasedTestSuiteClassName>true</usePhrasedTestSuiteClassName>
+                        <usePhrasedTestCaseClassName>true</usePhrasedTestCaseClassName>
+                    </statelessTestsetReporter>
+                    <statelessTestsetInfoReporter implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5StatelessTestsetInfoReporter">
+                        <usePhrasedFileName>false</usePhrasedFileName>
+                        <usePhrasedClassNameInRunning>true</usePhrasedClassNameInRunning>
+                        <usePhrasedClassNameInTestCaseSummary>true</usePhrasedClassNameInTestCaseSummary>
+                    </statelessTestsetInfoReporter>
                 </configuration>
             </plugin>
         </plugins>
@@ -203,6 +220,12 @@
             <id>schema-v2-tests</id>
             <properties>
                 <surefire.includeTags>schema-v2</surefire.includeTags>
+            </properties>
+        </profile>
+        <profile>
+            <id>schema-v2.0-tests</id>
+            <properties>
+                <surefire.includeTags>schema-v2.0</surefire.includeTags>
             </properties>
         </profile>
     </profiles>

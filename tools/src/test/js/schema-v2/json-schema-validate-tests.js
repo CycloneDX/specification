@@ -32,7 +32,7 @@ if (process.env['VALIDATE_BUNDLED'] === 'true') {
 }
 
 const schemaFilesBundleMatcher = /-bundled/
-const schemaModelDir = join(schemaDir, `model`)
+const schemaModulesDir = join(schemaDir, `modules`)
 const testdataDir = join(_thisDir, '..', '..', 'resources', testschemaVersion)
 
 const schemaGlob = '*.schema.json'
@@ -49,20 +49,21 @@ for (const schemaFile of schemaFiles) {
 }
 console.debug('DEBUG | schemaFiles = ', schemaFiles);
 
-if (!await stat(schemaModelDir).then(s => s.isDirectory()).catch(() => false)) {
-    throw new Error(`missing schemaModelDir: ${schemaModelDir}`);
+if (!await stat(schemaModulesDir).then(s => s.isDirectory()).catch(() => false)) {
+    throw new Error(`missing schemaModulesDir: ${schemaModulesDir}`);
 }
-console.debug('DEBUG | schemaModelDir = ', schemaModelDir);
+console.debug('DEBUG | schemaModulesDir = ', schemaModulesDir);
 
 // endregion config
 
-const [spdxSchema, cryptoDefsSchema, schemas, schemaModules] = await Promise.all([
+const [spdxSchema, cryptoDefsSchema, behaviorTaxonomySchema, schemas, schemaModules] = await Promise.all([
     readFile(join(schemaRootDir, 'spdx.schema.json'), 'utf-8').then(JSON.parse),
     readFile(join(schemaRootDir, 'cryptography-defs.schema.json'), 'utf-8').then(JSON.parse),
+    readFile(join(schemaRootDir, 'behavior-taxonomy.schema.json'), 'utf-8').then(JSON.parse),
     Promise.all(schemaFiles.map(
         f => readFile(f, 'utf-8').then(s => [f, JSON.parse(s)])
     )),
-    glob(join(schemaModelDir, schemaGlob)).then(fs => Promise.all(fs.map(
+    glob(join(schemaModulesDir, schemaGlob)).then(fs => Promise.all(fs.map(
         f => readFile(f, 'utf-8').then(s => [f, JSON.parse(s)])
     )))
 ])
@@ -75,6 +76,10 @@ const [spdxSchema, cryptoDefsSchema, schemas, schemaModules] = await Promise.all
 function getAjv(bundled) {
     // see https://ajv.js.org/options.html
     const ajv = new Ajv2020({
+        verbose: true,
+        addUsedSchema: false,
+        keywords: ["meta:enum"],
+        // see https://ajv.js.org/options.html#strict-mode-options
         strict: true,
         strictSchema: true,
         strictNumbers: true,
@@ -83,17 +88,16 @@ function getAjv(bundled) {
         strictRequired: true,
         validateFormats: true,
         allowMatchingProperties: true,
-        addUsedSchema: false,
         allowUnionTypes: true,
-        keywords: ["meta:enum"]
     });
     // some ref'd schemas mightbe draft-07
     ajv.addMetaSchema(draft7MetaSchema);
     ajv.addSchema(spdxSchema, 'https://cyclonedx.org/schema/spdx.schema.json')
     ajv.addSchema(cryptoDefsSchema, 'https://cyclonedx.org/schema/cryptography-defs.schema.json')
+    ajv.addSchema(behaviorTaxonomySchema, 'https://cyclonedx.org/schema/behavior-taxonomy.schema.json')
     if (!bundled) {
         for (const [f, s] of schemaModules) {
-            ajv.addSchema(s, `https://cyclonedx.org/schema/${testschemaVersion}/model/${f}`)
+            ajv.addSchema(s, `https://cyclonedx.org/schema/${testschemaVersion}/modules/${f}`)
         }
     }
     addFormats(ajv)
