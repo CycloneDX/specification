@@ -1,7 +1,8 @@
 /**
  * Constants and function related to JSON Schema Specification.
  *
- * This adheres to DRAFT 2020-12.
+ * This adheres to DRAFT 2020-12 only.
+ * Deprecated keywords are ignored.
  */
 
 
@@ -12,7 +13,7 @@ export const ID_KEYWORD = '$id';
 export const COMMENT_KEYWORD = '$comment';
 
 /** Ignores the deprecated `definitions` - though it is still allowed... */
-export const DEFS_KEYWORDS = '$defs';
+export const DEFS_KEYWORD = '$defs';
 
 export const REF_KEYWORDS = Object.freeze(new Set(['$ref', '$dynamicRef', '$recursiveRef']));
 
@@ -22,7 +23,7 @@ export const DATA_KEYWORDS = Object.freeze(new Set(['enum', 'const', 'examples',
 
 export const NOT_KEYWORD = 'not';
 
-export const SINGLE_SCHEMA = Object.freeze(new Set([
+const SINGLE_SCHEMA = Object.freeze(new Set([
     'additionalProperties', 'propertyNames',
     'items', 'contains',
     'unevaluatedProperties', 'unevaluatedItems',
@@ -30,9 +31,9 @@ export const SINGLE_SCHEMA = Object.freeze(new Set([
     'contentSchema',
 ]));
 
-export const SCHEMA_ARRAY = Object.freeze(new Set(['allOf', 'anyOf', 'oneOf', 'prefixItems']));
+const SCHEMA_ARRAY = Object.freeze(new Set(['allOf', 'anyOf', 'oneOf', 'prefixItems']));
 
-export const SCHEMA_MAP = Object.freeze(new Set([DEFS_KEYWORDS, 'properties', 'patternProperties', 'dependentSchemas']));
+const SCHEMA_MAP = Object.freeze(new Set([DEFS_KEYWORD, 'properties', 'patternProperties', 'dependentSchemas']));
 
 /**
  * @param {unknown} o

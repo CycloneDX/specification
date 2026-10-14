@@ -3,7 +3,7 @@ import {basename, dirname, relative, resolve} from 'node:path'
 import {JSON_SCHEMA_RE, getJsonfile, unixPath, findDuplicateValues} from './helpers/common.js';
 import {escapeJsonPointer} from './helpers/json-pointer-spec.js';
 import {
-    ID_KEYWORD, NOT_KEYWORD, SCHEMA_KEYWORD, COMMENT_KEYWORD, DEFS_KEYWORDS, REF_KEYWORDS,
+    ID_KEYWORD, NOT_KEYWORD, SCHEMA_KEYWORD, COMMENT_KEYWORD, DEFS_KEYWORD, REF_KEYWORDS,
     subschemas,
     refIsAbsolute, refSplit, refJoin,
 } from './helpers/json-schema-spec.js';
@@ -14,7 +14,7 @@ const HOLLOW_COMMENT =
     'Itself must not be used for validation.';
 
 
-const FRAG_DEFS_PREFIX = `/${DEFS_KEYWORDS}/`;
+const FRAG_DEFS_PREFIX = `/${DEFS_KEYWORD}/`;
 
 /**
  * @param {string} f
@@ -148,19 +148,19 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
         ).toString();
     }
     rewireRefs(schema, entryFile);
-    const schemaDefsOrig = schema[DEFS_KEYWORDS];
-    schema[DEFS_KEYWORDS] = Object.fromEntries( // deterministic order
+    const schemaDefsOrig = schema[DEFS_KEYWORD];
+    schema[DEFS_KEYWORD] = Object.fromEntries( // deterministic order
         [...fileModuleNames.values()].sort().map(m => [m, undefined]));
 
     const entryModuleName = fileModuleNames.get(entryFile);
     if (schemaDefsOrig) {
-        schema[DEFS_KEYWORDS][entryModuleName] = {
-            [DEFS_KEYWORDS]: schemaDefsOrig,
-            [NOT_KEYWORD]: {$comment: HOLLOW_COMMENT}
+        schema[DEFS_KEYWORD][entryModuleName] = {
+            [DEFS_KEYWORD]: schemaDefsOrig,
+            [NOT_KEYWORD]: {[COMMENT_KEYWORD]: HOLLOW_COMMENT}
         };
-        embeddedMap.set(`${entryFile}#${FRAG_DEFS_PREFIX}`, `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(entryModuleName)}`);
+        embeddedMap.set(`${entryFile}#/${DEFS_KEYWORD}`, `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(entryModuleName)}`);
     } else {
-        delete schema[DEFS_KEYWORDS][entryModuleName];
+        delete schema[DEFS_KEYWORD][entryModuleName];
     }
 
     for (const [includeFile, moduleName] of fileModuleNames) {
@@ -170,7 +170,7 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
         delete includeSchema[ID_KEYWORD];
         delete includeSchema[COMMENT_KEYWORD];
         rewireRefs(includeSchema, includeFile);
-        schema[DEFS_KEYWORDS][moduleName] = includeSchema;
+        schema[DEFS_KEYWORD][moduleName] = includeSchema;
         embeddedMap.set(includeFile, `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`);
     }
 
