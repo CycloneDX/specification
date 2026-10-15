@@ -1,62 +1,201 @@
-name: Bundle CycloneDX 2.0 JSON Schemas
+name: Bundle CDX-2.0
 
 on:
   push:
     branches:
-      - 2.0-dev
-      - 2.0-dev-threatmodeling
+      - 'master'
+      - 'main'
+      - '2.0-dev'
     paths:
+      - '.github/workflows/bundle_2.0_schemas.yml' # self
+      - 'tools/src/main/js/bundler/**'
+      - 'schema/2.0/cyclonedx-2.0.schema.json'
       - 'schema/2.0/**/*.schema.json'
-      - 'tools/src/main/js/bundle-schemas.js'
   workflow_dispatch:  # Allows manual trigger
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token
+permissions: { }
+
+env:
+  SCHEMA_VERSION: '2.0'
+  SCHEMA_DIR: schema/2.0
+  MODULES_DIR: schema/2.0/modules
+  SOURCE_FILE: schema/2.0/cyclonedx-2.0.schema.json
+  BUNDLED_FILE: schema/2.0/cyclonedx-2.0-bundled.schema.json
+  MINIFIED_FILE: schema/2.0/cyclonedx-2.0-bundled.min.schema.json
+  NODE_VERSION: '24.x'
 
 jobs:
   bundle-schemas:
+    name: Bundle Schemas
+    outputs:
+      has_changes: ${{ steps.changes.outputs.has_changes }}
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: write  # Required to push changes
-
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         # see https://github.com/actions/checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-
       - name: Setup Node.js
         # see https://github.com/actions/setup-node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: '20'
-
+          node-version: ${{ env.NODE_VERSION }}
+          package-manager-cache: false
       - name: Install dependencies
-        working-directory: tools/src/main/js
-        run: npm install
-
+        working-directory: tools/src/main/js/bundler
+        run: npm ci --no-fund --no-audit
       - name: Bundle schemas
-        working-directory: tools/src/main/js
+        run: >
+          node tools/src/main/js/bundler/cli.js
+          "$MODULES_DIR" "$SOURCE_FILE"
+      - name: Detect changes
+        id: changes
         run: |
-          node bundle-schemas.js \
-            ../../../../schema/2.0/model \
-            ../../../../schema/2.0/cyclonedx-2.0.schema.json
-
+          if git diff --quiet; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Upload modified
+        if: ${{ steps.changes.outputs.has_changes == 'true' }}
+        # see https://github.com/actions/upload-artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: modified
+          if-no-files-found: error
+          path: |
+            ${{ env.BUNDLED_FILE }}
+            ${{ env.MINIFIED_FILE }}
+          retention-days: 1
+  test-schemas:
+    name: Test Bundled Schemas
+    needs:
+      - bundle-schemas
+    if: ${{ needs.bundle-schemas.outputs.has_changes == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: tools/src/test/js/schema-v2
+    steps:
+      - name: Checkout repository
+        # see https://github.com/actions/checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Download modified
+        # see https://github.com/actions/download-artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: modified
+          path: ${{ env.SCHEMA_DIR }}
+      - name: Setup Node.js
+        # see https://github.com/actions/setup-node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          package-manager-cache: false
+      - name: Install Dependencies
+        run: npm install --no-fund --no-audit
+      - name: Run test
+        env:
+          TEST_BUNDLED_ONLY: true
+        run: npm run "test:v$SCHEMA_VERSION"
+  lint-schemas:
+    name: Lint Bundled Schemas
+    needs:
+      - bundle-schemas
+    if: ${{ needs.bundle-schemas.outputs.has_changes == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      REPORT_FILE: tools/src/main/js/linter/reports/bundled.json
+    steps:
+      - name: Checkout repository
+        # see https://github.com/actions/checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Download modified
+        # see https://github.com/actions/download-artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: modified
+          path: ${{ env.SCHEMA_DIR }}
+      - name: Setup Node.js
+        # see https://github.com/actions/setup-node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          package-manager-cache: false
+      - name: Install Dependencies
+        run: npm ci --no-fund --no-audit
+        working-directory: tools/src/main/js/linter
+      - name: Lint schemas
+        run: |
+          set -eu
+          mkdir -p "$(dirname "$REPORT_FILE")"
+          node tools/src/main/js/linter/cli.js \
+          --config ".config/cyclonedx-${SCHEMA_VERSION}-bundled.cdxlintrc.json" \
+          --format json \
+          "$BUNDLED_FILE" "$MINIFIED_FILE" \
+          > "$REPORT_FILE"
+      - name: Make report relative
+        if: ${{ !cancelled() }}
+        run: sed -i "s|${GITHUB_WORKSPACE}/||g" "$REPORT_FILE"
+      - name: Print report
+        if: ${{ !cancelled() }}
+        run: cat "$REPORT_FILE"
+      - name: Artifact report
+        if: ${{ !cancelled() }}
+        # https://github.com/actions/upload-artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: report_${{ env.SCHEMA_VERSION }}-bundled
+          path: ${{ env.REPORT_FILE }}
+          if-no-files-found: error
+  push-schemas:
+    name: Push Bundled Schemas
+    needs:
+      - bundle-schemas
+      - test-schemas
+      - lint-schemas
+    if: ${{ needs.bundle-schemas.outputs.has_changes == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write  # Required to push changes
+    steps:
+      - name: Checkout repository
+        # see https://github.com/actions/checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Download modified
+        # see https://github.com/actions/download-artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: modified
+          path: ${{ env.SCHEMA_DIR }}
       - name: Check for changes and commit
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          BUNDLED_FILE="schema/2.0/cyclonedx-2.0-bundled.schema.json"
-          
-          # Add the file (works for both new and modified files)
-          git add "$BUNDLED_FILE"
-          
-          # Check if there are staged changes
-          if git diff --staged --quiet; then
-            echo "No changes to bundled schema"
-          else
-            echo "Committing bundled schema changes"
-            git config --local user.email "github-actions[bot]@users.noreply.github.com"
-            git config --local user.name "github-actions[bot]"
-            git commit -m "chore: update bundled schema [skip ci]"
-            git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          fi
+          set -eu
+          # Add both files (works for both new and modified files)
+          git add "$BUNDLED_FILE" "$MINIFIED_FILE"
+          echo "Committing bundled schema changes"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -sm "chore: update bundled schemas"
+          echo "Pushing to ${GITHUB_REF_NAME}"
+          git push \
+            "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
+            "HEAD:refs/heads/${GITHUB_REF_NAME}"

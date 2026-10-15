@@ -118,7 +118,6 @@ public class SpdxXsdGenerator {
                 .append(indent(2)).append("\"$schema\": \"http://json-schema.org/draft-07/schema#\",").append("\n")
                 .append(indent(2)).append("\"$id\": \"http://cyclonedx.org/schema/spdx.schema.json\",").append("\n")
                 .append(indent(2)).append("\"$comment\": \"v1.1-" + StringEscapeUtils.escapeJson(stripLeadingV(tagName)) + "\",").append("\n")
-                .append(indent(2)).append("\"type\": \"string\",").append("\n")
                 .append(indent(2)).append("\"enum\": [");
 
         addLicenseAsJson(sb, licenses.entrySet());
