@@ -62,7 +62,7 @@ export const subschemas = function* (s) {
 };
 
 
-export const FRAG_SEP = '#';
+export const REF_FRAG_SEP = '#';
 
 /**
  * @typedef {object} RefSplit
@@ -79,9 +79,9 @@ export const FRAG_SEP = '#';
  * @returns {RefSplit}
  */
 export const refSplit = (r) => {
-    const split = r.split(FRAG_SEP);
+    const split = r.split(REF_FRAG_SEP);
     if (split.length > 2) {
-        throw new RangeError(`Unexpected amount of "${FRAG_SEP}" in ${r}`);
+        throw new RangeError(`Unexpected amount of "${REF_FRAG_SEP}" in ${r}`);
     }
     return {
         path: split[0] || null,
@@ -96,10 +96,10 @@ export const refSplit = (r) => {
  * @returns {string}
  */
 export const refJoin = ({path, frag}) => {
-    if (path && frag) return `${path}${FRAG_SEP}${frag}`;
+    if (path && frag) return `${path}${REF_FRAG_SEP}${frag}`;
     if (path) return path;
-    if (frag) return `${FRAG_SEP}${frag}`;
-    return FRAG_SEP; // the entire schema
+    if (frag) return `${REF_FRAG_SEP}${frag}`;
+    return REF_FRAG_SEP; // the entire schema
 };
 
 /**
@@ -113,7 +113,7 @@ const URI_OR_ABS_WIN_RE = Object.freeze(/^[a-z][a-z0-9+.-]*:/i);
  * @returns {boolean}
  */
 export const refIsAbsolute = (r) => {
-    if (r.startsWith(FRAG_SEP)) return false;
+    if (r.startsWith(REF_FRAG_SEP)) return false;
     return r.startsWith('/')  // Unix-like absolute path
         || r.startsWith('\\')  // UNC-like absolute path
         || URI_OR_ABS_WIN_RE.test(r);

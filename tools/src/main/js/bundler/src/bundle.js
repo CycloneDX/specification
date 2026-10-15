@@ -1,11 +1,11 @@
 import {basename, dirname, relative, resolve} from 'node:path'
 
 import {JSON_SCHEMA_RE, getJsonfile, posixPath, findDuplicateValues} from './helpers/common.js';
-import {escapeJsonPointer, PREFIX as JP_REFIX} from './helpers/json-pointer-spec.js';
+import {escapeJsonPointer, PREFIX as JP_PREFIX} from './helpers/json-pointer-spec.js';
 import {
     ID_KEYWORD, NOT_KEYWORD, SCHEMA_KEYWORD, COMMENT_KEYWORD, DEFS_KEYWORD, REF_KEYWORDS,
     subschemas,
-    refIsAbsolute, refSplit, refJoin, FRAG_SEP,
+    refIsAbsolute, refSplit, refJoin, REF_FRAG_SEP,
 } from './helpers/json-schema-spec.js';
 import {PATH_SEP as URI_PATH_SEP} from './helpers/uri.js';
 
@@ -15,7 +15,7 @@ const HOLLOW_COMMENT =
     'Itself must not be used for validation.';
 
 
-const FRAG_DEFS_PREFIX = `${JP_REFIX}${DEFS_KEYWORD}${JP_REFIX}`;
+const FRAG_DEFS_PREFIX = `${JP_PREFIX}${DEFS_KEYWORD}${JP_PREFIX}`;
 
 /**
  * @param {string} f
@@ -132,7 +132,7 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
                 : sourceFile;
             const moduleName = fileModuleNames.get(refFile);
             if (moduleName) {
-                if (frag && !frag.startsWith(JP_REFIX)) {
+                if (frag && !frag.startsWith(JP_PREFIX)) {
                     // currently dont support anchors - only JSON pointer.
                     throw new RangeError(`Unsupported ref fragment: ${v}`);
                 }
@@ -177,9 +177,7 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
             [DEFS_KEYWORD]: schemaDefsOrig,
             [NOT_KEYWORD]: {[COMMENT_KEYWORD]: HOLLOW_COMMENT}
         };
-        embeddedMap.set(`${entryFile}${FRAG_SEP}${JP_REFIX}${DEFS_KEYWORD}`, `${FRAG_SEP}${FRAG_DEFS_PREFIX}${escapeJsonPointer(entryModuleName)}`);
-    } else {
-        delete schema[DEFS_KEYWORD][entryModuleName];
+        embeddedMap.set(`${entryFile}${REF_FRAG_SEP}${JP_PREFIX}${DEFS_KEYWORD}`, `${REF_FRAG_SEP}${FRAG_DEFS_PREFIX}${escapeJsonPointer(entryModuleName)}`);
     }
 
     for (const [includeFile, moduleName] of fileModuleNames) {
@@ -190,7 +188,7 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
         delete includeSchema[COMMENT_KEYWORD];
         rewireRefs(includeSchema, includeFile);
         schema[DEFS_KEYWORD][moduleName] = includeSchema;
-        embeddedMap.set(includeFile, `${FRAG_SEP}${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`);
+        embeddedMap.set(includeFile, `${REF_FRAG_SEP}${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`);
     }
 
     return {

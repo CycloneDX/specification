@@ -1,8 +1,6 @@
-
 import {objectHasOwnPath} from "./helpers/common.js";
-import {FRAG_SEP, REF_KEYWORDS, subschemas} from './helpers/json-schema-spec.js';
+import {REF_FRAG_SEP, REF_KEYWORDS, subschemas} from './helpers/json-schema-spec.js';
 import {isJsonPointer, jsonPointer2stack} from './helpers/json-pointer-spec.js'
-
 
 
 /**
@@ -41,7 +39,7 @@ const validateRefs = (schema) => {
         for (const k of REF_KEYWORDS) {
             const v = schema[k];
             if (typeof v !== 'string') continue;
-            if (v.startsWith(FRAG_SEP)) {
+            if (v.startsWith(REF_FRAG_SEP)) {
                 localRefs.add(v.slice(1));
             } else {
                 warnings.add(`Unchecked external ref: ${v}`);
@@ -56,10 +54,10 @@ const validateRefs = (schema) => {
         if (ref === '') continue;
         if (isJsonPointer(ref)) {
             if (!objectHasOwnPath(schema, jsonPointer2stack(ref))) {
-                errors.add(`Missing local ref: ${FRAG_SEP}${ref}`);
+                errors.add(`Missing local ref: ${REF_FRAG_SEP}${ref}`);
             }
         } else {
-            warnings.add(`Unchecked local ref: ${FRAG_SEP}${ref}`);
+            warnings.add(`Unchecked local ref: ${REF_FRAG_SEP}${ref}`);
         }
     }
 
