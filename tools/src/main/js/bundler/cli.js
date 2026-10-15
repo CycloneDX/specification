@@ -102,7 +102,7 @@ const main = async (entryFile, includeDir) => {
     await writeFile(bundledFile, JSON.stringify(schema, null, 2));
 
     // 4. minify schema
-    subschemas(schema).forEach(dropComments);
+    subschemas(schema).forEach(([s]) => dropComments(s));
 
     await writeFile(minifiedFile, JSON.stringify({
         ...schema,
@@ -153,8 +153,8 @@ if (import.meta.main) {
             console.info(`bundler: embedded (${bundled.embedded.length}):`, bundled.embedded);
             console.info(`bundler: external (${bundled.external.length}):`, bundled.external);
 
-            console.info(`tree-shake: removed (${shaken.removed.length}):`, shaken.removed);
             console.info(`tree-shake: hollowed (${shaken.hollowed.length}):`, shaken.hollowed);
+            console.info(`tree-shake: removed (${shaken.removed.length}):`, shaken.removed);
 
             if (validationWarnings.length) {
                 console.warn(`validation warnings (${validationWarnings.length}):`, validationWarnings);
