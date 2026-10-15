@@ -58,7 +58,7 @@
         "predefined": {
           "title": "Pre-Defined Perspective",
           "description": "Identifies a well-known, pre-defined perspective, incorporating the published definition by reference and enabling tooling to recognize the perspective without matching on free-text names. Values use the reserved `cdx:perspectives:` namespace path and are drawn from the CycloneDX pre-defined perspectives registry (`perspectives-defs.schema.json`), which is maintained independently of the specification release cycle; the catalog document defining `cdx:perspectives:<name>` is `perspectives/<name>-perspective.json` in the CycloneDX specification repository. The specific published revision is selected by the sibling `predefinedVersion`. A perspective declaring a pre-defined identity shall provide `predefinedVersion` and shall not provide any inline content other than bom-ref and scopes, so the published definition remains the single source of truth; a perspective defining its own content shall omit both fields.",
-          "$ref": "../../perspectives-defs.schema.json#/definitions/preDefinedPerspectivesEnum"
+          "$ref": "../../perspectives-defs.schema.json#/$defs/preDefinedPerspectivesEnum"
         },
         "predefinedVersion": {
           "$ref": "#/$defs/preDefinedPerspectiveVersion"
@@ -165,7 +165,7 @@
         "expressions": {
           "type": "array",
           "title": "Path Expressions",
-          "description": "[JSONPath](https://datatracker.ietf.org/doc/html/rfc9535) expressions, evaluated from the document root, that identify the nodes whose subtrees form this scope.",
+          "description": "[JSONPath](https://datatracker.ietf.org/doc/html/rfc9535) expressions, evaluated from the document root, that identify the nodes whose subtrees form this scope. Every expression is evaluated, and the scope includes the nodes selected by each of them.",
           "minItems": 1,
           "uniqueItems": true,
           "items": {
@@ -183,7 +183,7 @@
         "targets": {
           "type": "array",
           "title": "Targets",
-          "description": "References using bom-link or bom-ref to the objects whose subtrees form this scope, such as a component or, where the document declares inventories, an inventory.",
+          "description": "References using bom-link or bom-ref to the objects whose subtrees form this scope, such as a component or, where the document declares inventories, an inventory. Every target is resolved, and the scope includes each referenced object, together with the nodes selected by any expressions.",
           "minItems": 1,
           "uniqueItems": true,
           "items": {
