@@ -88,14 +88,29 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
         throw new ModuleNameCollisionError(_dupModuleNames);
     }
 
-    /** @type {Map<string, string>} */
+    /**
+     * Keys are source schema ref with absolute fs path.
+     * Values are target schema local ref.
+     * @type {Map<string, string>}
+     */
     const embeddedMap = new Map();
-    /** @type {Set<string>} */
+    /**
+     * Values relative to `targetFile`.
+     * @type {Set<string>}
+     */
     const externals = new Set();
-    /** @type {Map<string, string>} */
+    /**
+     * Keys are source schema ref with absolute fs path.
+     * Values are target schema ref.
+     * @type {Map<string, string>}
+     */
     const rewiredMap = new Map();
 
     /**
+     * Rewire refs in place.
+     *
+     * No URI Decoding is done on refs, as out own cases just don't need it.
+     *
      * @param {*} schema
      * @param {string} sourceFile
      * @returns {void}
@@ -109,7 +124,8 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
                 externals.add(v);
                 continue;
             }
-            let rewired
+            /** @type {import('./helpers/json-schema-spec.js').RefSplit} */
+            let rewiredRS;
             const {path, frag} = refSplit(v);
             const refFile = path
                 ? resolve(sourceDir, ...path.split(URI_PATH_SEP))
@@ -120,7 +136,7 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
                     // currently dont support anchors - only JSON pointer.
                     throw new RangeError(`Unsupported ref fragment: ${v}`);
                 }
-                rewired = {
+                rewiredRS = {
                     path: null,
                     frag: (refFile === entryFile && !frag?.startsWith(FRAG_DEFS_PREFIX)
                             ? ''
@@ -128,16 +144,16 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
                     ) + (frag ?? '')
                 };
             } else {
-                rewired = {
+                rewiredRS = {
                     path: posixPath(relative(targetDir, refFile)),
                     frag
                 };
             }
-            rewiredMap.set(
-                refJoin({path: refFile, frag}),
-                schema[k] = refJoin(rewired));
-            if (rewired.path) {
-                externals.add(schema[k]);
+            const rewired = refJoin(rewiredRS);
+            schema[k] = rewired;
+            rewiredMap.set(refJoin({path: refFile, frag}), rewired);
+            if (rewiredRS.path) {
+                externals.add(rewired);
             }
         }
         subschemas(schema).forEach(s => rewireRefs(s, sourceFile));
