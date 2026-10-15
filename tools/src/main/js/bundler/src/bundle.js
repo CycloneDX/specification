@@ -56,6 +56,8 @@ class ModuleNameCollisionError extends Error {
 /**
  * Load and bundle a schema.
  *
+ * Works file-based, not ID based.
+ *
  * Does not convert between meta-schemas.
  * Bundles ALL `includeFiles`.
  * References are rewired.
