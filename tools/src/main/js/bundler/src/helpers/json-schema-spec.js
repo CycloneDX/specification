@@ -44,10 +44,12 @@ export const isSchemaObject = (o) =>
     && typeof o === 'object'
     && !Array.isArray(o);
 
+/** @typedef {import('./helpers/json-pointer-spec.js').JsonPointerStack} JsonPointerStack */
+
 /**
  * Yield immediate subschemas, never property maps or literal data.
  * @param {Readonly<*>} s schema
- * @yields {[*, import('./json-pointer-spec.js').JsonPointerStack]} schema and pointer stack
+ * @yields {[*, JsonPointerStack]} schema and pointer stack
  */
 export const subschemas = function* (s) {
     for (const [k, v] of Object.entries(s)) {

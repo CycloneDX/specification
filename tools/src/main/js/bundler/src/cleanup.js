@@ -25,8 +25,9 @@ const HOLLOW_COMMENT =
     'and only remains as a container for definitions that are still in use. ' +
     'Itself must not be used for validation.';
 
-/** @typedef {import('./helpers/json-pointer-spec.js').JsonPointerStack} JsonPointerStack */
 
+/** @typedef {import('./helpers/json-pointer-spec.js').JsonPointer} JsonPointer */
+/** @typedef {import('./helpers/json-pointer-spec.js').JsonPointerStack} JsonPointerStack */
 
 /**
  * @typedef {object} TreeShakeResult
@@ -112,7 +113,7 @@ export const treeShake = (schema) => {
                 sweep(def, dStack);
                 continue;
             }
-            if (ANCHOR_KEYWORDS.values().some(k => def.hasOwnProperty(k))) {
+            if (ANCHOR_KEYWORDS.values().some(k => Object.hasOwn(def, k))) {
                 // we do NOT support anchors, yet -> leave untouched for now
                 continue;
             }
