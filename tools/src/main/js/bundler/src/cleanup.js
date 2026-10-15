@@ -7,7 +7,7 @@ import {COMMENT_KEYWORD, subschemas} from './helpers/json-schema-spec.js';
  */
 export const dropComments = (schema) => {
     delete schema[COMMENT_KEYWORD];
-    subschemas(schema).forEach(dropComments);
+    subschemas(schema).forEach(([s]) => dropComments(s));
 }
 
 const HOLLOW_COMMENT =
@@ -38,6 +38,8 @@ export const treeShake = (schema) => {
     const removed = [];
     /** @type {string[]} */
     const hollowed = [];
+
+
 
     // TODO: tree-shake schema in place
     // will be added in a dedicated PR later.

@@ -156,7 +156,7 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
                 externals.add(rewired);
             }
         }
-        subschemas(schema).forEach(s => rewireRefs(s, sourceFile));
+        subschemas(schema).forEach(([s]) => rewireRefs(s, sourceFile));
     }
 
     const schema = await getJsonfile(entryFile);

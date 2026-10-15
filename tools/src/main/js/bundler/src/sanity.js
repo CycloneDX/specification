@@ -45,7 +45,7 @@ const validateRefs = (schema) => {
                 warnings.add(`Unchecked external ref: ${v}`);
             }
         }
-        subschemas(schema).forEach(gatherRefs);
+        subschemas(schema).forEach(([s]) => gatherRefs(s));
     }
 
     gatherRefs(schema);

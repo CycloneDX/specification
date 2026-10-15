@@ -8,8 +8,13 @@
  */
 
 /**
+ * Unescaped JSON Pointer token.
+ * @typedef {string} JsonPointerToken
+ */
+
+/**
  * Stack of unescaped JSON Pointer tokens.
- * @typedef {string[]} JsonPointerStack
+ * @typedef {JsonPointerToken[]} JsonPointerStack
  */
 
 
