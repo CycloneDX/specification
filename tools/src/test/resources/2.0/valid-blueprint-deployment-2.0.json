@@ -6,7 +6,7 @@
   "version": 1,
   "blueprints": [
     {
-      "bom-ref": "bp-deployment",
+      "refId": "bp-deployment",
       "name": "Acme checkout deployment topology",
       "description": "Production deployment of the checkout workloads onto a cluster node, fronted by a load balancer, with a managed database and object storage.",
       "modelTypes": [
@@ -14,25 +14,25 @@
       ],
       "zones": [
         {
-          "bom-ref": "zone-prod",
+          "refId": "zone-prod",
           "name": "Production",
           "type": "deployment"
         },
         {
-          "bom-ref": "zone-region-east",
+          "refId": "zone-region-east",
           "name": "East region",
           "type": "geographic"
         }
       ],
       "assets": [
         {
-          "bom-ref": "asset-lb",
+          "refId": "asset-lb",
           "type": "gateway",
           "name": "Load balancer",
           "zone": "zone-prod"
         },
         {
-          "bom-ref": "asset-node",
+          "refId": "asset-node",
           "type": "infrastructure",
           "name": "Cluster worker node",
           "zone": "zone-prod",
@@ -41,13 +41,13 @@
           ]
         },
         {
-          "bom-ref": "asset-checkout-pod",
+          "refId": "asset-checkout-pod",
           "type": "container",
           "name": "Checkout workload",
           "zone": "zone-prod"
         },
         {
-          "bom-ref": "asset-worker-pod",
+          "refId": "asset-worker-pod",
           "type": "container",
           "name": "Async worker workload",
           "zone": "zone-prod"
@@ -82,7 +82,7 @@
       ],
       "dataStores": [
         {
-          "bom-ref": "ds-postgres",
+          "refId": "ds-postgres",
           "name": "Managed PostgreSQL",
           "type": "relational",
           "environment": "production",
@@ -90,7 +90,7 @@
           "location": "east region"
         },
         {
-          "bom-ref": "ds-object",
+          "refId": "ds-object",
           "name": "Object storage bucket",
           "type": "object",
           "environment": "production",
@@ -99,7 +99,7 @@
       ],
       "flows": [
         {
-          "bom-ref": "dflow-ingress",
+          "refId": "dflow-ingress",
           "name": "Inbound HTTPS",
           "type": "data",
           "source": "asset-lb",
@@ -110,7 +110,7 @@
           "synchronous": true
         },
         {
-          "bom-ref": "dflow-db",
+          "refId": "dflow-db",
           "name": "Database queries",
           "type": "data",
           "source": "asset-checkout-pod",
@@ -123,7 +123,7 @@
       ],
       "assumptions": [
         {
-          "bom-ref": "asm-autoscale",
+          "refId": "asm-autoscale",
           "description": "The node pool autoscales horizontally under load.",
           "topic": "performance",
           "validity": "unverified"
