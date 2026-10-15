@@ -30,6 +30,7 @@ const HOLLOW_COMMENT =
 
 /**
  * @typedef {object} TreeShakeResult
+ * @property {JsonPointer[]} reached
  * @property {JsonPointer[]} hollowed
  * @property {JsonPointer[]} removed
  */
@@ -151,6 +152,7 @@ export const treeShake = (schema) => {
     sweep(schema, []);
 
     return {
+        reached: Array.from(reached, r => `${REF_FRAG_SEP}${r}`).sort(),
         hollowed: hollowed.sort(),
         removed: removed.sort()
     };
