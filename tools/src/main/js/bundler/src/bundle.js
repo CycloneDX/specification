@@ -1,12 +1,13 @@
 import {basename, dirname, relative, resolve} from 'node:path'
 
-import {JSON_SCHEMA_RE, getJsonfile, unixPath, findDuplicateValues} from './helpers/common.js';
-import {escapeJsonPointer} from './helpers/json-pointer-spec.js';
+import {JSON_SCHEMA_RE, getJsonfile, posixPath, findDuplicateValues} from './helpers/common.js';
+import {escapeJsonPointer, PREFIX as JP_REFIX} from './helpers/json-pointer-spec.js';
 import {
     ID_KEYWORD, NOT_KEYWORD, SCHEMA_KEYWORD, COMMENT_KEYWORD, DEFS_KEYWORD, REF_KEYWORDS,
     subschemas,
-    refIsAbsolute, refSplit, refJoin,
+    refIsAbsolute, refSplit, refJoin, FRAG_SEP,
 } from './helpers/json-schema-spec.js';
+import {PATH_SEP as URI_PATH_SEP} from './helpers/uri.js';
 
 
 const HOLLOW_COMMENT =
@@ -14,7 +15,7 @@ const HOLLOW_COMMENT =
     'Itself must not be used for validation.';
 
 
-const FRAG_DEFS_PREFIX = `/${DEFS_KEYWORD}/`;
+const FRAG_DEFS_PREFIX = `${JP_REFIX}${DEFS_KEYWORD}${JP_REFIX}`;
 
 /**
  * @param {string} f
@@ -111,11 +112,11 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
             let rewired
             const {path, frag} = refSplit(v);
             const refFile = path
-                ? resolve(sourceDir, ...path.split('/'))
+                ? resolve(sourceDir, ...path.split(URI_PATH_SEP))
                 : sourceFile;
             const moduleName = fileModuleNames.get(refFile);
             if (moduleName) {
-                if (frag && !frag.startsWith('/')) {
+                if (frag && !frag.startsWith(JP_REFIX)) {
                     // currently dont support anchors - only JSON pointer.
                     throw new RangeError(`Unsupported ref fragment: ${v}`);
                 }
@@ -128,7 +129,7 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
                 };
             } else {
                 rewired = {
-                    path: unixPath(relative(targetDir, refFile)),
+                    path: posixPath(relative(targetDir, refFile)),
                     frag
                 };
             }
@@ -145,13 +146,13 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
     const schema = await getJsonfile(entryFile);
     if (URL.canParse(schema[ID_KEYWORD])) {
         schema[ID_KEYWORD] = new URL(
-            unixPath(relative(entryDir, targetFile)),
+            posixPath(relative(entryDir, targetFile)),
             schema[ID_KEYWORD]
         ).toString();
     }
     rewireRefs(schema, entryFile);
     const schemaDefsOrig = schema[DEFS_KEYWORD];
-    schema[DEFS_KEYWORD] = Object.fromEntries( // deterministic order
+    schema[DEFS_KEYWORD] = Object.fromEntries( // sort for deterministic order
         [...fileModuleNames.values()].sort().map(m => [m, undefined]));
 
     const entryModuleName = fileModuleNames.get(entryFile);
@@ -160,7 +161,7 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
             [DEFS_KEYWORD]: schemaDefsOrig,
             [NOT_KEYWORD]: {[COMMENT_KEYWORD]: HOLLOW_COMMENT}
         };
-        embeddedMap.set(`${entryFile}#/${DEFS_KEYWORD}`, `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(entryModuleName)}`);
+        embeddedMap.set(`${entryFile}${FRAG_SEP}${JP_REFIX}${DEFS_KEYWORD}`, `${FRAG_SEP}${FRAG_DEFS_PREFIX}${escapeJsonPointer(entryModuleName)}`);
     } else {
         delete schema[DEFS_KEYWORD][entryModuleName];
     }
@@ -173,7 +174,7 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
         delete includeSchema[COMMENT_KEYWORD];
         rewireRefs(includeSchema, includeFile);
         schema[DEFS_KEYWORD][moduleName] = includeSchema;
-        embeddedMap.set(includeFile, `#${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`);
+        embeddedMap.set(includeFile, `${FRAG_SEP}${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`);
     }
 
     return {
@@ -182,12 +183,12 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
         embedded: Array.from(embeddedMap,
             ([f, d]) => {
                 const {path, frag} = refSplit(f);
-                return [refJoin({path: unixPath(relative(entryDir, path)), frag}), d];
+                return [refJoin({path: posixPath(relative(entryDir, path)), frag}), d];
             }),
         rewired: Array.from(rewiredMap,
             ([f, t]) => {
                 const {path, frag} = refSplit(f);
-                return [refJoin({path: unixPath(relative(entryDir, path)), frag}), t];
+                return [refJoin({path: posixPath(relative(entryDir, path)), frag}), t];
             }
         ),
     };

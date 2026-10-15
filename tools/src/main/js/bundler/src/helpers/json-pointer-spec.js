@@ -13,7 +13,7 @@
  */
 
 
-const PREFIX = '/';
+export const PREFIX = '/';
 const PREFIX_ESC = '~1';
 const TILDE = '~';
 const TILDE_ESC = '~0';

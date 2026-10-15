@@ -27,7 +27,7 @@ export const getJsonfile = async (file) =>
  * @param {string} p
  * @returns {string}
  */
-export const unixPath = (p) =>
+export const posixPath = (p) =>
     p.replaceAll(sep, '/');
 
 
