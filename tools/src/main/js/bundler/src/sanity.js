@@ -1,6 +1,6 @@
-import {objectHasOwnPath} from "./helpers/common.js";
+import {objectGetOwnPath, PATH_NOT_FOUND} from "./helpers/common.js";
 import {REF_FRAG_SEP, REF_KEYWORDS, subschemas} from './helpers/json-schema-spec.js';
-import {isJsonPointer, jsonPointer2stack} from './helpers/json-pointer-spec.js'
+import {isJsonPointer, jsonPointer2stack, ROOT_POINTER as JP_ROOT_POINTER} from './helpers/json-pointer-spec.js'
 
 
 /**
@@ -51,9 +51,8 @@ const validateRefs = (schema) => {
     gatherRefs(schema);
 
     for (const ref of localRefs) {
-        if (ref === '') continue;
         if (isJsonPointer(ref)) {
-            if (!objectHasOwnPath(schema, jsonPointer2stack(ref))) {
+            if (objectGetOwnPath(schema, jsonPointer2stack(ref)) === PATH_NOT_FOUND) {
                 errors.add(`Missing local ref: ${REF_FRAG_SEP}${ref}`);
             }
         } else {

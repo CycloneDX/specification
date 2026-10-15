@@ -17,6 +17,7 @@
  * @typedef {JsonPointerToken[]} JsonPointerStack
  */
 
+export const ROOT_POINTER = '';
 
 export const PREFIX = '/';
 const PREFIX_ESC = '~1';
@@ -28,7 +29,7 @@ const TILDE_ESC = '~0';
  * @returns {boolean}
  */
 export const isJsonPointer = (s) =>
-    s.startsWith(PREFIX);
+    s === ROOT_POINTER || s.startsWith(PREFIX);
 
 /**
  * JSON Pointer to stack.
@@ -44,7 +45,7 @@ export const jsonPointer2stack = (p) =>
  * @returns {JsonPointer}
  */
 export const jsonPointer4stack = (s) =>
-    PREFIX + s.map(escapeJsonPointer).join(PREFIX);
+    s.map(t => `${PREFIX}${escapeJsonPointer(t)}`).join('')
 
 
 /**

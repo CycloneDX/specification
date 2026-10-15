@@ -30,23 +30,31 @@ export const getJsonfile = async (file) =>
 export const posixPath = (p) =>
     p.replaceAll(sep, '/');
 
+/**
+ * Sentinel returned by {@link objectGetOwnPath} when a path does not exist.
+ *
+ * A Symbol is used, since `undefined`/`null` may be legit values.
+ */
+export const PATH_NOT_FOUND = Symbol('PATH_NOT_FOUND');
 
 /**
+ * Get the value at a path of own properties.
+ *
  * @param {Readonly<*>} o
  * @param {Iterable<string>} pathStack
- * @returns {boolean}
+ * @returns {*|typeof PATH_NOT_FOUND} the value, or {@link PATH_NOT_FOUND} if the path does not exist
  */
-export const objectHasOwnPath = (o, pathStack) => {
+export const objectGetOwnPath = (o, pathStack) => {
     let c = o;
     for (const s of pathStack) {
         try {
-            if (!Object.hasOwn(c, s)) return false;
+            if (!Object.hasOwn(c, s)) return PATH_NOT_FOUND;
         } catch { // TypeErrors and such.
-            return false;
+            return PATH_NOT_FOUND;
         }
         c = c[s];
     }
-    return true;
+    return c;
 };
 
 
