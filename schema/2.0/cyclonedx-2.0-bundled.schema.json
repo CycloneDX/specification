@@ -3223,6 +3223,24 @@
             "criticality": {
               "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/criticality"
             },
+            "safetyIntegrityLevels": {
+              "type": "array",
+              "title": "Safety Integrity Levels",
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/safetyIntegrityLevel"
+              },
+              "description": "The safety integrity classifications of this asset in the context of the blueprint. An asset may carry classifications from more than one scheme, for example where an element classified under IEC 61508 is also mapped to an automotive ASIL. The classification identifies the safety significance of the context so that the impact of a change on it can be assessed."
+            },
+            "riskAttributes": {
+              "type": "array",
+              "title": "Risk Attributes",
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/riskAttribute"
+              },
+              "description": "The security and privacy attributes of this asset that are worth protecting, such as integrity or availability, whose compromise leads to damage. Corresponds to the cybersecurity properties of an asset in ISO/SAE 21434 and to the security objectives of FIPS 199."
+            },
             "classification": {
               "$ref": "#/$defs/cyclonedx-data-2.0/$defs/dataClassification"
             },
@@ -3239,6 +3257,74 @@
                 "type": "string"
               },
               "description": "Tags for classification and search."
+            }
+          }
+        },
+        "safetyIntegrityLevel": {
+          "type": "object",
+          "title": "Safety Integrity Level",
+          "description": "A safety integrity classification drawn from a functional safety scheme, such as an Automotive Safety Integrity Level, a Safety Integrity Level, a Design Assurance Level, or a software safety class. The classification describes the safety significance of the context; a level that an authority has attested the subject achieved is recorded as a certification.",
+          "required": [
+            "scheme",
+            "level"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scheme": {
+              "title": "Scheme",
+              "description": "The functional safety scheme from which the level is drawn. Use the custom option for schemes not covered by the enumeration.",
+              "oneOf": [
+                {
+                  "title": "Predefined Safety Scheme",
+                  "enum": [
+                    "ISO-26262",
+                    "IEC-61508",
+                    "DO-178C",
+                    "IEC-62304",
+                    "EN-50128"
+                  ],
+                  "meta:enum": {
+                    "ISO-26262": "Road vehicles functional safety. Levels are Automotive Safety Integrity Levels, from QM to ASIL D.",
+                    "IEC-61508": "Functional safety of electrical, electronic, and programmable electronic safety-related systems. Levels are Safety Integrity Levels 1 to 4.",
+                    "DO-178C": "Software considerations in airborne systems and equipment certification. Levels are Design Assurance Levels A to E.",
+                    "IEC-62304": "Medical device software life cycle processes. Levels are software safety classes A to C.",
+                    "EN-50128": "Railway applications software for railway control and protection systems. Levels are Software Safety Integrity Levels 0 to 4."
+                  }
+                },
+                {
+                  "type": "object",
+                  "title": "Custom Safety Scheme",
+                  "required": [
+                    "name"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "title": "Name",
+                      "description": "The name of the custom scheme."
+                    },
+                    "description": {
+                      "type": "string",
+                      "title": "Description",
+                      "description": "A description of the custom scheme."
+                    }
+                  }
+                }
+              ]
+            },
+            "level": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Integrity Level",
+              "description": "The level within the scheme, using the designation the scheme defines. Lowercase kebab-case tokens are recommended so that levels compare reliably across documents.",
+              "examples": [
+                "asil-d",
+                "sil-3",
+                "dal-a",
+                "class-c"
+              ]
             }
           }
         },
@@ -3943,12 +4029,16 @@
                 "threat-model",
                 "adversary-model",
                 "risk-assessment",
+                "hazard-analysis",
+                "safety-case",
                 "vulnerability-assertion",
                 "exploitability-statement",
                 "pentest-report",
                 "static-analysis-report",
                 "dynamic-analysis-report",
                 "runtime-analysis-report",
+                "test-report",
+                "incident-report",
                 "component-analysis-report",
                 "maturity-report",
                 "certification-report",
@@ -3995,12 +4085,16 @@
                 "threat-model": "An enumeration of identified weaknesses, threats, and countermeasures, dataflow diagram (DFD), attack tree, and other supporting documentation in human-readable or machine-readable format.",
                 "adversary-model": "The defined assumptions, goals, and capabilities of an adversary.",
                 "risk-assessment": "Identifies and analyzes the potential of future events that may negatively impact individuals, assets, and/or the environment. Risk assessments may also include judgments on the tolerability of each risk.",
+                "hazard-analysis": "A hazard analysis, such as a hazard analysis and risk assessment (HARA), a failure mode and effects analysis (FMEA), or a fault tree analysis (FTA).",
+                "safety-case": "A structured argument, supported by a body of evidence, that a system is acceptably safe for a given application in a given environment.",
                 "vulnerability-assertion": "A Vulnerability Disclosure Report (VDR) which asserts the known and previously unknown vulnerabilities that affect a component, service, or product including the analysis and findings describing the impact (or lack of impact) that the reported vulnerability has on a component, service, or product.",
                 "exploitability-statement": "A Vulnerability Exploitability eXchange (VEX) which asserts the known vulnerabilities that do not affect a product, product family, or organization, and optionally the ones that do. The VEX should include the analysis and findings describing the impact (or lack of impact) that the reported vulnerability has on the product, product family, or organization.",
                 "pentest-report": "Results from an authorized simulated cyberattack on a component or service, otherwise known as a penetration test.",
                 "static-analysis-report": "SARIF or proprietary machine or human-readable report for which static analysis has identified code quality, security, and other potential issues with the source code.",
                 "dynamic-analysis-report": "Dynamic analysis report that has identified issues such as vulnerabilities and misconfigurations.",
                 "runtime-analysis-report": "Report generated by analyzing the call stack of a running application.",
+                "test-report": "Results of testing, such as a laboratory test, a verification test, or a validation test, of a component, service, or system.",
+                "incident-report": "A report of an incident, such as a safety incident, a security incident, or an operational failure, and its investigation.",
                 "component-analysis-report": "Report generated by Software Composition Analysis (SCA), container analysis, or other forms of component analysis.",
                 "maturity-report": "Report containing a formal assessment of an organization, business unit, or team against a maturity model.",
                 "certification-report": "Industry, regulatory, or other certification from an accredited (if applicable) certification body.",
@@ -13718,6 +13812,7 @@
             "privacy",
             "regulatory",
             "reliability",
+            "safety",
             "scalability",
             "security",
             "system",
@@ -13744,6 +13839,7 @@
             "privacy": "Requirements specifically addressing the handling and protection of personal and sensitive data.",
             "regulatory": "Requirements necessary for legal compliance, dictated by laws, regulations, or standards.",
             "reliability": "Requirements ensuring the system consistently performs under specified conditions and duration.",
+            "safety": "Requirements that address the prevention of harm to people, property, or the environment, such as functional safety requirements.",
             "scalability": "Requirements focused on the ability of the system to grow and manage increased demand effectively.",
             "security": "Requirements intended to protect systems, data, and users from malicious actions or threats.",
             "system": "Technical requirements defining infrastructure, architecture, or underlying technologies.",
@@ -13910,6 +14006,15 @@
               },
               "description": "The documented risks identified through risk analysis."
             },
+            "damageScenarios": {
+              "type": "array",
+              "title": "Damage Scenarios",
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/damageScenario"
+              },
+              "description": "The damage scenarios identified through risk analysis. A damage scenario describes an adverse consequence for the subjects it affects, independent of any particular cause, and is rated per impact category."
+            },
             "assessments": {
               "type": "array",
               "title": "Assessments",
@@ -13951,9 +14056,9 @@
                     "privacy",
                     "operational",
                     "financial",
-                    "compliance",
+                    "regulatory",
                     "strategic",
-                    "reputational",
+                    "reputation",
                     "safety",
                     "environmental",
                     "supply-chain",
@@ -13970,9 +14075,9 @@
                     "privacy": "Data protection and privacy risks.",
                     "operational": "Business operations and continuity risks.",
                     "financial": "Financial loss and economic impact risks.",
-                    "compliance": "Regulatory and legal compliance risks.",
+                    "regulatory": "Regulatory and legal compliance risks.",
                     "strategic": "Strategic business and market risks.",
-                    "reputational": "Brand and reputation damage risks.",
+                    "reputation": "Brand and reputation damage risks.",
                     "safety": "Human safety and physical security risks.",
                     "environmental": "Environmental impact and sustainability risks.",
                     "supply-chain": "Supply chain and third-party risks.",
@@ -14134,6 +14239,14 @@
               },
               "description": "References using bom-link or bom-ref to the threats or threat scenarios from a threat model that inform this risk. A reference may point to a discrete threat or to a threat scenario."
             },
+            "relatedDamageScenarios": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
+              },
+              "description": "References using bom-link or bom-ref to the damage scenarios that this risk realizes. A risk typically pairs a threat scenario, which supplies the likelihood, with a damage scenario, which supplies the impact."
+            },
             "relatedVulnerabilities": {
               "type": "array",
               "uniqueItems": true,
@@ -14149,6 +14262,14 @@
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
               "description": "References using bom-link or bom-ref to the weaknesses that inform this risk."
+            },
+            "relatedBehaviors": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
+              },
+              "description": "References using bom-link or bom-ref to the declared or observed behaviours that inform this risk. Any behaviour can give rise to a risk depending on context and expectation, for example an observed behaviour that defeats a declared safety behaviour."
             },
             "relatedRequirements": {
               "type": "array",
@@ -14203,24 +14324,22 @@
             },
             "status": {
               "title": "Status",
-              "description": "The lifecycle status of the risk. Use the custom option for a status specific to an organization's risk process.",
+              "description": "The lifecycle status of the risk. The status tracks progress through the risk process; the disposition chosen, such as reduce, share, or accept, is recorded on the responses. Use the custom option for a status specific to an organization's risk process.",
               "oneOf": [
                 {
                   "title": "Predefined Risk Status",
                   "enum": [
                     "identified",
                     "assessed",
-                    "mitigated",
-                    "accepted",
-                    "transferred",
+                    "treated",
+                    "monitored",
                     "retired"
                   ],
                   "meta:enum": {
-                    "identified": "Risk has been identified but not yet evaluated.",
-                    "assessed": "Risk has been assessed and prioritized.",
-                    "mitigated": "Responses are in place reducing this risk.",
-                    "accepted": "Risk has been formally accepted.",
-                    "transferred": "Risk has been transferred to another party.",
+                    "identified": "The risk has been identified and recorded.",
+                    "assessed": "The risk has been analysed and rated.",
+                    "treated": "Responses to the risk have been decided and are being applied. The disposition, such as reduce or accept, is recorded on the responses.",
+                    "monitored": "The risk and its responses are under ongoing monitoring and review.",
                     "retired": "Risk no longer applies."
                   }
                 },
@@ -14285,6 +14404,23 @@
                 "description": {
                   "type": "string",
                   "description": "A narrative explanation of the detectability assessment."
+                }
+              }
+            },
+            "controllability": {
+              "type": "object",
+              "title": "Controllability",
+              "additionalProperties": false,
+              "description": "The ability of the people involved to avoid the harm once the event occurs, used as a third axis by functional safety methodologies such as the hazard analysis and risk assessment of [ISO 26262](https://www.iso.org/standard/68383.html), which derives an integrity level from severity, exposure, and controllability.",
+              "properties": {
+                "score": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "The controllability value on the scale defined by the methodology. For ISO 26262, a higher class indicates that the harm is harder to avoid."
+                },
+                "description": {
+                  "type": "string",
+                  "description": "A narrative explanation of the controllability assessment."
                 }
               }
             },
@@ -14397,8 +14533,11 @@
                     "control-effectiveness",
                     "detectability",
                     "discoverability",
+                    "elapsed-time",
+                    "equipment",
                     "exploit-maturity",
                     "exposure",
+                    "knowledge",
                     "motivation",
                     "opportunity",
                     "targeting",
@@ -14411,8 +14550,11 @@
                     "control-effectiveness": "Strength, reliability, and coverage of existing preventive, detective, or corrective controls that reduce the probability of successful exploitation. Corresponds to resistance strength in FAIR.",
                     "detectability": "Likelihood that the activity is detected before the risk is realized. Lower detectability increases the chance of a successful action. Aligns with the OWASP Risk Rating intrusion detection factor and the FMEA detection axis.",
                     "discoverability": "Ease with which the weakness or opportunity can be found by a potential actor. Aligns with the OWASP Risk Rating ease of discovery factor.",
+                    "elapsed-time": "The time an attacker needs to identify and exploit the weakness, one of the attack potential factors of [ISO/IEC 18045](https://www.iso.org/standard/72889.html) used by attack feasibility ratings such as ISO/SAE 21434.",
+                    "equipment": "The equipment an attacker needs, from standard to bespoke, one of the attack potential factors of [ISO/IEC 18045](https://www.iso.org/standard/72889.html).",
                     "exploit-maturity": "Availability, reliability, and sophistication of known exploits, attack toolkits, or proof-of-concept code targeting the identified weakness.",
                     "exposure": "Degree to which the target asset, system, or service is visible, discoverable, or reachable by potential threat actors.",
+                    "knowledge": "The knowledge of the target an attacker needs, from public to critical, one of the attack potential factors of [ISO/IEC 18045](https://www.iso.org/standard/72889.html).",
                     "motivation": "Level of incentive, intent, or determination driving the threat actor to pursue exploitation, including financial gain, ideology, or competitive advantage.",
                     "opportunity": "Availability of the conditions, timing, or circumstances required for the threat actor to act, including access windows, environmental factors, and resource availability.",
                     "targeting": "Degree to which the threat actor specifically selects this asset or organization rather than acting opportunistically. Aligns with the NIST SP 800-30 targeting factor.",
@@ -14561,19 +14703,20 @@
             "description": {
               "type": "string",
               "description": "A description of the potential impact."
+            },
+            "methodology": {
+              "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/riskMethodology",
+              "description": "The methodology used to derive this impact rating, where the impact is rated on its own, for example on a damage scenario before any risk is scored."
             }
           }
         },
         "impactCategory": {
           "title": "Impact Category",
-          "description": "A category of impact, including harms relevant to AI and societal risk. Use the custom option for categories specific to an organization's risk taxonomy.",
+          "description": "A category of impact, including harms relevant to AI and societal risk. The security and privacy attributes compromised, such as confidentiality or integrity, are recorded as risk attributes rather than as impact categories. Use the custom option for categories specific to an organization's risk taxonomy.",
           "oneOf": [
             {
               "title": "Predefined Impact Category",
               "enum": [
-                "confidentiality",
-                "integrity",
-                "availability",
                 "financial",
                 "reputation",
                 "regulatory",
@@ -14592,9 +14735,6 @@
                 "health"
               ],
               "meta:enum": {
-                "confidentiality": "Impact on data confidentiality.",
-                "integrity": "Impact on data or system integrity.",
-                "availability": "Impact on service availability.",
                 "financial": "Financial loss or impact.",
                 "reputation": "Reputational damage.",
                 "regulatory": "Regulatory compliance impact.",
@@ -14751,7 +14891,7 @@
           "properties": {
             "level": {
               "enum": [
-                "info",
+                "negligible",
                 "low",
                 "medium",
                 "high",
@@ -14759,7 +14899,7 @@
               ],
               "description": "The overall qualitative risk level.",
               "meta:enum": {
-                "info": "Informational.",
+                "negligible": "Negligible risk.",
                 "low": "Low risk.",
                 "medium": "Medium risk.",
                 "high": "High risk.",
@@ -14776,54 +14916,58 @@
               "description": "A textual representation of the metric values used to derive the score, in the format defined by the methodology."
             },
             "methodology": {
-              "title": "Methodology",
-              "description": "The risk rating methodology used to derive this score. Only methodologies that define a scoring calculation are listed; governance frameworks such as [ISO 31000](https://www.iso.org/iso-31000-risk-management.html) are recorded as standards rather than as a score methodology. Use the custom option for methodologies not listed.",
-              "oneOf": [
-                {
-                  "title": "Predefined Risk Methodology",
-                  "enum": [
-                    "dread",
-                    "fair",
-                    "fmea",
-                    "nist-sp-800-30",
-                    "octave",
-                    "owasp-risk-rating",
-                    "qualitative-matrix"
-                  ],
-                  "meta:enum": {
-                    "dread": "[DREAD](https://en.wikipedia.org/wiki/DREAD_%28risk_assessment_model%29) risk rating model, the average of five ratings (damage, reproducibility, exploitability, affected users, discoverability) each scored 1 to 10.",
-                    "fair": "[Factor Analysis of Information Risk (FAIR)](https://www.fairinstitute.org/), a quantitative methodology expressing risk as loss event frequency multiplied by loss magnitude.",
-                    "fmea": "[Failure Mode and Effects Analysis (FMEA)](https://asq.org/quality-resources/fmea), using a risk priority number of severity multiplied by occurrence multiplied by detection.",
-                    "nist-sp-800-30": "[NIST SP 800-30](https://csrc.nist.gov/pubs/sp/800/30/r1/final) guide for conducting risk assessments, using its exemplary likelihood and impact scales.",
-                    "octave": "[OCTAVE Allegro](https://www.sei.cmu.edu/documents/786/2007_005_001_14885.pdf), using its relative risk score.",
-                    "owasp-risk-rating": "[OWASP Risk Rating](https://owasp.org/www-community/OWASP_Risk_Rating_Methodology), averaging likelihood and impact factors each scored 0 to 9.",
-                    "qualitative-matrix": "A qualitative risk matrix that derives a risk level by plotting a likelihood band against an impact band, such as a five by five matrix producing a score from 1 to 25."
-                  }
-                },
-                {
-                  "title": "Custom Risk Methodology",
-                  "type": "object",
-                  "required": [
-                    "name"
-                  ],
-                  "additionalProperties": false,
-                  "properties": {
-                    "name": {
-                      "type": "string",
-                      "minLength": 1,
-                      "title": "Name",
-                      "description": "The name of the custom risk methodology."
-                    },
-                    "description": {
-                      "type": "string",
-                      "title": "Description",
-                      "description": "A description of the custom risk methodology."
-                    }
-                  }
-                }
-              ]
+              "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/riskMethodology",
+              "description": "The risk rating methodology used to derive this score. Only methodologies that define a scoring calculation are listed; governance frameworks such as [ISO 31000](https://www.iso.org/iso-31000-risk-management.html) are recorded as standards rather than as a score methodology. Use the custom option for methodologies not listed."
             }
           }
+        },
+        "riskMethodology": {
+          "title": "Risk Methodology",
+          "description": "A risk rating methodology that defines a scoring calculation. Use the custom option for methodologies not listed.",
+          "oneOf": [
+            {
+              "title": "Predefined Risk Methodology",
+              "enum": [
+                "dread",
+                "fair",
+                "fmea",
+                "nist-sp-800-30",
+                "octave",
+                "owasp-risk-rating",
+                "qualitative-matrix"
+              ],
+              "meta:enum": {
+                "dread": "[DREAD](https://en.wikipedia.org/wiki/DREAD_%28risk_assessment_model%29) risk rating model, the average of five ratings (damage, reproducibility, exploitability, affected users, discoverability) each scored 1 to 10.",
+                "fair": "[Factor Analysis of Information Risk (FAIR)](https://www.fairinstitute.org/), a quantitative methodology expressing risk as loss event frequency multiplied by loss magnitude.",
+                "fmea": "[Failure Mode and Effects Analysis (FMEA)](https://asq.org/quality-resources/fmea), using a risk priority number of severity multiplied by occurrence multiplied by detection.",
+                "nist-sp-800-30": "[NIST SP 800-30](https://csrc.nist.gov/pubs/sp/800/30/r1/final) guide for conducting risk assessments, using its exemplary likelihood and impact scales.",
+                "octave": "[OCTAVE Allegro](https://www.sei.cmu.edu/documents/786/2007_005_001_14885.pdf), using its relative risk score.",
+                "owasp-risk-rating": "[OWASP Risk Rating](https://owasp.org/www-community/OWASP_Risk_Rating_Methodology), averaging likelihood and impact factors each scored 0 to 9.",
+                "qualitative-matrix": "A qualitative risk matrix that derives a risk level by plotting a likelihood band against an impact band, such as a five by five matrix producing a score from 1 to 25."
+              }
+            },
+            {
+              "title": "Custom Risk Methodology",
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom risk methodology."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom risk methodology."
+                }
+              }
+            }
+          ]
         },
         "riskResponse": {
           "type": "object",
@@ -14845,7 +14989,7 @@
               "enum": [
                 "avoid",
                 "reduce",
-                "transfer",
+                "share",
                 "accept",
                 "exploit",
                 "enhance"
@@ -14853,7 +14997,7 @@
               "meta:enum": {
                 "avoid": "Eliminate the risk by removing its source or not proceeding with the activity.",
                 "reduce": "Lower the likelihood or impact of the risk through controls.",
-                "transfer": "Shift the risk to another party, for example through insurance or contract.",
+                "share": "Share the risk with another party, for example through insurance, contract, or outsourcing. Some frameworks call this transfer.",
                 "accept": "Take no further action and retain the risk.",
                 "exploit": "Pursue an opportunity so that a positive risk occurs.",
                 "enhance": "Increase the likelihood or benefit of a positive risk."
@@ -14870,7 +15014,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the controls that implement this response."
+              "description": "References using bom-link or bom-ref to the controls that implement this response. Where a control is declared in the same document, its appliesTo property may also record the relationship."
             },
             "status": {
               "title": "Status",
@@ -14923,6 +15067,56 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/externalReference"
               }
+            },
+            "properties": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
+            }
+          }
+        },
+        "damageScenario": {
+          "type": "object",
+          "title": "Damage Scenario",
+          "description": "An adverse consequence for one or more subjects, described independently of the threat or event that could cause it. A damage scenario carries an impact per category, such as safety, financial, operational, or privacy, so that the same consequence can be paired with several causes. In ISO/SAE 21434 terms, for example, the damage scenario is the harm to a road user, the threat scenario is the cause, and the risk pairs the two.",
+          "required": [
+            "bom-ref",
+            "name"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Name",
+              "description": "A short name for the damage scenario."
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the adverse consequence and the circumstances in which it occurs."
+            },
+            "affects": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
+              },
+              "description": "References using bom-link or bom-ref to the subjects harmed in this damage scenario, such as the functions, assets, or components involved and the parties harmed, for example a road user or a patient."
+            },
+            "impacts": {
+              "type": "array",
+              "title": "Impacts",
+              "uniqueItems": true,
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/impact"
+              },
+              "description": "The impact of the damage scenario, one entry per impact category or group of categories, each with its own level. For example, a single damage scenario may be catastrophic for safety and moderate for finance."
+            },
+            "externalReferences": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/externalReferences"
             },
             "properties": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
@@ -15074,6 +15268,15 @@
               "title": "Scope",
               "description": "The scope of the assessment, including the systems, boundaries, and what is in or out of scope."
             },
+            "triggeredBy": {
+              "type": "array",
+              "title": "Triggered By",
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
+              },
+              "description": "References using bom-link or bom-ref to the objects that occasioned this assessment, such as a vulnerability, a threat scenario, a component, a release note, or an annotation that records an incident or a change. Typically used when the cadence is triggered."
+            },
             "status": {
               "title": "Status",
               "description": "The lifecycle status of the assessment. Use the custom option for a status specific to an organization's process.",
@@ -15196,6 +15399,46 @@
                 }
               },
               "description": "The aggregated risk result for this assessment."
+            },
+            "conclusion": {
+              "title": "Conclusion",
+              "description": "The conclusion of the assessment for decision-making, such as a release decision. The conclusion states whether the assessed risks are acceptable against the applicable risk appetite, whereas `overallRisk` carries the aggregated score. Use the custom option for a conclusion specific to an organization's process.",
+              "oneOf": [
+                {
+                  "title": "Predefined Assessment Conclusion",
+                  "enum": [
+                    "acceptable",
+                    "unacceptable",
+                    "inconclusive"
+                  ],
+                  "meta:enum": {
+                    "acceptable": "The assessed risks are within the applicable risk appetite.",
+                    "unacceptable": "One or more assessed risks exceed the applicable risk appetite.",
+                    "inconclusive": "The assessment could not determine whether the assessed risks are within the applicable risk appetite, for example because evidence is incomplete."
+                  }
+                },
+                {
+                  "title": "Custom Assessment Conclusion",
+                  "type": "object",
+                  "required": [
+                    "name"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "title": "Name",
+                      "description": "The name of the custom conclusion."
+                    },
+                    "description": {
+                      "type": "string",
+                      "title": "Description",
+                      "description": "A description of the custom conclusion."
+                    }
+                  }
+                }
+              ]
             },
             "assumptions": {
               "type": "array",
@@ -15540,7 +15783,7 @@
         "threats": {
           "type": "object",
           "title": "Threats",
-          "description": "Threat-modelling content, including the documented threats, the scenarios that realize them, the attack patterns and attack trees that describe how they are carried out, and the trust boundaries they cross.",
+          "description": "Threat-modelling content, including the documented threats, the threat scenarios that realize them, the attack patterns and attack trees that describe how they are carried out, and the trust boundaries they cross. Control references throughout this model point at controls that mitigate the referencing element. Where a control is declared in the same document, its appliesTo property may also record the relationship; the reference here is intended primarily for controls defined elsewhere.",
           "additionalProperties": false,
           "properties": {
             "threats": {
@@ -15552,9 +15795,9 @@
               },
               "description": "The documented threats. Each describes what can go wrong, independent of any specific actor or occurrence."
             },
-            "scenarios": {
+            "threatScenarios": {
               "type": "array",
-              "title": "Scenarios",
+              "title": "Threat Scenarios",
               "uniqueItems": true,
               "items": {
                 "$ref": "#/$defs/cyclonedx-threat-2.0/$defs/threatScenario"
@@ -15568,7 +15811,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-threat-2.0/$defs/attackPattern"
               },
-              "description": "A library of attack patterns, typically aligned with CAPEC, that threats and scenarios can reference."
+              "description": "A library of attack patterns, typically aligned with CAPEC, that threats and threat scenarios can reference."
             },
             "attackTrees": {
               "type": "array",
@@ -15981,14 +16224,14 @@
             "indicators": {
               "$ref": "#/$defs/cyclonedx-threat-2.0/$defs/indicators"
             },
-            "affectedAssets": {
+            "affects": {
               "type": "array",
-              "title": "Affected Assets",
+              "title": "Affects",
               "uniqueItems": true,
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the kinds of assets this threat affects."
+              "description": "References using bom-link or bom-ref to the assets that this threat can affect."
             },
             "relatedBusinessObjectives": {
               "type": "array",
@@ -16018,7 +16261,7 @@
         "threatScenario": {
           "type": "object",
           "title": "Threat Scenario",
-          "description": "A specific realization of a threat, in which an actor seeks to cause harm. The scenario references the threat it realizes, supplies the actor by reference to a party, and carries the scenario-specific traits and risk assessment, such as motivation, intent, access level, likelihood, and impact.",
+          "description": "A specific realization of a threat, in which an actor seeks to cause harm. The scenario references the threats it realizes, supplies the actor by reference to a party, and carries the scenario-specific traits, such as motivation, intent, access level, and likelihood. The consequence is expressed by the damage scenarios it leads to, and the resulting risk is documented under risks, referencing both.",
           "additionalProperties": false,
           "required": [
             "bom-ref",
@@ -16141,13 +16384,8 @@
               "$ref": "#/$defs/cyclonedx-threat-2.0/$defs/exploitability"
             },
             "likelihood": {
-              "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/likelihood"
-            },
-            "impact": {
-              "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/impact"
-            },
-            "riskScore": {
-              "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/riskScore"
+              "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/likelihood",
+              "description": "The likelihood that this scenario is realized, which in attack terms is its feasibility. The consequence is carried by the damage scenarios the scenario leads to, and the paired rating by the risk that references both."
             },
             "riskAttributes": {
               "type": "array",
@@ -16158,23 +16396,23 @@
               },
               "description": "The security and privacy attributes that this threat would compromise if realized."
             },
-            "affectedAssets": {
+            "affects": {
               "type": "array",
-              "title": "Affected Assets",
+              "title": "Affects",
               "uniqueItems": true,
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
               "description": "References using bom-link or bom-ref to the assets affected in this scenario."
             },
-            "relatedRisks": {
+            "damageScenarios": {
               "type": "array",
-              "title": "Related Risks",
+              "title": "Damage Scenarios",
               "uniqueItems": true,
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the risks that this scenario contributes to."
+              "description": "References using bom-link or bom-ref to the damage scenarios, declared under the risks collection, that this scenario can lead to."
             },
             "relatedVulnerabilities": {
               "type": "array",
@@ -16599,7 +16837,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the controls that mitigate this node."
+              "description": "References using bom-link or bom-ref to the controls that mitigate this attack tree node."
             }
           }
         },
@@ -16695,20 +16933,8 @@
           "additionalProperties": false,
           "properties": {
             "level": {
-              "title": "Level",
-              "description": "The maturity of available exploitation capability.",
-              "enum": [
-                "theoretical",
-                "proof-of-concept",
-                "functional",
-                "weaponized"
-              ],
-              "meta:enum": {
-                "theoretical": "Exploitation is theoretically possible but has not been demonstrated.",
-                "proof-of-concept": "A proof of concept exists.",
-                "functional": "A functional exploit exists.",
-                "weaponized": "A weaponized exploit is in use."
-              }
+              "$ref": "#/$defs/cyclonedx-vulnerability-2.0/$defs/exploitMaturity",
+              "description": "The maturity of available exploitation capability, using the same scale as vulnerability exploit maturity."
             },
             "complexity": {
               "title": "Complexity",
@@ -16903,7 +17129,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the controls in place at this boundary. Intended primarily for referencing externally defined controls. Where the control and boundary are declared together, prefer the control's appliesTo property."
+              "description": "References using bom-link or bom-ref to the controls that mitigate threats at this trust boundary."
             },
             "properties": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
@@ -16993,7 +17219,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the controls that detect or prevent this step."
+              "description": "References using bom-link or bom-ref to the controls that mitigate this attack path step, by preventing or detecting it."
             },
             "properties": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
@@ -17050,14 +17276,6 @@
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
               "description": "References using bom-link or bom-ref to the threats that this path realizes."
-            },
-            "relatedRisks": {
-              "type": "array",
-              "uniqueItems": true,
-              "items": {
-                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
-              },
-              "description": "References using bom-link or bom-ref to the risks that this path contributes to."
             },
             "externalReferences": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/externalReferences"
