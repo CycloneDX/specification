@@ -443,7 +443,23 @@
       "description": "Describes the geographic origin of the subject (for example, a component or party), expressed as a distribution across one or more countries or subdivisions, calculated on a stated basis. An origin may be scoped to a lifecycle or transformation stage, enabling stage-specific provenance such as distinguishing where a material was mined from where it was melted.",
       "additionalProperties": false,
       "required": [ "basis", "distribution" ],
+      "dependentRequired": {
+        "value": [ "unit" ],
+        "unit": [ "value" ]
+      },
       "properties": {
+        "value": {
+          "type": "number",
+          "minimum": 0,
+          "title": "Value",
+          "description": "The total quantity of the subject to which the origin distribution applies, expressed in the specified unit. When present, a unit shall also be present.",
+          "examples": [ 12.5, 2500 ]
+        },
+        "unit": {
+          "$ref": "#/$defs/unitOfMeasure",
+          "title": "Unit",
+          "description": "The unit of measure in which the value is expressed. When present, a value shall also be present."
+        },
         "stage": {
           "title": "Origin Stage",
           "description": "The lifecycle or transformation stage of the subject to which this origin applies. When omitted, the origin describes the subject as a whole.",
@@ -560,6 +576,87 @@
           "description": "Reference to the party that performed this stage of origin for this share of the distribution, such as the smelter that melted a material or the organization that developed a software component. Entries in a distribution may repeat a region in order to attribute shares to different parties."
         }
       }
+    },
+    "unitOfMeasure": {
+      "title": "Unit of Measure",
+      "description": "A unit of measure, either drawn from the predefined set or defined as a custom unit.",
+      "oneOf": [
+        {
+          "title": "Predefined Unit",
+          "description": "A unit of measure drawn from the predefined set.",
+          "enum": [
+            "count",
+            "mg", "ct", "g", "kg", "t",
+            "oz", "lb", "ozt", "short-ton", "long-ton",
+            "mL", "cm3", "L", "m3",
+            "fl-oz-us", "fl-oz-imp", "gal-us", "gal-imp", "bbl", "in3", "ft3", "yd3",
+            "mm", "cm", "m", "km",
+            "in", "ft", "yd", "mi",
+            "mm2", "cm2", "m2",
+            "in2", "ft2", "yd2"
+          ],
+          "meta:enum": {
+            "count": "A count of discrete items, commonly used for parts, devices, and other individually counted items.",
+            "mg": "Milligrams, commonly used for trace substances and small material quantities.",
+            "ct": "Metric carats of 200 milligrams, commonly used for diamond and gemstone quantities.",
+            "g": "Grams, commonly used for material quantities in parts and small lots.",
+            "kg": "Kilograms, commonly used for net weight in customs declarations and material lots.",
+            "t": "Tonnes of 1000 kilograms, commonly used for bulk material and mineral quantities.",
+            "oz": "Avoirdupois ounces, commonly used for small material quantities in United States procurement.",
+            "lb": "Avoirdupois pounds, commonly used for material quantities in United States procurement.",
+            "ozt": "Troy ounces, commonly used for precious metal quantities such as gold.",
+            "short-ton": "Short tons of 2000 avoirdupois pounds, commonly used for bulk material quantities in the United States.",
+            "long-ton": "Long tons of 2240 avoirdupois pounds, commonly used for bulk material and shipping quantities in the United Kingdom.",
+            "mL": "Millilitres, commonly used for small liquid quantities.",
+            "cm3": "Cubic centimetres, commonly used for small solid and liquid volumes.",
+            "L": "Litres, commonly used for liquid and gas quantities.",
+            "m3": "Cubic metres, commonly used for bulk liquid and gas quantities.",
+            "fl-oz-us": "United States fluid ounces, commonly used for small liquid quantities.",
+            "fl-oz-imp": "Imperial fluid ounces, commonly used for small liquid quantities in the United Kingdom.",
+            "gal-us": "United States gallons of 231 cubic inches, commonly used for liquid quantities.",
+            "gal-imp": "Imperial gallons of 4.54609 litres, commonly used for liquid quantities in the United Kingdom.",
+            "bbl": "United States oil barrels of 42 United States gallons, commonly used for crude oil and petroleum product quantities.",
+            "in3": "Cubic inches, commonly used for small solid and displacement volumes.",
+            "ft3": "Cubic feet, commonly used for gas quantities and bulk volumes.",
+            "yd3": "Cubic yards, commonly used for bulk aggregate and fill material.",
+            "mm": "Millimetres, commonly used for small cut-to-length items.",
+            "cm": "Centimetres, commonly used for short lengths of tape, ribbon, and tubing.",
+            "m": "Metres, commonly used for wire, cable, tubing, and other items supplied by length.",
+            "km": "Kilometres, commonly used for bulk wire and cable quantities.",
+            "in": "International inches, commonly used for small cut-to-length items.",
+            "ft": "International feet, commonly used for wire, cable, tubing, and other items supplied by length.",
+            "yd": "International yards, commonly used for fabric and textile supplied by length.",
+            "mi": "International miles, commonly used for bulk wire, cable, and pipeline quantities.",
+            "mm2": "Square millimetres, commonly used for die area.",
+            "cm2": "Square centimetres, commonly used for wafer and substrate area.",
+            "m2": "Square metres, commonly used for sheet, foil, and laminate supplied by area.",
+            "in2": "Square inches, commonly used for die, board, and substrate area.",
+            "ft2": "Square feet, commonly used for sheet, foil, and laminate supplied by area.",
+            "yd2": "Square yards, commonly used for fabric and textile supplied by area."
+          }
+        },
+        {
+          "type": "object",
+          "title": "Custom Unit",
+          "description": "A unit of measure that is not present in the predefined set.",
+          "required": [ "name" ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Name",
+              "description": "The name of the custom unit of measure.",
+              "examples": [ "pennyweight", "board foot" ]
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "Description of the custom unit of measure."
+            }
+          }
+        }
+      ]
     },
     "properties": {
       "type": "array",
