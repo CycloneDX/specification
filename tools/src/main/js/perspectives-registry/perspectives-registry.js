@@ -11,23 +11,28 @@
  *  - identities are `cdx:perspectives:<name>` (the enum in
  *    schema/perspectives-defs.schema.json is the hand-maintained source)
  *  - the catalog document defining `cdx:perspectives:<name>` is
- *    `perspectives/<name>-perspective.json` (naming convention, no mapping)
+ *    `perspectives/<name>-perspective.json` (naming convention, no mapping);
+ *    it holds the latest version
+ *  - every earlier version is kept, unchanged, as
+ *    `perspectives/archives/<name>-perspective/<name>-perspective-<version>.json`
  *  - a catalog document is a CycloneDX document defining exactly one inline
  *    perspective; its `version` is the perspective version referenced by
  *    `predefinedVersion`
  *  - the registry (schema/perspectives-defs.json) is GENERATED and records,
  *    per identity, every published version with the sha256 of the catalog
- *    document's canonical JSON and the commit that introduced it; once
- *    registered, a version's content is immutable
+ *    document's canonical JSON and the date it was registered; once
+ *    registered, a version's content is immutable, which the recorded hash
+ *    enforces for the current document and for every archived one
  */
 
 import {createHash} from 'node:crypto'
-import {readFile, stat} from 'node:fs/promises'
+import {readdir, readFile, stat} from 'node:fs/promises'
 import {join} from 'node:path'
 
 export const IDENTITY_PREFIX = 'cdx:perspectives:'
 export const CATALOG_DIR = 'perspectives'
 export const CATALOG_FILE_SUFFIX = '-perspective.json'
+export const ARCHIVES_DIR = `${CATALOG_DIR}/archives`
 export const REGISTRY_SCHEMA_FILE = join('schema', 'perspectives-defs.schema.json')
 export const REGISTRY_DATA_FILE = join('schema', 'perspectives-defs.json')
 export const ENUM_POINTER = Object.freeze(['$defs', 'preDefinedPerspectivesEnum', 'enum'])
@@ -61,9 +66,9 @@ export const OK_STATES = Object.freeze(new Set([State.RESERVED, State.NEW, State
 
 /**
  * @param {string} identity
- * @return {string} catalog document path relative to the repository root, using `/` separators
+ * @return {string} the base name of the identity's catalog files, `<name>-perspective`
  */
-export function catalogFileOf(identity) {
+function baseNameOf(identity) {
     if (typeof identity !== 'string' || !identity.startsWith(IDENTITY_PREFIX)) {
         throw new Error(`not a pre-defined perspective identity: ${identity}`)
     }
@@ -71,7 +76,32 @@ export function catalogFileOf(identity) {
     if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(name)) {
         throw new Error(`identity name is not lowercase-kebab-case: ${identity}`)
     }
-    return `${CATALOG_DIR}/${name}${CATALOG_FILE_SUFFIX}`
+    return `${name}${CATALOG_FILE_SUFFIX.replace(/\.json$/, '')}`
+}
+
+/**
+ * @param {string} identity
+ * @return {string} catalog document path relative to the repository root, using `/` separators
+ */
+export function catalogFileOf(identity) {
+    return `${CATALOG_DIR}/${baseNameOf(identity)}.json`
+}
+
+/**
+ * @param {string} identity
+ * @return {string} directory holding the identity's earlier versions, relative to the repository root
+ */
+export function archiveDirOf(identity) {
+    return `${ARCHIVES_DIR}/${baseNameOf(identity)}`
+}
+
+/**
+ * @param {string} identity
+ * @param {number} version
+ * @return {string} path of the archived catalog document of that version, relative to the repository root
+ */
+export function archiveFileOf(identity, version) {
+    return `${archiveDirOf(identity)}/${baseNameOf(identity)}-${version}.json`
 }
 
 /**
@@ -130,7 +160,17 @@ export function identitiesOf(schema) {
  * @return {Promise<CatalogDocument>}
  */
 export async function readCatalogDocument(repoRoot, identity) {
-    const file = catalogFileOf(identity)
+    return readDocument(repoRoot, identity, catalogFileOf(identity))
+}
+
+/**
+ * Read and structurally check a catalog document file.
+ * @param {string} repoRoot
+ * @param {string} identity
+ * @param {string} file path relative to repository root
+ * @return {Promise<CatalogDocument>}
+ */
+async function readDocument(repoRoot, identity, file) {
     const path = join(repoRoot, ...file.split('/'))
     const result = {identity, file, path, exists: false, problems: []}
     if (!await stat(path).then(s => s.isFile()).catch(() => false)) {
@@ -195,7 +235,7 @@ export function assess(catalog, entry) {
         const registered = entry.versions.find(v => v.version === latest)
         return registered.sha256 === sha256
             ? {state: State.UNCHANGED, latest, detail: `version ${version}, content matches the registry`}
-            : {state: State.MODIFIED, latest, detail: `content differs from registered version ${latest} (${registered.commit}); bump \`version\` to ${latest + 1}`}
+            : {state: State.MODIFIED, latest, detail: `content differs from registered version ${latest}; bump \`version\` to ${latest + 1} and archive version ${latest} as ${archiveFileOf(catalog.identity, latest)}`}
     }
     if (version === latest + 1) {
         return {state: State.PENDING, latest, detail: `version ${version} bumped from registered ${latest}, not registered yet`}
@@ -230,4 +270,79 @@ export function entryProblems(entry) {
         }
     }
     return problems
+}
+
+/**
+ * Check the archived earlier versions of an identity against the registry.
+ *
+ * Every registered version below the current catalog document's version shall
+ * be archived at its conventional path, unchanged: its content hash equals the
+ * registered one, and its own `version` matches. The archive directory holds
+ * nothing else.
+ *
+ * @param {string} repoRoot
+ * @param {CatalogDocument} catalog the identity's current catalog document
+ * @param {object|undefined} entry registry entry of the identity
+ * @return {Promise<string[]>} problems, empty when the archive is consistent
+ */
+export async function archiveProblems(repoRoot, catalog, entry) {
+    const identity = catalog.identity
+    const registered = Array.isArray(entry?.versions) ? entry.versions : []
+    const below = catalog.version ?? latestOf(registered)
+    const expected = new Map(registered
+        .filter(v => v.version < below)
+        .map(v => [archiveFileOf(identity, v.version), v]))
+    const problems = []
+    for (const [file, v] of expected) {
+        const archived = await readDocument(repoRoot, identity, file)
+        if (!archived.exists) {
+            problems.push(`registered version ${v.version} is not archived: copy it, unchanged, to ${file}`)
+        } else if (archived.problems.length > 0) {
+            problems.push(`${file}: ${archived.problems.join('; ')}`)
+        } else if (archived.version !== v.version) {
+            problems.push(`${file} declares \`version\` ${archived.version}, its file name says ${v.version}`)
+        } else if (archived.sha256 !== v.sha256) {
+            problems.push(`${file} differs from registered version ${v.version}; archived versions shall not change`)
+        }
+    }
+    const dir = archiveDirOf(identity)
+    for (const name of await listDir(repoRoot, dir)) {
+        if (!expected.has(`${dir}/${name}`)) {
+            problems.push(`${dir}/${name} is not an archived earlier version of ${identity}`)
+        }
+    }
+    return problems
+}
+
+/**
+ * @param {string} repoRoot
+ * @param {string[]} identities the identity enum
+ * @return {Promise<string[]>} problems for entries of the archives directory that belong to no identity
+ */
+export async function strayArchiveProblems(repoRoot, identities) {
+    const known = new Set()
+    for (const identity of identities) {
+        try {
+            known.add(archiveDirOf(identity))
+        } catch {
+            // an invalid identity is reported elsewhere
+        }
+    }
+    return (await listDir(repoRoot, ARCHIVES_DIR))
+        .filter(name => !known.has(`${ARCHIVES_DIR}/${name}`))
+        .map(name => `${ARCHIVES_DIR}/${name} does not belong to any identity in the enum`)
+}
+
+/**
+ * @param {string} repoRoot
+ * @param {string} dir path relative to repository root
+ * @return {Promise<string[]>} entry names, sorted; empty when the directory does not exist
+ */
+async function listDir(repoRoot, dir) {
+    try {
+        return (await readdir(join(repoRoot, ...dir.split('/')))).sort()
+    } catch (err) {
+        if (err.code === 'ENOENT') return []
+        throw err
+    }
 }

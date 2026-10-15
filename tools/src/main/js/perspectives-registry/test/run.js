@@ -15,6 +15,9 @@
  *    (version 1, not registered), unchanged (registered content), or pending (registered
  *    latest + 1). A document changed at an already registered version, a regressed or
  *    skipped version, or a removed registered document fails.
+ *  - every registered version below the current document's is archived, unchanged, at
+ *    perspectives/archives/<name>-perspective/<name>-perspective-<version>.json, and the
+ *    archives directory holds nothing else.
  * Shared logic with the generator lives in ../perspectives-registry.js.
  */
 
@@ -27,7 +30,7 @@ import addFormats from 'ajv-formats'
 
 import {
     REGISTRY_DATA_FILE, REGISTRY_SCHEMA_FILE, State, OK_STATES,
-    assess, entryProblems, identitiesOf, readCatalogDocument,
+    archiveProblems, assess, entryProblems, identitiesOf, readCatalogDocument, strayArchiveProblems,
 } from '../perspectives-registry.js'
 
 
@@ -155,6 +158,12 @@ for (const identity of identities) {
         continue
     }
     const {state, detail} = assess(catalog, entryById.get(identity))
+    if (state !== State.RESERVED) {
+        const archived = await archiveProblems(repoRootDir, catalog, entryById.get(identity))
+        if (archived.length > 0) {
+            fail(`archived versions of ${identity}:`, '\n  - ' + archived.join('\n  - '))
+        }
+    }
     if (!OK_STATES.has(state)) {
         fail(`${identity} is ${state}:`, detail, '\n  file:', `file://${catalog.path}`)
     } else if (state === State.RESERVED) {
@@ -164,6 +173,10 @@ for (const identity of identities) {
     } else {
         console.log(`OK (${state}).`, detail, '- the registry generator will register it after merge')
     }
+}
+
+for (const problem of await strayArchiveProblems(repoRootDir, identities)) {
+    fail(problem)
 }
 
 // endregion catalog documents

@@ -8,22 +8,22 @@
  * Sources: the identity enum in schema/perspectives-defs.schema.json (hand-maintained)
  * and the catalog documents under perspectives/ (hand-maintained, naming convention).
  * Registers every catalog document version that is not registered yet, recording the
- * sha256 of the document's canonical JSON and the commit that last touched the document.
+ * sha256 of the document's canonical JSON and the date of registration.
  * Never rewrites a registered version: a document whose content changed at an already
  * registered version is an error, and so is any version that is not exactly the
- * registered latest + 1 (or 1 for a new perspective).
+ * registered latest + 1 (or 1 for a new perspective), and any earlier version that is
+ * not archived unchanged under perspectives/archives/.
  *
  * Exit code is the number of errors (0 = success), capped at 254.
  */
 
-import {execFileSync} from 'node:child_process'
 import {readFile, writeFile} from 'node:fs/promises'
 import {dirname, join} from 'node:path'
 import {fileURLToPath} from 'node:url'
 
 import {
     REGISTRY_DATA_FILE, REGISTRY_SCHEMA_FILE, State, OK_STATES,
-    assess, identitiesOf, readCatalogDocument,
+    archiveProblems, assess, identitiesOf, readCatalogDocument, strayArchiveProblems,
 } from './perspectives-registry.js'
 
 const _thisDir = dirname(fileURLToPath(import.meta.url))
@@ -31,18 +31,8 @@ const repoRoot = join(_thisDir, '..', '..', '..', '..', '..')
 const schemaFile = join(repoRoot, REGISTRY_SCHEMA_FILE)
 const dataFile = join(repoRoot, REGISTRY_DATA_FILE)
 
-/**
- * @param {string} file path relative to repository root
- * @return {{commit: string, date: string}} last commit touching the file, date in UTC
- */
-function lastCommitOf(file) {
-    const stdout = execFileSync('git', ['log', '-1', '--format=%H%n%cI', '--', file], {cwd: repoRoot, encoding: 'utf-8'})
-    const [commit, date] = stdout.trim().split('\n')
-    if (!/^[0-9a-f]{40}$/.test(commit ?? '')) {
-        throw new Error(`no commit found for ${file}; the document shall be committed before it is registered`)
-    }
-    return {commit, date: new Date(date).toISOString().replace(/\.\d{3}Z$/, 'Z')}
-}
+/** registration date: now, in UTC, to the second */
+const registrationDate = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z')
 
 const schema = JSON.parse(await readFile(schemaFile, 'utf-8'))
 const identities = identitiesOf(schema)
@@ -60,6 +50,10 @@ for (const [id] of previousEntries) {
         ++errCnt
         console.error(`!!! ERROR: registered identity ${id} is not in the enum of ${REGISTRY_SCHEMA_FILE}; registered versions are never dropped`)
     }
+}
+for (const problem of await strayArchiveProblems(repoRoot, identities)) {
+    ++errCnt
+    console.error(`!!! ERROR: ${problem}`)
 }
 
 for (const identity of [...identities].sort()) {
@@ -90,11 +84,17 @@ for (const identity of [...identities].sort()) {
     if (state === State.RESERVED) {
         continue
     }
+    const archived = await archiveProblems(repoRoot, catalog, entry)
+    if (archived.length > 0) {
+        ++errCnt
+        console.error(`!!! ERROR: ${identity}: archived versions\n  - ${archived.join('\n  - ')}`)
+        if (entry !== undefined) entries.push(entry)
+        continue
+    }
     const versions = [...(entry?.versions ?? [])]
     if (state === State.NEW || state === State.PENDING) {
-        const {commit, date} = lastCommitOf(catalog.file)
-        versions.push({version: catalog.version, sha256: catalog.sha256, commit, date})
-        console.log(`  registering version ${catalog.version} from commit ${commit}`)
+        versions.push({version: catalog.version, sha256: catalog.sha256, date: registrationDate})
+        console.log(`  registering version ${catalog.version}`)
     }
     entries.push({
         predefined: identity,

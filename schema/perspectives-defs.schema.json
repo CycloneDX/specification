@@ -3,7 +3,7 @@
   "$id": "http://cyclonedx.org/schema/perspectives-defs.schema.json",
   "$comment": "2026-09-04T00:00:00Z",
   "title": "CycloneDX Pre-Defined Perspectives Registry",
-  "description": "Governs the registry of well-known, pre-defined perspectives (perspectives-defs.json) and declares their reserved identities (preDefinedPerspectivesEnum, referenced by the specification's perspective schema). The identity enum is maintained by hand. The catalog document defining `cdx:perspectives:<name>` is `perspectives/<name>-perspective.json` in the repository, by naming convention; its `version` is the perspective version selected by `predefinedVersion`. The registry data is generated: it records every published version of each perspective with the sha256 of the catalog document's canonical JSON and the commit that introduced it. Once registered, a version's content is immutable; changing a catalog document requires incrementing its `version` by 1. The registry is maintained independently of the CycloneDX specification release cycle.",
+  "description": "Governs the registry of well-known, pre-defined perspectives (perspectives-defs.json) and declares their reserved identities (preDefinedPerspectivesEnum, referenced by the specification's perspective schema). The identity enum is maintained by hand. The catalog document defining `cdx:perspectives:<name>` is `perspectives/<name>-perspective.json` in the repository, by naming convention, and holds the latest version; its `version` is the perspective version selected by `predefinedVersion`. Every earlier version is kept, unchanged, as `perspectives/archives/<name>-perspective/<name>-perspective-<version>.json`. The registry data is generated: it records every published version of each perspective with the sha256 of the catalog document's canonical JSON and the date it was registered. Once registered, a version's content is immutable; changing a catalog document requires incrementing its `version` by 1 and archiving the previous version. The registry is maintained independently of the CycloneDX specification release cycle.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -60,7 +60,7 @@
         "file": {
           "type": "string",
           "title": "Catalog Document",
-          "description": "Path, relative to the repository root, of the catalog document defining this perspective, as given by the naming convention.",
+          "description": "Path, relative to the repository root, of the catalog document defining this perspective at its latest version, as given by the naming convention. Earlier versions are archived under `perspectives/archives/`, also by naming convention.",
           "pattern": "^perspectives/[a-z0-9]+(-[a-z0-9]+)*-perspective\\.json$"
         },
         "name": {
@@ -91,7 +91,6 @@
       "required": [
         "version",
         "sha256",
-        "commit",
         "date"
       ],
       "properties": {
@@ -104,20 +103,14 @@
         "sha256": {
           "type": "string",
           "title": "Content Hash",
-          "description": "Lowercase hex SHA-256 of the catalog document's canonical JSON (object keys sorted, no insignificant whitespace) at this version. A catalog document whose hash differs from the one registered for its `version` has changed without a version bump.",
+          "description": "Lowercase hex SHA-256 of the catalog document's canonical JSON (object keys sorted, no insignificant whitespace) at this version. A catalog document, current or archived, whose hash differs from the one registered for its `version` has changed after publication.",
           "pattern": "^[0-9a-f]{64}$"
-        },
-        "commit": {
-          "type": "string",
-          "title": "Commit",
-          "description": "The commit that introduced this version of the catalog document, for provenance.",
-          "pattern": "^[0-9a-f]{40}$"
         },
         "date": {
           "type": "string",
           "format": "date-time",
           "title": "Date",
-          "description": "The date and time (timestamp) of that commit."
+          "description": "The date and time (timestamp) this version was registered."
         }
       }
     }
