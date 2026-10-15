@@ -146,6 +146,8 @@ export const treeShake = (schema) => {
     };
 
     markReached(schema, []);
+    Object.freeze(reached);
+
     sweep(schema, []);
 
     return {
