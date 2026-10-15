@@ -7,8 +7,8 @@
  *
  * This check targets the CycloneDX 2.x modular schema space:
  *   schema/<version>/cyclonedx-<version>.schema.json
- *   schema/<version>/model/cyclonedx-common-<version>.schema.json
- *   schema/<version>/model/*.schema.json
+ *   schema/<version>/modules/cyclonedx-common-<version>.schema.json
+ *   schema/<version>/modules/*.schema.json
  *
  * The expected relative `$ref` values are derived from the linted file's
  * path when available (walking relative from it on the filesystem);
@@ -37,7 +37,7 @@ const DEFAULT_REF_LINK_TYPE_POINTER = '#/$defs/refLinkType';
  * Default `$id` of the refType-defining schema.
  * `{version}` is replaced by the version derived from the linted schema's `$id`.
  */
-const DEFAULT_REF_TYPE_SCHEMA_ID = 'https://cyclonedx.org/schema/{version}/model/cyclonedx-common-{version}.schema.json';
+const DEFAULT_REF_TYPE_SCHEMA_ID = 'https://cyclonedx.org/schema/{version}/modules/cyclonedx-common-{version}.schema.json';
 
 /**
  * Default file name of the refType-defining schema.
@@ -180,8 +180,8 @@ class Cdx2RefTypeUsageCheck extends LintCheck {
     if (!refTypeFilePath) {
       // Derive from repository layout:
       //   schema/<version>/cyclonedx-<version>.schema.json
-      //   schema/<version>/model/cyclonedx-common-<version>.schema.json
-      //   schema/<version>/model/*.schema.json
+      //   schema/<version>/modules/cyclonedx-common-<version>.schema.json
+      //   schema/<version>/modules/*.schema.json
       const fileName = basename(filePath);
       const version = fileName.match(VERSION_RE)?.[1];
       if (version === undefined) {
@@ -189,9 +189,9 @@ class Cdx2RefTypeUsageCheck extends LintCheck {
       }
       const commonFileName = DEFAULT_REF_TYPE_FILE_NAME.replaceAll('{version}', version);
       const dir = dirname(filePath);
-      refTypeFilePath = basename(dir) === 'model'
+      refTypeFilePath = basename(dir) === 'modules'
         ? join(dir, commonFileName)
-        : join(dir, 'model', commonFileName);
+        : join(dir, 'modules', commonFileName);
     }
 
     if (filePath === refTypeFilePath) {
