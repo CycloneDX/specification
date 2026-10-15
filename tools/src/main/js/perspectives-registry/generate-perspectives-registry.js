@@ -16,11 +16,10 @@
  * Exit code is the number of errors (0 = success), capped at 254.
  */
 
-import {execFile} from 'node:child_process'
+import {execFileSync} from 'node:child_process'
 import {readFile, writeFile} from 'node:fs/promises'
 import {dirname, join} from 'node:path'
 import {fileURLToPath} from 'node:url'
-import {promisify} from 'node:util'
 
 import {
     REGISTRY_DATA_FILE, REGISTRY_SCHEMA_FILE, State, OK_STATES,
@@ -31,14 +30,13 @@ const _thisDir = dirname(fileURLToPath(import.meta.url))
 const repoRoot = join(_thisDir, '..', '..', '..', '..', '..')
 const schemaFile = join(repoRoot, REGISTRY_SCHEMA_FILE)
 const dataFile = join(repoRoot, REGISTRY_DATA_FILE)
-const execFileP = promisify(execFile)
 
 /**
  * @param {string} file path relative to repository root
- * @return {Promise<{commit: string, date: string}>} last commit touching the file, date in UTC
+ * @return {{commit: string, date: string}} last commit touching the file, date in UTC
  */
-async function lastCommitOf(file) {
-    const {stdout} = await execFileP('git', ['log', '-1', '--format=%H%n%cI', '--', file], {cwd: repoRoot})
+function lastCommitOf(file) {
+    const stdout = execFileSync('git', ['log', '-1', '--format=%H%n%cI', '--', file], {cwd: repoRoot, encoding: 'utf-8'})
     const [commit, date] = stdout.trim().split('\n')
     if (!/^[0-9a-f]{40}$/.test(commit ?? '')) {
         throw new Error(`no commit found for ${file}; the document shall be committed before it is registered`)
@@ -94,7 +92,7 @@ for (const identity of [...identities].sort()) {
     }
     const versions = [...(entry?.versions ?? [])]
     if (state === State.NEW || state === State.PENDING) {
-        const {commit, date} = await lastCommitOf(catalog.file)
+        const {commit, date} = lastCommitOf(catalog.file)
         versions.push({version: catalog.version, sha256: catalog.sha256, commit, date})
         console.log(`  registering version ${catalog.version} from commit ${commit}`)
     }
