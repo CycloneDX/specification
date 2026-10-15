@@ -178,6 +178,8 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
             [NOT_KEYWORD]: {[COMMENT_KEYWORD]: HOLLOW_COMMENT}
         };
         embeddedMap.set(`${entryFile}${REF_FRAG_SEP}${JP_PREFIX}${DEFS_KEYWORD}`, `${REF_FRAG_SEP}${FRAG_DEFS_PREFIX}${escapeJsonPointer(entryModuleName)}`);
+    } else {
+        delete schema[DEFS_KEYWORD][entryModuleName];
     }
 
     for (const [includeFile, moduleName] of fileModuleNames) {

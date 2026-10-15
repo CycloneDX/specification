@@ -103,12 +103,12 @@ export const treeShake = (schema) => {
         const defs = s[DEFS_KEYWORD];
         if (!defs) return;
         for (const [dName, def] of Object.entries(defs)) {
+            if (!isSchemaObject(def)) continue;
+
             const dStack = [...stack, DEFS_KEYWORD, dName];
             const dPtr = jsonPointer4stack(dStack);
             if (reached.has(dPtr)) {
-                if (isSchemaObject(def)) {
-                    sweep(def, dStack);
-                }
+                sweep(def, dStack);
                 continue;
             }
             // definition itself is unused
@@ -127,11 +127,10 @@ export const treeShake = (schema) => {
             }
             // something beneath is still in use
 
-            if (!isSchemaObject(def)) continue;
             sweep(def, dStack);
 
-            const defsPrefix = `${belowPrefix}${DEFS_KEYWORD}${JP_PREFIX}`;
-            if (below.every(r => r.startsWith(defsPrefix))) {
+            const belowPrefixDefs = `${belowPrefix}${DEFS_KEYWORD}${JP_PREFIX}`;
+            if (below.every(r => r.startsWith(belowPrefixDefs))) {
                 Object.keys(def).forEach(k => {
                     if (k === DEFS_KEYWORD) return;
                     delete def[k];
