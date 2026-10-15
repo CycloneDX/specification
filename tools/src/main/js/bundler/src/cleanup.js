@@ -118,7 +118,7 @@ export const treeShake = (schema) => {
             // definition itself is unused
 
             const belowPrefix = `${dPtr}${JP_PREFIX}`;
-            const below = reached.values().filter(r => r.startsWith(belowPrefix)).toArray();
+            const below = Object.freeze(reached.values().filter(r => r.startsWith(belowPrefix)).toArray());
             if (below.length === 0) {
                 delete defs[dName];
                 removed.push(`${REF_FRAG_SEP}${dPtr}`);
