@@ -72,6 +72,7 @@
                 "ethical",
                 "societal",
                 "human-rights",
+                "fairness",
                 "health",
                 "legal"
               ],
@@ -91,6 +92,7 @@
                 "ethical": "Ethical risks, including the responsible use of automated decision-making and artificial intelligence.",
                 "societal": "Risks to society, communities, or democratic and civic processes.",
                 "human-rights": "Risks to fundamental human rights, including discrimination and loss of autonomy.",
+                "fairness": "Risks to the fair and equitable treatment of individuals and groups, as an objective that a risk may undermine or advance.",
                 "health": "Risks to physical or mental health and wellbeing.",
                 "legal": "Legal exposure, including liability and contractual risks."
               }
@@ -361,6 +363,12 @@
           "$ref": "cyclonedx-party-2.0.schema.json#/$defs/partyChoice",
           "description": "The party accountable for this risk. May be an inline party object or a reference to a previously declared party. The party's `roles` should include `owner`."
         },
+        "externalReferences": {
+          "type": "array",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference"
+          }
+        },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
         }
@@ -375,8 +383,15 @@
         "likelihood": {
           "$ref": "#/$defs/likelihood"
         },
-        "impact": {
-          "$ref": "#/$defs/impact"
+        "impacts": {
+          "type": "array",
+          "title": "Impacts",
+          "uniqueItems": true,
+          "minItems": 1,
+          "description": "The impacts of the risk in this rating. A rating may carry more than one impact, for example a harm and a benefit for the same affected group, each with its own polarity and categories.",
+          "items": {
+            "$ref": "#/$defs/impact"
+          }
         },
         "score": {
           "$ref": "#/$defs/riskScore"
@@ -691,7 +706,6 @@
             "privacy",
             "operational",
             "strategic",
-            "bias",
             "discrimination",
             "fairness",
             "human-rights",
@@ -710,9 +724,8 @@
             "regulatory": "Regulatory compliance impact.",
             "safety": "Human safety impact.",
             "privacy": "Privacy violation impact.",
-            "operational": "Operational disruption.",
+            "operational": "Operational disruption, including degraded performance, reliability, or correctness of a system or its outputs.",
             "strategic": "Strategic business impact.",
-            "bias": "Systematic bias in automated outputs or decisions.",
             "discrimination": "Unfair treatment of individuals or groups, including on the basis of protected attributes.",
             "fairness": "Impact on the fair and equitable treatment of affected groups.",
             "human-rights": "Impact on fundamental human rights, including autonomy and dignity.",
