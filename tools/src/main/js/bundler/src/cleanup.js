@@ -111,12 +111,11 @@ export const treeShake = (schema) => {
                 sweep(def, dStack);
                 continue;
             }
-            // definition itself is unused
-
             if (ANCHOR_KEYWORDS.values().some(k => def.hasOwnProperty(k))) {
-                // we do NOT support anchors -> leave untouched for now
+                // we do NOT support anchors, yet -> leave untouched for now
                 continue;
             }
+            // definition itself is unused
 
             const belowPrefix = `${dPtr}${JP_PREFIX}`;
             const below = reached.values().filter(r => r.startsWith(belowPrefix)).toArray();
@@ -131,6 +130,7 @@ export const treeShake = (schema) => {
 
             const belowPrefixDefs = `${belowPrefix}${DEFS_KEYWORD}${JP_PREFIX}`;
             if (below.every(r => r.startsWith(belowPrefixDefs))) {
+                // only $defs sub-paths are referenced - make hollow
                 Object.keys(def).forEach(k => {
                     if (k === DEFS_KEYWORD) return;
                     delete def[k];
@@ -138,7 +138,6 @@ export const treeShake = (schema) => {
                 def[NOT_KEYWORD] = {[COMMENT_KEYWORD]: HOLLOW_COMMENT};
                 hollowed.push(`${REF_FRAG_SEP}${dPtr}`);
             }
-            // else: a non-$defs sub-path is referenced - must keep the schema intact
         }
 
         if (Object.keys(defs).length === 0) {
