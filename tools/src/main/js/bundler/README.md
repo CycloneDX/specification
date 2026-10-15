@@ -31,6 +31,7 @@ node tools/src/main/js/bundler/cli.js \
 This writes, next to the root schema:
 
 * `cyclonedx-2.0-bundled.schema.json` — pretty-printed, all `$comment` kept
+  (except the top-level `$comment` of embedded modules, see [How it works](#how-it-works))
 * `cyclonedx-2.0-bundled.min.schema.json` — minified, only the root `$comment` kept
 
 Exit codes:
@@ -47,7 +48,8 @@ The bundler is split into stages (one module each under `src/`):
 1. **Bundle** (`src/bundle.js`)
    * Loads the entry schema and *all* `*.schema.json` files found recursively in the modules directory.
    * Each module is embedded under `$defs/<module-name>`, where `<module-name>` is the file's basename without `.schema.json`.
-      `$schema`, `$id` and the top-level `$comment` of embedded modules are dropped.
+      `$schema`, `$id` and the top-level `$comment` of embedded modules are dropped —
+      they describe the module *file*, not the schema, and would be misleading inside the bundle.
    * The entry schema's own `$defs` are moved into a *hollow* container `$defs/<entry-name>`
       (marked with `"not": {"$comment": …}` so it is never used for validation by accident).
    * `$ref`, `$dynamicRef` and `$recursiveRef` are rewired:
