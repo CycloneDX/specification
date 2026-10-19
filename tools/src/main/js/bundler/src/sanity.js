@@ -1,6 +1,6 @@
 import {objectGetOwnPath, PATH_NOT_FOUND} from "./helpers/common.js";
 import {REF_FRAG_SEP, REF_KEYWORDS, subschemas} from './helpers/json-schema-spec.js';
-import {isJsonPointer, jsonPointer2stack, ROOT_POINTER as JP_ROOT_POINTER} from './helpers/json-pointer-spec.js'
+import {isJsonPointer, jsonPointer2stack} from './helpers/json-pointer-spec.js'
 
 
 /**
@@ -40,7 +40,7 @@ const validateRefs = (schema) => {
             const v = schema[k];
             if (typeof v !== 'string') continue;
             if (v.startsWith(REF_FRAG_SEP)) {
-                localRefs.add(v.slice(1));
+                localRefs.add(v.slice(REF_FRAG_SEP.length));
             } else {
                 warnings.add(`Unchecked external ref: ${v}`);
             }

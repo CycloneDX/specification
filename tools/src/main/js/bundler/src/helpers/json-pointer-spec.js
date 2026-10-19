@@ -37,7 +37,9 @@ export const isJsonPointer = (s) =>
  * @returns {JsonPointerStack}
  */
 export const jsonPointer2stack = (p) =>
-    p.split(PREFIX).slice(1).map(unescapeJsonPointer);
+    p === ROOT_POINTER
+        ? []
+        : p.split(PREFIX).slice(1).map(unescapeJsonPointer);
 
 /**
  * JSON Pointer for stack.
@@ -45,7 +47,9 @@ export const jsonPointer2stack = (p) =>
  * @returns {JsonPointer}
  */
 export const jsonPointer4stack = (s) =>
-    s.map(t => `${PREFIX}${escapeJsonPointer(t)}`).join('')
+    s.length === 0
+        ? ROOT_POINTER
+        : s.map(t => `${PREFIX}${escapeJsonPointer(t)}`).join('')
 
 
 /**

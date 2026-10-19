@@ -5,6 +5,7 @@
  * Deprecated keywords are ignored.
  */
 
+import {escapeJsonPointer, jsonPointer4stack} from "./json-pointer-spec.js";
 
 export const SCHEMA_KEYWORD = '$schema';
 

@@ -1,7 +1,12 @@
 import {basename, dirname, relative, resolve} from 'node:path'
 
 import {JSON_SCHEMA_RE, getJsonfile, posixPath, findDuplicateValues} from './helpers/common.js';
-import {escapeJsonPointer, PREFIX as JP_PREFIX, ROOT_POINTER as JP_ROOT_POINTER} from './helpers/json-pointer-spec.js';
+import {
+    escapeJsonPointer,
+    isJsonPointer,
+    PREFIX as JP_PREFIX,
+    ROOT_POINTER
+} from './helpers/json-pointer-spec.js';
 import {
     ID_KEYWORD, NOT_KEYWORD, SCHEMA_KEYWORD, COMMENT_KEYWORD, DEFS_KEYWORD, REF_KEYWORDS,
     subschemas,
@@ -132,14 +137,14 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
                 : sourceFile;
             const moduleName = fileModuleNames.get(refFile);
             if (moduleName) {
-                if (frag && !frag.startsWith(JP_PREFIX)) {
+                if (frag && !isJsonPointer(frag)) {
                     // currently dont support anchors - only JSON pointer.
                     throw new RangeError(`Unsupported ref fragment: ${v}`);
                 }
                 rewiredRS = {
                     path: null,
-                    frag: (refFile === entryFile && !frag?.startsWith(FRAG_DEFS_PREFIX)
-                            ? JP_ROOT_POINTER
+                    frag: (refFile === entryFile && (frag === null || frag === ROOT_POINTER)
+                            ? ROOT_POINTER
                             : `${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`
                     ) + (frag ?? '')
                 };
