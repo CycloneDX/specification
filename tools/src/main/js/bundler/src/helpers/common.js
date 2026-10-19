@@ -59,6 +59,22 @@ export const objectGetOwnPath = (o, pathStack) => {
 
 
 /**
+ * Get the value at a path of own properties.
+ *
+ * @param {Readonly<*>} o
+ * @param {Iterable<string>} pathStack
+ * @returns {void|PATH_NOT_FOUND}
+ */
+export const objectDeleteOwnPath = (o, pathStack) => {
+    const p = [...pathStack];
+    const d = p.pop();
+    const t = objectGetOwnPath(o, p);
+    if (t === PATH_NOT_FOUND) { throw new RangeError(`Path not found: ${JSON.stringify(p)}`) }
+    delete t[d];
+};
+
+
+/**
  * Find duplicate values in a map.
  * @template K
  * @template V
