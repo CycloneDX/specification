@@ -22,9 +22,9 @@ The runner copies `fixtures/` to a temporary directory, runs the CLI's `main()` 
 report to `report.json`, and compares all three generated files byte-for-byte against `snapshot/`.
 
 Each module file name states the edge case it covers (`used-whole`, `used-subdefs-only`,
-`unused`, `dynamic-anchor`); `externals/not-bundled` covers a file outside the modules directory,
-the `remote` property in `used-whole` covers an absolute `https://` ref, and `inArray` in
-`used-whole` covers refs nested inside an array (`allOf`).
+`used-properties-only`, `unused`, `dynamic-anchor`); `externals/not-bundled` covers a file outside
+the modules directory, the `remote` property in `used-whole` covers an absolute `https://` ref, and
+`inArray` in `used-whole` covers refs nested inside an array (`allOf`).
 
 The entry schema additionally covers:
 
@@ -32,6 +32,11 @@ The entry schema additionally covers:
   only its own `$comment` keyword is stripped;
 - local refs into the entry's own `$defs` — they are rewired to the hollow container
   `#/$defs/main/$defs/…`, which is marked with `"not": {"$comment": …}`.
+- an inline object property (`properties.composed`) whose own properties reference
+  *properties* of a module rather than its `$defs` — via JSON pointers like
+  `#/properties/address/properties/geo/properties/lat`. Only the referenced property subtrees
+  (and what they transitively reach) of `used-properties-only` are kept; unreferenced siblings
+  (`city`, `lon`, `unusedTopLevel`), unreachable `$defs` and `unused.schema.json` are dropped.
 
 Inside the fixtures, the annotation keywords have distinct roles:
 

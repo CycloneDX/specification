@@ -28,6 +28,32 @@
       "title": "Local",
       "description": "A definition of this very schema.",
       "$ref": "#/$defs/main/$defs/mainLocal"
+    },
+    "composed": {
+      "$comment": "A new object defined inline in main, whose properties reference *properties* (not $defs) of another module -> only those property subtrees of used-properties-only are kept.",
+      "title": "Composed",
+      "description": "An object assembled from parts of another module.",
+      "type": "object",
+      "properties": {
+        "street": {
+          "$comment": "Ref into a nested property of the module -> #/properties/address/properties/street.",
+          "title": "Street",
+          "description": "The street, taken from the module's address.",
+          "$ref": "#/$defs/used-properties-only/properties/address/properties/street"
+        },
+        "latitude": {
+          "$comment": "Ref into a three-level deep nested property -> transitively keeps $defs/degrees; sibling 'lon' must be dropped.",
+          "title": "Latitude",
+          "description": "The latitude, taken from the module's address.geo.",
+          "$ref": "#/$defs/used-properties-only/properties/address/properties/geo/properties/lat"
+        },
+        "contact": {
+          "$comment": "Ref to a whole top-level property (with children) of the module -> kept with all its children.",
+          "title": "Contact",
+          "description": "The contact block of the module, as is.",
+          "$ref": "#/$defs/used-properties-only/properties/contact"
+        }
+      }
     }
   },
   "$defs": {
@@ -79,6 +105,95 @@
           "title": "Pulls nothing in",
           "description": "A flag defined by another module.",
           "$ref": "#/$defs/used-whole/$defs/unusedButKept"
+        }
+      }
+    },
+    "used-properties-only": {
+      "title": "Used properties only",
+      "description": "A module of which only nested properties are referenced.",
+      "type": "object",
+      "properties": {
+        "address": {
+          "$comment": "Reached only through its nested children, never as a whole -> the container stays hollow, only the referenced children survive.",
+          "title": "Address",
+          "description": "A postal address.",
+          "type": "object",
+          "properties": {
+            "street": {
+              "$comment": "Reached from main via #/properties/address/properties/street.",
+              "title": "Street",
+              "description": "Street name and number.",
+              "type": "string"
+            },
+            "city": {
+              "$comment": "Not referenced -> dropped although its siblings are kept.",
+              "title": "City",
+              "description": "Name of the city.",
+              "type": "string"
+            },
+            "geo": {
+              "$comment": "Reached from main via a three-level deep pointer into #/properties/address/properties/geo/properties/lat.",
+              "title": "Geo",
+              "description": "Geographic coordinates.",
+              "type": "object",
+              "properties": {
+                "lat": {
+                  "$comment": "Deeply nested leaf that is referenced directly from main. Has an internal ref -> transitively keeps $defs/degrees.",
+                  "title": "Latitude",
+                  "description": "Latitude in degrees.",
+                  "$ref": "#/$defs/used-properties-only/$defs/degrees"
+                },
+                "lon": {
+                  "$comment": "Deeply nested leaf that is NOT referenced -> dropped.",
+                  "title": "Longitude",
+                  "description": "Longitude in degrees.",
+                  "$ref": "#/$defs/used-properties-only/$defs/degrees"
+                }
+              }
+            }
+          }
+        },
+        "contact": {
+          "$comment": "Referenced from main as a whole property (with all its children) -> kept entirely, including the unreferenced phone.",
+          "title": "Contact",
+          "description": "Contact details.",
+          "type": "object",
+          "properties": {
+            "email": {
+              "title": "E-mail",
+              "description": "An e-mail address.",
+              "type": "string",
+              "format": "email"
+            },
+            "phone": {
+              "$comment": "Not referenced individually, but kept because the parent property 'contact' is referenced as a whole.",
+              "title": "Phone",
+              "description": "A phone number.",
+              "type": "string"
+            }
+          }
+        },
+        "unusedTopLevel": {
+          "$comment": "Not referenced -> dropped together with everything it refers to; must NOT make unused.schema.json reachable.",
+          "title": "Unused top level",
+          "description": "A property nothing refers to.",
+          "$ref": "#/$defs/unused"
+        }
+      },
+      "$defs": {
+        "degrees": {
+          "$comment": "Only reachable via properties/address/properties/geo/properties/lat.",
+          "title": "Degrees",
+          "description": "An angle in degrees.",
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        },
+        "unusedDef": {
+          "$comment": "Not reachable -> shaken away.",
+          "title": "Unused def",
+          "description": "A definition nothing reachable refers to.",
+          "type": "null"
         }
       }
     },
