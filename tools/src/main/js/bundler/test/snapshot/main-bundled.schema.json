@@ -28,6 +28,19 @@
       "title": "Local",
       "description": "A definition of this very schema.",
       "$ref": "#/$defs/main/$defs/mainLocal"
+    },
+    "foo": {
+      "$comment": "",
+      "title": "",
+      "description": "",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/partially-used/properties/foo"
+        },
+        {
+          "$ref": "#/$defs/partially-used/properties/bar/properties/bazz/$defs/definedInProperty"
+        }
+      ]
     }
   },
   "$defs": {
@@ -61,6 +74,34 @@
       },
       "not": {
         "$comment": "This schema is hollow: it was not referenced and only remains as a container for definitions that are still in use. Itself must not be used for validation."
+      }
+    },
+    "partially-used": {
+      "title": "Partially used",
+      "description": "TODO write a text.",
+      "type": "object",
+      "properties": {
+        "foo": {
+          "type": "string"
+        },
+        "bar": {
+          "type": "object",
+          "properties": {
+            "bazz": {
+              "type": "string",
+              "$defs": {
+                "definedInProperty": {
+                  "$comment": "This schema is defined in a property",
+                  "type": "string",
+                  "minLength": 3
+                }
+              }
+            }
+          }
+        },
+        "someProperty": {
+          "$comment": "a property that is not referenced in main or elsewhere"
+        }
       }
     },
     "used-subdefs-only": {

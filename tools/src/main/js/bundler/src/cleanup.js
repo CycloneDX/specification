@@ -135,6 +135,7 @@ export const treeShake = (schema) => {
             }
             // something beneath is still in use
             sweepDefs(def, dPtr);
+
             const belowPrefixDefs = `${belowPrefix}${DEFS_KEYWORD}${JP_PREFIX}`;
             if (belowReached.every(r => r.startsWith(belowPrefixDefs))) {
                 // only defs are referenced -> make hollow

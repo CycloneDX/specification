@@ -28,6 +28,32 @@
       "title": "Local",
       "description": "A definition of this very schema.",
       "$ref": "#/$defs/mainLocal"
+    },
+    "composed": {
+      "$comment": "A new object defined inline in main, whose properties reference *properties* (not $defs) of another module -> only those property subtrees of used-properties-only are kept.",
+      "title": "Composed",
+      "description": "An object assembled from parts of another module.",
+      "type": "object",
+      "properties": {
+        "street": {
+          "$comment": "Ref into a nested property of the module -> #/properties/address/properties/street.",
+          "title": "Street",
+          "description": "The street, taken from the module's address.",
+          "$ref": "modules/used-properties-only.schema.json#/properties/address/properties/street"
+        },
+        "latitude": {
+          "$comment": "Ref into a three-level deep nested property -> transitively keeps $defs/degrees; sibling 'lon' must be dropped.",
+          "title": "Latitude",
+          "description": "The latitude, taken from the module's address.geo.",
+          "$ref": "modules/used-properties-only.schema.json#/properties/address/properties/geo/properties/lat"
+        },
+        "contact": {
+          "$comment": "Ref to a whole top-level property (with children) of the module -> kept with all its children.",
+          "title": "Contact",
+          "description": "The contact block of the module, as is.",
+          "$ref": "modules/used-properties-only.schema.json#/properties/contact"
+        }
+      }
     }
   },
   "$defs": {
