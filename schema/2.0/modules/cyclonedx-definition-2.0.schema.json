@@ -8,9 +8,53 @@
     "definitions": {
       "type": "object",
       "title": "Definitions",
-      "description": "A collection of reusable objects that are defined and may be used elsewhere in the BOM.",
+      "description": "A collection of reusable objects that may be referenced from elsewhere in the document or provided for interchange. The canonical form of each object is independent of any assertion, so every reference to it denotes an identical object.",
       "additionalProperties": false,
       "properties": {
+        "components": {
+          "type": "array",
+          "uniqueItems": true,
+          "title": "Components",
+          "description": "Reusable component declarations. Each entry is a concrete component that may be referenced from any position that accepts a component reference. Declaring a component here does not by itself include it in any subject. Components may also be declared here solely for interchange, without being referenced elsewhere in the document.",
+          "items": {
+            "$ref": "cyclonedx-component-2.0.schema.json#/$defs/component"
+          }
+        },
+        "parties": {
+          "type": "array",
+          "uniqueItems": true,
+          "title": "Parties",
+          "description": "Reusable party declarations. Each entry is a concrete party that may be referenced by its bom-ref from any position that accepts a party. Declaring a party here does not by itself associate the party with any subject.",
+          "items": {
+            "$ref": "cyclonedx-party-2.0.schema.json#/$defs/party"
+          }
+        },
+        "licenses": {
+          "type": "array",
+          "uniqueItems": true,
+          "title": "Licenses",
+          "description": "Reusable license declarations. Each entry is a concrete license or license expression that may be referenced by its bom-ref from any position that accepts a license reference. Declaring a license here does not by itself apply the license to any subject.",
+          "items": {
+            "$ref": "cyclonedx-license-2.0.schema.json#/$defs/licenseDeclaration"
+          }
+        },
+        "profiles": {
+          "$ref": "cyclonedx-profile-2.0.schema.json#/$defs/profiles"
+        },
+        "releaseNotes": {
+          "type": "array",
+          "uniqueItems": true,
+          "title": "Release Notes",
+          "description": "Reusable release notes declarations. Each entry may be referenced by its bom-ref from the components whose release it describes.",
+          "items": {
+            "$ref": "cyclonedx-release-notes-2.0.schema.json#/$defs/releaseNotes"
+          }
+        },
+        "certifications": {
+          "$ref": "cyclonedx-certification-2.0.schema.json#/$defs/certifications",
+          "title": "Certifications",
+          "description": "Reusable certification declarations. Each entry may be referenced by its bom-ref from the subjects it applies to."
+        },
         "standards": {
           "$ref": "cyclonedx-standard-2.0.schema.json#/$defs/standards"
         },
