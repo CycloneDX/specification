@@ -37,6 +37,13 @@ The modules exercise the tree-shaker as follows:
   (and what they transitively reach, i.e. `$defs/degrees`) are kept; the containers along the path
   (`address`, `geo`, the module itself) are hollowed; unreferenced siblings (`city`, `lon`,
   `unusedTopLevel`) and `$defs/unusedDef` are dropped.
+- `used-array-items` — refs point *into* schema arrays (`#/properties/combined/allOf/1`,
+  `#/properties/choice/oneOf/1`) and to a *non-schema* value (`#/properties/status/enum`).
+  Non-reached array siblings (`allOf/0`, `allOf/2`, `oneOf/0`) must be replaced by a void
+  `{"not": …}` placeholder — never removed, so indices and pointers stay stable, and never
+  serialised as `null`. The non-schema target is kept as a whole and its parent `status` is
+  hollowed. `$defs/keptViaArray` is kept transitively via `allOf/1`; `$defs/droppedDef` is removed.
+  A ref from the void `allOf/2` to `unused` must *not* make `unused` reachable.
 - `unused` — nothing reachable refers to it; the whole module is removed.
 - `dynamic-anchor` — declares a `$dynamicAnchor`; the tree-shaker cannot follow anchors and keeps it as is.
 
@@ -49,6 +56,9 @@ The entry schema additionally covers:
   `$defs/mainUnused` is dropped from that container.
 - an inline object property (`properties.composed`) whose own properties reference
   *properties* of a module rather than its `$defs` (see `used-properties-only` above).
+- refs into *array items* and to a *non-schema value* of a module
+  (`properties.middle`, `properties.lastChoice`, `properties.statusValues`;
+  see `used-array-items` above).
 
 Inside the fixtures, the annotation keywords have distinct roles:
 

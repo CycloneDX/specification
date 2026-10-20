@@ -54,6 +54,24 @@
           "$ref": "modules/used-properties-only.schema.json#/properties/contact"
         }
       }
+    },
+    "middle": {
+      "$comment": "Ref INTO a schema array (allOf/1) of a module -> siblings allOf/0 and allOf/2 must become void placeholders, not null; the index must stay 1.",
+      "title": "Middle",
+      "description": "The middle part of the module's combined schema.",
+      "$ref": "modules/used-array-items.schema.json#/properties/combined/allOf/1"
+    },
+    "lastChoice": {
+      "$comment": "Ref INTO the last item of a oneOf -> the preceding item must become a void placeholder.",
+      "title": "Last choice",
+      "description": "The last alternative of the module's choice.",
+      "$ref": "modules/used-array-items.schema.json#/properties/choice/oneOf/1"
+    },
+    "statusValues": {
+      "$comment": "Ref to a NON-schema value (the module's enum array). Semantically dubious, but a legal pointer -> the tree-shaker must record it as reached (no crash) and keep the enum intact.",
+      "title": "Status values",
+      "description": "Pointer to the module's status enum.",
+      "$ref": "modules/used-array-items.schema.json#/properties/status/enum"
     }
   },
   "$defs": {
