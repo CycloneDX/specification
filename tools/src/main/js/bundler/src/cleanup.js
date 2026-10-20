@@ -43,8 +43,6 @@ const HOLLOW_COMMENT =
  */
 
 
-const JP_DEFS_PREFIX = `${JP_PREFIX}${DEFS_KEYWORD}${JP_PREFIX}`;
-
 /**
  * Tree-shake a schema in place.
  *
@@ -65,9 +63,9 @@ export const treeShake = (schema) => {
 
     /**
      * JSON pointers of all reached schemas.
-     * @type {Set<JsonPointer>}
+     * @type {JsonPointer[]}
      */
-    const reached = new Set();
+    const reached = [];
 
     /**
      * Mark phase: walk a schema and everything it references.
@@ -79,8 +77,8 @@ export const treeShake = (schema) => {
      * @returns {void}
      */
     const markReached = (s, p) => {
-        if (reached.has(p)) return;
-        reached.add(p);
+        if (reached.includes(p)) return;
+        reached.push(p);
         for (const k of REF_KEYWORDS) {
             const v = s[k];
             if (typeof v !== 'string' || !v.startsWith(REF_FRAG_SEP)) {
@@ -105,22 +103,23 @@ export const treeShake = (schema) => {
         });
     };
 
-    const _schemaSwept = new Map();
+    /** @type {Map<JsonPointer, boolean>} */
+    const _schemaSweepRes = new Map();
     /**
      * Sweep phase: sweep non-reached from array.
      * @param {Array} a
      * @param {JsonPointer} p
      * @returns {boolean} still has items
      */
-    const sweepArray = (a, p) => {
+    const _sweepArray = (a, p) => {
         for (const [k, v] of a.entries()) {
             const kP = `${p}${JP_PREFIX}${String(k)}`;
-            if (reached.has(kP)) continue;
+            if (reached.includes(kP)) continue;
             if (typeof v === 'object' && v !== null) {
                 if (Array.isArray(v)) {
-                    if (sweepArray(v, kP)) continue;
+                    if (_sweepArray(v, kP)) continue;
                 } else {
-                    if (sweepObject(v, kP)) continue;
+                    if (_sweepObject(v, kP)) continue;
                 }
             }
             delete a[k];
@@ -134,19 +133,17 @@ export const treeShake = (schema) => {
      * @param {JsonPointer} p
      * @returns {boolean} not completely empty
      */
-    const sweepObject = (o, p) => {
-        if (_schemaSwept.has(p)) {
-            console.debug('_schemaSwept has ', p, _schemaSwept.get(p));
-            return _schemaSwept.get(p);
-        } console.debug('sweep opbject', p);
+    const _sweepObject = (o, p) => {
+        const schemaSweepRes = _schemaSweepRes.get(p);
+        if (schemaSweepRes !== undefined) return schemaSweepRes;
         for (const [k, v] of Object.entries(o)) {
             const kP = `${p}${JP_PREFIX}${escapeJsonPointer(k)}`;
-            if (reached.has(kP)) continue;
+            if (reached.includes(kP)) continue;
             if (typeof v === 'object' && v !== null) {
                 if (Array.isArray(v)) {
-                    if (sweepArray(v, kP)) continue;
+                    if (_sweepArray(v, kP)) continue;
                 } else {
-                    if (sweepObject(v, kP)) continue;
+                    if (_sweepObject(v, kP)) continue;
                 }
             }
             delete o[k];
@@ -163,16 +160,16 @@ export const treeShake = (schema) => {
     const sweepSchema = (s, p) => {
         if (ANCHOR_KEYWORDS.values().some(k => Object.hasOwn(s, k))) {
             // we do NOT support anchors, yet -> keep as is for now
-            _schemaSwept.set(p, true);
+            _schemaSweepRes.set(p, true);
             return true;
         }
-        const isReached = reached.has(p);
-        const candidates = Object.freeze(new Set(isReached
+        const isReached = reached.includes(p);
+        const candidates = Object.freeze(isReached
             ? [DEFS_KEYWORD]
-            : Object.keys(s)));
+            : Object.keys(s));
         subschemas(s).forEach(([sSchema, sRel]) => {
             const sRel0 = sRel[0];
-            if (!candidates.has(sRel0)) return;
+            if (!candidates.includes(sRel0)) return;
             const sP = `${p}${jsonPointer4stack(sRel)}`;
             const notEmpty = sweepSchema(sSchema, sP);
             if (notEmpty) return;
@@ -183,12 +180,12 @@ export const treeShake = (schema) => {
             const v = s[c];
             if (v === undefined) continue;
             const cP = `${p}${JP_PREFIX}${escapeJsonPointer(c)}`;
-            if (reached.has(cP)) continue;
+            if (reached.includes(cP)) continue;
             if (typeof v === 'object' && v !== null) {
                 if (Array.isArray(v)) {
-                    if (sweepArray(v, cP)) continue;
+                    if (_sweepArray(v, cP)) continue;
                 } else {
-                    if (sweepObject(v, cP)) continue;
+                    if (_sweepObject(v, cP)) continue;
                 }
             }
             delete s[c];
@@ -199,8 +196,7 @@ export const treeShake = (schema) => {
             s[NOT_KEYWORD] = {[COMMENT_KEYWORD]: HOLLOW_COMMENT};
             hollowed.push(p);
         }
-        _schemaSwept.set(p, notEmpty);
-        console.debug('> _schemaSwept', p, notEmpty); // TODO remove
+        _schemaSweepRes.set(p, notEmpty);
         return notEmpty;
     };
 
@@ -208,17 +204,16 @@ export const treeShake = (schema) => {
     Object.freeze(reached);
     sweepSchema(schema, ROOT_POINTER);
 
-    // TODO: removed shall not include all leaves - just the mst common
-    //       "#/$defs/used-properties-only/$defs/unusedDef",
-    //       "#/$defs/used-properties-only/$defs/unusedDef/$comment",
-    //       "#/$defs/used-properties-only/$defs/unusedDef/description",
-    //       "#/$defs/used-properties-only/$defs/unusedDef/title",
-    //       "#/$defs/used-properties-only/$defs/unusedDef/type",
-    //   shell become just "#/$defs/used-properties-only/$defs/unusedDef",
-
     return {
-        reached: Array.from(reached, r => `${REF_FRAG_SEP}${r}`).sort(),
+        reached: reached.map(r => `${REF_FRAG_SEP}${r}`).sort(),
         hollowed: hollowed.map(r => `${REF_FRAG_SEP}${r}`).sort(),
-        removed: removed.map(r => `${REF_FRAG_SEP}${r}`).sort()
+        removed: removed.filter((v,i,a) => {
+                let l = v.lastIndexOf(JP_PREFIX);
+                while (l > 0) {
+                    if (a.includes(v.slice(0, l))) return false;
+                    l = v.lastIndexOf(JP_PREFIX, l - 1);
+                }
+                return true;
+            }).map(r => `${REF_FRAG_SEP}${r}`).sort()
     };
 };
