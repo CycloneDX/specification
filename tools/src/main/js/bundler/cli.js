@@ -154,6 +154,7 @@ if (import.meta.main) {
             console.info(`bundler: external (${bundled.external.length}):`, bundled.external);
 
             console.info(`tree-shake: hollowed (${shaken.hollowed.length}):`, shaken.hollowed);
+            console.info(`tree-shake: voided (${shaken.voided.length}):`, shaken.voided);
             console.info(`tree-shake: removed (${shaken.removed.length}):`, shaken.removed);
 
             if (validationWarnings.length) {

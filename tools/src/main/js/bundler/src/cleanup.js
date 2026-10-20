@@ -6,7 +6,8 @@ import {
 import {
     ANCHOR_KEYWORDS, COMMENT_KEYWORD, DEFS_KEYWORD, DESCRIPTION_KEYWORD, NOT_KEYWORD, REF_KEYWORDS, TITLE_KEYWORD,
     REF_FRAG_SEP,
-    isSchemaObject, subschemas
+    isSchemaObject, subschemas,
+    SCHEMA_ARRAY
 } from './helpers/json-schema-spec.js';
 
 /**
@@ -24,6 +25,13 @@ const HOLLOW_COMMENT =
     'and only remains as a container for definitions that are still in use. ' +
     'Itself must not be used for validation.';
 
+const VOID_COMMENT =
+    'This schema is void: it was not referenced and was removed. ' +
+    'It only remains as a placeholder to keep sibling positions stable. ' +
+    'Itself must not be used for validation.';
+
+/** Fresh object per call - `dropComments` mutates in place. */
+const makeVoidSchema = () => ({[NOT_KEYWORD]: {[COMMENT_KEYWORD]: VOID_COMMENT}});
 
 /** @typedef {import('./helpers/json-pointer-spec.js').JsonPointer} JsonPointer */
 
@@ -36,6 +44,7 @@ const HOLLOW_COMMENT =
  * @typedef {object} TreeShakeResult
  * @property {LocalRef[]} reached
  * @property {LocalRef[]} hollowed
+ * @property {LocalRef[]} voided
  * @property {LocalRef[]} removed
  */
 
@@ -76,13 +85,15 @@ export const treeShake = (schema) => {
     const removed = [];
     /** @type {JsonPointer[]} */
     const hollowed = [];
+    /** @type {JsonPointer[]} */
+    const voided = [];
 
     /**
      * JSON Pointers of everything reached from the root:
      * schemas, and non-schema values that are ref targets.
-     * @type {JsonPointer[]}
+     * @type {Set<JsonPointer>}
      */
-    const reached = [];
+    const reached = new Set();
 
     /**
      * Mark phase: walk a schema and everything it references.
@@ -95,8 +106,8 @@ export const treeShake = (schema) => {
      * @throws {RangeError} on a local ref whose fragment is not a JSON Pointer
      */
     const markReached = (s, p) => {
-        if (reached.includes(p)) return;
-        reached.push(p);
+        if (reached.has(p)) return;
+        reached.add(p);
         for (const k of REF_KEYWORDS) {
             const v = s[k];
             if (typeof v !== 'string' || !v.startsWith(REF_FRAG_SEP)) {
@@ -112,7 +123,7 @@ export const treeShake = (schema) => {
             if (isSchemaObject(tSchema)) {
                 markReached(tSchema, frag);
             } else {
-                reached.push(frag);
+                reached.add(frag);
             }
         }
         subschemas(s).forEach(([sSchema, sRel]) => {
@@ -129,24 +140,37 @@ export const treeShake = (schema) => {
      */
     const _schemaSweepRes = new Map();
     /**
-     * Sweep phase: sweep non-reached items from a non-schema array
-     * (e.g. `allOf`, `enum`, `required`).
+     * Sweep phase: sweep non-reached items from an array.
+     *
+     * - Data arrays (`enum`, `required`, …) are values, not containers: they are never
+     *   partially swept. Returns whether any item is a ref target; the caller then keeps
+     *   or drops the array as a whole. (The array itself being reached is checked by the caller.)
+     * - Schema arrays (`allOf`, …): non-reached items are replaced by a void schema,
+     *   so indices - and therefore JSON pointers into the array - stay stable.
+     *
      * @param {Array} a
      * @param {JsonPointer} p
-     * @returns {boolean} whether any item remains
+     * @param {boolean} isSchemaArray
+     * @returns {boolean} whether anything was kept
      */
-    const _sweepArray = (a, p) => {
+    const _sweepArray = (a, p, isSchemaArray) => {
+        const itemP = (k) => `${p}${JP_PREFIX}${k}`;
+        if (!isSchemaArray) {
+            return a.some((_, k) => reached.has(itemP(k)));
+        }
+        let kept = false;
         for (const [k, v] of a.entries()) {
-            const kP = `${p}${JP_PREFIX}${String(k)}`;
-            if (reached.includes(kP)) continue;
-            if (v === null || typeof v !== 'object'
-                || (Array.isArray(v) ? _sweepArray : _sweepObject)(v, kP) === false
-            ) {
-                delete a[k];
-                removed.push(kP);
+            const kP = itemP(k);
+            if (reached.has(kP) || (
+                isSchemaObject(v) && _sweepObject(v, kP)
+            )) {
+                kept = true;
+            } else {
+                a[k] = makeVoidSchema();
+                voided.push(kP);
             }
         }
-        return a.some(() => true);
+        return kept;
     };
     /**
      * Sweep phase: sweep non-reached members from a non-schema object
@@ -161,10 +185,12 @@ export const treeShake = (schema) => {
         if (schemaSweepRes !== undefined) return schemaSweepRes;
         for (const [k, v] of Object.entries(o)) {
             const kP = `${p}${JP_PREFIX}${escapeJsonPointer(k)}`;
-            if (reached.includes(kP)) continue;
-            if (v === null || typeof v !== 'object'
-                || (Array.isArray(v) ? _sweepArray : _sweepObject)(v, kP) === false
-            ) {
+            if (reached.has(kP)) continue;
+            if (v === null || typeof v !== 'object' || (
+                Array.isArray(v)
+                    ? _sweepArray(v, kP, false)
+                    : _sweepObject(v, kP)
+            ) === false) {
                 delete o[k];
                 removed.push(kP);
             }
@@ -185,31 +211,32 @@ export const treeShake = (schema) => {
      * @throws {Error} if the schema is to be hollowed but already has a `not` keyword
      */
     const sweepSchema = (s, p) => {
-        if (ANCHOR_KEYWORDS.values().some(k => Object.hasOwn(s, k))) {
+        if (Object.keys(s).some(k => ANCHOR_KEYWORDS.has(k))) {
             // we do NOT support anchors, yet -> keep as is for now
             _schemaSweepRes.set(p, true);
             return true;
         }
-        const isReached = reached.includes(p);
+        const isReached = reached.has(p);
         const candidates = Object.freeze(isReached
             ? [DEFS_KEYWORD]
             : Object.keys(s).filter(k => !treeShakeSchemaKeep.has(k)));
-        subschemas(s).forEach(([sSchema, sRel]) => {
-            if (!candidates.includes(sRel[0])) return;
-            const sP = `${p}${jsonPointer4stack(sRel)}`;
-            if (sweepSchema(sSchema, sP) === false) {
-                objectDeleteOwnPath(s, sRel);
-                removed.push(sP);
+        // 1. recurse only - fills `_schemaSweepRes`; all removal happens in step 2.
+        for (const [sSchema, sRel] of subschemas(s)) {
+            if (candidates.includes(sRel[0])) {
+                sweepSchema(sSchema, `${p}${jsonPointer4stack(sRel)}`);
             }
-        });
+        }
+        // 2. remove / void non-reached candidates
         for (const c of candidates) {
             const v = s[c];
             if (v === undefined) continue;
             const cP = `${p}${JP_PREFIX}${escapeJsonPointer(c)}`;
-            if (reached.includes(cP)) continue;
-            if (v === null || typeof v !== 'object'
-                || (Array.isArray(v) ? _sweepArray : _sweepObject)(v, cP) === false
-            ) {
+            if (reached.has(cP)) continue;
+            if (v === null || typeof v !== 'object' || (
+                Array.isArray(v)
+                    ? _sweepArray(v, cP, SCHEMA_ARRAY.has(c))
+                    : _sweepObject(v, cP)
+            ) === false) {
                 delete s[c];
                 removed.push(cP);
             }
@@ -231,8 +258,9 @@ export const treeShake = (schema) => {
     sweepSchema(schema, ROOT_POINTER);
 
     return {
-        reached: reached.map(r => `${REF_FRAG_SEP}${r}`).sort(),
+        reached: Array.from(reached, r => `${REF_FRAG_SEP}${r}`).sort(),
         hollowed: hollowed.map(r => `${REF_FRAG_SEP}${r}`).sort(),
+        voided: voided.map(r => `${REF_FRAG_SEP}${r}`).sort(),
         removed: removed.filter((v, i, a) => {
             let l = v.lastIndexOf(JP_PREFIX);
             while (l > 0) {
