@@ -73,8 +73,7 @@ const makeTreeShakeResult = (reached, hollowed, voided, removed) => {
         reached: Array.from(reached, makeLocalRef).sort(),
         hollowed: Array.from(hollowed.values(), makeLocalRef).sort(),
         voided: Array.from(voided.values(), makeLocalRef).sort(),
-        removed: Array.from(removed.values().filter(
-            r => !hasGoneAncestor(r)), makeLocalRef).sort()
+        removed: Array.from(removed, makeLocalRef).sort()
     };
 }
 
