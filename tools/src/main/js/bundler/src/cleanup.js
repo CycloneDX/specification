@@ -1,19 +1,12 @@
 import {objectDeleteOwnPath, objectGetOwnPath, PATH_NOT_FOUND} from "./helpers/common.js";
 import {
-    escapeJsonPointer,
-    isJsonPointer,
-    jsonPointer2stack,
-    jsonPointer4stack,
+    escapeJsonPointer, isJsonPointer, jsonPointer2stack, jsonPointer4stack,
     PREFIX as JP_PREFIX, ROOT_POINTER
 } from "./helpers/json-pointer-spec.js";
 import {
-    ANCHOR_KEYWORDS,
-    COMMENT_KEYWORD,
-    DEFS_KEYWORD,
-    isSchemaObject, NOT_KEYWORD,
+    ANCHOR_KEYWORDS, COMMENT_KEYWORD, DEFS_KEYWORD, DESCRIPTION_KEYWORD, NOT_KEYWORD, REF_KEYWORDS, TITLE_KEYWORD,
     REF_FRAG_SEP,
-    REF_KEYWORDS,
-    subschemas
+    isSchemaObject, subschemas
 } from './helpers/json-schema-spec.js';
 
 /**
@@ -42,8 +35,11 @@ const HOLLOW_COMMENT =
  * @property {JsonPointer[]} removed
  */
 
+/**
+ * Which schema keys shall survive the tree shaking.
+ */
 const treeShakeSchemaKeep = Object.freeze(new Set([
-    'title', 'description', `$comment`,
+    TITLE_KEYWORD, DESCRIPTION_KEYWORD, COMMENT_KEYWORD,
 ]));
 
 /**
@@ -51,8 +47,9 @@ const treeShakeSchemaKeep = Object.freeze(new Set([
  *
  * References support JSON pointer only, no support for anchors, yet.
  *
- * Removes non-reached definitions.
- * Hollows non-reached definitions, when sub-definitions are kept.
+ * Removes non-reached schemaparts definitions.
+ * Hollows non-reached schemas, when structural sub-elements are kept.
+ * - keeps the keys from `treeShakeSchemaKeep`.
  * - Hollowed schemas are marked with `"not":{"$comment":HOLLOW_COMMENT}`.
  *
  * @param {*} schema
@@ -118,15 +115,12 @@ export const treeShake = (schema) => {
         for (const [k, v] of a.entries()) {
             const kP = `${p}${JP_PREFIX}${String(k)}`;
             if (reached.includes(kP)) continue;
-            if (typeof v === 'object' && v !== null) {
-                if (Array.isArray(v)) {
-                    if (_sweepArray(v, kP)) continue;
-                } else {
-                    if (_sweepObject(v, kP)) continue;
-                }
+            if (v === null || typeof v !== 'object'
+                || (Array.isArray(v) ? _sweepArray : _sweepObject)(v, kP) === false
+            ) {
+                delete a[k];
+                removed.push(kP);
             }
-            delete a[k];
-            removed.push(kP);
         }
         return a.some(() => true);
     };
@@ -142,15 +136,12 @@ export const treeShake = (schema) => {
         for (const [k, v] of Object.entries(o)) {
             const kP = `${p}${JP_PREFIX}${escapeJsonPointer(k)}`;
             if (reached.includes(kP)) continue;
-            if (typeof v === 'object' && v !== null) {
-                if (Array.isArray(v)) {
-                    if (_sweepArray(v, kP)) continue;
-                } else {
-                    if (_sweepObject(v, kP)) continue;
-                }
+            if (v === null || typeof v !== 'object'
+                || (Array.isArray(v) ? _sweepArray : _sweepObject)(v, kP) === false
+            ) {
+                delete o[k];
+                removed.push(kP);
             }
-            delete o[k];
-            removed.push(kP);
         }
         return Object.keys(o).length > 0;
     };
@@ -171,31 +162,30 @@ export const treeShake = (schema) => {
             ? [DEFS_KEYWORD]
             : Object.keys(s).filter(k => !treeShakeSchemaKeep.has(k)));
         subschemas(s).forEach(([sSchema, sRel]) => {
-            const sRel0 = sRel[0];
-            if (!candidates.includes(sRel0)) return;
+            if (!candidates.includes(sRel[0])) return;
             const sP = `${p}${jsonPointer4stack(sRel)}`;
-            const notEmpty = sweepSchema(sSchema, sP);
-            if (notEmpty) return;
-            objectDeleteOwnPath(s, sRel);
-            removed.push(sP);
+            if (sweepSchema(sSchema, sP) === false) {
+                objectDeleteOwnPath(s, sRel);
+                removed.push(sP);
+            }
         });
         for (const c of candidates) {
             const v = s[c];
             if (v === undefined) continue;
             const cP = `${p}${JP_PREFIX}${escapeJsonPointer(c)}`;
             if (reached.includes(cP)) continue;
-            if (typeof v === 'object' && v !== null) {
-                if (Array.isArray(v)) {
-                    if (_sweepArray(v, cP)) continue;
-                } else {
-                    if (_sweepObject(v, cP)) continue;
-                }
+            if (v === null || typeof v !== 'object'
+                || (Array.isArray(v) ? _sweepArray : _sweepObject)(v, cP) === false
+            ) {
+                delete s[c];
+                removed.push(cP);
             }
-            delete s[c];
-            removed.push(cP);
         }
         const notEmpty = Object.keys(s).some(k => !treeShakeSchemaKeep.has(k));
         if (!isReached && notEmpty) {
+            if (Object.hasOwn(s, NOT_KEYWORD)) {
+                throw new Error(`Collision ${p}${JP_PREFIX}${NOT_KEYWORD}`);
+            }
             s[NOT_KEYWORD] = {[COMMENT_KEYWORD]: HOLLOW_COMMENT};
             hollowed.push(p);
         }
@@ -210,13 +200,13 @@ export const treeShake = (schema) => {
     return {
         reached: reached.map(r => `${REF_FRAG_SEP}${r}`).sort(),
         hollowed: hollowed.map(r => `${REF_FRAG_SEP}${r}`).sort(),
-        removed: removed.filter((v,i,a) => {
-                let l = v.lastIndexOf(JP_PREFIX);
-                while (l > 0) {
-                    if (a.includes(v.slice(0, l))) return false;
-                    l = v.lastIndexOf(JP_PREFIX, l - 1);
-                }
-                return true;
-            }).map(r => `${REF_FRAG_SEP}${r}`).sort()
+        removed: removed.filter((v, i, a) => {
+            let l = v.lastIndexOf(JP_PREFIX);
+            while (l > 0) {
+                if (a.includes(v.slice(0, l))) return false;
+                l = v.lastIndexOf(JP_PREFIX, l - 1);
+            }
+            return true;
+        }).map(r => `${REF_FRAG_SEP}${r}`).sort()
     };
 };

@@ -24,6 +24,10 @@ export const DATA_KEYWORDS = Object.freeze(new Set(['enum', 'const', 'examples',
 
 export const NOT_KEYWORD = 'not';
 
+export const TITLE_KEYWORD = 'title';
+export const DESCRIPTION_KEYWORD = 'description';
+
+
 const SINGLE_SCHEMA = Object.freeze(new Set([
     'additionalProperties', 'propertyNames',
     'items', 'contains',
