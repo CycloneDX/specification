@@ -90,8 +90,13 @@
       }
     },
     "used-properties-only": {
+      "title": "Used properties only",
+      "description": "A module of which only nested properties are referenced.",
       "properties": {
         "address": {
+          "$comment": "Reached only through its nested children, never as a whole -> the container stays hollow, only the referenced children survive.",
+          "title": "Address",
+          "description": "A postal address.",
           "properties": {
             "street": {
               "$comment": "Reached from main via #/properties/address/properties/street.",
@@ -100,6 +105,9 @@
               "type": "string"
             },
             "geo": {
+              "$comment": "Reached from main via a three-level deep pointer into #/properties/address/properties/geo/properties/lat.",
+              "title": "Geo",
+              "description": "Geographic coordinates.",
               "properties": {
                 "lat": {
                   "$comment": "Deeply nested leaf that is referenced directly from main. Has an internal ref -> transitively keeps $defs/degrees.",
@@ -153,6 +161,8 @@
       }
     },
     "used-subdefs-only": {
+      "title": "Used sub-defs only",
+      "description": "A module of which only individual definitions are referenced.",
       "$defs": {
         "kept": {
           "$comment": "Reached from main. Exercises three ref flavours.",

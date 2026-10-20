@@ -42,6 +42,9 @@ const HOLLOW_COMMENT =
  * @property {JsonPointer[]} removed
  */
 
+const treeShakeSchemaKeep = Object.freeze(new Set([
+    'title', 'description', `$comment`,
+]));
 
 /**
  * Tree-shake a schema in place.
@@ -166,7 +169,7 @@ export const treeShake = (schema) => {
         const isReached = reached.includes(p);
         const candidates = Object.freeze(isReached
             ? [DEFS_KEYWORD]
-            : Object.keys(s));
+            : Object.keys(s).filter(k => !treeShakeSchemaKeep.has(k)));
         subschemas(s).forEach(([sSchema, sRel]) => {
             const sRel0 = sRel[0];
             if (!candidates.includes(sRel0)) return;
@@ -191,7 +194,7 @@ export const treeShake = (schema) => {
             delete s[c];
             removed.push(cP);
         }
-        const notEmpty = Object.keys(s).length > 0;
+        const notEmpty = Object.keys(s).some(k => !treeShakeSchemaKeep.has(k));
         if (!isReached && notEmpty) {
             s[NOT_KEYWORD] = {[COMMENT_KEYWORD]: HOLLOW_COMMENT};
             hollowed.push(p);
