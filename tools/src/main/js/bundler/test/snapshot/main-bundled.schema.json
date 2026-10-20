@@ -54,6 +54,24 @@
           "$ref": "#/$defs/used-properties-only/properties/contact"
         }
       }
+    },
+    "middle": {
+      "$comment": "Ref INTO a schema array (allOf/1) of a module -> siblings allOf/0 and allOf/2 must become void placeholders, not null; the index must stay 1.",
+      "title": "Middle",
+      "description": "The middle part of the module's combined schema.",
+      "$ref": "#/$defs/used-array-items/properties/combined/allOf/1"
+    },
+    "lastChoice": {
+      "$comment": "Ref INTO the last item of a oneOf -> the preceding item must become a void placeholder.",
+      "title": "Last choice",
+      "description": "The last alternative of the module's choice.",
+      "$ref": "#/$defs/used-array-items/properties/choice/oneOf/1"
+    },
+    "statusValues": {
+      "$comment": "Ref to a NON-schema value (the module's enum array). Semantically dubious, but a legal pointer -> the tree-shaker must record it as reached (no crash) and keep the enum intact.",
+      "title": "Status values",
+      "description": "Pointer to the module's status enum.",
+      "$ref": "#/$defs/used-array-items/properties/status/enum"
     }
   },
   "$defs": {
@@ -105,6 +123,95 @@
           "title": "Pulls nothing in",
           "description": "A flag defined by another module.",
           "$ref": "#/$defs/used-whole/$defs/unusedButKept"
+        }
+      }
+    },
+    "used-array-items": {
+      "title": "Used array items",
+      "description": "A module of which only individual array items and a non-schema value are referenced.",
+      "type": "object",
+      "properties": {
+        "combined": {
+          "$comment": "Only allOf/1 is referenced from main. allOf/0 and allOf/2 are not reached -> they must become void placeholders, never JSON null, so that the index of allOf/1 stays stable. 'combined' itself is not reached -> hollowed.",
+          "title": "Combined",
+          "description": "A composition of which only the middle part is referenced.",
+          "allOf": [
+            {
+              "$comment": "allOf/0: NOT referenced -> void placeholder.",
+              "title": "Combined part 0",
+              "description": "The first part.",
+              "type": "object",
+              "properties": {
+                "a": {
+                  "title": "A",
+                  "description": "An unreferenced value.",
+                  "type": "string"
+                }
+              }
+            },
+            {
+              "$comment": "allOf/1: referenced from main via #/properties/combined/allOf/1 -> kept as a whole, including its internal ref to $defs/keptViaArray.",
+              "title": "Combined part 1",
+              "description": "The middle part.",
+              "type": "object",
+              "properties": {
+                "b": {
+                  "title": "B",
+                  "description": "A value defined in this module.",
+                  "$ref": "#/$defs/used-array-items/$defs/keptViaArray"
+                }
+              }
+            },
+            {
+              "$comment": "allOf/2: NOT referenced -> void placeholder. Its ref must NOT make unused.schema.json reachable.",
+              "title": "Combined part 2",
+              "description": "The last part.",
+              "$ref": "#/$defs/unused"
+            }
+          ]
+        },
+        "choice": {
+          "$comment": "Only the LAST item of oneOf is referenced -> oneOf/0 becomes a void placeholder, oneOf/1 is kept.",
+          "title": "Choice",
+          "description": "A choice of which only the last alternative is referenced.",
+          "oneOf": [
+            {
+              "$comment": "oneOf/0: NOT referenced -> void placeholder.",
+              "title": "Choice 0",
+              "description": "The first alternative.",
+              "type": "null"
+            },
+            {
+              "$comment": "oneOf/1: referenced from main via #/properties/choice/oneOf/1.",
+              "title": "Choice 1",
+              "description": "The second alternative.",
+              "type": "integer"
+            }
+          ]
+        },
+        "status": {
+          "$comment": "A NON-schema value of this schema (the enum array) is referenced from main via #/properties/status/enum. The enum must be kept as a whole; 'status' itself is not reached -> hollowed; its 'type' is dropped.",
+          "title": "Status",
+          "description": "A status value.",
+          "type": "string",
+          "enum": [
+            "on",
+            "off"
+          ]
+        }
+      },
+      "$defs": {
+        "keptViaArray": {
+          "$comment": "Only reachable via combined.allOf/1.",
+          "title": "Kept via array",
+          "description": "A boolean value.",
+          "type": "boolean"
+        },
+        "droppedDef": {
+          "$comment": "Not reachable -> shaken away.",
+          "title": "Dropped def",
+          "description": "A definition nothing reachable refers to.",
+          "type": "null"
         }
       }
     },
