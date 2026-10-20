@@ -170,6 +170,39 @@ export const treeShake = (schema) => {
      */
     const _schemaSweepRes = new Map();
     /**
+     * Sweep phase: sweep a non-reached value of any kind.
+     *
+     * - Scalars/`null` are values, not containers: nothing of them can be reached -> gone.
+     * - Arrays are delegated to {@link _sweepArray}.
+     * - Objects (schemas or maps) are delegated to {@link _sweepObject}.
+     *
+     * @param {*} v
+     * @param {JsonPointer} p pointer of `v`
+     * @param {boolean} isSchemaArray whether an array `v` is a schema array (`allOf`, …)
+     * @returns {boolean} whether anything of `v` is kept
+     */
+    const _sweepValue = (v, p, isSchemaArray) => {
+        if (v === null || typeof v !== 'object') return false;
+        return Array.isArray(v)
+            ? _sweepArray(v, p, isSchemaArray)
+            : _sweepObject(v, p);
+    };
+    /**
+     * Sweep phase: remove a non-reached member `k` of `o` if nothing of it is kept.
+     * @param {*} o container
+     * @param {string} k key in `o`
+     * @param {JsonPointer} kP pointer of `o[k]`
+     * @param {boolean} isSchemaArray see {@link _sweepValue}
+     * @returns {boolean} whether the member was kept
+     */
+    const _sweepMember = (o, k, kP, isSchemaArray) => {
+        if (reached.has(kP)) return true;
+        if (_sweepValue(o[k], kP, isSchemaArray)) return true;
+        delete o[k];
+        removed.add(kP);
+        return false
+    };
+    /**
      * Sweep phase: sweep non-reached items from an array.
      *
      * - Data arrays (`enum`, `required`, …) are values, not containers: they are never
@@ -213,17 +246,10 @@ export const treeShake = (schema) => {
     const _sweepObject = (o, p) => {
         const schemaSweepRes = _schemaSweepRes.get(p);
         if (schemaSweepRes !== undefined) return schemaSweepRes;
-        for (const [k, v] of Object.entries(o)) {
-            const kP = `${p}${JP_PREFIX}${escapeJsonPointer(k)}`;
-            if (reached.has(kP)) continue;
-            if (v === null || typeof v !== 'object' || (
-                Array.isArray(v)
-                    ? _sweepArray(v, kP, false)
-                    : _sweepObject(v, kP)
-            ) === false) {
-                delete o[k];
-                removed.add(kP);
-            }
+        for (const k of Object.keys(o)) {
+            _sweepMember(o, k,
+                `${p}${JP_PREFIX}${escapeJsonPointer(k)}`,
+                false);
         }
         return Object.keys(o).length > 0;
     };
@@ -258,17 +284,10 @@ export const treeShake = (schema) => {
         }
         // 2. remove / void non-reached candidates
         for (const c of candidates) {
-            const v = s[c];
-            if (v === undefined) continue;
-            const cP = `${p}${JP_PREFIX}${escapeJsonPointer(c)}`;
-            if (reached.has(cP)) continue;
-            if (v === null || typeof v !== 'object' || (
-                Array.isArray(v)
-                    ? _sweepArray(v, cP, SCHEMA_ARRAY.has(c))
-                    : _sweepObject(v, cP)
-            ) === false) {
-                delete s[c];
-                removed.add(cP);
+            if (Object.hasOwn(s, c)) {
+                _sweepMember(s, c,
+                    `${p}${JP_PREFIX}${escapeJsonPointer(c)}`,
+                    SCHEMA_ARRAY.has(c));
             }
         }
         const notEmpty = Object.keys(s).some(k => !treeShakeSchemaKeep.has(k));
