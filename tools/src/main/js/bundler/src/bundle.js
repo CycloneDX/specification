@@ -143,7 +143,7 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
                 }
                 rewiredRS = {
                     path: null,
-                    frag: (refFile === entryFile && frag === null
+                    frag: (refFile === entryFile && !frag?.startsWith(FRAG_DEFS_PREFIX)
                             ? ROOT_POINTER
                             : `${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`
                     ) + (frag ?? '')
