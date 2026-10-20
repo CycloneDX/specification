@@ -137,13 +137,13 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
                 : sourceFile;
             const moduleName = fileModuleNames.get(refFile);
             if (moduleName) {
-                if (frag && !isJsonPointer(frag)) {
+                if (frag !== null && !isJsonPointer(frag)) {
                     // currently dont support anchors - only JSON pointer.
                     throw new RangeError(`Unsupported ref fragment: ${v}`);
                 }
                 rewiredRS = {
                     path: null,
-                    frag: (refFile === entryFile && (frag === null || frag === ROOT_POINTER)
+                    frag: (refFile === entryFile && frag === null
                             ? ROOT_POINTER
                             : `${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`
                     ) + (frag ?? '')
