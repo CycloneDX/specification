@@ -26,7 +26,6 @@ const HOLLOW_COMMENT =
 
 
 /** @typedef {import('./helpers/json-pointer-spec.js').JsonPointer} JsonPointer */
-/** @typedef {import('./helpers/json-pointer-spec.js').JsonPointerStack} JsonPointerStack */
 
 /**
  * @typedef {object} TreeShakeResult
