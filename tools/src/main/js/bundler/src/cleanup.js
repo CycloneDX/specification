@@ -49,6 +49,43 @@ const makeVoidSchema = () => ({[NOT_KEYWORD]: {[COMMENT_KEYWORD]: VOID_COMMENT}}
  */
 
 /**
+ * @param {string} s
+ * @return {LocalRef}
+ */
+const makeLocalRef = (s) => `${REF_FRAG_SEP}${s}`;
+
+/**
+ * @param {Readonly<Set<JsonPointer>>} reached
+ * @param {Readonly<Set<JsonPointer>>} hollowed
+ * @param {Readonly<Set<JsonPointer>>} voided
+ * @param {Readonly<Set<JsonPointer>>} removed
+ * @return {TreeShakeResult}
+ */
+const makeTreeShakeResult = (reached, hollowed, voided, removed) => {
+    const shakenRemoved = new Set(removed.values().filter(v => {
+        let l = v.lastIndexOf(JP_PREFIX);
+        while (l > 0) {
+            if (removed.has(v.slice(0, l))) return false;
+            l = v.lastIndexOf(JP_PREFIX, l - 1);
+        }
+        return true;
+    }));
+    /**
+     * @param {JsonPointer} p
+     * @return {boolean}
+     */
+    const notRemoved = (p) =>
+        !shakenRemoved.has(p) && !shakenRemoved.values().some(
+            r => p.startsWith(`${r}${JP_PREFIX}`));
+    return {
+        reached: Array.from(reached, makeLocalRef).sort(),
+        hollowed: Array.from(hollowed.values().filter(notRemoved), makeLocalRef).sort(),
+        voided: Array.from(voided.values().filter(notRemoved), makeLocalRef).sort(),
+        removed: Array.from(shakenRemoved, makeLocalRef).sort()
+    };
+}
+
+/**
  * Annotation keywords that are kept on hollowed schemas,
  * and that do not count when deciding whether a schema is empty.
  */
@@ -81,12 +118,12 @@ class HollowCollisionError extends Error {
  * @throws {HollowCollisionError} if a schema to be hollowed already has a `not` keyword
  */
 export const treeShake = (schema) => {
-    /** @type {JsonPointer[]} */
-    const removed = [];
-    /** @type {JsonPointer[]} */
-    const hollowed = [];
-    /** @type {JsonPointer[]} */
-    const voided = [];
+    /** @type {Set<JsonPointer>} */
+    const removed = new Set();
+    /** @type {Set<JsonPointer>} */
+    const hollowed = new Set();
+    /** @type {Set<JsonPointer>} */
+    const voided = new Set();
 
     /**
      * JSON Pointers of everything reached from the root:
@@ -167,7 +204,7 @@ export const treeShake = (schema) => {
                 kept = true;
             } else {
                 a[k] = makeVoidSchema();
-                voided.push(kP);
+                voided.add(kP);
             }
         }
         return kept;
@@ -192,7 +229,7 @@ export const treeShake = (schema) => {
                     : _sweepObject(v, kP)
             ) === false) {
                 delete o[k];
-                removed.push(kP);
+                removed.add(kP);
             }
         }
         return Object.keys(o).length > 0;
@@ -217,12 +254,12 @@ export const treeShake = (schema) => {
             return true;
         }
         const isReached = reached.has(p);
-        const candidates = Object.freeze(isReached
+        const candidates = new Set(isReached
             ? [DEFS_KEYWORD]
             : Object.keys(s).filter(k => !treeShakeSchemaKeep.has(k)));
         // 1. recurse only - fills `_schemaSweepRes`; all removal happens in step 2.
         for (const [sSchema, sRel] of subschemas(s)) {
-            if (candidates.includes(sRel[0])) {
+            if (candidates.has(sRel[0])) {
                 sweepSchema(sSchema, `${p}${jsonPointer4stack(sRel)}`);
             }
         }
@@ -238,7 +275,7 @@ export const treeShake = (schema) => {
                     : _sweepObject(v, cP)
             ) === false) {
                 delete s[c];
-                removed.push(cP);
+                removed.add(cP);
             }
         }
         const notEmpty = Object.keys(s).some(k => !treeShakeSchemaKeep.has(k));
@@ -247,7 +284,7 @@ export const treeShake = (schema) => {
                 throw new HollowCollisionError(`Collision ${p}${JP_PREFIX}${NOT_KEYWORD}`);
             }
             s[NOT_KEYWORD] = {[COMMENT_KEYWORD]: HOLLOW_COMMENT};
-            hollowed.push(p);
+            hollowed.add(p);
         }
         _schemaSweepRes.set(p, notEmpty);
         return notEmpty;
@@ -256,17 +293,9 @@ export const treeShake = (schema) => {
     markReached(schema, ROOT_POINTER);
     sweepSchema(schema, ROOT_POINTER);
 
-    return {
-        reached: Array.from(reached, r => `${REF_FRAG_SEP}${r}`).sort(),
-        hollowed: hollowed.map(r => `${REF_FRAG_SEP}${r}`).sort(),
-        voided: voided.map(r => `${REF_FRAG_SEP}${r}`).sort(),
-        removed: removed.filter((v, i, a) => {
-            let l = v.lastIndexOf(JP_PREFIX);
-            while (l > 0) {
-                if (a.includes(v.slice(0, l))) return false;
-                l = v.lastIndexOf(JP_PREFIX, l - 1);
-            }
-            return true;
-        }).map(r => `${REF_FRAG_SEP}${r}`).sort()
-    };
+    return makeTreeShakeResult(
+        reached,
+        hollowed,
+        voided,
+        removed);
 };
