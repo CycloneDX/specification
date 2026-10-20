@@ -28,10 +28,15 @@ const HOLLOW_COMMENT =
 /** @typedef {import('./helpers/json-pointer-spec.js').JsonPointer} JsonPointer */
 
 /**
+ * Local reference: a JSON Pointer prefixed with `REF_FRAG_SEP` (`#`).
+ * @typedef {string} LocalRef
+ */
+
+/**
  * @typedef {object} TreeShakeResult
- * @property {JsonPointer[]} reached
- * @property {JsonPointer[]} hollowed
- * @property {JsonPointer[]} removed
+ * @property {LocalRef[]} reached
+ * @property {LocalRef[]} hollowed
+ * @property {LocalRef[]} removed
  */
 
 /**
