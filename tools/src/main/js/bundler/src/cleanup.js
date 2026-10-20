@@ -1,4 +1,4 @@
-import {objectDeleteOwnPath, objectGetOwnPath, PATH_NOT_FOUND} from "./helpers/common.js";
+import {objectGetOwnPath, PATH_NOT_FOUND} from "./helpers/common.js";
 import {
     escapeJsonPointer, isJsonPointer, jsonPointer2stack, jsonPointer4stack,
     PREFIX as JP_PREFIX, ROOT_POINTER
@@ -254,7 +254,6 @@ export const treeShake = (schema) => {
     };
 
     markReached(schema, ROOT_POINTER);
-    Object.freeze(reached);
     sweepSchema(schema, ROOT_POINTER);
 
     return {
