@@ -112,7 +112,7 @@ export const treeShake = (schema) => {
             if (isSchemaObject(tSchema)) {
                 markReached(tSchema, frag);
             } else {
-                reached.add(frag);
+                reached.push(frag);
             }
         }
         subschemas(s).forEach(([sSchema, sRel]) => {
