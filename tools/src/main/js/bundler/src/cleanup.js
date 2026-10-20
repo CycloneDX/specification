@@ -62,26 +62,19 @@ const makeLocalRef = (s) => `${REF_FRAG_SEP}${s}`;
  * @return {TreeShakeResult}
  */
 const makeTreeShakeResult = (reached, hollowed, voided, removed) => {
-    const shakenRemoved = new Set(removed.values().filter(v => {
-        let l = v.lastIndexOf(JP_PREFIX);
-        while (l > 0) {
-            if (removed.has(v.slice(0, l))) return false;
-            l = v.lastIndexOf(JP_PREFIX, l - 1);
+    const gone = removed.union(voided);
+    const hasGoneAncestor = (p) => {
+        for (let l = p.lastIndexOf(JP_PREFIX); l > 0; l = p.lastIndexOf(JP_PREFIX, l - 1)) {
+            if (gone.has(p.slice(0, l))) return true;
         }
-        return true;
-    }));
-    /**
-     * @param {JsonPointer} p
-     * @return {boolean}
-     */
-    const notRemoved = (p) =>
-        !shakenRemoved.has(p) && !shakenRemoved.values().some(
-            r => p.startsWith(`${r}${JP_PREFIX}`));
+        return false;
+    };
     return {
         reached: Array.from(reached, makeLocalRef).sort(),
-        hollowed: Array.from(hollowed.values().filter(notRemoved), makeLocalRef).sort(),
-        voided: Array.from(voided.values().filter(notRemoved), makeLocalRef).sort(),
-        removed: Array.from(shakenRemoved, makeLocalRef).sort()
+        hollowed: Array.from(hollowed.values(), makeLocalRef).sort(),
+        voided: Array.from(voided.values(), makeLocalRef).sort(),
+        removed: Array.from(removed.values().filter(
+            r => !hasGoneAncestor(r)), makeLocalRef).sort()
     };
 }
 
