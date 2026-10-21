@@ -1,6 +1,7 @@
 import {objectGetOwnPath, PATH_NOT_FOUND} from './helpers/common.js';
 import {
-    escapeJsonPointer, isJsonPointer, jsonPointer2stack, jsonPointer4stack,
+    escapeJsonPointer, isJsonPointer,
+    jsonPointer2stack, jsonPointer4stack,
     hasAncestorIn,
     PREFIX as JP_PREFIX, ROOT_POINTER
 } from './helpers/json-pointer-spec.js';
@@ -274,7 +275,7 @@ export const treeShake = (schema) => {
                 removed.add(kP);
             }
         }
-        const kept = Object.keys(s).some(k => !treeShakeSchemaKeep.has(k));
+        const kept = isReached || Object.keys(s).some(k => !treeShakeSchemaKeep.has(k));
         // 3. mark hollow
         if (!isReached) {
             if (Object.hasOwn(s, NOT_KEYWORD)) {

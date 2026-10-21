@@ -3,15 +3,13 @@ import {ok} from 'node:assert/strict';
 
 import {JSON_SCHEMA_RE, getJsonfile, posixPath, findDuplicateValues} from './helpers/common.js';
 import {
-    escapeJsonPointer,
-    isJsonPointer,
-    PREFIX as JP_PREFIX,
-    ROOT_POINTER
+    escapeJsonPointer, isJsonPointer,
+    PREFIX as JP_PREFIX, ROOT_POINTER
 } from './helpers/json-pointer-spec.js';
 import {
     ID_KEYWORD, NOT_KEYWORD, SCHEMA_KEYWORD, COMMENT_KEYWORD, DEFS_KEYWORD, REF_KEYWORDS,
     isSchemaObject, subschemas,
-    refIsAbsolute, refSplit, refJoin, REF_FRAG_SEP,
+    refIsAbsolute, refSplit, refJoin, REF_FRAG_SEP
 } from './helpers/json-schema-spec.js';
 import {PATH_SEP as URI_PATH_SEP} from './helpers/uri.js';
 
