@@ -34,6 +34,14 @@
       "title": "Composed",
       "description": "An object assembled from parts of another module.",
       "type": "object",
+      "$defs": {
+        "rootNestedDropped": {
+          "$comment": "Nested $defs inside a REACHED property of the ROOT schema. Unreferenced -> must be removed; the root and its properties are reached, yet their $defs still need sweeping. The then-empty `$defs` object is removed too.",
+          "title": "Root nested dropped",
+          "description": "An unreferenced nested definition of the root.",
+          "type": "null"
+        }
+      },
       "properties": {
         "street": {
           "$comment": "Ref into a nested property of the module -> #/properties/address/properties/street.",
@@ -52,6 +60,12 @@
           "title": "Contact",
           "description": "The contact block of the module, as is.",
           "$ref": "#/$defs/used-properties-only/properties/contact"
+        },
+        "nested": {
+          "$comment": "Ref into the nested $defs of a REACHED property of another module -> only that nested def is kept, its sibling is removed.",
+          "title": "Nested",
+          "description": "A value defined in a property-level $defs.",
+          "$ref": "#/$defs/used-whole/properties/withDefs/$defs/nestedKept"
         }
       }
     },
@@ -72,6 +86,30 @@
       "title": "Status values",
       "description": "Pointer to the module's status enum.",
       "$ref": "#/$defs/used-array-items/properties/status/enum"
+    },
+    "midLevel": {
+      "$comment": "Pointer to ONE ITEM of a NON-schema array (enum/1) of a schema that is itself not reached. The item must stay at index 1; its siblings may become void placeholders, like in schema arrays.",
+      "title": "Mid level",
+      "description": "The middle level literal.",
+      "$ref": "#/$defs/used-array-items/properties/level/enum/1"
+    },
+    "anyValue": {
+      "$comment": "Ref to an EMPTY schema `{}`. Reached -> must survive the sweep even though it has no keys at all.",
+      "title": "Any value",
+      "description": "Accepts anything.",
+      "$ref": "#/$defs/used-subdefs-only/$defs/keptEmpty"
+    },
+    "todoValue": {
+      "$comment": "Ref to a `$comment`-only schema. Reached -> must survive and must NOT be hollowed. Becomes `{}` in the minified output.",
+      "title": "Todo value",
+      "description": "A placeholder.",
+      "$ref": "#/$defs/used-subdefs-only/$defs/keptCommentOnly"
+    },
+    "annotatedValue": {
+      "$comment": "Ref to a title/description-only schema. Reached -> must survive and must NOT be hollowed.",
+      "title": "Annotated value",
+      "description": "An annotation-only schema.",
+      "$ref": "#/$defs/used-subdefs-only/$defs/keptAnnotationsOnly"
     }
   },
   "$defs": {
@@ -172,6 +210,27 @@
           "enum": [
             "on",
             "off"
+          ],
+          "not": {
+            "$comment": "This schema is hollow: it was not referenced and only remains as a container for definitions that are still in use. Itself must not be used for validation."
+          }
+        },
+        "level": {
+          "$comment": "A single ITEM of a data array (enum/1) is referenced from main. Legal pointer, semantically dubious. 'level' itself is not reached -> hollowed, so the enum has no validation meaning anymore; enum/0 and enum/2 may become void placeholders so that the index of enum/1 stays stable. 'type' is dropped.",
+          "title": "Level",
+          "description": "A level value.",
+          "enum": [
+            {
+              "not": {
+                "$comment": "This schema is void: it was not referenced and was removed. It only remains as a placeholder to keep sibling positions stable. Itself must not be used for validation."
+              }
+            },
+            "mid",
+            {
+              "not": {
+                "$comment": "This schema is void: it was not referenced and was removed. It only remains as a placeholder to keep sibling positions stable. Itself must not be used for validation."
+              }
+            }
           ],
           "not": {
             "$comment": "This schema is hollow: it was not referenced and only remains as a container for definitions that are still in use. Itself must not be used for validation."
@@ -291,6 +350,15 @@
             }
           }
         },
+        "keptEmpty": {},
+        "keptCommentOnly": {
+          "$comment": "TODO - Reached from main, but has no structural keywords. Must NOT be removed and must NOT be hollowed; the minified output will legitimately become `{}`."
+        },
+        "keptAnnotationsOnly": {
+          "$comment": "Reached from main, carries only annotation keywords. Must NOT be removed and must NOT be hollowed.",
+          "title": "Kept annotations only",
+          "description": "A schema that is just an annotation."
+        },
         "keptTransitively": {
           "$comment": "Only reachable via kept.chain.",
           "title": "Kept transitively",
@@ -310,7 +378,35 @@
         "name": {
           "title": "Name",
           "description": "A display name.",
-          "type": "string"
+          "type": "string",
+          "$defs": {
+            "nestedDropped": {
+              "$comment": "Lives in $defs of a REACHED property (used-whole is used as a whole). Nothing refs it -> removed; the then-empty `$defs` object is removed too.",
+              "title": "Nested dropped",
+              "description": "An unreferenced nested definition.",
+              "type": "null"
+            }
+          }
+        },
+        "withDefs": {
+          "$comment": "A REACHED property carrying nested $defs of which exactly one is referenced from main.",
+          "title": "With defs",
+          "description": "A property that hosts its own definitions.",
+          "type": "string",
+          "$defs": {
+            "nestedKept": {
+              "$comment": "Referenced from main via #/$defs/used-whole/properties/withDefs/$defs/nestedKept -> kept.",
+              "title": "Nested kept",
+              "description": "A referenced nested definition.",
+              "type": "integer"
+            },
+            "nestedDropped": {
+              "$comment": "Sibling of a kept nested def, itself unreferenced -> removed.",
+              "title": "Nested dropped",
+              "description": "An unreferenced nested definition.",
+              "type": "null"
+            }
+          }
         },
         "inner": {
           "$comment": "Internal ref -> rewritten to #/$defs/used-whole/$defs/inner.",

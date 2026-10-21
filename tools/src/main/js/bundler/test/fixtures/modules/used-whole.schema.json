@@ -9,7 +9,35 @@
     "name": {
       "title": "Name",
       "description": "A display name.",
-      "type": "string"
+      "type": "string",
+      "$defs": {
+        "nestedDropped": {
+          "$comment": "Lives in $defs of a REACHED property (used-whole is used as a whole). Nothing refs it -> removed; the then-empty `$defs` object is removed too.",
+          "title": "Nested dropped",
+          "description": "An unreferenced nested definition.",
+          "type": "null"
+        }
+      }
+    },
+    "withDefs": {
+      "$comment": "A REACHED property carrying nested $defs of which exactly one is referenced from main.",
+      "title": "With defs",
+      "description": "A property that hosts its own definitions.",
+      "type": "string",
+      "$defs": {
+        "nestedKept": {
+          "$comment": "Referenced from main via #/$defs/used-whole/properties/withDefs/$defs/nestedKept -> kept.",
+          "title": "Nested kept",
+          "description": "A referenced nested definition.",
+          "type": "integer"
+        },
+        "nestedDropped": {
+          "$comment": "Sibling of a kept nested def, itself unreferenced -> removed.",
+          "title": "Nested dropped",
+          "description": "An unreferenced nested definition.",
+          "type": "null"
+        }
+      }
     },
     "inner": {
       "$comment": "Internal ref -> rewritten to #/$defs/used-whole/$defs/inner.",
