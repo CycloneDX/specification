@@ -34,14 +34,6 @@
       "title": "Composed",
       "description": "An object assembled from parts of another module.",
       "type": "object",
-      "$defs": {
-        "rootNestedDropped": {
-          "$comment": "Nested $defs inside a REACHED property of the ROOT schema. Unreferenced -> must be removed; the root and its properties are reached, yet their $defs still need sweeping. The then-empty `$defs` object is removed too.",
-          "title": "Root nested dropped",
-          "description": "An unreferenced nested definition of the root.",
-          "type": "null"
-        }
-      },
       "properties": {
         "street": {
           "$comment": "Ref into a nested property of the module -> #/properties/address/properties/street.",
@@ -378,33 +370,34 @@
         "name": {
           "title": "Name",
           "description": "A display name.",
-          "type": "string",
-          "$defs": {
-            "nestedDropped": {
-              "$comment": "Lives in $defs of a REACHED property (used-whole is used as a whole). Nothing refs it -> removed; the then-empty `$defs` object is removed too.",
-              "title": "Nested dropped",
-              "description": "An unreferenced nested definition.",
-              "type": "null"
-            }
-          }
+          "type": "string"
         },
         "withDefs": {
           "$comment": "A REACHED property carrying nested $defs of which exactly one is referenced from main.",
           "title": "With defs",
           "description": "A property that hosts its own definitions.",
-          "type": "string",
+          "anyOf": [
+            {
+              "title": "Is string",
+              "type": "string"
+            },
+            {
+              "title": "Non-zero number",
+              "type": "number",
+              "$comment": "if/then/else are intentionally NOT schema objects.",
+              "if": {
+                "const": 0
+              },
+              "then": false,
+              "else": true
+            }
+          ],
           "$defs": {
             "nestedKept": {
               "$comment": "Referenced from main via #/$defs/used-whole/properties/withDefs/$defs/nestedKept -> kept.",
               "title": "Nested kept",
               "description": "A referenced nested definition.",
               "type": "integer"
-            },
-            "nestedDropped": {
-              "$comment": "Sibling of a kept nested def, itself unreferenced -> removed.",
-              "title": "Nested dropped",
-              "description": "An unreferenced nested definition.",
-              "type": "null"
             }
           }
         },

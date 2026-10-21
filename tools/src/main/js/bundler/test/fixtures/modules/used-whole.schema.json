@@ -23,7 +23,43 @@
       "$comment": "A REACHED property carrying nested $defs of which exactly one is referenced from main.",
       "title": "With defs",
       "description": "A property that hosts its own definitions.",
-      "type": "string",
+      "anyOf": [
+        {
+          "title": "Is string",
+          "type": "string"
+        },
+        {
+          "title": "Non-zero number",
+          "type": "number",
+          "$comment": "if/then/else are intentionally NOT schema objects.",
+          "if": {
+            "const": 0,
+            "$defs": {
+              "unused": {
+                "$comment": "unreferenced -> shaken away.",
+                "title": "Unused",
+                "type": "null"
+              }
+            }
+          },
+          "then": false,
+          "else": true,
+          "$defs": {
+            "unusedPositive": {
+              "$comment": "unreferenced -> shaken away.",
+              "title": "Number > 0",
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "unusedNegative": {
+              "$comment": "unreferenced -> shaken away.",
+              "title": "Number < 0",
+              "type": "number",
+              "exclusiveMaximum": 0
+            }
+          }
+        }
+      ],
       "$defs": {
         "nestedKept": {
           "$comment": "Referenced from main via #/$defs/used-whole/properties/withDefs/$defs/nestedKept -> kept.",
@@ -80,9 +116,9 @@
       "description": "An integer value.",
       "type": "integer"
     },
-    "unusedButKept": {
-      "$comment": "Not referenced anywhere, but kept because the module is used as a whole.",
-      "title": "Unused but kept",
+    "unused": {
+      "$comment": "Not reachable -> shaken away.",
+      "title": "Unused",
       "description": "A flag.",
       "type": "boolean"
     },

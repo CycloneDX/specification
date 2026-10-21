@@ -163,9 +163,8 @@ export const treeShake = (schema) => {
             }
         }
         subschemas(s).forEach(([sSchema, sRel]) => {
-            if (sRel[0] !== DEFS_KEYWORD) {
-                markReached(sSchema, `${p}${jsonPointer4stack(sRel)}`);
-            }
+            if (sRel[0] === DEFS_KEYWORD) return;
+            markReached(sSchema, `${p}${jsonPointer4stack(sRel)}`);
         });
     };
 
@@ -259,13 +258,11 @@ export const treeShake = (schema) => {
         const candidates = new Set(isReached
             ? [DEFS_KEYWORD]
             : Object.keys(s).filter(k => !treeShakeSchemaKeep.has(k)));
-        // 1. sweep sub-schemas & fill `_sweepSchemaRes`
+        // 1. sweep sub-schemas & fill `_sweepSchemaRes`; nothing is removed here.
         for (const [sSchema, sRel] of subschemas(s)) {
-            if (candidates.has(sRel[0])) {
-                sweepSchema(sSchema, `${p}${jsonPointer4stack(sRel)}`);
-            }
+            sweepSchema(sSchema, `${p}${jsonPointer4stack(sRel)}`);
         }
-        // 2. sweep the candidates
+        // 2. sweep the candidates; remove unused candidates
         for (const k of candidates) {
             if (!Object.hasOwn(s, k)) continue;
             const kP = `${p}${JP_PREFIX}${escapeJsonPointer(k)}`;
