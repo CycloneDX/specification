@@ -175,6 +175,24 @@ export const treeShake = (schema) => {
      * @type {Map<JsonPointer, boolean>}
      */
     const _sweepSchemaRes = new Map();
+    const _sweepValue = (v, p) => {
+        if (typeof v === 'object' && v !== null) {
+            if (Array.isArray(v)) {
+                if (_sweepArray(v, p)) {
+                    return true;
+                }
+            } else {
+                if (_sweepObject(v, p)) {
+                    return true;
+                }
+            }
+        } else {
+            if (reached.has(p)) {
+                return true;
+            }
+        }
+        return false;
+    }
     /**
      * Sweep phase: sweep an object.
      *
@@ -190,23 +208,10 @@ export const treeShake = (schema) => {
         if (reached.has(p)) return true;
         for (const [k, v] of Object.entries(o)) {
             const kP = `${p}${JP_PREFIX}${escapeJsonPointer(k)}`;
-            if (typeof v === 'object' && v !== null) {
-                if (Array.isArray(v)) {
-                    if (_sweepArray(v, kP)) {
-                        continue;
-                    }
-                } else {
-                    if (_sweepObject(v, kP)) {
-                        continue;
-                    }
-                }
-            } else {
-                if (reached.has(kP)) {
-                    continue;
-                }
+            if (!_sweepValue(v, kP)) {
+                delete o[k];
+                removed.add(kP);
             }
-            delete o[k];
-            removed.add(kP);
         }
         return Object.keys(o).length > 0;
     };
@@ -221,26 +226,12 @@ export const treeShake = (schema) => {
         let kept = false;
         for (const [k, v] of a.entries()) {
             const kP = `${p}${JP_PREFIX}${k}`;
-            if (typeof v === 'object' && v !== null) {
-                if (Array.isArray(v)) {
-                    if (_sweepArray(v, kP)) {
-                        kept = true;
-                        continue;
-                    }
-                } else {
-                    if (_sweepObject(v, kP)) {
-                        kept = true;
-                        continue
-                    }
-                }
+            if (_sweepValue(v, kP)) {
+                kept = true;
             } else {
-                if (reached.has(kP)) {
-                    kept = true;
-                    continue
-                }
+                a[k] = {[NOT_KEYWORD]: {[COMMENT_KEYWORD]: VOID_COMMENT}};
+                voided.add(kP);
             }
-            a[k] = {[NOT_KEYWORD]: {[COMMENT_KEYWORD]: VOID_COMMENT}};
-            voided.add(kP);
         }
         return kept;
     };
@@ -267,34 +258,24 @@ export const treeShake = (schema) => {
         const candidates = new Set(isReached
             ? [DEFS_KEYWORD]
             : Object.keys(s).filter(k => !treeShakeSchemaKeep.has(k)));
+        // 1. sweep sub-schemas & fill `_sweepSchemaRes`
         for (const [sSchema, sRel] of subschemas(s)) {
             if (candidates.has(sRel[0])) {
                 sweepSchema(sSchema, `${p}${jsonPointer4stack(sRel)}`);
             }
         }
+        // 2. sweep the candidates
         for (const k of candidates) {
             if (!Object.hasOwn(s, k)) continue;
             const kP = `${p}${JP_PREFIX}${escapeJsonPointer(k)}`;
             const v = s[k];
-            if (typeof v === 'object' && v !== null) {
-                if (Array.isArray(v)) {
-                    if (_sweepArray(v, kP)) {
-                        continue;
-                    }
-                } else {
-                    if (_sweepObject(v, kP)) {
-                        continue;
-                    }
-                }
-            } else {
-                if (reached.has(kP)) {
-                    continue;
-                }
+            if (!_sweepValue(v, kP)) {
+                delete s[k];
+                removed.add(kP);
             }
-            delete s[k];
-            removed.add(kP);
         }
         const kept = Object.keys(s).some(k => !treeShakeSchemaKeep.has(k));
+        // 3. mark hollow
         if (!isReached) {
             if (Object.hasOwn(s, NOT_KEYWORD)) {
                 throw new HollowCollisionError(`Collision ${p}${JP_PREFIX}${NOT_KEYWORD}`);
