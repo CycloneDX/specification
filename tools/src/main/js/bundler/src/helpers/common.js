@@ -40,7 +40,7 @@ export const PATH_NOT_FOUND = Symbol('PATH_NOT_FOUND');
 /**
  * Get the value at a path of own properties.
  *
- * @param {Readonly<*>} o
+ * @param {Readonly<object>} o
  * @param {Iterable<string>} pathStack
  * @returns {*|typeof PATH_NOT_FOUND} the value, or {@link PATH_NOT_FOUND} if the path does not exist
  */

@@ -5,7 +5,10 @@
  * Deprecated keywords are ignored.
  */
 
-import {escapeJsonPointer, jsonPointer4stack} from "./json-pointer-spec.js";
+/**
+ * Json Schema
+ * @typedef {Record<string, unknown>} Schema
+ */
 
 export const SCHEMA_KEYWORD = '$schema';
 
@@ -16,10 +19,13 @@ export const COMMENT_KEYWORD = '$comment';
 /** Ignores the deprecated `definitions` - though it is still allowed... */
 export const DEFS_KEYWORD = '$defs';
 
+/** @type {ReadonlySet<string>} */
 export const REF_KEYWORDS = Object.freeze(new Set(['$ref', '$dynamicRef', '$recursiveRef']));
 
+/** @type {ReadonlySet<string>} */
 export const ANCHOR_KEYWORDS = Object.freeze(new Set(['$anchor', '$dynamicAnchor', '$recursiveAnchor']));
 
+/** @type {ReadonlySet<string>} */
 export const DATA_KEYWORDS = Object.freeze(new Set(['enum', 'const', 'examples', 'default']));
 
 export const NOT_KEYWORD = 'not';
@@ -27,7 +33,7 @@ export const NOT_KEYWORD = 'not';
 export const TITLE_KEYWORD = 'title';
 export const DESCRIPTION_KEYWORD = 'description';
 
-
+/** @type {ReadonlySet<string>} */
 const SINGLE_SCHEMA = Object.freeze(new Set([
     'additionalProperties', 'propertyNames',
     'items', 'contains',
@@ -36,13 +42,15 @@ const SINGLE_SCHEMA = Object.freeze(new Set([
     'contentSchema',
 ]));
 
+/** @type {ReadonlySet<string>} */
 export const SCHEMA_ARRAY = Object.freeze(new Set(['allOf', 'anyOf', 'oneOf', 'prefixItems']));
 
+/** @type {ReadonlySet<string>} */
 const SCHEMA_MAP = Object.freeze(new Set([DEFS_KEYWORD, 'properties', 'patternProperties', 'dependentSchemas']));
 
 /**
- * @param {unknown} o
- * @returns {o is Record<string, unknown>}
+ * @param {Readonly<unknown>} o
+ * @returns {o is Schema}
  */
 export const isSchemaObject = (o) =>
     o !== null
@@ -54,8 +62,8 @@ export const isSchemaObject = (o) =>
 
 /**
  * Yield immediate subschemas, never property maps or literal data.
- * @param {Readonly<*>} s schema
- * @yields {[*, JsonPointerStack]} schema and pointer stack
+ * @param {Readonly<Schema>} s schema
+ * @yields {[Schema, JsonPointerStack]} schema and pointer stack
  */
 export const subschemas = function* (s) {
     for (const [k, v] of Object.entries(s)) {

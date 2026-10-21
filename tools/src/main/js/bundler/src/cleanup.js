@@ -10,9 +10,11 @@ import {
     SCHEMA_ARRAY
 } from './helpers/json-schema-spec.js';
 
+/** @typedef {import('./helpers/json-schema-spec.js').Schema} Schema */
+
 /**
  * Remove $comment in place
- * @param {*} schema
+ * @param {Schema} schema
  * @returns {void}
  */
 export const dropComments = (schema) => {
@@ -79,6 +81,7 @@ const makeTreeShakeResult = (reached, hollowed, voided, removed) => {
 /**
  * Annotation keywords that are kept on hollowed schemas,
  * and that do not count when deciding whether a schema is empty.
+ * @type {ReadonlySet<string>}
  */
 const treeShakeSchemaKeep = Object.freeze(new Set([
     TITLE_KEYWORD, DESCRIPTION_KEYWORD, COMMENT_KEYWORD,
@@ -103,7 +106,7 @@ class HollowCollisionError extends Error {
  *
  * References are supported as JSON Pointer fragments only, no anchors.
  *
- * @param {*} schema
+ * @param {Schema} schema
  * @returns {TreeShakeResult}
  * @throws {RangeError} on a local ref whose fragment is not a JSON Pointer (e.g. an anchor)
  * @throws {HollowCollisionError} if a schema to be hollowed already has a `not` keyword
@@ -128,7 +131,7 @@ export const treeShake = (schema) => {
      *
      * Does NOT descend into `$defs` - definitions are only reached via refs.
      *
-     * @param {Readonly<*>} s
+     * @param {Readonly<Schema>} s
      * @param {JsonPointer} p
      * @returns {void}
      * @throws {RangeError} on a local ref whose fragment is not a JSON Pointer
@@ -174,7 +177,7 @@ export const treeShake = (schema) => {
      * - Arrays are delegated to {@link _sweepArray}.
      * - Objects (schemas or maps) are delegated to {@link _sweepObject}.
      *
-     * @param {*} v
+     * @param {unknown} v
      * @param {JsonPointer} p pointer of `v`
      * @param {boolean} isSchemaArray whether an array `v` is a schema array (`allOf`, …)
      * @returns {boolean} whether anything of `v` is kept
@@ -187,16 +190,16 @@ export const treeShake = (schema) => {
     };
     /**
      * Sweep phase: remove a non-reached member `k` of `o` if nothing of it is kept.
-     * @param {*} o container
+     * @param {object} c container
      * @param {string} k key in `o`
      * @param {JsonPointer} kP pointer of `o[k]`
      * @param {boolean} isSchemaArray see {@link _sweepValue}
      * @returns {boolean} whether the member was kept
      */
-    const _sweepMember = (o, k, kP, isSchemaArray) => {
+    const _sweepMember = (c, k, kP, isSchemaArray) => {
         if (reached.has(kP)) return true;
-        if (_sweepValue(o[k], kP, isSchemaArray)) return true;
-        delete o[k];
+        if (_sweepValue(c[k], kP, isSchemaArray)) return true;
+        delete c[k];
         removed.add(kP);
         return false
     };
@@ -237,7 +240,7 @@ export const treeShake = (schema) => {
      * Sweep phase: sweep non-reached members from a non-schema object
      * (e.g. a `properties` or `$defs` map).
      * Returns the cached `sweepSchema` verdict if `p` was already swept as a schema.
-     * @param {*} o
+     * @param {object} o
      * @param {JsonPointer} p
      * @returns {boolean} whether any member remains
      */
@@ -259,7 +262,7 @@ export const treeShake = (schema) => {
      * - Non-reached schemas: every key except {@link treeShakeSchemaKeep} is swept;
      *   if structural content remains, the schema is hollowed.
      *
-     * @param {*} s
+     * @param {Schema} s
      * @param {JsonPointer} p
      * @returns {boolean} whether anything besides {@link treeShakeSchemaKeep} keys remains
      * @throws {Error} if the schema is to be hollowed but already has a `not` keyword
