@@ -41,18 +41,19 @@ const VOID_COMMENT =
  */
 
 /**
+ * @param {string} s
+ * @return {LocalRef}
+ */
+const makeLocalRef = (s) => `${REF_FRAG_SEP}${s}`;
+
+
+/**
  * @typedef {object} TreeShakeResult
  * @property {LocalRef[]} reached
  * @property {LocalRef[]} hollowed
  * @property {LocalRef[]} voided
  * @property {LocalRef[]} removed
  */
-
-/**
- * @param {string} s
- * @return {LocalRef}
- */
-const makeLocalRef = (s) => `${REF_FRAG_SEP}${s}`;
 
 /**
  * @param {Readonly<Set<JsonPointer>>} reached
@@ -71,10 +72,15 @@ const makeTreeShakeResult = (reached, hollowed, voided, removed) => {
     };
     return {
         reached: Array.from(reached, makeLocalRef).sort(),
-        hollowed: Array.from(hollowed.values(), makeLocalRef).sort(),
-        voided: Array.from(voided.values(), makeLocalRef).sort(),
-        removed: Array.from(removed.values().filter(
-            r => !hasGoneAncestor(r)), makeLocalRef).sort()
+        hollowed: Array.from(
+            hollowed.values().filter(p => !gone.has(p) && !hasGoneAncestor(p)),
+            makeLocalRef).sort(),
+        voided: Array.from(
+            voided.values().filter(p => !hasGoneAncestor(p))
+            , makeLocalRef).sort(),
+        removed: Array.from(
+            removed.values().filter(p => !hasGoneAncestor(p)),
+            makeLocalRef).sort()
     };
 }
 
@@ -87,8 +93,10 @@ const treeShakeSchemaKeep = Object.freeze(new Set([
     TITLE_KEYWORD, DESCRIPTION_KEYWORD, COMMENT_KEYWORD,
 ]));
 
+
 class HollowCollisionError extends Error {
 }
+
 
 /**
  * Tree-shake a schema in place.
@@ -158,8 +166,9 @@ export const treeShake = (schema) => {
             }
         }
         subschemas(s).forEach(([sSchema, sRel]) => {
-            if (sRel[0] === DEFS_KEYWORD) return;
-            markReached(sSchema, `${p}${jsonPointer4stack(sRel)}`);
+            if (sRel[0] !== DEFS_KEYWORD) {
+                markReached(sSchema, `${p}${jsonPointer4stack(sRel)}`);
+            }
         });
     };
 
@@ -293,7 +302,7 @@ export const treeShake = (schema) => {
         }
         // 3. kee/ hollow schema
         const kept = Object.keys(s).some(k => !treeShakeSchemaKeep.has(k));
-        if (kept && !isReached) {
+        if (!isReached) {
             if (Object.hasOwn(s, NOT_KEYWORD)) {
                 throw new HollowCollisionError(`Collision ${p}${JP_PREFIX}${NOT_KEYWORD}`);
             }
