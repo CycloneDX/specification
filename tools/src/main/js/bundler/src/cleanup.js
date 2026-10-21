@@ -30,8 +30,6 @@ const VOID_COMMENT =
     'It only remains as a placeholder to keep sibling positions stable. ' +
     'Itself must not be used for validation.';
 
-/** Fresh object per call - `dropComments` mutates in place. */
-const makeVoidSchema = () => ({[NOT_KEYWORD]: {[COMMENT_KEYWORD]: VOID_COMMENT}});
 
 /** @typedef {import('./helpers/json-pointer-spec.js').JsonPointer} JsonPointer */
 
@@ -229,7 +227,7 @@ export const treeShake = (schema) => {
             )) {
                 kept = true;
             } else {
-                a[k] = makeVoidSchema();
+                a[k] = {[NOT_KEYWORD]: {[COMMENT_KEYWORD]: VOID_COMMENT}};
                 voided.add(kP);
             }
         }
@@ -290,16 +288,17 @@ export const treeShake = (schema) => {
                     SCHEMA_ARRAY.has(c));
             }
         }
-        const notEmpty = Object.keys(s).some(k => !treeShakeSchemaKeep.has(k));
-        if (!isReached && notEmpty) {
+        // 3. kee/ hollow schema
+        const kept = Object.keys(s).some(k => !treeShakeSchemaKeep.has(k));
+        if (kept && !isReached) {
             if (Object.hasOwn(s, NOT_KEYWORD)) {
                 throw new HollowCollisionError(`Collision ${p}${JP_PREFIX}${NOT_KEYWORD}`);
             }
             s[NOT_KEYWORD] = {[COMMENT_KEYWORD]: HOLLOW_COMMENT};
             hollowed.add(p);
         }
-        _schemaSweepRes.set(p, notEmpty);
-        return notEmpty;
+        _schemaSweepRes.set(p, kept);
+        return kept;
     };
 
     markReached(schema, ROOT_POINTER);
