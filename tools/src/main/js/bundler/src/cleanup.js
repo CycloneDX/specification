@@ -1,14 +1,15 @@
-import {objectGetOwnPath, PATH_NOT_FOUND} from "./helpers/common.js";
+import {objectGetOwnPath, PATH_NOT_FOUND} from './helpers/common.js';
 import {
     escapeJsonPointer, isJsonPointer, jsonPointer2stack, jsonPointer4stack,
+    hasAncestorIn,
     PREFIX as JP_PREFIX, ROOT_POINTER
-} from "./helpers/json-pointer-spec.js";
+} from './helpers/json-pointer-spec.js';
 import {
     ANCHOR_KEYWORDS, COMMENT_KEYWORD, DEFS_KEYWORD, DESCRIPTION_KEYWORD, NOT_KEYWORD, REF_KEYWORDS, TITLE_KEYWORD,
     REF_FRAG_SEP,
     isSchemaObject, subschemas,
-    SCHEMA_ARRAY
 } from './helpers/json-schema-spec.js';
+
 
 /** @typedef {import('./helpers/json-schema-spec.js').Schema} Schema */
 
@@ -56,30 +57,25 @@ const makeLocalRef = (s) => `${REF_FRAG_SEP}${s}`;
  */
 
 /**
- * @param {Readonly<Set<JsonPointer>>} reached
- * @param {Readonly<Set<JsonPointer>>} hollowed
- * @param {Readonly<Set<JsonPointer>>} voided
- * @param {Readonly<Set<JsonPointer>>} removed
+ * @param {ReadonlySet<JsonPointer>} reached
+ * @param {ReadonlySet<JsonPointer>} hollowed
+ * @param {ReadonlySet<JsonPointer>} voided
+ * @param {ReadonlySet<JsonPointer>} removed
  * @return {TreeShakeResult}
  */
 const makeTreeShakeResult = (reached, hollowed, voided, removed) => {
     const gone = removed.union(voided);
-    const hasGoneAncestor = (p) => {
-        for (let l = p.lastIndexOf(JP_PREFIX); l > 0; l = p.lastIndexOf(JP_PREFIX, l - 1)) {
-            if (gone.has(p.slice(0, l))) return true;
-        }
-        return false;
-    };
     return {
         reached: Array.from(reached, makeLocalRef).sort(),
         hollowed: Array.from(
-            hollowed.values().filter(p => !gone.has(p) && !hasGoneAncestor(p)),
+            hollowed.values().filter(p =>
+                !gone.has(p) && !hasAncestorIn(p, gone)),
             makeLocalRef).sort(),
         voided: Array.from(
-            voided.values().filter(p => !hasGoneAncestor(p))
-            , makeLocalRef).sort(),
+            voided.values().filter(p => !hasAncestorIn(p, gone)),
+            makeLocalRef).sort(),
         removed: Array.from(
-            removed.values().filter(p => !hasGoneAncestor(p)),
+            removed.values().filter(p => !hasAncestorIn(p, gone)),
             makeLocalRef).sort()
     };
 }
@@ -178,90 +174,75 @@ export const treeShake = (schema) => {
      * already processed, instead of sweeping them a second time.
      * @type {Map<JsonPointer, boolean>}
      */
-    const _schemaSweepRes = new Map();
+    const _sweepSchemaRes = new Map();
     /**
-     * Sweep phase: sweep a non-reached value of any kind.
+     * Sweep phase: sweep an object.
      *
-     * - Scalars/`null` are values, not containers: nothing of them can be reached -> gone.
-     * - Arrays are delegated to {@link _sweepArray}.
-     * - Objects (schemas or maps) are delegated to {@link _sweepObject}.
+     * Since a {@link Schema} is an object, we utilize {@link _sweepSchemaRes}.
      *
-     * @param {unknown} v
-     * @param {JsonPointer} p pointer of `v`
-     * @param {boolean} isSchemaArray whether an array `v` is a schema array (`allOf`, …)
-     * @returns {boolean} whether anything of `v` is kept
-     */
-    const _sweepValue = (v, p, isSchemaArray) => {
-        if (v === null || typeof v !== 'object') return false;
-        return Array.isArray(v)
-            ? _sweepArray(v, p, isSchemaArray)
-            : _sweepObject(v, p);
-    };
-    /**
-     * Sweep phase: remove a non-reached member `k` of `o` if nothing of it is kept.
-     * @param {object} c container
-     * @param {string} k key in `o`
-     * @param {JsonPointer} kP pointer of `o[k]`
-     * @param {boolean} isSchemaArray see {@link _sweepValue}
-     * @returns {boolean} whether the member was kept
-     */
-    const _sweepMember = (c, k, kP, isSchemaArray) => {
-        if (reached.has(kP)) return true;
-        if (_sweepValue(c[k], kP, isSchemaArray)) return true;
-        delete c[k];
-        removed.add(kP);
-        return false
-    };
-    /**
-     * Sweep phase: sweep non-reached items from an array.
-     *
-     * - Data arrays (`enum`, `required`, …) are values, not containers: they are never
-     *   partially swept. Returns whether any item is a ref target; the caller then keeps
-     *   or drops the array as a whole. (The array itself being reached is checked by the caller.)
-     * - Schema arrays (`allOf`, …): non-reached items are replaced by a void schema,
-     *   so indices - and therefore JSON pointers into the array - stay stable.
-     *
-     * @param {Array} a
-     * @param {JsonPointer} p
-     * @param {boolean} isSchemaArray
-     * @returns {boolean} whether anything was kept
-     */
-    const _sweepArray = (a, p, isSchemaArray) => {
-        const itemP = (k) => `${p}${JP_PREFIX}${k}`;
-        if (!isSchemaArray) {
-            return a.some((_, k) => reached.has(itemP(k)));
-        }
-        let kept = false;
-        for (const [k, v] of a.entries()) {
-            const kP = itemP(k);
-            if (reached.has(kP) || (
-                isSchemaObject(v) && _sweepObject(v, kP)
-            )) {
-                kept = true;
-            } else {
-                a[k] = {[NOT_KEYWORD]: {[COMMENT_KEYWORD]: VOID_COMMENT}};
-                voided.add(kP);
-            }
-        }
-        return kept;
-    };
-    /**
-     * Sweep phase: sweep non-reached members from a non-schema object
-     * (e.g. a `properties` or `$defs` map).
-     * Returns the cached `sweepSchema` verdict if `p` was already swept as a schema.
      * @param {object} o
      * @param {JsonPointer} p
-     * @returns {boolean} whether any member remains
+     * @return {boolean}
      */
     const _sweepObject = (o, p) => {
-        const schemaSweepRes = _schemaSweepRes.get(p);
-        if (schemaSweepRes !== undefined) return schemaSweepRes;
-        for (const k of Object.keys(o)) {
-            _sweepMember(o, k,
-                `${p}${JP_PREFIX}${escapeJsonPointer(k)}`,
-                false);
+        const sweepSchemaRes = _sweepSchemaRes.get(p);
+        if (sweepSchemaRes !== undefined) return sweepSchemaRes;
+        if (reached.has(p)) return true;
+        for (const [k, v] of Object.entries(o)) {
+            const kP = `${p}${JP_PREFIX}${escapeJsonPointer(k)}`;
+            if (typeof v === 'object' && v !== null) {
+                if (Array.isArray(v)) {
+                    if (_sweepArray(v, kP)) {
+                        continue;
+                    }
+                } else {
+                    if (_sweepObject(v, kP)) {
+                        continue;
+                    }
+                }
+            } else {
+                if (reached.has(kP)) {
+                    continue;
+                }
+            }
+            delete o[k];
+            removed.add(kP);
         }
         return Object.keys(o).length > 0;
+    };
+    /**
+     * Sweep phase: sweep an array and void its items needed.
+     * @param {Array} a
+     * @param {JsonPointer} p
+     * @return {boolean}
+     */
+    const _sweepArray = (a, p) => {
+        if (reached.has(p)) return true;
+        let kept = false;
+        for (const [k, v] of a.entries()) {
+            const kP = `${p}${JP_PREFIX}${k}`;
+            if (typeof v === 'object' && v !== null) {
+                if (Array.isArray(v)) {
+                    if (_sweepArray(v, kP)) {
+                        kept = true;
+                        continue;
+                    }
+                } else {
+                    if (_sweepObject(v, kP)) {
+                        kept = true;
+                        continue
+                    }
+                }
+            } else {
+                if (reached.has(kP)) {
+                    kept = true;
+                    continue
+                }
+            }
+            a[k] = {[NOT_KEYWORD]: {[COMMENT_KEYWORD]: VOID_COMMENT}};
+            voided.add(kP);
+        }
+        return kept;
     };
     /**
      * Sweep phase: sweep a schema and hollow it if needed.
@@ -279,28 +260,40 @@ export const treeShake = (schema) => {
     const sweepSchema = (s, p) => {
         if (Object.keys(s).some(k => ANCHOR_KEYWORDS.has(k))) {
             // we do NOT support anchors, yet -> keep as is for now
-            _schemaSweepRes.set(p, true);
+            _sweepSchemaRes.set(p, true);
             return true;
         }
         const isReached = reached.has(p);
         const candidates = new Set(isReached
             ? [DEFS_KEYWORD]
             : Object.keys(s).filter(k => !treeShakeSchemaKeep.has(k)));
-        // 1. recurse only - fills `_schemaSweepRes`; all removal happens in step 2.
         for (const [sSchema, sRel] of subschemas(s)) {
             if (candidates.has(sRel[0])) {
                 sweepSchema(sSchema, `${p}${jsonPointer4stack(sRel)}`);
             }
         }
-        // 2. remove / void non-reached candidates
-        for (const c of candidates) {
-            if (Object.hasOwn(s, c)) {
-                _sweepMember(s, c,
-                    `${p}${JP_PREFIX}${escapeJsonPointer(c)}`,
-                    SCHEMA_ARRAY.has(c));
+        for (const k of candidates) {
+            if (!Object.hasOwn(s, k)) continue;
+            const kP = `${p}${JP_PREFIX}${escapeJsonPointer(k)}`;
+            const v = s[k];
+            if (typeof v === 'object' && v !== null) {
+                if (Array.isArray(v)) {
+                    if (_sweepArray(v, kP)) {
+                        continue;
+                    }
+                } else {
+                    if (_sweepObject(v, kP)) {
+                        continue;
+                    }
+                }
+            } else {
+                if (reached.has(kP)) {
+                    continue;
+                }
             }
+            delete s[k];
+            removed.add(kP);
         }
-        // 3. kee/ hollow schema
         const kept = Object.keys(s).some(k => !treeShakeSchemaKeep.has(k));
         if (!isReached) {
             if (Object.hasOwn(s, NOT_KEYWORD)) {
@@ -309,7 +302,7 @@ export const treeShake = (schema) => {
             s[NOT_KEYWORD] = {[COMMENT_KEYWORD]: HOLLOW_COMMENT};
             hollowed.add(p);
         }
-        _schemaSweepRes.set(p, kept);
+        _sweepSchemaRes.set(p, kept);
         return kept;
     };
 

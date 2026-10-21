@@ -43,7 +43,7 @@ const SINGLE_SCHEMA = Object.freeze(new Set([
 ]));
 
 /** @type {ReadonlySet<string>} */
-export const SCHEMA_ARRAY = Object.freeze(new Set(['allOf', 'anyOf', 'oneOf', 'prefixItems']));
+const SCHEMA_ARRAY = Object.freeze(new Set(['allOf', 'anyOf', 'oneOf', 'prefixItems']));
 
 /** @type {ReadonlySet<string>} */
 const SCHEMA_MAP = Object.freeze(new Set([DEFS_KEYWORD, 'properties', 'patternProperties', 'dependentSchemas']));

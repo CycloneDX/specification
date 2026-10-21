@@ -63,3 +63,15 @@ export const escapeJsonPointer = (p) =>
  */
 export const unescapeJsonPointer = (p) =>
     p.replaceAll(PREFIX_ESC, PREFIX).replaceAll(TILDE_ESC, TILDE);
+
+/**
+ * @param {JsonPointer} p
+ * @param {ReadonlySet<JsonPointer>} u
+ * @return {boolean}
+ */
+export const hasAncestorIn = (p, u) => {
+    for (let l = p.lastIndexOf(PREFIX); l > 0; l = p.lastIndexOf(PREFIX, l - 1)) {
+        if (u.has(p.slice(0, l))) return true;
+    }
+    return false;
+};
