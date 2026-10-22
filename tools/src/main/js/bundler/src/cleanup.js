@@ -9,6 +9,7 @@ import {
     ANCHOR_KEYWORDS, COMMENT_KEYWORD, DEFS_KEYWORD, DESCRIPTION_KEYWORD, NOT_KEYWORD, REF_KEYWORDS, TITLE_KEYWORD,
     REF_FRAG_SEP,
     isSchemaObject, subschemas,
+    makeLocalRef
 } from './helpers/json-schema-spec.js';
 
 
@@ -38,17 +39,7 @@ const VOID_COMMENT =
 
 /** @typedef {import('./helpers/json-pointer-spec.js').JsonPointer} JsonPointer */
 
-/**
- * Local reference: a JSON Pointer prefixed with {@link REF_FRAG_SEP}.
- * @typedef {string} LocalRef
- */
-
-/**
- * @param {string} s
- * @return {LocalRef}
- */
-const makeLocalRef = (s) => `${REF_FRAG_SEP}${s}`;
-
+/** @typedef {import('./helpers/json-schema-spec.js').LocalRef} LocalRef */
 
 /**
  * @typedef {object} TreeShakeResult

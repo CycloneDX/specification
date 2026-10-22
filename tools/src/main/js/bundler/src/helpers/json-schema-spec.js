@@ -144,3 +144,15 @@ export const refIsAbsolute = (r) => {
         || r.startsWith('\\')  // UNC-like absolute path
         || URI_OR_ABS_WIN_RE.test(r);
 };
+
+
+/**
+ * Local reference: a JSON Pointer prefixed with {@link REF_FRAG_SEP}.
+ * @typedef {string} LocalRef
+ */
+
+/**
+ * @param {string} s
+ * @return {LocalRef}
+ */
+export const makeLocalRef = (s) => `${REF_FRAG_SEP}${s}`;

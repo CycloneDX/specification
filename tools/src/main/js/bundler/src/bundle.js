@@ -9,7 +9,7 @@ import {
 import {
     ID_KEYWORD, NOT_KEYWORD, SCHEMA_KEYWORD, COMMENT_KEYWORD, DEFS_KEYWORD, REF_KEYWORDS,
     isSchemaObject, subschemas,
-    refIsAbsolute, refSplit, refJoin, REF_FRAG_SEP
+    refIsAbsolute, refSplit, refJoin, REF_FRAG_SEP, makeLocalRef
 } from './helpers/json-schema-spec.js';
 import {PATH_SEP as URI_PATH_SEP} from './helpers/uri.js';
 
@@ -55,8 +55,8 @@ class ModuleNameCollisionError extends Error {
 /**
  * @typedef {object} BundleResult
  * @property {Schema} schema
- * @property {string[]} embedded embedded schema files
- * @property {Array<[string, string]>} external external refs
+ * @property {string[]} external external refs
+ * @property {Array<[string, LocalRef]>} embedded embedded schema files
  * @property {Array<[string, string]>} rewired rewired refs
  */
 
@@ -94,10 +94,12 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
         throw new ModuleNameCollisionError(_dupModuleNames);
     }
 
+    /** @typedef {import('./helpers/json-schema-spec.js').LocalRef} LocalRef */
+
     /**
      * Keys are source schema ref with absolute fs path.
      * Values are target schema local ref.
-     * @type {Map<string, string>}
+     * @type {Map<string, LocalRef>}
      */
     const embeddedMap = new Map();
     /**
@@ -184,7 +186,10 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
             [DEFS_KEYWORD]: schemaDefsOrig,
             [NOT_KEYWORD]: {[COMMENT_KEYWORD]: HOLLOW_COMMENT}
         };
-        embeddedMap.set(`${entryFile}${REF_FRAG_SEP}${JP_PREFIX}${DEFS_KEYWORD}`, `${REF_FRAG_SEP}${FRAG_DEFS_PREFIX}${escapeJsonPointer(entryModuleName)}`);
+        embeddedMap.set(refJoin({
+            path: entryFile,
+            frag: `${JP_PREFIX}${DEFS_KEYWORD}`
+        }), `${FRAG_DEFS_PREFIX}${escapeJsonPointer(entryModuleName)}`);
     } else {
         delete schema[DEFS_KEYWORD][entryModuleName];
     }
@@ -198,7 +203,7 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
         delete includeSchema[COMMENT_KEYWORD];
         rewireRefs(includeSchema, includeFile);
         schema[DEFS_KEYWORD][moduleName] = includeSchema;
-        embeddedMap.set(includeFile, `${REF_FRAG_SEP}${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`);
+        embeddedMap.set(includeFile, `${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`);
     }
 
     return {
@@ -207,12 +212,18 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
         embedded: Array.from(embeddedMap,
             ([f, d]) => {
                 const {path, frag} = refSplit(f);
-                return [refJoin({path: posixPath(relative(entryDir, path)), frag}), d];
+                return [
+                    refJoin({path: posixPath(relative(entryDir, path)), frag}),
+                    makeLocalRef(d)
+                ];
             }),
         rewired: Array.from(rewiredMap,
             ([f, t]) => {
                 const {path, frag} = refSplit(f);
-                return [refJoin({path: posixPath(relative(entryDir, path)), frag}), t];
+                return [
+                    refJoin({path: posixPath(relative(entryDir, path)), frag}),
+                    t
+                ];
             }
         )
     };
