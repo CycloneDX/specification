@@ -28,7 +28,7 @@ export const dropComments = (schema) => {
 
 const HOLLOW_COMMENT =
     'This schema is hollow: it was not referenced ' +
-    'and only remains as a container for definitions that are still in use. ' +
+    'and only remains as a container for structures that are still in use. ' +
     'Itself must not be used for validation.';
 
 const VOID_COMMENT =
@@ -117,17 +117,23 @@ export const treeShake = (schema) => {
     const voided = new Set();
 
     /**
-     * JSON Pointers of everything reached from the root:
-     * schemas, and non-schema values that are ref targets.
+     * @type {Set<Schema>}
+     */
+    const schemas = new Set();
+    /**
+     * @param {Readonly<Schema>} s
+     * @return {void}
+     */
+    const markSchemas = (s) => {
+        schemas.add(s);
+        subschemas(s).forEach(([sSub]) => markSchemas(sSub));
+    }
+
+    /**
      * @type {Set<JsonPointer>}
      */
     const reached = new Set();
-
     /**
-     * Mark phase: walk a schema and everything it references.
-     *
-     * Does NOT descend into `$defs` - definitions are only reached via refs.
-     *
      * @param {Readonly<Schema>} s
      * @param {JsonPointer} p
      * @returns {void}
@@ -164,20 +170,18 @@ export const treeShake = (schema) => {
     };
 
     /**
-     * Cache of {@link sweepSchema} verdicts, keyed by pointer.
-     * Lets {@link _sweepObject} reuse the result for subschemas that {@link sweepSchema}
-     * already processed, instead of sweeping them a second time.
-     * @type {Map<JsonPointer, boolean>}
+     * @param {unknown} v
+     * @param {string} p
+     * @return {boolean}
      */
-    const _sweepSchemaRes = new Map();
-    const _sweepValue = (v, p) => {
+    const sweepValue = (v, p) => {
         if (typeof v === 'object' && v !== null) {
             if (Array.isArray(v)) {
-                if (_sweepArray(v, p)) {
+                if (sweepArray(v, p)) {
                     return true;
                 }
             } else {
-                if (_sweepObject(v, p)) {
+                if (sweepObject(v, p)) {
                     return true;
                 }
             }
@@ -189,21 +193,16 @@ export const treeShake = (schema) => {
         return false;
     }
     /**
-     * Sweep phase: sweep an object.
-     *
-     * Since a {@link Schema} is an object, we utilize {@link _sweepSchemaRes}.
-     *
      * @param {object} o
      * @param {JsonPointer} p
      * @return {boolean}
      */
-    const _sweepObject = (o, p) => {
-        const sweepSchemaRes = _sweepSchemaRes.get(p);
-        if (sweepSchemaRes !== undefined) return sweepSchemaRes;
+    const sweepObject = (o, p) => {
+        if (schemas.has(o)) return sweepSchema(o, p);
         if (reached.has(p)) return true;
         for (const [k, v] of Object.entries(o)) {
             const kP = `${p}${JP_PREFIX}${escapeJsonPointer(k)}`;
-            if (!_sweepValue(v, kP)) {
+            if (!sweepValue(v, kP)) {
                 delete o[k];
                 removed.add(kP);
             }
@@ -216,15 +215,17 @@ export const treeShake = (schema) => {
      * @param {JsonPointer} p
      * @return {boolean}
      */
-    const _sweepArray = (a, p) => {
+    const sweepArray = (a, p) => {
         if (reached.has(p)) return true;
         let kept = false;
         for (const [k, v] of a.entries()) {
             const kP = `${p}${JP_PREFIX}${k}`;
-            if (_sweepValue(v, kP)) {
+            if (sweepValue(v, kP)) {
                 kept = true;
             } else {
-                a[k] = {[NOT_KEYWORD]: {[COMMENT_KEYWORD]: VOID_COMMENT}};
+                a[k] = schemas.has(v)
+                    ? {[NOT_KEYWORD]: {[COMMENT_KEYWORD]: VOID_COMMENT}}
+                    : null;
                 voided.add(kP);
             }
         }
@@ -246,29 +247,21 @@ export const treeShake = (schema) => {
     const sweepSchema = (s, p) => {
         if (Object.keys(s).some(k => ANCHOR_KEYWORDS.has(k))) {
             // we do NOT support anchors, yet -> keep as is for now
-            _sweepSchemaRes.set(p, true);
             return true;
         }
         const isReached = reached.has(p);
         const candidates = new Set(isReached
             ? [DEFS_KEYWORD]
             : Object.keys(s).filter(k => !treeShakeSchemaKeep.has(k)));
-        // 1. sweep sub-schemas & fill `_sweepSchemaRes`; nothing is removed here.
-        for (const [sSchema, sRel] of subschemas(s)) {
-            sweepSchema(sSchema, `${p}${jsonPointer4stack(sRel)}`);
-        }
-        // 2. sweep the candidates; remove unused candidates
-        for (const k of candidates) {
-            if (!Object.hasOwn(s, k)) continue;
+        for (const [k, v] of Object.entries(s)) {
             const kP = `${p}${JP_PREFIX}${escapeJsonPointer(k)}`;
-            const v = s[k];
-            if (!_sweepValue(v, kP)) {
+            const keep = sweepValue(v, kP) || !candidates.has(k);
+            if (!keep) {
                 delete s[k];
                 removed.add(kP);
             }
         }
         const kept = isReached || Object.keys(s).some(k => !treeShakeSchemaKeep.has(k));
-        // 3. mark hollow
         if (!isReached) {
             if (Object.hasOwn(s, NOT_KEYWORD)) {
                 throw new HollowCollisionError(`Collision ${p}${JP_PREFIX}${NOT_KEYWORD}`);
@@ -276,10 +269,10 @@ export const treeShake = (schema) => {
             s[NOT_KEYWORD] = {[COMMENT_KEYWORD]: HOLLOW_COMMENT};
             hollowed.add(p);
         }
-        _sweepSchemaRes.set(p, kept);
         return kept;
     };
 
+    markSchemas(schema);
     markReached(schema, ROOT_POINTER);
     sweepSchema(schema, ROOT_POINTER);
 
