@@ -46,7 +46,7 @@
       ]
     },
     "choice": {
-      "$comment": "Only the LAST item of oneOf is referenced -> oneOf/0 becomes a void placeholder, oneOf/1 is kept.",
+      "$comment": "Only the LAST item of oneOf is referenced -> oneOf/0 becomes a void placeholder, oneOf/1 is kept. The examples are not referenced -> remove",
       "title": "Choice",
       "description": "A choice of which only the last alternative is referenced.",
       "oneOf": [
@@ -54,15 +54,32 @@
           "$comment": "oneOf/0: NOT referenced -> void placeholder.",
           "title": "Choice 0",
           "description": "The first alternative.",
-          "type": "null"
+          "type": "null",
+          "$defs": {
+            "droppedDef": {
+              "$comment": "Not reachable -> shaken away.",
+              "title": "Dropped def",
+              "description": "A definition nothing reachable refers to.",
+              "type": "null"
+            }
+          }
         },
         {
           "$comment": "oneOf/1: referenced from main via #/properties/choice/oneOf/1.",
           "title": "Choice 1",
           "description": "The second alternative.",
-          "type": "integer"
+          "type": "integer",
+          "$defs": {
+            "droppedDef": {
+              "$comment": "Not reachable -> shaken away.",
+              "title": "Dropped def",
+              "description": "A definition nothing reachable refers to.",
+              "type": "null"
+            }
+          }
         }
-      ]
+      ],
+      "examples": [null, 1, 2, 3]
     },
     "status": {
       "$comment": "A NON-schema value of this schema (the enum array) is referenced from main via #/properties/status/enum. The enum must be kept as a whole; 'status' itself is not reached -> hollowed; its 'type' is dropped.",
@@ -72,6 +89,17 @@
       "enum": [
         "on",
         "off"
+      ]
+    },
+    "level": {
+      "$comment": "A single ITEM of a data array (enum/1) is referenced from main. Legal pointer, semantically dubious. 'level' itself is not reached -> hollowed, so the enum has no validation meaning anymore; enum/0 and enum/2 may become void placeholders so that the index of enum/1 stays stable. 'type' is dropped.",
+      "title": "Level",
+      "description": "A level value.",
+      "type": "string",
+      "enum": [
+        "low",
+        "mid",
+        "high"
       ]
     }
   },

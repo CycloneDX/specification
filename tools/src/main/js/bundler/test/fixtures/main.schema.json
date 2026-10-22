@@ -34,6 +34,14 @@
       "title": "Composed",
       "description": "An object assembled from parts of another module.",
       "type": "object",
+      "$defs": {
+        "rootNestedDropped": {
+          "$comment": "Nested $defs inside a REACHED property of the ROOT schema. Unreferenced -> must be removed; the root and its properties are reached, yet their $defs still need sweeping. The then-empty `$defs` object is removed too.",
+          "title": "Root nested dropped",
+          "description": "An unreferenced nested definition of the root.",
+          "type": "null"
+        }
+      },
       "properties": {
         "street": {
           "$comment": "Ref into a nested property of the module -> #/properties/address/properties/street.",
@@ -52,6 +60,12 @@
           "title": "Contact",
           "description": "The contact block of the module, as is.",
           "$ref": "modules/used-properties-only.schema.json#/properties/contact"
+        },
+        "nested": {
+          "$comment": "Ref into the nested $defs of a REACHED property of another module -> only that nested def is kept, its sibling is removed.",
+          "title": "Nested",
+          "description": "A value defined in a property-level $defs.",
+          "$ref": "modules/used-whole.schema.json#/properties/withDefs/$defs/nestedKept"
         }
       }
     },
@@ -72,6 +86,30 @@
       "title": "Status values",
       "description": "Pointer to the module's status enum.",
       "$ref": "modules/used-array-items.schema.json#/properties/status/enum"
+    },
+    "midLevel": {
+      "$comment": "Pointer to ONE ITEM of a NON-schema array (enum/1) of a schema that is itself not reached. The item must stay at index 1; its siblings may become void placeholders, like in schema arrays.",
+      "title": "Mid level",
+      "description": "The middle level literal.",
+      "$ref": "modules/used-array-items.schema.json#/properties/level/enum/1"
+    },
+    "anyValue": {
+      "$comment": "Ref to an EMPTY schema `{}`. Reached -> must survive the sweep even though it has no keys at all.",
+      "title": "Any value",
+      "description": "Accepts anything.",
+      "$ref": "modules/used-subdefs-only.schema.json#/$defs/keptEmpty"
+    },
+    "todoValue": {
+      "$comment": "Ref to a `$comment`-only schema. Reached -> must survive and must NOT be hollowed. Becomes `{}` in the minified output.",
+      "title": "Todo value",
+      "description": "A placeholder.",
+      "$ref": "modules/used-subdefs-only.schema.json#/$defs/keptCommentOnly"
+    },
+    "annotatedValue": {
+      "$comment": "Ref to a title/description-only schema. Reached -> must survive and must NOT be hollowed.",
+      "title": "Annotated value",
+      "description": "An annotation-only schema.",
+      "$ref": "modules/used-subdefs-only.schema.json#/$defs/keptAnnotationsOnly"
     }
   },
   "$defs": {

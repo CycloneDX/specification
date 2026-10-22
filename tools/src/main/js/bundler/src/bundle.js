@@ -1,11 +1,15 @@
-import {basename, dirname, relative, resolve} from 'node:path'
+import {basename, dirname, relative, resolve} from 'node:path';
+import {ok} from 'node:assert/strict';
 
 import {JSON_SCHEMA_RE, getJsonfile, posixPath, findDuplicateValues} from './helpers/common.js';
-import {escapeJsonPointer, PREFIX as JP_PREFIX} from './helpers/json-pointer-spec.js';
+import {
+    escapeJsonPointer, isJsonPointer,
+    PREFIX as JP_PREFIX, ROOT_POINTER
+} from './helpers/json-pointer-spec.js';
 import {
     ID_KEYWORD, NOT_KEYWORD, SCHEMA_KEYWORD, COMMENT_KEYWORD, DEFS_KEYWORD, REF_KEYWORDS,
-    subschemas,
-    refIsAbsolute, refSplit, refJoin, REF_FRAG_SEP,
+    isSchemaObject, subschemas,
+    refIsAbsolute, refSplit, refJoin, REF_FRAG_SEP
 } from './helpers/json-schema-spec.js';
 import {PATH_SEP as URI_PATH_SEP} from './helpers/uri.js';
 
@@ -46,9 +50,11 @@ class ModuleNameCollisionError extends Error {
     }
 }
 
+/** @typedef {import('./helpers/json-schema-spec.js').Schema} Schema */
+
 /**
  * @typedef {object} BundleResult
- * @property {*} schema
+ * @property {Schema} schema
  * @property {string[]} embedded embedded schema files
  * @property {Array<[string, string]>} external external refs
  * @property {Array<[string, string]>} rewired rewired refs
@@ -111,7 +117,7 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
      *
      * No URI Decoding is done on refs, as out own cases just don't need it.
      *
-     * @param {*} schema
+     * @param {Schema} schema
      * @param {string} sourceFile
      * @returns {void}
      */
@@ -132,14 +138,14 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
                 : sourceFile;
             const moduleName = fileModuleNames.get(refFile);
             if (moduleName) {
-                if (frag && !frag.startsWith(JP_PREFIX)) {
+                if (frag !== null && !isJsonPointer(frag)) {
                     // currently dont support anchors - only JSON pointer.
                     throw new RangeError(`Unsupported ref fragment: ${v}`);
                 }
                 rewiredRS = {
                     path: null,
                     frag: (refFile === entryFile && !frag?.startsWith(FRAG_DEFS_PREFIX)
-                            ? ''
+                            ? ROOT_POINTER
                             : `${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`
                     ) + (frag ?? '')
                 };
@@ -156,10 +162,11 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
                 externals.add(rewired);
             }
         }
-        subschemas(schema).forEach(s => rewireRefs(s, sourceFile));
+        subschemas(schema).forEach(([s]) => rewireRefs(s, sourceFile));
     }
 
     const schema = await getJsonfile(entryFile);
+    ok(isSchemaObject(schema), `Not schema: ${entryFile}`);
     if (URL.canParse(schema[ID_KEYWORD])) {
         schema[ID_KEYWORD] = new URL(
             posixPath(relative(entryDir, targetFile)),
@@ -178,11 +185,14 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
             [NOT_KEYWORD]: {[COMMENT_KEYWORD]: HOLLOW_COMMENT}
         };
         embeddedMap.set(`${entryFile}${REF_FRAG_SEP}${JP_PREFIX}${DEFS_KEYWORD}`, `${REF_FRAG_SEP}${FRAG_DEFS_PREFIX}${escapeJsonPointer(entryModuleName)}`);
+    } else {
+        delete schema[DEFS_KEYWORD][entryModuleName];
     }
 
     for (const [includeFile, moduleName] of fileModuleNames) {
         if (includeFile === entryFile) continue;
         const includeSchema = await getJsonfile(includeFile);
+        ok(isSchemaObject(includeSchema), `Not schema: ${includeFile}`);
         delete includeSchema[SCHEMA_KEYWORD];
         delete includeSchema[ID_KEYWORD];
         delete includeSchema[COMMENT_KEYWORD];
@@ -204,6 +214,6 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
                 const {path, frag} = refSplit(f);
                 return [refJoin({path: posixPath(relative(entryDir, path)), frag}), t];
             }
-        ),
+        )
     };
 };
