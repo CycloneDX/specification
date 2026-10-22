@@ -43,7 +43,6 @@ const VOID_COMMENT =
 
 /**
  * @typedef {object} TreeShakeResult
- * @property {LocalRef[]} reached
  * @property {LocalRef[]} hollowed
  * @property {LocalRef[]} voided
  * @property {LocalRef[]} removed
@@ -56,10 +55,9 @@ const VOID_COMMENT =
  * @param {ReadonlySet<JsonPointer>} removed
  * @return {TreeShakeResult}
  */
-const makeTreeShakeResult = (reached, hollowed, voided, removed) => {
+const makeTreeShakeResult = (hollowed, voided, removed) => {
     const gone = removed.union(voided);
     return {
-        reached: Array.from(reached, makeLocalRef).sort(),
         hollowed: Array.from(
             hollowed.values().filter(p =>
                 !gone.has(p) && !hasAncestorIn(p, gone)),
@@ -222,12 +220,17 @@ export const treeShake = (schema) => {
             const kP = `${p}${JP_PREFIX}${k}`;
             if (sweepValue(v, kP)) {
                 kept = true;
-            } else {
-                a[k] = schemas.has(v)
-                    ? {[NOT_KEYWORD]: {[COMMENT_KEYWORD]: VOID_COMMENT}}
-                    : null;
-                voided.add(kP);
+                continue;
             }
+            if (schemas.has(v)) {
+                a[k] = {[NOT_KEYWORD]: {[COMMENT_KEYWORD]: VOID_COMMENT}};
+                schemas.add(a[k]);
+                schemas.add(a[k][NOT_KEYWORD]);
+                schemas.delete(v);
+            } else {
+                a[k] = null;
+            }
+            voided.add(kP);
         }
         return kept;
     };
@@ -267,6 +270,7 @@ export const treeShake = (schema) => {
                 throw new HollowCollisionError(`Collision ${p}${JP_PREFIX}${NOT_KEYWORD}`);
             }
             s[NOT_KEYWORD] = {[COMMENT_KEYWORD]: HOLLOW_COMMENT};
+            schemas.add(s[NOT_KEYWORD]);
             hollowed.add(p);
         }
         return kept;
@@ -277,7 +281,6 @@ export const treeShake = (schema) => {
     sweepSchema(schema, ROOT_POINTER);
 
     return makeTreeShakeResult(
-        reached,
         hollowed,
         voided,
         removed);
