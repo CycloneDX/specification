@@ -15,8 +15,6 @@ import {
 /** @typedef {import('./helpers/json-schema-spec.js').Schema} Schema */
 
 
-/** @typedef {import('./helpers/json-schema-spec.js').Schema} Schema */
-
 /**
  * Remove $comment in place
  * @param {Schema} schema
