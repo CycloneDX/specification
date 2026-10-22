@@ -132,6 +132,7 @@ export const treeShake = (schema) => {
      * @param {JsonPointer} p
      * @returns {void}
      * @throws {RangeError} on a local ref whose fragment is not a JSON Pointer
+     * @throws {RangeError} on a local ref whose JSON Pointer does not exist
      */
     const markReached = (s, p) => {
         if (reached.has(p)) return;
@@ -148,7 +149,7 @@ export const treeShake = (schema) => {
             }
             const tSchema = objectGetOwnPath(schema, jsonPointer2stack(frag));
             if (tSchema === PATH_NOT_FOUND) {
-                throw RangeError('Missing target for LocalRef');
+                throw RangeError(`Missing target for LocalRef: ${v}`);
             }
             if (isSchemaObject(tSchema)) {
                 markReached(tSchema, frag);
