@@ -155,7 +155,9 @@ export const treeShake = (schema) => {
                 throw new RangeError(`Unsupported ref fragment: ${v}`);
             }
             const tSchema = objectGetOwnPath(schema, jsonPointer2stack(frag));
-            if (tSchema === PATH_NOT_FOUND) continue;
+            if (tSchema === PATH_NOT_FOUND) {
+                throw RangeError('Missing target for LocalRef');
+            }
             if (isSchemaObject(tSchema)) {
                 markReached(tSchema, frag);
             } else {

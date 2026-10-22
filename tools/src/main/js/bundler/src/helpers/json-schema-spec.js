@@ -20,10 +20,10 @@ export const COMMENT_KEYWORD = '$comment';
 export const DEFS_KEYWORD = '$defs';
 
 /** @type {ReadonlySet<string>} */
-export const REF_KEYWORDS = Object.freeze(new Set(['$ref', '$dynamicRef', '$recursiveRef']));
+export const REF_KEYWORDS = Object.freeze(new Set(['$ref', '$dynamicRef']));
 
 /** @type {ReadonlySet<string>} */
-export const ANCHOR_KEYWORDS = Object.freeze(new Set(['$anchor', '$dynamicAnchor', '$recursiveAnchor']));
+export const ANCHOR_KEYWORDS = Object.freeze(new Set(['$anchor', '$dynamicAnchor']));
 
 /** @type {ReadonlySet<string>} */
 export const DATA_KEYWORDS = Object.freeze(new Set(['enum', 'const', 'examples', 'default']));
