@@ -102,7 +102,7 @@ const main = async (entryFile, includeDir) => {
     await writeFile(bundledFile, JSON.stringify(schema, null, 2));
 
     // 4. minify schema
-    subschemas(schema).forEach(dropComments);
+    subschemas(schema).forEach(([s]) => dropComments(s));
 
     await writeFile(minifiedFile, JSON.stringify({
         ...schema,
