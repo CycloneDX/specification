@@ -1,0 +1,166 @@
+/**
+ * Constants and function related to JSON Schema Specification.
+ *
+ * This adheres to DRAFT 2020-12 only.
+ * Deprecated keywords are ignored.
+ */
+
+
+/**
+ * Json Schema
+ * @typedef {Record<string, unknown>} Schema
+ */
+
+
+export const SCHEMA_KEYWORD = '$schema';
+
+export const ID_KEYWORD = '$id';
+
+export const COMMENT_KEYWORD = '$comment';
+
+/** Ignores the deprecated `definitions` - though it is still allowed... */
+export const DEFS_KEYWORD = '$defs';
+
+/** @type {ReadonlySet<string>} */
+export const REF_KEYWORDS = Object.freeze(new Set(['$ref', '$dynamicRef']));
+
+/** @type {ReadonlySet<string>} */
+export const ANCHOR_KEYWORDS = Object.freeze(new Set(['$anchor', '$dynamicAnchor']));
+
+/** @type {ReadonlySet<string>} */
+export const DATA_KEYWORDS = Object.freeze(new Set(['enum', 'const', 'examples', 'default']));
+
+export const NOT_KEYWORD = 'not';
+
+export const TITLE_KEYWORD = 'title';
+export const DESCRIPTION_KEYWORD = 'description';
+
+/** @type {ReadonlySet<string>} */
+const SINGLE_SCHEMA = Object.freeze(new Set([
+    'additionalProperties', 'propertyNames',
+    'items', 'contains',
+    'unevaluatedProperties', 'unevaluatedItems',
+    'if', 'then', 'else', NOT_KEYWORD,
+    'contentSchema',
+]));
+
+/** @type {ReadonlySet<string>} */
+const SCHEMA_ARRAY = Object.freeze(new Set(['allOf', 'anyOf', 'oneOf', 'prefixItems']));
+
+/** @type {ReadonlySet<string>} */
+const SCHEMA_MAP = Object.freeze(new Set([DEFS_KEYWORD, 'properties', 'patternProperties', 'dependentSchemas']));
+
+/**
+ * @param {Readonly<unknown>} o
+ * @returns {o is Schema}
+ */
+export const isSchemaObject = (o) =>
+    o !== null
+    && typeof o === 'object'
+    && !Array.isArray(o);
+
+
+/** @typedef {import('./json-pointer-spec.js').JsonPointerStack} JsonPointerStack */
+
+/**
+ * Yield immediate subschemas, never property maps or literal data.
+ * @param {Readonly<Schema>} s schema
+ * @yields {[Schema, JsonPointerStack]} schema and pointer stack
+ */
+export const subschemas = function* (s) {
+    for (const [k, v] of Object.entries(s)) {
+        if (SINGLE_SCHEMA.has(k)) {
+            if (isSchemaObject(v)) yield [v, [k]];
+            continue;
+        }
+        if (SCHEMA_ARRAY.has(k)) {
+            if (!Array.isArray(v)) continue;
+            for (const [ak, av] of v.entries()) {
+                if (isSchemaObject(av)) yield [av, [k, String(ak)]];
+            }
+            continue;
+        }
+        if (SCHEMA_MAP.has(k)) {
+            if (!isSchemaObject(v)) continue;
+            for (const [mk, mv] of Object.entries(v)) {
+                if (isSchemaObject(mv)) yield [mv, [k, mk]];
+            }
+        }
+    }
+};
+
+
+const FRAG_SEP = '#';
+
+/**
+ * @typedef {object} RefSplit
+ * @property {string|null} path
+ * @property {string|null} frag
+ */
+
+/**
+ * Split a ref in path and fragment.
+ *
+ * Return values are either non-empty strings or `null`.
+ *
+ * @param {string} r ref
+ * @returns {RefSplit}
+ */
+export const refSplit = (r) => {
+    const split = r.split(FRAG_SEP);
+    if (split.length > 2) {
+        throw new RangeError(`Unexpected amount of "${FRAG_SEP}" in ${r}`);
+    }
+    return {
+        path: split[0] || null,
+        frag: split[1] || null,
+    }
+};
+
+/**
+ * Join a ref path and fragment.
+ *
+ * @param {Readonly<RefSplit>} rs
+ * @returns {string}
+ */
+export const refJoin = ({path, frag}) => {
+    if (path && frag) return `${path}${FRAG_SEP}${frag}`;
+    if (path) return path;
+    if (frag) return `${FRAG_SEP}${frag}`;
+    return FRAG_SEP; // the entire schema
+};
+
+/**
+ * Regex: URI scheme or Windows drive prefix
+ */
+const URI_OR_ABS_WIN_RE = Object.freeze(/^[a-z][a-z0-9+.-]*:/i);
+
+/**
+ * Whether a ref is absolute.
+ * @param {string} r ref
+ * @returns {boolean}
+ */
+export const refIsAbsolute = (r) => {
+    if (refIsLocal(r)) return false;
+    return r.startsWith('/')  // Unix-like absolute path
+        || r.startsWith('\\')  // UNC-like absolute path
+        || URI_OR_ABS_WIN_RE.test(r);
+};
+
+/**
+ * Local reference: a JSON Pointer prefixed with {@link FRAG_SEP}.
+ * @typedef {`${typeof FRAG_SEP}${string}`} LocalRef
+ */
+
+/**
+ * Whether a ref is local.
+ * @param {string} r ref
+ * @return {r is LocalRef}
+ */
+export const refIsLocal = (r) => r.startsWith(FRAG_SEP);
+
+/**
+ * @param {string} s
+ * @return {LocalRef}
+ */
+export const makeLocalRef = (s) => `${FRAG_SEP}${s}`;

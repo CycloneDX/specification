@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "http://example.com/test/modules/used-array-items.schema.json",
+  "$comment": "FIXTURE: refs point INTO schema arrays and to NON-schema values of this module. The module itself is never referenced as a whole -> hollowed.",
+  "title": "Used array items",
+  "description": "A module of which only individual array items and a non-schema value are referenced.",
+  "type": "object",
+  "properties": {
+    "combined": {
+      "$comment": "Only allOf/1 is referenced from main. allOf/0 and allOf/2 are not reached -> they must become void placeholders, never JSON null, so that the index of allOf/1 stays stable. 'combined' itself is not reached -> hollowed.",
+      "title": "Combined",
+      "description": "A composition of which only the middle part is referenced.",
+      "allOf": [
+        {
+          "$comment": "allOf/0: NOT referenced -> void placeholder.",
+          "title": "Combined part 0",
+          "description": "The first part.",
+          "type": "object",
+          "properties": {
+            "a": {
+              "title": "A",
+              "description": "An unreferenced value.",
+              "type": "string"
+            }
+          }
+        },
+        {
+          "$comment": "allOf/1: referenced from main via #/properties/combined/allOf/1 -> kept as a whole, including its internal ref to $defs/keptViaArray.",
+          "title": "Combined part 1",
+          "description": "The middle part.",
+          "type": "object",
+          "properties": {
+            "b": {
+              "title": "B",
+              "description": "A value defined in this module.",
+              "$ref": "#/$defs/keptViaArray"
+            }
+          }
+        },
+        {
+          "$comment": "allOf/2: NOT referenced -> void placeholder. Its ref must NOT make unused.schema.json reachable.",
+          "title": "Combined part 2",
+          "description": "The last part.",
+          "$ref": "unused.schema.json"
+        }
+      ]
+    },
+    "choice": {
+      "$comment": "Only the LAST item of oneOf is referenced -> oneOf/0 becomes a void placeholder, oneOf/1 is kept. The examples are not referenced -> remove",
+      "title": "Choice",
+      "description": "A choice of which only the last alternative is referenced.",
+      "oneOf": [
+        {
+          "$comment": "oneOf/0: NOT referenced -> void placeholder.",
+          "title": "Choice 0",
+          "description": "The first alternative.",
+          "type": "null",
+          "$defs": {
+            "droppedDef": {
+              "$comment": "Not reachable -> shaken away.",
+              "title": "Dropped def",
+              "description": "A definition nothing reachable refers to.",
+              "type": "null"
+            }
+          }
+        },
+        {
+          "$comment": "oneOf/1: referenced from main via #/properties/choice/oneOf/1.",
+          "title": "Choice 1",
+          "description": "The second alternative.",
+          "type": "integer",
+          "$defs": {
+            "droppedDef": {
+              "$comment": "Not reachable -> shaken away.",
+              "title": "Dropped def",
+              "description": "A definition nothing reachable refers to.",
+              "type": "null"
+            }
+          }
+        }
+      ],
+      "examples": [null, 1, 2, 3]
+    }
+  },
+  "$defs": {
+    "keptViaArray": {
+      "$comment": "Only reachable via combined.allOf/1.",
+      "title": "Kept via array",
+      "description": "A boolean value.",
+      "type": "boolean"
+    },
+    "droppedDef": {
+      "$comment": "Not reachable -> shaken away.",
+      "title": "Dropped def",
+      "description": "A definition nothing reachable refers to.",
+      "type": "null"
+    }
+  }
+}
