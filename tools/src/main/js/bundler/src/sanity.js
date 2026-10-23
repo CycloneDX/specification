@@ -1,6 +1,13 @@
 import {objectGetOwnPath, PATH_NOT_FOUND} from "./helpers/common.js";
-import {REF_FRAG_SEP, REF_KEYWORDS, subschemas} from './helpers/json-schema-spec.js';
-import {isJsonPointer, jsonPointer2stack} from './helpers/json-pointer-spec.js'
+import {
+    isSchemaObject,
+    makeLocalRef,
+    REF_KEYWORDS,
+    refIsLocal,
+    refSplit,
+    subschemas
+} from './helpers/json-schema-spec.js';
+import {isJsonPointer, jsonPointer2stack, ROOT_POINTER} from './helpers/json-pointer-spec.js'
 
 /** @typedef {import('./helpers/json-schema-spec.js').Schema} Schema */
 
@@ -33,16 +40,20 @@ const validateRefs = (schema) => {
     /** @type {Set<string>} */
     const localRefs = new Set();
 
+    /** @type {WeakSet<Schema>} */
+    const _seen = new WeakSet();
     /**
      * @param {Readonly<Schema>} schema
      * @returns {void}
      */
     const gatherRefs = (schema) => {
+        if (_seen.has(schema)) return;
+        _seen.add(schema);
         for (const k of REF_KEYWORDS) {
             const v = schema[k];
             if (typeof v !== 'string') continue;
-            if (v.startsWith(REF_FRAG_SEP)) {
-                localRefs.add(v.slice(REF_FRAG_SEP.length));
+            if (refIsLocal(v)) {
+                localRefs.add(refSplit(v).frag ?? ROOT_POINTER);
             } else {
                 warnings.add(`Unchecked external ref: ${v}`);
             }
@@ -54,11 +65,18 @@ const validateRefs = (schema) => {
 
     for (const ref of localRefs) {
         if (isJsonPointer(ref)) {
-            if (objectGetOwnPath(schema, jsonPointer2stack(ref)) === PATH_NOT_FOUND) {
-                errors.add(`Missing local ref: ${REF_FRAG_SEP}${ref}`);
+            const rTarget = objectGetOwnPath(schema, jsonPointer2stack(ref));
+            if (rTarget === PATH_NOT_FOUND) {
+                errors.add(`Missing local ref target: ${makeLocalRef(ref)}`);
+            }
+            if (isSchemaObject(rTarget)) {
+                gatherRefs(rTarget);
+            } else if (typeof rTarget !== 'boolean') {
+                // ref must resolve to a schema or literal boolean
+                errors.add(`Illegal (non-schema) local ref target: ${makeLocalRef(ref)}`);
             }
         } else {
-            warnings.add(`Unchecked local ref: ${REF_FRAG_SEP}${ref}`);
+            warnings.add(`Unchecked local ref: ${makeLocalRef(ref)}`);
         }
     }
 

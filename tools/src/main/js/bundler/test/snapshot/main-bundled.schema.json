@@ -81,18 +81,6 @@
       "description": "The last alternative of the module's choice.",
       "$ref": "#/$defs/used-array-items/properties/choice/oneOf/1"
     },
-    "statusValues": {
-      "$comment": "Ref to a NON-schema value (the module's enum array). Semantically dubious, but a legal pointer -> the tree-shaker must record it as reached (no crash) and keep the enum intact.",
-      "title": "Status values",
-      "description": "Pointer to the module's status enum.",
-      "$ref": "#/$defs/used-array-items/properties/status/enum"
-    },
-    "midLevel": {
-      "$comment": "Pointer to ONE ITEM of a NON-schema array (enum/1) of a schema that is itself not reached. The item must stay at index 1; its siblings may become void placeholders, like in schema arrays.",
-      "title": "Mid level",
-      "description": "The middle level literal.",
-      "$ref": "#/$defs/used-array-items/properties/level/enum/1"
-    },
     "anyValue": {
       "$comment": "Ref to an EMPTY schema `{}`. Reached -> must survive the sweep even though it has no keys at all.",
       "title": "Any value",
@@ -247,27 +235,6 @@
             1,
             2,
             3
-          ]
-        },
-        "status": {
-          "$comment": "A NON-schema value of this schema (the enum array) is referenced from main via #/properties/status/enum. The enum must be kept as a whole; 'status' itself is not reached -> hollowed; its 'type' is dropped.",
-          "title": "Status",
-          "description": "A status value.",
-          "type": "string",
-          "enum": [
-            "on",
-            "off"
-          ]
-        },
-        "level": {
-          "$comment": "A single ITEM of a data array (enum/1) is referenced from main. Legal pointer, semantically dubious. 'level' itself is not reached -> hollowed, so the enum has no validation meaning anymore; enum/0 and enum/2 may become void placeholders so that the index of enum/1 stays stable. 'type' is dropped.",
-          "title": "Level",
-          "description": "A level value.",
-          "type": "string",
-          "enum": [
-            "low",
-            "mid",
-            "high"
           ]
         }
       },
