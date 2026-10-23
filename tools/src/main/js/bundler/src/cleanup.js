@@ -9,7 +9,7 @@ import {
     ANCHOR_KEYWORDS, COMMENT_KEYWORD, DEFS_KEYWORD, DESCRIPTION_KEYWORD, NOT_KEYWORD, REF_KEYWORDS, TITLE_KEYWORD,
     REF_FRAG_SEP,
     isSchemaObject, subschemas,
-    makeLocalRef
+    makeLocalRef, SCHEMA_ARRAY, SCHEMA_MAP
 } from './helpers/json-schema-spec.js';
 
 
@@ -158,7 +158,8 @@ export const treeShake = (schema) => {
             if (isSchemaObject(tSchema)) {
                 markReached(tSchema, frag);
             } else {
-                reached.add(frag);
+                // not supported, yet
+                throw new RangeError(`Unsupported ref fragment: ${v}`);
             }
         }
         subschemas(s).forEach(([sSchema, sRel]) => {
@@ -214,8 +215,6 @@ export const treeShake = (schema) => {
                 a[k] = {[NOT_KEYWORD]: {[COMMENT_KEYWORD]: VOID_COMMENT}};
                 schemas.add(a[k]);
                 schemas.add(a[k][NOT_KEYWORD]);
-            } else {
-                a[k] = null;
             }
             voided.add(kP);
         }
@@ -240,17 +239,27 @@ export const treeShake = (schema) => {
             return true;
         }
         const isReached = reached.has(p);
-        const candidates = new Set(isReached
-            ? [DEFS_KEYWORD]
-            : Object.keys(s).filter(k => !treeShakeSchemaKeep.has(k)));
         for (const [k, v] of Object.entries(s)) {
             const kP = `${p}${JP_PREFIX}${escapeJsonPointer(k)}`;
-            const kKept = sweepValue(v, kP) || !candidates.has(k);
-            if (!kKept) {
-                delete s[k];
-                removed.add(kP);
+            if (reached.has(kP)) continue;
+            if (typeof v === 'object') {
+                if (Array.isArray(v)) {
+                    if (SCHEMA_ARRAY.has(k)) {
+                        //
+                    } else {
+                        if(sweepArray(v, kP))continue;
+                    }
+                } else if (v!== null) {
+                    if (SCHEMA_MAP.has(k)) {
+                        //
+                    } else {
+                        if(sweepObject(v, kP))continue;
+                    }
+                }
             }
+            delete s[k];
         }
+        subschemas(s).forEach(([ss, sp]) => sweepSchema(ss, sp));
         const kept = isReached || Object.keys(s).some(k => !treeShakeSchemaKeep.has(k));
         if (!isReached) {
             if (Object.hasOwn(s, NOT_KEYWORD)) {

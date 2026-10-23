@@ -5,6 +5,13 @@
   "title": "Main",
   "description": "Root document of the bundler test fixtures.",
   "type": "object",
+  "required": [
+    "whole"
+  ],
+  "examples": [
+    {"whole": {}}
+  ],
+  "$comment": "FIXTURE: root schema; entry point of the bundle. This $comment is the only one that survives minification. The root title/description must survive in both outputs. The root `required`/`examples` are data arrays inside the (reached) root schema and must survive the tree-shaker untouched.",
   "properties": {
     "$comment": {
       "$comment": "the comment property is expected to stay - but this comment might be removed.",
@@ -16,6 +23,12 @@
       "title": "Whole",
       "description": "A module referenced in its entirety.",
       "$ref": "modules/used-whole.schema.json"
+    },
+    "wholeData": {
+      "$comment": "External ref without fragment to a module whose reached schemas carry data arrays/maps/literals and boolean subschemas -> all of that must survive the sweep.",
+      "title": "Whole data",
+      "description": "A data-heavy module referenced in its entirety.",
+      "$ref": "modules/used-whole-data.schema.json"
     },
     "sub": {
       "$comment": "External ref into a sub-def -> only that sub-def (and what it reaches) is kept.",
@@ -110,6 +123,9 @@
       "title": "Annotated value",
       "description": "An annotation-only schema.",
       "$ref": "modules/used-subdefs-only.schema.json#/$defs/keptAnnotationsOnly"
+    },
+    "custom-defs": {
+      "$ref": "modules/custom-defs.schema.json"
     }
   },
   "$defs": {
