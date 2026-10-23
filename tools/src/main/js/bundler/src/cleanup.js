@@ -115,9 +115,9 @@ export const treeShake = (schema) => {
     const voided = new Set();
 
     /**
-     * @type {Set<Schema>}
+     * @type {WeakSet<Schema>}
      */
-    const schemas = new Set();
+    const schemas = new WeakSet();
     /**
      * @param {Readonly<Schema>} s
      * @return {void}
@@ -226,7 +226,6 @@ export const treeShake = (schema) => {
                 a[k] = {[NOT_KEYWORD]: {[COMMENT_KEYWORD]: VOID_COMMENT}};
                 schemas.add(a[k]);
                 schemas.add(a[k][NOT_KEYWORD]);
-                schemas.delete(v);
             } else {
                 a[k] = null;
             }
