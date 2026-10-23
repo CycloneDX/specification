@@ -7,7 +7,7 @@ import {
     refSplit,
     subschemas
 } from './helpers/json-schema-spec.js';
-import {isJsonPointer, jsonPointer2stack} from './helpers/json-pointer-spec.js'
+import {isJsonPointer, jsonPointer2stack, ROOT_POINTER} from './helpers/json-pointer-spec.js'
 
 /** @typedef {import('./helpers/json-schema-spec.js').Schema} Schema */
 
@@ -53,7 +53,7 @@ const validateRefs = (schema) => {
             const v = schema[k];
             if (typeof v !== 'string') continue;
             if (refIsLocal(v)) {
-                localRefs.add(refSplit(v).frag);
+                localRefs.add(refSplit(v).frag ?? ROOT_POINTER);
             } else {
                 warnings.add(`Unchecked external ref: ${v}`);
             }
