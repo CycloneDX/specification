@@ -1,5 +1,5 @@
 import {objectGetOwnPath, PATH_NOT_FOUND} from "./helpers/common.js";
-import {makeLocalRef, REF_FRAG_SEP, REF_KEYWORDS, subschemas} from './helpers/json-schema-spec.js';
+import {isSchemaObject, makeLocalRef, REF_FRAG_SEP, REF_KEYWORDS, subschemas} from './helpers/json-schema-spec.js';
 import {isJsonPointer, jsonPointer2stack} from './helpers/json-pointer-spec.js'
 
 /** @typedef {import('./helpers/json-schema-spec.js').Schema} Schema */
@@ -34,10 +34,16 @@ const validateRefs = (schema) => {
     const localRefs = new Set();
 
     /**
+     * @type {WeakSet<Schema>}
+     */
+    const _seen = new WeakSet();
+    /**
      * @param {Readonly<Schema>} schema
      * @returns {void}
      */
     const gatherRefs = (schema) => {
+        if (_seen.has(schema)) return;
+        _seen.add(schema);
         for (const k of REF_KEYWORDS) {
             const v = schema[k];
             if (typeof v !== 'string') continue;
@@ -54,8 +60,12 @@ const validateRefs = (schema) => {
 
     for (const ref of localRefs) {
         if (isJsonPointer(ref)) {
-            if (objectGetOwnPath(schema, jsonPointer2stack(ref)) === PATH_NOT_FOUND) {
+            const res = objectGetOwnPath(schema, jsonPointer2stack(ref));
+            if (res === PATH_NOT_FOUND) {
                 errors.add(`Missing local ref: ${makeLocalRef(ref)}`);
+            }
+            if (isSchemaObject(res)) {
+                gatherRefs(res);
             }
         } else {
             warnings.add(`Unchecked local ref: ${makeLocalRef(ref)}`);
