@@ -8,7 +8,7 @@ import {
 import {
     ANCHOR_KEYWORDS, COMMENT_KEYWORD, DEFS_KEYWORD, DESCRIPTION_KEYWORD, NOT_KEYWORD, REF_KEYWORDS, TITLE_KEYWORD,
     isSchemaObject, subschemas,
-    makeLocalRef, SCHEMA_ARRAY, SCHEMA_MAP, refIsLocal, refSplit
+    makeLocalRef, refIsLocal, refSplit
 } from './helpers/json-schema-spec.js';
 
 
