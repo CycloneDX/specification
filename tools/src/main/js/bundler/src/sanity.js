@@ -72,8 +72,8 @@ const validateRefs = (schema) => {
             if (isSchemaObject(rTarget)) {
                 gatherRefs(rTarget);
             } else if (typeof rTarget !== 'boolean') {
-                // ref must resolve to a schema or boolean;
-                throw new RangeError(`Illegal local ref target: ${makeLocalRef(ref)}`);
+                // ref must resolve to a schema or literal boolean
+                errors.add(`Illegal (non-schema) local ref target: ${makeLocalRef(ref)}`);
             }
         } else {
             warnings.add(`Unchecked local ref: ${makeLocalRef(ref)}`);
