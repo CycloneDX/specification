@@ -157,7 +157,7 @@ export const refIsAbsolute = (r) => {
  * @param {string} r ref
  * @return {r is LocalRef}
  */
-export const refIsLocal = (r) => r.startsWith(REF_FRAG_SEP)
+export const refIsLocal = (r) => r.startsWith(REF_FRAG_SEP);
 
 /**
  * @param {string} s
