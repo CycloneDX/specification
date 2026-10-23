@@ -7,9 +7,8 @@ import {
 } from './helpers/json-pointer-spec.js';
 import {
     ANCHOR_KEYWORDS, COMMENT_KEYWORD, DEFS_KEYWORD, DESCRIPTION_KEYWORD, NOT_KEYWORD, REF_KEYWORDS, TITLE_KEYWORD,
-    REF_FRAG_SEP,
     isSchemaObject, subschemas,
-    makeLocalRef, SCHEMA_ARRAY, SCHEMA_MAP
+    makeLocalRef, SCHEMA_ARRAY, SCHEMA_MAP, refIsLocal, refSplit
 } from './helpers/json-schema-spec.js';
 
 
@@ -143,10 +142,10 @@ export const treeShake = (schema) => {
         reached.add(p);
         for (const k of REF_KEYWORDS) {
             const v = s[k];
-            if (typeof v !== 'string' || !v.startsWith(REF_FRAG_SEP)) {
+            if (typeof v !== 'string' || !refIsLocal(v)) {
                 continue; // non-local ref -> out of scope
             }
-            const frag = v.slice(REF_FRAG_SEP.length);
+            const frag = refSplit(v).frag ?? ROOT_POINTER;
             if (!isJsonPointer(frag)) {
                 // currently dont support anchors - only JSON pointer.
                 throw new RangeError(`Unsupported ref fragment: ${v}`);
