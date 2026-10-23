@@ -113,9 +113,7 @@ export const treeShake = (schema) => {
     /** @type {Set<JsonPointer>} */
     const voided = new Set();
 
-    /**
-     * @type {WeakSet<Schema>}
-     */
+    /** @type {WeakSet<Schema>} */
     const schemaObjects = new WeakSet();
     /**
      * @param {Readonly<Schema>} s
@@ -126,9 +124,7 @@ export const treeShake = (schema) => {
         subschemas(s).forEach(([sSub]) => markSchemas(sSub));
     }
 
-    /**
-     * @type {Set<JsonPointer>}
-     */
+    /** @type {Set<JsonPointer>} */
     const reached = new Set();
     /**
      * @param {Readonly<Schema>} s
@@ -176,16 +172,18 @@ export const treeShake = (schema) => {
         if (typeof v === 'object' && v !== null) {
             return (Array.isArray(v) ? sweepArray : sweepObject)(v, p);
         }
+        // reached a non-object schema?
         return reached.has(p);
     }
     /**
+     * Sweep phase: sweep an object and removes unused children.
+     * Utilizes {@link sweepSchema} when `o` is a schema.
      * @param {object} o
      * @param {JsonPointer} p
      * @return {boolean}
      */
     const sweepObject = (o, p) => {
         if (schemaObjects.has(o)) return sweepSchema(o, p);
-        if (reached.has(p)) return true;
         for (const [k, v] of Object.entries(o)) {
             const kP = `${p}${JP_PREFIX}${escapeJsonPointer(k)}`;
             if (!sweepValue(v, kP)) {
@@ -209,11 +207,9 @@ export const treeShake = (schema) => {
                 kept = true;
                 continue;
             }
-            if (schemaObjects.has(v)) {
-                a[k] = {[NOT_KEYWORD]: {[COMMENT_KEYWORD]: VOID_COMMENT}};
-            } else {
-                a[k] = null;
-            }
+            a[k] = schemaObjects.has(v)
+                ? {[NOT_KEYWORD]: {[COMMENT_KEYWORD]: VOID_COMMENT}}
+                : null;
             voided.add(kP);
         }
         return kept;
@@ -229,7 +225,7 @@ export const treeShake = (schema) => {
      * @param {Schema} s
      * @param {JsonPointer} p
      * @returns {boolean} whether anything besides {@link treeShakeSchemaKeep} keys remains
-     * @throws {Error} if the schema is to be hollowed but already has a `not` keyword
+     * @throws {HollowCollisionError} if the schema is to be hollowed but already has a `not` keyword
      */
     const sweepSchema = (s, p) => {
         if (Object.keys(s).some(k => ANCHOR_KEYWORDS.has(k))) {
@@ -243,9 +239,9 @@ export const treeShake = (schema) => {
                 sweepSchema(sSchema, `${p}${jsonPointer4stack(sRef)}`)
             });
             const defs = s[DEFS_KEYWORD];
-            if(isSchemaObject(defs)) {
+            if (isSchemaObject(defs)) {
                 const dK = `${p}${JP_PREFIX}${DEFS_KEYWORD}`
-                if(!sweepObject(defs, dK)) {
+                if (!sweepObject(defs, dK)) {
                     delete s[DEFS_KEYWORD];
                     removed.add(dK);
                 }
