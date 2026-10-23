@@ -5,10 +5,12 @@
  * Deprecated keywords are ignored.
  */
 
+
 /**
  * Json Schema
  * @typedef {Record<string, unknown>} Schema
  */
+
 
 export const SCHEMA_KEYWORD = '$schema';
 
@@ -88,7 +90,7 @@ export const subschemas = function* (s) {
 };
 
 
-export const REF_FRAG_SEP = '#';
+const REF_FRAG_SEP = '#';
 
 /**
  * @typedef {object} RefSplit
@@ -139,8 +141,26 @@ const URI_OR_ABS_WIN_RE = Object.freeze(/^[a-z][a-z0-9+.-]*:/i);
  * @returns {boolean}
  */
 export const refIsAbsolute = (r) => {
-    if (r.startsWith(REF_FRAG_SEP)) return false;
+    if (refIsLocal(r)) return false;
     return r.startsWith('/')  // Unix-like absolute path
         || r.startsWith('\\')  // UNC-like absolute path
         || URI_OR_ABS_WIN_RE.test(r);
 };
+
+/**
+ * Local reference: a JSON Pointer prefixed with {@link REF_FRAG_SEP}.
+ * @typedef {`${typeof REF_FRAG_SEP}${string}`} LocalRef
+ */
+
+/**
+ * Whether a ref is local.
+ * @param {string} r ref
+ * @return {r is LocalRef}
+ */
+export const refIsLocal = (r) => r.startsWith(REF_FRAG_SEP)
+
+/**
+ * @param {string} s
+ * @return {LocalRef}
+ */
+export const makeLocalRef = (s) => `${REF_FRAG_SEP}${s}`;
