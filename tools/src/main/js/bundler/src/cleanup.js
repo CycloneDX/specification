@@ -120,6 +120,7 @@ export const treeShake = (schema) => {
      * @return {void}
      */
     const markSchemas = (s) => {
+        if (schemaObjects.has(s)) return;
         schemaObjects.add(s);
         subschemas(s).forEach(([sSub]) => markSchemas(sSub));
     }
