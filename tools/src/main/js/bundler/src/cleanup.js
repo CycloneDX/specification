@@ -259,7 +259,7 @@ export const treeShake = (schema) => {
         const kept = isReached || Object.keys(s).some(k => !treeShakeSchemaKeep.has(k));
         if (!isReached) {
             if (Object.hasOwn(s, NOT_KEYWORD)) {
-                throw new HollowCollisionError(`Collision ${p}${JP_PREFIX}${NOT_KEYWORD}`);
+                throw new HollowCollisionError(`Collision: ${makeLocalRef(p)}${JP_PREFIX}${NOT_KEYWORD}`);
             }
             s[NOT_KEYWORD] = {[COMMENT_KEYWORD]: HOLLOW_COMMENT};
             hollowed.add(p);
