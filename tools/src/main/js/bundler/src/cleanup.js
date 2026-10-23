@@ -258,8 +258,8 @@ export const treeShake = (schema) => {
             : Object.keys(s).filter(k => !treeShakeSchemaKeep.has(k)));
         for (const [k, v] of Object.entries(s)) {
             const kP = `${p}${JP_PREFIX}${escapeJsonPointer(k)}`;
-            const keep = sweepValue(v, kP) || !candidates.has(k);
-            if (!keep) {
+            const kKept = sweepValue(v, kP) || !candidates.has(k);
+            if (!kKept) {
                 delete s[k];
                 removed.add(kP);
             }
