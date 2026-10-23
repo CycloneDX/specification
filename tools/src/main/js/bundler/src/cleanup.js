@@ -116,13 +116,13 @@ export const treeShake = (schema) => {
     /**
      * @type {WeakSet<Schema>}
      */
-    const schemas = new WeakSet();
+    const schemaObjects = new WeakSet();
     /**
      * @param {Readonly<Schema>} s
      * @return {void}
      */
     const markSchemas = (s) => {
-        schemas.add(s);
+        schemaObjects.add(s);
         subschemas(s).forEach(([sSub]) => markSchemas(sSub));
     }
 
@@ -155,10 +155,10 @@ export const treeShake = (schema) => {
                 throw RangeError(`Missing target for LocalRef: ${v}`);
             }
             if (isSchemaObject(tSchema)) {
+                markSchemas(tSchema);
                 markReached(tSchema, frag);
             } else {
-                // not supported, yet
-                throw new RangeError(`Unsupported ref fragment: ${v}`);
+                reached.add(frag);
             }
         }
         subschemas(s).forEach(([sSchema, sRel]) => {
@@ -184,7 +184,7 @@ export const treeShake = (schema) => {
      * @return {boolean}
      */
     const sweepObject = (o, p) => {
-        if (schemas.has(o)) return sweepSchema(o, p);
+        if (schemaObjects.has(o)) return sweepSchema(o, p);
         if (reached.has(p)) return true;
         for (const [k, v] of Object.entries(o)) {
             const kP = `${p}${JP_PREFIX}${escapeJsonPointer(k)}`;
@@ -210,10 +210,8 @@ export const treeShake = (schema) => {
                 kept = true;
                 continue;
             }
-            if (schemas.has(v)) {
+            if (schemaObjects.has(v)) {
                 a[k] = {[NOT_KEYWORD]: {[COMMENT_KEYWORD]: VOID_COMMENT}};
-                schemas.add(a[k]);
-                schemas.add(a[k][NOT_KEYWORD]);
             }
             voided.add(kP);
         }
@@ -238,34 +236,41 @@ export const treeShake = (schema) => {
             return true;
         }
         const isReached = reached.has(p);
-        for (const [k, v] of Object.entries(s)) {
-            const kP = `${p}${JP_PREFIX}${escapeJsonPointer(k)}`;
-            if (reached.has(kP)) continue;
-            if (typeof v === 'object') {
-                if (Array.isArray(v)) {
-                    if (SCHEMA_ARRAY.has(k)) {
-                        //
-                    } else {
-                        if(sweepArray(v, kP))continue;
-                    }
-                } else if (v!== null) {
-                    if (SCHEMA_MAP.has(k)) {
-                        //
-                    } else {
-                        if(sweepObject(v, kP))continue;
+        if (isReached) {
+            subschemas(s).forEach(([sSchema, sRef]) => {
+                if (sRef[0] === DEFS_KEYWORD) return;
+                sweepSchema(sSchema, `${p}${jsonPointer4stack(sRef)}`)
+            });
+            const defs = s[DEFS_KEYWORD];
+            if (isSchemaObject(defs)) {
+                for (const [k, v] of Object.entries(defs)) {
+                    const kP = `${p}${JP_PREFIX}${DEFS_KEYWORD}${JP_PREFIX}${escapeJsonPointer(k)}`;
+                    if (!sweepValue(v, kP)) {
+                        delete defs[k];
+                        removed.add(kP);
                     }
                 }
+                if (Object.keys(defs).length === 0) {
+                    delete s[DEFS_KEYWORD];
+                    removed.add(`${p}${JP_PREFIX}${DEFS_KEYWORD}`);
+                }
             }
-            delete s[k];
+        } else {
+            for (const [k, v] of Object.entries(s)) {
+                if (treeShakeSchemaKeep.has(k)) continue;
+                const kP = `${p}${JP_PREFIX}${escapeJsonPointer(k)}`;
+                if (!sweepValue(v, kP)) {
+                    delete s[k];
+                    removed.add(kP);
+                }
+            }
         }
-        subschemas(s).forEach(([ss, sp]) => sweepSchema(ss, sp));
         const kept = isReached || Object.keys(s).some(k => !treeShakeSchemaKeep.has(k));
         if (!isReached) {
             if (Object.hasOwn(s, NOT_KEYWORD)) {
                 throw new HollowCollisionError(`Collision ${p}${JP_PREFIX}${NOT_KEYWORD}`);
             }
             s[NOT_KEYWORD] = {[COMMENT_KEYWORD]: HOLLOW_COMMENT};
-            schemas.add(s[NOT_KEYWORD]);
             hollowed.add(p);
         }
         return kept;
