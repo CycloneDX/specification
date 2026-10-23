@@ -9,7 +9,7 @@ import {
 import {
     ID_KEYWORD, NOT_KEYWORD, SCHEMA_KEYWORD, COMMENT_KEYWORD, DEFS_KEYWORD, REF_KEYWORDS,
     isSchemaObject, subschemas,
-    refIsAbsolute, refSplit, refJoin, REF_FRAG_SEP, makeLocalRef
+    refIsAbsolute, refSplit, refJoin, makeLocalRef
 } from './helpers/json-schema-spec.js';
 import {PATH_SEP as URI_PATH_SEP} from './helpers/uri.js';
 
@@ -19,7 +19,9 @@ const HOLLOW_COMMENT =
     'Itself must not be used for validation.';
 
 
-const FRAG_DEFS_PREFIX = `${JP_PREFIX}${DEFS_KEYWORD}${JP_PREFIX}`;
+const JP_DEFS = `${JP_PREFIX}${DEFS_KEYWORD}`;
+const JP_DEFS_PREFIX = `${JP_DEFS}${JP_PREFIX}`;
+
 
 /**
  * @param {string} f
@@ -49,6 +51,10 @@ class ModuleNameCollisionError extends Error {
             ).sort().join('\n');
     }
 }
+
+/** @typedef {import('./helpers/json-schema-spec.js').LocalRef} LocalRef */
+
+/** @typedef {import('./helpers/json-pointer-spec.js').JsonPointer} JsonPointer */
 
 /** @typedef {import('./helpers/json-schema-spec.js').Schema} Schema */
 
@@ -94,12 +100,10 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
         throw new ModuleNameCollisionError(_dupModuleNames);
     }
 
-    /** @typedef {import('./helpers/json-schema-spec.js').LocalRef} LocalRef */
-
     /**
      * Keys are source schema ref with absolute fs path.
      * Values are target schema local ref.
-     * @type {Map<string, LocalRef>}
+     * @type {Map<string, JsonPointer>}
      */
     const embeddedMap = new Map();
     /**
@@ -146,9 +150,9 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
                 }
                 rewiredRS = {
                     path: null,
-                    frag: (refFile === entryFile && !frag?.startsWith(FRAG_DEFS_PREFIX)
+                    frag: (refFile === entryFile && !frag?.startsWith(JP_DEFS_PREFIX)
                             ? ROOT_POINTER
-                            : `${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`
+                            : `${JP_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`
                     ) + (frag ?? '')
                 };
             } else {
@@ -188,8 +192,8 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
         };
         embeddedMap.set(refJoin({
             path: entryFile,
-            frag: `${JP_PREFIX}${DEFS_KEYWORD}`
-        }), `${FRAG_DEFS_PREFIX}${escapeJsonPointer(entryModuleName)}`);
+            frag: JP_DEFS
+        }), `${JP_DEFS_PREFIX}${escapeJsonPointer(entryModuleName)}`);
     } else {
         delete schema[DEFS_KEYWORD][entryModuleName];
     }
@@ -203,7 +207,7 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
         delete includeSchema[COMMENT_KEYWORD];
         rewireRefs(includeSchema, includeFile);
         schema[DEFS_KEYWORD][moduleName] = includeSchema;
-        embeddedMap.set(includeFile, `${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`);
+        embeddedMap.set(includeFile, `${JP_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`);
     }
 
     return {
@@ -214,16 +218,14 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
                 const {path, frag} = refSplit(f);
                 return [
                     refJoin({path: posixPath(relative(entryDir, path)), frag}),
-                    makeLocalRef(d)
-                ];
+                    makeLocalRef(d)];
             }),
         rewired: Array.from(rewiredMap,
             ([f, t]) => {
                 const {path, frag} = refSplit(f);
                 return [
                     refJoin({path: posixPath(relative(entryDir, path)), frag}),
-                    t
-                ];
+                    t];
             }
         )
     };
