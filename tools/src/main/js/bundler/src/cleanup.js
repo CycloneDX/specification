@@ -202,7 +202,6 @@ export const treeShake = (schema) => {
      * @return {boolean}
      */
     const sweepArray = (a, p) => {
-        if (reached.has(p)) return true;
         let kept = false;
         for (const [k, v] of a.entries()) {
             const kP = `${p}${JP_PREFIX}${k}`;
@@ -212,6 +211,8 @@ export const treeShake = (schema) => {
             }
             if (schemaObjects.has(v)) {
                 a[k] = {[NOT_KEYWORD]: {[COMMENT_KEYWORD]: VOID_COMMENT}};
+            } else {
+                a[k] = null;
             }
             voided.add(kP);
         }
@@ -242,17 +243,11 @@ export const treeShake = (schema) => {
                 sweepSchema(sSchema, `${p}${jsonPointer4stack(sRef)}`)
             });
             const defs = s[DEFS_KEYWORD];
-            if (isSchemaObject(defs)) {
-                for (const [k, v] of Object.entries(defs)) {
-                    const kP = `${p}${JP_PREFIX}${DEFS_KEYWORD}${JP_PREFIX}${escapeJsonPointer(k)}`;
-                    if (!sweepValue(v, kP)) {
-                        delete defs[k];
-                        removed.add(kP);
-                    }
-                }
-                if (Object.keys(defs).length === 0) {
+            if(isSchemaObject(defs)) {
+                const dK = `${p}${JP_PREFIX}${DEFS_KEYWORD}`
+                if(!sweepObject(defs, dK)) {
                     delete s[DEFS_KEYWORD];
-                    removed.add(`${p}${JP_PREFIX}${DEFS_KEYWORD}`);
+                    removed.add(dK);
                 }
             }
         } else {
