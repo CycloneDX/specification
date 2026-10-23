@@ -48,6 +48,14 @@
       "title": "Composed",
       "description": "An object assembled from parts of another module.",
       "type": "object",
+      "$defs": {
+        "rootNestedDropped": {
+          "$comment": "Nested $defs inside a REACHED property of the ROOT schema. Unreferenced -> must be removed; the root and its properties are reached, yet their $defs still need sweeping. The then-empty `$defs` object is removed too.",
+          "title": "Root nested dropped",
+          "description": "An unreferenced nested definition of the root.",
+          "type": "null"
+        }
+      },
       "properties": {
         "street": {
           "$comment": "Ref into a nested property of the module -> #/properties/address/properties/street.",
@@ -133,15 +141,35 @@
           "title": "Main local",
           "description": "A local string definition of the root schema.",
           "type": "string"
+        },
+        "mainUnused": {
+          "$comment": "Never referenced -> shaken away from #/$defs/main/$defs.",
+          "title": "Main unused",
+          "description": "A definition nothing refers to.",
+          "type": "null"
         }
       },
       "not": {
-        "$comment": "This schema is hollow: it was not referenced and only remains as a container for structures that are still in use. Itself must not be used for validation."
+        "$comment": "This schema is hollow: it is as a container for definitions. Itself must not be used for validation."
+      }
+    },
+    "unused": {
+      "title": "Unused",
+      "description": "A module that nothing reachable refers to.",
+      "type": "object",
+      "properties": {
+        "pullsNothingIn": {
+          "$comment": "Even though this refs a module, it is itself unreachable and must not influence shaking.",
+          "title": "Pulls nothing in",
+          "description": "A flag defined by another module.",
+          "$ref": "#/$defs/used-whole/$defs/unused"
+        }
       }
     },
     "used-array-items": {
       "title": "Used array items",
       "description": "A module of which only individual array items and a non-schema value are referenced.",
+      "type": "object",
       "properties": {
         "combined": {
           "$comment": "Only allOf/1 is referenced from main. allOf/0 and allOf/2 are not reached -> they must become void placeholders, never JSON null, so that the index of allOf/1 stays stable. 'combined' itself is not reached -> hollowed.",
@@ -149,8 +177,16 @@
           "description": "A composition of which only the middle part is referenced.",
           "allOf": [
             {
-              "not": {
-                "$comment": "This schema is void: it was not referenced and was removed. It only remains as a placeholder to keep sibling positions stable. Itself must not be used for validation."
+              "$comment": "allOf/0: NOT referenced -> void placeholder.",
+              "title": "Combined part 0",
+              "description": "The first part.",
+              "type": "object",
+              "properties": {
+                "a": {
+                  "title": "A",
+                  "description": "An unreferenced value.",
+                  "type": "string"
+                }
               }
             },
             {
@@ -167,14 +203,12 @@
               }
             },
             {
-              "not": {
-                "$comment": "This schema is void: it was not referenced and was removed. It only remains as a placeholder to keep sibling positions stable. Itself must not be used for validation."
-              }
+              "$comment": "allOf/2: NOT referenced -> void placeholder. Its ref must NOT make unused.schema.json reachable.",
+              "title": "Combined part 2",
+              "description": "The last part.",
+              "$ref": "#/$defs/unused"
             }
-          ],
-          "not": {
-            "$comment": "This schema is hollow: it was not referenced and only remains as a container for structures that are still in use. Itself must not be used for validation."
-          }
+          ]
         },
         "choice": {
           "$comment": "Only the LAST item of oneOf is referenced -> oneOf/0 becomes a void placeholder, oneOf/1 is kept. The examples are not referenced -> remove",
@@ -182,20 +216,40 @@
           "description": "A choice of which only the last alternative is referenced.",
           "oneOf": [
             {
-              "not": {
-                "$comment": "This schema is void: it was not referenced and was removed. It only remains as a placeholder to keep sibling positions stable. Itself must not be used for validation."
+              "$comment": "oneOf/0: NOT referenced -> void placeholder.",
+              "title": "Choice 0",
+              "description": "The first alternative.",
+              "type": "null",
+              "$defs": {
+                "droppedDef": {
+                  "$comment": "Not reachable -> shaken away.",
+                  "title": "Dropped def",
+                  "description": "A definition nothing reachable refers to.",
+                  "type": "null"
+                }
               }
             },
             {
               "$comment": "oneOf/1: referenced from main via #/properties/choice/oneOf/1.",
               "title": "Choice 1",
               "description": "The second alternative.",
-              "type": "integer"
+              "type": "integer",
+              "$defs": {
+                "droppedDef": {
+                  "$comment": "Not reachable -> shaken away.",
+                  "title": "Dropped def",
+                  "description": "A definition nothing reachable refers to.",
+                  "type": "null"
+                }
+              }
             }
           ],
-          "not": {
-            "$comment": "This schema is hollow: it was not referenced and only remains as a container for structures that are still in use. Itself must not be used for validation."
-          }
+          "examples": [
+            null,
+            1,
+            2,
+            3
+          ]
         }
       },
       "$defs": {
@@ -204,20 +258,25 @@
           "title": "Kept via array",
           "description": "A boolean value.",
           "type": "boolean"
+        },
+        "droppedDef": {
+          "$comment": "Not reachable -> shaken away.",
+          "title": "Dropped def",
+          "description": "A definition nothing reachable refers to.",
+          "type": "null"
         }
-      },
-      "not": {
-        "$comment": "This schema is hollow: it was not referenced and only remains as a container for structures that are still in use. Itself must not be used for validation."
       }
     },
     "used-properties-only": {
       "title": "Used properties only",
       "description": "A module of which only nested properties are referenced.",
+      "type": "object",
       "properties": {
         "address": {
           "$comment": "Reached only through its nested children, never as a whole -> the container stays hollow, only the referenced children survive.",
           "title": "Address",
           "description": "A postal address.",
+          "type": "object",
           "properties": {
             "street": {
               "$comment": "Reached from main via #/properties/address/properties/street.",
@@ -225,25 +284,32 @@
               "description": "Street name and number.",
               "type": "string"
             },
+            "city": {
+              "$comment": "Not referenced -> dropped although its siblings are kept.",
+              "title": "City",
+              "description": "Name of the city.",
+              "type": "string"
+            },
             "geo": {
               "$comment": "Reached from main via a three-level deep pointer into #/properties/address/properties/geo/properties/lat.",
               "title": "Geo",
               "description": "Geographic coordinates.",
+              "type": "object",
               "properties": {
                 "lat": {
                   "$comment": "Deeply nested leaf that is referenced directly from main. Has an internal ref -> transitively keeps $defs/degrees.",
                   "title": "Latitude",
                   "description": "Latitude in degrees.",
                   "$ref": "#/$defs/used-properties-only/$defs/degrees"
+                },
+                "lon": {
+                  "$comment": "Deeply nested leaf that is NOT referenced -> dropped.",
+                  "title": "Longitude",
+                  "description": "Longitude in degrees.",
+                  "$ref": "#/$defs/used-properties-only/$defs/degrees"
                 }
-              },
-              "not": {
-                "$comment": "This schema is hollow: it was not referenced and only remains as a container for structures that are still in use. Itself must not be used for validation."
               }
             }
-          },
-          "not": {
-            "$comment": "This schema is hollow: it was not referenced and only remains as a container for structures that are still in use. Itself must not be used for validation."
           }
         },
         "contact": {
@@ -265,6 +331,12 @@
               "type": "string"
             }
           }
+        },
+        "unusedTopLevel": {
+          "$comment": "Not referenced -> dropped together with everything it refers to; must NOT make unused.schema.json reachable.",
+          "title": "Unused top level",
+          "description": "A property nothing refers to.",
+          "$ref": "#/$defs/unused"
         }
       },
       "$defs": {
@@ -275,15 +347,27 @@
           "type": "number",
           "minimum": -180,
           "maximum": 180
+        },
+        "unusedDef": {
+          "$comment": "Not reachable -> shaken away.",
+          "title": "Unused def",
+          "description": "A definition nothing reachable refers to.",
+          "type": "null"
         }
-      },
-      "not": {
-        "$comment": "This schema is hollow: it was not referenced and only remains as a container for structures that are still in use. Itself must not be used for validation."
       }
     },
     "used-subdefs-only": {
       "title": "Used sub-defs only",
       "description": "A module of which only individual definitions are referenced.",
+      "type": "object",
+      "properties": {
+        "body": {
+          "$comment": "Lives in the dropped body, so this ref must NOT make unused.schema.json reachable.",
+          "title": "Body",
+          "description": "The body of this module.",
+          "$ref": "#/$defs/unused"
+        }
+      },
       "$defs": {
         "kept": {
           "$comment": "Reached from main. Exercises three ref flavours.",
@@ -325,10 +409,13 @@
           "title": "Kept transitively",
           "description": "A string value.",
           "type": "string"
+        },
+        "dropped": {
+          "$comment": "Not reachable -> shaken away.",
+          "title": "Dropped",
+          "description": "A definition nothing reachable refers to.",
+          "type": "null"
         }
-      },
-      "not": {
-        "$comment": "This schema is hollow: it was not referenced and only remains as a container for structures that are still in use. Itself must not be used for validation."
       }
     },
     "used-whole": {
@@ -339,7 +426,15 @@
         "name": {
           "title": "Name",
           "description": "A display name.",
-          "type": "string"
+          "type": "string",
+          "$defs": {
+            "nestedDropped": {
+              "$comment": "Lives in $defs of a REACHED property (used-whole is used as a whole). Nothing refs it -> removed; the then-empty `$defs` object is removed too.",
+              "title": "Nested dropped",
+              "description": "An unreferenced nested definition.",
+              "type": "null"
+            }
+          }
         },
         "withDefs": {
           "$comment": "A REACHED property carrying nested $defs of which exactly one is referenced from main.",
@@ -355,10 +450,31 @@
               "type": "number",
               "$comment": "if/then/else are intentionally NOT schema objects.",
               "if": {
-                "const": 0
+                "const": 0,
+                "$defs": {
+                  "unused": {
+                    "$comment": "unreferenced -> shaken away.",
+                    "title": "Unused",
+                    "type": "null"
+                  }
+                }
               },
               "then": false,
-              "else": true
+              "else": true,
+              "$defs": {
+                "unusedPositive": {
+                  "$comment": "unreferenced -> shaken away.",
+                  "title": "Number > 0",
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unusedNegative": {
+                  "$comment": "unreferenced -> shaken away.",
+                  "title": "Number < 0",
+                  "type": "number",
+                  "exclusiveMaximum": 0
+                }
+              }
             }
           ],
           "$defs": {
@@ -367,6 +483,12 @@
               "title": "Nested kept",
               "description": "A referenced nested definition.",
               "type": "integer"
+            },
+            "nestedDropped": {
+              "$comment": "Sibling of a kept nested def, itself unreferenced -> removed.",
+              "title": "Nested dropped",
+              "description": "An unreferenced nested definition.",
+              "type": "null"
             }
           }
         },
@@ -410,6 +532,12 @@
           "title": "Inner",
           "description": "An integer value.",
           "type": "integer"
+        },
+        "unused": {
+          "$comment": "Not reachable -> shaken away.",
+          "title": "Unused",
+          "description": "A flag.",
+          "type": "boolean"
         },
         "sharedByOther": {
           "$comment": "Cross-referenced from used-subdefs-only#/$defs/kept.",
@@ -493,6 +621,14 @@
             "description": "A single tag.",
             "type": "string"
           }
+        }
+      },
+      "$defs": {
+        "unusedDef": {
+          "$comment": "The ONLY thing the tree-shaker is allowed to drop from this module.",
+          "title": "Unused def",
+          "description": "A definition nothing reachable refers to.",
+          "type": "null"
         }
       }
     }
