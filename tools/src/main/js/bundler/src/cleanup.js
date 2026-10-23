@@ -174,21 +174,9 @@ export const treeShake = (schema) => {
      */
     const sweepValue = (v, p) => {
         if (typeof v === 'object' && v !== null) {
-            if (Array.isArray(v)) {
-                if (sweepArray(v, p)) {
-                    return true;
-                }
-            } else {
-                if (sweepObject(v, p)) {
-                    return true;
-                }
-            }
-        } else {
-            if (reached.has(p)) {
-                return true;
-            }
+            return (Array.isArray(v) ? sweepArray : sweepObject)(v, p);
         }
-        return false;
+        return reached.has(p);
     }
     /**
      * @param {object} o
