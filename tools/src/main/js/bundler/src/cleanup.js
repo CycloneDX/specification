@@ -198,14 +198,13 @@ export const treeShake = (schema) => {
 
     /**
      * @param {unknown} v
-     * @param {string} p
-     * @return {boolean}
+     * @param {JsonPointer} p
+     * @return {boolean} whether anything remains
      */
     const sweepValue = (v, p) => {
         if (typeof v === 'object' && v !== null) {
             return (Array.isArray(v) ? sweepArray : sweepObject)(v, p);
         }
-        // reached a non-object schema?
         return reached.has(p);
     }
     /**
@@ -213,7 +212,7 @@ export const treeShake = (schema) => {
      * Utilizes {@link sweepSchema} when `o` is a schema.
      * @param {object} o
      * @param {JsonPointer} p
-     * @return {boolean}
+     * @return {boolean} whether anything remains
      */
     const sweepObject = (o, p) => {
         if (schemas.has(p)) return sweepSchema(o, p);
@@ -228,9 +227,10 @@ export const treeShake = (schema) => {
     };
     /**
      * Sweep phase: sweep an array and void its items needed.
+     * Unused trailing items are dropped; unused middle items are voided.
      * @param {Array} a
      * @param {JsonPointer} p
-     * @return {boolean}
+     * @return {boolean} whether anything remains
      */
     const sweepArray = (a, p) => {
         const kept = a.map((v, i) => sweepValue(v, `${p}${JP_PREFIX}${i}`));
