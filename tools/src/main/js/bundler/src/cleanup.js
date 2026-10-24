@@ -84,6 +84,27 @@ class HollowCollisionError extends Error {
 }
 
 
+const getVoid = (v) => {
+    switch (typeof v) {
+        case 'boolean':
+            return v;
+        case 'string':
+            return '';
+        case "bigint":
+        case 'number':
+            return 0;
+        case "function":
+            return () => {
+            };
+        case "object":
+            if (v === null) return v;
+            if (Array.isArray(v)) return [];
+            return {};
+        default:
+            return null;
+    }
+};
+
 /**
  * Tree-shake a schema in place.
  *
@@ -113,16 +134,22 @@ export const treeShake = (schema) => {
     /** @type {Set<JsonPointer>} */
     const voided = new Set();
 
-    /** @type {WeakSet<Schema>} */
-    const schemaObjects = new WeakSet();
+    /** @type {Set<JsonPointer>} */
+    const schemas = new Set();
     /**
      * @param {Readonly<Schema>} s
      * @return {void}
      */
-    const markSchemas = (s) => {
-        if (schemaObjects.has(s)) return;
-        schemaObjects.add(s);
-        subschemas(s).forEach(([sSub]) => markSchemas(sSub));
+    const markSchemas = (s, p) => {
+        if (schemas.has(p)) return;
+        schemas.add(p);
+        subschemas(s, false).forEach(([sSchema, sRel]) => {
+            if (isSchemaObject(sSchema)) {
+                markSchemas(sSchema, `${p}${jsonPointer4stack(sRel)}`);
+            } else {
+                schemas.add(`${p}${jsonPointer4stack(sRel)}`);
+            }
+        });
     }
 
     /** @type {Set<JsonPointer>} */
@@ -152,15 +179,20 @@ export const treeShake = (schema) => {
                 throw RangeError(`Missing target for LocalRef: ${v}`);
             }
             if (isSchemaObject(tSchema)) {
-                markSchemas(tSchema);
+                markSchemas(tSchema, frag);
                 markReached(tSchema, frag);
             } else {
                 reached.add(frag);
             }
         }
-        subschemas(s).forEach(([sSchema, sRel]) => {
+        subschemas(s, false).forEach(([sSchema, sRel]) => {
             if (sRel[0] === DEFS_KEYWORD) return;
-            markReached(sSchema, `${p}${jsonPointer4stack(sRel)}`);
+            const sP = `${p}${jsonPointer4stack(sRel)}`;
+            if (isSchemaObject(sSchema)) {
+                markReached(sSchema, sP);
+            } else {
+                reached.add(sP);
+            }
         });
     };
 
@@ -184,7 +216,7 @@ export const treeShake = (schema) => {
      * @return {boolean}
      */
     const sweepObject = (o, p) => {
-        if (schemaObjects.has(o)) return sweepSchema(o, p);
+        if (schemas.has(p)) return sweepSchema(o, p);
         for (const [k, v] of Object.entries(o)) {
             const kP = `${p}${JP_PREFIX}${escapeJsonPointer(k)}`;
             if (!sweepValue(v, kP)) {
@@ -201,19 +233,25 @@ export const treeShake = (schema) => {
      * @return {boolean}
      */
     const sweepArray = (a, p) => {
-        let kept = false;
-        for (const [k, v] of a.entries()) {
-            const kP = `${p}${JP_PREFIX}${k}`;
-            if (sweepValue(v, kP)) {
-                kept = true;
-                continue;
+        const kept = a.map((v, i) => sweepValue(v, `${p}${JP_PREFIX}${i}`));
+        if (kept.size === 0) return false;
+        const newLength = 1 + Math.max(-1, kept.lastIndexOf(true));
+        for (const [i, k] of kept.entries()) {
+            if (k) continue;
+            const iP = `${p}${JP_PREFIX}${i}`;
+            if (newLength <= i) {
+                delete a[i];
+                removed.add(iP);
+            } else {
+                const v = a[i];
+                a[i] = schemas.has(iP) && isSchemaObject(v)
+                    ? {[NOT_KEYWORD]: {[COMMENT_KEYWORD]: VOID_COMMENT}}
+                    : getVoid(v);
+                voided.add(iP);
             }
-            a[k] = schemaObjects.has(v)
-                ? {[NOT_KEYWORD]: {[COMMENT_KEYWORD]: VOID_COMMENT}}
-                : null;
-            voided.add(kP);
         }
-        return kept;
+        a.length = newLength;
+        return true;
     };
     /**
      * Sweep phase: sweep a schema and hollow it if needed.
@@ -268,7 +306,7 @@ export const treeShake = (schema) => {
         return kept;
     };
 
-    markSchemas(schema);
+    markSchemas(schema, ROOT_POINTER);
     markReached(schema, ROOT_POINTER);
     sweepSchema(schema, ROOT_POINTER);
 
