@@ -28,12 +28,12 @@ export const dropComments = (schema) => {
 
 
 const HOLLOW_COMMENT =
-    'This schema is hollow: it was not referenced ' +
+    'This schema is hollow: it is not referenced ' +
     'and only remains as a container for structures that are still in use. ' +
     'Itself must not be used for validation.';
 
 const VOID_COMMENT =
-    'This schema is void: it was not referenced and was removed. ' +
+    'This schema is void: it is not referenced and was removed. ' +
     'It only remains as a placeholder to keep sibling positions stable. ' +
     'Itself must not be used for validation.';
 
