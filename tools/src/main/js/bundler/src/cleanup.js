@@ -134,9 +134,13 @@ export const treeShake = (schema) => {
     /** @type {Set<JsonPointer>} */
     const voided = new Set();
 
-    /** @type {Set<JsonPointer>} */
+    /**
+     * Pointer of known schemas - they can be objects or boolean.
+     * @type {Set<JsonPointer>}
+     */
     const schemas = new Set();
     /**
+     * Mark known schemas.
      * @param {Readonly<Schema>} s
      * @return {void}
      */
@@ -144,10 +148,11 @@ export const treeShake = (schema) => {
         if (schemas.has(p)) return;
         schemas.add(p);
         subschemas(s, false).forEach(([sSchema, sRel]) => {
+            const sP = `${p}${jsonPointer4stack(sRel)}`;
             if (isSchemaObject(sSchema)) {
-                markSchemas(sSchema, `${p}${jsonPointer4stack(sRel)}`);
+                markSchemas(sSchema, sP);
             } else {
-                schemas.add(`${p}${jsonPointer4stack(sRel)}`);
+                schemas.add(sP);
             }
         });
     }
@@ -155,6 +160,8 @@ export const treeShake = (schema) => {
     /** @type {Set<JsonPointer>} */
     const reached = new Set();
     /**
+     * Mark reached.
+     * Since reached are expected to be schemas, we mark them on the way as refs may go out of order.
      * @param {Readonly<Schema>} s
      * @param {JsonPointer} p
      * @returns {void}
@@ -182,6 +189,7 @@ export const treeShake = (schema) => {
                 markSchemas(tSchema, frag);
                 markReached(tSchema, frag);
             } else {
+                if (typeof tSchema === 'boolean') schemas.add(frag);
                 reached.add(frag);
             }
         }
@@ -189,8 +197,10 @@ export const treeShake = (schema) => {
             if (sRel[0] === DEFS_KEYWORD) return;
             const sP = `${p}${jsonPointer4stack(sRel)}`;
             if (isSchemaObject(sSchema)) {
+                markSchemas(sSchema, sP);
                 markReached(sSchema, sP);
             } else {
+                schemas.add(sP);
                 reached.add(sP);
             }
         });
@@ -233,25 +243,26 @@ export const treeShake = (schema) => {
      * @return {boolean} whether anything remains
      */
     const sweepArray = (a, p) => {
-        const kept = a.map((v, i) => sweepValue(v, `${p}${JP_PREFIX}${i}`));
-        const newLength = 1 + kept.lastIndexOf(true);
-        if (newLength === 0) return false;
-        for (const [i, k] of kept.entries()) {
-            if (k) continue;
+        let lastKeptIndex = -1;
+        for (let i = a.length - 1; i >= 0; --i) {
+            const v = a[i];
             const iP = `${p}${JP_PREFIX}${i}`;
-            if (newLength <= i) {
+            if (sweepValue(v, iP)) {
+                lastKeptIndex = Math.max(lastKeptIndex, i);
+                continue;
+            }
+            if (lastKeptIndex < i) {
                 delete a[i];
                 removed.add(iP);
-            } else {
-                const v = a[i];
-                a[i] = schemas.has(iP) && isSchemaObject(v)
-                    ? {[NOT_KEYWORD]: {[COMMENT_KEYWORD]: VOID_COMMENT}}
-                    : getVoid(v);
-                voided.add(iP);
+                continue;
             }
+            a[i] = schemas.has(iP) && isSchemaObject(v)
+                ? {[NOT_KEYWORD]: {[COMMENT_KEYWORD]: VOID_COMMENT}}
+                : getVoid(v);
+            voided.add(iP);
         }
-        a.length = newLength;
-        return true;
+        a.length = 1 + lastKeptIndex;
+        return a.length > 0;
     };
     /**
      * Sweep phase: sweep a schema and hollow it if needed.
