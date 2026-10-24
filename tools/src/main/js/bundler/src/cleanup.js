@@ -234,8 +234,8 @@ export const treeShake = (schema) => {
      */
     const sweepArray = (a, p) => {
         const kept = a.map((v, i) => sweepValue(v, `${p}${JP_PREFIX}${i}`));
-        if (kept.size === 0) return false;
         const newLength = 1 + Math.max(-1, kept.lastIndexOf(true));
+        if (newLength === 0) return false;
         for (const [i, k] of kept.entries()) {
             if (k) continue;
             const iP = `${p}${JP_PREFIX}${i}`;
