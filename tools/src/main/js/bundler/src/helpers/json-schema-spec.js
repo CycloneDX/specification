@@ -65,25 +65,29 @@ export const isSchemaObject = (o) =>
 /**
  * Yield immediate subschemas, never property maps or literal data.
  * @param {Readonly<Schema>} s schema
- * @yields {[Schema, JsonPointerStack]} schema and pointer stack
+ * @param {boolean} oo shall return objects only
+ * @yields {[Schema|boolean, JsonPointerStack]} schema and pointer stack; if `oo` is true then schema may be boolean.
  */
-export const subschemas = function* (s) {
+export const subschemas = function* (s, oo = true) {
+    const check = oo
+        ? isSchemaObject
+        : (v) => isSchemaObject(v) || typeof v === 'boolean';
     for (const [k, v] of Object.entries(s)) {
         if (SINGLE_SCHEMA.has(k)) {
-            if (isSchemaObject(v)) yield [v, [k]];
+            if (check(v)) yield [v, [k]];
             continue;
         }
         if (SCHEMA_ARRAY.has(k)) {
             if (!Array.isArray(v)) continue;
             for (const [ak, av] of v.entries()) {
-                if (isSchemaObject(av)) yield [av, [k, String(ak)]];
+                if (check(av)) yield [av, [k, String(ak)]];
             }
             continue;
         }
         if (SCHEMA_MAP.has(k)) {
-            if (!isSchemaObject(v)) continue;
+            if (typeof v !== 'object' || v === null) continue;
             for (const [mk, mv] of Object.entries(v)) {
-                if (isSchemaObject(mv)) yield [mv, [k, mk]];
+                if (check(mv)) yield [mv, [k, mk]];
             }
         }
     }
