@@ -293,11 +293,11 @@ export const treeShake = (schema) => {
                 sweepSchema(sSchema, `${p}${jsonPointer4stack(sRef)}`)
             });
             const defs = s[DEFS_KEYWORD];
-            if (isSchemaObject(defs)) {
-                const dK = `${p}${JP_PREFIX}${DEFS_KEYWORD}`
-                if (!sweepObject(defs, dK)) {
+            if (typeof defs === 'object' && defs !== null) {
+                const dP = `${p}${JP_PREFIX}${DEFS_KEYWORD}`
+                if (!sweepObject(defs, dP)) {
                     delete s[DEFS_KEYWORD];
-                    removed.add(dK);
+                    removed.add(dP);
                 }
             }
         } else {
