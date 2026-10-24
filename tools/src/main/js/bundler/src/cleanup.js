@@ -25,6 +25,8 @@ export const dropComments = (schema) => {
     subschemas(schema).forEach(([s]) => dropComments(s));
 }
 
+
+
 const HOLLOW_COMMENT =
     'This schema is hollow: it was not referenced ' +
     'and only remains as a container for structures that are still in use. ' +
@@ -84,6 +86,11 @@ class HollowCollisionError extends Error {
 }
 
 
+/**
+ * @template T
+ * @param {T} v
+ * @return {T}
+ */
 const getVoid = (v) => {
     switch (typeof v) {
         case 'boolean':
@@ -93,15 +100,12 @@ const getVoid = (v) => {
         case "bigint":
         case 'number':
             return 0;
-        case "function":
-            return () => {
-            };
         case "object":
             if (v === null) return v;
             if (Array.isArray(v)) return [];
             return {};
         default:
-            return null;
+            throw TypeError(`Unsupported type ${typeof v}`)
     }
 };
 
