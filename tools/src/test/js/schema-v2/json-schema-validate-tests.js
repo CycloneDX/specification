@@ -84,6 +84,7 @@ const [spdxSchema, cryptoDefsSchema, behaviorTaxonomySchema, schemas, schemaModu
 function getAjv(bundled) {
     // see https://ajv.js.org/options.html
     const ajv = new Ajv2020({
+        allErrors: true,
         verbose: true,
         addUsedSchema: false,
         keywords: ["meta:enum"],
@@ -121,17 +122,16 @@ let errCnt = 0
 
 for (const [schemaFile, schema] of schemas) {
     console.log('\n> SchemaFile: ', schemaFile);
-    const ajv = getAjv(schemaFilesBundleMatcher.test(basename(schemaFile)))
-
-    console.group(`> compile schema, log warnings ...`)
+    console.group(`> validate & compile schema, log warnings ...`)
     try {
+        const ajv = getAjv(schemaFilesBundleMatcher.test(basename(schemaFile)))
         ajv.compile(schema)
     } catch (err) {
         ++errCnt
-        console.groupEnd()
         console.error(
             `!!! SCHEMA ERROR:`, String(err),
             '\n   in file:', schemaFile)
+        console.groupEnd()
         continue
     }
     console.groupEnd()
