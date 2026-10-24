@@ -125,6 +125,7 @@ for (const [schemaFile, schema] of schemas) {
     console.group(`> validate & compile schema, log warnings ...`)
     try {
         const ajv = getAjv(schemaFilesBundleMatcher.test(basename(schemaFile)))
+        // compile goes beyond validation - it also checs references, and such
         ajv.compile(schema)
     } catch (err) {
         ++errCnt
