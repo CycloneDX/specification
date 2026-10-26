@@ -81,7 +81,7 @@ export const subschemas = function* (s) {
             continue;
         }
         if (SCHEMA_MAP.has(k)) {
-            if (!isSchemaObject(v)) continue;
+            if (typeof v !== 'object' || v === null) continue;
             for (const [mk, mv] of Object.entries(v)) {
                 if (isSchemaObject(mv)) yield [mv, [k, mk]];
             }

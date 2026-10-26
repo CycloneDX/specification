@@ -212,21 +212,20 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
 
     return {
         schema,
-        external: Array.from(externals),
+        external: Array.from(externals).sort(),
         embedded: Array.from(embeddedMap,
             ([f, d]) => {
                 const {path, frag} = refSplit(f);
                 return [
                     refJoin({path: posixPath(relative(entryDir, path)), frag}),
                     makeLocalRef(d)];
-            }),
+            }).sort(([a], [b]) => a.localeCompare(b)),
         rewired: Array.from(rewiredMap,
             ([f, t]) => {
                 const {path, frag} = refSplit(f);
                 return [
                     refJoin({path: posixPath(relative(entryDir, path)), frag}),
                     t];
-            }
-        )
+            }).sort(([a], [b]) => a.localeCompare(b)),
     };
 };
