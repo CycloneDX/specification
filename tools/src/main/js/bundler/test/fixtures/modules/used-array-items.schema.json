@@ -7,7 +7,7 @@
   "type": "object",
   "properties": {
     "combined": {
-      "$comment": "Only allOf/1 is referenced from main. allOf/0 and allOf/2 are not reached -> they must become void placeholders, never JSON null, so that the index of allOf/1 stays stable. 'combined' itself is not reached -> hollowed.",
+      "$comment": "Only allOf/1 and allOf/3 are referenced from main. allOf/0 and allOf/2 are not reached -> they must become void placeholders or stay boolean, never JSON null, so that the index of allOf/3 stays stable; the rest can be truncated. 'combined' itself is not reached -> hollowed.",
       "title": "Combined",
       "description": "A composition of which only the middle part is referenced.",
       "allOf": [
@@ -37,11 +37,24 @@
             }
           }
         },
+        false,
+        true,
         {
-          "$comment": "allOf/2: NOT referenced -> void placeholder. Its ref must NOT make unused.schema.json reachable.",
-          "title": "Combined part 2",
-          "description": "The last part.",
-          "$ref": "unused.schema.json"
+          "$comment": "allOf/4: NOT referenced and nothing used after it -> removed.",
+          "title": "Combined part 6",
+          "description": "The end part.",
+          "type": "object",
+          "properties": {
+            "a": {
+              "title": "A",
+              "description": "An unreferenced value.",
+              "type": "string"
+            }
+          }
+        },
+        {
+          "$comment": "allOf/5: NOT referenced and nothing used after it -> removed.",
+          "$ref": "#/$defs/droppedDef"
         }
       ]
     },

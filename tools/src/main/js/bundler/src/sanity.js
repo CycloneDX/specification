@@ -1,4 +1,6 @@
-import {objectGetOwnPath, PATH_NOT_FOUND} from "./helpers/common.js";
+import Ajv2020 from 'ajv/dist/2020.js';
+
+import {objectGetOwnPath, PATH_NOT_FOUND} from './helpers/common.js';
 import {
     isSchemaObject,
     makeLocalRef,
@@ -90,14 +92,36 @@ const validateRefs = (schema) => {
  * @param {Readonly<Schema>} schema
  * @returns {ValidationResult}
  */
+const validateAgainstMetaSchema = (schema) => {
+    const warnings = new Set();
+    const errors = new Set();
+    const ajv = new Ajv2020({allErrors: true});
+    const valid = ajv.validateSchema(schema);
+    if (!valid) {
+        ajv.errorsText(ajv.errors, {separator: '\n'})
+            .split('\n').forEach(e => errors.add(e));
+    }
+    return {
+        warnings: Array.from(warnings),
+        errors: Array.from(errors),
+    };
+};
+
+/**
+ * @param {Readonly<Schema>} schema
+ * @returns {ValidationResult}
+ */
 export const validateSchema = (schema) => {
-    const refs = validateRefs(schema)
+    const refs = validateRefs(schema);
+    const meta = validateAgainstMetaSchema(schema);
     return {
         warnings: [
             ...refs.warnings,
+            ...meta.warnings,
         ],
         errors: [
             ...refs.errors,
+            ...meta.errors,
         ],
     }
 };
