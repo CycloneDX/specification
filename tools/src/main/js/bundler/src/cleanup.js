@@ -236,7 +236,7 @@ export const treeShake = (schema) => {
      * @return {boolean} whether anything remains
      */
     const sweepObject = (o, p) => {
-        if (schemas.has(o)) return sweepSchema(o, p);
+        if (schemas.has(o)) return sweepSchema(o, p, false);
         for (const [k, v] of Object.entries(o)) {
             const kP = `${p}${JP_PREFIX}${escapeJsonPointer(k)}`;
             if (!sweepValue(v, kP)) {
