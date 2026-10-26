@@ -12,7 +12,13 @@ into `$defs` instead of via embedded resources.
 ## Requirements
 
 * Node.js `>= 24.2` (uses `import.meta.main`, `RegExp.escape`, `fs.glob`)
-* No runtime dependencies
+* [`ajv`](https://ajv.js.org/) `^8.20` — used to validate the bundle against the JSON Schema meta schema
+
+Install the dependencies once:
+
+```shell
+npm ci
+```
 
 ## Usage
 
@@ -59,8 +65,11 @@ The bundler is split into stages (one module each under `src/`):
    * The root `$id` is rewritten to point at the bundled file name.
 2. **Tree-shake** (`src/cleanup.js`) — remove definitions that are not reachable from the root.  
    *Not implemented yet; currently a no-op.*
-3. **Sanity check** (`src/sanity.js`) — verifies every local JSON-Pointer ref resolves in the bundle.
-   Unresolvable refs are errors; external refs and anchor-based refs are reported as warnings only.
+3. **Sanity check** (`src/sanity.js`) — validates the bundled result:
+   * every local JSON-Pointer ref must resolve in the bundle.
+     Unresolvable refs are errors; external refs and anchor-based refs are reported as warnings only.
+   * the bundle must be valid against the JSON Schema draft 2020-12 meta schema (checked via `ajv`).
+     Every meta-schema violation is an error.
 4. **Write** (`cli.js`) — emits the pretty bundle, then strips `$comment` from all subschemas
    (property *names* called `$comment` are preserved) and emits the minified bundle.
 
