@@ -164,9 +164,7 @@ export const treeShake = (schema) => {
                 markSchemas(tSchema);
             }
         }
-        subschemas(s).forEach(([sSchema]) => {
-            markSchemas(sSchema);
-        });
+        subschemas(s).forEach(([sSchema]) => markSchemas(sSchema));
     }
 
     /**
