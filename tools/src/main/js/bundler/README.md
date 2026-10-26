@@ -42,7 +42,7 @@ This writes, next to the root schema:
 
 Exit codes:
 * `1` — invalid arguments
-* `2` — bundling/validation error
+* `2` — bundling/tree-shaking/validation error
 
 This is what the `bundle_2.0_schemas` GitHub workflow runs on every change to
 the 2.0 schema sources.
@@ -67,16 +67,27 @@ The bundler is split into stages (one module each under `src/`):
    * *Mark*: starting at the root schema, walk all subschemas (`properties`, `items`, `allOf`, …)
      and follow every local `$ref`/`$dynamicRef`/`$recursiveRef`. `$defs` are *not* descended into —
      definitions are only reached via refs. Refs may point at any JSON Pointer, not just `$defs`
-     entries, e.g. `#/$defs/<module>/properties/address/properties/street`.
-   * *Sweep*: everything that was not marked is removed:
-     * unreached `$defs` entries — also in modules that are referenced as a whole;
-     * unreached parts (`properties`, `type`, …) of schemas that are not reached themselves
-       but contain reached parts.
-   * Schemas that are not reached but contain reached parts are *hollowed*:
-     only `title`, `description`, `$comment` and the keys leading to the reached parts are kept,
-     and `"not": {"$comment": …}` is added so the hollow schema never validates anything.
-     Typical example: an embedded module of which only some `$defs` are referenced.
+     entries, e.g. `#/$defs/<module>/properties/address/properties/street`
+     or `#/$defs/<module>/properties/combined/allOf/1`.
+   * *Sweep*: everything that was not marked is dropped. Three things can happen:
+     * **removed** — unreached object members are deleted:
+       * unreached `$defs` entries — also in schemas that are reached as a whole;
+       * unreached parts (`properties`, `type`, `examples`, …) of schemas that are not reached
+         themselves but contain reached parts;
+       * unreached *trailing* array items (`allOf`, `oneOf`, …).
+     * **voided** — unreached array items that are followed by a reached item are *not* removed,
+       so that the indices of the reached items stay stable. They are replaced by a placeholder:
+       `{"not": {"$comment": …}}` for schemas, an empty value (`{}`, `[]`, `""`, `0`) for data;
+       booleans and `null` are kept as they are.
+     * **hollowed** — schemas that are not reached but contain reached parts:
+       only `title`, `description`, `$comment` and the keys leading to the reached parts are kept,
+       and `"not": {"$comment": …}` is added so the hollow schema never validates anything.
+       Typical examples: an embedded module of which only some `$defs` are referenced,
+       or a `properties` container of which only a nested property is referenced.
+     Reached schemas themselves are left untouched — only their `$defs` are swept.
    * Schemas carrying `$anchor`/`$dynamicAnchor`/`$recursiveAnchor` are kept untouched.
+   * The tree-shaker aborts with an error if a local ref uses an anchor fragment instead of a
+     JSON Pointer, if its target does not exist, or if its target is neither a schema nor a boolean.
 3. **Sanity check** (`src/sanity.js`) — validates the bundled result:
    * every local JSON-Pointer ref must resolve in the bundle.
      Unresolvable refs are errors; external refs and anchor-based refs are reported as warnings only.
@@ -86,14 +97,18 @@ The bundler is split into stages (one module each under `src/`):
    (property *names* called `$comment` are preserved) and emits the minified bundle.
 
 A report of what was embedded, rewired and treated as external, and of what the tree-shaker
-hollowed and removed, is printed to the console.
+hollowed, voided and removed, is printed to the console.
 
 ## Limitations
 
 * Refs via `$anchor` / `$dynamicAnchor` / `$recursiveAnchor` into bundled files are **not** supported
   and cause an error; only JSON-Pointer fragments are rewired.
-* Tree-shaking follows JSON-Pointer refs only. Schemas that declare an anchor are kept as they are,
-  since the tree-shaker cannot tell whether they are referenced.
+* Tree-shaking follows JSON-Pointer refs only; a local ref with an anchor fragment aborts with an
+  `Unsupported ref fragment` error before the sanity check runs.
+  Schemas that declare an anchor are kept as they are, since the tree-shaker cannot tell whether
+  they are referenced.
+* Unresolvable local refs abort the tree-shaker with a `Missing target for LocalRef` error
+  before the sanity check gets to report them.
 * Tree-shaking cannot hollow a schema that kept a `not` keyword;
   this aborts with a `Collision` error.
 * The bundler is not aware of `$id`-based resolution; refs are resolved purely by file path.
