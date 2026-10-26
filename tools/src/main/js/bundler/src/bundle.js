@@ -1,9 +1,14 @@
 import {basename, dirname, relative, resolve} from 'node:path';
 import {ok} from 'node:assert/strict';
 
-import {JSON_SCHEMA_RE, getJsonfile, posixPath, findDuplicateValues} from './helpers/common.js';
 import {
-    escapeJsonPointer, isJsonPointer,
+    posixPath,
+    JSON_SCHEMA_RE, getJsonfile,
+    objectGetOwnPath, PATH_NOT_FOUND,
+    findDuplicateValues
+} from './helpers/common.js';
+import {
+    escapeJsonPointer, isJsonPointer, jsonPointer2stack,
     PREFIX as JP_PREFIX, ROOT_POINTER
 } from './helpers/json-pointer-spec.js';
 import {
@@ -86,16 +91,22 @@ class ModuleNameCollisionError extends Error {
  * @param {Iterable<string>} includeFiles Absolute path to schema files that shall be bundled.
  * @param {string} targetFile Absolute path to target schema file.
  * @returns {Promise<BundleResult>}
+ * @throws {RangeError} on a local ref whose fragment is not a JSON Pointer (e.g. an anchor
  */
 export const bundle = async (entryFile, includeFiles, targetFile) => {
     const entryDir = dirname(entryFile);
     const targetDir = dirname(targetFile);
 
-    /** @type {ReadonlyMap<string, string>} */
-    const fileModuleNames = Object.freeze(new Map(
-        [entryFile, ...includeFiles].map(f => [f, makeModuleName(basename(f))])
-    ));
-    const _dupModuleNames = findDuplicateValues(fileModuleNames)
+    /** @type {ReadonlyMap<string, Readonly<{module:string, schema:Schema}>>} */
+    const fileModuleSchema = Object.freeze(new Map(await Promise.all(
+        [entryFile, ...includeFiles].map(async f => {
+            const module = makeModuleName(basename(f));
+            const schema = await getJsonfile(f);
+            ok(isSchemaObject(schema), `Not schema: ${f}`);
+            return [f, Object.freeze({module, schema})];
+        }))));
+    const _dupModuleNames = findDuplicateValues(new Map(
+        fileModuleSchema.entries().map(([f, {module}]) => [f, module])));
     if (_dupModuleNames.size) {
         throw new ModuleNameCollisionError(_dupModuleNames);
     }
@@ -118,6 +129,8 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
      */
     const rewiredMap = new Map();
 
+    /** @type {WeakSet<Schema>} */
+    const _rewireRefsSeen = new WeakSet();
     /**
      * Rewire refs in place.
      *
@@ -128,6 +141,8 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
      * @returns {void}
      */
     const rewireRefs = (schema, sourceFile) => {
+        if (_rewireRefsSeen.has(schema)) return;
+        _rewireRefsSeen.add(schema);
         const sourceDir = dirname(sourceFile);
         for (const k of REF_KEYWORDS) {
             const v = schema[k];
@@ -142,8 +157,8 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
             const refFile = path
                 ? resolve(sourceDir, ...path.split(URI_PATH_SEP))
                 : sourceFile;
-            const moduleName = fileModuleNames.get(refFile);
-            if (moduleName) {
+            const refMS = fileModuleSchema.get(refFile)
+            if (refMS) {
                 if (frag !== null && !isJsonPointer(frag)) {
                     // currently dont support anchors - only JSON pointer.
                     throw new RangeError(`Unsupported ref fragment: ${v}`);
@@ -152,7 +167,7 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
                     path: null,
                     frag: (refFile === entryFile && !frag?.startsWith(JP_DEFS_PREFIX)
                             ? ROOT_POINTER
-                            : `${JP_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`
+                            : `${JP_DEFS_PREFIX}${escapeJsonPointer(refMS.module)}`
                     ) + (frag ?? '')
                 };
             } else {
@@ -166,25 +181,33 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
             rewiredMap.set(refJoin({path: refFile, frag}), rewired);
             if (rewiredRS.path) {
                 externals.add(rewired);
+            } else if (refMS) {
+                const tSchema = objectGetOwnPath(refMS.schema, jsonPointer2stack(frag ?? ROOT_POINTER));
+                if (tSchema === PATH_NOT_FOUND) {
+                    throw RangeError(`Missing target for ref: ${v}`);
+                }
+                if (isSchemaObject(tSchema)) {
+                    rewireRefs(tSchema, refFile);
+                } else if (typeof tSchema !== 'boolean') {
+                    throw new RangeError(`Ref target is not schema nor boolean: ${v}`)
+                }
             }
         }
         subschemas(schema).forEach(([s]) => rewireRefs(s, sourceFile));
-    }
+    };
+    fileModuleSchema.forEach(({schema}, sourceFile) => rewireRefs(schema, sourceFile));
 
-    const schema = await getJsonfile(entryFile);
-    ok(isSchemaObject(schema), `Not schema: ${entryFile}`);
+    const {schema, module: entryModuleName} = fileModuleSchema.get(entryFile);
     if (URL.canParse(schema[ID_KEYWORD])) {
         schema[ID_KEYWORD] = new URL(
             posixPath(relative(entryDir, targetFile)),
             schema[ID_KEYWORD]
         ).toString();
     }
-    rewireRefs(schema, entryFile);
     const schemaDefsOrig = schema[DEFS_KEYWORD];
     schema[DEFS_KEYWORD] = Object.fromEntries( // sort for deterministic order
-        [...fileModuleNames.values()].sort().map(m => [m, undefined]));
+        [...fileModuleSchema.values().map(({module}) => module)].sort().map(m => [m, undefined]));
 
-    const entryModuleName = fileModuleNames.get(entryFile);
     if (schemaDefsOrig) {
         schema[DEFS_KEYWORD][entryModuleName] = {
             [DEFS_KEYWORD]: schemaDefsOrig,
@@ -198,9 +221,8 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
         delete schema[DEFS_KEYWORD][entryModuleName];
     }
 
-    for (const [includeFile, moduleName] of fileModuleNames) {
+    for (const [includeFile, {module: moduleName, schema: includeSchema}] of fileModuleSchema) {
         if (includeFile === entryFile) continue;
-        const includeSchema = await getJsonfile(includeFile);
         ok(isSchemaObject(includeSchema), `Not schema: ${includeFile}`);
         delete includeSchema[SCHEMA_KEYWORD];
         delete includeSchema[ID_KEYWORD];
