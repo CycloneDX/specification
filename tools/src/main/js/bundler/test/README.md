@@ -52,6 +52,10 @@ The modules exercise the tree-shaker as follows:
   items *after* the last reached one (`allOf/4`) may be truncated. The unreferenced `examples` of
   `choice` are removed. `$defs/keptViaArray` is kept transitively via `allOf/1`; `$defs/droppedDef`
   and the nested `oneOf/*/$defs/droppedDef` are removed.
+- `used-custom-defs` — definitions live in non-standard containers (`custom-defs`,
+  `even-more-custom-defs`) instead of `$defs`. The entry refs `#/custom-defs/customKept`, which refs
+  `#/even-more-custom-defs/deepKept`. Both containers must be traversed; `customKept` and `deepKept`
+  are kept, `customDropped`/`deepDropped` and the module body are dropped, the containers are hollowed.
 - `unused` — nothing reachable refers to it; the whole module is removed.
 - `dynamic-anchor` — declares a `$dynamicAnchor`; the tree-shaker cannot follow anchors and keeps it as is.
 
@@ -66,6 +70,8 @@ The entry schema additionally covers:
   *properties* of a module rather than its `$defs` (see `used-properties-only` above).
 - refs into *array items* of a module (`properties.middle`, `properties.lastChoice`;
   see `used-array-items` above).
+- a ref into a *non-standard* definitions container of a module (`properties.customDef`;
+    see `used-custom-defs` above).
 - refs to an empty `{}`, a `$comment`-only and an annotation-only schema
   (`properties.anyValue`, `properties.todoValue`, `properties.annotatedValue`) — reached, so
   they must survive and must *not* be hollowed.

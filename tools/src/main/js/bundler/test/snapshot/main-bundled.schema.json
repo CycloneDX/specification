@@ -111,6 +111,12 @@
       "title": "Annotated value",
       "description": "An annotation-only schema.",
       "$ref": "#/$defs/used-subdefs-only/$defs/keptAnnotationsOnly"
+    },
+    "customDef": {
+      "$comment": "Ref into a NON-STANDARD definitions container (`custom-defs`, not `$defs`) of a module, which itself refs into yet another non-standard container (`even-more-custom-defs`). Both must be followed; unreferenced siblings in both containers and the module body are dropped.",
+      "title": "Custom def",
+      "description": "A value defined in a non-standard definitions container of another module.",
+      "$ref": "#/$defs/used-custom-defs/custom-defs/customKept"
     }
   },
   "$defs": {
@@ -212,6 +218,55 @@
       },
       "not": {
         "$comment": "This schema is hollow: it is not referenced and only remains as a container for structures that are still in use. Itself must not be used for validation."
+      }
+    },
+    "used-custom-defs": {
+      "title": "Used custom defs",
+      "description": "A module whose definitions live in non-standard containers.",
+      "type": "object",
+      "properties": {
+        "body": {
+          "$comment": "Lives in the dropped body -> this ref must NOT make `custom-defs/customDropped` reachable.",
+          "title": "Body",
+          "description": "The body of this module.",
+          "$ref": "#/$defs/used-custom-defs/custom-defs/customDropped"
+        }
+      },
+      "custom-defs": {
+        "customKept": {
+          "$comment": "Reached from main via a JSON pointer into a non-`$defs` container. Transitively keeps `even-more-custom-defs/deepKept`.",
+          "title": "Custom kept",
+          "description": "A definition in a non-standard container, reached from the root schema.",
+          "type": "object",
+          "properties": {
+            "deep": {
+              "$comment": "Internal ref into ANOTHER non-standard container -> must be rewired and keep `deepKept`.",
+              "title": "Deep",
+              "description": "A value defined in an even more custom container.",
+              "$ref": "#/$defs/used-custom-defs/even-more-custom-defs/deepKept"
+            }
+          }
+        },
+        "customDropped": {
+          "$comment": "Only referenced from the dropped body -> shaken away.",
+          "title": "Custom dropped",
+          "description": "A definition nothing reachable refers to.",
+          "type": "null"
+        }
+      },
+      "even-more-custom-defs": {
+        "deepKept": {
+          "$comment": "Only reachable via `custom-defs/customKept`.",
+          "title": "Deep kept",
+          "description": "A string value.",
+          "type": "string"
+        },
+        "deepDropped": {
+          "$comment": "Not reachable -> shaken away.",
+          "title": "Deep dropped",
+          "description": "A definition nothing reachable refers to.",
+          "type": "null"
+        }
       }
     },
     "used-properties-only": {
