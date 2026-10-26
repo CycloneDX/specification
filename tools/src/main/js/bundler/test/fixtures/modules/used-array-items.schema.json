@@ -7,7 +7,7 @@
   "type": "object",
   "properties": {
     "combined": {
-      "$comment": "Only allOf/3 is referenced from main. allOf/0 to allOf/2 are not reached -> they must become void placeholders, never JSON null, so that the index of allOf/3 stays stable; the rest can be removed. 'combined' itself is not reached -> hollowed.",
+      "$comment": "Only allOf/1 and allOf/3 are referenced from main. allOf/0 and allOf/2 are not reached -> they must become void placeholders or stay boolean, never JSON null, so that the index of allOf/3 stays stable; the rest can be truncated. 'combined' itself is not reached -> hollowed.",
       "title": "Combined",
       "description": "A composition of which only the middle part is referenced.",
       "allOf": [
@@ -24,11 +24,9 @@
             }
           }
         },
-        true,
-        false,
         {
-          "$comment": "allOf/3: referenced from main via #/properties/combined/allOf/3 -> kept as a whole, including its internal ref to $defs/keptViaArray.",
-          "title": "Combined part 3",
+          "$comment": "allOf/1: referenced from main via #/properties/combined/allOf/1 -> kept as a whole, including its internal ref to $defs/keptViaArray.",
+          "title": "Combined part 2",
           "description": "The middle part.",
           "type": "object",
           "properties": {
@@ -39,10 +37,10 @@
             }
           }
         },
-        true,
         false,
+        true,
         {
-          "$comment": "allOf/6: NOT referenced ano nothing used after -> removed.",
+          "$comment": "allOf/4: NOT referenced ano nothing used after -> removed.",
           "title": "Combined part 6",
           "description": "The end part.",
           "type": "object",
