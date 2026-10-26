@@ -49,7 +49,6 @@ const VOID_COMMENT =
  */
 
 /**
- * @param {ReadonlySet<JsonPointer>} reached
  * @param {ReadonlySet<JsonPointer>} hollowed
  * @param {ReadonlySet<JsonPointer>} voided
  * @param {ReadonlySet<JsonPointer>} removed
