@@ -1,7 +1,7 @@
 import {objectGetOwnPath, PATH_NOT_FOUND} from './helpers/common.js';
 import {
     escapeJsonPointer, isJsonPointer,
-    jsonPointer2stack, jsonPointer4stack,
+    jsonPointer2stack,
     hasAncestorIn,
     PREFIX as JP_PREFIX, ROOT_POINTER
 } from './helpers/json-pointer-spec.js';
