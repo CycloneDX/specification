@@ -181,7 +181,7 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
             rewiredMap.set(refJoin({path: refFile, frag}), rewired);
             if (rewiredRS.path) {
                 externals.add(rewired);
-            } else {
+            } else if (refMS) {
                 const tSchema = objectGetOwnPath(refMS.schema, jsonPointer2stack(frag ?? ROOT_POINTER));
                 if (tSchema === PATH_NOT_FOUND) {
                     throw RangeError(`Missing target for ref: ${v}`);
