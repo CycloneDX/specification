@@ -95,7 +95,6 @@ const getVoid = (v) => {
             return v;
         case 'string':
             return '';
-        case "bigint":
         case 'number':
             return 0;
         case "object":
@@ -122,6 +121,9 @@ const getVoid = (v) => {
  *   - Schemas declaring an anchor are kept untouched - anchors are not supported, yet.
  *
  * References are supported as JSON Pointer fragments only, no anchors.
+ * `$dynamicRef` is NOT supported with dynamic-scope semantics: it is treated like a plain `$ref`
+ * and resolved statically. A `$dynamicRef` with an anchor fragment (the usual case) is rejected
+ * with a RangeError.
  *
  * @param {Schema} schema
  * @returns {TreeShakeResult}
@@ -157,6 +159,7 @@ export const treeShake = (schema) => {
             const frag = refSplit(v).frag ?? ROOT_POINTER;
             if (!isJsonPointer(frag)) {
                 // currently dont support anchors - only JSON pointer.
+                // this also rejects every `$dynamicRef` that targets a `$dynamicAnchor`.
                 throw new RangeError(`Unsupported ref fragment: ${v}`);
             }
             const tSchema = objectGetOwnPath(schema, jsonPointer2stack(frag));

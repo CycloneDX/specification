@@ -143,6 +143,8 @@ if (import.meta.main) {
         console.log('This will create a bundled and tree-shaken schema:');
         console.log(`  ${bundled} (pretty-printed with all $comment)`);
         console.log(`  ${minified} (minified, root $comment only)`);
+        console.log('');
+        console.log('Note: refs via anchors and $dynamicRef dynamic-scope semantics are not supported. See README.');
         process.exit(E_INVALID);
     }
 

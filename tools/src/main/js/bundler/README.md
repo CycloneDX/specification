@@ -58,14 +58,17 @@ The bundler is split into stages (one module each under `src/`):
       they describe the module *file*, not the schema, and would be misleading inside the bundle.
    * The entry schema's own `$defs` are moved into a *hollow* container `$defs/<entry-name>`
       (marked with `"not": {"$comment": …}` so it is never used for validation by accident).
-   * `$ref`, `$dynamicRef` and `$recursiveRef` are rewired:
+   * `$ref`, `$dynamicRef` and `$recursiveRef` are rewired
+     (all treated alike as static pointers, see [Limitations](#limitations)):
      * refs to a bundled file → `#/$defs/<module-name>[/<pointer>]`
      * refs to a non-bundled file → path made relative to the output file, kept external
      * absolute URIs → left untouched, reported as external
    * The root `$id` is rewritten to point at the bundled file name.
 2. **Tree-shake** (`src/cleanup.js`) — a mark-and-sweep pass over the bundled schema.
    * *Mark*: starting at the root schema, walk all subschemas (`properties`, `items`, `allOf`, …)
-     and follow every local `$ref`/`$dynamicRef`. `$defs` are *not* descended into —
+     and follow every local `$ref`/`$dynamicRef`.
+     `$dynamicRef` is treated exactly like `$ref` — resolved statically as a JSON Pointer,
+     without dynamic-scope semantics. `$defs` are *not* descended into —
      definitions are only reached via refs. Non-standard keywords are not descended into either.
      Refs may point at any JSON Pointer, not just `$defs`
      entries, e.g. `#/$defs/<module>/properties/address/properties/street`
@@ -108,6 +111,12 @@ hollowed, voided and removed, is printed to the console.
 
 * Refs via `$anchor` / `$dynamicAnchor` / `$recursiveAnchor` into bundled files are **not** supported
   and cause an error; only JSON-Pointer fragments are rewired.
+* `$dynamicRef` is **not** supported with its dynamic-scope semantics.
+  The bundler and the tree-shaker treat it as a plain `$ref`: the fragment must be a JSON Pointer and
+  is resolved statically against the bundle. A `$dynamicRef` with an anchor fragment
+  (e.g. `"$dynamicRef": "#node"`) aborts the tree-shaker with an `Unsupported ref fragment` error.
+  Since a statically resolved `$dynamicRef` may keep a different target than a validator would pick
+  at runtime, avoid `$dynamicRef`/`$dynamicAnchor` in the modular schemas altogether.
 * Tree-shaking follows JSON-Pointer refs only; a local ref with an anchor fragment aborts with an
   `Unsupported ref fragment` error before the sanity check runs.
   Schemas that declare an anchor are kept as they are, since the tree-shaker cannot tell whether
