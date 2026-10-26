@@ -21,6 +21,10 @@ The runner copies `fixtures/` to a temporary directory, runs the CLI's `main()` 
 `main.schema.json` as the entry and `modules/` as the modules directory, writes the returned
 report to `report.json`, and compares all three generated files byte-for-byte against `snapshot/`.
 
+The bundler validates its output against the JSON Schema draft 2020-12 meta schema and fails on
+any violation, so every fixture (and the bundled result of it) must be valid draft 2020-12 —
+boolean subschemas (`true`/`false`) included.
+
 Each module file name states the edge case it covers; `externals/not-bundled` covers a file outside
 the modules directory, the `remote` property in `used-whole` covers an absolute `https://` ref, and
 `inArray` in `used-whole` covers refs nested inside an array (`allOf`).
@@ -28,7 +32,10 @@ the modules directory, the `remote` property in `used-whole` covers an absolute 
 The modules exercise the tree-shaker as follows:
 
 - `used-whole` — referenced as a whole from the entry; the module body survives untouched, but
-  its unreferenced `$defs/unusedButKept` is dropped nevertheless.
+  its unreferenced `$defs/unused` is dropped nevertheless.
+- `used-whole-data` — referenced as a whole; its reached schemas carry data-bearing keywords
+  (`required`, `examples`, `default`, `enum`, `const`, `meta:enum`) and boolean-schema properties.
+  All of that must pass the sweep untouched; only `$defs/unusedDef` is dropped.
 - `used-subdefs-only` — only individual `$defs` are referenced; the module body (`type`, `properties`)
   is dropped, the module is hollowed, and `$defs/dropped` is removed. A ref from the dropped body
   to `unused` must *not* make `unused` reachable.
@@ -38,12 +45,13 @@ The modules exercise the tree-shaker as follows:
   (`address`, `geo`, the module itself) are hollowed; unreferenced siblings (`city`, `lon`,
   `unusedTopLevel`) and `$defs/unusedDef` are dropped.
 - `used-array-items` — refs point *into* schema arrays (`#/properties/combined/allOf/1`,
-  `#/properties/choice/oneOf/1`) and to a *non-schema* value (`#/properties/status/enum`).
-  Non-reached array siblings (`allOf/0`, `allOf/2`, `oneOf/0`) must be replaced by a void
-  `{"not": …}` placeholder — never removed, so indices and pointers stay stable, and never
-  serialised as `null`. The non-schema target is kept as a whole and its parent `status` is
-  hollowed. `$defs/keptViaArray` is kept transitively via `allOf/1`; `$defs/droppedDef` is removed.
-  A ref from the void `allOf/2` to `unused` must *not* make `unused` reachable.
+  `#/properties/combined/allOf/3`, `#/properties/choice/oneOf/1`). `allOf/3` is the boolean
+  schema `true`. Non-reached array items *before* the last reached one (`allOf/0`, `oneOf/0`) must be
+  replaced by a void `{"not": …}` placeholder — never removed, so indices and pointers stay stable,
+  and never serialised as `null`; boolean items (`allOf/2` = `false`) stay as they are. Non-reached
+  items *after* the last reached one (`allOf/4`) may be truncated. The unreferenced `examples` of
+  `choice` are removed. `$defs/keptViaArray` is kept transitively via `allOf/1`; `$defs/droppedDef`
+  and the nested `oneOf/*/$defs/droppedDef` are removed.
 - `unused` — nothing reachable refers to it; the whole module is removed.
 - `dynamic-anchor` — declares a `$dynamicAnchor`; the tree-shaker cannot follow anchors and keeps it as is.
 
@@ -56,9 +64,11 @@ The entry schema additionally covers:
   `$defs/mainUnused` is dropped from that container.
 - an inline object property (`properties.composed`) whose own properties reference
   *properties* of a module rather than its `$defs` (see `used-properties-only` above).
-- refs into *array items* and to a *non-schema value* of a module
-  (`properties.middle`, `properties.lastChoice`, `properties.statusValues`;
+- refs into *array items* of a module (`properties.middle`, `properties.lastChoice`;
   see `used-array-items` above).
+- refs to an empty `{}`, a `$comment`-only and an annotation-only schema
+  (`properties.anyValue`, `properties.todoValue`, `properties.annotatedValue`) — reached, so
+  they must survive and must *not* be hollowed.
 
 Inside the fixtures, the annotation keywords have distinct roles:
 
@@ -72,8 +82,9 @@ Inside the fixtures, the annotation keywords have distinct roles:
 `report.json` pins the bundler's bookkeeping: which files were embedded and under which
 `$defs` key, which refs were left external, every rewired ref (source → target), the
 tree-shake result (every `reached`, `hollowed` and `removed` JSON pointer), and the
-validation warnings. Paths in the report are relative to the entry schema's directory,
-so the snapshot is independent of the temporary work directory.
+validation warnings. Paths in the report are relative to the entry schema's directory and
+the `embedded`/`external`/`rewired` lists are sorted, so the snapshot is independent of the
+temporary work directory and of file-system iteration order.
 
 ## Run
 
