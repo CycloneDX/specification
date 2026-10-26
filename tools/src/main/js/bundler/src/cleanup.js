@@ -26,7 +26,6 @@ export const dropComments = (schema) => {
 }
 
 
-
 const HOLLOW_COMMENT =
     'This schema is hollow: it is not referenced ' +
     'and only remains as a container for structures that are still in use. ' +
@@ -140,41 +139,55 @@ export const treeShake = (schema) => {
 
     /**
      * Pointer of known schemas - they can be objects or boolean.
-     * @type {Set<JsonPointer>}
+     * @type {WeakSet<Schema>}
      */
-    const schemas = new Set();
+    const schemas = new WeakSet();
     /**
      * Mark known schemas.
      * @param {Readonly<Schema>} s
      * @return {void}
      */
-    const markSchemas = (s, p) => {
-        if (schemas.has(p)) return;
-        schemas.add(p);
-        subschemas(s, false).forEach(([sSchema, sRel]) => {
-            const sP = `${p}${jsonPointer4stack(sRel)}`;
-            if (isSchemaObject(sSchema)) {
-                markSchemas(sSchema, sP);
-            } else {
-                schemas.add(sP);
+    const markSchemas = (s) => {
+        if (schemas.has(s)) return;
+        schemas.add(s);
+        for (const k of REF_KEYWORDS) {
+            const v = s[k];
+            if (typeof v !== 'string' || !refIsLocal(v)) {
+                continue; // non-local ref -> out of scope
             }
+            const frag = refSplit(v).frag ?? ROOT_POINTER;
+            if (!isJsonPointer(frag)) {
+                // currently dont support anchors - only JSON pointer.
+                throw new RangeError(`Unsupported ref fragment: ${v}`);
+            }
+            const tSchema = objectGetOwnPath(schema, jsonPointer2stack(frag));
+            if (isSchemaObject(tSchema)) {
+                markSchemas(tSchema);
+            }
+        }
+        subschemas(s).forEach(([sSchema]) => {
+            markSchemas(sSchema);
         });
     }
 
-    /** @type {Set<JsonPointer>} */
-    const reached = new Set();
     /**
-     * Mark reached.
-     * Since reached are expected to be schemas, we mark them on the way as refs may go out of order.
+     * Targets are {@link }Schema} objects or `boolean`s.
+     * @type {Set<JsonPointer>}
+     */
+    const reffed = new Set();
+    /** @type {WeakSet<Schema>} */
+    const _markReffedSeen = new WeakSet();
+    /**
+     * Mark reffed.
      * @param {Readonly<Schema>} s
-     * @param {JsonPointer} p
      * @returns {void}
      * @throws {RangeError} on a local ref whose fragment is not a JSON Pointer
      * @throws {RangeError} on a local ref whose JSON Pointer does not exist
+     * @throws {RangeError} on a local ref whose JSON Pointer does not target {@link Schema}|`boolean`
      */
-    const markReached = (s, p) => {
-        if (reached.has(p)) return;
-        reached.add(p);
+    const markReffed = (s) => {
+        if (_markReffedSeen.has(s)) return;
+        _markReffedSeen.add(s);
         for (const k of REF_KEYWORDS) {
             const v = s[k];
             if (typeof v !== 'string' || !refIsLocal(v)) {
@@ -190,23 +203,17 @@ export const treeShake = (schema) => {
                 throw RangeError(`Missing target for LocalRef: ${v}`);
             }
             if (isSchemaObject(tSchema)) {
-                markSchemas(tSchema, frag);
-                markReached(tSchema, frag);
+                reffed.add(frag);
+                markReffed(tSchema);
+            } else if (typeof tSchema === 'boolean') {
+                reffed.add(frag);
             } else {
-                if (typeof tSchema === 'boolean') schemas.add(frag);
-                reached.add(frag);
+                throw new RangeError(`Ref target is not schema nor boolean: ${v}`)
             }
         }
-        subschemas(s, false).forEach(([sSchema, sRel]) => {
+        subschemas(s).forEach(([sSchema, sRel]) => {
             if (sRel[0] === DEFS_KEYWORD) return;
-            const sP = `${p}${jsonPointer4stack(sRel)}`;
-            if (isSchemaObject(sSchema)) {
-                markSchemas(sSchema, sP);
-                markReached(sSchema, sP);
-            } else {
-                schemas.add(sP);
-                reached.add(sP);
-            }
+            markReffed(sSchema);
         });
     };
 
@@ -219,7 +226,7 @@ export const treeShake = (schema) => {
         if (typeof v === 'object' && v !== null) {
             return (Array.isArray(v) ? sweepArray : sweepObject)(v, p);
         }
-        return reached.has(p);
+        return reffed.has(p);
     }
     /**
      * Sweep phase: sweep an object and removes unused children.
@@ -229,7 +236,7 @@ export const treeShake = (schema) => {
      * @return {boolean} whether anything remains
      */
     const sweepObject = (o, p) => {
-        if (schemas.has(p)) return sweepSchema(o, p);
+        if (schemas.has(o)) return sweepSchema(o, p);
         for (const [k, v] of Object.entries(o)) {
             const kP = `${p}${JP_PREFIX}${escapeJsonPointer(k)}`;
             if (!sweepValue(v, kP)) {
@@ -260,7 +267,7 @@ export const treeShake = (schema) => {
                 removed.add(iP);
                 continue;
             }
-            a[i] = schemas.has(iP) && isSchemaObject(v)
+            a[i] = schemas.has(v)
                 ? {[NOT_KEYWORD]: {[COMMENT_KEYWORD]: VOID_COMMENT}}
                 : getVoid(v);
             voided.add(iP);
@@ -272,25 +279,26 @@ export const treeShake = (schema) => {
      * Sweep phase: sweep a schema and hollow it if needed.
      *
      * - Schemas declaring an anchor are kept untouched.
-     * - Reached schemas: only `$defs` is swept.
-     * - Non-reached schemas: every key except {@link treeShakeSchemaKeep} is swept;
+     * - Reffed schemas: only `$defs` is swept.
+     * - Non-reffed schemas: every key except {@link treeShakeSchemaKeep} is swept;
      *   if structural content remains, the schema is hollowed.
      *
      * @param {Schema} s
      * @param {JsonPointer} p
+     * @param {boolean} used
      * @returns {boolean} whether anything besides {@link treeShakeSchemaKeep} keys remains
      * @throws {HollowCollisionError} if the schema is to be hollowed but already has a `not` keyword
      */
-    const sweepSchema = (s, p) => {
+    const sweepSchema = (s, p, used) => {
         if (Object.keys(s).some(k => ANCHOR_KEYWORDS.has(k))) {
             // we do NOT support anchors, yet -> keep as is for now
             return true;
         }
-        const isReached = reached.has(p);
-        if (isReached) {
+        used |= reffed.has(p);
+        if (used) {
             subschemas(s).forEach(([sSchema, sRef]) => {
                 if (sRef[0] === DEFS_KEYWORD) return;
-                sweepSchema(sSchema, `${p}${jsonPointer4stack(sRef)}`)
+                sweepSchema(sSchema, `${p}${jsonPointer4stack(sRef)}`, true);
             });
             const defs = s[DEFS_KEYWORD];
             if (typeof defs === 'object' && defs !== null) {
@@ -310,8 +318,8 @@ export const treeShake = (schema) => {
                 }
             }
         }
-        const kept = isReached || Object.keys(s).some(k => !treeShakeSchemaKeep.has(k));
-        if (!isReached) {
+        const kept = used || Object.keys(s).some(k => !treeShakeSchemaKeep.has(k));
+        if (!used) {
             if (Object.hasOwn(s, NOT_KEYWORD)) {
                 throw new HollowCollisionError(`Collision: ${makeLocalRef(p)}${JP_PREFIX}${NOT_KEYWORD}`);
             }
@@ -321,9 +329,9 @@ export const treeShake = (schema) => {
         return kept;
     };
 
-    markSchemas(schema, ROOT_POINTER);
-    markReached(schema, ROOT_POINTER);
-    sweepSchema(schema, ROOT_POINTER);
+    markSchemas(schema);
+    markReffed(schema);
+    sweepSchema(schema, ROOT_POINTER, true);
 
     return makeTreeShakeResult(
         hollowed,
