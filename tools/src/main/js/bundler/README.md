@@ -65,8 +65,9 @@ The bundler is split into stages (one module each under `src/`):
    * The root `$id` is rewritten to point at the bundled file name.
 2. **Tree-shake** (`src/cleanup.js`) — a mark-and-sweep pass over the bundled schema.
    * *Mark*: starting at the root schema, walk all subschemas (`properties`, `items`, `allOf`, …)
-     and follow every local `$ref`/`$dynamicRef`/`$recursiveRef`. `$defs` are *not* descended into —
-     definitions are only reached via refs. Refs may point at any JSON Pointer, not just `$defs`
+     and follow every local `$ref`/`$dynamicRef`. `$defs` are *not* descended into —
+     definitions are only reached via refs. Non-standard keywords are not descended into either.
+     Refs may point at any JSON Pointer, not just `$defs`
      entries, e.g. `#/$defs/<module>/properties/address/properties/street`
      or `#/$defs/<module>/properties/combined/allOf/1`.
    * *Sweep*: everything that was not marked is dropped. Three things can happen:
@@ -85,9 +86,13 @@ The bundler is split into stages (one module each under `src/`):
        Typical examples: an embedded module of which only some `$defs` are referenced,
        or a `properties` container of which only a nested property is referenced.
      Reached schemas themselves are left untouched — only their `$defs` are swept.
-   * Schemas carrying `$anchor`/`$dynamicAnchor`/`$recursiveAnchor` are kept untouched.
-   * The tree-shaker aborts with an error if a local ref uses an anchor fragment instead of a
-     JSON Pointer, if its target does not exist, or if its target is neither a schema nor a boolean.
+     Non-standard keywords of reached schemas (e.g. custom definition containers) are kept as a whole.
+   * Schemas carrying `$anchor`/`$dynamicAnchor` are kept untouched, whether reached or not:
+     their `$defs` are not swept, and refs inside them are not followed.
+   * The tree-shaker aborts with an error if any local ref in the schema — reached or not — uses
+     an anchor fragment instead of a JSON Pointer.
+     It also aborts if a *reached* local ref's target does not exist, or is neither a schema nor a boolean.
+     Unresolvable refs in unreached parts are dropped silently along with those parts.
 3. **Sanity check** (`src/sanity.js`) — validates the bundled result:
    * every local JSON-Pointer ref must resolve in the bundle.
      Unresolvable refs are errors; external refs and anchor-based refs are reported as warnings only.
@@ -106,9 +111,13 @@ hollowed, voided and removed, is printed to the console.
 * Tree-shaking follows JSON-Pointer refs only; a local ref with an anchor fragment aborts with an
   `Unsupported ref fragment` error before the sanity check runs.
   Schemas that declare an anchor are kept as they are, since the tree-shaker cannot tell whether
-  they are referenced.
-* Unresolvable local refs abort the tree-shaker with a `Missing target for LocalRef` error
-  before the sanity check gets to report them.
+  they are referenced. Refs inside them are not followed, so their targets may be removed,
+  which then fails the sanity check.
+* Non-standard keywords of reached schemas are kept, but refs inside them are not followed,
+  so their targets may be removed, which then fails the sanity check.
+* Unresolvable *reached* local refs abort the tree-shaker with a `Missing target for LocalRef` error
+  before the sanity check gets to report them. Unresolvable refs in unreached parts are removed
+  without notice.
 * Tree-shaking cannot hollow a schema that kept a `not` keyword;
   this aborts with a `Collision` error.
 * The bundler is not aware of `$id`-based resolution; refs are resolved purely by file path.
