@@ -220,45 +220,48 @@ export const treeShake = (schema) => {
     /**
      * @param {unknown} v
      * @param {JsonPointer} p
+     * @param {boolean} used
      * @return {boolean} whether anything remains
      */
-    const sweepValue = (v, p) => {
+    const sweepValue = (v, p, used) => {
         if (typeof v === 'object' && v !== null) {
-            return (Array.isArray(v) ? sweepArray : sweepObject)(v, p);
+            return (Array.isArray(v) ? sweepArray : sweepObject)(v, p, used);
         }
-        return reffed.has(p);
+        return used;
     }
     /**
      * Sweep phase: sweep an object and removes unused children.
      * Utilizes {@link sweepSchema} when `o` is a schema.
      * @param {object} o
      * @param {JsonPointer} p
+     * @param {boolean} used
      * @return {boolean} whether anything remains
      */
-    const sweepObject = (o, p) => {
-        if (schemas.has(o)) return sweepSchema(o, p, false);
+    const sweepObject = (o, p, used) => {
+        if (schemas.has(o)) return sweepSchema(o, p, used);
         for (const [k, v] of Object.entries(o)) {
             const kP = `${p}${JP_PREFIX}${escapeJsonPointer(k)}`;
-            if (!sweepValue(v, kP)) {
+            if (!sweepValue(v, kP, used || reffed.has(kP))) {
                 delete o[k];
                 removed.add(kP);
             }
         }
-        return Object.keys(o).length > 0;
+        return used || Object.keys(o).length > 0;
     };
     /**
      * Sweep phase: sweep an array and void its items needed.
      * Unused trailing items are dropped; unused middle items are voided.
      * @param {Array} a
      * @param {JsonPointer} p
+     * @param {boolean} used
      * @return {boolean} whether anything remains
      */
-    const sweepArray = (a, p) => {
+    const sweepArray = (a, p, used) => {
         let lastKeptIndex = -1;
         for (let i = a.length - 1; i >= 0; --i) {
             const v = a[i];
             const iP = `${p}${JP_PREFIX}${i}`;
-            if (sweepValue(v, iP)) {
+            if (sweepValue(v, iP, used || reffed.has(iP))) {
                 lastKeptIndex = Math.max(lastKeptIndex, i);
                 continue;
             }
@@ -273,7 +276,7 @@ export const treeShake = (schema) => {
             voided.add(iP);
         }
         a.length = 1 + lastKeptIndex;
-        return a.length > 0;
+        return used || a.length > 0;
     };
     /**
      * Sweep phase: sweep a schema and hollow it if needed.
@@ -294,28 +297,13 @@ export const treeShake = (schema) => {
             // we do NOT support anchors, yet -> keep as is for now
             return true;
         }
-        used |= reffed.has(p);
-        if (used) {
-            subschemas(s).forEach(([sSchema, sRef]) => {
-                if (sRef[0] === DEFS_KEYWORD) return;
-                sweepSchema(sSchema, `${p}${jsonPointer4stack(sRef)}`, true);
-            });
-            const defs = s[DEFS_KEYWORD];
-            if (typeof defs === 'object' && defs !== null) {
-                const dP = `${p}${JP_PREFIX}${DEFS_KEYWORD}`
-                if (!sweepObject(defs, dP)) {
-                    delete s[DEFS_KEYWORD];
-                    removed.add(dP);
-                }
-            }
-        } else {
-            for (const [k, v] of Object.entries(s)) {
-                if (treeShakeSchemaKeep.has(k)) continue;
-                const kP = `${p}${JP_PREFIX}${escapeJsonPointer(k)}`;
-                if (!sweepValue(v, kP)) {
-                    delete s[k];
-                    removed.add(kP);
-                }
+        for (const [k, v] of Object.entries(s)) {
+            if (treeShakeSchemaKeep.has(k)) continue;
+            const kP = `${p}${JP_PREFIX}${escapeJsonPointer(k)}`;
+            const kUsed = (used && k !== DEFS_KEYWORD) || reffed.has(kP);
+            if (!sweepValue(v, kP, kUsed)) {
+                delete s[k];
+                removed.add(kP);
             }
         }
         const kept = used || Object.keys(s).some(k => !treeShakeSchemaKeep.has(k));
