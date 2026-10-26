@@ -140,7 +140,7 @@ if (import.meta.main) {
         console.log(`    ${modules} \\`);
         console.log(`    ${entry}`);
         console.log('');
-        console.log('This will create:');
+        console.log('This will create a bundled and tree-shaken schema:');
         console.log(`  ${bundled} (pretty-printed with all $comment)`);
         console.log(`  ${minified} (minified, root $comment only)`);
         process.exit(E_INVALID);
