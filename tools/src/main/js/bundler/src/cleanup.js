@@ -259,7 +259,7 @@ export const treeShake = (schema) => {
      * and remove its unused children. Delegates to {@link sweepSchema} if `o` is a schema.
      * @param {object} o
      * @param {JsonPointer} p
-     * @param {boolean} used
+     * @param {boolean} used whether `o` is reached (directly reffed or inside a reached schema)
      * @return {boolean} whether anything remains
      */
     const sweepObject = (o, p, used) => {
@@ -279,7 +279,7 @@ export const treeShake = (schema) => {
      * schemas become a `"not"` marker, data becomes a {@link voidPlaceholder} - so indices stay stable.
      * @param {Array} a
      * @param {JsonPointer} p
-     * @param {boolean} used
+     * @param {boolean} used whether `a` is reached (directly reffed or inside a reached schema)
      * @return {boolean} whether anything remains
      */
     const sweepArray = (a, p, used) => {
