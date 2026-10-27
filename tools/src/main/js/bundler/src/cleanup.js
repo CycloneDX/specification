@@ -80,16 +80,24 @@ const treeShakeSchemaKeep = Object.freeze(new Set([
 ]));
 
 
-class HollowCollisionError extends Error {
-}
-
+/**
+ * Whether a schema accepts every instance: `true`, `{}` or annotations-only.
+ * @param {unknown} s
+ * @return {boolean}
+ */
+const acceptsAnything = (s) =>
+    s === true || (
+        isSchemaObject(s)
+        && Object.keys(s).every(k => treeShakeSchemaKeep.has(k))
+    );
 
 /**
+ * Get a type-preserving, minimal-footprint placeholder for a non-schema value.
  * @template T
  * @param {T} v
  * @return {T}
  */
-const getVoid = (v) => {
+const voidPlaceholder = (v) => {
     switch (typeof v) {
         case 'boolean':
             return v;
@@ -105,6 +113,9 @@ const getVoid = (v) => {
             throw TypeError(`Unsupported type ${typeof v}`)
     }
 };
+
+class HollowCollisionError extends Error {
+}
 
 /**
  * Tree-shake a schema in place.
@@ -272,7 +283,7 @@ export const treeShake = (schema) => {
             }
             a[i] = schemas.has(v)
                 ? {[NOT_KEYWORD]: {[COMMENT_KEYWORD]: VOID_COMMENT}}
-                : getVoid(v);
+                : voidPlaceholder(v);
             voided.add(iP);
         }
         a.length = 1 + lastKeptIndex;
@@ -297,6 +308,7 @@ export const treeShake = (schema) => {
             // we do NOT support anchors, yet -> keep as is for now
             return true;
         }
+        const hadNot = Object.hasOwn(s, NOT_KEYWORD);
         for (const [k, v] of Object.entries(s)) {
             if (treeShakeSchemaKeep.has(k)) continue;
             const kP = `${p}${JP_PREFIX}${escapeJsonPointer(k)}`;
@@ -315,7 +327,18 @@ export const treeShake = (schema) => {
                     + `Move it out of the "${NOT_KEYWORD}", e.g. into a "${DEFS_KEYWORD}" container next to it.`);
             }
             s[NOT_KEYWORD] = {[COMMENT_KEYWORD]: HOLLOW_COMMENT};
-            hollowed.add(p);
+            if (hadNot) {
+                const nP = `${p}${JP_PREFIX}${NOT_KEYWORD}`;
+                // the old `not` was swept away above and is now REPLACED by the marker:
+                // the pointer still exists, so it is neither removed ...
+                removed.delete(nP);
+                // ... nor hollowed - that marker was written into a subtree that is gone.
+                hollowed.delete(nP);
+            }
+            if (!hadNot || !acceptsAnything(s[NOT_KEYWORD])) {
+                // only report when the marker actually changed the schema's meaning!
+                hollowed.add(p);
+            }
         }
         return kept;
     };
