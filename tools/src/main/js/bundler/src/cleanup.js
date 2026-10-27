@@ -125,8 +125,8 @@ const makeTreeShakeResult = (hollowed, voided, removed) => {
  *
  * Mark-and-sweep:
  * - Mark: two walks from the root, both following every local ref.
- *   {@link markSchemas} registers every schema object (including `$defs`) so the sweep can tell
- *   schemas from plain data. {@link markReffed} collects the pointers of all ref targets;
+ *   `markSchemas` registers every schema object (including `$defs`) so the sweep can tell
+ *   schemas from plain data. `markReffed` collects the pointers of all ref targets;
  *   it does not descend into `$defs` - definitions are only reached via refs.
  * - Sweep: walk the whole document and drop everything that is not reached.
  *   - Reached schemas only lose their non-reached `$defs`.
@@ -200,7 +200,6 @@ export const treeShake = (schema) => {
     /** @type {WeakSet<Schema>} */
     const _markReffedSeen = new WeakSet();
     /**
-     * Mark reffed.
      * Mark phase: walk the reachable subschemas of `s` - skipping `$defs` - and record every
      * local ref target in {@link reffed}.
      * @param {Readonly<Schema>} s
