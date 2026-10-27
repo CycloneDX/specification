@@ -309,7 +309,10 @@ export const treeShake = (schema) => {
         const kept = used || Object.keys(s).some(k => !treeShakeSchemaKeep.has(k));
         if (!used) {
             if (Object.hasOwn(s, NOT_KEYWORD)) {
-                throw new HollowCollisionError(`Collision: ${makeLocalRef(p)}${JP_PREFIX}${NOT_KEYWORD}`);
+                throw new HollowCollisionError(
+                    `Collision: ${makeLocalRef(p)}${JP_PREFIX}${NOT_KEYWORD}\n`
+                    + `A reachable schema lives inside the "${NOT_KEYWORD}" of a schema that is to be hollowed. `
+                    + `Move it out of the "${NOT_KEYWORD}", e.g. into a "${DEFS_KEYWORD}" container next to it.`);
             }
             s[NOT_KEYWORD] = {[COMMENT_KEYWORD]: HOLLOW_COMMENT};
             hollowed.add(p);
