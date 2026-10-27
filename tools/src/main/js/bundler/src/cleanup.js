@@ -41,34 +41,6 @@ const VOID_COMMENT =
 
 /** @typedef {import('./helpers/json-schema-spec.js').LocalRef} LocalRef */
 
-/**
- * @typedef {object} TreeShakeResult
- * @property {LocalRef[]} hollowed
- * @property {LocalRef[]} voided
- * @property {LocalRef[]} removed
- */
-
-/**
- * @param {ReadonlySet<JsonPointer>} hollowed
- * @param {ReadonlySet<JsonPointer>} voided
- * @param {ReadonlySet<JsonPointer>} removed
- * @return {TreeShakeResult}
- */
-const makeTreeShakeResult = (hollowed, voided, removed) => {
-    const gone = removed.union(voided);
-    return {
-        hollowed: Array.from(
-            hollowed.values().filter(p =>
-                !gone.has(p) && !hasAncestorIn(p, gone)),
-            makeLocalRef).sort(),
-        voided: Array.from(
-            voided.values().filter(p => !hasAncestorIn(p, gone)),
-            makeLocalRef).sort(),
-        removed: Array.from(
-            removed.values().filter(p => !hasAncestorIn(p, gone)),
-            makeLocalRef).sort()
-    };
-}
 
 /**
  * Annotation keywords that are kept on hollowed schemas,
@@ -117,6 +89,37 @@ const voidPlaceholder = (v) => {
 class HollowCollisionError extends Error {
 }
 
+
+/**
+ * @typedef {object} TreeShakeResult
+ * @property {LocalRef[]} hollowed
+ * @property {LocalRef[]} voided
+ * @property {LocalRef[]} removed
+ */
+
+
+/**
+ * @param {ReadonlySet<JsonPointer>} hollowed
+ * @param {ReadonlySet<JsonPointer>} voided
+ * @param {ReadonlySet<JsonPointer>} removed
+ * @return {TreeShakeResult}
+ */
+const makeTreeShakeResult = (hollowed, voided, removed) => {
+    const gone = removed.union(voided);
+    return {
+        hollowed: Array.from(
+            hollowed.values().filter(p =>
+                !gone.has(p) && !hasAncestorIn(p, gone)),
+            makeLocalRef).sort(),
+        voided: Array.from(
+            voided.values().filter(p => !hasAncestorIn(p, gone)),
+            makeLocalRef).sort(),
+        removed: Array.from(
+            removed.values().filter(p => !hasAncestorIn(p, gone)),
+            makeLocalRef).sort()
+    };
+}
+
 /**
  * Tree-shake a schema in place.
  *
@@ -143,11 +146,11 @@ class HollowCollisionError extends Error {
  */
 export const treeShake = (schema) => {
     /** @type {Set<JsonPointer>} */
-    const removed = new Set();
-    /** @type {Set<JsonPointer>} */
     const hollowed = new Set();
     /** @type {Set<JsonPointer>} */
     const voided = new Set();
+    /** @type {Set<JsonPointer>} */
+    const removed = new Set();
 
     /**
      * Pointer of known schemas - they can be objects or boolean.
@@ -309,6 +312,7 @@ export const treeShake = (schema) => {
             return true;
         }
         const hadNot = Object.hasOwn(s, NOT_KEYWORD);
+        const wasHollow = hadNot && acceptsAnything(s[NOT_KEYWORD]);
         for (const [k, v] of Object.entries(s)) {
             if (treeShakeSchemaKeep.has(k)) continue;
             const kP = `${p}${JP_PREFIX}${escapeJsonPointer(k)}`;
@@ -335,8 +339,7 @@ export const treeShake = (schema) => {
                 // ... nor hollowed - that marker was written into a subtree that is gone.
                 hollowed.delete(nP);
             }
-            if (!hadNot || !acceptsAnything(s[NOT_KEYWORD])) {
-                // only report when the marker actually changed the schema's meaning!
+            if (!wasHollow) {
                 hollowed.add(p);
             }
         }
@@ -347,8 +350,5 @@ export const treeShake = (schema) => {
     markReffed(schema);
     sweepSchema(schema, ROOT_POINTER, true);
 
-    return makeTreeShakeResult(
-        hollowed,
-        voided,
-        removed);
+    return makeTreeShakeResult(hollowed, voided, removed);
 };
