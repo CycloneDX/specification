@@ -56,6 +56,11 @@ The modules exercise the tree-shaker as follows:
   `even-more-custom-defs`) instead of `$defs`. The entry refs `#/custom-defs/customKept`, which refs
   `#/even-more-custom-defs/deepKept`. Both containers must be traversed; `customKept` and `deepKept`
   are kept, `customDropped`/`deepDropped` and the module body are dropped, the containers are hollowed.
+- `used-not-keyword` — schemas that already carry a `not`. `$defs/hotWithNot` is reached: its `not`
+  survives untouched, only the unreferenced `not/$defs/droppedInNot` is removed. `$defs/hollowedWithNot`
+  is *not* reached, only its `$defs/inner` is: its original `not` (and `type`) are dropped, then the
+  schema is hollowed with the marker `not` — the marker must never collide with the original keyword.
+  The module root also has an unreached `not`; it is dropped and the root is hollowed likewise.
 - `unused` — nothing reachable refers to it; the whole module is removed.
 - `dynamic-anchor` — declares a `$dynamicAnchor`; the tree-shaker cannot follow anchors and keeps it as is.
 

@@ -117,6 +117,18 @@
       "title": "Custom def",
       "description": "A value defined in a non-standard definitions container of another module.",
       "$ref": "#/$defs/used-custom-defs/custom-defs/customKept"
+    },
+    "hotNot": {
+      "$comment": "Ref to a schema that carries a `not`. Reached -> the `not` survives untouched; only the unreferenced `$defs` inside that `not` are dropped.",
+      "title": "Hot not",
+      "description": "A value constrained by a `not`.",
+      "$ref": "#/$defs/used-not-keyword/$defs/hotWithNot"
+    },
+    "innerOfHollowedNot": {
+      "$comment": "Ref into the nested `$defs` of a schema that carries its own `not` but is NOT reached itself. That parent must be hollowed: its original `not` is dropped first, then the hollow marker `not` is written - no collision.",
+      "title": "Inner of hollowed not",
+      "description": "A value defined inside a hollowed schema that used to have a `not`.",
+      "$ref": "#/$defs/used-not-keyword/$defs/hollowedWithNot/$defs/inner"
     }
   },
   "$defs": {
@@ -245,6 +257,42 @@
           "title": "Deep kept",
           "description": "A string value.",
           "type": "string"
+        }
+      },
+      "not": {
+        "$comment": "This schema is hollow: it is not referenced and only remains as a container for structures that are still in use. Itself must not be used for validation."
+      }
+    },
+    "used-not-keyword": {
+      "title": "Used not keyword",
+      "description": "A module whose schemas carry a `not` keyword.",
+      "$defs": {
+        "hotWithNot": {
+          "$comment": "Reached from main. A hot schema loses nothing but unreached `$defs`, so the `not` and its content survive untouched - while `not/$defs/droppedInNot` is removed.",
+          "title": "Hot with not",
+          "description": "A string that must not be the forbidden value.",
+          "type": "string",
+          "not": {
+            "title": "Forbidden value",
+            "description": "The one value that is not allowed.",
+            "const": "forbidden"
+          }
+        },
+        "hollowedWithNot": {
+          "$comment": "NOT reached itself, only its `$defs/inner` is. Its original `not` is unreached -> dropped together with `type`; afterwards the schema is hollowed, i.e. gets the marker `not`. The marker must never merge with or sit next to the original `not`.",
+          "title": "Hollowed with not",
+          "description": "A container whose own constraints are no longer in use.",
+          "$defs": {
+            "inner": {
+              "$comment": "Reached from main -> kept; forces the parent to be hollowed instead of removed.",
+              "title": "Inner",
+              "description": "An integer value.",
+              "type": "integer"
+            }
+          },
+          "not": {
+            "$comment": "This schema is hollow: it is not referenced and only remains as a container for structures that are still in use. Itself must not be used for validation."
+          }
         }
       },
       "not": {
