@@ -60,6 +60,28 @@
           "type": "integer"
         }
       }
+    },
+    "hotWithBooleanNot": {
+      "$comment": "Reached from main. `not` is the BOOLEAN schema `true` (= nothing ever validates). Booleans are not schema objects, so `subschemas()` never yields them; the sweep must keep the key as is and never turn it into `null`, `{}` or a marker object.",
+      "title": "Hot with boolean not",
+      "description": "A schema that rejects everything by negating `true`.",
+      "type": "string",
+      "not": true
+    },
+    "hollowedWithBooleanNot": {
+      "$comment": "NOT reached itself, only its `$defs/inner` is. The BOOLEAN `not: false` is unreached -> dropped (a bare boolean is swept away like any unreached scalar); afterwards the schema is hollowed with the marker `not`. No collision, and the marker must be an object - not the original boolean.",
+      "title": "Hollowed with boolean not",
+      "description": "A container whose boolean `not` is no longer in use.",
+      "type": "object",
+      "not": false,
+      "$defs": {
+        "inner": {
+          "$comment": "Reached from main -> kept; forces the parent to be hollowed instead of removed.",
+          "title": "Inner",
+          "description": "A number value.",
+          "type": "number"
+        }
+      }
     }
   }
 }

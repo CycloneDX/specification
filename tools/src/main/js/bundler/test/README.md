@@ -61,6 +61,9 @@ The modules exercise the tree-shaker as follows:
   is *not* reached, only its `$defs/inner` is: its original `not` (and `type`) are dropped, then the
   schema is hollowed with the marker `not` — the marker must never collide with the original keyword.
   The module root also has an unreached `not`; it is dropped and the root is hollowed likewise.
+  The same two cases exist with a *boolean* `not`: `$defs/hotWithBooleanNot` (`not: true`, reached,
+  the boolean survives as is) and `$defs/hollowedWithBooleanNot` (`not: false`, unreached, dropped;
+  only its `$defs/inner` is kept and the parent gets the object marker `not`).
 - `unused` — nothing reachable refers to it; the whole module is removed.
 - `dynamic-anchor` — declares a `$dynamicAnchor`; the tree-shaker cannot follow anchors and keeps it as is.
 

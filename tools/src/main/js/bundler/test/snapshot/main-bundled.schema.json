@@ -129,6 +129,18 @@
       "title": "Inner of hollowed not",
       "description": "A value defined inside a hollowed schema that used to have a `not`.",
       "$ref": "#/$defs/used-not-keyword/$defs/hollowedWithNot/$defs/inner"
+    },
+    "hotBooleanNot": {
+      "$comment": "Ref to a schema whose `not` is the boolean `true`. Reached -> the boolean must survive byte-for-byte.",
+      "title": "Hot boolean not",
+      "description": "A value negated by a boolean schema.",
+      "$ref": "#/$defs/used-not-keyword/$defs/hotWithBooleanNot"
+    },
+    "innerOfHollowedBooleanNot": {
+      "$comment": "Ref into the nested `$defs` of a schema whose own `not` is the boolean `false` and which is NOT reached itself. The boolean is dropped, then the hollow marker `not` (an object) is written.",
+      "title": "Inner of hollowed boolean not",
+      "description": "A value defined inside a hollowed schema that used to have a boolean `not`.",
+      "$ref": "#/$defs/used-not-keyword/$defs/hollowedWithBooleanNot/$defs/inner"
     }
   },
   "$defs": {
@@ -288,6 +300,29 @@
               "title": "Inner",
               "description": "An integer value.",
               "type": "integer"
+            }
+          },
+          "not": {
+            "$comment": "This schema is hollow: it is not referenced and only remains as a container for structures that are still in use. Itself must not be used for validation."
+          }
+        },
+        "hotWithBooleanNot": {
+          "$comment": "Reached from main. `not` is the BOOLEAN schema `true` (= nothing ever validates). Booleans are not schema objects, so `subschemas()` never yields them; the sweep must keep the key as is and never turn it into `null`, `{}` or a marker object.",
+          "title": "Hot with boolean not",
+          "description": "A schema that rejects everything by negating `true`.",
+          "type": "string",
+          "not": true
+        },
+        "hollowedWithBooleanNot": {
+          "$comment": "NOT reached itself, only its `$defs/inner` is. The BOOLEAN `not: false` is unreached -> dropped (a bare boolean is swept away like any unreached scalar); afterwards the schema is hollowed with the marker `not`. No collision, and the marker must be an object - not the original boolean.",
+          "title": "Hollowed with boolean not",
+          "description": "A container whose boolean `not` is no longer in use.",
+          "$defs": {
+            "inner": {
+              "$comment": "Reached from main -> kept; forces the parent to be hollowed instead of removed.",
+              "title": "Inner",
+              "description": "A number value.",
+              "type": "number"
             }
           },
           "not": {
