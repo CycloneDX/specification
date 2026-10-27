@@ -92,9 +92,9 @@ class HollowCollisionError extends Error {
 
 /**
  * @typedef {object} TreeShakeResult
- * @property {LocalRef[]} hollowed
- * @property {LocalRef[]} voided
- * @property {LocalRef[]} removed
+ * @property {LocalRef[]} hollowed schemas that now reject everything but still exist as containers
+ * @property {LocalRef[]} voided array items replaced by a placeholder to keep sibling indices stable
+ * @property {LocalRef[]} removed pointers that no longer exist
  */
 
 
@@ -124,14 +124,19 @@ const makeTreeShakeResult = (hollowed, voided, removed) => {
  * Tree-shake a schema in place.
  *
  * Mark-and-sweep:
- * - Mark: walk all subschemas from the root and follow every local ref.
- *   `$defs` are not walked - definitions are only reached via refs.
- * - Sweep: remove everything that was not reached.
+ * - Mark: two walks from the root, both following every local ref.
+ *   {@link markSchemas} registers every schema object (including `$defs`) so the sweep can tell
+ *   schemas from plain data. {@link markReffed} collects the pointers of all ref targets;
+ *   it does not descend into `$defs` - definitions are only reached via refs.
+ * - Sweep: walk the whole document and drop everything that is not reached.
  *   - Reached schemas only lose their non-reached `$defs`.
- *   - Non-reached schemas lose every key except {@link treeShakeSchemaKeep}
- *     and the paths leading to reached parts.
- *     If anything structural remains, the schema is hollowed:
- *     marked with `"not":{"$comment":HOLLOW_COMMENT}` so it never validates.
+ *   - Non-reached schemas lose every key except {@link treeShakeSchemaKeep} and the paths
+ *     leading to reached parts. If nothing structural remains, the schema is removed.
+ *     Otherwise it is hollowed: `"not":{"$comment":HOLLOW_COMMENT}` is set so it never validates.
+ *     A pre-existing, non-reached `not` is replaced by that marker; if it already rejected
+ *     everything (`not` of {@link acceptsAnything}), the schema is not reported as hollowed.
+ *   - Non-reached array items before the last reached one are voided, not removed, so that
+ *     indices and pointers stay stable; trailing ones are removed.
  *   - Schemas declaring an anchor are kept untouched - anchors are not supported, yet.
  *
  * References are supported as JSON Pointer fragments only, no anchors.
@@ -141,8 +146,9 @@ const makeTreeShakeResult = (hollowed, voided, removed) => {
  *
  * @param {Schema} schema
  * @returns {TreeShakeResult}
- * @throws {RangeError} on a local ref whose fragment is not a JSON Pointer (e.g. an anchor)
- * @throws {HollowCollisionError} if a schema to be hollowed already has a `not` keyword
+ * @throws {RangeError} on a local ref whose fragment is not a JSON Pointer (e.g. an anchor),
+ *   whose target does not exist, or whose target is neither a schema object nor a boolean
+ * @throws {HollowCollisionError} if a schema to be hollowed has a `not` that still contains reached parts
  */
 export const treeShake = (schema) => {
     /** @type {Set<JsonPointer>} */
@@ -153,14 +159,16 @@ export const treeShake = (schema) => {
     const removed = new Set();
 
     /**
-     * Pointer of known schemas - they can be objects or boolean.
+     * Every schema object in the document, including the ones in `$defs` and ref targets.
      * @type {WeakSet<Schema>}
      */
     const schemas = new WeakSet();
     /**
-     * Mark known schemas.
+     * Mark phase: register `s` and all schema objects below it or reachable from it via local refs,
+     * so the sweep can tell schema objects from plain data objects.
      * @param {Readonly<Schema>} s
      * @return {void}
+     * @throws {RangeError} on a local ref whose fragment is not a JSON Pointer
      */
     const markSchemas = (s) => {
         if (schemas.has(s)) return;
@@ -185,7 +193,7 @@ export const treeShake = (schema) => {
     }
 
     /**
-     * Targets are {@link }Schema} objects or `boolean`s.
+     * Pointers of all local ref targets - schema objects or booleans - reachable from the root.
      * @type {Set<JsonPointer>}
      */
     const reffed = new Set();
@@ -193,6 +201,8 @@ export const treeShake = (schema) => {
     const _markReffedSeen = new WeakSet();
     /**
      * Mark reffed.
+     * Mark phase: walk the reachable subschemas of `s` - skipping `$defs` - and record every
+     * local ref target in {@link reffed}.
      * @param {Readonly<Schema>} s
      * @returns {void}
      * @throws {RangeError} on a local ref whose fragment is not a JSON Pointer
@@ -232,9 +242,11 @@ export const treeShake = (schema) => {
     };
 
     /**
+     * Sweep phase: dispatch to {@link sweepArray}/{@link sweepObject}.
+     * Scalars have no children, so they remain iff `used`.
      * @param {unknown} v
      * @param {JsonPointer} p
-     * @param {boolean} used
+     * @param {boolean} used whether `v` is reached (directly reffed or inside a reached schema)
      * @return {boolean} whether anything remains
      */
     const sweepValue = (v, p, used) => {
@@ -244,8 +256,8 @@ export const treeShake = (schema) => {
         return used;
     }
     /**
-     * Sweep phase: sweep an object and removes unused children.
-     * Utilizes {@link sweepSchema} when `o` is a schema.
+     * Sweep phase: sweep a non-schema object (property map, `$defs` container, data map)
+     * and remove its unused children. Delegates to {@link sweepSchema} if `o` is a schema.
      * @param {object} o
      * @param {JsonPointer} p
      * @param {boolean} used
@@ -263,8 +275,9 @@ export const treeShake = (schema) => {
         return used || Object.keys(o).length > 0;
     };
     /**
-     * Sweep phase: sweep an array and void its items needed.
-     * Unused trailing items are dropped; unused middle items are voided.
+     * Sweep phase: sweep an array back to front.
+     * Unused trailing items are removed; unused items before the last kept one are voided -
+     * schemas become a `"not"` marker, data becomes a {@link voidPlaceholder} - so indices stay stable.
      * @param {Array} a
      * @param {JsonPointer} p
      * @param {boolean} used
@@ -296,15 +309,18 @@ export const treeShake = (schema) => {
      * Sweep phase: sweep a schema and hollow it if needed.
      *
      * - Schemas declaring an anchor are kept untouched.
-     * - Reffed schemas: only `$defs` is swept.
-     * - Non-reffed schemas: every key except {@link treeShakeSchemaKeep} is swept;
-     *   if structural content remains, the schema is hollowed.
+     * - Used schemas: only `$defs` is swept.
+     * - Unused schemas: every key except {@link treeShakeSchemaKeep} is swept, then the
+     *   schema is hollowed with a `"not"` marker. A pre-existing `not` has been swept away by then
+     *   and is replaced - it is reported as neither removed nor hollowed. The schema itself is only
+     *   reported as hollowed if the marker changed its meaning, i.e. it did not already reject everything.
      *
      * @param {Schema} s
      * @param {JsonPointer} p
-     * @param {boolean} used
+     * @param {boolean} used whether `s` is reached (directly reffed or inside a reached schema)
      * @returns {boolean} whether anything besides {@link treeShakeSchemaKeep} keys remains
-     * @throws {HollowCollisionError} if the schema is to be hollowed but already has a `not` keyword
+     * @throws {HollowCollisionError} if the schema is to be hollowed but its `not` survived the sweep,
+     *   i.e. something reached lives inside it
      */
     const sweepSchema = (s, p, used) => {
         if (Object.keys(s).some(k => ANCHOR_KEYWORDS.has(k))) {
@@ -334,7 +350,7 @@ export const treeShake = (schema) => {
             if (hadNot) {
                 const nP = `${p}${JP_PREFIX}${NOT_KEYWORD}`;
                 // the old `not` was swept away above and is now REPLACED by the marker:
-                // the pointer still exists, so it is neither removed ...
+                // the pointer still exists -> it is neither removed ...
                 removed.delete(nP);
                 // ... nor hollowed - that marker was written into a subtree that is gone.
                 hollowed.delete(nP);
