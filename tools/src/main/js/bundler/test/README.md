@@ -64,6 +64,10 @@ The modules exercise the tree-shaker as follows:
   The same two cases exist with a *boolean* `not`: `$defs/hotWithBooleanNot` (`not: true`, reached,
   the boolean survives as is) and `$defs/hollowedWithBooleanNot` (`not: false`, unreached, dropped;
   only its `$defs/inner` is kept and the parent gets the object marker `not`).
+  A replaced `not` is reported as neither `removed` nor `hollowed` — the pointer still exists; only
+  its dropped children are listed under `removed`. `$defs/alreadyHollowTrueNot` (`not: true`) and
+  `$defs/alreadyHollowEmptyNot` (annotations-only `not`) already rejected everything before the sweep:
+  the marker is written, but the schema is *not* reported as hollowed, since its meaning did not change.
 - `unused` — nothing reachable refers to it; the whole module is removed.
 - `dynamic-anchor` — declares a `$dynamicAnchor`; the tree-shaker cannot follow anchors and keeps it as is.
 
@@ -72,8 +76,9 @@ The entry schema additionally covers:
 - a property *named* `$comment` (`properties.$comment`) — it must survive minification,
   only its own `$comment` keyword is stripped;
 - local refs into the entry's own `$defs` — they are rewired to the hollow container
-  `#/$defs/main/$defs/…`, which is marked with `"not": {"$comment": …}`; the unreferenced
-  `$defs/mainUnused` is dropped from that container.
+  `#/$defs/main/$defs/…`, which the bundler already marks with `"not": {"$comment": …}`; the
+  tree-shaker therefore does *not* report it as hollowed. The unreferenced `$defs/mainUnused` is
+  dropped from that container.
 - an inline object property (`properties.composed`) whose own properties reference
   *properties* of a module rather than its `$defs` (see `used-properties-only` above).
 - refs into *array items* of a module (`properties.middle`, `properties.lastChoice`;

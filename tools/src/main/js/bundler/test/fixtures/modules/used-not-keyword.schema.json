@@ -82,6 +82,39 @@
           "type": "number"
         }
       }
+    },
+    "alreadyHollowTrueNot": {
+      "$comment": "NOT reached itself, only its `$defs/inner` is. `not: true` already rejected everything, so the schema was hollow before the sweep. The marker replaces the boolean, but this schema must NOT appear in `hollowed`, and `…/not` must NOT appear in `removed`.",
+      "title": "Already hollow true not",
+      "description": "A container that already rejected everything via `not: true`.",
+      "type": "object",
+      "not": true,
+      "$defs": {
+        "inner": {
+          "$comment": "Reached from main -> kept; forces the parent to be kept as a container.",
+          "title": "Inner",
+          "description": "A boolean value.",
+          "type": "boolean"
+        }
+      }
+    },
+    "alreadyHollowEmptyNot": {
+      "$comment": "NOT reached itself, only its `$defs/inner` is. The `not` is an annotations-only object, which accepts anything, so the schema was hollow before the sweep. Same expectations as alreadyHollowTrueNot.",
+      "title": "Already hollow empty not",
+      "description": "A container that already rejected everything via an annotations-only `not`.",
+      "type": "object",
+      "not": {
+        "title": "Anything",
+        "description": "Accepts anything - so negating it rejects everything."
+      },
+      "$defs": {
+        "inner": {
+          "$comment": "Reached from main -> kept; forces the parent to be kept as a container.",
+          "title": "Inner",
+          "description": "A null value.",
+          "type": "null"
+        }
+      }
     }
   }
 }

@@ -128,7 +128,9 @@
       "$ref": "modules/used-custom-defs.schema.json#/custom-defs/customKept"
     },
     "used-not-keyword": {
-      "$comment": "Refs to schemas that carry a `not`",
+      "$comment": "Refs to schemas that carry a `not`, see module used-not-keyword.",
+      "title": "Used not keyword",
+      "description": "Values defined by schemas that carry a `not` keyword.",
       "type": "object",
       "properties": {
         "hotNot": {
@@ -154,6 +156,18 @@
           "title": "Inner of hollowed boolean not",
           "description": "A value defined inside a hollowed schema that used to have a boolean `not`.",
           "$ref": "modules/used-not-keyword.schema.json#/$defs/hollowedWithBooleanNot/$defs/inner"
+        },
+        "innerOfAlreadyHollowTrueNot": {
+          "$comment": "Ref into the nested `$defs` of a schema whose own `not` is the boolean `true` and which is NOT reached itself. It already rejected everything -> the marker replaces the boolean, but the schema is NOT reported as hollowed and `…/not` is NOT reported as removed.",
+          "title": "Inner of already hollow true not",
+          "description": "A value defined inside a schema that was already hollow via `not: true`.",
+          "$ref": "modules/used-not-keyword.schema.json#/$defs/alreadyHollowTrueNot/$defs/inner"
+        },
+        "innerOfAlreadyHollowEmptyNot": {
+          "$comment": "Same as above, but the `not` is the empty object schema `{}` with annotations only. Also already hollow -> marker written silently.",
+          "title": "Inner of already hollow empty not",
+          "description": "A value defined inside a schema that was already hollow via `not: {}`.",
+          "$ref": "modules/used-not-keyword.schema.json#/$defs/alreadyHollowEmptyNot/$defs/inner"
         }
       }
     }
