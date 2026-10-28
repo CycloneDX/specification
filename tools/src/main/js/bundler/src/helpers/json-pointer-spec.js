@@ -65,13 +65,14 @@ export const unescapeJsonPointer = (p) =>
     p.replaceAll(PREFIX_ESC, PREFIX).replaceAll(TILDE_ESC, TILDE);
 
 /**
+ * Whether any pointer in `u` is a strict ancestor of `p`.
  * @param {JsonPointer} p
- * @param {ReadonlySet<JsonPointer>} u
+ * @param {Iterable<JsonPointer>} u
  * @return {boolean}
  */
 export const hasAncestorIn = (p, u) => {
-    for (let l = p.lastIndexOf(PREFIX); l > 0; l = p.lastIndexOf(PREFIX, l - 1)) {
-        if (u.has(p.slice(0, l))) return true;
+    for (const up of u) {
+        if (p.startsWith(up + PREFIX)) return true;
     }
     return false;
 };
