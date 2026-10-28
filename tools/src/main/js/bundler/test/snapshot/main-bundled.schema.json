@@ -119,7 +119,9 @@
       "$ref": "#/$defs/used-custom-defs/custom-defs/customKept"
     },
     "used-not-keyword": {
-      "$comment": "Refs to schemas that carry a `not`",
+      "$comment": "Refs to schemas that carry a `not`, see module used-not-keyword.",
+      "title": "Used not keyword",
+      "description": "Values defined by schemas that carry a `not` keyword.",
       "type": "object",
       "properties": {
         "hotNot": {
@@ -145,6 +147,18 @@
           "title": "Inner of hollowed boolean not",
           "description": "A value defined inside a hollowed schema that used to have a boolean `not`.",
           "$ref": "#/$defs/used-not-keyword/$defs/hollowedWithBooleanNot/$defs/inner"
+        },
+        "innerOfAlreadyHollowTrueNot": {
+          "$comment": "Ref into the nested `$defs` of a schema whose own `not` is the boolean `true` and which is NOT reached itself. It already rejected everything -> the marker replaces the boolean, but the schema is NOT reported as hollowed and `…/not` is NOT reported as removed.",
+          "title": "Inner of already hollow true not",
+          "description": "A value defined inside a schema that was already hollow via `not: true`.",
+          "$ref": "#/$defs/used-not-keyword/$defs/alreadyHollowTrueNot/$defs/inner"
+        },
+        "innerOfAlreadyHollowEmptyNot": {
+          "$comment": "Same as above, but the `not` is the empty object schema `{}` with annotations only. Also already hollow -> marker written silently.",
+          "title": "Inner of already hollow empty not",
+          "description": "A value defined inside a schema that was already hollow via `not: {}`.",
+          "$ref": "#/$defs/used-not-keyword/$defs/alreadyHollowEmptyNot/$defs/inner"
         }
       }
     }
@@ -329,6 +343,38 @@
               "title": "Inner",
               "description": "A number value.",
               "type": "number"
+            }
+          },
+          "not": {
+            "$comment": "This schema is hollow: it is not referenced and only remains as a container for structures that are still in use. Itself must not be used for validation."
+          }
+        },
+        "alreadyHollowTrueNot": {
+          "$comment": "NOT reached itself, only its `$defs/inner` is. `not: true` already rejected everything, so the schema was hollow before the sweep. The marker replaces the boolean, but this schema must NOT appear in `hollowed`, and `…/not` must NOT appear in `removed`.",
+          "title": "Already hollow true not",
+          "description": "A container that already rejected everything via `not: true`.",
+          "$defs": {
+            "inner": {
+              "$comment": "Reached from main -> kept; forces the parent to be kept as a container.",
+              "title": "Inner",
+              "description": "A boolean value.",
+              "type": "boolean"
+            }
+          },
+          "not": {
+            "$comment": "This schema is hollow: it is not referenced and only remains as a container for structures that are still in use. Itself must not be used for validation."
+          }
+        },
+        "alreadyHollowEmptyNot": {
+          "$comment": "NOT reached itself, only its `$defs/inner` is. The `not` is an annotations-only object, which accepts anything, so the schema was hollow before the sweep. Same expectations as alreadyHollowTrueNot.",
+          "title": "Already hollow empty not",
+          "description": "A container that already rejected everything via an annotations-only `not`.",
+          "$defs": {
+            "inner": {
+              "$comment": "Reached from main -> kept; forces the parent to be kept as a container.",
+              "title": "Inner",
+              "description": "A null value.",
+              "type": "null"
             }
           },
           "not": {
