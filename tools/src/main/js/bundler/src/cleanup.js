@@ -54,14 +54,13 @@ const treeShakeSchemaKeep = Object.freeze(new Set([
 
 /**
  * Whether a schema accepts every instance: `true`, `{}` or annotations-only.
+ * Covers not the entire JSON schema spec, only the domain of this module.
  * @param {unknown} s
  * @return {boolean}
  */
-const acceptsAnything = (s) =>
-    s === true || (
-        isSchemaObject(s)
-        && Object.keys(s).every(k => treeShakeSchemaKeep.has(k))
-    );
+const acceptsAnything = (s) => s === true || (
+    isSchemaObject(s) && Object.keys(s).every(k => treeShakeSchemaKeep.has(k))
+);
 
 /**
  * Get a type-preserving, minimal-footprint placeholder for a non-schema value.
