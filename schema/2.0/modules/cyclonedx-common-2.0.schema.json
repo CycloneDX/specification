@@ -5,16 +5,16 @@
   "title": "CycloneDX Common Module",
   "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
-    "refType": {
+    "refIdType": {
       "description": "Identifier for referable and therefore interlinkable elements.\nValue shall not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
       "type": "string",
       "minLength": 1,
       "pattern": "^(?!urn:cdx:)"
     },
     "refLinkType": {
-      "description": "Descriptor for an element identified by the attribute 'bom-ref' in the same BOM document.\nIn contrast to `bomLinkElementType`.",
-      "allOf": [{ "$ref": "#/$defs/refType" }],
-      "$comment": "value-range is same as 'refType'"
+      "description": "Descriptor for an element identified by the attribute `refId` in the same BOM document.\nIn contrast to `bomLinkElementType`.",
+      "allOf": [{ "$ref": "#/$defs/refIdType" }],
+      "$comment": "value-range is same as 'refIdType'"
     },
     "bomLinkDocumentType": {
       "title": "BOM-Link Document",
@@ -47,7 +47,7 @@
     },
     "elementLink": {
       "title": "Referenced Element",
-      "description": "Reference using bom-link or bom-ref to an element.",
+      "description": "Reference using bom-link or `refId` to an element.",
       "anyOf": [
         {
           "title": "Ref",
@@ -321,10 +321,10 @@
       "description": "An address used to identify a contactable location.",
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the address elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
-          "$ref": "#/$defs/refType"
+        "refId": {
+          "title": "Reference Identifier",
+          "description": "An optional identifier which can be used to reference the address elsewhere in the document. Every `refId` shall be unique within the document.\nValue should not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+          "$ref": "#/$defs/refIdType"
         },
         "country": {
           "type": "string",
@@ -368,10 +368,10 @@
       "title": "Organizational Entity",
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        "refId": {
+          "$ref": "#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An optional identifier which can be used to reference the object elsewhere in the document. Every `refId` shall be unique within the document.\nValue should not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "name": {
           "type": "string",
@@ -416,10 +416,10 @@
       "title": "Organizational Contact",
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the object elsewhere in the BOM. Every bom-ref must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        "refId": {
+          "$ref": "#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An optional identifier which can be used to reference the object elsewhere in the document. Every `refId` shall be unique within the document.\nValue should not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "name": {
           "type": "string",
@@ -815,10 +815,10 @@
       ],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference the patch elsewhere in the document, such as from an annotation. Every `bom-ref` shall be unique within the document."
+        "refId": {
+          "$ref": "#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the patch elsewhere in the document, such as from an annotation. Every `refId` shall be unique within the document."
         },
         "type": {
           "enum": [
@@ -857,7 +857,7 @@
                 "properties": {
                   "ref": {
                     "title": "Reference",
-                    "description": "Reference using bom-link or bom-ref to the resolved item.",
+                    "description": "Reference using bom-link or `refId` to the resolved item.",
                     "$ref": "cyclonedx-common-2.0.schema.json#/$defs/elementLink"
                   }
                 }
@@ -866,6 +866,31 @@
           },
           "title": "Resolves",
           "description": "A collection of items the patch resolves. Each entry is an inline issue or a reference to the weakness, vulnerability, use case, requirement, or threat that the patch resolves."
+        }
+      }
+    },
+    "patchReference": {
+      "type": "object",
+      "title": "Patch Reference",
+      "description": "A reference to a patch declared elsewhere, such as in the definitions registry, in another position of the same document, or in another document via BOM-Link. A reference includes the referenced patch exactly as declared: every position that references the same patch includes an identical patch. Where the context differs, declare the patch inline instead.",
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "title": "Reference",
+          "description": "Reference using bom-link or `refId` to the patch.",
+          "anyOf": [
+            {
+              "title": "Ref",
+              "$ref": "#/$defs/refLinkType"
+            },
+            {
+              "title": "BOM-Link Element",
+              "$ref": "#/$defs/bomLinkElementType"
+            }
+          ]
         }
       }
     },
@@ -1281,9 +1306,9 @@
       "required": ["image"],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "#/$defs/refType",
-          "description": "An optional identifier which can be used to reference the graphic elsewhere using a bom-ref or bom-link."
+        "refId": {
+          "$ref": "#/$defs/refIdType",
+          "description": "An optional identifier which can be used to reference the graphic elsewhere using a `refId` or bom-link."
         },
         "name": {
           "type": "string",
@@ -1310,8 +1335,18 @@
       "additionalProperties": false,
       "properties": {
         "ref": {
-          "$ref": "#/$defs/refLinkType",
-          "description": "Reference using bom-link or bom-ref to the graphic."
+          "title": "Reference",
+          "description": "Reference using bom-link or `refId` to the graphic.",
+          "anyOf": [
+            {
+              "title": "Ref",
+              "$ref": "#/$defs/refLinkType"
+            },
+            {
+              "title": "BOM-Link Element",
+              "$ref": "#/$defs/bomLinkElementType"
+            }
+          ]
         }
       }
     },
@@ -1341,8 +1376,13 @@
         "collection": {
           "type": "array",
           "title": "Collection",
-          "description": "A collection of graphics.",
-          "items": {"$ref": "#/$defs/graphic"}
+          "description": "A collection of graphics. Items may be inline graphics or references to graphics defined elsewhere.",
+          "items": {
+            "oneOf": [
+              {"$ref": "#/$defs/graphic"},
+              {"$ref": "#/$defs/graphicReference"}
+            ]
+          }
         }
       }
     }

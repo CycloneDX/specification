@@ -10,9 +10,16 @@
       "title": "Weaknesses",
       "uniqueItems": true,
       "items": {
-        "$ref": "#/$defs/weakness"
+        "oneOf": [
+          {
+            "$ref": "#/$defs/weakness"
+          },
+          {
+            "$ref": "#/$defs/weaknessReference"
+          }
+        ]
       },
-      "description": "A collection of weaknesses. Each weakness records a source of risk: a flaw, hazard, bias, or other predisposing condition of a subject or its context."
+      "description": "A collection of weaknesses. Each weakness records a source of risk: a flaw, hazard, bias, or other predisposing condition of a subject or its context. Items may be inline weakness objects or references to weaknesses declared elsewhere."
     },
     "weakness": {
       "type": "object",
@@ -32,9 +39,9 @@
         }
       ],
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "description": "An optional identifier which can be used to reference the weakness elsewhere using a bom-ref or bom-link."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "description": "An optional identifier which can be used to reference the weakness elsewhere using a `refId` or bom-link."
         },
         "kind": {
           "title": "Kind",
@@ -106,6 +113,31 @@
           "items": {
             "$ref": "#/$defs/weaknessCategory"
           }
+        }
+      }
+    },
+    "weaknessReference": {
+      "type": "object",
+      "title": "Weakness Reference",
+      "description": "A reference to a weakness declared elsewhere, such as in the definitions registry, in another position of the same document, or in another document via BOM-Link. A reference includes the referenced weakness exactly as declared: every position that references the same weakness includes an identical weakness.",
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "title": "Reference",
+          "description": "Reference using bom-link or `refId` to the weakness.",
+          "anyOf": [
+            {
+              "title": "Ref",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+            },
+            {
+              "title": "BOM-Link Element",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+            }
+          ]
         }
       }
     },
