@@ -1,13 +1,16 @@
 import {COMMENT_KEYWORD, subschemas} from './helpers/json-schema-spec.js';
 
+
+/** @typedef {import('./helpers/json-schema-spec.js').Schema} Schema */
+
 /**
  * Remove $comment in place
- * @param {*} schema
+ * @param {Schema} schema
  * @returns {void}
  */
 export const dropComments = (schema) => {
     delete schema[COMMENT_KEYWORD];
-    subschemas(schema).forEach(dropComments);
+    subschemas(schema).forEach(([s]) => dropComments(s));
 }
 
 const HOLLOW_COMMENT =

@@ -1,11 +1,20 @@
-import {basename, dirname, relative, resolve} from 'node:path'
+import {basename, dirname, relative, resolve} from 'node:path';
+import {ok} from 'node:assert/strict';
 
-import {JSON_SCHEMA_RE, getJsonfile, posixPath, findDuplicateValues} from './helpers/common.js';
-import {escapeJsonPointer, PREFIX as JP_PREFIX} from './helpers/json-pointer-spec.js';
+import {
+    posixPath,
+    JSON_SCHEMA_RE, getJsonfile,
+    objectGetOwnPath, PATH_NOT_FOUND,
+    findDuplicateValues
+} from './helpers/common.js';
+import {
+    escapeJsonPointer, isJsonPointer, jsonPointer2stack,
+    PREFIX as JP_PREFIX, ROOT_POINTER
+} from './helpers/json-pointer-spec.js';
 import {
     ID_KEYWORD, NOT_KEYWORD, SCHEMA_KEYWORD, COMMENT_KEYWORD, DEFS_KEYWORD, REF_KEYWORDS,
-    subschemas,
-    refIsAbsolute, refSplit, refJoin, REF_FRAG_SEP,
+    isSchemaObject, subschemas,
+    refIsAbsolute, refSplit, refJoin, makeLocalRef
 } from './helpers/json-schema-spec.js';
 import {PATH_SEP as URI_PATH_SEP} from './helpers/uri.js';
 
@@ -15,7 +24,9 @@ const HOLLOW_COMMENT =
     'Itself must not be used for validation.';
 
 
-const FRAG_DEFS_PREFIX = `${JP_PREFIX}${DEFS_KEYWORD}${JP_PREFIX}`;
+const JP_DEFS = `${JP_PREFIX}${DEFS_KEYWORD}`;
+const JP_DEFS_PREFIX = `${JP_DEFS}${JP_PREFIX}`;
+
 
 /**
  * @param {string} f
@@ -46,11 +57,17 @@ class ModuleNameCollisionError extends Error {
     }
 }
 
+/** @typedef {import('./helpers/json-schema-spec.js').LocalRef} LocalRef */
+
+/** @typedef {import('./helpers/json-pointer-spec.js').JsonPointer} JsonPointer */
+
+/** @typedef {import('./helpers/json-schema-spec.js').Schema} Schema */
+
 /**
  * @typedef {object} BundleResult
- * @property {*} schema
- * @property {string[]} embedded embedded schema files
- * @property {Array<[string, string]>} external external refs
+ * @property {Schema} schema
+ * @property {string[]} external external refs
+ * @property {Array<[string, LocalRef]>} embedded embedded schema files
  * @property {Array<[string, string]>} rewired rewired refs
  */
 
@@ -74,16 +91,22 @@ class ModuleNameCollisionError extends Error {
  * @param {Iterable<string>} includeFiles Absolute path to schema files that shall be bundled.
  * @param {string} targetFile Absolute path to target schema file.
  * @returns {Promise<BundleResult>}
+ * @throws {RangeError} on a local ref whose fragment is not a JSON Pointer (e.g. an anchor
  */
 export const bundle = async (entryFile, includeFiles, targetFile) => {
     const entryDir = dirname(entryFile);
     const targetDir = dirname(targetFile);
 
-    /** @type {ReadonlyMap<string, string>} */
-    const fileModuleNames = Object.freeze(new Map(
-        [entryFile, ...includeFiles].map(f => [f, makeModuleName(basename(f))])
-    ));
-    const _dupModuleNames = findDuplicateValues(fileModuleNames)
+    /** @type {ReadonlyMap<string, Readonly<{module:string, schema:Schema}>>} */
+    const fileModuleSchema = Object.freeze(new Map(await Promise.all(
+        [entryFile, ...includeFiles].map(async f => {
+            const module = makeModuleName(basename(f));
+            const schema = await getJsonfile(f);
+            ok(isSchemaObject(schema), `Not schema: ${f}`);
+            return [f, Object.freeze({module, schema})];
+        }))));
+    const _dupModuleNames = findDuplicateValues(new Map(
+        fileModuleSchema.entries().map(([f, {module}]) => [f, module])));
     if (_dupModuleNames.size) {
         throw new ModuleNameCollisionError(_dupModuleNames);
     }
@@ -91,7 +114,7 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
     /**
      * Keys are source schema ref with absolute fs path.
      * Values are target schema local ref.
-     * @type {Map<string, string>}
+     * @type {Map<string, JsonPointer>}
      */
     const embeddedMap = new Map();
     /**
@@ -106,16 +129,20 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
      */
     const rewiredMap = new Map();
 
+    /** @type {WeakSet<Schema>} */
+    const _rewireRefsSeen = new WeakSet();
     /**
      * Rewire refs in place.
      *
      * No URI Decoding is done on refs, as out own cases just don't need it.
      *
-     * @param {*} schema
+     * @param {Schema} schema
      * @param {string} sourceFile
      * @returns {void}
      */
     const rewireRefs = (schema, sourceFile) => {
+        if (_rewireRefsSeen.has(schema)) return;
+        _rewireRefsSeen.add(schema);
         const sourceDir = dirname(sourceFile);
         for (const k of REF_KEYWORDS) {
             const v = schema[k];
@@ -130,17 +157,17 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
             const refFile = path
                 ? resolve(sourceDir, ...path.split(URI_PATH_SEP))
                 : sourceFile;
-            const moduleName = fileModuleNames.get(refFile);
-            if (moduleName) {
-                if (frag && !frag.startsWith(JP_PREFIX)) {
+            const refMS = fileModuleSchema.get(refFile)
+            if (refMS) {
+                if (frag !== null && !isJsonPointer(frag)) {
                     // currently dont support anchors - only JSON pointer.
                     throw new RangeError(`Unsupported ref fragment: ${v}`);
                 }
                 rewiredRS = {
                     path: null,
-                    frag: (refFile === entryFile && !frag?.startsWith(FRAG_DEFS_PREFIX)
-                            ? ''
-                            : `${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`
+                    frag: (refFile === entryFile && !frag?.startsWith(JP_DEFS_PREFIX)
+                            ? ROOT_POINTER
+                            : `${JP_DEFS_PREFIX}${escapeJsonPointer(refMS.module)}`
                     ) + (frag ?? '')
                 };
             } else {
@@ -154,56 +181,73 @@ export const bundle = async (entryFile, includeFiles, targetFile) => {
             rewiredMap.set(refJoin({path: refFile, frag}), rewired);
             if (rewiredRS.path) {
                 externals.add(rewired);
+            } else if (refMS) {
+                const tSchema = objectGetOwnPath(refMS.schema, jsonPointer2stack(frag ?? ROOT_POINTER));
+                if (tSchema === PATH_NOT_FOUND) {
+                    throw RangeError(`Missing target for ref: ${v}`);
+                }
+                if (isSchemaObject(tSchema)) {
+                    rewireRefs(tSchema, refFile);
+                } else if (typeof tSchema !== 'boolean') {
+                    throw new RangeError(`Ref target is not schema nor boolean: ${v}`)
+                }
             }
         }
-        subschemas(schema).forEach(s => rewireRefs(s, sourceFile));
-    }
+        subschemas(schema).forEach(([s]) => rewireRefs(s, sourceFile));
+    };
+    fileModuleSchema.forEach(({schema}, sourceFile) => rewireRefs(schema, sourceFile));
 
-    const schema = await getJsonfile(entryFile);
+    const {schema, module: entryModuleName} = fileModuleSchema.get(entryFile);
     if (URL.canParse(schema[ID_KEYWORD])) {
         schema[ID_KEYWORD] = new URL(
             posixPath(relative(entryDir, targetFile)),
             schema[ID_KEYWORD]
         ).toString();
     }
-    rewireRefs(schema, entryFile);
     const schemaDefsOrig = schema[DEFS_KEYWORD];
     schema[DEFS_KEYWORD] = Object.fromEntries( // sort for deterministic order
-        [...fileModuleNames.values()].sort().map(m => [m, undefined]));
+        [...fileModuleSchema.values().map(({module}) => module)].sort().map(m => [m, undefined]));
 
-    const entryModuleName = fileModuleNames.get(entryFile);
     if (schemaDefsOrig) {
         schema[DEFS_KEYWORD][entryModuleName] = {
             [DEFS_KEYWORD]: schemaDefsOrig,
             [NOT_KEYWORD]: {[COMMENT_KEYWORD]: HOLLOW_COMMENT}
         };
-        embeddedMap.set(`${entryFile}${REF_FRAG_SEP}${JP_PREFIX}${DEFS_KEYWORD}`, `${REF_FRAG_SEP}${FRAG_DEFS_PREFIX}${escapeJsonPointer(entryModuleName)}`);
+        embeddedMap.set(refJoin({
+            path: entryFile,
+            frag: JP_DEFS
+        }), `${JP_DEFS_PREFIX}${escapeJsonPointer(entryModuleName)}`);
+    } else {
+        delete schema[DEFS_KEYWORD][entryModuleName];
     }
 
-    for (const [includeFile, moduleName] of fileModuleNames) {
+    for (const [includeFile, {module: moduleName, schema: includeSchema}] of fileModuleSchema) {
         if (includeFile === entryFile) continue;
-        const includeSchema = await getJsonfile(includeFile);
+        ok(isSchemaObject(includeSchema), `Not schema: ${includeFile}`);
         delete includeSchema[SCHEMA_KEYWORD];
         delete includeSchema[ID_KEYWORD];
         delete includeSchema[COMMENT_KEYWORD];
         rewireRefs(includeSchema, includeFile);
         schema[DEFS_KEYWORD][moduleName] = includeSchema;
-        embeddedMap.set(includeFile, `${REF_FRAG_SEP}${FRAG_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`);
+        embeddedMap.set(includeFile, `${JP_DEFS_PREFIX}${escapeJsonPointer(moduleName)}`);
     }
 
     return {
         schema,
-        external: Array.from(externals),
+        external: Array.from(externals).sort(),
         embedded: Array.from(embeddedMap,
             ([f, d]) => {
                 const {path, frag} = refSplit(f);
-                return [refJoin({path: posixPath(relative(entryDir, path)), frag}), d];
-            }),
+                return [
+                    refJoin({path: posixPath(relative(entryDir, path)), frag}),
+                    makeLocalRef(d)];
+            }).sort(([a], [b]) => a.localeCompare(b)),
         rewired: Array.from(rewiredMap,
             ([f, t]) => {
                 const {path, frag} = refSplit(f);
-                return [refJoin({path: posixPath(relative(entryDir, path)), frag}), t];
-            }
-        ),
+                return [
+                    refJoin({path: posixPath(relative(entryDir, path)), frag}),
+                    t];
+            }).sort(([a], [b]) => a.localeCompare(b)),
     };
 };

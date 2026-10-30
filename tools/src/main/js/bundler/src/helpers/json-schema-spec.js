@@ -6,6 +6,12 @@
  */
 
 
+/**
+ * Json Schema
+ * @typedef {Record<string, unknown>} Schema
+ */
+
+
 export const SCHEMA_KEYWORD = '$schema';
 
 export const ID_KEYWORD = '$id';
@@ -15,14 +21,21 @@ export const COMMENT_KEYWORD = '$comment';
 /** Ignores the deprecated `definitions` - though it is still allowed... */
 export const DEFS_KEYWORD = '$defs';
 
-export const REF_KEYWORDS = Object.freeze(new Set(['$ref', '$dynamicRef', '$recursiveRef']));
+/** @type {ReadonlySet<string>} */
+export const REF_KEYWORDS = Object.freeze(new Set(['$ref', '$dynamicRef']));
 
-export const ANCHOR_KEYWORDS = Object.freeze(new Set(['$anchor', '$dynamicAnchor', '$recursiveAnchor']));
+/** @type {ReadonlySet<string>} */
+export const ANCHOR_KEYWORDS = Object.freeze(new Set(['$anchor', '$dynamicAnchor']));
 
+/** @type {ReadonlySet<string>} */
 export const DATA_KEYWORDS = Object.freeze(new Set(['enum', 'const', 'examples', 'default']));
 
 export const NOT_KEYWORD = 'not';
 
+export const TITLE_KEYWORD = 'title';
+export const DESCRIPTION_KEYWORD = 'description';
+
+/** @type {ReadonlySet<string>} */
 const SINGLE_SCHEMA = Object.freeze(new Set([
     'additionalProperties', 'propertyNames',
     'items', 'contains',
@@ -31,38 +44,53 @@ const SINGLE_SCHEMA = Object.freeze(new Set([
     'contentSchema',
 ]));
 
+/** @type {ReadonlySet<string>} */
 const SCHEMA_ARRAY = Object.freeze(new Set(['allOf', 'anyOf', 'oneOf', 'prefixItems']));
 
+/** @type {ReadonlySet<string>} */
 const SCHEMA_MAP = Object.freeze(new Set([DEFS_KEYWORD, 'properties', 'patternProperties', 'dependentSchemas']));
 
 /**
- * @param {unknown} o
- * @returns {o is Record<string, unknown>}
+ * @param {Readonly<unknown>} o
+ * @returns {o is Schema}
  */
 export const isSchemaObject = (o) =>
     o !== null
     && typeof o === 'object'
     && !Array.isArray(o);
 
+
+/** @typedef {import('./json-pointer-spec.js').JsonPointerStack} JsonPointerStack */
+
 /**
  * Yield immediate subschemas, never property maps or literal data.
- * @param {Readonly<*>} s schema
- * @yields {*}
+ * @param {Readonly<Schema>} s schema
+ * @yields {[Schema, JsonPointerStack]} schema and pointer stack
  */
 export const subschemas = function* (s) {
     for (const [k, v] of Object.entries(s)) {
         if (SINGLE_SCHEMA.has(k)) {
-            if (isSchemaObject(v)) yield v;
-        } else if (SCHEMA_ARRAY.has(k)) {
-            if (Array.isArray(v)) yield* v.filter(isSchemaObject);
-        } else if (SCHEMA_MAP.has(k)) {
-            if (isSchemaObject(v)) yield* Object.values(v).filter(isSchemaObject);
+            if (isSchemaObject(v)) yield [v, [k]];
+            continue;
+        }
+        if (SCHEMA_ARRAY.has(k)) {
+            if (!Array.isArray(v)) continue;
+            for (const [ak, av] of v.entries()) {
+                if (isSchemaObject(av)) yield [av, [k, String(ak)]];
+            }
+            continue;
+        }
+        if (SCHEMA_MAP.has(k)) {
+            if (typeof v !== 'object' || v === null) continue;
+            for (const [mk, mv] of Object.entries(v)) {
+                if (isSchemaObject(mv)) yield [mv, [k, mk]];
+            }
         }
     }
 };
 
 
-export const REF_FRAG_SEP = '#';
+const FRAG_SEP = '#';
 
 /**
  * @typedef {object} RefSplit
@@ -79,9 +107,9 @@ export const REF_FRAG_SEP = '#';
  * @returns {RefSplit}
  */
 export const refSplit = (r) => {
-    const split = r.split(REF_FRAG_SEP);
+    const split = r.split(FRAG_SEP);
     if (split.length > 2) {
-        throw new RangeError(`Unexpected amount of "${REF_FRAG_SEP}" in ${r}`);
+        throw new RangeError(`Unexpected amount of "${FRAG_SEP}" in ${r}`);
     }
     return {
         path: split[0] || null,
@@ -96,10 +124,10 @@ export const refSplit = (r) => {
  * @returns {string}
  */
 export const refJoin = ({path, frag}) => {
-    if (path && frag) return `${path}${REF_FRAG_SEP}${frag}`;
+    if (path && frag) return `${path}${FRAG_SEP}${frag}`;
     if (path) return path;
-    if (frag) return `${REF_FRAG_SEP}${frag}`;
-    return REF_FRAG_SEP; // the entire schema
+    if (frag) return `${FRAG_SEP}${frag}`;
+    return FRAG_SEP; // the entire schema
 };
 
 /**
@@ -113,8 +141,26 @@ const URI_OR_ABS_WIN_RE = Object.freeze(/^[a-z][a-z0-9+.-]*:/i);
  * @returns {boolean}
  */
 export const refIsAbsolute = (r) => {
-    if (r.startsWith(REF_FRAG_SEP)) return false;
+    if (refIsLocal(r)) return false;
     return r.startsWith('/')  // Unix-like absolute path
         || r.startsWith('\\')  // UNC-like absolute path
         || URI_OR_ABS_WIN_RE.test(r);
 };
+
+/**
+ * Local reference: a JSON Pointer prefixed with {@link FRAG_SEP}.
+ * @typedef {`${typeof FRAG_SEP}${string}`} LocalRef
+ */
+
+/**
+ * Whether a ref is local.
+ * @param {string} r ref
+ * @return {r is LocalRef}
+ */
+export const refIsLocal = (r) => r.startsWith(FRAG_SEP);
+
+/**
+ * @param {string} s
+ * @return {LocalRef}
+ */
+export const makeLocalRef = (s) => `${FRAG_SEP}${s}`;

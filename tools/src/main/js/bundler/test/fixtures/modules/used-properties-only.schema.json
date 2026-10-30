@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "http://example.com/test/modules/used-properties-only.schema.json",
+  "$comment": "FIXTURE: only individual (deeply nested) *properties* of this module are referenced, never a $def and never the module as a whole -> the referenced property subtrees (and what they reach) must be kept under their original JSON-pointer path, the siblings and the top-level body must be dropped. The top-level title/description live in the dropped body and must not appear in the bundle.",
+  "title": "Used properties only",
+  "description": "A module of which only nested properties are referenced.",
+  "type": "object",
+  "properties": {
+    "address": {
+      "$comment": "Reached only through its nested children, never as a whole -> the container stays hollow, only the referenced children survive.",
+      "title": "Address",
+      "description": "A postal address.",
+      "type": "object",
+      "properties": {
+        "street": {
+          "$comment": "Reached from main via #/properties/address/properties/street.",
+          "title": "Street",
+          "description": "Street name and number.",
+          "type": "string"
+        },
+        "city": {
+          "$comment": "Not referenced -> dropped although its siblings are kept.",
+          "title": "City",
+          "description": "Name of the city.",
+          "type": "string"
+        },
+        "geo": {
+          "$comment": "Reached from main via a three-level deep pointer into #/properties/address/properties/geo/properties/lat.",
+          "title": "Geo",
+          "description": "Geographic coordinates.",
+          "type": "object",
+          "properties": {
+            "lat": {
+              "$comment": "Deeply nested leaf that is referenced directly from main. Has an internal ref -> transitively keeps $defs/degrees.",
+              "title": "Latitude",
+              "description": "Latitude in degrees.",
+              "$ref": "#/$defs/degrees"
+            },
+            "lon": {
+              "$comment": "Deeply nested leaf that is NOT referenced -> dropped.",
+              "title": "Longitude",
+              "description": "Longitude in degrees.",
+              "$ref": "#/$defs/degrees"
+            }
+          }
+        }
+      }
+    },
+    "contact": {
+      "$comment": "Referenced from main as a whole property (with all its children) -> kept entirely, including the unreferenced phone.",
+      "title": "Contact",
+      "description": "Contact details.",
+      "type": "object",
+      "properties": {
+        "email": {
+          "title": "E-mail",
+          "description": "An e-mail address.",
+          "type": "string",
+          "format": "email"
+        },
+        "phone": {
+          "$comment": "Not referenced individually, but kept because the parent property 'contact' is referenced as a whole.",
+          "title": "Phone",
+          "description": "A phone number.",
+          "type": "string"
+        }
+      }
+    },
+    "unusedTopLevel": {
+      "$comment": "Not referenced -> dropped together with everything it refers to; must NOT make unused.schema.json reachable.",
+      "title": "Unused top level",
+      "description": "A property nothing refers to.",
+      "$ref": "unused.schema.json"
+    }
+  },
+  "$defs": {
+    "degrees": {
+      "$comment": "Only reachable via properties/address/properties/geo/properties/lat.",
+      "title": "Degrees",
+      "description": "An angle in degrees.",
+      "type": "number",
+      "minimum": -180,
+      "maximum": 180
+    },
+    "unusedDef": {
+      "$comment": "Not reachable -> shaken away.",
+      "title": "Unused def",
+      "description": "A definition nothing reachable refers to.",
+      "type": "null"
+    }
+  }
+}
