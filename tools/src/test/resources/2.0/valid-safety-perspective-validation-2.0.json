@@ -1,0 +1,266 @@
+{
+  "$schema": "https://cyclonedx.org/schema/2.0/cyclonedx-2.0.schema.json",
+  "$comment": "Illustrative Safety Perspective fixture. All organizations, records, and results are synthetic. The declarations carry evidence for review, not a safety certification or an independently established authorization.",
+  "specFormat": "CycloneDX",
+  "specVersion": "2.0",
+  "serialNumber": "urn:uuid:dde87342-8401-49d2-9898-223b1c5d03da",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-10-16T15:00:00Z"
+  },
+  "definitions": {
+    "components": [
+      {
+        "bom-ref": "comp-pump-firmware",
+        "type": "firmware",
+        "name": "acme-pump-firmware",
+        "version": "3.2.0",
+        "externalReferences": [
+          {
+            "type": "hazard-analysis",
+            "url": "https://plm.acme-medical.example/safety/RA-2026-117"
+          }
+        ]
+      },
+      {
+        "bom-ref": "comp-globex-tls",
+        "type": "library",
+        "name": "globex-tls",
+        "version": "1.4.2"
+      }
+    ],
+    "requirements": [
+      {
+        "bom-ref": "req-command-integrity",
+        "id": "SR-041",
+        "name": "Therapy command integrity",
+        "type": [
+          "safety"
+        ],
+        "description": "Only authentic therapy commands are accepted in the stated deployment.",
+        "rationale": "Command integrity prevents unintended drug delivery in the classified therapy path."
+      }
+    ]
+  },
+  "blueprints": [
+    {
+      "bom-ref": "bp-pump-deployment",
+      "name": "Infusion pump, hospital deployment",
+      "modelTypes": [
+        "data-flow"
+      ],
+      "assets": [
+        {
+          "bom-ref": "asset-tls-path",
+          "componentRef": "comp-globex-tls",
+          "classification": {
+            "criticality": "critical",
+            "safetyIntegrityLevels": [
+              {
+                "scheme": "IEC-62304",
+                "level": "class-c"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "declarations": {
+    "claims": [
+      {
+        "bom-ref": "claim-command-integrity-failure",
+        "target": "asset-tls-path",
+        "predicate": "Requirement SR-041 is not satisfied by firmware 3.2.0 in the tested certificate replacement configuration.",
+        "reasoning": "The test exercises the safety-relevant command path using a substituted certificate. Acceptance of an unauthentic command directly violates SR-041, so the failed result supports the non-conformance finding.",
+        "evidence": [
+          "evidence-validation-failure"
+        ]
+      }
+    ],
+    "evidence": [
+      {
+        "bom-ref": "evidence-validation-failure",
+        "description": "Illustrative failed validation result.",
+        "data": [
+          {
+            "name": "evidence-validation-failure",
+            "contents": {
+              "attachment": {
+                "mediaType": "text/plain",
+                "content": "TR-042; subject: asset-tls-path; firmware 3.2.0; requirement SR-041. Method: replace gateway certificate, send unauthentic therapy command, observe delivery command acceptance. Expected: reject. Observed: accepted. Result: fail."
+              },
+              "hashes": [
+                {
+                  "alg": "SHA-256",
+                  "content": "c868000fc7be3ce59bdc4ae81e3d84ae26e3d866c1e785a3373b61b23b3a3762"
+                }
+              ]
+            }
+          }
+        ],
+        "created": "2026-10-16T12:00:00Z",
+        "author": {
+          "name": "Example safety engineering team"
+        }
+      },
+      {
+        "bom-ref": "evidence-review",
+        "description": "Illustrative review and disposition record.",
+        "data": [
+          {
+            "name": "evidence-review",
+            "contents": {
+              "attachment": {
+                "mediaType": "text/plain",
+                "content": "REVIEW-042; subject: asset-tls-path; assessment: assessment-validation-failure; disposition: request change, release blocked. Reason: failed SR-041 validation demonstrates an unauthentic command can enter the therapy path. Reviewer: Example product safety manager; process: Example lifecycle policy P-01 revision 1. CR-042 tracks the proposed modification and replacement verification; they are not completed by this assessment."
+              },
+              "hashes": [
+                {
+                  "alg": "SHA-256",
+                  "content": "26b4b2cb6f3745869847515810e42cca663ea0cb4ba832a629be2975115e76d7"
+                }
+              ]
+            }
+          }
+        ],
+        "created": "2026-10-16T12:00:00Z",
+        "author": {
+          "name": "Example safety engineering team"
+        }
+      }
+    ]
+  },
+  "risks": {
+    "risks": [
+      {
+        "bom-ref": "risk-validation-failure",
+        "name": "Failed command-integrity validation",
+        "statement": "The tested certificate replacement permits an unauthentic command and could cause unintended delivery.",
+        "domains": [
+          {
+            "type": "safety"
+          }
+        ],
+        "affects": [
+          "asset-tls-path",
+          "comp-pump-firmware"
+        ],
+        "inherentRisk": {
+          "impact": {
+            "level": "catastrophic",
+            "polarity": "harm",
+            "categories": [
+              "safety"
+            ],
+            "description": "Incorrect drug delivery to a patient.",
+            "riskAttributes": [
+              "integrity"
+            ]
+          },
+          "rationale": "Example qualitative hazard-analysis method H-01 revision 1: catastrophic denotes potential death or permanent injury from unintended delivery. No event probability or numeric risk score is asserted."
+        },
+        "status": "assessed",
+        "relatedDamageScenarios": [
+          "damage-unintended-delivery"
+        ],
+        "relatedRequirements": [
+          "req-command-integrity"
+        ],
+        "relatedClaims": [
+          "claim-command-integrity-failure"
+        ]
+      }
+    ],
+    "assessments": [
+      {
+        "bom-ref": "assessment-validation-failure",
+        "name": "Safety impact assessment of TR-042",
+        "type": [
+          "safety"
+        ],
+        "cadence": "triggered",
+        "triggeredBy": [
+          "trigger-validation-report"
+        ],
+        "timestamp": "2026-10-16T14:00:00Z",
+        "status": "completed",
+        "scope": "Pump firmware 3.2.0, Globex TLS 1.4.2, and the hospital deployment therapy command path. No claim about other products or deployments.",
+        "assessors": [
+          {
+            "roles": [
+              {
+                "role": "auditor"
+              }
+            ],
+            "organization": {
+              "name": "Acme Medical Systems"
+            }
+          }
+        ],
+        "risks": [
+          "risk-validation-failure"
+        ],
+        "conclusion": "unacceptable",
+        "summary": "The impact assessment is completed, but SR-041 fails validation. Release is blocked under the example lifecycle process; correction and verification rerun remain open in the authoritative change record.",
+        "nextReview": "2026-12-12T00:00:00Z",
+        "externalReferences": [
+          {
+            "type": "evidence",
+            "url": "urn:cdx:dde87342-8401-49d2-9898-223b1c5d03da/1#evidence-review",
+            "comment": "Review record distinguishes the completed assessment from unfinished corrective work."
+          },
+          {
+            "type": "issue-tracker",
+            "url": "https://qms.example.invalid/changes/CR-042",
+            "comment": "Authoritative change record: firmware correction proposed; replacement verification to be added; previous result retained. No release approval recorded."
+          }
+        ],
+        "assumptions": [
+          "This result applies to the tested certificate replacement and firmware 3.2.0. A later correction requires a new assessment and verification evidence."
+        ]
+      }
+    ],
+    "damageScenarios": [
+      {
+        "bom-ref": "damage-unintended-delivery",
+        "name": "Unintended drug delivery",
+        "description": "An unauthentic therapy command changes delivery to a patient.",
+        "affects": [
+          "asset-tls-path"
+        ],
+        "impacts": [
+          {
+            "level": "catastrophic",
+            "categories": [
+              "safety"
+            ],
+            "polarity": "harm",
+            "description": "Potential patient harm from unintended drug delivery; the example severity label is interpreted under the fictional manufacturer hazard-analysis process."
+          }
+        ]
+      }
+    ]
+  },
+  "externalReferences": [
+    {
+      "type": "perspective",
+      "url": "https://github.com/CycloneDX/specification/blob/2.0-dev/perspectives/safety-perspective.json"
+    }
+  ],
+  "annotations": [
+    {
+      "bom-ref": "trigger-validation-report",
+      "subjects": [
+        "asset-tls-path"
+      ],
+      "annotator": {
+        "organization": {
+          "name": "Example validation laboratory"
+        }
+      },
+      "timestamp": "2026-10-16T12:00:00Z",
+      "text": "TR-042: validation of firmware 3.2.0 found that a gateway certificate replacement permits an unauthentic therapy command. This report initiates assessment; it does not prescribe or approve a change."
+    }
+  ]
+}

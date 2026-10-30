@@ -1,0 +1,284 @@
+{
+  "$schema": "https://cyclonedx.org/schema/2.0/cyclonedx-2.0.schema.json",
+  "$comment": "Illustrative Safety Perspective fixture. All organizations, records, and results are synthetic. The declarations carry evidence for review, not a safety certification or an independently established authorization.",
+  "specFormat": "CycloneDX",
+  "specVersion": "2.0",
+  "serialNumber": "urn:uuid:2f984e8e-5e55-4b2d-875a-ef5144aa9f8a",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-10-16T15:00:00Z"
+  },
+  "definitions": {
+    "components": [
+      {
+        "bom-ref": "comp-pump-firmware",
+        "type": "firmware",
+        "name": "acme-pump-firmware",
+        "version": "3.2.0",
+        "externalReferences": [
+          {
+            "type": "hazard-analysis",
+            "url": "https://plm.acme-medical.example/safety/RA-2026-117"
+          }
+        ]
+      },
+      {
+        "bom-ref": "comp-globex-tls",
+        "type": "library",
+        "name": "globex-tls",
+        "version": "1.4.2"
+      }
+    ],
+    "requirements": [
+      {
+        "bom-ref": "req-command-integrity",
+        "id": "SR-041",
+        "name": "Therapy command integrity",
+        "type": [
+          "safety"
+        ],
+        "description": "Only authentic therapy commands are accepted in the stated deployment.",
+        "rationale": "Command integrity prevents unintended drug delivery in the classified therapy path."
+      }
+    ]
+  },
+  "blueprints": [
+    {
+      "bom-ref": "bp-pump-deployment",
+      "name": "Infusion pump, hospital deployment",
+      "modelTypes": [
+        "data-flow"
+      ],
+      "assets": [
+        {
+          "bom-ref": "asset-tls-path",
+          "componentRef": "comp-globex-tls",
+          "classification": {
+            "criticality": "critical",
+            "safetyIntegrityLevels": [
+              {
+                "scheme": "IEC-62304",
+                "level": "class-c"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "declarations": {
+    "claims": [
+      {
+        "bom-ref": "claim-no-new-safety-impact",
+        "target": "asset-tls-path",
+        "predicate": "REPORT-043 does not invalidate the assessed therapy-path safety requirement or baseline verification.",
+        "reasoning": "Design inspection establishes that the maintenance icon cannot affect command processing. Existing command-integrity verification applies to the unchanged baseline, so repeating it would not test a changed safety path.",
+        "evidence": [
+          "evidence-design-inspection",
+          "evidence-baseline-test"
+        ]
+      }
+    ],
+    "evidence": [
+      {
+        "bom-ref": "evidence-design-inspection",
+        "description": "Illustrative design inspection result.",
+        "data": [
+          {
+            "name": "evidence-design-inspection",
+            "contents": {
+              "attachment": {
+                "mediaType": "text/plain",
+                "content": "INSPECT-043: firmware 3.2.0 maintenance icon reads a diagnostic-only value. There is no write or control-flow path to therapy command processing. The affected baseline and isolation boundary were inspected."
+              },
+              "hashes": [
+                {
+                  "alg": "SHA-256",
+                  "content": "aef97527e884eaed60974862a282a2e66e68cf41107e26dfa65df11ece12b10e"
+                }
+              ]
+            }
+          }
+        ],
+        "created": "2026-10-16T12:00:00Z",
+        "author": {
+          "name": "Example safety engineering team"
+        }
+      },
+      {
+        "bom-ref": "evidence-baseline-test",
+        "description": "Illustrative applicable baseline verification.",
+        "data": [
+          {
+            "name": "evidence-baseline-test",
+            "contents": {
+              "attachment": {
+                "mediaType": "text/plain",
+                "content": "BASELINE-041: firmware 3.2.0 therapy command-integrity verification passed. REPORT-043 changes neither the baseline nor the assumptions of that verification."
+              },
+              "hashes": [
+                {
+                  "alg": "SHA-256",
+                  "content": "60690a2f9831557d0b3237f4b69a7370230b039e9dd56a3e6aab0bd8fc92e8f2"
+                }
+              ]
+            }
+          }
+        ],
+        "created": "2026-10-16T12:00:00Z",
+        "author": {
+          "name": "Example safety engineering team"
+        }
+      },
+      {
+        "bom-ref": "evidence-review",
+        "description": "Illustrative no-action decision record.",
+        "data": [
+          {
+            "name": "evidence-review",
+            "contents": {
+              "attachment": {
+                "mediaType": "text/plain",
+                "content": "REVIEW-043; subject: asset-tls-path; assessment: assessment-customer-report; disposition: no action for the therapy safety requirement. Reason: design inspection confirms isolation, and baseline verification remains applicable. Reviewer: Example product safety manager; process: Example lifecycle policy P-01 revision 1. No new verification is required for this disposition; other product-quality follow-up is outside this safety assessment."
+              },
+              "hashes": [
+                {
+                  "alg": "SHA-256",
+                  "content": "456ff51d4dc0838ff31a4c4795320b38bee886ed8bbc2ab01028a9fe323598c2"
+                }
+              ]
+            }
+          }
+        ],
+        "created": "2026-10-16T12:00:00Z",
+        "author": {
+          "name": "Example safety engineering team"
+        }
+      }
+    ]
+  },
+  "risks": {
+    "risks": [
+      {
+        "bom-ref": "risk-reported-indicator",
+        "name": "Reported indicator failure considered for therapy impact",
+        "statement": "If the reported status icon were part of the therapy command path, a hidden unsafe state could affect delivery. Analysis checks this possible connection.",
+        "domains": [
+          {
+            "type": "safety"
+          }
+        ],
+        "affects": [
+          "asset-tls-path",
+          "comp-pump-firmware"
+        ],
+        "inherentRisk": {
+          "impact": {
+            "level": "catastrophic",
+            "polarity": "harm",
+            "categories": [
+              "safety"
+            ],
+            "description": "Incorrect drug delivery to a patient.",
+            "riskAttributes": [
+              "integrity"
+            ]
+          },
+          "rationale": "Example qualitative hazard-analysis method H-01 revision 1: catastrophic denotes potential death or permanent injury from unintended delivery. No event probability or numeric risk score is asserted."
+        },
+        "status": "assessed",
+        "relatedDamageScenarios": [
+          "damage-unintended-delivery"
+        ],
+        "residualRisk": {
+          "rationale": "The reported maintenance icon is outside the therapy command path. Design inspection and the existing command-integrity verification establish that the report does not invalidate SR-041 or its verification in this baseline."
+        }
+      }
+    ],
+    "assessments": [
+      {
+        "bom-ref": "assessment-customer-report",
+        "name": "Safety triage of REPORT-043",
+        "type": [
+          "safety"
+        ],
+        "cadence": "triggered",
+        "triggeredBy": [
+          "trigger-customer-report"
+        ],
+        "timestamp": "2026-10-16T14:00:00Z",
+        "status": "completed",
+        "scope": "Pump firmware 3.2.0, Globex TLS 1.4.2, and the hospital deployment therapy command path. No claim about other products or deployments.",
+        "assessors": [
+          {
+            "roles": [
+              {
+                "role": "auditor"
+              }
+            ],
+            "organization": {
+              "name": "Acme Medical Systems"
+            }
+          }
+        ],
+        "risks": [
+          "risk-reported-indicator"
+        ],
+        "conclusion": "acceptable",
+        "summary": "Completed triage found no additional safety impact. A justified no-action disposition is recorded for this context; no new verification is required under the example process because the report does not invalidate the existing baseline evidence.",
+        "nextReview": "2026-12-12T00:00:00Z",
+        "externalReferences": [
+          {
+            "type": "evidence",
+            "url": "urn:cdx:2f984e8e-5e55-4b2d-875a-ef5144aa9f8a/1#evidence-review",
+            "comment": "Review record supporting a bounded no-action disposition; not a blanket release approval."
+          }
+        ],
+        "assumptions": [
+          "The maintenance interface remains isolated from the therapy command path in firmware 3.2.0."
+        ]
+      }
+    ],
+    "damageScenarios": [
+      {
+        "bom-ref": "damage-unintended-delivery",
+        "name": "Unintended drug delivery",
+        "description": "An unauthentic therapy command changes delivery to a patient.",
+        "affects": [
+          "asset-tls-path"
+        ],
+        "impacts": [
+          {
+            "level": "catastrophic",
+            "categories": [
+              "safety"
+            ],
+            "polarity": "harm",
+            "description": "Potential patient harm from unintended drug delivery; the example severity label is interpreted under the fictional manufacturer hazard-analysis process."
+          }
+        ]
+      }
+    ]
+  },
+  "externalReferences": [
+    {
+      "type": "perspective",
+      "url": "https://github.com/CycloneDX/specification/blob/2.0-dev/perspectives/safety-perspective.json"
+    }
+  ],
+  "annotations": [
+    {
+      "bom-ref": "trigger-customer-report",
+      "subjects": [
+        "asset-tls-path"
+      ],
+      "annotator": {
+        "organization": {
+          "name": "Example validation laboratory"
+        }
+      },
+      "timestamp": "2026-10-16T12:00:00Z",
+      "text": "REPORT-043: customer reports a missing status icon in the maintenance interface. Review determines whether the report changes the therapy safety context; no change is presumed."
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "$schema": "https://cyclonedx.org/schema/2.0/cyclonedx-2.0.schema.json",
+  "specFormat": "CycloneDX",
+  "specVersion": "2.0",
+  "version": 1,
+  "perspectives": [
+    {
+      "bom-ref": "perspective-safety",
+      "name": "Safety Perspective",
+      "description": "A view of safety impact assessments, their classified product context, source triggers, affected elements, claims, evidence, and recorded conclusions. Presence of these fields does not establish evidence completeness, reviewer authority, release approval, or safety claim truth. The mappings apply to the whole document; consumers resolve references to associate each assessment with its own context.",
+      "domains": [
+        "functional-safety",
+        "risk-management"
+      ],
+      "mappings": [
+        {
+          "expression": "$.blueprints[*].assets[*].classification.safetyIntegrityLevels[*]",
+          "nativeName": "Safety integrity context",
+          "nativeDescription": "The scheme and integrity level assigned to an asset in its product or deployment context.",
+          "relevance": "recommended",
+          "rationale": "An integrity classification is contextual and is not a risk score. Absence means no classification was supplied; it does not mean the asset has no safety relevance."
+        },
+        {
+          "expression": "$.risks.assessments[*].triggeredBy[*]",
+          "nativeName": "Analysis source",
+          "nativeDescription": "References to existing source objects that occasioned the assessment.",
+          "relevance": "required",
+          "rationale": "Reuse an existing vulnerability, annotation, or other source object instead of creating a second trigger for the same event. A trigger does not imply that a change is necessary."
+        },
+        {
+          "expression": "$.risks.assessments[*].scope",
+          "nativeName": "Analysis scope",
+          "nativeDescription": "The system, version, deployment, and boundaries considered by the analysis.",
+          "relevance": "required"
+        },
+        {
+          "expression": "$.risks.assessments[*].risks[*]",
+          "nativeName": "Assessed risks",
+          "nativeDescription": "References to the risks evaluated by each assessment.",
+          "relevance": "required"
+        },
+        {
+          "expression": "$.risks.risks[*].affects[*]",
+          "nativeName": "Affected elements",
+          "nativeDescription": "References to the elements considered by a risk.",
+          "relevance": "required",
+          "rationale": "Being affected or in scope does not mean that an element was added, modified, or removed. Those changes belong in the authoritative change records."
+        },
+        {
+          "expression": "$.risks.damageScenarios[*]",
+          "nativeName": "Potential harm",
+          "nativeDescription": "Damage scenarios describing the consequence whose applicability or change is assessed.",
+          "relevance": "recommended",
+          "rationale": "Describe the harm and the impact category; severity and likelihood labels need an identified organizational methodology."
+        },
+        {
+          "expression": "$.risks.risks[*].inherentRisk.impact",
+          "nativeName": "Safety impact",
+          "nativeDescription": "The impact category and potential harm before the stated risk responses.",
+          "relevance": "recommended",
+          "rationale": "A potential consequence is not a finding that it occurred. No cross-standard conversion of ASIL, SIL, DAL, or software safety classes is implied."
+        },
+        {
+          "expression": "$.risks.assessments[*].status",
+          "nativeName": "Assessment lifecycle state",
+          "nativeDescription": "Progress of the assessment activity.",
+          "relevance": "required",
+          "rationale": "A completed assessment can conclude unacceptable or inconclusive. Lifecycle state alone is insufficient to infer release permission."
+        },
+        {
+          "expression": "$.risks.assessments[*].conclusion",
+          "nativeName": "Assessment conclusion",
+          "nativeDescription": "Acceptability of the assessed risks under the applicable context and process.",
+          "relevance": "required",
+          "rationale": "The conclusion supports a decision; it does not identify the authorized decision-maker or encode a general per-element decision lifecycle."
+        },
+        {
+          "expression": "$.declarations.claims[*]",
+          "nativeName": "Claims and verification rationale",
+          "nativeDescription": "Claims against explicit targets, with reasoning explaining why the referenced evidence supports each claim.",
+          "relevance": "required",
+          "rationale": "Keep the reason for initiating an assessment separate from the rationale for its result and from the justification for a verification method."
+        },
+        {
+          "expression": "$.declarations.evidence[*]",
+          "nativeName": "Supporting and counter evidence",
+          "nativeDescription": "Evidence objects referenced by claims, including test results, analysis records, and authoritative decision records.",
+          "relevance": "required",
+          "rationale": "Resolve both evidence and counterEvidence. The presence of an evidence object does not prove that every required branch is complete, current, or accepted."
+        },
+        {
+          "expression": "$.risks.assessments[*].assessors[*]",
+          "nativeName": "Assessment provenance",
+          "nativeDescription": "The parties that performed the assessment.",
+          "relevance": "recommended",
+          "rationale": "An assessor or automated tool is not necessarily authorized to approve a product release."
+        },
+        {
+          "expression": "$.risks.assessments[*].externalReferences[?(@.type=='evidence')]",
+          "nativeName": "Decision and review records",
+          "nativeDescription": "References to records of review, per-element disposition, responsible identity, and governing process where supplied.",
+          "relevance": "recommended",
+          "rationale": "Retain reusable decisions and authorization in the authoritative lifecycle system. A reference, reviewer name, signature, or recorded approval does not by itself establish relying-party authorization."
+        }
+      ]
+    }
+  ]
+}
