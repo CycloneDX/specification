@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cyclonedx.org/schema/2.0/cyclonedx-2.0-bundled.schema.json",
   "type": "object",
-  "title": "CycloneDX Transparency Expression Language",
+  "title": "CycloneDX Transparency Exchange Language",
   "$comment": "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "required": [
     "specFormat",
@@ -49,9 +49,8 @@
     "metadata": {
       "$ref": "#/$defs/cyclonedx-metadata-2.0/$defs/metadata"
     },
-    "components": {
-      "$ref": "#/$defs/cyclonedx-component-2.0/$defs/components",
-      "description": "A collection of components. When a metadata component is present, this array represents the inventory of components associated with that subject, forming a bill of materials. When the metadata component is omitted, the array provides component data for interchange purposes without establishing a compositional relationship."
+    "inventories": {
+      "$ref": "#/$defs/cyclonedx-component-2.0/$defs/inventories"
     },
     "dependencies": {
       "$ref": "#/$defs/cyclonedx-dependency-2.0/$defs/dependencies"
@@ -745,7 +744,7 @@
                 },
                 "component": {
                   "description": "The tool or component that created the annotation",
-                  "$ref": "#/$defs/cyclonedx-component-2.0/$defs/component"
+                  "$ref": "#/$defs/cyclonedx-component-2.0/$defs/componentEntry"
                 }
               }
             },
@@ -1527,6 +1526,10 @@
             "ordinalVersion": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/ordinalVersion"
             },
+            "frozen": {
+              "type": "boolean",
+              "description": "Whether the blueprint is frozen and must be versioned before modification."
+            },
             "lifecycles": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/lifecycles"
             },
@@ -1616,6 +1619,12 @@
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
             }
           }
+        },
+        "inScope": {
+          "type": "boolean",
+          "title": "In Scope",
+          "description": "Whether this element is within the scope of the model.",
+          "default": true
         },
         "asset": {
           "type": "object",
@@ -1731,6 +1740,9 @@
               "type": "string",
               "title": "Description",
               "description": "Description of the asset's role and purpose."
+            },
+            "inScope": {
+              "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/inScope"
             },
             "zone": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
@@ -1863,6 +1875,9 @@
               "type": "string",
               "title": "Description",
               "description": "Purpose and contents of the store."
+            },
+            "inScope": {
+              "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/inScope"
             },
             "type": {
               "title": "Type",
@@ -2034,7 +2049,7 @@
             "dataProfiles": {
               "type": "array",
               "title": "Data Profiles",
-              "description": "Data profiles that govern the dataset. Each entry is either an inline profile object or a reference using bom-link or bom-ref to a previously declared profile, typically declared in the root profiles catalogue.",
+              "description": "Data profiles that govern the dataset. Each entry is either an inline profile object or a reference using bom-link or bom-ref to a previously declared profile, typically declared in the definitions.",
               "uniqueItems": true,
               "items": {
                 "$ref": "#/$defs/cyclonedx-data-2.0/$defs/dataProfileChoice"
@@ -2053,6 +2068,9 @@
               "type": "integer",
               "title": "Record Count",
               "description": "Approximate number of records."
+            },
+            "inScope": {
+              "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/inScope"
             },
             "owners": {
               "type": "array",
@@ -2307,6 +2325,9 @@
               },
               "description": "Constraints or limitations of this zone."
             },
+            "inScope": {
+              "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/inScope"
+            },
             "properties": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
             }
@@ -2394,6 +2415,9 @@
             },
             "sessionManagement": {
               "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/sessionManagement"
+            },
+            "inScope": {
+              "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/inScope"
             },
             "properties": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
@@ -2717,6 +2741,9 @@
               "title": "Description",
               "description": "Detailed description of what flows and why."
             },
+            "inScope": {
+              "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/inScope"
+            },
             "type": {
               "title": "Type",
               "description": "The type of flow. Use the custom option for types not covered by the enumeration.",
@@ -2882,6 +2909,9 @@
               "type": "string",
               "title": "Description",
               "description": "A narrative describing this actor's role within the modelled system, distinct from the party's identity-level description. Use to record context-specific framing such as why this actor is in scope or how it interacts with the assets in this blueprint."
+            },
+            "inScope": {
+              "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/inScope"
             },
             "permissions": {
               "type": "array",
@@ -3193,6 +3223,24 @@
             "criticality": {
               "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/criticality"
             },
+            "safetyIntegrityLevels": {
+              "type": "array",
+              "title": "Safety Integrity Levels",
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/cyclonedx-blueprint-2.0/$defs/safetyIntegrityLevel"
+              },
+              "description": "The safety integrity classifications of this asset in the context of the blueprint. An asset may carry classifications from more than one scheme, for example where an element classified under IEC 61508 is also mapped to an automotive ASIL. The classification identifies the safety significance of the context so that the impact of a change on it can be assessed."
+            },
+            "riskAttributes": {
+              "type": "array",
+              "title": "Risk Attributes",
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/riskAttribute"
+              },
+              "description": "The security and privacy attributes of this asset that are worth protecting, such as integrity or availability, whose compromise leads to damage. Corresponds to the cybersecurity properties of an asset in ISO/SAE 21434 and to the security objectives of FIPS 199."
+            },
             "classification": {
               "$ref": "#/$defs/cyclonedx-data-2.0/$defs/dataClassification"
             },
@@ -3209,6 +3257,74 @@
                 "type": "string"
               },
               "description": "Tags for classification and search."
+            }
+          }
+        },
+        "safetyIntegrityLevel": {
+          "type": "object",
+          "title": "Safety Integrity Level",
+          "description": "A safety integrity classification drawn from a functional safety scheme, such as an Automotive Safety Integrity Level, a Safety Integrity Level, a Design Assurance Level, or a software safety class. The classification describes the safety significance of the context; a level that an authority has attested the subject achieved is recorded as a certification.",
+          "required": [
+            "scheme",
+            "level"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scheme": {
+              "title": "Scheme",
+              "description": "The functional safety scheme from which the level is drawn. Use the custom option for schemes not covered by the enumeration.",
+              "oneOf": [
+                {
+                  "title": "Predefined Safety Scheme",
+                  "enum": [
+                    "ISO-26262",
+                    "IEC-61508",
+                    "DO-178C",
+                    "IEC-62304",
+                    "EN-50128"
+                  ],
+                  "meta:enum": {
+                    "ISO-26262": "Road vehicles functional safety. Levels are Automotive Safety Integrity Levels, from QM to ASIL D.",
+                    "IEC-61508": "Functional safety of electrical, electronic, and programmable electronic safety-related systems. Levels are Safety Integrity Levels 1 to 4.",
+                    "DO-178C": "Software considerations in airborne systems and equipment certification. Levels are Design Assurance Levels A to E.",
+                    "IEC-62304": "Medical device software life cycle processes. Levels are software safety classes A to C.",
+                    "EN-50128": "Railway applications software for railway control and protection systems. Levels are Software Safety Integrity Levels 0 to 4."
+                  }
+                },
+                {
+                  "type": "object",
+                  "title": "Custom Safety Scheme",
+                  "required": [
+                    "name"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "title": "Name",
+                      "description": "The name of the custom scheme."
+                    },
+                    "description": {
+                      "type": "string",
+                      "title": "Description",
+                      "description": "A description of the custom scheme."
+                    }
+                  }
+                }
+              ]
+            },
+            "level": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Integrity Level",
+              "description": "The level within the scheme, using the designation the scheme defines. Lowercase kebab-case tokens are recommended so that levels compare reliably across documents.",
+              "examples": [
+                "asil-d",
+                "sil-3",
+                "dal-a",
+                "class-c"
+              ]
             }
           }
         },
@@ -3437,6 +3553,7 @@
       "$defs": {
         "certifications": {
           "type": "array",
+          "uniqueItems": true,
           "title": "Certifications",
           "description": "Certifications held by or applicable to the subject.",
           "items": {
@@ -3553,6 +3670,22 @@
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
             }
           }
+        },
+        "certificationReference": {
+          "type": "object",
+          "title": "Certification Reference",
+          "description": "A reference to a certification defined elsewhere, such as in the definitions or in another document via BOM-Link. A reference includes the referenced certification exactly as defined: every position that references the same certification includes an identical certification.",
+          "required": [
+            "ref"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "ref": {
+              "title": "Reference",
+              "description": "Reference using bom-link or bom-ref to the certification.",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/elementLink"
+            }
+          }
         }
       }
     },
@@ -3584,22 +3717,22 @@
               "items": {
                 "type": "string",
                 "title": "Field Reference",
-                "description": "A [JSON Pointer](https://datatracker.ietf.org/doc/html/rfc6901) identifying the BOM field to which the attribution applies."
+                "description": "A [JSON Pointer](https://datatracker.ietf.org/doc/html/rfc6901) identifying the JSON property to which the attribution applies."
               },
               "minItems": 1,
               "title": "Field References",
-              "description": "One or more [JSON Pointers](https://datatracker.ietf.org/doc/html/rfc6901) identifying the BOM fields to which the attribution applies.\nExactly one of the \"pointers\" or \"expressions\" elements must be present."
+              "description": "One or more [JSON Pointers](https://datatracker.ietf.org/doc/html/rfc6901) identifying the JSON properties to which the attribution applies.\nExactly one of the \"pointers\" or \"expressions\" elements must be present."
             },
             "expressions": {
               "type": "array",
               "items": {
                 "type": "string",
                 "title": "Path Expression",
-                "description": "Specifies a [JSONPath](https://datatracker.ietf.org/doc/html/rfc9535) expression used to locate a value within a BOM."
+                "description": "Specifies a [JSONPath](https://datatracker.ietf.org/doc/html/rfc9535) expression used to locate a value within a CycloneDX artifact or payload."
               },
               "minItems": 1,
               "title": "Path Expressions",
-              "description": "One or more path expressions used to locate values within a BOM.\nExactly one of the \"pointers\" or \"expressions\" elements must be present."
+              "description": "One or more path expressions used to locate values within a CycloneDX artifact or payload.\nExactly one of the \"pointers\" or \"expressions\" elements must be present."
             },
             "timestamp": {
               "type": "string",
@@ -3785,11 +3918,11 @@
         "mediaType": {
           "type": "string",
           "title": "Media Type",
-          "description": "The media type of the object. The media type can provide additional context about the kind of data being represented, such as an image, font, or executable.",
+          "description": "The media type of the object, optionally including media type parameters. The media type can provide additional context about the kind of data being represented, such as an image, font, or executable.",
           "examples": [
-            "text/plain",
             "application/json",
-            "image/png"
+            "image/png",
+            "text/html; charset=utf-8"
           ],
           "pattern": "^[-+a-z0-9.]+/[-+a-z0-9.]+(\\s*;\\s*[a-zA-Z0-9!#$&^_.+-]+=(\"[^\"]*\"|[^\\s;\"]+))*$"
         },
@@ -3896,12 +4029,16 @@
                 "threat-model",
                 "adversary-model",
                 "risk-assessment",
+                "hazard-analysis",
+                "safety-case",
                 "vulnerability-assertion",
                 "exploitability-statement",
                 "pentest-report",
                 "static-analysis-report",
                 "dynamic-analysis-report",
                 "runtime-analysis-report",
+                "test-report",
+                "incident-report",
                 "component-analysis-report",
                 "maturity-report",
                 "certification-report",
@@ -3943,17 +4080,21 @@
                 "log": "A record of events that occurred in a computer system or application, such as problems, errors, or information on current operations.",
                 "configuration": "Parameters or settings that may be used by other components or services.",
                 "evidence": "Information used to substantiate a claim.",
-                "formulation": "Describes the formulation of any referencable object within the BOM, including components, services, metadata, declarations, or the BOM itself.",
+                "formulation": "Describes the formulation of any referencable object within the CycloneDX artifact or payload, including components, services, metadata, declarations, or the CycloneDX artifact or payload itself.",
                 "attestation": "Human or machine-readable statements containing facts, evidence, or testimony.",
                 "threat-model": "An enumeration of identified weaknesses, threats, and countermeasures, dataflow diagram (DFD), attack tree, and other supporting documentation in human-readable or machine-readable format.",
                 "adversary-model": "The defined assumptions, goals, and capabilities of an adversary.",
                 "risk-assessment": "Identifies and analyzes the potential of future events that may negatively impact individuals, assets, and/or the environment. Risk assessments may also include judgments on the tolerability of each risk.",
+                "hazard-analysis": "A hazard analysis, such as a hazard analysis and risk assessment (HARA), a failure mode and effects analysis (FMEA), or a fault tree analysis (FTA).",
+                "safety-case": "A structured argument, supported by a body of evidence, that a system is acceptably safe for a given application in a given environment.",
                 "vulnerability-assertion": "A Vulnerability Disclosure Report (VDR) which asserts the known and previously unknown vulnerabilities that affect a component, service, or product including the analysis and findings describing the impact (or lack of impact) that the reported vulnerability has on a component, service, or product.",
                 "exploitability-statement": "A Vulnerability Exploitability eXchange (VEX) which asserts the known vulnerabilities that do not affect a product, product family, or organization, and optionally the ones that do. The VEX should include the analysis and findings describing the impact (or lack of impact) that the reported vulnerability has on the product, product family, or organization.",
                 "pentest-report": "Results from an authorized simulated cyberattack on a component or service, otherwise known as a penetration test.",
                 "static-analysis-report": "SARIF or proprietary machine or human-readable report for which static analysis has identified code quality, security, and other potential issues with the source code.",
                 "dynamic-analysis-report": "Dynamic analysis report that has identified issues such as vulnerabilities and misconfigurations.",
                 "runtime-analysis-report": "Report generated by analyzing the call stack of a running application.",
+                "test-report": "Results of testing, such as a laboratory test, a verification test, or a validation test, of a component, service, or system.",
+                "incident-report": "A report of an incident, such as a safety incident, a security incident, or an operational failure, and its investigation.",
                 "component-analysis-report": "Report generated by Software Composition Analysis (SCA), container analysis, or other forms of component analysis.",
                 "maturity-report": "Report containing a formal assessment of an organization, business unit, or team against a maturity model.",
                 "certification-report": "Industry, regulatory, or other certification from an accredited (if applicable) certification body.",
@@ -3967,7 +4108,7 @@
                 "patent": "References information about patents which may be defined in human-readable documents or in machine-readable formats such as CycloneDX or ST.96. For detailed patent information or to reference the information provided directly by patent offices, it is recommended to leverage standards from the World Intellectual Property Organization (WIPO) such as [ST.96](https://www.wipo.int/standards/en/st96).",
                 "patent-family": "References information about a patent family which may be defined in human-readable documents or in machine-readable formats such as CycloneDX or ST.96. A patent family is a group of related patent applications or granted patents that cover the same or similar invention. For detailed patent family information or to reference the information provided directly by patent offices, it is recommended to leverage standards from the World Intellectual Property Organization (WIPO) such as [ST.96](https://www.wipo.int/standards/en/st96).",
                 "patent-assertion": "References assertions made regarding patents associated with a component or service. Assertions distinguish between ownership, licensing, and other relevant interactions with patents.",
-                "citation": "A reference to external citations applicable to the object identified by this BOM entry or the BOM itself. When used with a BOM-Link, this allows offloading citations into a separate CycloneDX BOM.",
+                "citation": "A reference to external citations applicable to the object identified in a CycloneDX artifact or payload or the CycloneDX artifact or payload itself. When used with a BOM-Link, this allows offloading citations into a separate CycloneDX artifacts or payloads.",
                 "swid-tag": "A Software Identification (SWID) tag document conforming to ISO/IEC 19770-2. The reference resolves to the XML SoftwareIdentity document itself, including all of its metadata (entities, evidence, payload, links, and meta elements). This is distinct from the `swid` identifier scheme, which carries only the tagId of a SWID tag.",
                 "gs1-digital-link": "A [GS1 Digital Link URI](https://ref.gs1.org/standards/digital-link/uri-syntax/) that connects the component's GS1 identification key, such as a GTIN, to online sources of information, including product data, safety documentation, digital product passports, and recall status. The URI may include key qualifiers, such as a batch or serial number, enabling identification at the class, batch, or individual item level. Component identity shall be derived from the component's identifiers, not from keys embedded in this URI.",
                 "other": "Use this if no other types accurately describe the purpose of the external reference."
@@ -4539,6 +4680,11 @@
           ],
           "additionalProperties": false,
           "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "title": "BOM Reference",
+              "description": "An identifier which can be used to reference the patch elsewhere in the document, such as from an annotation. Every `bom-ref` shall be unique within the document."
+            },
             "type": {
               "enum": [
                 "unofficial",
@@ -4563,10 +4709,30 @@
             "resolves": {
               "type": "array",
               "items": {
-                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/issue"
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/issue"
+                  },
+                  {
+                    "type": "object",
+                    "title": "Resolved Reference",
+                    "description": "A reference to the item the patch resolves, such as a weakness, vulnerability, use case, requirement, or threat declared elsewhere.",
+                    "required": [
+                      "ref"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "ref": {
+                        "title": "Reference",
+                        "description": "Reference using bom-link or bom-ref to the resolved item.",
+                        "$ref": "#/$defs/cyclonedx-common-2.0/$defs/elementLink"
+                      }
+                    }
+                  }
+                ]
               },
               "title": "Resolves",
-              "description": "A collection of issues the patch resolves"
+              "description": "A collection of items the patch resolves. Each entry is an inline issue or a reference to the weakness, vulnerability, use case, requirement, or threat that the patch resolves."
             }
           }
         },
@@ -4710,7 +4876,7 @@
         "components": {
           "type": "array",
           "items": {
-            "$ref": "#/$defs/cyclonedx-component-2.0/$defs/componentOrChoice"
+            "$ref": "#/$defs/cyclonedx-component-2.0/$defs/componentEntry"
           },
           "uniqueItems": true,
           "title": "Components"
@@ -4765,14 +4931,8 @@
                 "library"
               ]
             },
-            "mime-type": {
-              "type": "string",
-              "title": "Mime-Type",
-              "description": "The mime-type of the component. When used on file components, the mime-type can provide additional context about the kind of file being represented, such as an image, font, or executable. Some library or framework components may also have an associated mime-type.",
-              "examples": [
-                "image/jpeg"
-              ],
-              "pattern": "^[-+a-z0-9.]+/[-+a-z0-9.]+$"
+            "mediaType": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/mediaType"
             },
             "bom-ref": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
@@ -4820,7 +4980,7 @@
             "isExternal": {
               "type": "boolean",
               "title": "Component Is External",
-              "description": "Determine whether this component is external.\nAn external component is one that is not part of an assembly, but is expected to be provided by the environment, regardless of the component's `.scope`. This setting can be useful for distinguishing which components are bundled with the product and which can be relied upon to be present in the deployment environment.\nThis may be set to `true` for runtime components only. For `$.metadata.component`, it must be set to `false`.",
+              "description": "Determine whether this component is external.\nAn external component is one that is not part of an assembly, but is expected to be provided by the environment, regardless of the component's `.scope`. This setting can be useful for distinguishing which components are bundled with the product and which can be relied upon to be present in the deployment environment.\nThis may be set to `true` for runtime components only. For the subject of an inventory statement, it shall be `false`.",
               "default": false
             },
             "description": {
@@ -4884,7 +5044,14 @@
                   "title": "Ancestors",
                   "description": "Describes zero or more components in which a component is derived from. This is commonly used to describe forks from existing projects where the forked version contains an ancestor node containing the original component it was forked from. For example, Component A is the original component. Component B is the component being used and documented in the BOM. However, Component B contains a pedigree node with a single ancestor documenting Component A - the original component from which Component B is derived from.",
                   "items": {
-                    "$ref": "#/$defs/cyclonedx-component-2.0/$defs/component"
+                    "oneOf": [
+                      {
+                        "$ref": "#/$defs/cyclonedx-component-2.0/$defs/component"
+                      },
+                      {
+                        "$ref": "#/$defs/cyclonedx-component-2.0/$defs/componentReference"
+                      }
+                    ]
                   }
                 },
                 "descendants": {
@@ -4892,7 +5059,14 @@
                   "title": "Descendants",
                   "description": "Descendants are the exact opposite of ancestors. This provides a way to document all forks (and their forks) of an original or root component.",
                   "items": {
-                    "$ref": "#/$defs/cyclonedx-component-2.0/$defs/component"
+                    "oneOf": [
+                      {
+                        "$ref": "#/$defs/cyclonedx-component-2.0/$defs/component"
+                      },
+                      {
+                        "$ref": "#/$defs/cyclonedx-component-2.0/$defs/componentReference"
+                      }
+                    ]
                   }
                 },
                 "variants": {
@@ -4900,7 +5074,14 @@
                   "title": "Variants",
                   "description": "Variants describe relations where the relationship between the components is not known. For example, if Component A contains nearly identical code to Component B. They are both related, but it is unclear if one is derived from the other, or if they share a common ancestor.",
                   "items": {
-                    "$ref": "#/$defs/cyclonedx-component-2.0/$defs/component"
+                    "oneOf": [
+                      {
+                        "$ref": "#/$defs/cyclonedx-component-2.0/$defs/component"
+                      },
+                      {
+                        "$ref": "#/$defs/cyclonedx-component-2.0/$defs/componentReference"
+                      }
+                    ]
                   }
                 },
                 "commits": {
@@ -4918,22 +5099,17 @@
                   "items": {
                     "$ref": "#/$defs/cyclonedx-common-2.0/$defs/patch"
                   }
-                },
-                "notes": {
-                  "type": "string",
-                  "title": "Notes",
-                  "description": "Notes, observations, and other non-structured commentary describing the components pedigree."
                 }
               }
             },
             "components": {
               "type": "array",
               "items": {
-                "$ref": "#/$defs/cyclonedx-component-2.0/$defs/componentOrChoice"
+                "$ref": "#/$defs/cyclonedx-component-2.0/$defs/componentEntry"
               },
               "uniqueItems": true,
               "title": "Components",
-              "description": "A list of components included in the parent component, including software, hardware, and services. Entries may be concrete components or component-choice wrappers expressing conditional or alternate relationships. This is not a dependency tree. It provides a way to specify a hierarchical representation of component assemblies, similar to system &#8594; subsystem &#8594; parts assembly in physical supply chains."
+              "description": "A list of entries included in the parent component, including software, hardware, and services. Entries may be concrete components, references to components declared elsewhere, or component-choice wrappers expressing conditional or alternate relationships. This is not a dependency tree. It provides a way to specify a hierarchical representation of component assemblies, similar to system &#8594; subsystem &#8594; parts assembly in physical supply chains."
             },
             "evidence": {
               "$ref": "#/$defs/cyclonedx-component-2.0/$defs/componentEvidence",
@@ -4941,9 +5117,16 @@
               "description": "Provides the ability to document evidence collected through various forms of extraction or analysis."
             },
             "releaseNotes": {
-              "$ref": "#/$defs/cyclonedx-release-notes-2.0/$defs/releaseNotes",
-              "title": "Release notes",
-              "description": "Specifies release notes."
+              "title": "Release Notes",
+              "description": "The release notes for the component. Either inline release notes or a reference using bom-link or bom-ref to release notes defined elsewhere, such as in the definitions.",
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/cyclonedx-release-notes-2.0/$defs/releaseNotes"
+                },
+                {
+                  "$ref": "#/$defs/cyclonedx-release-notes-2.0/$defs/releaseNotesReference"
+                }
+              ]
             },
             "modelCard": {
               "$ref": "#/$defs/cyclonedx-ai-modelcard-2.0/$defs/modelCard",
@@ -4995,9 +5178,20 @@
               "description": "The quantity of the item in the context in which it is declared, such as the number of identical parts within the enclosing assembly or the amount of material in the described lot. This object may only be specified for components of type `device` or `material` and shall not be specified for other component types."
             },
             "certifications": {
-              "$ref": "#/$defs/cyclonedx-certification-2.0/$defs/certifications",
+              "type": "array",
+              "uniqueItems": true,
               "title": "Certifications",
-              "description": "Certifications held by or applicable to the component. Applicable to components of any type, hardware and software alike."
+              "description": "Certifications held by or applicable to the component. Each entry is either an inline certification or a reference using bom-link or bom-ref to a certification defined elsewhere, such as in the definitions. Applicable to components of any type, hardware and software alike.",
+              "items": {
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/cyclonedx-certification-2.0/$defs/certification"
+                  },
+                  {
+                    "$ref": "#/$defs/cyclonedx-certification-2.0/$defs/certificationReference"
+                  }
+                ]
+              }
             },
             "endpoints": {
               "type": "array",
@@ -5018,7 +5212,7 @@
                 "$ref": "#/$defs/cyclonedx-data-2.0/$defs/dataProfileChoice"
               },
               "title": "Data Profiles",
-              "description": "The data handled by the service, characterized by data profiles. Each entry is either an inline profile object or a reference using bom-link or bom-ref to a previously declared profile, typically declared in the root profiles catalogue. May only be used for components of type `service`. Data movement is intentionally not expressed here: flow direction, sources, destinations, authentication, and boundary crossings are modelled via blueprint flows, assets, and boundaries, which reference this component by bom-ref."
+              "description": "The data handled by the service, characterized by data profiles. Each entry is either an inline profile object or a reference using bom-link or bom-ref to a previously declared profile, typically declared in the definitions. May only be used for components of type `service`. Data movement is intentionally not expressed here: flow direction, sources, destinations, authentication, and boundary crossings are modelled via blueprint flows, assets, and boundaries, which reference this component by bom-ref."
             },
             "tags": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/tags",
@@ -5165,12 +5359,15 @@
             }
           ]
         },
-        "componentOrChoice": {
-          "title": "Component or Component Choice",
-          "description": "An entry in a components array. May be a concrete component, or a component-choice wrapper that expresses a conditional or alternate relationship between two or more components. The discriminator is the `type` property: when `type` is `component-choice`, the entry shall conform to the `componentChoice` schema; otherwise it shall conform to the `component` schema.",
+        "componentEntry": {
+          "title": "Component Entry",
+          "description": "An entry in a components array. A concrete component, a reference to a component declared elsewhere, or a component-choice wrapper that expresses a conditional or alternate relationship between two or more entries. An entry with a `ref` property is a reference; an entry whose `type` is `component-choice` is a choice; any other entry is a component.",
           "oneOf": [
             {
               "$ref": "#/$defs/cyclonedx-component-2.0/$defs/component"
+            },
+            {
+              "$ref": "#/$defs/cyclonedx-component-2.0/$defs/componentReference"
             },
             {
               "$ref": "#/$defs/cyclonedx-component-2.0/$defs/componentChoice"
@@ -5231,7 +5428,7 @@
               "minItems": 2,
               "uniqueItems": true,
               "items": {
-                "$ref": "#/$defs/cyclonedx-component-2.0/$defs/componentOrChoice"
+                "$ref": "#/$defs/cyclonedx-component-2.0/$defs/componentEntry"
               },
               "title": "Components",
               "description": "Two or more alternate or grouped entries. Each entry may itself be a component-choice to express nested alternates, such as a choice between kits."
@@ -5537,7 +5734,7 @@
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/elementLink"
               },
               "title": "BOM References",
-              "description": "The object in the BOM identified by its bom-ref. This is often a component or service but may be any object type supporting bom-refs. Tools used for analysis should already be defined in the BOM, either in the metadata/tools, components, or formulation."
+              "description": "The object in the BOM identified by its bom-ref. This is often a component or service but may be any object type supporting bom-refs. Tools used for analysis should already be defined in the BOM, such as in the metadata tools, an inventory, or the definitions."
             },
             "assertion": {
               "$ref": "#/$defs/cyclonedx-evidence-2.0/$defs/assertion",
@@ -5828,6 +6025,80 @@
           "minLength": 1,
           "title": "Identifier Value",
           "description": "The value of an identifier."
+        },
+        "componentReference": {
+          "type": "object",
+          "title": "Component Reference",
+          "description": "A reference to a component declared elsewhere, such as in the definitions registry, in another position of the same document, or in another document via BOM-Link. A reference includes the referenced component exactly as declared: every position that references the same component includes an identical component. Where the inclusion context differs, such as a different scope or quantity, declare the component inline instead.",
+          "required": [
+            "ref"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "ref": {
+              "title": "Reference",
+              "description": "Reference using bom-link or bom-ref to the component.",
+              "anyOf": [
+                {
+                  "title": "Ref",
+                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
+                },
+                {
+                  "title": "BOM-Link Element",
+                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/bomLinkElementType"
+                }
+              ]
+            }
+          }
+        },
+        "inventories": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/cyclonedx-component-2.0/$defs/inventory"
+          },
+          "uniqueItems": true,
+          "title": "Inventories",
+          "description": "The inventories of the subjects that the document describes. Each entry declares one subject and lists the entries included in it."
+        },
+        "inventory": {
+          "type": "object",
+          "title": "Inventory",
+          "description": "The declared inventory of one subject: the entries included in the subject. The completeness of the list is asserted through compositions.",
+          "required": [
+            "subject",
+            "components"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "title": "BOM Reference",
+              "description": "An identifier which can be used to reference the inventory elsewhere in the document. Every `bom-ref` shall be unique within the document."
+            },
+            "subject": {
+              "title": "Subject",
+              "description": "The subject whose inventory this statement declares. Either a concrete component or a reference using bom-link or bom-ref to a component declared elsewhere, such as in the definitions.",
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/cyclonedx-component-2.0/$defs/component"
+                },
+                {
+                  "$ref": "#/$defs/cyclonedx-component-2.0/$defs/componentReference"
+                }
+              ]
+            },
+            "components": {
+              "$ref": "#/$defs/cyclonedx-component-2.0/$defs/components",
+              "description": "The entries included in the subject. Entries may be concrete components, references to components declared elsewhere, or component-choice wrappers."
+            },
+            "properties": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
+            },
+            "signatures": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/signatures",
+              "description": "Enveloped signatures over the inventory statement. A signature binds reference entries by their identifiers; the content of a referenced component is covered by the hashes or signatures on the referenced component itself."
+            }
+          }
         }
       }
     },
@@ -5842,13 +6113,16 @@
           },
           "uniqueItems": true,
           "title": "Compositions",
-          "description": "Compositions describe constituent parts (including components, services, and dependency relationships) and their completeness. The completeness of vulnerabilities expressed in a BOM may also be described."
+          "description": "Completeness assertions for enumerations in the document, such as the components of a subject, the dependencies of a component, or the vulnerability disclosure for a subject."
         },
         "composition": {
           "type": "object",
-          "title": "Compositions",
+          "title": "Composition",
+          "description": "A completeness assertion: for each target, the enumeration named by `kind` is as complete as `aggregate` states.",
           "required": [
-            "aggregate"
+            "kind",
+            "aggregate",
+            "targets"
           ],
           "additionalProperties": false,
           "properties": {
@@ -5857,37 +6131,73 @@
               "title": "BOM Reference",
               "description": "An identifier which can be used to reference the composition elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
             },
+            "kind": {
+              "title": "Kind",
+              "description": "The enumeration the completeness assertion applies to. Either a predefined kind or a custom kind described by name and description.",
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "components",
+                    "dependencies",
+                    "vulnerabilities",
+                    "licenses",
+                    "certifications"
+                  ],
+                  "meta:enum": {
+                    "components": "The components included in each target: the entries of an inventory statement or of a nested assembly. The assertion does not cascade to the assemblies of nested entries.",
+                    "dependencies": "The direct dependencies of each target. The assertion does not cascade to transitive dependencies.",
+                    "vulnerabilities": "The vulnerability disclosure for each target.",
+                    "licenses": "The licenses that apply to each target. A complete assertion with no licenses on the target states that the target has no licenses.",
+                    "certifications": "The certifications held by each target. A complete assertion with no certifications on the target states that the target holds no certifications."
+                  }
+                },
+                {
+                  "type": "object",
+                  "title": "Custom Kind",
+                  "description": "A custom completeness kind not represented in the predefined taxonomy.",
+                  "required": [
+                    "name"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "title": "Name",
+                      "description": "The name of the custom kind."
+                    },
+                    "description": {
+                      "type": "string",
+                      "title": "Description",
+                      "description": "A description of the custom kind."
+                    }
+                  }
+                }
+              ]
+            },
             "aggregate": {
               "$ref": "#/$defs/cyclonedx-composition-2.0/$defs/aggregateType",
               "title": "Aggregate",
-              "description": "Specifies an aggregate type that describes how complete a relationship is."
+              "description": "Specifies an aggregate type that describes how complete the relationship is."
             },
-            "assemblies": {
+            "targets": {
               "type": "array",
+              "minItems": 1,
               "uniqueItems": true,
               "items": {
-                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/elementLink"
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/elementLink"
+                  },
+                  {
+                    "title": "BOM-Link Document",
+                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/bomLinkDocumentType"
+                  }
+                ]
               },
-              "title": "BOM references",
-              "description": "The bom-ref identifiers of the components or services being described. Assemblies refer to nested relationships whereby a constituent part may include other constituent parts. References do not cascade to child parts. References are explicit for the specified constituent part only."
-            },
-            "dependencies": {
-              "type": "array",
-              "uniqueItems": true,
-              "items": {
-                "type": "string"
-              },
-              "title": "BOM references",
-              "description": "The bom-ref identifiers of the components or services being described. Dependencies refer to a relationship whereby an independent constituent part requires another independent constituent part. References do not cascade to transitive dependencies. References are explicit for the specified dependency only."
-            },
-            "vulnerabilities": {
-              "type": "array",
-              "uniqueItems": true,
-              "items": {
-                "type": "string"
-              },
-              "title": "BOM references",
-              "description": "The bom-ref identifiers of the vulnerabilities being described."
+              "title": "Targets",
+              "description": "References using bom-link or bom-ref to the objects whose enumeration the assertion describes. The document itself may be a target, referenced by a BOM-Link document reference."
             },
             "signatures": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/signatures"
@@ -5895,30 +6205,30 @@
           }
         },
         "aggregateType": {
-          "default": "not_specified",
+          "default": "not-specified",
           "enum": [
             "complete",
             "incomplete",
-            "incomplete_first_party_only",
-            "incomplete_first_party_proprietary_only",
-            "incomplete_first_party_opensource_only",
-            "incomplete_third_party_only",
-            "incomplete_third_party_proprietary_only",
-            "incomplete_third_party_opensource_only",
+            "incomplete-first-party-only",
+            "incomplete-first-party-proprietary-only",
+            "incomplete-first-party-opensource-only",
+            "incomplete-third-party-only",
+            "incomplete-third-party-proprietary-only",
+            "incomplete-third-party-opensource-only",
             "unknown",
-            "not_specified"
+            "not-specified"
           ],
           "meta:enum": {
-            "complete": "The relationship is complete. No further relationships including constituent components, services, or dependencies are known to exist.",
-            "incomplete": "The relationship is incomplete. Additional relationships exist and may include constituent components, services, or dependencies.",
-            "incomplete_first_party_only": "The relationship is incomplete. Only relationships for first-party components, services, or their dependencies are represented.",
-            "incomplete_first_party_proprietary_only": "The relationship is incomplete. Only relationships for first-party components, services, or their dependencies are represented, limited specifically to those that are proprietary.",
-            "incomplete_first_party_opensource_only": "The relationship is incomplete. Only relationships for first-party components, services, or their dependencies are represented, limited specifically to those that are opensource.",
-            "incomplete_third_party_only": "The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented.",
-            "incomplete_third_party_proprietary_only": "The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented, limited specifically to those that are proprietary.",
-            "incomplete_third_party_opensource_only": "The relationship is incomplete. Only relationships for third-party components, services, or their dependencies are represented, limited specifically to those that are opensource.",
-            "unknown": "The relationship may be complete or incomplete. This usually signifies a 'best-effort' to obtain constituent components, services, or dependencies but the completeness is inconclusive.",
-            "not_specified": "The relationship completeness is not specified."
+            "complete": "The enumeration is complete. No additional items are known to exist.",
+            "incomplete": "The enumeration is incomplete. Additional items are known or expected to exist.",
+            "incomplete-first-party-only": "The enumeration is incomplete. Only first-party items are represented.",
+            "incomplete-first-party-proprietary-only": "The enumeration is incomplete. Only first-party items are represented, limited specifically to those that are proprietary.",
+            "incomplete-first-party-opensource-only": "The enumeration is incomplete. Only first-party items are represented, limited specifically to those that are open source.",
+            "incomplete-third-party-only": "The enumeration is incomplete. Only third-party items are represented.",
+            "incomplete-third-party-proprietary-only": "The enumeration is incomplete. Only third-party items are represented, limited specifically to those that are proprietary.",
+            "incomplete-third-party-opensource-only": "The enumeration is incomplete. Only third-party items are represented, limited specifically to those that are open source.",
+            "unknown": "The enumeration may be complete or incomplete. This usually signifies a best-effort attempt whose completeness is inconclusive.",
+            "not-specified": "The completeness is not specified."
           }
         }
       }
@@ -6306,77 +6616,6 @@
                     }
                   }
                 },
-                "certificationLevel": {
-                  "type": "array",
-                  "title": "Certification Level",
-                  "description": "The certification that the implementation of the cryptographic algorithm has received, if any. Certifications include revisions and levels of FIPS 140 or Common Criteria of different Extended Assurance Levels (CC-EAL).",
-                  "items": {
-                    "enum": [
-                      "none",
-                      "fips140-1-l1",
-                      "fips140-1-l2",
-                      "fips140-1-l3",
-                      "fips140-1-l4",
-                      "fips140-2-l1",
-                      "fips140-2-l2",
-                      "fips140-2-l3",
-                      "fips140-2-l4",
-                      "fips140-3-l1",
-                      "fips140-3-l2",
-                      "fips140-3-l3",
-                      "fips140-3-l4",
-                      "cc-eal1",
-                      "cc-eal1+",
-                      "cc-eal2",
-                      "cc-eal2+",
-                      "cc-eal3",
-                      "cc-eal3+",
-                      "cc-eal4",
-                      "cc-eal4+",
-                      "cc-eal5",
-                      "cc-eal5+",
-                      "cc-eal6",
-                      "cc-eal6+",
-                      "cc-eal7",
-                      "cc-eal7+",
-                      "cavp",
-                      "other",
-                      "unknown"
-                    ],
-                    "meta:enum": {
-                      "none": "No certification obtained",
-                      "fips140-1-l1": "FIPS 140-1 Level 1",
-                      "fips140-1-l2": "FIPS 140-1 Level 2",
-                      "fips140-1-l3": "FIPS 140-1 Level 3",
-                      "fips140-1-l4": "FIPS 140-1 Level 4",
-                      "fips140-2-l1": "FIPS 140-2 Level 1",
-                      "fips140-2-l2": "FIPS 140-2 Level 2",
-                      "fips140-2-l3": "FIPS 140-2 Level 3",
-                      "fips140-2-l4": "FIPS 140-2 Level 4",
-                      "fips140-3-l1": "FIPS 140-3 Level 1",
-                      "fips140-3-l2": "FIPS 140-3 Level 2",
-                      "fips140-3-l3": "FIPS 140-3 Level 3",
-                      "fips140-3-l4": "FIPS 140-3 Level 4",
-                      "cc-eal1": "Common Criteria - Evaluation Assurance Level 1",
-                      "cc-eal1+": "Common Criteria - Evaluation Assurance Level 1 (Augmented)",
-                      "cc-eal2": "Common Criteria - Evaluation Assurance Level 2",
-                      "cc-eal2+": "Common Criteria - Evaluation Assurance Level 2 (Augmented)",
-                      "cc-eal3": "Common Criteria - Evaluation Assurance Level 3",
-                      "cc-eal3+": "Common Criteria - Evaluation Assurance Level 3 (Augmented)",
-                      "cc-eal4": "Common Criteria - Evaluation Assurance Level 4",
-                      "cc-eal4+": "Common Criteria - Evaluation Assurance Level 4 (Augmented)",
-                      "cc-eal5": "Common Criteria - Evaluation Assurance Level 5",
-                      "cc-eal5+": "Common Criteria - Evaluation Assurance Level 5 (Augmented)",
-                      "cc-eal6": "Common Criteria - Evaluation Assurance Level 6",
-                      "cc-eal6+": "Common Criteria - Evaluation Assurance Level 6 (Augmented)",
-                      "cc-eal7": "Common Criteria - Evaluation Assurance Level 7",
-                      "cc-eal7+": "Common Criteria - Evaluation Assurance Level 7 (Augmented)",
-                      "cavp": "Cryptographic Algorithm Validation Program",
-                      "other": "Another certification",
-                      "unknown": "The certification level is not known"
-                    }
-                  }
-                },
                 "mode": {
                   "title": "Mode",
                   "description": "The mode of operation in which the cryptographic algorithm (block cipher) is used.",
@@ -6748,12 +6987,12 @@
             "relatedCryptoMaterialProperties": {
               "type": "object",
               "title": "Related Cryptographic Material Properties",
-              "description": "Properties for cryptographic assets of asset type: `related-crypto-material`.",
+              "description": "Properties for cryptographic assets of asset type: `related-crypto-material`. Depending on the described use case, an entry may represent a particular material instance or a variable or placeholder with known cryptographic characteristics. For example, a BOM produced by source code analysis may describe a private-key parameter, while an operational BOM may describe a particular key held in an HSM. The material type identifies the kind of material in either case. Omission of `value` does not imply that the entry represents a placeholder.",
               "additionalProperties": false,
               "properties": {
                 "type": {
                   "title": "relatedCryptoMaterialType",
-                  "description": "The type for the related cryptographic material.",
+                  "description": "The type for the related cryptographic material. Select the most specific applicable type according to the role of the material in the described cryptographic context. Broader categories, such as `key` and `credential`, can be used when a more specific classification is unavailable or does not apply. Types can overlap; for example, a password is also a credential, but should be classified as `password` when that type is known.",
                   "enum": [
                     "private-key",
                     "public-key",
@@ -6778,20 +7017,20 @@
                   "meta:enum": {
                     "private-key": "The confidential key of a key pair used in asymmetric cryptography.",
                     "public-key": "The non-confidential key of a key pair used in asymmetric cryptography.",
-                    "secret-key": "A key used to encrypt and decrypt messages in symmetric cryptography.",
-                    "key": "A piece of information, usually an octet string, which, when processed through a cryptographic algorithm, processes cryptographic data.",
+                    "secret-key": "A key used with a symmetric cryptographic algorithm, for example for encryption, message authentication, key wrapping, or key derivation.",
+                    "key": "A cryptographic key whose more specific type is unknown or is not covered by the available key types. Use `private-key`, `public-key`, or `secret-key` when that classification is known and applicable.",
                     "ciphertext": "The result of encryption performed on plaintext using an algorithm (or cipher).",
                     "signature": "A cryptographic value that is calculated from the data and a key known only by the signer.",
                     "digest": "The output of the hash function.",
                     "initialization-vector": "A fixed-size random or pseudo-random value used as an input parameter for cryptographic algorithms.",
-                    "nonce": "A random or pseudo-random number that can only be used once in a cryptographic communication.",
+                    "nonce": "A value used only once within a defined cryptographic context, such as encryption operations under a particular key.",
                     "seed": "The input to a pseudo-random number generator. Different seeds generate different pseudo-random sequences.",
-                    "salt": "A value used in a cryptographic process, usually to ensure that the results of computations for one instance cannot be reused by an attacker.",
-                    "shared-secret": "A piece of data known only to the parties involved, in a secure communication.",
+                    "salt": "A value used to diversify a cryptographic computation, such as password hashing, key derivation, or randomized signing.",
+                    "shared-secret": "Secret data shared between parties, for example material established through key agreement or key encapsulation and used as input to key derivation. When describing its role as a symmetric key, use `secret-key`.",
                     "tag": "A message authentication code (MAC), sometimes known as an authentication tag, is a short piece of information used for authenticating and integrity-checking a message.",
                     "additional-data": "An unspecified collection of data with relevance to cryptographic activity.",
                     "password": "A secret word, phrase, or sequence of characters used during authentication or authorization.",
-                    "credential": "Establishes the identity of a party to communication, usually in the form of cryptographic keys or passwords.",
+                    "credential": "Information used to establish the identity of a party, such as a password, token, or cryptographic key. Use a more specific material type when it is known and applicable.",
                     "token": "An object encapsulating a security identity.",
                     "other": "Another type of cryptographic asset.",
                     "unknown": "The type of cryptographic asset is not known."
@@ -7598,7 +7837,7 @@
         },
         "dataProfileChoice": {
           "title": "Data Profile Choice",
-          "description": "A data profile represented either as a complete inline object or as a reference to a previously declared profile. References use bom-link or bom-ref to point at a profile declared in the root profiles catalogue or elsewhere in the document.",
+          "description": "A data profile represented either as a complete inline object or as a reference to a previously declared profile. References use bom-link or bom-ref to point at a profile declared in the definitions or elsewhere in the document.",
           "oneOf": [
             {
               "$ref": "#/$defs/cyclonedx-data-2.0/$defs/dataProfile"
@@ -8568,7 +8807,7 @@
                   "title": "Components",
                   "description": "The list of components which claims are made against.",
                   "items": {
-                    "$ref": "#/$defs/cyclonedx-component-2.0/$defs/component"
+                    "$ref": "#/$defs/cyclonedx-component-2.0/$defs/componentEntry"
                   }
                 }
               }
@@ -8659,9 +8898,53 @@
         "definitions": {
           "type": "object",
           "title": "Definitions",
-          "description": "A collection of reusable objects that are defined and may be used elsewhere in the BOM.",
+          "description": "A collection of reusable objects that may be referenced from elsewhere in the document or provided for interchange. The canonical form of each object is independent of any assertion, so every reference to it denotes an identical object.",
           "additionalProperties": false,
           "properties": {
+            "components": {
+              "type": "array",
+              "uniqueItems": true,
+              "title": "Components",
+              "description": "Reusable component declarations. Each entry is a concrete component that may be referenced from any position that accepts a component reference. Declaring a component here does not by itself include it in any subject. Components may also be declared here solely for interchange, without being referenced elsewhere in the document.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-component-2.0/$defs/component"
+              }
+            },
+            "parties": {
+              "type": "array",
+              "uniqueItems": true,
+              "title": "Parties",
+              "description": "Reusable party declarations. Each entry is a concrete party that may be referenced by its bom-ref from any position that accepts a party. Declaring a party here does not by itself associate the party with any subject.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-party-2.0/$defs/party"
+              }
+            },
+            "licenses": {
+              "type": "array",
+              "uniqueItems": true,
+              "title": "Licenses",
+              "description": "Reusable license declarations. Each entry is a concrete license or license expression that may be referenced by its bom-ref from any position that accepts a license reference. Declaring a license here does not by itself apply the license to any subject.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-license-2.0/$defs/licenseDeclaration"
+              }
+            },
+            "profiles": {
+              "$ref": "#/$defs/cyclonedx-profile-2.0/$defs/profiles"
+            },
+            "releaseNotes": {
+              "type": "array",
+              "uniqueItems": true,
+              "title": "Release Notes",
+              "description": "Reusable release notes declarations. Each entry may be referenced by its bom-ref from the components whose release it describes.",
+              "items": {
+                "$ref": "#/$defs/cyclonedx-release-notes-2.0/$defs/releaseNotes"
+              }
+            },
+            "certifications": {
+              "$ref": "#/$defs/cyclonedx-certification-2.0/$defs/certifications",
+              "title": "Certifications",
+              "description": "Reusable certification declarations. Each entry may be referenced by its bom-ref from the subjects it applies to."
+            },
             "standards": {
               "$ref": "#/$defs/cyclonedx-standard-2.0/$defs/standards"
             },
@@ -8706,7 +8989,7 @@
             "ref": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Reference",
-              "description": "References a component by its bom-ref attribute"
+              "description": "References a component by its bom-ref property."
             },
             "dependsOn": {
               "type": "array",
@@ -9324,15 +9607,6 @@
               "description": "An identifier which can be used to reference the formula elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
             },
-            "components": {
-              "title": "Components",
-              "description": "Transient components that are used in tasks that constitute one or more of this formula's workflows",
-              "type": "array",
-              "items": {
-                "$ref": "#/$defs/cyclonedx-component-2.0/$defs/component"
-              },
-              "uniqueItems": true
-            },
             "workflows": {
               "title": "Workflows",
               "description": "List of workflows that can be declared to accomplish specific orchestrated goals and independently triggered.",
@@ -9435,7 +9709,7 @@
               "title": "Inputs",
               "description": "Represents resources and data brought into a task at runtime by executor or task commands",
               "examples": [
-                "a `configuration` file which was declared as a local `component` or `externalReference`"
+                "a `configuration` file which was defined as a `component` in the definitions or as an `externalReference`"
               ],
               "type": "array",
               "items": {
@@ -9559,7 +9833,7 @@
               "title": "Inputs",
               "description": "Represents resources and data brought into a task at runtime by executor or task commands",
               "examples": [
-                "a `configuration` file which was declared as a local `component` or `externalReference`"
+                "a `configuration` file which was defined as a `component` in the definitions or as an `externalReference`"
               ],
               "type": "array",
               "items": {
@@ -9881,7 +10155,7 @@
               "title": "Inputs",
               "description": "Represents resources and data brought into a task at runtime by executor or task commands",
               "examples": [
-                "a `configuration` file which was declared as a local `component` or `externalReference`"
+                "a `configuration` file which was defined as a `component` in the definitions or as an `externalReference`"
               ],
               "type": "array",
               "items": {
@@ -10026,21 +10300,8 @@
             },
             "environmentVars": {
               "title": "Environment variables",
-              "description": "Inputs that have the form of parameters with names and values.",
-              "type": "array",
-              "uniqueItems": true,
-              "items": {
-                "oneOf": [
-                  {
-                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/property"
-                  },
-                  {
-                    "type": "string",
-                    "title": "String-Based Environment Variables",
-                    "description": "In addition to the more common key–value pair format, some environment variables may consist of a single string without an explicit value assignment. These string-based environment variables typically act as flags or signals to software, indicating that a feature should be enabled, a mode should be activated, or a specific condition is present. Their presence alone conveys meaning."
-                  }
-                ]
-              }
+              "description": "Inputs that have the form of environment variables.",
+              "$ref": "#/$defs/cyclonedx-formulation-2.0/$defs/environmentVars"
             },
             "data": {
               "title": "Data",
@@ -10125,20 +10386,7 @@
             "environmentVars": {
               "title": "Environment variables",
               "description": "Outputs that have the form of environment variables.",
-              "type": "array",
-              "items": {
-                "oneOf": [
-                  {
-                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/property"
-                  },
-                  {
-                    "type": "string",
-                    "title": "String-Based Environment Variables",
-                    "description": "In addition to the more common key–value pair format, some environment variables may consist of a single string without an explicit value assignment. These string-based environment variables typically act as flags or signals to software, indicating that a feature should be enabled, a mode should be activated, or a specific condition is present. Their presence alone conveys meaning."
-                  }
-                ]
-              },
-              "uniqueItems": true
+              "$ref": "#/$defs/cyclonedx-formulation-2.0/$defs/environmentVars"
             },
             "properties": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
@@ -10255,6 +10503,34 @@
               "type": "string"
             }
           }
+        },
+        "environmentVars": {
+          "title": "Environment variables",
+          "description": "A map of environment variable names to values.\n\nKeys are environment variable names and are intentionally unconstrained by this schema (including names that may be empty or start with non-alphabetic characters).\n\nValues must be either a `string` or `null`:\n- `null` means the variable is absent/unset.\n- `\"\"` (empty string) is a valid, explicit value and does not mean absent.",
+          "$comment": "While some systems may have restrictions on env var names, others may have not. See this test: `env '=empty-name' '0trust=starts-with-number' python -c 'import os;print(repr(os.environ))'`",
+          "type": "object",
+          "additionalProperties": {
+            "description": "Values must be either a `string` or `null`:\n- `null` means the variable is absent/unset.\n- `\"\"` (empty string) is a valid, explicit value and does not mean absent.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "examples": [
+            {
+              "LC_ALL": null,
+              "LANG": "en_US.UTF-8"
+            },
+            {
+              "MY_FLAG": "1"
+            },
+            {
+              "0TRUST": "true"
+            },
+            {
+              "": ""
+            }
+          ]
         }
       }
     },
@@ -10566,102 +10842,134 @@
       "$defs": {
         "licenseChoice": {
           "title": "License Choice",
-          "description": "A list of SPDX licenses and/or named licenses and/or SPDX License Expression.",
+          "description": "A list of SPDX licenses and/or named licenses and/or SPDX License Expression. Entries may be concrete license declarations or references to licenses defined elsewhere.",
           "type": "array",
           "items": {
             "oneOf": [
               {
-                "type": "object",
-                "title": "License",
-                "required": [
-                  "license"
-                ],
-                "additionalProperties": false,
-                "properties": {
-                  "license": {
-                    "$ref": "#/$defs/cyclonedx-license-2.0/$defs/license"
-                  }
-                }
+                "$ref": "#/$defs/cyclonedx-license-2.0/$defs/licenseDeclaration"
               },
               {
-                "title": "License Expression",
-                "description": "Specifies the details and attributes related to a software license.\nIt must be a valid SPDX license expression, along with additional properties such as license acknowledgment.",
-                "type": "object",
-                "additionalProperties": false,
-                "required": [
-                  "expression"
-                ],
-                "properties": {
-                  "expression": {
-                    "type": "string",
-                    "title": "SPDX License Expression",
-                    "description": "A valid SPDX license expression.\nRefer to https://spdx.org/specifications for syntax requirements.",
-                    "examples": [
-                      "Apache-2.0 AND (MIT OR GPL-2.0-only)",
-                      "GPL-3.0-only WITH Classpath-exception-2.0"
-                    ]
-                  },
-                  "expressionDetails": {
-                    "title": "Expression Details",
-                    "description": "Details for parts of the `expression`.",
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "description": "This document specifies the details and attributes related to a software license identifier. An SPDX expression may be a compound of license identifiers.\nThe `license_identifier` property serves as the key that identifies each record. Note that this key is not required to be unique, as the same license identifier could apply to multiple, different but similar license details, texts, etc.",
-                      "required": [
-                        "licenseIdentifier"
-                      ],
-                      "properties": {
-                        "licenseIdentifier": {
-                          "title": "License Identifier",
-                          "description": "The valid SPDX license identifier. Refer to https://spdx.org/specifications for syntax requirements.\nThis property serves as the primary key, which uniquely identifies each record.",
-                          "type": "string",
-                          "examples": [
-                            "Apache-2.0",
-                            "GPL-3.0-only WITH Classpath-exception-2.0",
-                            "LicenseRef-my-custom-license"
-                          ]
-                        },
-                        "bom-ref": {
-                          "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-                          "title": "BOM Reference",
-                          "description": "An identifier which can be used to reference the license elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
-                        },
-                        "text": {
-                          "title": "License texts",
-                          "description": "A way to include the textual content of the license.",
-                          "$ref": "#/$defs/cyclonedx-common-2.0/$defs/attachment"
-                        },
-                        "url": {
-                          "type": "string",
-                          "title": "License URL",
-                          "description": "The URL to the license file. If specified, a 'license' externalReference should also be specified for completeness",
-                          "examples": [
-                            "https://www.apache.org/licenses/LICENSE-2.0.txt"
-                          ],
-                          "format": "iri-reference"
-                        }
-                      },
-                      "additionalProperties": false
-                    }
-                  },
-                  "acknowledgement": {
-                    "$ref": "#/$defs/cyclonedx-license-2.0/$defs/licenseAcknowledgementEnumeration"
-                  },
-                  "bom-ref": {
-                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
-                    "title": "BOM Reference",
-                    "description": "An identifier which can be used to reference the license elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
-                  },
-                  "licensing": {
-                    "$ref": "#/$defs/cyclonedx-license-2.0/$defs/licensing"
-                  },
-                  "properties": {
-                    "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
-                  }
-                }
+                "$ref": "#/$defs/cyclonedx-license-2.0/$defs/licenseReference"
               }
             ]
+          }
+        },
+        "licenseDeclaration": {
+          "title": "License Declaration",
+          "description": "A concrete license declaration: a single SPDX or named license, or an SPDX license expression.",
+          "oneOf": [
+            {
+              "type": "object",
+              "title": "License",
+              "required": [
+                "license"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "license": {
+                  "$ref": "#/$defs/cyclonedx-license-2.0/$defs/license"
+                }
+              }
+            },
+            {
+              "title": "License Expression",
+              "description": "Specifies the details and attributes related to a software license.\nIt must be a valid SPDX license expression, along with additional properties such as license acknowledgment.",
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "expression"
+              ],
+              "properties": {
+                "expression": {
+                  "type": "string",
+                  "title": "SPDX License Expression",
+                  "description": "A valid SPDX license expression.\nRefer to https://spdx.org/specifications for syntax requirements.",
+                  "examples": [
+                    "Apache-2.0 AND (MIT OR GPL-2.0-only)",
+                    "GPL-3.0-only WITH Classpath-exception-2.0"
+                  ]
+                },
+                "expressionDetails": {
+                  "title": "Expression Details",
+                  "description": "Details for parts of the `expression`.",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "description": "This document specifies the details and attributes related to a software license identifier. An SPDX expression may be a compound of license identifiers.\nThe `license_identifier` property serves as the key that identifies each record. Note that this key is not required to be unique, as the same license identifier could apply to multiple, different but similar license details, texts, etc.",
+                    "required": [
+                      "licenseIdentifier"
+                    ],
+                    "properties": {
+                      "licenseIdentifier": {
+                        "title": "License Identifier",
+                        "description": "The valid SPDX license identifier. Refer to https://spdx.org/specifications for syntax requirements.\nThis property serves as the primary key, which uniquely identifies each record.",
+                        "type": "string",
+                        "examples": [
+                          "Apache-2.0",
+                          "GPL-3.0-only WITH Classpath-exception-2.0",
+                          "LicenseRef-my-custom-license"
+                        ]
+                      },
+                      "text": {
+                        "title": "License texts",
+                        "description": "A way to include the textual content of the license.",
+                        "$ref": "#/$defs/cyclonedx-common-2.0/$defs/attachment"
+                      },
+                      "url": {
+                        "type": "string",
+                        "title": "License URL",
+                        "description": "The URL to the license file. If specified, a 'license' externalReference should also be specified for completeness",
+                        "examples": [
+                          "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                        ],
+                        "format": "iri-reference"
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "acknowledgement": {
+                  "$ref": "#/$defs/cyclonedx-license-2.0/$defs/licenseAcknowledgementEnumeration"
+                },
+                "bom-ref": {
+                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+                  "title": "BOM Reference",
+                  "description": "An identifier which can be used to reference the license elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+                },
+                "licensing": {
+                  "$ref": "#/$defs/cyclonedx-license-2.0/$defs/licensing"
+                },
+                "properties": {
+                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
+                }
+              }
+            }
+          ]
+        },
+        "licenseReference": {
+          "type": "object",
+          "title": "License Reference",
+          "description": "A reference to a license declared elsewhere, such as in the definitions registry or in another document via BOM-Link. A reference includes the referenced license exactly as declared: every position that references the same license carries an identical license. Where the licensing context differs, such as a different acknowledgement, declare the license inline instead.",
+          "required": [
+            "ref"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "ref": {
+              "title": "Reference",
+              "description": "Reference using bom-link or bom-ref to the license. The referent is the bom-ref of a license or of a license expression.",
+              "anyOf": [
+                {
+                  "title": "Ref",
+                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
+                },
+                {
+                  "title": "BOM-Link Element",
+                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/bomLinkElementType"
+                }
+              ]
+            }
           }
         },
         "license": {
@@ -10976,10 +11284,6 @@
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/organizationalContact"
               }
             },
-            "component": {
-              "description": "The component that the BOM describes.",
-              "$ref": "#/$defs/cyclonedx-component-2.0/$defs/component"
-            },
             "supplier": {
               "title": "Supplier",
               "description": " The organization that supplied the component that the BOM describes. The supplier may often be the manufacturer, but may also be a distributor or repackager.",
@@ -10987,7 +11291,7 @@
             },
             "licenses": {
               "title": "BOM License(s)",
-              "description": "The license information for the BOM document.\nThis may be different from the license(s) of the component(s) that the BOM describes.",
+              "description": "The license information for the CycloneDX artifact or payload.",
               "$ref": "#/$defs/cyclonedx-license-2.0/$defs/licenseChoice"
             },
             "distributionConstraints": {
@@ -12536,9 +12840,9 @@
               "title": "Path Expression",
               "description": "A [JSONPath](https://datatracker.ietf.org/doc/html/rfc9535) expression that identifies the types of data relevant to this perspective.",
               "examples": [
-                "$.components[*].pedigree",
-                "$.components[?(@.type=='machine-learning-model')].modelCard",
-                "$.components[?(@.type=='cryptographic-asset')]",
+                "$.inventories[*].components[*].pedigree",
+                "$.inventories[*].components[?(@.type=='machine-learning-model')].modelProperties",
+                "$.definitions.components[?(@.type=='cryptographic-asset')]",
                 "$.vulnerabilities"
               ]
             },
@@ -13210,6 +13514,11 @@
           ],
           "additionalProperties": false,
           "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType",
+              "title": "BOM Reference",
+              "description": "An identifier which can be used to reference the release notes elsewhere in the document. Every `bom-ref` shall be unique within the document."
+            },
             "type": {
               "$ref": "#/$defs/cyclonedx-release-notes-2.0/$defs/releaseType",
               "title": "Type",
@@ -13310,6 +13619,31 @@
               "title": "Release note content",
               "description": "Specifies the full content of the release note.",
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/attachment"
+            }
+          }
+        },
+        "releaseNotesReference": {
+          "type": "object",
+          "title": "Release Notes Reference",
+          "description": "A reference to release notes defined elsewhere, such as in the definitions or in another document via BOM-Link. A reference includes the referenced release notes exactly as defined: every position that references the same release notes includes identical release notes.",
+          "required": [
+            "ref"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "ref": {
+              "title": "Reference",
+              "description": "Reference using bom-link or bom-ref to the release notes.",
+              "anyOf": [
+                {
+                  "title": "Ref",
+                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
+                },
+                {
+                  "title": "BOM-Link Element",
+                  "$ref": "#/$defs/cyclonedx-common-2.0/$defs/bomLinkElementType"
+                }
+              ]
             }
           }
         }
@@ -13478,6 +13812,7 @@
             "privacy",
             "regulatory",
             "reliability",
+            "safety",
             "scalability",
             "security",
             "system",
@@ -13504,6 +13839,7 @@
             "privacy": "Requirements specifically addressing the handling and protection of personal and sensitive data.",
             "regulatory": "Requirements necessary for legal compliance, dictated by laws, regulations, or standards.",
             "reliability": "Requirements ensuring the system consistently performs under specified conditions and duration.",
+            "safety": "Requirements that address the prevention of harm to people, property, or the environment, such as functional safety requirements.",
             "scalability": "Requirements focused on the ability of the system to grow and manage increased demand effectively.",
             "security": "Requirements intended to protect systems, data, and users from malicious actions or threats.",
             "system": "Technical requirements defining infrastructure, architecture, or underlying technologies.",
@@ -13561,7 +13897,7 @@
           "additionalProperties": false,
           "properties": {
             "ref": {
-              "oneOf": [
+              "anyOf": [
                 {
                   "title": "Ref",
                   "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
@@ -13670,6 +14006,15 @@
               },
               "description": "The documented risks identified through risk analysis."
             },
+            "damageScenarios": {
+              "type": "array",
+              "title": "Damage Scenarios",
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/damageScenario"
+              },
+              "description": "The damage scenarios identified through risk analysis. A damage scenario describes an adverse consequence for the subjects it affects, independent of any particular cause, and is rated per impact category."
+            },
             "assessments": {
               "type": "array",
               "title": "Assessments",
@@ -13711,9 +14056,9 @@
                     "privacy",
                     "operational",
                     "financial",
-                    "compliance",
+                    "regulatory",
                     "strategic",
-                    "reputational",
+                    "reputation",
                     "safety",
                     "environmental",
                     "supply-chain",
@@ -13730,9 +14075,9 @@
                     "privacy": "Data protection and privacy risks.",
                     "operational": "Business operations and continuity risks.",
                     "financial": "Financial loss and economic impact risks.",
-                    "compliance": "Regulatory and legal compliance risks.",
+                    "regulatory": "Regulatory and legal compliance risks.",
                     "strategic": "Strategic business and market risks.",
-                    "reputational": "Brand and reputation damage risks.",
+                    "reputation": "Brand and reputation damage risks.",
                     "safety": "Human safety and physical security risks.",
                     "environmental": "Environmental impact and sustainability risks.",
                     "supply-chain": "Supply chain and third-party risks.",
@@ -13894,6 +14239,14 @@
               },
               "description": "References using bom-link or bom-ref to the threats or threat scenarios from a threat model that inform this risk. A reference may point to a discrete threat or to a threat scenario."
             },
+            "relatedDamageScenarios": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
+              },
+              "description": "References using bom-link or bom-ref to the damage scenarios that this risk realizes. A risk typically pairs a threat scenario, which supplies the likelihood, with a damage scenario, which supplies the impact."
+            },
             "relatedVulnerabilities": {
               "type": "array",
               "uniqueItems": true,
@@ -13909,6 +14262,14 @@
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
               "description": "References using bom-link or bom-ref to the weaknesses that inform this risk."
+            },
+            "relatedBehaviors": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
+              },
+              "description": "References using bom-link or bom-ref to the declared or observed behaviours that inform this risk. Any behaviour can give rise to a risk depending on context and expectation, for example an observed behaviour that defeats a declared safety behaviour."
             },
             "relatedRequirements": {
               "type": "array",
@@ -13963,24 +14324,22 @@
             },
             "status": {
               "title": "Status",
-              "description": "The lifecycle status of the risk. Use the custom option for a status specific to an organization's risk process.",
+              "description": "The lifecycle status of the risk. The status tracks progress through the risk process; the disposition chosen, such as reduce, share, or accept, is recorded on the responses. Use the custom option for a status specific to an organization's risk process.",
               "oneOf": [
                 {
                   "title": "Predefined Risk Status",
                   "enum": [
                     "identified",
                     "assessed",
-                    "mitigated",
-                    "accepted",
-                    "transferred",
+                    "treated",
+                    "monitored",
                     "retired"
                   ],
                   "meta:enum": {
-                    "identified": "Risk has been identified but not yet evaluated.",
-                    "assessed": "Risk has been assessed and prioritized.",
-                    "mitigated": "Responses are in place reducing this risk.",
-                    "accepted": "Risk has been formally accepted.",
-                    "transferred": "Risk has been transferred to another party.",
+                    "identified": "The risk has been identified and recorded.",
+                    "assessed": "The risk has been analysed and rated.",
+                    "treated": "Responses to the risk have been decided and are being applied. The disposition, such as reduce or accept, is recorded on the responses.",
+                    "monitored": "The risk and its responses are under ongoing monitoring and review.",
                     "retired": "Risk no longer applies."
                   }
                 },
@@ -14045,6 +14404,23 @@
                 "description": {
                   "type": "string",
                   "description": "A narrative explanation of the detectability assessment."
+                }
+              }
+            },
+            "controllability": {
+              "type": "object",
+              "title": "Controllability",
+              "additionalProperties": false,
+              "description": "The ability of the people involved to avoid the harm once the event occurs, used as a third axis by functional safety methodologies such as the hazard analysis and risk assessment of [ISO 26262](https://www.iso.org/standard/68383.html), which derives an integrity level from severity, exposure, and controllability.",
+              "properties": {
+                "score": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "The controllability value on the scale defined by the methodology. For ISO 26262, a higher class indicates that the harm is harder to avoid."
+                },
+                "description": {
+                  "type": "string",
+                  "description": "A narrative explanation of the controllability assessment."
                 }
               }
             },
@@ -14157,8 +14533,11 @@
                     "control-effectiveness",
                     "detectability",
                     "discoverability",
+                    "elapsed-time",
+                    "equipment",
                     "exploit-maturity",
                     "exposure",
+                    "knowledge",
                     "motivation",
                     "opportunity",
                     "targeting",
@@ -14171,8 +14550,11 @@
                     "control-effectiveness": "Strength, reliability, and coverage of existing preventive, detective, or corrective controls that reduce the probability of successful exploitation. Corresponds to resistance strength in FAIR.",
                     "detectability": "Likelihood that the activity is detected before the risk is realized. Lower detectability increases the chance of a successful action. Aligns with the OWASP Risk Rating intrusion detection factor and the FMEA detection axis.",
                     "discoverability": "Ease with which the weakness or opportunity can be found by a potential actor. Aligns with the OWASP Risk Rating ease of discovery factor.",
+                    "elapsed-time": "The time an attacker needs to identify and exploit the weakness, one of the attack potential factors of [ISO/IEC 18045](https://www.iso.org/standard/72889.html) used by attack feasibility ratings such as ISO/SAE 21434.",
+                    "equipment": "The equipment an attacker needs, from standard to bespoke, one of the attack potential factors of [ISO/IEC 18045](https://www.iso.org/standard/72889.html).",
                     "exploit-maturity": "Availability, reliability, and sophistication of known exploits, attack toolkits, or proof-of-concept code targeting the identified weakness.",
                     "exposure": "Degree to which the target asset, system, or service is visible, discoverable, or reachable by potential threat actors.",
+                    "knowledge": "The knowledge of the target an attacker needs, from public to critical, one of the attack potential factors of [ISO/IEC 18045](https://www.iso.org/standard/72889.html).",
                     "motivation": "Level of incentive, intent, or determination driving the threat actor to pursue exploitation, including financial gain, ideology, or competitive advantage.",
                     "opportunity": "Availability of the conditions, timing, or circumstances required for the threat actor to act, including access windows, environmental factors, and resource availability.",
                     "targeting": "Degree to which the threat actor specifically selects this asset or organization rather than acting opportunistically. Aligns with the NIST SP 800-30 targeting factor.",
@@ -14321,19 +14703,20 @@
             "description": {
               "type": "string",
               "description": "A description of the potential impact."
+            },
+            "methodology": {
+              "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/riskMethodology",
+              "description": "The methodology used to derive this impact rating, where the impact is rated on its own, for example on a damage scenario before any risk is scored."
             }
           }
         },
         "impactCategory": {
           "title": "Impact Category",
-          "description": "A category of impact, including harms relevant to AI and societal risk. Use the custom option for categories specific to an organization's risk taxonomy.",
+          "description": "A category of impact, including harms relevant to AI and societal risk. The security and privacy attributes compromised, such as confidentiality or integrity, are recorded as risk attributes rather than as impact categories. Use the custom option for categories specific to an organization's risk taxonomy.",
           "oneOf": [
             {
               "title": "Predefined Impact Category",
               "enum": [
-                "confidentiality",
-                "integrity",
-                "availability",
                 "financial",
                 "reputation",
                 "regulatory",
@@ -14352,9 +14735,6 @@
                 "health"
               ],
               "meta:enum": {
-                "confidentiality": "Impact on data confidentiality.",
-                "integrity": "Impact on data or system integrity.",
-                "availability": "Impact on service availability.",
                 "financial": "Financial loss or impact.",
                 "reputation": "Reputational damage.",
                 "regulatory": "Regulatory compliance impact.",
@@ -14511,7 +14891,7 @@
           "properties": {
             "level": {
               "enum": [
-                "info",
+                "negligible",
                 "low",
                 "medium",
                 "high",
@@ -14519,7 +14899,7 @@
               ],
               "description": "The overall qualitative risk level.",
               "meta:enum": {
-                "info": "Informational.",
+                "negligible": "Negligible risk.",
                 "low": "Low risk.",
                 "medium": "Medium risk.",
                 "high": "High risk.",
@@ -14536,54 +14916,58 @@
               "description": "A textual representation of the metric values used to derive the score, in the format defined by the methodology."
             },
             "methodology": {
-              "title": "Methodology",
-              "description": "The risk rating methodology used to derive this score. Only methodologies that define a scoring calculation are listed; governance frameworks such as [ISO 31000](https://www.iso.org/iso-31000-risk-management.html) are recorded as standards rather than as a score methodology. Use the custom option for methodologies not listed.",
-              "oneOf": [
-                {
-                  "title": "Predefined Risk Methodology",
-                  "enum": [
-                    "dread",
-                    "fair",
-                    "fmea",
-                    "nist-sp-800-30",
-                    "octave",
-                    "owasp-risk-rating",
-                    "qualitative-matrix"
-                  ],
-                  "meta:enum": {
-                    "dread": "[DREAD](https://en.wikipedia.org/wiki/DREAD_%28risk_assessment_model%29) risk rating model, the average of five ratings (damage, reproducibility, exploitability, affected users, discoverability) each scored 1 to 10.",
-                    "fair": "[Factor Analysis of Information Risk (FAIR)](https://www.fairinstitute.org/), a quantitative methodology expressing risk as loss event frequency multiplied by loss magnitude.",
-                    "fmea": "[Failure Mode and Effects Analysis (FMEA)](https://asq.org/quality-resources/fmea), using a risk priority number of severity multiplied by occurrence multiplied by detection.",
-                    "nist-sp-800-30": "[NIST SP 800-30](https://csrc.nist.gov/pubs/sp/800/30/r1/final) guide for conducting risk assessments, using its exemplary likelihood and impact scales.",
-                    "octave": "[OCTAVE Allegro](https://www.sei.cmu.edu/documents/786/2007_005_001_14885.pdf), using its relative risk score.",
-                    "owasp-risk-rating": "[OWASP Risk Rating](https://owasp.org/www-community/OWASP_Risk_Rating_Methodology), averaging likelihood and impact factors each scored 0 to 9.",
-                    "qualitative-matrix": "A qualitative risk matrix that derives a risk level by plotting a likelihood band against an impact band, such as a five by five matrix producing a score from 1 to 25."
-                  }
-                },
-                {
-                  "title": "Custom Risk Methodology",
-                  "type": "object",
-                  "required": [
-                    "name"
-                  ],
-                  "additionalProperties": false,
-                  "properties": {
-                    "name": {
-                      "type": "string",
-                      "minLength": 1,
-                      "title": "Name",
-                      "description": "The name of the custom risk methodology."
-                    },
-                    "description": {
-                      "type": "string",
-                      "title": "Description",
-                      "description": "A description of the custom risk methodology."
-                    }
-                  }
-                }
-              ]
+              "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/riskMethodology",
+              "description": "The risk rating methodology used to derive this score. Only methodologies that define a scoring calculation are listed; governance frameworks such as [ISO 31000](https://www.iso.org/iso-31000-risk-management.html) are recorded as standards rather than as a score methodology. Use the custom option for methodologies not listed."
             }
           }
+        },
+        "riskMethodology": {
+          "title": "Risk Methodology",
+          "description": "A risk rating methodology that defines a scoring calculation. Use the custom option for methodologies not listed.",
+          "oneOf": [
+            {
+              "title": "Predefined Risk Methodology",
+              "enum": [
+                "dread",
+                "fair",
+                "fmea",
+                "nist-sp-800-30",
+                "octave",
+                "owasp-risk-rating",
+                "qualitative-matrix"
+              ],
+              "meta:enum": {
+                "dread": "[DREAD](https://en.wikipedia.org/wiki/DREAD_%28risk_assessment_model%29) risk rating model, the average of five ratings (damage, reproducibility, exploitability, affected users, discoverability) each scored 1 to 10.",
+                "fair": "[Factor Analysis of Information Risk (FAIR)](https://www.fairinstitute.org/), a quantitative methodology expressing risk as loss event frequency multiplied by loss magnitude.",
+                "fmea": "[Failure Mode and Effects Analysis (FMEA)](https://asq.org/quality-resources/fmea), using a risk priority number of severity multiplied by occurrence multiplied by detection.",
+                "nist-sp-800-30": "[NIST SP 800-30](https://csrc.nist.gov/pubs/sp/800/30/r1/final) guide for conducting risk assessments, using its exemplary likelihood and impact scales.",
+                "octave": "[OCTAVE Allegro](https://www.sei.cmu.edu/documents/786/2007_005_001_14885.pdf), using its relative risk score.",
+                "owasp-risk-rating": "[OWASP Risk Rating](https://owasp.org/www-community/OWASP_Risk_Rating_Methodology), averaging likelihood and impact factors each scored 0 to 9.",
+                "qualitative-matrix": "A qualitative risk matrix that derives a risk level by plotting a likelihood band against an impact band, such as a five by five matrix producing a score from 1 to 25."
+              }
+            },
+            {
+              "title": "Custom Risk Methodology",
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom risk methodology."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom risk methodology."
+                }
+              }
+            }
+          ]
         },
         "riskResponse": {
           "type": "object",
@@ -14605,7 +14989,7 @@
               "enum": [
                 "avoid",
                 "reduce",
-                "transfer",
+                "share",
                 "accept",
                 "exploit",
                 "enhance"
@@ -14613,7 +14997,7 @@
               "meta:enum": {
                 "avoid": "Eliminate the risk by removing its source or not proceeding with the activity.",
                 "reduce": "Lower the likelihood or impact of the risk through controls.",
-                "transfer": "Shift the risk to another party, for example through insurance or contract.",
+                "share": "Share the risk with another party, for example through insurance, contract, or outsourcing. Some frameworks call this transfer.",
                 "accept": "Take no further action and retain the risk.",
                 "exploit": "Pursue an opportunity so that a positive risk occurs.",
                 "enhance": "Increase the likelihood or benefit of a positive risk."
@@ -14630,7 +15014,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the controls that implement this response."
+              "description": "References using bom-link or bom-ref to the controls that implement this response. Where a control is declared in the same document, its appliesTo property may also record the relationship."
             },
             "status": {
               "title": "Status",
@@ -14683,6 +15067,56 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/externalReference"
               }
+            },
+            "properties": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
+            }
+          }
+        },
+        "damageScenario": {
+          "type": "object",
+          "title": "Damage Scenario",
+          "description": "An adverse consequence for one or more subjects, described independently of the threat or event that could cause it. A damage scenario carries an impact per category, such as safety, financial, operational, or privacy, so that the same consequence can be paired with several causes. In ISO/SAE 21434 terms, for example, the damage scenario is the harm to a road user, the threat scenario is the cause, and the risk pairs the two.",
+          "required": [
+            "bom-ref",
+            "name"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "bom-ref": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refType"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Name",
+              "description": "A short name for the damage scenario."
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the adverse consequence and the circumstances in which it occurs."
+            },
+            "affects": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
+              },
+              "description": "References using bom-link or bom-ref to the subjects harmed in this damage scenario, such as the functions, assets, or components involved and the parties harmed, for example a road user or a patient."
+            },
+            "impacts": {
+              "type": "array",
+              "title": "Impacts",
+              "uniqueItems": true,
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/impact"
+              },
+              "description": "The impact of the damage scenario, one entry per impact category or group of categories, each with its own level. For example, a single damage scenario may be catastrophic for safety and moderate for finance."
+            },
+            "externalReferences": {
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/externalReferences"
             },
             "properties": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
@@ -14834,6 +15268,15 @@
               "title": "Scope",
               "description": "The scope of the assessment, including the systems, boundaries, and what is in or out of scope."
             },
+            "triggeredBy": {
+              "type": "array",
+              "title": "Triggered By",
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
+              },
+              "description": "References using bom-link or bom-ref to the objects that occasioned this assessment, such as a vulnerability, a threat scenario, a component, a release note, or an annotation that records an incident or a change. Typically used when the cadence is triggered."
+            },
             "status": {
               "title": "Status",
               "description": "The lifecycle status of the assessment. Use the custom option for a status specific to an organization's process.",
@@ -14956,6 +15399,46 @@
                 }
               },
               "description": "The aggregated risk result for this assessment."
+            },
+            "conclusion": {
+              "title": "Conclusion",
+              "description": "The conclusion of the assessment for decision-making, such as a release decision. The conclusion states whether the assessed risks are acceptable against the applicable risk appetite, whereas `overallRisk` carries the aggregated score. Use the custom option for a conclusion specific to an organization's process.",
+              "oneOf": [
+                {
+                  "title": "Predefined Assessment Conclusion",
+                  "enum": [
+                    "acceptable",
+                    "unacceptable",
+                    "inconclusive"
+                  ],
+                  "meta:enum": {
+                    "acceptable": "The assessed risks are within the applicable risk appetite.",
+                    "unacceptable": "One or more assessed risks exceed the applicable risk appetite.",
+                    "inconclusive": "The assessment could not determine whether the assessed risks are within the applicable risk appetite, for example because evidence is incomplete."
+                  }
+                },
+                {
+                  "title": "Custom Assessment Conclusion",
+                  "type": "object",
+                  "required": [
+                    "name"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "title": "Name",
+                      "description": "The name of the custom conclusion."
+                    },
+                    "description": {
+                      "type": "string",
+                      "title": "Description",
+                      "description": "A description of the custom conclusion."
+                    }
+                  }
+                }
+              ]
             },
             "assumptions": {
               "type": "array",
@@ -15300,7 +15783,7 @@
         "threats": {
           "type": "object",
           "title": "Threats",
-          "description": "Threat-modelling content, including the documented threats, the scenarios that realize them, the attack patterns and attack trees that describe how they are carried out, and the trust boundaries they cross.",
+          "description": "Threat-modelling content, including the documented threats, the threat scenarios that realize them, the attack patterns and attack trees that describe how they are carried out, and the trust boundaries they cross. Control references throughout this model point at controls that mitigate the referencing element. Where a control is declared in the same document, its appliesTo property may also record the relationship; the reference here is intended primarily for controls defined elsewhere.",
           "additionalProperties": false,
           "properties": {
             "threats": {
@@ -15312,9 +15795,9 @@
               },
               "description": "The documented threats. Each describes what can go wrong, independent of any specific actor or occurrence."
             },
-            "scenarios": {
+            "threatScenarios": {
               "type": "array",
-              "title": "Scenarios",
+              "title": "Threat Scenarios",
               "uniqueItems": true,
               "items": {
                 "$ref": "#/$defs/cyclonedx-threat-2.0/$defs/threatScenario"
@@ -15328,7 +15811,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-threat-2.0/$defs/attackPattern"
               },
-              "description": "A library of attack patterns, typically aligned with CAPEC, that threats and scenarios can reference."
+              "description": "A library of attack patterns, typically aligned with CAPEC, that threats and threat scenarios can reference."
             },
             "attackTrees": {
               "type": "array",
@@ -15741,14 +16224,14 @@
             "indicators": {
               "$ref": "#/$defs/cyclonedx-threat-2.0/$defs/indicators"
             },
-            "affectedAssets": {
+            "affects": {
               "type": "array",
-              "title": "Affected Assets",
+              "title": "Affects",
               "uniqueItems": true,
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the kinds of assets this threat affects."
+              "description": "References using bom-link or bom-ref to the assets that this threat can affect."
             },
             "relatedBusinessObjectives": {
               "type": "array",
@@ -15778,7 +16261,7 @@
         "threatScenario": {
           "type": "object",
           "title": "Threat Scenario",
-          "description": "A specific realization of a threat, in which an actor seeks to cause harm. The scenario references the threat it realizes, supplies the actor by reference to a party, and carries the scenario-specific traits and risk assessment, such as motivation, intent, access level, likelihood, and impact.",
+          "description": "A specific realization of a threat, in which an actor seeks to cause harm. The scenario references the threats it realizes, supplies the actor by reference to a party, and carries the scenario-specific traits, such as motivation, intent, access level, and likelihood. The consequence is expressed by the damage scenarios it leads to, and the resulting risk is documented under risks, referencing both.",
           "additionalProperties": false,
           "required": [
             "bom-ref",
@@ -15800,6 +16283,11 @@
               "type": "string",
               "title": "Description",
               "description": "A description of the threat scenario."
+            },
+            "event": {
+              "type": "string",
+              "title": "Event",
+              "description": "The event that realizes or triggers the threat in this scenario."
             },
             "threats": {
               "type": "array",
@@ -15896,13 +16384,8 @@
               "$ref": "#/$defs/cyclonedx-threat-2.0/$defs/exploitability"
             },
             "likelihood": {
-              "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/likelihood"
-            },
-            "impact": {
-              "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/impact"
-            },
-            "riskScore": {
-              "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/riskScore"
+              "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/likelihood",
+              "description": "The likelihood that this scenario is realized, which in attack terms is its feasibility. The consequence is carried by the damage scenarios the scenario leads to, and the paired rating by the risk that references both."
             },
             "riskAttributes": {
               "type": "array",
@@ -15913,23 +16396,23 @@
               },
               "description": "The security and privacy attributes that this threat would compromise if realized."
             },
-            "affectedAssets": {
+            "affects": {
               "type": "array",
-              "title": "Affected Assets",
+              "title": "Affects",
               "uniqueItems": true,
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
               "description": "References using bom-link or bom-ref to the assets affected in this scenario."
             },
-            "relatedRisks": {
+            "damageScenarios": {
               "type": "array",
-              "title": "Related Risks",
+              "title": "Damage Scenarios",
               "uniqueItems": true,
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the risks that this scenario contributes to."
+              "description": "References using bom-link or bom-ref to the damage scenarios, declared under the risks collection, that this scenario can lead to."
             },
             "relatedVulnerabilities": {
               "type": "array",
@@ -16354,7 +16837,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the controls that mitigate this node."
+              "description": "References using bom-link or bom-ref to the controls that mitigate this attack tree node."
             }
           }
         },
@@ -16450,20 +16933,8 @@
           "additionalProperties": false,
           "properties": {
             "level": {
-              "title": "Level",
-              "description": "The maturity of available exploitation capability.",
-              "enum": [
-                "theoretical",
-                "proof-of-concept",
-                "functional",
-                "weaponized"
-              ],
-              "meta:enum": {
-                "theoretical": "Exploitation is theoretically possible but has not been demonstrated.",
-                "proof-of-concept": "A proof of concept exists.",
-                "functional": "A functional exploit exists.",
-                "weaponized": "A weaponized exploit is in use."
-              }
+              "$ref": "#/$defs/cyclonedx-vulnerability-2.0/$defs/exploitMaturity",
+              "description": "The maturity of available exploitation capability, using the same scale as vulnerability exploit maturity."
             },
             "complexity": {
               "title": "Complexity",
@@ -16658,7 +17129,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the controls in place at this boundary. Intended primarily for referencing externally defined controls. Where the control and boundary are declared together, prefer the control's appliesTo property."
+              "description": "References using bom-link or bom-ref to the controls that mitigate threats at this trust boundary."
             },
             "properties": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
@@ -16748,7 +17219,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or bom-ref to the controls that detect or prevent this step."
+              "description": "References using bom-link or bom-ref to the controls that mitigate this attack path step, by preventing or detecting it."
             },
             "properties": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/properties"
@@ -16805,14 +17276,6 @@
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
               "description": "References using bom-link or bom-ref to the threats that this path realizes."
-            },
-            "relatedRisks": {
-              "type": "array",
-              "uniqueItems": true,
-              "items": {
-                "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
-              },
-              "description": "References using bom-link or bom-ref to the risks that this path contributes to."
             },
             "externalReferences": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/externalReferences"
@@ -17312,7 +17775,7 @@
                 "components": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/$defs/cyclonedx-component-2.0/$defs/component"
+                    "$ref": "#/$defs/cyclonedx-component-2.0/$defs/componentEntry"
                   },
                   "uniqueItems": true,
                   "title": "Components",
@@ -17506,25 +17969,51 @@
         },
         "scoreMethod": {
           "title": "Method",
-          "description": "Specifies the severity or risk scoring methodology or standard used.",
-          "enum": [
-            "CVSSv2",
-            "CVSSv3",
-            "CVSSv31",
-            "CVSSv4",
-            "OWASP",
-            "SSVC",
-            "other"
-          ],
-          "meta:enum": {
-            "CVSSv2": "Common Vulnerability Scoring System v2.0",
-            "CVSSv3": "Common Vulnerability Scoring System v3.0",
-            "CVSSv31": "Common Vulnerability Scoring System v3.1",
-            "CVSSv4": "Common Vulnerability Scoring System v4.0",
-            "OWASP": "OWASP Risk Rating Methodology",
-            "SSVC": "Stakeholder Specific Vulnerability Categorization",
-            "other": "Another severity or risk scoring methodology"
-          }
+          "description": "Specifies the severity or risk scoring methodology or standard used. Use the custom option for methodologies not listed.",
+          "oneOf": [
+            {
+              "title": "Predefined Method",
+              "enum": [
+                "CVSSv2",
+                "CVSSv3",
+                "CVSSv31",
+                "CVSSv4",
+                "OWASP",
+                "SSVC",
+                "EPSS"
+              ],
+              "meta:enum": {
+                "CVSSv2": "Common Vulnerability Scoring System v2.0.",
+                "CVSSv3": "Common Vulnerability Scoring System v3.0.",
+                "CVSSv31": "Common Vulnerability Scoring System v3.1.",
+                "CVSSv4": "Common Vulnerability Scoring System v4.0.",
+                "OWASP": "OWASP Risk Rating Methodology.",
+                "SSVC": "Stakeholder Specific Vulnerability Categorization.",
+                "EPSS": "Exploit Prediction Scoring System."
+              }
+            },
+            {
+              "title": "Custom Method",
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom scoring methodology."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom scoring methodology."
+                }
+              }
+            }
+          ]
         },
         "impactAnalysisState": {
           "title": "Impact Analysis State",
@@ -17585,7 +18074,16 @@
             "score": {
               "type": "number",
               "title": "Score",
-              "description": "The numerical score of the rating."
+              "description": "The numerical score of the rating, on the scale defined by the method. Methods that do not produce a single score on that scale record their values in `measures` instead."
+            },
+            "measures": {
+              "type": "array",
+              "title": "Measures",
+              "description": "Named values produced by the scoring method. Methods that emit more than one value, or a value on a scale unlike the primary score, record each value here rather than in `score`. Each measure name shall appear at most once within a rating.",
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/cyclonedx-vulnerability-2.0/$defs/ratingMeasure"
+              }
             },
             "severity": {
               "$ref": "#/$defs/cyclonedx-vulnerability-2.0/$defs/severity",
@@ -17594,15 +18092,114 @@
             "method": {
               "$ref": "#/$defs/cyclonedx-vulnerability-2.0/$defs/scoreMethod"
             },
+            "methodVersion": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Method Version",
+              "description": "The version or revision of the scoring method that produced this rating, for methods that version themselves independently of the value recorded in `method`.",
+              "examples": [
+                "v2025.03.14"
+              ]
+            },
             "vector": {
               "type": "string",
               "title": "Vector",
               "description": "Textual representation of the metric values used to score the vulnerability"
             },
+            "timestamp": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Timestamp",
+              "description": "The date and time the rating was produced or observed. Relevant to methods whose scores are recalculated on a schedule."
+            },
             "justification": {
               "type": "string",
               "title": "Justification",
               "description": "A reason for rating the vulnerability as it was"
+            }
+          },
+          "allOf": [
+            {
+              "$comment": "The Exploit Prediction Scoring System reports probabilities and ranks rather than a score on the severity scale that `score` carries, so its values are recorded as named measures. Constraining the form keeps an EPSS probability from being read or ordered as though it were a severity score.",
+              "if": {
+                "required": [
+                  "method"
+                ],
+                "properties": {
+                  "method": {
+                    "const": "EPSS"
+                  }
+                }
+              },
+              "then": {
+                "not": {
+                  "required": [
+                    "score"
+                  ],
+                  "properties": {
+                    "score": true
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "ratingMeasure": {
+          "type": "object",
+          "title": "Rating Measure",
+          "description": "A named value produced by a scoring method. The set of names a method emits is defined by that method.",
+          "required": [
+            "name",
+            "value"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "title": "Name",
+              "description": "The name of the measure, given as a predefined name or as a custom name defined by the scoring method.",
+              "oneOf": [
+                {
+                  "title": "Predefined Measure",
+                  "enum": [
+                    "probability",
+                    "percentile",
+                    "confidence",
+                    "rank"
+                  ],
+                  "meta:enum": {
+                    "probability": "The likelihood of the scored outcome within the period defined by the method, expressed as a decimal from 0 to 1.",
+                    "percentile": "The proportion of the scored population at or below this subject, expressed as a decimal from 0 to 1.",
+                    "confidence": "The degree of certainty in the score, expressed as a decimal from 0 to 1.",
+                    "rank": "The position of the subject within the scored population."
+                  }
+                },
+                {
+                  "title": "Custom Measure",
+                  "type": "object",
+                  "required": [
+                    "name"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "title": "Name",
+                      "description": "The name of the custom measure."
+                    },
+                    "description": {
+                      "type": "string",
+                      "title": "Description",
+                      "description": "A description of the custom measure."
+                    }
+                  }
+                }
+              ]
+            },
+            "value": {
+              "type": "number",
+              "title": "Value",
+              "description": "The numeric value of the measure."
             }
           }
         },
