@@ -205,8 +205,13 @@
             "patches": {
               "type": "array",
               "title": "Patches",
-              "description": ">A list of zero or more patches describing how the component deviates from an ancestor, descendant, or variant. Patches may be complementary to commits or may be used in place of commits.",
-              "items": {"$ref": "cyclonedx-common-2.0.schema.json#/$defs/patch"}
+              "description": "A list of zero or more patches describing how the component deviates from an ancestor, descendant, or variant. Patches may be complementary to commits or may be used in place of commits.",
+              "items": {
+                "oneOf": [
+                  {"$ref": "cyclonedx-common-2.0.schema.json#/$defs/patch"},
+                  {"$ref": "cyclonedx-common-2.0.schema.json#/$defs/patchReference"}
+                ]
+              }
             }
           }
         },
@@ -526,7 +531,7 @@
           "type": "array",
           "title": "Occurrences",
           "description": "Evidence of individual instances of a component spread across multiple locations.",
-          "items": { "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/occurrence" }
+          "items": { "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/occurrenceChoice" }
         },
         "callStacks": {
           "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/callStacks",
@@ -612,7 +617,7 @@
           "type": "array",
           "title": "Occurrences",
           "description": "The locations at which the license was detected, for example a license file or a source header.",
-          "items": { "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/occurrence" }
+          "items": { "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/occurrenceChoice" }
         },
         "assertion": {
           "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/assertion",
@@ -672,7 +677,7 @@
           "type": "array",
           "title": "Occurrences",
           "description": "The locations at which the copyright statement was detected.",
-          "items": { "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/occurrence" }
+          "items": { "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/occurrenceChoice" }
         },
         "assertion": {
           "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/assertion",

@@ -76,6 +76,43 @@
         }
       }
     },
+    "occurrenceChoice": {
+      "title": "Occurrence Choice",
+      "description": "An occurrence represented either as a complete inline object or as a reference to an occurrence declared elsewhere, such as an occurrence recorded in the evidence of a component.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/occurrence"
+        },
+        {
+          "$ref": "#/$defs/occurrenceReference"
+        }
+      ]
+    },
+    "occurrenceReference": {
+      "type": "object",
+      "title": "Occurrence Reference",
+      "description": "A reference to an occurrence declared elsewhere, such as in another position of the same document or in another document via BOM-Link. A reference includes the referenced occurrence exactly as declared: every position that references the same occurrence includes an identical occurrence. Where the context differs, declare the occurrence inline instead.",
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "title": "Reference",
+          "description": "Reference using bom-link or refId to the occurrence.",
+          "anyOf": [
+            {
+              "title": "Ref",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+            },
+            {
+              "title": "BOM-Link Element",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+            }
+          ]
+        }
+      }
+    },
     "callStacks": {
       "type": "array",
       "title": "Call Stacks",
@@ -196,8 +233,15 @@
           "description": "The outcome of applying this method, distinguishing a positive detection from a method that ran and found nothing or was inconclusive. This makes negative evidence machine actionable."
         },
         "rule": {
-          "$ref": "#/$defs/detectionRule",
-          "description": "The rule, policy, or query that produced this method's result. Recording it, together with the version of the ruleset or policy bundle that contains it, supports reproducibility, which matters most for findings in custom code that will never receive a CVE."
+          "oneOf": [
+            {
+              "$ref": "#/$defs/detectionRule"
+            },
+            {
+              "$ref": "#/$defs/detectionRuleReference"
+            }
+          ],
+          "description": "The rule, policy, or query that produced this method's result, either inline or as a reference to a rule declared elsewhere. Recording it, together with the version of the ruleset or policy bundle that contains it, supports reproducibility, which matters most for findings in custom code that will never receive a CVE."
         },
         "externalReferences": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReferences",
@@ -249,6 +293,31 @@
           "type": "string",
           "title": "Text",
           "description": "The rule, policy, or query text. Large or sensitive rule content should instead be referenced through supporting data of type `rule`."
+        }
+      }
+    },
+    "detectionRuleReference": {
+      "type": "object",
+      "title": "Detection Rule Reference",
+      "description": "A reference to a detection rule declared elsewhere, such as in the definitions registry, in another position of the same document, or in another document via BOM-Link. A reference includes the referenced detection rule exactly as declared: every position that references the same detection rule includes an identical detection rule. Where the context differs, declare the detection rule inline instead.",
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "title": "Reference",
+          "description": "Reference using bom-link or refId to the detection rule.",
+          "anyOf": [
+            {
+              "title": "Ref",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+            },
+            {
+              "title": "BOM-Link Element",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+            }
+          ]
         }
       }
     },

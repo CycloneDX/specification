@@ -402,6 +402,43 @@
         }
       }
     },
+    "dataObjectChoice": {
+      "title": "Data Object Choice",
+      "description": "A data object represented either as a complete inline object or as a reference to a data object declared elsewhere.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/dataObject"
+        },
+        {
+          "$ref": "#/$defs/dataObjectReference"
+        }
+      ]
+    },
+    "dataObjectReference": {
+      "type": "object",
+      "title": "Data Object Reference",
+      "description": "A reference to a data object declared elsewhere, such as in the definitions registry, in another position of the same document, or in another document via BOM-Link. A reference includes the referenced data object exactly as declared: every position that references the same data object includes an identical data object. Where the context differs, declare the data object inline instead.",
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "title": "Reference",
+          "description": "Reference using bom-link or refId to the data object.",
+          "anyOf": [
+            {
+              "title": "Ref",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+            },
+            {
+              "title": "BOM-Link Element",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+            }
+          ]
+        }
+      }
+    },
     "dataAttribute": {
       "type": "object",
       "title": "Data Attribute",

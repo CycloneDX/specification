@@ -159,7 +159,7 @@
           "type": "array",
           "uniqueItems": true,
           "items": {
-            "$ref": "#/$defs/workspace"
+            "$ref": "#/$defs/workspaceChoice"
           }
         },
         "runtimeTopology": {
@@ -278,7 +278,7 @@
           "description": "A set of named filesystem or data resource shareable by workflow tasks.",
           "type": "array",
           "items": {
-            "$ref": "#/$defs/workspace"
+            "$ref": "#/$defs/workspaceChoice"
           },
           "uniqueItems": true
         },
@@ -422,6 +422,43 @@
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "workspaceChoice": {
+      "title": "Workspace Choice",
+      "description": "A workspace represented either as a complete inline object or as a reference to a workspace declared elsewhere, such as a workspace of the enclosing workflow.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/workspace"
+        },
+        {
+          "$ref": "#/$defs/workspaceReference"
+        }
+      ]
+    },
+    "workspaceReference": {
+      "type": "object",
+      "title": "Workspace Reference",
+      "description": "A reference to a workspace declared elsewhere, such as in another position of the same document or in another document via BOM-Link. A reference includes the referenced workspace exactly as declared: every position that references the same workspace includes an identical workspace. Where the context differs, declare the workspace inline instead.",
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "title": "Reference",
+          "description": "Reference using bom-link or refId to the workspace.",
+          "anyOf": [
+            {
+              "title": "Ref",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+            },
+            {
+              "title": "BOM-Link Element",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+            }
+          ]
         }
       }
     },
