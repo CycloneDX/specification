@@ -1,0 +1,49 @@
+import {COMMENT_KEYWORD, subschemas} from './helpers/json-schema-spec.js';
+
+
+/** @typedef {import('./helpers/json-schema-spec.js').Schema} Schema */
+
+/**
+ * Remove $comment in place
+ * @param {Schema} schema
+ * @returns {void}
+ */
+export const dropComments = (schema) => {
+    delete schema[COMMENT_KEYWORD];
+    subschemas(schema).forEach(([s]) => dropComments(s));
+}
+
+const HOLLOW_COMMENT =
+    'This schema is hollow: it was not referenced ' +
+    'and only remains as a container for definitions that are still in use. ' +
+    'Itself must not be used for validation.';
+
+/**
+ * @typedef {object} TreeShakeResult
+ * @property {string[]} hollowed
+ * @property {string[]} removed
+ */
+
+/**
+ * Tree-shake a schema in place.
+ *
+ * References support JSON pointer only, no support for anchors, yet.
+ *
+ * Removes non-reached definitions.
+ * Hollows non-reached definitions, when sub-definitions are kept.
+ * - Hollowed schemas are marked with `"not":{"$comment":HOLLOW_COMMENT}`.
+ *
+ * @param {*} schema
+ * @returns {TreeShakeResult}
+ */
+export const treeShake = (schema) => {
+    /** @type {string[]} */
+    const removed = [];
+    /** @type {string[]} */
+    const hollowed = [];
+
+    // TODO: tree-shake schema in place
+    // will be added in a dedicated PR later.
+
+    return {hollowed, removed};
+};
