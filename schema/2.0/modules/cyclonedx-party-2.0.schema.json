@@ -80,12 +80,31 @@
       "description": "A party represented either as a complete object or as a reference to a previously declared party.",
       "oneOf": [
         { "$ref": "#/$defs/party" },
-        {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
-          "title": "Reference",
-          "description": "A refLinkType pointing to a previously declared party."
-        }
+        { "$ref": "#/$defs/partyReference" }
       ]
+    },
+    "partyReference": {
+      "type": "object",
+      "title": "Party Reference",
+      "description": "A reference to a party declared elsewhere, such as in the definitions registry, in another position of the same document, or in another document via BOM-Link. A reference includes the referenced party exactly as declared: every position that references the same party includes an identical party. Where the party context differs, such as a different role, declare the party inline instead.",
+      "required": [ "ref" ],
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "title": "Reference",
+          "description": "Reference using bom-link or refId to the party.",
+          "anyOf": [
+            {
+              "title": "Ref",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+            },
+            {
+              "title": "BOM-Link Element",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+            }
+          ]
+        }
+      }
     },
     "role": {
       "title": "Role",

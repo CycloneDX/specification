@@ -249,17 +249,40 @@
     },
     "dataProfileChoice": {
       "title": "Data Profile Choice",
-      "description": "A data profile represented either as a complete inline object or as a reference to a previously declared profile. References use bom-link or refId to point at a profile declared in the root profiles catalogue or elsewhere in the document.",
+      "description": "A data profile represented either as a complete inline object or as a reference to a previously declared profile. References use bom-link or refId to point at a profile declared in the definitions or elsewhere in the document.",
       "oneOf": [
         {
           "$ref": "#/$defs/dataProfile"
         },
         {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
-          "title": "Reference",
-          "description": "Reference using bom-link or refId to a previously declared data profile."
+          "$ref": "#/$defs/dataProfileReference"
         }
       ]
+    },
+    "dataProfileReference": {
+      "type": "object",
+      "title": "Data Profile Reference",
+      "description": "A reference to a data profile declared elsewhere, such as in the definitions registry, in another position of the same document, or in another document via BOM-Link. A reference includes the referenced data profile exactly as declared: every position that references the same data profile includes an identical data profile. Where the context differs, declare the data profile inline instead.",
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "title": "Reference",
+          "description": "Reference using bom-link or refId to the data profile.",
+          "anyOf": [
+            {
+              "title": "Ref",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+            },
+            {
+              "title": "BOM-Link Element",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+            }
+          ]
+        }
+      }
     },
     "dataObject": {
       "type": "object",

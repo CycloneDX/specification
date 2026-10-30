@@ -4,66 +4,66 @@
   "specVersion": "2.0",
   "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
   "version": 1,
-  "components": [
-    {
-      "refId": "component-a",
-      "type": "machine-learning-model",
-      "parties": [
-        {
-          "roles": [ { "role": "publisher" } ],
-          "organization": { "name": "Acme Inc" }
-        }
-      ],
-      "group": "CompVis",
-      "name": "stable-diffusion",
-      "version": "1.4",
-      "description": "Stable Diffusion is a latent text-to-image diffusion model capable of generating photo-realistic images given any text input. For more information about how Stable Diffusion functions, please have a look at \uD83E\uDD17's Stable Diffusion with \uD83E\uDDE8Diffusers blog.",
-      "modelCard": {
-        "modelParameters": {
-          "approach": {
-            "type": "supervised"
+  "definitions": {
+    "components": [
+      {
+        "refId": "component-a",
+        "type": "machine-learning-model",
+        "parties": [
+          {
+            "roles": [ { "role": "publisher" } ],
+            "organization": { "name": "Acme Inc" }
           },
-          "task": "task goes here",
-          "architectureFamily": "the architecture family goes here",
-          "modelArchitecture": "The architecture of the model.",
-          "datasets": [
-            {
-              "type": "dataset",
-              "name": "Training Data",
-              "contents": {
-                "url": "https://example.com/path/to/dataset"
-              },
-              "classification": "public"
-            }
-          ],
+          {
+            "refId": "party-intended-users",
+            "roles": [ { "role": "end-user" } ],
+            "persona": { "description": "Who are the intended users of the model?" }
+          }
+        ],
+        "group": "CompVis",
+        "name": "stable-diffusion",
+        "version": "1.4",
+        "description": "Stable Diffusion is a latent text-to-image diffusion model capable of generating photo-realistic images given any text input. For more information about how Stable Diffusion functions, please have a look at \uD83E\uDD17's Stable Diffusion with \uD83E\uDDE8Diffusers blog.",
+        "modelProperties": {
+          "learningTypes": [ "supervised" ],
+          "tasks": [ "text-to-image" ],
+          "architecture": {
+            "description": "The architecture of the model.",
+            "family": "diffusion"
+          },
           "inputs": [
             {
-              "format": "string"
+              "name": "prompt",
+              "modality": "text",
+              "dataType": "string"
             }
           ],
           "outputs": [
             {
-              "format": "byte[]"
-            }
-          ]
-        },
-        "quantitativeAnalysis": {
-          "performanceMetrics": [
-            {
-              "type": "The type of performance metric",
-              "value": "The value of the performance metric",
-              "slice": "The name of the slice this metric was computed on. By default, assume this metric is not sliced",
-              "confidenceInterval": {
-                "lowerBound": "The lower bound of the confidence interval",
-                "upperBound": "The upper bound of the confidence interval"
-              }
+              "name": "image",
+              "modality": "image",
+              "dataType": "uint8"
             }
           ],
-          "graphics": {
-            "description": "Performance images",
-            "collection": [
+          "training": {
+            "datasets": [ "dataset-training" ]
+          },
+          "limitations": [
+            "What are the known technical limitations of the model? E.g. What kind(s) of data should the model be expected not to perform well on? What are the factors that might degrade model performance?",
+            "What are the known tradeoffs in accuracy/performance of the model?"
+          ]
+        },
+        "measurements": [
+          {
+            "type": "clip-score",
+            "measure": { "value": 0.3, "unit": "1" },
+            "slice": "resolution:512x512",
+            "confidenceInterval": { "lowerBound": 0.29, "upperBound": 0.31 },
+            "evaluationDatasets": [ "dataset-training" ],
+            "graphics": [
               {
                 "name": "FID vs CLIP Scores on 512x512 samples for different v1-versions",
+                "description": "Performance image.",
                 "image": {
                   "mediaType": "image/jpeg",
                   "encoding": "base64",
@@ -72,36 +72,76 @@
               }
             ]
           }
-        },
-        "considerations": {
-          "users": [
-            "Who are the intended users of the model?"
-          ],
-          "useCases": [
-            "Who are the intended users of the model?"
-          ],
-          "technicalLimitations": [
-            "What are the known technical limitations of the model? E.g. What kind(s) of data should the model be expected not to perform well on? What are the factors that might degrade model performance?"
-          ],
-          "performanceTradeoffs": [
-            "What are the known tradeoffs in accuracy/performance of the model?"
-          ],
-          "ethicalConsiderations": [
-            {
-              "name": "The name of the risk",
-              "mitigationStrategy": "Strategy used to address this risk"
-            }
-          ],
-          "fairnessAssessments": [
-            {
-              "groupAtRisk": "The groups or individuals at risk of being systematically disadvantaged by the model",
-              "benefits": "Expected benefits to the identified groups",
-              "harms": "Expected harms to the identified groups",
-              "mitigationStrategy": "With respect to the benefits and harms outlined, please describe any mitigation strategy implemented."
-            }
-          ]
-        }
+        ]
+      },
+      {
+        "refId": "dataset-training",
+        "type": "data",
+        "name": "Training Data",
+        "data": [
+          {
+            "type": "dataset",
+            "name": "Training Data",
+            "contents": {
+              "url": "https://example.com/path/to/dataset"
+            },
+            "classification": "public"
+          }
+        ]
       }
-    }
-  ]
+    ],
+    "parties": [
+      {
+        "refId": "party-group-at-risk",
+        "roles": [ { "role": "data-subject" } ],
+        "persona": { "description": "The groups or individuals at risk of being systematically disadvantaged by the model" }
+      }
+    ],
+    "useCases": [
+      {
+        "refId": "usecase-1",
+        "name": "Intended use",
+        "description": "What are the intended uses of the model?",
+        "actors": [ "party-intended-users" ]
+      }
+    ]
+  },
+  "risks": {
+    "risks": [
+      {
+        "refId": "risk-ethical-1",
+        "name": "The name of the risk",
+        "statement": "A statement of the ethical risk.",
+        "domains": [ { "type": "ethical" } ],
+        "affects": [ "component-a" ],
+        "responses": [
+          {
+            "refId": "response-ethical-1",
+            "strategy": "reduce",
+            "description": "Strategy used to address this risk"
+          }
+        ]
+      },
+      {
+        "refId": "risk-fairness-1",
+        "name": "Fairness assessment",
+        "statement": "The model may systematically disadvantage the identified groups.",
+        "domains": [ { "type": "fairness" } ],
+        "affects": [ "component-a", "party-group-at-risk" ],
+        "inherentRisk": {
+          "impacts": [
+            { "level": "moderate", "polarity": "harm", "description": "Expected harms to the identified groups" },
+            { "level": "moderate", "polarity": "benefit", "description": "Expected benefits to the identified groups" }
+          ]
+        },
+        "responses": [
+          {
+            "refId": "response-fairness-1",
+            "strategy": "reduce",
+            "description": "With respect to the benefits and harms outlined, please describe any mitigation strategy implemented."
+          }
+        ]
+      }
+    ]
+  }
 }
