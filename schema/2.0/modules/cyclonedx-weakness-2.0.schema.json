@@ -12,60 +12,265 @@
       "items": {
         "$ref": "#/$defs/weakness"
       },
-      "description": "A collection of weaknesses, such as CWE classifications, that classify an underlying flaw."
+      "description": "A collection of weaknesses. Each weakness records a source of risk: a flaw, hazard, bias, or other predisposing condition of a subject or its context."
     },
     "weakness": {
+      "type": "object",
       "title": "Weakness",
-      "description": "A classification of an underlying weakness, given either by a Common Weakness Enumeration (CWE) identifier or by a free-text name with an optional description.\n The exploitability and the affected scope are expressed by the vulnerability or threat that references the weakness, not on the weakness itself.",
-      "oneOf": [
+      "description": "A source of risk: a flaw, hazard, bias, or other predisposing condition of a subject or its context that, under certain circumstances, can contribute to a vulnerability, to a threat being realized, or to an adverse or beneficial outcome. A weakness records the condition itself. It may be identified in an external registry, classified by external taxonomies, or named, and at least a name or an identifier shall be provided. What the condition leads to, how likely that is, who or what is affected, and the consequences are not recorded on the weakness. They are expressed by the vulnerability, threat, or risk that references the weakness; for a risk, the consequences are recorded in its impact categories. For example, a bias in data, design, or outputs is recorded as a weakness, and the discrimination or unfair treatment it can cause is recorded in the impact categories of the risk that references it.",
+      "additionalProperties": false,
+      "anyOf": [
         {
-          "type": "object",
-          "title": "CWE Weakness",
-          "description": "A weakness identified by its CWE identifier.",
-          "additionalProperties": false,
-          "required": [
-            "cweId"
-          ],
-          "properties": {
-            "bom-ref": {
-              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-              "description": "An optional identifier which can be used to reference the weakness elsewhere using a bom-ref or bom-link."
-            },
-            "cweId": {
-              "type": "integer",
-              "minimum": 1,
-              "title": "CWE Identifier",
-              "description": "The Common Weakness Enumeration (CWE) identifier that classifies this weakness."
-            }
-          }
-        },
-        {
-          "type": "object",
-          "title": "Named Weakness",
-          "description": "A weakness identified by a free-text name, used where no CWE classification applies.",
-          "additionalProperties": false,
           "required": [
             "name"
-          ],
-          "properties": {
-            "bom-ref": {
-              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-              "description": "An optional identifier which can be used to reference the weakness elsewhere using a bom-ref or bom-link."
-            },
-            "name": {
+          ]
+        },
+        {
+          "required": [
+            "identifiers"
+          ]
+        }
+      ],
+      "properties": {
+        "bom-ref": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+          "description": "An optional identifier which can be used to reference the weakness elsewhere using a bom-ref or bom-link."
+        },
+        "kind": {
+          "title": "Kind",
+          "description": "The kind of source this weakness is. The kind separates a flaw in the subject, an intrinsic hazard, a systematic bias, and a circumstantial predisposing condition, so that weaknesses of one kind can be selected, for example the biases that inform the risks of a machine learning model.",
+          "oneOf": [
+            {
+              "title": "Pre-Defined Kind",
               "type": "string",
-              "minLength": 1,
-              "title": "Name",
-              "description": "The name of the weakness."
+              "enum": [
+                "flaw",
+                "hazard",
+                "bias",
+                "predisposing-condition"
+              ],
+              "meta:enum": {
+                "flaw": "An imperfection in the design, implementation, manufacture, or configuration of the subject, such as a CWE weakness or a weld imperfection. A flaw is a property of the subject that a vulnerability or threat can exploit.",
+                "hazard": "An intrinsic property of a material, energy source, or process that can cause harm, such as a toxic substance or a moving part. A hazard exists regardless of any flaw; the risk arises from exposure to it.",
+                "bias": "A systematic deviation in data, models, measurements, or human judgement that favours some outcomes or groups over others. A bias is a source of risk; its consequences, such as discrimination or unfair treatment, are recorded in the impact categories of the risk that references it.",
+                "predisposing-condition": "A circumstance of the subject or its context that increases the likelihood or the consequence of an adverse event without itself being a flaw, hazard, or bias, such as a single-source supplier, an obsolete part, or an unsupported dependency."
+              }
             },
-            "description": {
+            {
+              "title": "Custom Kind",
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "The name of the custom kind."
+                },
+                "description": {
+                  "type": "string",
+                  "description": "A description of the custom kind."
+                }
+              }
+            }
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Name",
+          "description": "A short name for the weakness. A name is required when no identifier is given, and is recommended beside an identifier whose registry is not freely readable."
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the weakness: the condition itself, where it arises in the subject or its context, and the evidence for it. Likelihood, affected parties, and consequences belong to the vulnerability, threat, or risk that references the weakness."
+        },
+        "identifiers": {
+          "type": "array",
+          "title": "Identifiers",
+          "uniqueItems": true,
+          "minItems": 1,
+          "description": "Identifiers of this weakness in external registries that assign a stable identifier to each entry, such as a CWE identifier. A weakness may carry identifiers from several registries when they describe the same condition.",
+          "items": {
+            "$ref": "#/$defs/weaknessIdentifier"
+          }
+        },
+        "categories": {
+          "type": "array",
+          "title": "Categories",
+          "uniqueItems": true,
+          "description": "Classifications of this weakness in taxonomies that name categories without assigning identifiers to entries, such as the NIST SP 1270 categories of bias. Categories complement identifiers; a weakness identified in one registry may also be classified by several taxonomies.",
+          "items": {
+            "$ref": "#/$defs/weaknessCategory"
+          }
+        }
+      }
+    },
+    "weaknessIdentifier": {
+      "type": "object",
+      "title": "Weakness Identifier",
+      "description": "An identifier of a weakness in an external registry, given by the scheme of the registry and the value the registry assigns.",
+      "required": [
+        "scheme",
+        "value"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "scheme": {
+          "title": "Scheme",
+          "description": "The registry that assigns the identifier.",
+          "oneOf": [
+            {
+              "title": "Pre-Defined Scheme",
               "type": "string",
-              "title": "Description",
-              "description": "A description of the weakness."
+              "enum": [
+                "cwe",
+                "imdrf-aet",
+                "hfacs",
+                "sot",
+                "ghs",
+                "iso-6520",
+                "iso-iec-24772"
+              ],
+              "meta:enum": {
+                "cwe": "Identifiers of the [Common Weakness Enumeration](https://cwe.mitre.org/), a community-developed list of software, hardware, and service weakness types.",
+                "imdrf-aet": "Investigation conclusion codes of Annex D of the [IMDRF Adverse Event Terminology](https://www.imdrf.org/documents/terminologies-categorized-adverse-event-reporting-aer-terms-terminology-and-codes), which classify the root cause of a medical device adverse event.",
+                "hfacs": "Codes of the [Department of Defense Human Factors Analysis and Classification System](https://navalsafetycommand.navy.mil/portals/100/documents/HF-Enc2-HFACS.pdf), which classify the human and organizational conditions that contribute to mishaps.",
+                "sot": "Risk category and risk factor identifiers of the [MITRE System of Trust](https://sot.mitre.org/), which classify conditions of suppliers, supplies, and services that affect supply chain risk.",
+                "ghs": "Hazard statement codes of the [Globally Harmonized System of Classification and Labelling of Chemicals](https://unece.org/about-ghs), which identify the physical, health, and environmental hazards of a substance or mixture.",
+                "iso-6520": "Reference numbers of [ISO 6520-1](https://www.iso.org/standard/40229.html), which classify geometric imperfections in fusion-welded metallic materials.",
+                "iso-iec-24772": "Vulnerability codes of [ISO/IEC 24772-1](https://www.iso.org/standard/83629.html), a language-independent catalogue of programming language vulnerabilities."
+              }
+            },
+            {
+              "title": "Custom Scheme",
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "The name of the custom scheme."
+                },
+                "description": {
+                  "type": "string",
+                  "description": "A description of the custom scheme."
+                },
+                "url": {
+                  "type": "string",
+                  "format": "iri-reference",
+                  "description": "URL of the scheme registry or specification."
+                }
+              }
+            }
+          ]
+        },
+        "schemeVersion": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Scheme Version",
+          "description": "The version or edition of the registry that issued the identifier, for example 4.20 for CWE or 8.0 for HFACS."
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Value",
+          "description": "The identifier value as issued by the registry, for example CWE-502."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "scheme": {
+                "const": "cwe"
+              }
+            },
+            "required": [
+              "scheme"
+            ]
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "pattern": "^CWE-[1-9][0-9]*$"
+              }
             }
           }
         }
       ]
+    },
+    "weaknessCategory": {
+      "type": "object",
+      "title": "Weakness Category",
+      "description": "A classification of a weakness within a taxonomy, given by the taxonomy and the category named or numbered within it.",
+      "required": [
+        "taxonomy",
+        "category"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "taxonomy": {
+          "title": "Taxonomy",
+          "description": "The taxonomy that the category is drawn from.",
+          "oneOf": [
+            {
+              "title": "Pre-Defined Taxonomy",
+              "type": "string",
+              "enum": [
+                "nist-sp-1270",
+                "iso-iec-tr-24027",
+                "orx-cause",
+                "hfacs",
+                "nist-sp-800-30"
+              ],
+              "meta:enum": {
+                "nist-sp-1270": "Categories of bias in artificial intelligence defined by [NIST SP 1270](https://doi.org/10.6028/NIST.SP.1270).",
+                "iso-iec-tr-24027": "Sources of unwanted bias in AI systems and AI-aided decision making defined by [ISO/IEC TR 24027](https://www.iso.org/standard/77607.html).",
+                "orx-cause": "Cause categories of the [ORX Reference Taxonomy](https://orx.org/operational-risk-reference-taxonomy) for operational and non-financial risk.",
+                "hfacs": "Causal levels of the [Human Factors Analysis and Classification System](https://www.faa.gov/sites/faa.gov/files/data_research/research/med_humanfacs/oamtechreports/00_07.pdf).",
+                "nist-sp-800-30": "Types of predisposing condition defined by [NIST SP 800-30 Revision 1](https://doi.org/10.6028/NIST.SP.800-30r1)."
+              }
+            },
+            {
+              "title": "Custom Taxonomy",
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "The name of the custom taxonomy."
+                },
+                "description": {
+                  "type": "string",
+                  "description": "A description of the custom taxonomy."
+                },
+                "url": {
+                  "type": "string",
+                  "format": "iri-reference",
+                  "description": "URL of the taxonomy specification."
+                }
+              }
+            }
+          ]
+        },
+        "category": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Category",
+          "description": "The category within the taxonomy, as named or numbered by the taxonomy."
+        }
+      }
     }
   }
 }
