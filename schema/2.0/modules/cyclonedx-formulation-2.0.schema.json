@@ -18,19 +18,10 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference the formula elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
-        },
-        "components": {
-          "title": "Components",
-          "description": "Transient components that are used in tasks that constitute one or more of this formula's workflows",
-          "type": "array",
-          "items": {
-            "$ref": "cyclonedx-component-2.0.schema.json#/$defs/component"
-          },
-          "uniqueItems": true
+        "refId": {
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the formula elsewhere in the document. Every `refId` shall be unique within the document.\nValue should not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType"
         },
         "workflows": {
           "title": "Workflows",
@@ -53,16 +44,16 @@
       "$comment": "Workflow are as task themselves and can trigger other workflow tasks.  These relationships can be modeled in the taskDependencies graph.",
       "type": "object",
       "required": [
-        "bom-ref",
+        "refId",
         "uid",
         "taskTypes"
       ],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference the workflow elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        "refId": {
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the workflow elsewhere in the document. Every `refId` shall be unique within the document.\nValue should not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType"
         },
         "uid": {
           "title": "Unique Identifier (UID)",
@@ -133,7 +124,7 @@
         "inputs": {
           "title": "Inputs",
           "description": "Represents resources and data brought into a task at runtime by executor or task commands",
-          "examples": ["a `configuration` file which was declared as a local `component` or `externalReference`"],
+          "examples": ["a `configuration` file which was defined as a `component` in the definitions or as an `externalReference`"],
           "type": "array",
           "items": {
             "$ref": "#/$defs/inputType"
@@ -168,7 +159,7 @@
           "type": "array",
           "uniqueItems": true,
           "items": {
-            "$ref": "#/$defs/workspace"
+            "$ref": "#/$defs/workspaceChoice"
           }
         },
         "runtimeTopology": {
@@ -192,16 +183,16 @@
       "$comment": "Tasks are building blocks for constructing assemble CI/CD workflows or pipelines.",
       "type": "object",
       "required": [
-        "bom-ref",
+        "refId",
         "uid",
         "taskTypes"
       ],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference the task elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        "refId": {
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the task elsewhere in the document. Every `refId` shall be unique within the document.\nValue should not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType"
         },
         "uid": {
           "title": "Unique Identifier (UID)",
@@ -253,7 +244,7 @@
         "inputs": {
           "title": "Inputs",
           "description": "Represents resources and data brought into a task at runtime by executor or task commands",
-          "examples": ["a `configuration` file which was declared as a local `component` or `externalReference`"],
+          "examples": ["a `configuration` file which was defined as a `component` in the definitions or as an `externalReference`"],
           "type": "array",
           "items": {
             "$ref": "#/$defs/inputType"
@@ -287,7 +278,7 @@
           "description": "A set of named filesystem or data resource shareable by workflow tasks.",
           "type": "array",
           "items": {
-            "$ref": "#/$defs/workspace"
+            "$ref": "#/$defs/workspaceChoice"
           },
           "uniqueItems": true
         },
@@ -353,15 +344,15 @@
       "description": "A named filesystem or data resource shareable by workflow tasks.",
       "type": "object",
       "required": [
-        "bom-ref",
+        "refId",
         "uid"
       ],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference the workspace elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        "refId": {
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the workspace elsewhere in the document. Every `refId` shall be unique within the document.\nValue should not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType"
         },
         "uid": {
           "title": "Unique Identifier (UID)",
@@ -434,6 +425,43 @@
         }
       }
     },
+    "workspaceChoice": {
+      "title": "Workspace Choice",
+      "description": "A workspace represented either as a complete inline object or as a reference to a workspace declared elsewhere, such as a workspace of the enclosing workflow.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/workspace"
+        },
+        {
+          "$ref": "#/$defs/workspaceReference"
+        }
+      ]
+    },
+    "workspaceReference": {
+      "type": "object",
+      "title": "Workspace Reference",
+      "description": "A reference to a workspace declared elsewhere, such as in another position of the same document or in another document via BOM-Link. A reference includes the referenced workspace exactly as declared: every position that references the same workspace includes an identical workspace. Where the context differs, declare the workspace inline instead.",
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "title": "Reference",
+          "description": "Reference using bom-link or `refId` to the workspace.",
+          "anyOf": [
+            {
+              "title": "Ref",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+            },
+            {
+              "title": "BOM-Link Element",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+            }
+          ]
+        }
+      }
+    },
     "volume": {
       "title": "Volume",
       "description": "An identifiable, logical unit of data storage tied to a physical device.",
@@ -491,14 +519,14 @@
       "additionalProperties": false,
       "required": [
         "type",
-        "bom-ref",
+        "refId",
         "uid"
       ],
       "properties": {
-        "bom-ref": {
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference the trigger elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        "refId": {
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the trigger elsewhere in the document. Every `refId` shall be unique within the document.\nValue should not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType"
         },
         "uid": {
           "title": "Unique Identifier (UID)",
@@ -557,7 +585,7 @@
         "inputs": {
           "title": "Inputs",
           "description": "Represents resources and data brought into a task at runtime by executor or task commands",
-          "examples": ["a `configuration` file which was declared as a local `component` or `externalReference`"],
+          "examples": ["a `configuration` file which was defined as a `component` in the definitions or as an `externalReference`"],
           "type": "array",
           "items": {
             "$ref": "#/$defs/inputType"
@@ -667,8 +695,8 @@
           "title": "Resource",
           "description": "A reference to an independent resource provided as an input to a task by the workflow runtime.",
           "examples": [
-            "a reference to a configuration file in a repository (i.e., a bom-ref)",
-            "a reference to a scanning service used in a task (i.e., a bom-ref)"
+            "a reference to a configuration file in a repository (i.e., a refId)",
+            "a reference to a scanning service used in a task (i.e., a refId)"
           ],
           "$ref": "#/$defs/resourceReferenceChoice"
         },
@@ -683,21 +711,8 @@
         },
         "environmentVars": {
           "title": "Environment variables",
-          "description": "Inputs that have the form of parameters with names and values.",
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "oneOf": [
-              {
-                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/property"
-              },
-              {
-                "type": "string",
-                "title": "String-Based Environment Variables",
-                "description": "In addition to the more common key–value pair format, some environment variables may consist of a single string without an explicit value assignment. These string-based environment variables typically act as flags or signals to software, indicating that a feature should be enabled, a mode should be activated, or a specific condition is present. Their presence alone conveys meaning."
-              }
-            ]
-          }
+          "description": "Inputs that have the form of environment variables.",
+          "$ref": "#/$defs/environmentVars"
         },
         "data": {
           "title": "Data",
@@ -768,20 +783,7 @@
         "environmentVars": {
           "title": "Environment variables",
           "description": "Outputs that have the form of environment variables.",
-          "type": "array",
-          "items": {
-            "oneOf": [
-              {
-                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/property"
-              },
-              {
-                "type": "string",
-                "title": "String-Based Environment Variables",
-                "description": "In addition to the more common key–value pair format, some environment variables may consist of a single string without an explicit value assignment. These string-based environment variables typically act as flags or signals to software, indicating that a feature should be enabled, a mode should be activated, or a specific condition is present. Their presence alone conveys meaning."
-              }
-            ]
-          },
-          "uniqueItems": true
+          "$ref": "#/$defs/environmentVars"
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
@@ -790,14 +792,14 @@
     },
     "resourceReferenceChoice": {
       "title": "Resource reference choice",
-      "description": "A reference to a locally defined resource (e.g., a bom-ref) or an externally accessible resource.",
-      "$comment": "Enables reference to a resource that participates in a workflow; using either internal (bom-ref) or external (externalReference) types.",
+      "description": "A reference to a locally defined resource (e.g., a `refId`) or an externally accessible resource.",
+      "$comment": "Enables reference to a resource that participates in a workflow; using either internal (refId) or external (externalReference) types.",
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "ref": {
-          "title": "BOM Reference",
-          "description": "References an object by its bom-ref attribute",
+          "title": "Reference",
+          "description": "References an object by its `refId` attribute",
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/elementLink"
         },
         "externalReference": {
@@ -890,6 +892,22 @@
           "type": "string"
         }
       }
+    },
+    "environmentVars": {
+      "title": "Environment variables",
+      "description": "A map of environment variable names to values.\n\nKeys are environment variable names and are intentionally unconstrained by this schema (including names that may be empty or start with non-alphabetic characters).\n\nValues must be either a `string` or `null`:\n- `null` means the variable is absent/unset.\n- `\"\"` (empty string) is a valid, explicit value and does not mean absent.",
+      "$comment": "While some systems may have restrictions on env var names, others may have not. See this test: `env '=empty-name' '0trust=starts-with-number' python -c 'import os;print(repr(os.environ))'`",
+      "type": "object",
+      "additionalProperties": {
+        "description": "Values must be either a `string` or `null`:\n- `null` means the variable is absent/unset.\n- `\"\"` (empty string) is a valid, explicit value and does not mean absent.",
+        "type": ["string", "null"]
+      },
+      "examples": [
+        { "LC_ALL": null, "LANG": "en_US.UTF-8" },
+        { "MY_FLAG": "1" },
+        { "0TRUST": "true" },
+        { "": "" }
+      ]
     }
   }
 }
