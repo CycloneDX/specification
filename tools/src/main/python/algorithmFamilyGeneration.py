@@ -30,7 +30,6 @@ schema_data['$comment'] = datetime.now(timezone.utc).replace(microsecond=0) \
     .isoformat().replace('+00:00', 'Z')
 
 schema_data['definitions']['algorithmFamiliesEnum'] = {
-    "type": "string",
     "title": "Algorithm Families",
     "description": "An enum for the algorithm families.",
     "enum": families,

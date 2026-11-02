@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "http://example.com/test/modules/used-not-keyword.schema.json",
+  "$comment": "FIXTURE: schemas that already carry a `not` keyword and are either hot (reached) or hollowed. Only `$defs` of this module are referenced, so the module body - including the root's own unreached `not` - is dropped and the root is hollowed; the hollow marker `not` must not collide with the original one.",
+  "title": "Used not keyword",
+  "description": "A module whose schemas carry a `not` keyword.",
+  "type": "object",
+  "not": {
+    "$comment": "Unreached `not` on a schema that gets hollowed -> dropped BEFORE the hollow marker is written, so there is no collision.",
+    "title": "Forbidden body",
+    "description": "Rejects an object that has a forbidden property.",
+    "required": [
+      "forbidden"
+    ]
+  },
+  "properties": {
+    "body": {
+      "$comment": "Lives in the dropped body.",
+      "title": "Body",
+      "description": "The body of this module.",
+      "type": "string"
+    }
+  },
+  "$defs": {
+    "hotWithNot": {
+      "$comment": "Reached from main. A hot schema loses nothing but unreached `$defs`, so the `not` and its content survive untouched - while `not/$defs/droppedInNot` is removed.",
+      "title": "Hot with not",
+      "description": "A string that must not be the forbidden value.",
+      "type": "string",
+      "not": {
+        "title": "Forbidden value",
+        "description": "The one value that is not allowed.",
+        "const": "forbidden",
+        "$defs": {
+          "droppedInNot": {
+            "$comment": "Unreferenced `$defs` inside a reached `not` -> removed.",
+            "title": "Dropped in not",
+            "description": "A definition nothing refers to.",
+            "type": "null"
+          }
+        }
+      }
+    },
+    "hollowedWithNot": {
+      "$comment": "NOT reached itself, only its `$defs/inner` is. Its original `not` is unreached -> dropped together with `type`; afterwards the schema is hollowed, i.e. gets the marker `not`. The marker must never merge with or sit next to the original `not`.",
+      "title": "Hollowed with not",
+      "description": "A container whose own constraints are no longer in use.",
+      "type": "object",
+      "not": {
+        "$comment": "Unreached -> dropped.",
+        "title": "Forbidden shape",
+        "description": "Rejects an empty object.",
+        "maxProperties": 0
+      },
+      "$defs": {
+        "inner": {
+          "$comment": "Reached from main -> kept; forces the parent to be hollowed instead of removed.",
+          "title": "Inner",
+          "description": "An integer value.",
+          "type": "integer"
+        }
+      }
+    },
+    "hotWithBooleanNot": {
+      "$comment": "Reached from main. `not` is the BOOLEAN schema `true` (= nothing ever validates). Booleans are not schema objects, so `subschemas()` never yields them; the sweep must keep the key as is and never turn it into `null`, `{}` or a marker object.",
+      "title": "Hot with boolean not",
+      "description": "A schema that rejects everything by negating `true`.",
+      "type": "string",
+      "not": true
+    },
+    "hollowedWithBooleanNot": {
+      "$comment": "NOT reached itself, only its `$defs/inner` is. The BOOLEAN `not: false` is unreached -> dropped (a bare boolean is swept away like any unreached scalar); afterwards the schema is hollowed with the marker `not`. No collision, and the marker must be an object - not the original boolean.",
+      "title": "Hollowed with boolean not",
+      "description": "A container whose boolean `not` is no longer in use.",
+      "type": "object",
+      "not": false,
+      "$defs": {
+        "inner": {
+          "$comment": "Reached from main -> kept; forces the parent to be hollowed instead of removed.",
+          "title": "Inner",
+          "description": "A number value.",
+          "type": "number"
+        }
+      }
+    },
+    "alreadyHollowTrueNot": {
+      "$comment": "NOT reached itself, only its `$defs/inner` is. `not: true` already rejected everything, so the schema was hollow before the sweep. The marker replaces the boolean, but this schema must NOT appear in `hollowed`, and `…/not` must NOT appear in `removed`.",
+      "title": "Already hollow true not",
+      "description": "A container that already rejected everything via `not: true`.",
+      "type": "object",
+      "not": true,
+      "$defs": {
+        "inner": {
+          "$comment": "Reached from main -> kept; forces the parent to be kept as a container.",
+          "title": "Inner",
+          "description": "A boolean value.",
+          "type": "boolean"
+        }
+      }
+    },
+    "alreadyHollowEmptyNot": {
+      "$comment": "NOT reached itself, only its `$defs/inner` is. The `not` is an annotations-only object, which accepts anything, so the schema was hollow before the sweep. Same expectations as alreadyHollowTrueNot.",
+      "title": "Already hollow empty not",
+      "description": "A container that already rejected everything via an annotations-only `not`.",
+      "type": "object",
+      "not": {
+        "title": "Anything",
+        "description": "Accepts anything - so negating it rejects everything."
+      },
+      "$defs": {
+        "inner": {
+          "$comment": "Reached from main -> kept; forces the parent to be kept as a container.",
+          "title": "Inner",
+          "description": "A null value.",
+          "type": "null"
+        }
+      }
+    }
+  }
+}
