@@ -695,6 +695,16 @@
                 "title": "Cipher Suite"
               }
             },
+            "tlsGroups": {
+              "$ref": "#/$defs/tlsGroups",
+              "title": "Protocol TLS groups",
+              "description": "Protocol-level inventory of TLS named groups, independent of any single cipher suite. Array order does not convey negotiation preference. The list does not imply that every group is compatible with every listed cipher suite. The list does not, by itself, identify which group was selected in a particular connection. Cipher-suite-level `tlsGroups` associate groups with one suite and do not override this list."
+            },
+            "tlsSignatureSchemes": {
+              "$ref": "#/$defs/tlsSignatureSchemes",
+              "title": "Protocol TLS signature schemes",
+              "description": "Protocol-level inventory of TLS signature schemes, independent of any single cipher suite. Array order does not convey negotiation preference. The list does not imply that every scheme is compatible with every listed cipher suite. The list does not, by itself, identify which signature scheme was selected in a particular connection. Cipher-suite-level `tlsSignatureSchemes` associate schemes with one suite and do not override this list."
+            },
             "ikev2TransformTypes": {
               "type": "object",
               "title": "IKEv2 Transform Types",
@@ -803,34 +813,45 @@
           }
         },
         "tlsGroups": {
-          "type": "array",
-          "title": "TLS Groups",
-          "description": "A list of TLS named groups (formerly known as curves) for this cipher suite. These groups define the parameters for key exchange algorithms like ECDHE.",
-          "items": {
-            "type": "string",
-            "title": "Group Name",
-            "description": "The name of the TLS group.",
-            "examples": [
-              "x25519",
-              "ffdhe2048"
-            ]
-          }
+          "$ref": "#/$defs/tlsGroups",
+          "title": "Cipher suite TLS groups",
+          "description": "TLS named groups associated with this cipher suite. For the protocol-level inventory, use `protocolProperties.tlsGroups`. This list does not define or override the protocol-level list."
         },
         "tlsSignatureSchemes": {
-          "type": "array",
-          "title": "TLS Signature Schemes",
-          "description": "A list of signature schemes supported for cipher suite. These schemes specify the algorithms used for digital signatures in TLS handshakes and certificate verification.",
-          "items": {
-            "type": "string",
-            "title": "Signature Scheme",
-            "description": "The name of the TLS signature scheme.",
-            "examples": [
-              "ecdsa_secp256r1_sha256",
-              "rsa_pss_rsae_sha256",
-              "ed25519"
-            ]
-          }
+          "$ref": "#/$defs/tlsSignatureSchemes",
+          "title": "Cipher suite TLS signature schemes",
+          "description": "TLS signature schemes associated with this cipher suite. For the protocol-level inventory, use `protocolProperties.tlsSignatureSchemes`. This list does not define or override the protocol-level list."
         }
+      }
+    },
+    "tlsGroups": {
+      "type": "array",
+      "title": "TLS named groups",
+      "description": "A list of TLS named groups, such as elliptic curve, finite-field, or hybrid groups used for key exchange.",
+      "items": {
+        "type": "string",
+        "title": "TLS group name",
+        "description": "The name of a TLS group. Prefer the IANA TLS Supported Groups Registry name where a registered name exists.",
+        "examples": [
+          "x25519",
+          "ffdhe2048",
+          "X25519MLKEM768"
+        ]
+      }
+    },
+    "tlsSignatureSchemes": {
+      "type": "array",
+      "title": "TLS signature schemes",
+      "description": "A list of TLS signature schemes. Entries may describe handshake-signature or certificate-signature schemes. This field does not distinguish their use or distinguish the TLS `signature_algorithms` extension from `signature_algorithms_cert`.",
+      "items": {
+        "type": "string",
+        "title": "TLS signature scheme name",
+        "description": "The name of a TLS signature scheme. Prefer the IANA TLS SignatureScheme Registry name where a registered name exists.",
+        "examples": [
+          "ecdsa_secp256r1_sha256",
+          "rsa_pss_rsae_sha256",
+          "ed25519"
+        ]
       }
     },
     "ikeV2Enc": {
