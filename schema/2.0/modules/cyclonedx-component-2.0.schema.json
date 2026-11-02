@@ -334,24 +334,22 @@
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/signatures"
         }
       },
-      "allOf": [
-        {
-          "description": "Requirement: ensure that `version` and `versionRange` are mutually exclusive.",
-          "not": {
-            "properties": { "version": true, "versionRange": true },
-            "required": ["version", "versionRange"]
+      "dependentSchemas": {
+        "version": {
+          "$comment": "if `version` is set, then `versionRange` must be absent",
+          "properties": {
+            "versionRange": false
           }
         },
-        {
-          "description": "Requirement: 'versionRange' must not be present when 'isExternal' is `false`.",
-          "if": {
-            "properties": { "isExternal": { "const": false } }
-          },
-          "then": {
-            "not": { "required": ["versionRange"] }
-          },
-          "else": true
-        },
+        "versionRange": {
+          "$comment": "if `versionRange` is set, then `version` must be absent and `isExternal` must be `true`",
+          "properties": {
+            "version": false,
+            "isExternal": { "const": true }
+          }
+        }
+      },
+      "allOf": [
         {
           "description": "Requirement: `classification`, `leadTime`, and `quantity` may only be present when `type` is `device` or `material`.",
           "if": {
