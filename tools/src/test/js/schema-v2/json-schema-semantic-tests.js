@@ -21,16 +21,19 @@ const _thisDir = dirname(fileURLToPath(import.meta.url))
 // region config
 
 const testschemaVersion = (parseArgs({options: {v: {type: 'string', short: 'v'}}}).values.v ?? '').trim()
+const testBundledOnly = process.env['TEST_BUNDLED_ONLY'] === 'true'
+const testBundled = testBundledOnly || process.env['TEST_BUNDLED'] === 'true'
+
+if (testBundledOnly) {
+    console.info('SKIPPED THIS TEST - it does not support bundled schema.')
+    process.exit()
+}
+
 const schemaRootDir = join(_thisDir, '..', '..', '..', '..', '..', 'schema')
 const schemaDir = join(schemaRootDir, testschemaVersion)
 const schemaModulesDir = join(schemaDir, `modules`)
 
 const schemaGlob = '*.schema.json'
-
-const expectedRefTypeFP = Object.freeze([
-    join(schemaModulesDir, `cyclonedx-common-${testschemaVersion}.schema.json`),
-    '#/$defs/refType'
-])
 
 if (testschemaVersion.length === 0) {
     throw new Error('missing testschemaVersion. expected via argument')
@@ -41,11 +44,6 @@ if (!await stat(schemaModulesDir).then(s => s.isDirectory()).catch(() => false))
     throw new Error(`missing schemaModulesDir: ${schemaModulesDir}`);
 }
 console.debug('DEBUG | schemaModulesDir = ', schemaModulesDir);
-
-if (!await stat(expectedRefTypeFP[0]).then(s => s.isFile()).catch(() => false)) {
-    throw new Error(`missing expectedRefTypeFP file: ${expectedRefTypeFP[0]}`);
-}
-console.debug('DEBUG | expectedRefTypeFP = ', expectedRefTypeFP);
 
 const schemaFiles = Object.freeze([
     // test only the source schema, not the bundled for now ...
@@ -73,6 +71,8 @@ const __FINDNODES_SKIP_KEYS = Object.freeze(new Set(
  * @private
  */
 function _makeValueConstraintTest(node) {
+    // TODO: use AJV to test against respective sub-schema
+    // see https://github.com/CycloneDX/specification/issues/1094#issuecomment-5993456107
     if (node.type === undefined) return () => true
     const typeChecks = [...new Set(
         Array.isArray(node.type)
@@ -203,19 +203,6 @@ function* _findNodes(node, matcher, path = '$') {
 }
 
 /**
- * @param {string} schemaFile
- * @return {string} the expected `$ref` value pointing at refType, relative to schemaFile
- * @private
- */
-function _refTypeRefFor(schemaFile) {
-    return (
-        schemaFile === expectedRefTypeFP[0]
-            ? ''
-            : relative(dirname(schemaFile), expectedRefTypeFP[0])
-    ) + expectedRefTypeFP[1]
-}
-
-/**
  * @function
  * @param {*} schema
  * @return {Generator<[string, *], void, *>} every node that has an `enum` or a `meta:enum`
@@ -238,7 +225,7 @@ const _findObjectWithDefault = (schema) => _findNodes(schema,
 function _printError(actual, expected, msg, schemaFile, schemaPath) {
     console.error(
         '!!! ERROR:', msg,
-        '\n   in file:', `file://${schemaFile}`,
+        '\n   in file:', schemaFile,
         '\n  for path:', schemaPath,
         '\n    actual:', actual,
         '\n  expected:', expected
@@ -250,35 +237,13 @@ function _printError(actual, expected, msg, schemaFile, schemaPath) {
 // region tests
 
 /**
- * Enum values adheres constraints.
- * @param {*} schema
- * @param {string} schemaFile
- * @return {number} number of errors found
- */
-function testEnumValues(schema, schemaFile) {
-    let errCnt = 0
-    for (const [path, node] of _findObjectWithEnum(schema)) {
-        const valueConstraintTest = _makeValueConstraintTest(node)
-        for (const enumValue of node.enum) {
-            if (!valueConstraintTest(enumValue)) {
-                ++errCnt
-                _printError(
-                    enumValue, `in range of type and constraints`,
-                    'enum value out of range',
-                    schemaFile, `${path}.enum`)
-            }
-        }
-    }
-    return errCnt
-}
-
-/**
  * Default values adheres constraints.
  * @param {*} schema
  * @param {string} schemaFile
  * @return {number} number of errors found
  */
 function testDefaultValues(schema, schemaFile) {
+    // TODO: move to linter - see https://github.com/CycloneDX/specification/issues/1094
     let errCnt = 0
     for (const [path, node] of _findObjectWithDefault(schema)) {
         if (path.endsWith('.properties')) continue;
@@ -314,14 +279,26 @@ function testDefaultValues(schema, schemaFile) {
     return errCnt
 }
 
+/**
+ * Example values adheres constraints.
+ * @param {*} schema
+ * @param {string} schemaFile
+ * @return {number} number of errors found
+ */
+function testExampleValues (schema, schemaFile) {
+    //TODO ...
+    // move to linter - see https://github.com/CycloneDX/specification/issues/1094
+    return 0
+}
+
 // endregion tests
 
 // region main
 
 /** @type {Readonly<Record<string, function(*, string): number>>} */
 const tests = Object.freeze({
-    'enum value in range': testEnumValues,
     'default value in range': testDefaultValues,
+    'example values in range': testExampleValues,
 })
 
 const schemas = await Promise.all(schemaFiles.map(

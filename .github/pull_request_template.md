@@ -19,6 +19,6 @@ Example:
 
 In case this is for a spelling or grammar improvement, please provide a brief description.
 Example:
-> Fixe typo: color(AE) -> colour(BE)
+> Fix typo: color(AE) -> colour(BE)
 
 -->
