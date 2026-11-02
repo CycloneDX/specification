@@ -90,7 +90,7 @@ abstract class AbstractJsonSchemaVerificationTest {
             }
         };
         JsonSchemaFactory factory = JsonSchemaFactory.builder()
-            // main schema and models are 2020-12
+            // main schema and modules are 2020-12
             .defaultMetaSchemaIri(SchemaId.V202012)
             .metaSchema(addCustomKeywords(JsonMetaSchema.getV202012()))
             // referenced externals may still be draft-07
@@ -98,8 +98,8 @@ abstract class AbstractJsonSchemaVerificationTest {
             .metaSchemaFactory(metaSchemaFactory)
             .schemaLoaders(b -> b.add(new ClasspathSchemaLoader()).add(DisallowSchemaLoader.getInstance()))
             .schemaMappers(b -> b
-                .mapPrefix("https://cyclonedx.org/schema/" + version + "/model/",
-                    "classpath:" + version + "/model/")
+                .mapPrefix("https://cyclonedx.org/schema/" + version + "/modules/",
+                    "classpath:" + version + "/modules/")
                 // version-independent externals
                 .mapPrefix("https://" + SPDX_NAMESPACE, "classpath:spdx.schema.json")
                 .mapPrefix("http://" + SPDX_NAMESPACE, "classpath:spdx.schema.json")

@@ -8,7 +8,7 @@
 
 import { LintCheck, registerCheck, Severity, traverseSchema } from '../index.js';
 
-const LiteralOther = /other/i;
+const LiteralOther = /^other$/i;
 
 /**
  * Check that validates enum value are not literal "other"
