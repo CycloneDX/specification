@@ -27,6 +27,40 @@
       },
       {
         "type": "cryptographic-asset",
+        "refId": "alg-aes-256-ctr",
+        "name": "AES-256-CTR",
+        "cryptoProperties": {
+          "assetType": "algorithm",
+          "algorithmProperties": {
+            "primitive": "block-cipher",
+            "algorithmFamily": "AES",
+            "parameterSetIdentifier": "256",
+            "mode": "ctr",
+            "cryptoFunctions": [
+              "encrypt",
+              "decrypt"
+            ]
+          }
+        }
+      },
+      {
+        "type": "cryptographic-asset",
+        "refId": "alg-hmac-sha-256",
+        "name": "HMAC-SHA-256",
+        "cryptoProperties": {
+          "assetType": "algorithm",
+          "algorithmProperties": {
+            "primitive": "mac",
+            "algorithmFamily": "HMAC",
+            "cryptoFunctions": [
+              "tag",
+              "verify"
+            ]
+          }
+        }
+      },
+      {
+        "type": "cryptographic-asset",
         "refId": "alg-x25519",
         "name": "x25519",
         "cryptoProperties": {
@@ -102,6 +136,16 @@
               },
               {
                 "type": "algorithm",
+                "role": "encryption",
+                "ref": "alg-aes-256-ctr"
+              },
+              {
+                "type": "algorithm",
+                "role": "mac",
+                "ref": "alg-hmac-sha-256"
+              },
+              {
+                "type": "algorithm",
                 "role": "key-exchange",
                 "ref": "alg-x25519"
               },
@@ -114,6 +158,11 @@
                 "type": "privateKey",
                 "role": "host-key",
                 "ref": "key-ssh-host"
+              },
+              {
+                "type": "algorithm",
+                "role": "org.example.custom-role",
+                "ref": "alg-hmac-sha-256"
               },
               {
                 "type": "algorithm",
