@@ -13,6 +13,16 @@
 
 import { LintCheck, registerCheck, Severity } from '../index.js';
 
+function isEmptySchema(value) {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    // not a schema
+    return false;
+  }
+  const keys = new Set(Object.keys(value));
+  keys.delete('$comment'); // delete keys that don't define a schema
+  return keys.size === 0;
+}
+
 /**
  * Check that validates module schema structure
  */
@@ -21,7 +31,7 @@ class ModuleStructureCheck extends LintCheck {
     super(
       'module-structure',
       'Module Structure',
-      'Validates that module schemas have type "null", $defs, and no properties.',
+      'Validates that module schemas have "not:{}", $defs, and no type nor properties.',
       Severity.ERROR
     );
   }
@@ -35,18 +45,20 @@ class ModuleStructureCheck extends LintCheck {
       return issues; // Not a module schema, skip
     }
 
-    // Check type must be "null"
-    if (!('type' in schema)) {
+    // Check root is not usable
+    // `not: {}` rejects every instance, so the container is unusable on its own;
+    // unlike `false` it can still hold `$defs`, and unlike `not: true` it is valid in draft-04.
+    if (!('not' in schema)) {
       issues.push(this.createIssue(
-        'Module schema is missing required "type" property.',
-        '$.type',
-        { expected: 'null' }
+        'Module schema is missing required "not" property.',
+        '$.not',
+        { expected: {} }
       ));
-    } else if (schema.type !== 'null') {
+    } else if (!isEmptySchema(schema.not)) {
       issues.push(this.createIssue(
-        `Module schema "type" must be "null", found "${schema.type}".`,
-        '$.type',
-        { actual: schema.type, expected: 'null' }
+        `Module schema "not" must be an empty schema, found ${JSON.stringify(schema.not)}".`,
+        '$.not',
+        { actual: schema.not, expected: {} }
       ));
     }
 
@@ -56,6 +68,14 @@ class ModuleStructureCheck extends LintCheck {
         'Module schema is missing required "$defs" property.',
         '$.$defs',
         { suggestion: 'Add a $defs object containing the module definitions.' }
+      ));
+    }
+
+    // Check properties must not exist at root level
+    if ('type' in schema) {
+      issues.push(this.createIssue(
+        'Module schema must not have "type" at root level.',
+        '$.type'
       ));
     }
 
