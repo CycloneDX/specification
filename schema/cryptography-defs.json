@@ -1,6 +1,6 @@
 {
   "$schema": "http://cyclonedx.org/schema/cryptography-defs.schema.json",
-  "lastUpdated": "2026-02-24T00:00:00Z",
+  "lastUpdated": "2026-08-06T00:00:00Z",
   "algorithms": [
     {
       "family": "RSASSA-PKCS1",
@@ -982,6 +982,56 @@
           ],
           "pattern": "GOST28147_MAC",
           "primitive": "mac"
+        },
+        {
+          "standard": [
+            {
+              "name": "RFC7091",
+              "url": "https://doi.org/10.17487/RFC7091"
+            }
+          ],
+          "pattern": "GOSTR3410-2012-(256|512)",
+          "primitive": "signature"
+        },
+        {
+          "standard": [
+            {
+              "name": "RFC6986",
+              "url": "https://doi.org/10.17487/RFC6986"
+            }
+          ],
+          "pattern": "GOSTR3411-2012-(256|512)",
+          "primitive": "hash"
+        },
+        {
+          "standard": [
+            {
+              "name": "RFC7836",
+              "url": "https://doi.org/10.17487/RFC7836"
+            }
+          ],
+          "pattern": "HMAC-GOSTR3411-2012-(256|512)",
+          "primitive": "mac"
+        },
+        {
+          "standard": [
+            {
+              "name": "RFC8891",
+              "url": "https://doi.org/10.17487/RFC8891"
+            }
+          ],
+          "pattern": "Magma[-{mode}][-{padding}]",
+          "primitive": "block-cipher"
+        },
+        {
+          "standard": [
+            {
+              "name": "RFC7801",
+              "url": "https://doi.org/10.17487/RFC7801"
+            }
+          ],
+          "pattern": "Kuznyechik[-{mode}][-{padding}]",
+          "primitive": "block-cipher"
         }
       ]
     },
@@ -2195,43 +2245,43 @@
         {
           "name": "id-GostR3410-2001-CryptoPro-A-ParamSet",
           "description": "RFC4357",
-          "oid": null,
+          "oid": "1.2.643.2.2.35.1",
           "form": "Weierstrass"
         },
         {
           "name": "id-GostR3410-2001-CryptoPro-B-ParamSet",
           "description": "RFC4357",
-          "oid": null,
+          "oid": "1.2.643.2.2.35.2",
           "form": "Weierstrass"
         },
         {
           "name": "id-GostR3410-2001-CryptoPro-C-ParamSet",
           "description": "RFC4357",
-          "oid": null,
+          "oid": "1.2.643.2.2.35.3",
           "form": "Weierstrass"
         },
         {
           "name": "id-tc26-gost-3410-12-512-paramSetA",
           "description": "RFC7836",
-          "oid": null,
+          "oid": "1.2.643.7.1.2.1.2.1",
           "form": "Weierstrass"
         },
         {
           "name": "id-tc26-gost-3410-12-512-paramSetB",
           "description": "RFC7836",
-          "oid": null,
+          "oid": "1.2.643.7.1.2.1.2.2",
           "form": "Weierstrass"
         },
         {
           "name": "id-tc26-gost-3410-2012-256-paramSetA",
-          "description": "RFC5832",
-          "oid": null,
+          "description": "RFC7836",
+          "oid": "1.2.643.7.1.2.1.1.1",
           "form": "TwistedEdwards"
         },
         {
           "name": "id-tc26-gost-3410-2012-512-paramSetC",
-          "description": "RFC5832",
-          "oid": null,
+          "description": "RFC7836",
+          "oid": "1.2.643.7.1.2.1.2.3",
           "form": "TwistedEdwards"
         }
       ]
@@ -4219,6 +4269,237 @@
             {
               "category": "secg",
               "name": "sect571r1"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "protocols": [
+    {
+      "family": "tls",
+      "description": "Transport Layer Security (TLS) provides confidentiality, integrity, and authentication for communication over a network.",
+      "standard": [
+        {
+          "name": "IANA TLS Parameters",
+          "url": "https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml"
+        }
+      ],
+      "version": [
+        {
+          "version": "1.3",
+          "standard": [
+            {
+              "name": "RFC8446",
+              "url": "https://doi.org/10.17487/RFC8446"
+            }
+          ],
+          "composition": [
+            {
+              "role": "key-exchange",
+              "selection": "one-of",
+              "selectedBy": "negotiation",
+              "selectingParty": "server",
+              "algorithmSet": [
+                "x25519",
+                "x448",
+                "ECDHE-secp256r1",
+                "ECDHE-secp384r1",
+                {
+                  "name": "X25519MLKEM768",
+                  "algorithms": [
+                    "x25519",
+                    "ML-KEM-768"
+                  ]
+                },
+                {
+                  "name": "SecP256r1MLKEM768",
+                  "algorithms": [
+                    "ECDHE-secp256r1",
+                    "ML-KEM-768"
+                  ]
+                },
+                {
+                  "name": "SecP384r1MLKEM1024",
+                  "algorithms": [
+                    "ECDHE-secp384r1",
+                    "ML-KEM-1024"
+                  ]
+                }
+              ]
+            },
+            {
+              "role": "signature",
+              "selection": "one-of",
+              "selectedBy": "negotiation",
+              "selectingParty": "server",
+              "algorithmSet": [
+                "ECDSA-secp256r1-SHA-256",
+                "ECDSA-secp384r1-SHA-384",
+                "RSA-PSS-SHA-256",
+                "Ed25519",
+                "ML-DSA-65"
+              ]
+            },
+            {
+              "role": "cert-chain-signature",
+              "selection": "any-of",
+              "selectedBy": "configuration",
+              "selectingParty": "server",
+              "algorithmSet": [
+                "ECDSA-secp256r1-SHA-256",
+                "RSA-PKCS1-1.5-SHA-256",
+                "RSA-PSS-SHA-256",
+                "ML-DSA-65"
+              ]
+            },
+            {
+              "role": "encryption",
+              "selection": "one-of",
+              "selectedBy": "negotiation",
+              "selectingParty": "server",
+              "algorithmSet": [
+                {
+                  "name": "TLS_AES_128_GCM_SHA256",
+                  "algorithms": [
+                    "AES-128-GCM",
+                    "HKDF-SHA-256"
+                  ]
+                },
+                {
+                  "name": "TLS_AES_256_GCM_SHA384",
+                  "algorithms": [
+                    "AES-256-GCM",
+                    "HKDF-SHA-384"
+                  ]
+                },
+                {
+                  "name": "TLS_CHACHA20_POLY1305_SHA256",
+                  "algorithms": [
+                    "ChaCha20-Poly1305",
+                    "HKDF-SHA-256"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "family": "ike",
+      "description": "Internet Key Exchange (IKE) negotiates security associations and keying material for IPsec.",
+      "standard": [
+        {
+          "name": "RFC7296",
+          "url": "https://doi.org/10.17487/RFC7296"
+        }
+      ],
+      "version": [
+        {
+          "version": "2",
+          "standard": [
+            {
+              "name": "RFC7296",
+              "url": "https://doi.org/10.17487/RFC7296"
+            }
+          ],
+          "composition": [
+            {
+              "role": "encryption",
+              "selection": "one-of",
+              "selectedBy": "negotiation",
+              "selectingParty": "responder",
+              "algorithmSet": [
+                "AES-128-GCM",
+                "AES-256-GCM",
+                "AES-256-CBC",
+                "ChaCha20-Poly1305"
+              ]
+            },
+            {
+              "role": "prf",
+              "selection": "one-of",
+              "selectedBy": "negotiation",
+              "selectingParty": "responder",
+              "algorithmSet": [
+                "HMAC-SHA-256",
+                "HMAC-SHA-384",
+                "AES-CMAC-PRF-128"
+              ]
+            },
+            {
+              "role": "integrity",
+              "selection": "one-of",
+              "selectedBy": "negotiation",
+              "selectingParty": "responder",
+              "algorithmSet": [
+                "HMAC-SHA-256-128",
+                "HMAC-SHA-384-192"
+              ]
+            },
+            {
+              "role": "key-exchange",
+              "selection": "any-of",
+              "selectedBy": "negotiation",
+              "selectingParty": "responder",
+              "algorithmSet": [
+                "ECDH-secp256r1",
+                "ECDH-secp384r1",
+                "x25519",
+                "ML-KEM-768"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "family": "ipsec",
+      "description": "Internet Protocol Security (IPsec) secures IP traffic using a key management protocol and packet protection protocols.",
+      "standard": [
+        {
+          "name": "RFC4301",
+          "url": "https://doi.org/10.17487/RFC4301"
+        }
+      ],
+      "version": [
+        {
+          "version": "3",
+          "standard": [
+            {
+              "name": "RFC4301",
+              "url": "https://doi.org/10.17487/RFC4301"
+            }
+          ],
+          "composition": [
+            {
+              "role": "key-management",
+              "selection": "one-of",
+              "selectedBy": "configuration",
+              "algorithmSet": [
+                {
+                  "protocol": "ike",
+                  "version": "1"
+                },
+                {
+                  "protocol": "ike",
+                  "version": "2"
+                }
+              ]
+            },
+            {
+              "role": "packet-protection",
+              "selection": "any-of",
+              "selectedBy": "configuration",
+              "algorithmSet": [
+                {
+                  "protocol": "esp"
+                },
+                {
+                  "protocol": "ah"
+                }
+              ]
             }
           ]
         }

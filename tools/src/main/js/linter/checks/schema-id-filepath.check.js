@@ -18,7 +18,7 @@ import { LintCheck, registerCheck, Severity } from '../index.js';
  * Valid patterns:
  *   https://cyclonedx.org/schema/bom-1.7.schema.json
  *   https://cyclonedx.org/schema/2.0/cyclonedx-2.0.schema.json
- *   https://cyclonedx.org/schema/2.0/model/cyclonedx-cryptography-2.0.schema.json
+ *   https://cyclonedx.org/schema/2.0/modules/cyclonedx-cryptography-2.0.schema.json
  *
  * Pattern breakdown:
  *   - Base URL: https://cyclonedx.org/schema/
