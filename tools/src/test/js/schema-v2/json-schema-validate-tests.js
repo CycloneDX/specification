@@ -113,6 +113,7 @@ function getAjv(bundled) {
     addFormats2019(ajv, {formats: ['idn-email']})
     // there is just no working implementation for format "iri-reference"
     // see https://github.com/luzlab/ajv-formats-draft2019/issues/22
+    ajv.addFormat('iri', true)
     ajv.addFormat('iri-reference', true)
     return ajv
 }

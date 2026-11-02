@@ -62,10 +62,10 @@
         "mediaType": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/mediaType"
         },
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference the component elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the component elsewhere in the document. Every `refId` shall be unique within the document.\nValue should not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "parties": {
           "$ref": "cyclonedx-party-2.0.schema.json#/$defs/parties"
@@ -205,8 +205,13 @@
             "patches": {
               "type": "array",
               "title": "Patches",
-              "description": ">A list of zero or more patches describing how the component deviates from an ancestor, descendant, or variant. Patches may be complementary to commits or may be used in place of commits.",
-              "items": {"$ref": "cyclonedx-common-2.0.schema.json#/$defs/patch"}
+              "description": "A list of zero or more patches describing how the component deviates from an ancestor, descendant, or variant. Patches may be complementary to commits or may be used in place of commits.",
+              "items": {
+                "oneOf": [
+                  {"$ref": "cyclonedx-common-2.0.schema.json#/$defs/patch"},
+                  {"$ref": "cyclonedx-common-2.0.schema.json#/$defs/patchReference"}
+                ]
+              }
             }
           }
         },
@@ -224,7 +229,7 @@
         },
         "releaseNotes": {
           "title": "Release Notes",
-          "description": "The release notes for the component. Either inline release notes or a reference using bom-link or bom-ref to release notes defined elsewhere, such as in the definitions.",
+          "description": "The release notes for the component. Either inline release notes or a reference using bom-link or `refId` to release notes defined elsewhere, such as in the definitions.",
           "oneOf": [
             {
               "$ref": "cyclonedx-release-notes-2.0.schema.json#/$defs/releaseNotes"
@@ -286,7 +291,7 @@
           "type": "array",
           "uniqueItems": true,
           "title": "Certifications",
-          "description": "Certifications held by or applicable to the component. Each entry is either an inline certification or a reference using bom-link or bom-ref to a certification defined elsewhere, such as in the definitions. Applicable to components of any type, hardware and software alike.",
+          "description": "Certifications held by or applicable to the component. Each entry is either an inline certification or a reference using bom-link or `refId` to a certification defined elsewhere, such as in the definitions. Applicable to components of any type, hardware and software alike.",
           "items": {
             "oneOf": [
               {
@@ -313,7 +318,7 @@
           "uniqueItems": true,
           "items": {"$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataProfileChoice"},
           "title": "Data Profiles",
-          "description": "The data handled by the service, characterized by data profiles. Each entry is either an inline profile object or a reference using bom-link or bom-ref to a previously declared profile, typically declared in the definitions. May only be used for components of type `service`. Data movement is intentionally not expressed here: flow direction, sources, destinations, authentication, and boundary crossings are modelled via blueprint flows, assets, and boundaries, which reference this component by bom-ref."
+          "description": "The data handled by the service, characterized by data profiles. Each entry is either an inline profile object or a reference using bom-link or `refId` to a previously declared profile, typically declared in the definitions. May only be used for components of type `service`. Data movement is intentionally not expressed here: flow direction, sources, destinations, authentication, and boundary crossings are modelled via blueprint flows, assets, and boundaries, which reference this component by `refId`."
         },
         "tags": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/tags",
@@ -432,10 +437,10 @@
           "title": "Type",
           "description": "Discriminator for a component-choice entry. The value shall be the literal string `component-choice`."
         },
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference the component-choice elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the component-choice elsewhere in the document. Every `refId` shall be unique within the document.\nValue should not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "name": {
           "type": "string",
@@ -526,7 +531,7 @@
           "type": "array",
           "title": "Occurrences",
           "description": "Evidence of individual instances of a component spread across multiple locations.",
-          "items": { "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/occurrence" }
+          "items": { "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/occurrenceChoice" }
         },
         "callStacks": {
           "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/callStacks",
@@ -556,10 +561,10 @@
       ],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference this license evidence elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference this license evidence elsewhere in the document. Every `refId` shall be unique within the document.\nValue should not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "license": {
           "allOf": [
@@ -600,7 +605,7 @@
           "type": "array",
           "uniqueItems": true,
           "title": "Tools",
-          "description": "The tools that detected the license, referenced by `bom-ref`.",
+          "description": "The tools that detected the license, referenced by `refId`.",
           "items": {
             "anyOf": [
               { "title": "Ref", "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType" },
@@ -612,7 +617,7 @@
           "type": "array",
           "title": "Occurrences",
           "description": "The locations at which the license was detected, for example a license file or a source header.",
-          "items": { "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/occurrence" }
+          "items": { "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/occurrenceChoice" }
         },
         "assertion": {
           "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/assertion",
@@ -633,10 +638,10 @@
       "required": [ "text" ],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference this copyright evidence elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference this copyright evidence elsewhere in the document. Every `refId` shall be unique within the document.\nValue should not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "text": {
           "type": "string",
@@ -660,7 +665,7 @@
           "type": "array",
           "uniqueItems": true,
           "title": "Tools",
-          "description": "The tools that detected the copyright statement, referenced by `bom-ref`.",
+          "description": "The tools that detected the copyright statement, referenced by `refId`.",
           "items": {
             "anyOf": [
               { "title": "Ref", "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType" },
@@ -672,7 +677,7 @@
           "type": "array",
           "title": "Occurrences",
           "description": "The locations at which the copyright statement was detected.",
-          "items": { "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/occurrence" }
+          "items": { "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/occurrenceChoice" }
         },
         "assertion": {
           "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/assertion",
@@ -720,8 +725,8 @@
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/elementLink"
           },
-          "title": "BOM References",
-          "description": "The object in the BOM identified by its bom-ref. This is often a component or service but may be any object type supporting bom-refs. Tools used for analysis should already be defined in the BOM, such as in the metadata tools, an inventory, or the definitions."
+          "title": "Tools",
+          "description": "The object in the BOM identified by its `refId`. This is often a component or service but may be any object type supporting `refId`s. Tools used for analysis should already be defined in the BOM, such as in the metadata tools, an inventory, or the definitions."
         },
         "assertion": {
           "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/assertion",
@@ -742,10 +747,10 @@
         "type"
       ],
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference the dataset elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the dataset elsewhere in the document. Every `refId` shall be unique within the document.\nValue should not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
         },
         "type": {
           "title": "Type of Data",
@@ -832,7 +837,7 @@
         "configurationRef": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "title": "Configuration Reference",
-          "description": "The bom-ref of the configuration that determines this component's configuration. Typically points to a component of type 'data' whose data type is 'configuration'."
+          "description": "The `refId` of the configuration that determines this component's configuration. Typically points to a component of type 'data' whose data type is 'configuration'."
         },
         "changeMechanism": {
           "type": "array",
@@ -883,13 +888,13 @@
       ],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType"
         },
         "party": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "title": "Asserting Party",
-          "description": "Reference using bom-link or bom-ref to the party making the identity assertion."
+          "description": "Reference using bom-link or `refId` to the party making the identity assertion."
         },
         "identities": {
           "type": "array",
@@ -1018,7 +1023,7 @@
       "properties": {
         "ref": {
           "title": "Reference",
-          "description": "Reference using bom-link or bom-ref to the component.",
+          "description": "Reference using bom-link or `refId` to the component.",
           "anyOf": [
             {
               "title": "Ref",
@@ -1049,14 +1054,14 @@
       ],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference the inventory elsewhere in the document. Every `bom-ref` shall be unique within the document."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the inventory elsewhere in the document. Every `refId` shall be unique within the document."
         },
         "subject": {
           "title": "Subject",
-          "description": "The subject whose inventory this statement declares. Either a concrete component or a reference using bom-link or bom-ref to a component declared elsewhere, such as in the definitions.",
+          "description": "The subject whose inventory this statement declares. Either a concrete component or a reference using bom-link or `refId` to a component declared elsewhere, such as in the definitions.",
           "oneOf": [
             {
               "$ref": "#/$defs/component"
@@ -1175,7 +1180,7 @@
         },
         "formula": {
           "title": "Formula Reference",
-          "description": "References using bom-link or bom-ref a formula, workflow, or task, defined in formulation, that captures the process which incurred this energy consumption, for example a training workflow or a manufacturing run.",
+          "description": "References using bom-link or `refId` a formula, workflow, or task, defined in formulation, that captures the process which incurred this energy consumption, for example a training workflow or a manufacturing run.",
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
         },
         "energyProviders": {
@@ -1292,10 +1297,10 @@
         "energyProvided"
       ],
       "properties": {
-        "bom-ref": {
-          "title": "BOM Reference",
-          "description": "An optional identifier which can be used to reference the energy provider elsewhere using a bom-ref or bom-link.",
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        "refId": {
+          "title": "Reference Identifier",
+          "description": "An optional identifier which can be used to reference the energy provider elsewhere using a `refId` or bom-link.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType"
         },
         "description": {
           "type": "string",
