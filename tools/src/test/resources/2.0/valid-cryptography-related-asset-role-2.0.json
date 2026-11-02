@@ -1,0 +1,150 @@
+{
+  "$schema": "https://cyclonedx.org/schema/2.0/cyclonedx-2.0.schema.json",
+  "specFormat": "CycloneDX",
+  "specVersion": "2.0",
+  "serialNumber": "urn:uuid:7c2f1a90-4d5e-4b8f-9c1a-2e3f4a5b6c7d",
+  "version": 1,
+  "definitions": {
+    "components": [
+      {
+        "type": "cryptographic-asset",
+        "refId": "alg-aes-256-gcm",
+        "name": "AES-256-GCM",
+        "cryptoProperties": {
+          "assetType": "algorithm",
+          "algorithmProperties": {
+            "primitive": "ae",
+            "algorithmFamily": "AES",
+            "parameterSetIdentifier": "256",
+            "mode": "gcm",
+            "cryptoFunctions": [
+              "encrypt",
+              "decrypt",
+              "tag"
+            ]
+          }
+        }
+      },
+      {
+        "type": "cryptographic-asset",
+        "refId": "alg-x25519",
+        "name": "x25519",
+        "cryptoProperties": {
+          "assetType": "algorithm",
+          "algorithmProperties": {
+            "primitive": "key-agree",
+            "algorithmFamily": "ECDH",
+            "cryptoFunctions": [
+              "keyagree"
+            ]
+          }
+        }
+      },
+      {
+        "type": "cryptographic-asset",
+        "refId": "alg-ed25519",
+        "name": "Ed25519",
+        "cryptoProperties": {
+          "assetType": "algorithm",
+          "algorithmProperties": {
+            "primitive": "signature",
+            "algorithmFamily": "EdDSA",
+            "cryptoFunctions": [
+              "sign",
+              "verify"
+            ]
+          }
+        }
+      },
+      {
+        "type": "cryptographic-asset",
+        "refId": "key-ssh-host",
+        "name": "SSH host private key",
+        "cryptoProperties": {
+          "assetType": "related-crypto-material",
+          "relatedCryptoMaterialProperties": {
+            "type": "private-key",
+            "format": "OpenSSH"
+          }
+        }
+      },
+      {
+        "type": "cryptographic-asset",
+        "refId": "key-cert-public",
+        "name": "example.com subject public key",
+        "cryptoProperties": {
+          "assetType": "related-crypto-material",
+          "relatedCryptoMaterialProperties": {
+            "type": "public-key",
+            "format": "SPKI"
+          }
+        }
+      },
+      {
+        "type": "cryptographic-asset",
+        "refId": "protocol-ssh-observed",
+        "name": "SSH server algorithm inventory",
+        "cryptoProperties": {
+          "assetType": "protocol",
+          "protocolProperties": {
+            "type": "ssh",
+            "version": "2.0",
+            "relatedCryptographicAssets": [
+              {
+                "type": "algorithm",
+                "role": "encryption",
+                "ref": "alg-aes-256-gcm"
+              },
+              {
+                "type": "algorithm",
+                "role": "integrity",
+                "ref": "alg-aes-256-gcm"
+              },
+              {
+                "type": "algorithm",
+                "role": "key-exchange",
+                "ref": "alg-x25519"
+              },
+              {
+                "type": "algorithm",
+                "role": "signature",
+                "ref": "alg-ed25519"
+              },
+              {
+                "type": "privateKey",
+                "role": "host-key",
+                "ref": "key-ssh-host"
+              },
+              {
+                "type": "algorithm",
+                "ref": "alg-ed25519"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "type": "cryptographic-asset",
+        "refId": "cert-example",
+        "name": "example.com certificate",
+        "cryptoProperties": {
+          "assetType": "certificate",
+          "certificateProperties": {
+            "subjectName": "CN=example.com",
+            "relatedCryptographicAssets": [
+              {
+                "type": "algorithm",
+                "role": "signature",
+                "ref": "alg-ed25519"
+              },
+              {
+                "type": "publicKey",
+                "ref": "key-cert-public"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

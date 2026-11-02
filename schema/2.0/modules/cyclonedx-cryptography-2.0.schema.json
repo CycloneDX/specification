@@ -1030,7 +1030,7 @@
     "relatedCryptographicAssets": {
       "type": "array",
       "title": "Related Cryptographic Assets",
-      "description": "A list of cryptographic assets related to this component.",
+      "description": "A list of cryptographic assets related to this component. The same `ref` may appear more than once when distinct contextual uses are recorded.",
       "items": {
         "$ref": "#/$defs/relatedCryptographicAsset"
       }
@@ -1038,17 +1038,33 @@
     "relatedCryptographicAsset": {
       "type": "object",
       "title": "Related Cryptographic Asset",
-      "description": "A cryptographic assets related to this component.",
+      "description": "A reference to a related cryptographic asset, optionally with a contextual use for this relationship.",
       "additionalProperties": false,
       "properties": {
         "type": {
           "type": "string",
           "title": "Type",
-          "description": "Specifies the mechanism by which the cryptographic asset is secured by.",
+          "description": "The kind of referenced cryptographic asset, such as an algorithm, certificate, public key, or private key. Distinct from `role`, which records contextual use.",
           "examples": [
             "publicKey",
             "privateKey",
-            "algorithm"
+            "algorithm",
+            "certificate"
+          ]
+        },
+        "role": {
+          "type": "string",
+          "title": "Relationship Role",
+          "description": "How the referenced cryptographic asset is used in the context of the containing asset. Distinct from `type`. Distinct from `algorithmProperties.primitive` and `cryptoFunctions`, which describe the referenced algorithm rather than this relationship. Distinct from protocol composition roles in `cryptography-defs.json`, which describe registry capability rather than a BOM-instance relationship. Omission makes no contextual-role assertion. An algorithm's primitive and supported functions do not, by themselves, establish its use in this relationship. This field is an open string. Recommended labels and meanings, aligned with registry composition terminology where the semantics match: `encryption` for confidentiality or AEAD cipher use; `integrity` for authenticity or integrity protection, including an AEAD integrity contribution; `mac` only when a distinct MAC algorithm role is recorded rather than broader integrity; `key-exchange` for key agreement, KEM, or named-group use; `prf` for a pseudorandom function; `signature` for a digital-signature algorithm used by the containing asset (for a certificate, the certificate signature algorithm; for a protocol, protocol authentication or handshake signature use); `cert-chain-signature` for signatures on certificates in a chain; `host-key` for SSH host-authentication key material. To record multiple contextual uses of the same asset, use separate relationship entries with the same `ref` and different `role` values. For an AEAD algorithm, use `encryption` for its confidentiality role and `integrity` for its authenticity/integrity role. Record any separate MAC algorithm through its own reference with role `mac`.",
+          "examples": [
+            "encryption",
+            "integrity",
+            "mac",
+            "key-exchange",
+            "prf",
+            "signature",
+            "cert-chain-signature",
+            "host-key"
           ]
         },
         "ref": {
