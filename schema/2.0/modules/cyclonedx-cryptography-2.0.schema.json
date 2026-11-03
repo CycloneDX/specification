@@ -1030,7 +1030,7 @@
     "relatedCryptographicAssets": {
       "type": "array",
       "title": "Related Cryptographic Assets",
-      "description": "A list of cryptographic assets related to this component.",
+      "description": "A list of cryptographic assets related to this component. Multiple contextual uses of the same asset may be recorded as separate entries with the same `ref` and different `role` values.",
       "items": {
         "$ref": "#/$defs/relatedCryptographicAsset"
       }
@@ -1038,17 +1038,33 @@
     "relatedCryptographicAsset": {
       "type": "object",
       "title": "Related Cryptographic Asset",
-      "description": "A cryptographic assets related to this component.",
+      "description": "A reference to a related cryptographic asset, optionally with a contextual use for this relationship.",
       "additionalProperties": false,
       "properties": {
         "type": {
           "type": "string",
           "title": "Type",
-          "description": "Specifies the mechanism by which the cryptographic asset is secured by.",
+          "description": "The kind of referenced cryptographic asset, such as an algorithm, certificate, public key, or private key.",
           "examples": [
             "publicKey",
             "privateKey",
-            "algorithm"
+            "algorithm",
+            "certificate"
+          ]
+        },
+        "role": {
+          "type": "string",
+          "title": "Relationship Role",
+          "description": "The contextual use of the referenced cryptographic asset in relation to the containing cryptographic asset. Omission makes no assertion about that use.",
+          "examples": [
+            "encryption",
+            "integrity",
+            "mac",
+            "key-exchange",
+            "prf",
+            "signature",
+            "cert-chain-signature",
+            "host-key"
           ]
         },
         "ref": {
