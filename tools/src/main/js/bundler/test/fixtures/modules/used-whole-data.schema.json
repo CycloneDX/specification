@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "http://example.com/test/modules/used-whole-data.schema.json",
+  "$comment": "FIXTURE: a module referenced as a whole whose REACHED schemas carry non-schema data (arrays, maps, literals) and boolean subschemas. The tree-shaker must leave every one of these byte-for-byte intact: a reached schema may only lose unreferenced `$defs`. Any `null` item, emptied map, or dropped key below is a sweep bug.",
+  "title": "Used whole data",
+  "description": "A module referenced in its entirety that carries data-bearing keywords inside reached schemas.",
+  "type": "object",
+  "required": [
+    "status",
+    "level"
+  ],
+  "examples": [
+    {
+      "status": "on",
+      "level": 1
+    },
+    {
+      "status": "off",
+      "level": 2
+    }
+  ],
+  "default": {
+    "status": "on",
+    "level": 1
+  },
+  "properties": {
+    "status": {
+      "$comment": "`enum` is a data array inside a reached schema -> items must stay literals, never become `null`. `meta:enum` is a non-schema map -> entries must not be emptied.",
+      "title": "Status",
+      "description": "A status value.",
+      "type": "string",
+      "enum": [
+        "on",
+        "off"
+      ],
+      "meta:enum": {
+        "on": "It is on.",
+        "off": "It is off."
+      }
+    },
+    "level": {
+      "$comment": "`const`, `examples` and `default` are literal data in a reached schema -> must stay as is.",
+      "title": "Level",
+      "description": "A fixed level.",
+      "type": "integer",
+      "const": 1,
+      "examples": [
+        1
+      ],
+      "default": 1
+    },
+    "flags": {
+      "$comment": "`properties` map that contains BOOLEAN subschemas. Booleans are not schema objects, so `subschemas()` never yields them; the sweep must nevertheless keep the keys `anything`/`nothing` with their boolean values.",
+      "title": "Flags",
+      "description": "An object with boolean-schema properties.",
+      "type": "object",
+      "required": [
+        "anything"
+      ],
+      "properties": {
+        "anything": true,
+        "nothing": false
+      },
+      "additionalProperties": false
+    },
+    "tags": {
+      "$comment": "`items` is a schema; `uniqueItems`/`minItems` are scalars in a reached schema -> kept.",
+      "title": "Tags",
+      "description": "A list of tags.",
+      "type": "array",
+      "uniqueItems": true,
+      "minItems": 0,
+      "items": {
+        "title": "Tag",
+        "description": "A single tag.",
+        "type": "string"
+      }
+    }
+  },
+  "$defs": {
+    "unusedDef": {
+      "$comment": "The ONLY thing the tree-shaker is allowed to drop from this module.",
+      "title": "Unused def",
+      "description": "A definition nothing reachable refers to.",
+      "type": "null"
+    }
+  }
+}
