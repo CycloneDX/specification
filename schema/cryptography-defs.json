@@ -247,7 +247,7 @@
       ],
       "variant": [
         {
-          "pattern": "FFDH(E)[-{namedGroup}]",
+          "pattern": "FFDH[E][-{namedGroup}]",
           "primitive": "key-agree"
         }
       ]
@@ -426,6 +426,16 @@
             }
           ],
           "pattern": "AES[-(128|192|256)]-GCM-SIV[-{tagLength}][-{ivLength}]",
+          "primitive": "ae"
+        },
+        {
+          "standard": [
+            {
+              "name": "ISO/IEC 19772:2020",
+              "url": "https://www.iso.org/standard/81550.html"
+            }
+          ],
+          "pattern": "AES[-(128|192|256)]-EAX[-{tagLength}][-{nonceLength}]",
           "primitive": "ae"
         },
         {
@@ -802,15 +812,23 @@
         {
           "name": "RFC8554",
           "url": "https://doi.org/10.17487/RFC8554"
+        },
+        {
+          "name": "RFC9858",
+          "url": "https://doi.org/10.17487/RFC9858"
         }
       ],
       "variant": [
         {
-          "pattern": "LMS[_{hashAlgorithm}][_M{bytesPerNode}][_H{treeHeight}]",
+          "pattern": "LMS[_(SHA256|SHAKE)][_M{bytesPerNode}][_H{treeHeight}]",
           "primitive": "signature"
         },
         {
-          "pattern": "LMOTS[_{hashfun}][_N{bytespernode}][_H{treeheight}]",
+          "pattern": "LMOTS[_(SHA256|SHAKE)][_N{hashOutputLength}][_W{winternitzParameter}]",
+          "primitive": "signature"
+        },
+        {
+          "pattern": "HSS[_L{levels}][(_<LMS>_<LMOTS>)+]",
           "primitive": "signature"
         }
       ]
