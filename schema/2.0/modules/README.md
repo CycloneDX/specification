@@ -16,7 +16,7 @@ These modules are referenced by the schemas in the parent directory and compiled
 (`cyclonedx-2.0-bundled.schema.json` and `cyclonedx-2.0-bundled.min.schema.json`), ensuring consistency and maximising reuse.
 
 | Schema File | Purpose |
-|---|---|
+|-------------|---------|
 | [`cyclonedx-ai-ml-2.0.schema.json`](cyclonedx-ai-ml-2.0.schema.json) | Describes machine learning model properties: learning types, tasks, architecture, modality, quantization, parameters, training datasets, and performance metrics. |
 | [`cyclonedx-annotation-2.0.schema.json`](cyclonedx-annotation-2.0.schema.json) | Represents human or automated comments about BOM elements, such as components. |
 | [`cyclonedx-behavior-2.0.schema.json`](cyclonedx-behavior-2.0.schema.json) | Models behaviors and behavior graphs: behavior instances, triggers, ordering, acknowledgments, nodes, and transitions. |
