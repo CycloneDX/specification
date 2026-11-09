@@ -12,8 +12,8 @@
       "required": [ "roles" ],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType"
         },
         "roles": {
           "type": "array",
@@ -80,12 +80,31 @@
       "description": "A party represented either as a complete object or as a reference to a previously declared party.",
       "oneOf": [
         { "$ref": "#/$defs/party" },
-        {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
-          "title": "Reference",
-          "description": "A refLinkType pointing to a previously declared party."
-        }
+        { "$ref": "#/$defs/partyReference" }
       ]
+    },
+    "partyReference": {
+      "type": "object",
+      "title": "Party Reference",
+      "description": "A reference to a party declared elsewhere, such as in the definitions registry, in another position of the same document, or in another document via BOM-Link. A reference includes the referenced party exactly as declared: every position that references the same party includes an identical party. Where the party context differs, such as a different role, declare the party inline instead.",
+      "required": [ "ref" ],
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "title": "Reference",
+          "description": "Reference using bom-link or `refId` to the party.",
+          "anyOf": [
+            {
+              "title": "Ref",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+            },
+            {
+              "title": "BOM-Link Element",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+            }
+          ]
+        }
+      }
     },
     "role": {
       "title": "Role",
@@ -493,7 +512,7 @@
         "affiliation": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/elementLink",
           "title": "Affiliation",
-          "description": "Reference using bom-link or bom-ref to an organization party with which the person is affiliated."
+          "description": "Reference using bom-link or `refId` to an organization party with which the person is affiliated."
         }
       }
     },
@@ -503,6 +522,13 @@
       "description": "Identity attributes for a party that is a software system, hardware system, service account, automation, or autonomous agent.",
       "additionalProperties": false,
       "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Label",
+          "description": "A short, human-readable label for the system, used to refer to it in documentation, diagrams, and tooling. Where `ref` is present, the referenced object remains the authoritative source of identity.",
+          "examples": [ "Release Pipeline", "Payments Service Account", "Support Chatbot" ]
+        },
         "kind": {
           "title": "Kind",
           "description": "The kind of system the party represents. May be a predefined kind from the CycloneDX system-kind taxonomy expressed as a plain string, or a custom kind expressed as an object with `name` and optional `description`.",
@@ -560,7 +586,7 @@
         "ref": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "title": "Reference",
-          "description": "Reference to any bom-ref'd object that represents this system. The referenced object provides the underlying identity (component, service, blueprint asset, or other object type). Use to associate the party with its concrete representation declared elsewhere."
+          "description": "Reference to any object carrying a `refId` that represents this system. The referenced object provides the underlying identity (component, service, blueprint asset, or other object type). Use to associate the party with its concrete representation declared elsewhere."
         },
         "identifiers": {
           "type": "array",
@@ -583,6 +609,13 @@
       "description": "Identity attributes for a party that is an abstract archetype rather than a specific named instance. Use for generic users, generic suppliers, or hypothesized attackers when a specific party is intentionally not named. When the specific instance is known (for example a tracked APT group), use `organization` instead.",
       "additionalProperties": false,
       "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Label",
+          "description": "A short, human-readable label for the persona, used to tell personas apart and to refer to them in documentation, diagrams, and tooling. The label is a display handle and does not assert the identity of a specific person or organization.",
+          "examples": [ "Mallory", "Disgruntled Administrator", "Anonymous Shopper" ]
+        },
         "description": {
           "type": "string",
           "title": "Description",
@@ -833,7 +866,7 @@
         "issuer": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/elementLink",
           "title": "Issuer",
-          "description": "Reference using bom-link or bom-ref to the party that issued the identifier."
+          "description": "Reference using bom-link or `refId` to the party that issued the identifier."
         }
       }
     },
@@ -843,10 +876,10 @@
       "description": "An address used to identify a contactable or operational location.",
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
           "title": "Reference Identifier",
-          "description": "An optional identifier that can be used to reference the address from elsewhere. Every bom-ref shall be unique within the containing instance. The value should not start with the prefix 'urn:cdx:' to avoid conflicts with BOM-Link identifiers."
+          "description": "An optional identifier that can be used to reference the address from elsewhere. Every `refId` shall be unique within the containing instance. The value should not start with the prefix 'urn:cdx:' to avoid conflicts with BOM-Link identifiers."
         },
         "country": {
           "type": "string",
