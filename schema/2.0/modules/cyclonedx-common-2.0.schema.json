@@ -299,7 +299,7 @@
             "patent-family": "References information about a patent family which may be defined in human-readable documents or in machine-readable formats such as CycloneDX or ST.96. A patent family is a group of related patent applications or granted patents that cover the same or similar invention. For detailed patent family information or to reference the information provided directly by patent offices, it is recommended to leverage standards from the World Intellectual Property Organization (WIPO) such as [ST.96](https://www.wipo.int/standards/en/st96).",
             "patent-assertion" : "References assertions made regarding patents associated with a component or service. Assertions distinguish between ownership, licensing, and other relevant interactions with patents.",
             "citation": "A reference to external citations applicable to the object identified in a CycloneDX artifact or payload or the CycloneDX artifact or payload itself. When used with a BOM-Link, this allows offloading citations into a separate CycloneDX artifacts or payloads.",
-            "swid-tag": "A Software Identification (SWID) tag document conforming to ISO/IEC 19770-2. The reference resolves to the XML SoftwareIdentity document itself, including all of its metadata (entities, evidence, payload, links, and meta elements). This is distinct from the `\"swid\"` identifier scheme, which carries only the tagId of a SWID tag.",
+            "swid-tag": "A Software Identification (SWID) tag document conforming to ISO/IEC 19770-2. The reference resolves to the XML SoftwareIdentity document itself, including all of its metadata (entities, evidence, payload, links, and meta elements). This is distinct from the `\"swid\"` identifier scheme, which carries only the `tagId` of a SWID tag.",
             "gs1-digital-link": "A [GS1 Digital Link URI](https://ref.gs1.org/standards/digital-link/uri-syntax/) that connects the component's GS1 identification key, such as a GTIN, to online sources of information, including product data, safety documentation, digital product passports, and recall status. The URI may include key qualifiers, such as a batch or serial number, enabling identification at the class, batch, or individual item level. Component identity shall be derived from the component's identifiers, not from keys embedded in this URI.",
             "other": "Use this if no other types accurately describe the purpose of the external reference."
           }
@@ -607,10 +607,10 @@
     "extensibleProperties": {
       "type": "object",
       "title": "Extensible Properties",
-      "$comment": "This is a mixin. It intentionally does NOT restrict additional/unevaluated properties itself; schemas composing it via `allOf` are expected to close themselves with `unevaluatedProperties=false` so that both their own defined properties and these patternProperties remain usable.",
+      "$comment": "This is a mixin. It intentionally does NOT restrict additional/unevaluated properties itself; schemas composing it via `allOf` are expected to close themselves with `\"unevaluatedProperties\": false` so that both their own defined properties and these patternProperties remain usable.",
       "patternProperties": {
         "^ext:[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}:.+$": {
-          "description": "CycloneDX supports a structured and namespace-aware mechanism for extensibility through the use of extensible properties. This mechanism enables organizations, ecosystems, and tool vendors to safely introduce custom properties without conflicting with the core schema or other extensions.\n\nExtensible properties are defined as a JSON object whose keys must conform to a strict pattern that resembles a reverse domain name structure, prefixed with ext:. This pattern provides a namespacing convention that aligns with well-established practices in other structured formats (e.g., XML namespaces).\n\nValues that are objects must declare the schema they conform to via `$schema`. This requirement applies recursively to objects contained in arrays, at any nesting depth.",
+          "description": "CycloneDX supports a structured and namespace-aware mechanism for extensibility through the use of extensible properties. This mechanism enables organizations, ecosystems, and tool vendors to safely introduce custom properties without conflicting with the core schema or other extensions.\n\nExtensible properties are defined as a JSON object whose keys must conform to a strict pattern that resembles a reverse domain name structure, prefixed with `\"ext:\"`. This pattern provides a namespacing convention that aligns with well-established practices in other structured formats (e.g., XML namespaces).\n\nValues that are objects must declare the schema they conform to via `$schema`. This requirement applies recursively to objects contained in arrays, at any nesting depth.",
           "examples": [
             "ext:<domain>:<name>",
             "ext:example.org:myExtension"
@@ -622,7 +622,7 @@
         "propertyObject": {
           "type": "object",
           "title": "Extensible Property Object",
-          "$comment": "Internal helper for extensibleProperties. Not part of the public schema API — do not reference externally; may change without notice.\n\nThis is a mixin.",
+          "$comment": "Internal helper for `extensibleProperties`. Not part of the public schema API — do not reference externally; may change without notice.\n\nThis is a mixin.",
           "required": ["$schema"],
           "properties": {
             "$schema": {
@@ -633,7 +633,7 @@
         },
         "propertyValue": {
           "title": "Extensible Property Value",
-          "$comment": "Internal helper for extensibleProperties. Not part of the public schema API — do not reference externally; may change without notice.\nRecursive: objects must declare a `$schema`, arrays may nest arbitrarily deep with the same rule applied to every item, all other values are plain scalars.",
+          "$comment": "Internal helper for `extensibleProperties`. Not part of the public schema API — do not reference externally; may change without notice.\nRecursive: objects must declare a `$schema`, arrays may nest arbitrarily deep with the same rule applied to every item, all other values are plain scalars.",
           "if": {
             "type": "object"
           },
@@ -660,7 +660,7 @@
     "baseObject": {
       "type": "object",
       "description": "Base object for all CycloneDX entities. Automatically includes support for extensible properties.",
-      "$comment": "This is a mixin. It intentionally does NOT set `unevaluatedProperties=false` — that keyword cannot see properties defined by schemas composing this one via `allOf`, and would reject them. Concrete (leaf) schemas composing this mixin must close themselves with `unevaluatedProperties=false`.",
+      "$comment": "This is a mixin. It intentionally does NOT set `\"unevaluatedProperties\": false` — that keyword cannot see properties defined by schemas composing this one via `allOf`, and would reject them. Concrete (leaf) schemas composing this mixin must close themselves with `\"unevaluatedProperties\": false`.",
       "allOf": [
         { "$ref": "#/$defs/extensibleProperties" }
       ],
@@ -1026,7 +1026,7 @@
     "measure": {
       "type": "object",
       "title": "Measure",
-      "description": "A quantity expressed as a numeric value and a unit. Contexts that use this definition may constrain the permitted units, as the energy and carbon dioxide equivalent measures do. Dimensionless quantities and counts use the unit one, written as 1.",
+      "description": "A quantity expressed as a numeric value and a unit. Contexts that use this definition may constrain the permitted units, as the energy and carbon dioxide equivalent measures do. Dimensionless quantities and counts use the unit one, written as `\"1\"`.",
       "additionalProperties": false,
       "required": ["value", "unit"],
       "properties": {
@@ -1147,7 +1147,7 @@
               "enum": ["ucum", "unece-rec20", "qudt"],
               "meta:enum": {
                 "ucum": "The [Unified Code for Units of Measure](https://ucum.org/), whose codes are case-sensitive strings such as kg, By, or {token}/s.",
-                "unece-rec20": "[UN/ECE Recommendation 20](https://unece.org/trade/uncefact/cl-recommendations), whose codes are two or three character strings such as KWH or C26.",
+                "unece-rec20": "[UN/ECE Recommendation 20](https://unece.org/trade/uncefact/cl-recommendations), whose codes are two or three character strings such as `\"KWH\"` or `\"C26\"`.",
                 "qudt": "The [QUDT](https://qudt.org/) unit vocabulary, whose codes are the unit identifiers in IRI form."
               }
             },
