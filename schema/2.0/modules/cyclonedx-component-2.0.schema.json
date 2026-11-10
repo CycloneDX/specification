@@ -334,83 +334,70 @@
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/signatures"
         }
       },
-      "allOf": [
-        {
-          "description": "Requirement: ensure that `version` and `versionRange` are mutually exclusive.",
-          "not": {
-            "properties": { "version": true, "versionRange": true },
-            "required": ["version", "versionRange"]
+      "dependentSchemas": {
+        "version": {
+          "description": "if `version` is set, then `versionRange` must be absent",
+          "properties": {
+            "versionRange": false
           }
         },
-        {
-          "description": "Requirement: 'versionRange' must not be present when 'isExternal' is `false`.",
-          "if": {
-            "properties": { "isExternal": { "const": false } }
-          },
-          "then": {
-            "not": { "required": ["versionRange"] }
-          },
-          "else": true
-        },
-        {
-          "description": "Requirement: `classification`, `leadTime`, and `quantity` may only be present when `type` is `device` or `material`.",
-          "if": {
-            "properties": { "type": { "enum": ["device", "material"] } },
-            "required": ["type"]
-          },
-          "then": true,
-          "else": {
-            "properties": {
-              "classification": false,
-              "leadTime": false,
-              "quantity": false
-            }
+        "versionRange": {
+          "description": "if `versionRange` is set, then `version` must be absent, and `isExternal` must be `true`",
+          "required": ["isExternal"],
+          "properties": {
+            "version": false,
+            "isExternal": { "const": true }
           }
         },
-        {
-          "description": "Requirement: `boardLocation` and `deviceType` may only be present when `type` is `device`.",
-          "if": {
-            "properties": { "type": { "const": "device" } },
-            "required": ["type"]
-          },
-          "then": true,
-          "else": {
-            "properties": {
-              "boardLocation": false,
-              "deviceType": false
-            }
+        "classification": {
+          "description": "may only be present where `type=\"device\"` or `type==\"material\"`",
+          "properties": {
+             "type": { "enum": ["device", "material"] }
           }
         },
-        {
-          "description": "Requirement: `materialForm` may only be present when `type` is `material`.",
-          "if": {
-            "properties": { "type": { "const": "material" } },
-            "required": ["type"]
-          },
-          "then": true,
-          "else": {
-            "properties": {
-              "materialForm": false
-            }
+        "leadTime": {
+          "description": "may only be present where `type=\"device\"` or `type=\"material\"`",
+          "properties": {
+            "type": { "enum": ["device", "material"] }
           }
         },
-        {
-          "title": "Service Requirement",
-          "description": "Requirement: endpoints and dataProfiles may only be used for components of type `service`.",
-          "if": {
-            "properties": { "type": { "const": "service" } }
-          },
-          "then": true,
-          "else": {
-            "not": {
-              "anyOf": [
-                { "required": ["endpoints"], "properties": { "endpoints":  true } },
-                { "required": ["dataProfiles"], "properties": { "dataProfiles":  true } }
-              ]
-            }
+        "quantity": {
+          "description": "may only be present where `type=\"device\"` or `type=\"material\"`",
+          "properties": {
+            "type": { "enum": ["device", "material"] }
+          }
+        },
+        "boardLocation": {
+          "$comment": "may only be present where `type=\"device\"`.",
+          "properties": {
+            "type": { "const": "device" }
+          }
+        },
+        "deviceType": {
+          "description": "may only be present where `type=\"device`.",
+          "properties": {
+            "type": { "const": "device" }
+          }
+        },
+        "materialForm": {
+          "description": "may only be present when `type=\"device\"`.",
+          "properties": {
+            "type": { "const": "material" }
+          }
+        },
+        "endpoints": {
+          "description": "may only be present when `type=\"service\"`.",
+          "properties": {
+            "type": { "const": "service" }
+          }
+        },
+        "dataProfiles": {
+          "description": "may only be present when `type=\"service\"`.",
+          "properties": {
+            "type": { "const": "service" }
           }
         }
-      ]
+      }
     },
     "componentEntry": {
       "title": "Component Entry",
