@@ -698,12 +698,17 @@
             "tlsGroups": {
               "$ref": "#/$defs/tlsGroups",
               "title": "Protocol TLS groups",
-              "description": "Protocol-level inventory of TLS named groups, independent of any single cipher suite. Array order does not convey negotiation preference. The list does not imply that every group is compatible with every listed cipher suite. The list does not, by itself, identify which group was selected in a particular connection. Cipher-suite-level `tlsGroups` associate groups with one suite and do not override this list."
+              "description": "A list of TLS named groups related to the protocol, as configured or observed for the subject of this BOM. Array order does not convey negotiation preference. The list does not imply that every group is compatible with every listed cipher suite, and does not identify which group was selected in a particular connection."
             },
             "tlsSignatureSchemes": {
               "$ref": "#/$defs/tlsSignatureSchemes",
-              "title": "Protocol TLS signature schemes",
-              "description": "Protocol-level inventory of TLS signature schemes, independent of any single cipher suite. Array order does not convey negotiation preference. The list does not imply that every scheme is compatible with every listed cipher suite. The list does not, by itself, identify which signature scheme was selected in a particular connection. Cipher-suite-level `tlsSignatureSchemes` associate schemes with one suite and do not override this list."
+              "title": "Protocol TLS signature schemes (authentication)",
+              "description": "A list of TLS signature schemes used for authentication in the handshake (the `signature_algorithms` extension, e.g. `CertificateVerify`), as configured or observed for the subject of this BOM. This does not describe signatures within the certificate chain; use `tlsSignatureSchemesCert` for those. Array order does not convey negotiation preference. The list does not imply that every scheme is compatible with every listed cipher suite, and does not identify which scheme was selected in a particular connection."
+            },
+            "tlsSignatureSchemesCert": {
+              "$ref": "#/$defs/tlsSignatureSchemes",
+              "title": "Protocol TLS signature schemes (certificate chain)",
+              "description": "A list of TLS signature schemes accepted or used for signatures within the certificate chain (the `signature_algorithms_cert` extension), as configured or observed for the subject of this BOM. This does not describe handshake authentication signatures; use `tlsSignatureSchemes` for those. Array order does not convey negotiation preference, and the list does not identify which scheme was selected in a particular connection."
             },
             "ikev2TransformTypes": {
               "type": "object",
@@ -815,12 +820,14 @@
         "tlsGroups": {
           "$ref": "#/$defs/tlsGroups",
           "title": "Cipher suite TLS groups",
-          "description": "TLS named groups associated with this cipher suite. For the protocol-level inventory, use `protocolProperties.tlsGroups`. This list does not define or override the protocol-level list."
+          "deprecated": true,
+          "description": "Deprecated: use `protocolProperties.tlsGroups`. TLS named groups associated with this cipher suite. This list does not define or override the protocol-level list."
         },
         "tlsSignatureSchemes": {
           "$ref": "#/$defs/tlsSignatureSchemes",
           "title": "Cipher suite TLS signature schemes",
-          "description": "TLS signature schemes associated with this cipher suite. For the protocol-level inventory, use `protocolProperties.tlsSignatureSchemes`. This list does not define or override the protocol-level list."
+          "deprecated": true,
+          "description": "Deprecated: use `protocolProperties.tlsSignatureSchemes` and `protocolProperties.tlsSignatureSchemesCert`. TLS signature schemes associated with this cipher suite. This list does not define or override the protocol-level lists."
         }
       }
     },
@@ -842,7 +849,7 @@
     "tlsSignatureSchemes": {
       "type": "array",
       "title": "TLS signature schemes",
-      "description": "A list of TLS signature schemes. Entries may describe handshake-signature or certificate-signature schemes. This field does not distinguish their use or distinguish the TLS `signature_algorithms` extension from `signature_algorithms_cert`.",
+      "description": "A list of TLS signature schemes. The containing property determines whether they apply to handshake authentication or to the certificate chain.",
       "items": {
         "type": "string",
         "title": "TLS signature scheme name",
