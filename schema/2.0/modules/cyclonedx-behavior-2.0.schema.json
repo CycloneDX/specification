@@ -354,27 +354,32 @@
           "description": "For a state node, a reference to a behavior instance performed while the subject remains in the state."
         }
       },
-      "allOf": [
-        {
-          "if": {
-            "properties": {
-              "kind": {
-                "const": "activity"
-              }
-            },
-            "required": [
-              "kind"
-            ]
-          },
-          "then": {
-            "oneOf": [
-              { "required": [ "behavior" ], "properties": { "behavior": true } },
-              { "required": [ "ref" ], "properties": { "ref": true } },
-              { "required": [ "graph" ], "properties": { "graph": true } }
-            ]
+      "dependentSchemas": {
+        "behavior": {
+          "description": "`behavior` requires `kind=\"activity\"`, and is mutually exclusive with `ref` and `graph`",
+          "properties": {
+            "kind": { "const": "activity" },
+            "ref": false,
+            "graph": false
+          }
+        },
+        "ref": {
+          "description": "`ref` requires `kind=\"activity\"`, and is mutually exclusive with `behavior` and `graph`",
+          "properties": {
+            "kind": { "const": "activity" },
+            "behavior": false,
+            "graph": false
+          }
+        },
+        "graph": {
+          "description": "`graph` requires `kind=\"activity\"`, and is mutually exclusive with `behavior` and `ref`",
+          "properties": {
+            "kind": { "const": "activity" },
+            "behavior": false,
+            "ref": false
           }
         }
-      ]
+      }
     },
     "transition": {
       "type": "object",
