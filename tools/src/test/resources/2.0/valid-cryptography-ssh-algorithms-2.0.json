@@ -1,0 +1,93 @@
+{
+  "$schema": "https://cyclonedx.org/schema/2.0/cyclonedx-2.0.schema.json",
+  "specFormat": "CycloneDX",
+  "specVersion": "2.0",
+  "definitions": {
+    "components": [
+      {
+        "type": "cryptographic-asset",
+        "refId": "alg-ed25519",
+        "name": "Ed25519",
+        "cryptoProperties": {
+          "assetType": "algorithm",
+          "algorithmProperties": {
+            "primitive": "signature",
+            "algorithmFamily": "EdDSA",
+            "cryptoFunctions": [
+              "sign",
+              "verify"
+            ]
+          }
+        }
+      },
+      {
+        "type": "cryptographic-asset",
+        "name": "SSH server KEXINIT",
+        "cryptoProperties": {
+          "assetType": "protocol",
+          "protocolProperties": {
+            "type": "ssh",
+            "version": "2.0",
+            "sshAlgorithms": {
+              "kex": [
+                {
+                  "name": "mlkem768x25519-sha256"
+                },
+                {
+                  "name": "curve25519-sha256"
+                }
+              ],
+              "hostKey": [
+                {
+                  "name": "ssh-ed25519",
+                  "algorithm": "alg-ed25519"
+                },
+                {
+                  "name": "rsa-sha2-512"
+                }
+              ],
+              "encryption": [
+                {
+                  "name": "chacha20-poly1305@openssh.com"
+                },
+                {
+                  "name": "aes256-gcm@openssh.com"
+                }
+              ],
+              "mac": [
+                {
+                  "name": "hmac-sha2-256"
+                }
+              ],
+              "compression": [
+                {
+                  "name": "none"
+                },
+                {
+                  "name": "zlib@openssh.com"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "type": "cryptographic-asset",
+        "name": "SSH host key only",
+        "cryptoProperties": {
+          "assetType": "protocol",
+          "protocolProperties": {
+            "type": "ssh",
+            "sshAlgorithms": {
+              "hostKey": [
+                {
+                  "name": "ssh-ed25519"
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

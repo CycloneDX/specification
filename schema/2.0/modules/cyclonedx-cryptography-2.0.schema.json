@@ -695,6 +695,59 @@
                 "title": "Cipher Suite"
               }
             },
+            "sshAlgorithms": {
+              "type": "object",
+              "title": "SSH Algorithms",
+              "description": "The SSH algorithms, grouped by the name-list categories of the key exchange initialization message (`SSH_MSG_KEXINIT`) defined in [RFC 4253 section 7.1](https://www.rfc-editor.org/rfc/rfc4253#section-7.1), as configured or observed for the subject of this BOM. Array order does not convey negotiation preference. The lists do not identify which algorithms were selected in a particular connection. Each list applies to both directions of the connection unless a producer records the two directions separately in different components.",
+              "additionalProperties": false,
+              "properties": {
+                "kex": {
+                  "type": "array",
+                  "title": "Key Exchange Algorithms",
+                  "description": "SSH key exchange methods (`kex_algorithms`).",
+                  "items": {
+                    "$ref": "#/$defs/sshAlgorithm",
+                    "title": "Key Exchange Algorithms entry"
+                  }
+                },
+                "hostKey": {
+                  "type": "array",
+                  "title": "Host Key Algorithms",
+                  "description": "SSH server host key algorithms (`server_host_key_algorithms`), used to authenticate the server.",
+                  "items": {
+                    "$ref": "#/$defs/sshAlgorithm",
+                    "title": "Host Key Algorithms entry"
+                  }
+                },
+                "encryption": {
+                  "type": "array",
+                  "title": "Encryption Algorithms",
+                  "description": "SSH encryption algorithms (`encryption_algorithms_client_to_server` and `encryption_algorithms_server_to_client`).",
+                  "items": {
+                    "$ref": "#/$defs/sshAlgorithm",
+                    "title": "Encryption Algorithms entry"
+                  }
+                },
+                "mac": {
+                  "type": "array",
+                  "title": "MAC Algorithms",
+                  "description": "SSH message authentication code algorithms (`mac_algorithms_client_to_server` and `mac_algorithms_server_to_client`).",
+                  "items": {
+                    "$ref": "#/$defs/sshAlgorithm",
+                    "title": "MAC Algorithms entry"
+                  }
+                },
+                "compression": {
+                  "type": "array",
+                  "title": "Compression Algorithms",
+                  "description": "SSH compression algorithms (`compression_algorithms_client_to_server` and `compression_algorithms_server_to_client`).",
+                  "items": {
+                    "$ref": "#/$defs/sshAlgorithm",
+                    "title": "Compression Algorithms entry"
+                  }
+                }
+              }
+            },
             "ikev2TransformTypes": {
               "type": "object",
               "title": "IKEv2 Transform Types",
@@ -830,6 +883,34 @@
               "ed25519"
             ]
           }
+        }
+      }
+    },
+    "sshAlgorithm": {
+      "type": "object",
+      "title": "SSH Algorithm",
+      "description": "Object representing an algorithm name as it appears in an SSH name-list.",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The algorithm name as used in SSH. Prefer the name from the IANA Secure Shell (SSH) Protocol Parameters registry where a registered name exists.",
+          "examples": [
+            "mlkem768x25519-sha256",
+            "ssh-ed25519",
+            "aes256-gcm@openssh.com",
+            "hmac-sha2-256",
+            "none"
+          ]
+        },
+        "algorithm": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "title": "Algorithm reference",
+          "description": "The `refId` to algorithm cryptographic asset."
         }
       }
     },
