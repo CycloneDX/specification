@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cyclonedx.org/schema/2.0/modules/cyclonedx-license-2.0.schema.json",
-  "type": "null",
+  "not": { "$comment": "This schema provides definitions only and is not intended for direct validation or instantiation." },
   "title": "CycloneDX License Module",
   "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
@@ -38,77 +38,7 @@
           }
         },
         {
-          "title": "License Expression",
-          "description": "Specifies the details and attributes related to a software license.\nIt must be a valid SPDX license expression, along with additional properties such as license acknowledgment.",
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "expression"
-          ],
-          "properties": {
-            "expression": {
-              "type": "string",
-              "title": "SPDX License Expression",
-              "description": "A valid SPDX license expression.\nRefer to https://spdx.org/specifications for syntax requirements.",
-              "examples": [
-                "Apache-2.0 AND (MIT OR GPL-2.0-only)",
-                "GPL-3.0-only WITH Classpath-exception-2.0"
-              ]
-            },
-            "expressionDetails": {
-              "title": "Expression Details",
-              "description": "Details for parts of the `expression`.",
-              "type": "array",
-              "items": {
-                "type": "object",
-                "description": "This document specifies the details and attributes related to a software license identifier. An SPDX expression may be a compound of license identifiers.\nThe `license_identifier` property serves as the key that identifies each record. Note that this key is not required to be unique, as the same license identifier could apply to multiple, different but similar license details, texts, etc.",
-                "required": [
-                  "licenseIdentifier"
-                ],
-                "properties": {
-                  "licenseIdentifier": {
-                    "title": "License Identifier",
-                    "description": "The valid SPDX license identifier. Refer to https://spdx.org/specifications for syntax requirements.\nThis property serves as the primary key, which uniquely identifies each record.",
-                    "type": "string",
-                    "examples": [
-                      "Apache-2.0",
-                      "GPL-3.0-only WITH Classpath-exception-2.0",
-                      "LicenseRef-my-custom-license"
-                    ]
-                  },
-                  "text": {
-                    "title": "License texts",
-                    "description": "A way to include the textual content of the license.",
-                    "$ref": "cyclonedx-common-2.0.schema.json#/$defs/attachment"
-                  },
-                  "url": {
-                    "type": "string",
-                    "title": "License URL",
-                    "description": "The URL to the license file. If specified, a `externalReference` with `type=\"license\"` should also be specified for completeness",
-                    "examples": [
-                      "https://www.apache.org/licenses/LICENSE-2.0.txt"
-                    ],
-                    "format": "iri-reference"
-                  }
-                },
-                "additionalProperties": false
-              }
-            },
-            "acknowledgement": {
-              "$ref": "#/$defs/licenseAcknowledgementEnumeration"
-            },
-            "refId": {
-              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
-              "title": "Reference Identifier",
-              "description": "An identifier which can be used to reference the license elsewhere in the document. Every `refId` shall be unique within the document.\nValue should not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
-            },
-            "licensing": {
-              "$ref": "#/$defs/licensing"
-            },
-            "properties": {
-              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
-            }
-          }
+          "$ref": "#/$defs/expression"
         }
       ]
     },
@@ -156,7 +86,7 @@
         "refId": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
           "title": "Reference Identifier",
-          "description": "An identifier which can be used to reference the license elsewhere in the document. Every `refId` shall be unique within the document.\nValue should not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+          "description": "An identifier which can be used to reference the license elsewhere in the document. Every `refId` shall be unique within the document."
         },
         "id": {
           "$ref": "../../spdx.schema.json",
@@ -186,6 +116,79 @@
           "format": "iri-reference"
         },
         "licensing": {"$ref": "#/$defs/licensing"},
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "expression": {
+      "title": "License Expression",
+      "description": "Specifies the details and attributes related to a software license.\nIt must be a valid SPDX license expression, along with additional properties such as license acknowledgment.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "expression"
+      ],
+      "properties": {
+        "expression": {
+          "type": "string",
+          "title": "SPDX License Expression",
+          "description": "A valid SPDX license expression.\nRefer to <https://spdx.org/specifications> for syntax requirements.",
+          "examples": [
+            "Apache-2.0 AND (MIT OR GPL-2.0-only)",
+            "GPL-3.0-only WITH Classpath-exception-2.0"
+          ]
+        },
+        "expressionDetails": {
+          "title": "Expression Details",
+          "description": "Details for parts of the `expression`.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "description": "This document specifies the details and attributes related to a software license identifier. An SPDX expression may be a compound of license identifiers.\nThe `license_identifier` property serves as the key that identifies each record. Note that this key is not required to be unique, as the same license identifier could apply to multiple, different but similar license details, texts, etc.",
+            "required": [
+              "licenseIdentifier"
+            ],
+            "properties": {
+              "licenseIdentifier": {
+                "title": "License Identifier",
+                "description": "The valid SPDX license identifier. Refer to <https://spdx.org/specifications> for syntax requirements.\nThis property serves as the primary key, which uniquely identifies each record.",
+                "type": "string",
+                "examples": [
+                  "Apache-2.0",
+                  "GPL-3.0-only WITH Classpath-exception-2.0",
+                  "LicenseRef-my-custom-license"
+                ]
+              },
+              "text": {
+                "title": "License texts",
+                "description": "A way to include the textual content of the license.",
+                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/attachment"
+              },
+              "url": {
+                "type": "string",
+                "title": "License URL",
+                "description": "The URL to the license file. If specified, a `externalReference` with `type=\"license\"` should also be specified for completeness",
+                "examples": [
+                  "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                ],
+                "format": "iri-reference"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "acknowledgement": {
+          "$ref": "#/$defs/licenseAcknowledgementEnumeration"
+        },
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the license elsewhere in the document. Every `refId` shall be unique within the document."
+        },
+        "licensing": {
+          "$ref": "#/$defs/licensing"
+        },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
         }
