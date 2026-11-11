@@ -698,25 +698,25 @@
             "sshAlgorithms": {
               "type": "object",
               "title": "SSH Algorithms",
-              "description": "The SSH algorithms, grouped by the name-list categories of the key exchange initialization message (`SSH_MSG_KEXINIT`) defined in [RFC 4253 section 7.1](https://www.rfc-editor.org/rfc/rfc4253#section-7.1), as configured or observed for the subject of this BOM. Array order does not convey negotiation preference. The lists do not identify which algorithms were selected in a particular connection. Each list applies to both directions of the connection unless a producer records the two directions separately in different components.",
+              "description": "The SSH algorithms, grouped by the name-list categories of the key exchange initialization message (`SSH_MSG_KEXINIT`) defined in [RFC 4253 section 7.1](https://www.rfc-editor.org/rfc/rfc4253#section-7.1), as configured or observed for the subject of this BOM. Array order does not convey negotiation preference. The lists do not identify which algorithms were selected in a particular connection. Name-lists that SSH negotiates separately for each direction (encryption, MAC, and compression) are recorded here without distinguishing the direction. Algorithms used for user authentication ([RFC 4252](https://www.rfc-editor.org/rfc/rfc4252)) are not part of these lists.",
               "additionalProperties": false,
               "properties": {
                 "kex": {
                   "type": "array",
                   "title": "Key Exchange Algorithms",
-                  "description": "SSH key exchange methods (`kex_algorithms`).",
+                  "description": "SSH key exchange methods (`kex_algorithms`). Extension indicators carried in the same name-list, such as `ext-info-s` ([RFC 8308](https://www.rfc-editor.org/rfc/rfc8308)), are not key exchange methods and are not recorded here.",
                   "items": {
                     "$ref": "#/$defs/sshAlgorithm",
-                    "title": "Key Exchange Algorithms entry"
+                    "title": "Key Exchange Algorithm"
                   }
                 },
                 "hostKey": {
                   "type": "array",
                   "title": "Host Key Algorithms",
-                  "description": "SSH server host key algorithms (`server_host_key_algorithms`), used to authenticate the server.",
+                  "description": "SSH server host key algorithms (`server_host_key_algorithms`): the algorithms a server offers, or a client accepts, for authenticating the server.",
                   "items": {
                     "$ref": "#/$defs/sshAlgorithm",
-                    "title": "Host Key Algorithms entry"
+                    "title": "Host Key Algorithm"
                   }
                 },
                 "encryption": {
@@ -725,7 +725,7 @@
                   "description": "SSH encryption algorithms (`encryption_algorithms_client_to_server` and `encryption_algorithms_server_to_client`).",
                   "items": {
                     "$ref": "#/$defs/sshAlgorithm",
-                    "title": "Encryption Algorithms entry"
+                    "title": "Encryption Algorithm"
                   }
                 },
                 "mac": {
@@ -734,7 +734,7 @@
                   "description": "SSH message authentication code algorithms (`mac_algorithms_client_to_server` and `mac_algorithms_server_to_client`).",
                   "items": {
                     "$ref": "#/$defs/sshAlgorithm",
-                    "title": "MAC Algorithms entry"
+                    "title": "MAC Algorithm"
                   }
                 },
                 "compression": {
@@ -743,7 +743,7 @@
                   "description": "SSH compression algorithms (`compression_algorithms_client_to_server` and `compression_algorithms_server_to_client`).",
                   "items": {
                     "$ref": "#/$defs/sshAlgorithm",
-                    "title": "Compression Algorithms entry"
+                    "title": "Compression Algorithm"
                   }
                 }
               }
@@ -898,7 +898,7 @@
         "name": {
           "type": "string",
           "title": "Name",
-          "description": "The algorithm name as used in SSH. Prefer the name from the IANA Secure Shell (SSH) Protocol Parameters registry where a registered name exists.",
+          "description": "The algorithm name as it appears in the SSH name-list. Where a registered name exists, the name from the IANA Secure Shell (SSH) Protocol Parameters registry should be used.",
           "examples": [
             "mlkem768x25519-sha256",
             "ssh-ed25519",
