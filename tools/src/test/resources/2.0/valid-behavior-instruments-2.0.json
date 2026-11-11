@@ -1,0 +1,90 @@
+{
+  "$comment": "A build service signs a firmware image. The behavior instance names who signs (actors), what is signed (targets), and the key and algorithm used to sign (instruments).",
+  "specFormat": "CycloneDX",
+  "specVersion": "2.0",
+  "serialNumber": "urn:uuid:c2000000-0000-4000-8000-0000000000b1",
+  "version": 1,
+  "definitions": {
+    "components": [
+      {
+        "type": "cryptographic-asset",
+        "refId": "alg-ml-dsa-65",
+        "name": "ML-DSA-65",
+        "cryptoProperties": {
+          "assetType": "algorithm",
+          "algorithmProperties": {
+            "primitive": "signature",
+            "algorithmFamily": "ML-DSA",
+            "parameterSetIdentifier": "65",
+            "cryptoFunctions": [
+              "sign",
+              "verify"
+            ]
+          }
+        }
+      },
+      {
+        "type": "cryptographic-asset",
+        "refId": "key-release-signing",
+        "name": "Release signing private key",
+        "cryptoProperties": {
+          "assetType": "related-crypto-material",
+          "relatedCryptoMaterialProperties": {
+            "type": "private-key",
+            "keyUsage": [
+              "sign"
+            ],
+            "relatedCryptographicAssets": [
+              {
+                "type": "algorithm",
+                "ref": "alg-ml-dsa-65"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "blueprints": [
+    {
+      "refId": "bp-signing",
+      "name": "Firmware release signing",
+      "modelTypes": [
+        "behavioral"
+      ],
+      "assets": [
+        {
+          "refId": "asset-build-service",
+          "type": "service",
+          "name": "Build service"
+        },
+        {
+          "refId": "asset-firmware",
+          "type": "data",
+          "name": "Firmware image"
+        }
+      ],
+      "behaviors": {
+        "instances": [
+          {
+            "refId": "bi-sign-firmware",
+            "behavior": "security:cryptography:signsCode",
+            "acknowledgment": [
+              "declared"
+            ],
+            "actors": [
+              "asset-build-service"
+            ],
+            "targets": [
+              "asset-firmware"
+            ],
+            "instruments": [
+              "key-release-signing",
+              "alg-ml-dsa-65"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
