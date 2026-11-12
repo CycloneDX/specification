@@ -1,0 +1,138 @@
+{
+  "$schema": "https://cyclonedx.org/schema/2.0/cyclonedx-2.0.schema.json",
+  "specFormat": "CycloneDX",
+  "specVersion": "2.0",
+  "version": 1,
+  "serialNumber": "urn:uuid:3b79e304-098a-4221-a12d-795a0ec59329",
+  "inventories": [
+    {
+      "subject": {
+        "refId": "subject-1",
+        "type": "application",
+        "name": "Acme Server",
+        "version": "1.0"
+      },
+      "components": [
+        {
+          "type": "cryptographic-asset",
+          "refId": "protocol-ssh-server",
+          "name": "SSH server",
+          "cryptoProperties": {
+            "assetType": "protocol",
+            "protocolProperties": {
+              "type": "ssh",
+              "version": "2.0",
+              "composition": [
+                {
+                  "role": "key-exchange",
+                  "selection": "one-of",
+                  "selectedBy": "negotiation",
+                  "selectingParty": "client",
+                  "algorithmSet": [
+                    {
+                      "name": "mlkem768x25519-sha256",
+                      "algorithms": [
+                        "ML-KEM-768",
+                        "x25519",
+                        "SHA-256"
+                      ]
+                    },
+                    {
+                      "name": "curve25519-sha256",
+                      "algorithms": [
+                        "x25519",
+                        "SHA-256"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "signature",
+                  "selection": "one-of",
+                  "selectedBy": "negotiation",
+                  "selectingParty": "client",
+                  "algorithmSet": [
+                    {
+                      "name": "ssh-ed25519",
+                      "algorithms": [
+                        "Ed25519"
+                      ]
+                    },
+                    {
+                      "name": "rsa-sha2-512",
+                      "algorithms": [
+                        "RSA-PKCS1-1.5-SHA-512"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "encryption",
+                  "selection": "one-of",
+                  "selectedBy": "negotiation",
+                  "selectingParty": "client",
+                  "algorithmSet": [
+                    {
+                      "name": "chacha20-poly1305@openssh.com",
+                      "algorithms": [
+                        "ChaCha20",
+                        "Poly1305"
+                      ]
+                    },
+                    {
+                      "name": "aes256-gcm@openssh.com",
+                      "algorithms": [
+                        "AES-256-GCM-128-96"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "integrity",
+                  "selection": "one-of",
+                  "selectedBy": "negotiation",
+                  "selectingParty": "client",
+                  "algorithmSet": [
+                    {
+                      "name": "hmac-sha2-256",
+                      "algorithms": [
+                        "HMAC-SHA-256-256"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "cryptographic-asset",
+          "refId": "protocol-ssh-host-key",
+          "name": "SSH host key, observed",
+          "cryptoProperties": {
+            "assetType": "protocol",
+            "protocolProperties": {
+              "type": "ssh",
+              "composition": [
+                {
+                  "role": "signature",
+                  "selection": "one-of",
+                  "selectedBy": "negotiation",
+                  "selectingParty": "client",
+                  "algorithmSet": [
+                    {
+                      "name": "ssh-ed25519",
+                      "algorithms": [
+                        "Ed25519"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
