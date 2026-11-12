@@ -143,26 +143,46 @@
             "protocolProperties": {
               "type": "tls",
               "version": "1.3",
-              "cipherSuites": [
+              "composition": [
                 {
-                  "name": "TLS_AES_256_GCM_SHA384",
-                  "algorithms": [
-                    "1977d71b-8981-4292-b40d-842a019c2229",
-                    "422fa336-b401-42b7-89b8-8966aa30bca0"
-                  ],
-                  "identifiers": [
-                    "0x13,0x02"
+                  "role": "encryption",
+                  "selection": "one-of",
+                  "selectedBy": "negotiation",
+                  "selectingParty": "server",
+                  "algorithmSet": [
+                    {
+                      "name": "TLS_AES_256_GCM_SHA384",
+                      "algorithms": [
+                        "AES-256-GCM-128-96",
+                        "HKDF-SHA-384"
+                      ]
+                    },
+                    {
+                      "name": "TLS_CHACHA20_POLY1305_SHA256",
+                      "algorithms": [
+                        "ChaCha20-Poly1305",
+                        "HKDF-SHA-256"
+                      ]
+                    }
                   ]
+                }
+              ],
+              "relatedCryptographicAssets": [
+                {
+                  "type": "algorithm",
+                  "ref": "1977d71b-8981-4292-b40d-842a019c2229"
                 },
                 {
-                  "name": "TLS_CHACHA20_POLY1305_SHA256",
-                  "algorithms": [
-                    "1af4fc08-5d0d-436e-8058-eeef921983d0",
-                    "6af3066b-ab66-4593-975f-d9ba2c623a89"
-                  ],
-                  "identifiers": [
-                    "0x13,0x03"
-                  ]
+                  "type": "algorithm",
+                  "ref": "422fa336-b401-42b7-89b8-8966aa30bca0"
+                },
+                {
+                  "type": "algorithm",
+                  "ref": "1af4fc08-5d0d-436e-8058-eeef921983d0"
+                },
+                {
+                  "type": "algorithm",
+                  "ref": "6af3066b-ab66-4593-975f-d9ba2c623a89"
                 }
               ]
             },
@@ -193,24 +213,23 @@
           }
         },
         {
-          "name": "SHA-384",
+          "name": "HKDF-SHA-384",
           "type": "cryptographic-asset",
           "refId": "422fa336-b401-42b7-89b8-8966aa30bca0",
           "cryptoProperties": {
             "assetType": "algorithm",
             "algorithmProperties": {
-              "primitive": "hash",
-              "algorithmFamily": "SHA-2",
-              "parameterSetIdentifier": "384",
+              "primitive": "kdf",
+              "algorithmFamily": "HKDF",
               "executionEnvironment": "software-plain-ram",
               "implementationPlatform": [
                 "x86_64"
               ],
               "cryptoFunctions": [
-                "digest"
+                "keyderive"
               ]
             },
-            "oid": "2.16.840.1.101.3.4.2.2"
+            "oid": "1.2.840.113549.1.9.16.3.29"
           }
         },
         {
@@ -236,24 +255,23 @@
           }
         },
         {
-          "name": "SHA-256",
+          "name": "HKDF-SHA-256",
           "type": "cryptographic-asset",
           "refId": "6af3066b-ab66-4593-975f-d9ba2c623a89",
           "cryptoProperties": {
             "assetType": "algorithm",
             "algorithmProperties": {
-              "primitive": "hash",
-              "algorithmFamily": "SHA-2",
-              "parameterSetIdentifier": "256",
+              "primitive": "kdf",
+              "algorithmFamily": "HKDF",
               "executionEnvironment": "software-plain-ram",
               "implementationPlatform": [
                 "x86_64"
               ],
               "cryptoFunctions": [
-                "digest"
+                "keyderive"
               ]
             },
-            "oid": "2.16.840.1.101.3.4.2.1"
+            "oid": "1.2.840.113549.1.9.16.3.28"
           }
         }
       ]
