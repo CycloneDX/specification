@@ -8,7 +8,7 @@
     "party": {
       "type": "object",
       "title": "Party",
-      "description": "Identifies an organization, individual, system, or abstract archetype that participates in supplying, producing, attesting, operating, owning, regulating, or otherwise relating to the subject. Each party plays one or more named roles. Roles may carry preference order (`role.order`) to express primary, alternate, and secondary rankings among parties sharing the same role.\n\nExactly one identity sub-shape (`organization`, `person`, `system`, or `persona`) shall be present. Optional sub-objects layer inter-party relationships and standard extension data.",
+      "description": "Identifies an organization, individual, system, or abstract archetype that participates in supplying, producing, attesting, operating, owning, regulating, or otherwise relating to the subject. Each party plays one or more named roles. Roles may carry preference order (`roles[].order`) to express primary, alternate, and secondary rankings among parties sharing the same role.\n\nExactly one identity sub-shape (`organization`, `person`, `system`, or `persona`) shall be present. Optional sub-objects layer inter-party relationships and standard extension data.",
       "required": [ "roles" ],
       "additionalProperties": false,
       "properties": {
@@ -73,7 +73,7 @@
     "parties": {
       "type": "array",
       "title": "Parties",
-      "description": "Parties associated with the subject. Each item identifies an organization, individual, system, or abstract archetype playing one or more named roles such as manufacturer, supplier, author, integrator, quality-control, or any custom role. The same party can hold multiple roles, each independently ranked via `role.order` to express preference (for example, primary supplier with order 1 and alternate supplier with order 2). Items may be inline party objects or references to parties declared elsewhere.",
+      "description": "Parties associated with the subject. Each item identifies an organization, individual, system, or abstract archetype playing one or more named roles such as `\"manufacturer\"`, `\"supplier\"`, `\"author\"`, `\"integrator\"`, `\"quality-control\"`, or any custom role. The same party can hold multiple roles, each independently ranked via `roles[].order` to express preference (for example, primary supplier with order `1` and alternate supplier with order `2`). Items may be inline party objects or references to parties declared elsewhere.",
       "items": { "$ref": "#/$defs/partyChoice" }
     },
     "partyChoice": {
@@ -109,7 +109,7 @@
     },
     "role": {
       "title": "Role",
-      "description": "A role that a party fulfils. May be a predefined role from the CycloneDX role taxonomy or a custom role definition. The optional `order` property ranks parties that share the same role, supporting use cases such as primary versus alternate suppliers in hardware manufacturing supply chains.",
+      "description": "A role that a party fulfils. May be a predefined role from the CycloneDX role taxonomy or a custom role definition. The `order` property ranks parties that share the same role, supporting use cases such as primary versus alternate suppliers in hardware manufacturing supply chains.",
       "oneOf": [
         { "$ref": "#/$defs/preDefinedRole" },
         {
@@ -290,7 +290,7 @@
           "type": "integer",
           "minimum": 1,
           "title": "Order",
-          "description": "Preference order among parties sharing this role. Lower values indicate higher preference. Ties are permitted. Absence means unranked. For example, a primary supplier may have `order: 1` while an alternate supplier has `order: 2`.",
+          "description": "Preference order among parties sharing this role. Lower values indicate higher preference. Ties are permitted. Absence means unranked. For example, a primary supplier may have `order=1` while an alternate supplier has `order=2`.",
           "examples": [ 1, 2, 3 ]
         }
       }
@@ -376,7 +376,7 @@
               "name": {
                 "type": "string",
                 "title": "Name",
-                "description": "Label describing the URL, such as `homepage`, `support`, `press`, `status`, or `repository`.",
+                "description": "Label describing the URL.",
                 "examples": [ "homepage", "support", "press", "status", "repository" ]
               },
               "url": {
@@ -411,7 +411,7 @@
         "sortName": {
           "type": "string",
           "title": "Sort Name",
-          "description": "Optional sortable form of the name for catalog and index views. Use when the natural form of `name` does not sort intuitively, for example a comma-separated last-name-first form.",
+          "description": "Sortable form of the name for catalog and index views. Use when the natural form of `name` does not sort intuitively, for example a comma-separated last-name-first form.",
           "examples": [ "Lovelace, Ada", "García López, Maria del Carmen" ]
         },
         "honorificPrefix": {
@@ -449,7 +449,7 @@
               "name": {
                 "type": "string",
                 "title": "Name",
-                "description": "Label describing the email, such as `work`, `personal`, `support`, or `security`.",
+                "description": "Label describing the email.",
                 "examples": [ "work", "personal", "support", "security" ]
               },
               "address": {
@@ -472,7 +472,7 @@
               "name": {
                 "type": "string",
                 "title": "Name",
-                "description": "Label describing the phone, such as `office`, `mobile`, `fax`, or `pager`.",
+                "description": "Label describing the phone.",
                 "examples": [ "office", "mobile", "fax", "pager" ]
               },
               "number": {
@@ -495,8 +495,8 @@
               "name": {
                 "type": "string",
                 "title": "Name",
-                "description": "Label describing the URL, such as `homepage`, `github`, `linkedin`, `mastodon`, or `orcid`.",
-                "examples": [ "homepage", "github", "linkedin", "orcid" ]
+                "description": "Label describing the URL.",
+                "examples": [ "homepage", "github", "linkedin", "mastodon", "orcid" ]
               },
               "url": {
                 "type": "string",
@@ -532,7 +532,7 @@
         },
         "kind": {
           "title": "Kind",
-          "description": "The kind of system the party represents. May be a predefined kind from the CycloneDX system-kind taxonomy expressed as a plain string, or a custom kind expressed as an object with `name` and optional `description`.",
+          "description": "The kind of system the party represents. May be a predefined kind from the CycloneDX system-kind taxonomy expressed as a plain string, or a custom kind expressed as an object with `name` and `description`.",
           "oneOf": [
             {
               "title": "Pre-Defined Kind",
@@ -560,7 +560,7 @@
                 "oracle":           "External data feed or oracle, including blockchain oracles that bridge off-chain data into on-chain systems.",
                 "smart-contract":   "On-chain program that executes deterministically.",
                 "device":           "Physical end user device such as a phone or IoT device acting as a party in its own right.",
-                "robot":            "Physical robot or autonomous mechanical system. For software-only counterparts, see `bot`, `agent`, or `automation`."
+                "robot":            "Physical robot or autonomous mechanical system. For software-only counterparts, see `\"bot\"`, `\"agent\"`, or `\"automation\"`."
               }
             },
             {
@@ -625,7 +625,7 @@
         },
         "archetype": {
           "title": "Archetype",
-          "description": "The persona archetype. May be a predefined archetype from the CycloneDX persona-archetype taxonomy expressed as a plain string, or a custom archetype expressed as an object with `name` and optional `description`.",
+          "description": "The persona archetype. May be a predefined archetype from the CycloneDX persona-archetype taxonomy expressed as a plain string, or a custom archetype expressed as an object with `name` and `description`.",
           "oneOf": [
             {
               "title": "Pre-Defined Archetype",
@@ -736,7 +736,7 @@
     "partyRelations": {
       "type": "object",
       "title": "Party Relations",
-      "description": "Links from this party to other parties. Captures hierarchical, organizational, and delegation relationships. Order ranking is on the role itself (`role.order`), not here.",
+      "description": "Links from this party to other parties. Captures hierarchical, organizational, and delegation relationships. Order ranking is on the role itself (`roles[].order`), not here.",
       "additionalProperties": false,
       "properties": {
         "parent": {
@@ -760,7 +760,7 @@
       "properties": {
         "scheme": {
           "title": "Scheme",
-          "description": "The identifier scheme. May be a predefined scheme from the CycloneDX identifier-scheme taxonomy expressed as a plain string, or a custom scheme expressed as an object with `name` and optional `description` and `url`.",
+          "description": "The identifier scheme. May be a predefined scheme from the CycloneDX identifier-scheme taxonomy expressed as a plain string, or a custom scheme expressed as an object with `name` and `description` and `url`.",
           "oneOf": [
             {
               "title": "Pre-Defined Scheme",
@@ -885,12 +885,12 @@
         "country": {
           "type": "string",
           "title": "Country",
-          "description": "The country name or the two-letter ISO 3166-1 country code. When the isoCode property is present, the value of isoCode is authoritative."
+          "description": "The country name or the two-letter ISO 3166-1 country code. When the `isoCode` property is present, the value of `isoCode` is authoritative."
         },
         "region": {
           "type": "string",
           "title": "Region",
-          "description": "The region or state in the country. When the isoCode property carries an ISO 3166-2 subdivision, the value of isoCode is authoritative.",
+          "description": "The region or state in the country. When the `isoCode` property carries an ISO 3166-2 subdivision, the value of `isoCode` is authoritative.",
           "examples": [ "Texas" ]
         },
         "isoCode": {
@@ -921,7 +921,7 @@
         "streetAddress": {
           "type": "string",
           "title": "Street Address",
-          "description": "The street address. Multi-line addresses are expressed as a single string with line breaks (`\\n`) between lines. Implementations and serialization formats are not required to preserve the order of elements in an array, so a multi-line address shall not be modeled as an array.",
+          "description": "The street address. Multi-line addresses are expressed as a single string with line breaks (`\"\\n\"`) between lines. Implementations and serialization formats are not required to preserve the order of elements in an array, so a multi-line address shall not be modeled as an array.",
           "examples": [
             "100 Main Street",
             "Acme Tower\nSuite 1200\n100 Main Street"
@@ -951,7 +951,7 @@
             "altitude": {
               "type": "number",
               "title": "Altitude",
-              "description": "Altitude in meters above the reference ellipsoid identified by the datum property."
+              "description": "Altitude in meters above the reference ellipsoid identified by the `datum` property."
             },
             "datum": {
               "type": "string",
