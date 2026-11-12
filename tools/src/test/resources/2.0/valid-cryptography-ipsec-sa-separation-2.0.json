@@ -1,0 +1,218 @@
+{
+  "$schema": "https://cyclonedx.org/schema/2.0/cyclonedx-2.0.schema.json",
+  "specFormat": "CycloneDX",
+  "specVersion": "2.0",
+  "serialNumber": "urn:uuid:a1b2c3d4-e5f6-4789-a012-3456789abcde",
+  "version": 1,
+  "definitions": {
+    "components": [
+      {
+        "type": "cryptographic-asset",
+        "refId": "alg-aes-256-gcm",
+        "name": "AES-256-GCM",
+        "cryptoProperties": {
+          "assetType": "algorithm",
+          "algorithmProperties": {
+            "primitive": "ae",
+            "algorithmFamily": "AES",
+            "parameterSetIdentifier": "256",
+            "mode": "gcm",
+            "cryptoFunctions": [
+              "encrypt",
+              "decrypt",
+              "tag"
+            ]
+          }
+        }
+      },
+      {
+        "type": "cryptographic-asset",
+        "refId": "alg-aes-128-gcm",
+        "name": "AES-128-GCM",
+        "cryptoProperties": {
+          "assetType": "algorithm",
+          "algorithmProperties": {
+            "primitive": "ae",
+            "algorithmFamily": "AES",
+            "parameterSetIdentifier": "128",
+            "mode": "gcm",
+            "cryptoFunctions": [
+              "encrypt",
+              "decrypt",
+              "tag"
+            ]
+          }
+        }
+      },
+      {
+        "type": "cryptographic-asset",
+        "refId": "alg-hmac-sha2-256",
+        "name": "HMAC-SHA-256",
+        "cryptoProperties": {
+          "assetType": "algorithm",
+          "algorithmProperties": {
+            "primitive": "mac",
+            "algorithmFamily": "HMAC",
+            "cryptoFunctions": [
+              "tag",
+              "verify"
+            ]
+          }
+        }
+      },
+      {
+        "type": "cryptographic-asset",
+        "refId": "alg-ecdh-secp256r1",
+        "name": "ECDH-secp256r1",
+        "cryptoProperties": {
+          "assetType": "algorithm",
+          "algorithmProperties": {
+            "primitive": "key-agree",
+            "algorithmFamily": "ECDH",
+            "ellipticCurve": "secg/secp256r1",
+            "cryptoFunctions": [
+              "keyagree"
+            ]
+          }
+        }
+      },
+      {
+        "type": "cryptographic-asset",
+        "refId": "alg-ecdsa-p256",
+        "name": "ECDSA-secp256r1-SHA-256",
+        "cryptoProperties": {
+          "assetType": "algorithm",
+          "algorithmProperties": {
+            "primitive": "signature",
+            "algorithmFamily": "ECDSA",
+            "ellipticCurve": "secg/secp256r1",
+            "cryptoFunctions": [
+              "sign",
+              "verify"
+            ]
+          }
+        }
+      },
+      {
+        "type": "cryptographic-asset",
+        "refId": "proto-ike-configured",
+        "name": "IKEv2 configured IKE SA transforms",
+        "cryptoProperties": {
+          "assetType": "protocol",
+          "protocolProperties": {
+            "type": "ike",
+            "version": "2",
+            "ikev2TransformTypes": {
+              "encr": [
+                {
+                  "name": "ENCR_AES_GCM_16",
+                  "keyLength": 256,
+                  "algorithm": "alg-aes-256-gcm"
+                }
+              ],
+              "prf": [
+                {
+                  "name": "PRF_HMAC_SHA2_256",
+                  "algorithm": "alg-hmac-sha2-256"
+                }
+              ],
+              "ke": [
+                {
+                  "group": 19,
+                  "algorithm": "alg-ecdh-secp256r1"
+                }
+              ],
+              "auth": [
+                {
+                  "name": "ECDSA",
+                  "algorithm": "alg-ecdsa-p256"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "type": "cryptographic-asset",
+        "refId": "proto-esp-child-a-configured",
+        "name": "ESP Child SA A (site-to-site), configured",
+        "cryptoProperties": {
+          "assetType": "protocol",
+          "protocolProperties": {
+            "type": "esp",
+            "relatedCryptographicAssets": [
+              {
+                "type": "algorithm",
+                "ref": "alg-aes-256-gcm"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "type": "cryptographic-asset",
+        "refId": "proto-esp-child-b-configured",
+        "name": "ESP Child SA B (remote-access), configured",
+        "cryptoProperties": {
+          "assetType": "protocol",
+          "protocolProperties": {
+            "type": "esp",
+            "relatedCryptographicAssets": [
+              {
+                "type": "algorithm",
+                "ref": "alg-aes-128-gcm"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "type": "cryptographic-asset",
+        "refId": "proto-esp-child-a-observed",
+        "name": "ESP Child SA A (site-to-site), observed",
+        "cryptoProperties": {
+          "assetType": "protocol",
+          "protocolProperties": {
+            "type": "esp",
+            "relatedCryptographicAssets": [
+              {
+                "type": "algorithm",
+                "ref": "alg-aes-256-gcm"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "type": "cryptographic-asset",
+        "refId": "proto-ipsec",
+        "name": "IPsec deployment grouping the IKE SA and its Child SAs",
+        "cryptoProperties": {
+          "assetType": "protocol",
+          "protocolProperties": {
+            "type": "ipsec",
+            "version": "3",
+            "relatedCryptographicAssets": [
+              {
+                "type": "protocol",
+                "ref": "proto-ike-configured"
+              },
+              {
+                "type": "protocol",
+                "ref": "proto-esp-child-a-configured"
+              },
+              {
+                "type": "protocol",
+                "ref": "proto-esp-child-b-configured"
+              },
+              {
+                "type": "protocol",
+                "ref": "proto-esp-child-a-observed"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}
