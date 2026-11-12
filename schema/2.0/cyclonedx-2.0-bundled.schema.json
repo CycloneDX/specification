@@ -17,7 +17,7 @@
     },
     "specFormat": {
       "title": "Specification Format",
-      "description": "Specifies the format. This value shall be \"CycloneDX\".",
+      "description": "Specifies the format. This value shall be `\"CycloneDX\"`.",
       "const": "CycloneDX"
     },
     "specVersion": {
@@ -40,7 +40,7 @@
     "version": {
       "type": "integer",
       "title": "BOM Version",
-      "description": "Whenever an existing BOM is modified, either manually or through automated processes, the version of the BOM SHOULD be incremented by 1. When a system is presented with multiple BOMs with identical serial numbers, the system SHOULD use the most recent version of the BOM. The default version is '1'.",
+      "description": "Whenever an existing BOM is modified, either manually or through automated processes, the version of the BOM SHOULD be incremented by `1`. When a system is presented with multiple BOMs with identical serial numbers, the system SHOULD use the most recent version of the BOM. The default version is `1`.",
       "minimum": 1,
       "default": 1
     },
@@ -115,7 +115,7 @@
         "modelProperties": {
           "type": "object",
           "title": "AI/ML Model Properties",
-          "description": "Intrinsic technical characteristics of a machine learning model. This object should be specified for any component of type `machine-learning-model` and shall not be specified for other component types. Contextual and subjective aspects of a model, including ethical and fairness considerations, potential harms, groups at risk, and impact assessments, are expressed as risks. The `affects` property of each such risk references the model component and the parties that represent any groups at risk. Views of this data tailored to a specific audience, such as a model card, are expressed with perspectives.",
+          "description": "Intrinsic technical characteristics of a machine learning model. This object should be specified for any component with `type=\"machine-learning-model\"` and shall not be specified for other component types. Contextual and subjective aspects of a model, including ethical and fairness considerations, potential harms, groups at risk, and impact assessments, are expressed as risks. The `affects` property of each such risk references the model component and the parties that represent any groups at risk. Views of this data tailored to a specific audience, such as a model card, are expressed with perspectives.",
           "additionalProperties": false,
           "properties": {
             "learningTypes": {
@@ -674,7 +674,7 @@
             "bits": {
               "type": "number",
               "title": "Bits",
-              "description": "The nominal bit width per value. Fractional widths are permitted, for example 1.58 for ternary quantization.",
+              "description": "The nominal bit width per value. Fractional widths are permitted, for example `1.58` for ternary quantization.",
               "exclusiveMinimum": 0,
               "examples": [
                 8,
@@ -761,7 +761,7 @@
             "groupSize": {
               "type": "integer",
               "title": "Group Size",
-              "description": "The number of elements sharing one scale and zero point when the granularity is `per-group`.",
+              "description": "The number of elements sharing one scale and zero point when `granularity=\"per-group\"`.",
               "minimum": 1,
               "examples": [
                 32,
@@ -772,7 +772,7 @@
             "axis": {
               "type": "integer",
               "title": "Axis",
-              "description": "The tensor axis along which scales and zero points are assigned when the granularity is `per-channel` or `per-group`.",
+              "description": "The tensor axis along which scales and zero points are assigned when `granularity=\"per-channel\"` or `granularity=\"per-group\"`.",
               "minimum": 0
             }
           }
@@ -834,7 +834,7 @@
             "shape": {
               "type": "array",
               "title": "Shape",
-              "description": "The dimensional shape of the parameter, for example tensor dimensions. A dynamic dimension is expressed as null or -1.",
+              "description": "The dimensional shape of the parameter, for example tensor dimensions. A dynamic dimension is expressed as `null` or `-1`.",
               "items": {
                 "oneOf": [
                   {
@@ -961,7 +961,7 @@
         },
         "datasetChoice": {
           "title": "Dataset Choice",
-          "description": "A reference to a dataset documented as a component of type `data`, either within this BOM by `refId` or in another BOM by BOM-Link.",
+          "description": "A reference to a dataset documented as a component with `type=\"data\"`, either within this BOM by `refId` or in another BOM by BOM-Link.",
           "$ref": "#/$defs/cyclonedx-common-2.0/$defs/elementLink",
           "examples": [
             "training-dataset-1",
@@ -1031,7 +1031,7 @@
             },
             "measure": {
               "title": "Measure",
-              "description": "The measured value of the performance metric with its unit. A dimensionless score uses the unit one, written as 1.",
+              "description": "The measured value of the performance metric with its unit. A dimensionless score uses the unit one, written as `\"1\"`.",
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/measure"
             },
             "slice": {
@@ -1381,7 +1381,7 @@
             },
             "kind": {
               "title": "Kind",
-              "description": "An optional hint at the intent of the graph.",
+              "description": "A hint at the intent of the graph.",
               "enum": [
                 "activity",
                 "state-machine",
@@ -1485,7 +1485,7 @@
               ],
               "meta:enum": {
                 "activity": "An action that is performed, identified by a behavior, a behavior-instance reference, or a nested graph. The activity-flow counterpart of a step.",
-                "state": "A durable condition the subject rests in until a transition fires. The state-machine counterpart of a node. A composite state references its nested region through 'graph'.",
+                "state": "A durable condition the subject rests in until a transition fires. The state-machine counterpart of a node. A composite state references its nested region through `graph`.",
                 "event": "An intermediate event that occurs during the graph.",
                 "gateway": "A branch or merge point whose outgoing transitions carry the guards.",
                 "initial": "The starting point of the graph or of a composite node.",
@@ -1506,22 +1506,22 @@
               "type": "integer",
               "title": "Ordinal",
               "minimum": 1,
-              "description": "Position within a sequential graph. Required when the graph ordering is 'sequential'. Ignored when transitions define the order."
+              "description": "Position within a sequential graph. Required when the containing graph has `ordering=\"sequential\"`. Ignored when transitions define the order."
             },
             "behavior": {
               "$ref": "../behavior-taxonomy.schema.json",
               "title": "Behavior",
-              "description": "For an activity node, the behavior performed, drawn from the taxonomy. Mutually exclusive with 'ref' and 'graph'."
+              "description": "For an activity node, the behavior performed, drawn from the taxonomy. Mutually exclusive with `ref` and `graph`."
             },
             "ref": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Behavior Reference",
-              "description": "For an activity node, a reference to a behavior instance. Mutually exclusive with 'behavior' and 'graph'."
+              "description": "For an activity node, a reference to a behavior instance. Mutually exclusive with `behavior` and `graph`."
             },
             "graph": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Graph Reference",
-              "description": "A reference to a nested behavior graph. For an activity node it is the sub-process performed and is mutually exclusive with 'behavior' and 'ref'; for a composite node it is the nested region."
+              "description": "A reference to a nested behavior graph. For an activity node it is the sub-process performed and is mutually exclusive with `behavior` and `ref`; for a composite node it is the nested region."
             },
             "actors": {
               "type": "array",
@@ -1544,7 +1544,7 @@
             "eventType": {
               "$ref": "#/$defs/cyclonedx-behavior-2.0/$defs/trigger",
               "title": "Event Type",
-              "description": "For an event node, the nature of the event, reusing the trigger vocabulary, such as signal, scheduled, or event-driven."
+              "description": "For an event node, the nature of the event, reusing the trigger vocabulary, such as `\"signal\"`, `\"scheduled\"`, or `\"event-driven\"`."
             },
             "gatewayKind": {
               "title": "Gateway Kind",
@@ -1660,7 +1660,7 @@
             "guard": {
               "type": "string",
               "title": "Guard",
-              "description": "A guard condition; the transition fires only when it evaluates to true."
+              "description": "A guard condition; the transition fires only when it evaluates to `true`."
             },
             "default": {
               "type": "boolean",
@@ -1959,11 +1959,11 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-party-2.0/$defs/partyChoice"
               },
-              "description": "The parties that created the blueprint. Each entry is either an inline party object or a reference to a previously declared party. The party's `roles` should include `author`."
+              "description": "The parties that created the blueprint. Each entry is either an inline party object or a reference to a previously declared party. The party's `roles` should include `\"author\"`."
             },
             "reviewer": {
               "$ref": "#/$defs/cyclonedx-party-2.0/$defs/partyChoice",
-              "description": "The party that reviewed the blueprint. The party's `roles` should include `reviewer`."
+              "description": "The party that reviewed the blueprint. The party's `roles` should include `\"reviewer\"`."
             },
             "reviewDate": {
               "type": "string",
@@ -1973,7 +1973,7 @@
             },
             "approver": {
               "$ref": "#/$defs/cyclonedx-party-2.0/$defs/partyChoice",
-              "description": "The party that approved the blueprint. The party's `roles` should include `signatory` or a custom role identifying the approving authority."
+              "description": "The party that approved the blueprint. The party's `roles` should include `\"signatory\"` or a custom role identifying the approving authority."
             },
             "approvalDate": {
               "type": "string",
@@ -2018,7 +2018,13 @@
               "type": "string",
               "title": "Review Frequency",
               "pattern": "^P(?!$)(\\d+Y)?(\\d+M)?(\\d+W)?(\\d+D)?$",
-              "description": "ISO 8601 duration for review frequency (e.g., P3M for quarterly)."
+              "description": "ISO 8601 duration for review frequency (e.g., `\"P3M\"` for quarterly).",
+              "examples": [
+                "P1Y",
+                "P3M",
+                "P5W",
+                "P23D"
+              ]
             }
           }
         },
@@ -2137,7 +2143,7 @@
                     "tool"
                   ],
                   "meta:enum": {
-                    "actor": "An actor that is an asset in its own right, referencing a party via partyRef. A party such as a system or organization is commonly an asset, and a person may be an asset in the intelligence sense of a human source.",
+                    "actor": "An actor that is an asset in its own right, referencing a party via `partyRef`. A party such as a system or organization is commonly an asset, and a person may be an asset in the intelligence sense of a human source.",
                     "agent": "Autonomous AI or software agent.",
                     "api": "API endpoint or interface.",
                     "broker": "Message broker or event bus infrastructure.",
@@ -2537,7 +2543,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-party-2.0/$defs/partyChoice"
               },
-              "description": "Parties that own the dataset. Each entry is either an inline party object or a reference to a previously declared party. The party's `roles` should include `owner`."
+              "description": "Parties that own the dataset. Each entry is either an inline party object or a reference to a previously declared party. The party's `roles` should include `\"owner\"`."
             },
             "authorization": {
               "type": "array",
@@ -2659,7 +2665,12 @@
             },
             "dataFormat": {
               "type": "string",
-              "description": "Data format (e.g., JSON, XML, Protocol Buffers)."
+              "description": "Data format.",
+              "examples": [
+                "JSON",
+                "XML",
+                "Protocol Buffers"
+              ]
             },
             "authentication": {
               "type": "array",
@@ -2794,7 +2805,7 @@
         "boundary": {
           "type": "object",
           "title": "Boundary",
-          "description": "An edge that separates or connects two or more zones, marking a point where security controls, policies, or trust levels change. The controls expected when data or actors cross it are captured in crossingRequirements, and the threat model's trust boundary extends a boundary with trust semantics.",
+          "description": "An edge that separates or connects two or more zones, marking a point where security controls, policies, or trust levels change. The controls expected when data or actors cross it are captured in `crossingRequirements`, and the threat model's trust boundary extends a boundary with trust semantics.",
           "required": [
             "refId",
             "zones"
@@ -3489,7 +3500,7 @@
             },
             "owner": {
               "$ref": "#/$defs/cyclonedx-party-2.0/$defs/partyChoice",
-              "description": "The party responsible for tracking, validating, and maintaining this assumption over the lifecycle of the model. May be an inline party object or a reference to a previously declared party. The party's `roles` should include `owner`."
+              "description": "The party responsible for tracking, validating, and maintaining this assumption over the lifecycle of the model. May be an inline party object or a reference to a previously declared party. The party's `roles` should include `\"owner\"`."
             },
             "validationMethod": {
               "type": "string",
@@ -3789,7 +3800,7 @@
         "ownership": {
           "type": "array",
           "title": "Ownership",
-          "description": "Parties responsible for the asset. Each entry is either an inline party object or a reference to a previously declared party. The party's `roles` carry the relationship (`owner`, `steward`, `custodian`, `end-user`, or a custom role). Multiple parties may share the same role; preference among them is expressed via `role.order`.",
+          "description": "Parties responsible for the asset. Each entry is either an inline party object or a reference to a previously declared party. The party's `roles` carry the relationship (`\"owner\"`, `\"steward\"`, `\"custodian\"`, `\"end-user\"`, or a custom role). Multiple parties may share the same role; preference among them is expressed via `roles[].order`.",
           "uniqueItems": true,
           "items": {
             "$ref": "#/$defs/cyclonedx-party-2.0/$defs/partyChoice"
@@ -4034,7 +4045,7 @@
             "refId": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
               "title": "Reference Identifier",
-              "description": "An optional identifier that can be used to reference the certification from elsewhere. Every `refId` shall be unique within the containing instance."
+              "description": "An identifier that can be used to reference the certification from elsewhere. Every `refId` shall be unique within the containing instance."
             },
             "standard": {
               "type": "string",
@@ -4085,7 +4096,7 @@
             "jurisdiction": {
               "type": "string",
               "title": "Jurisdiction",
-              "description": "ISO 3166-1 alpha-2 country code, ISO 3166-2 subdivision, or supranational identifier such as `EU`, where the certification applies.",
+              "description": "ISO 3166-1 alpha-2 country code, ISO 3166-2 subdivision, or supranational identifier such as `\"EU\"`, where the certification applies.",
               "examples": [
                 "US",
                 "EU",
@@ -4185,7 +4196,7 @@
               },
               "minItems": 1,
               "title": "Field References",
-              "description": "One or more [JSON Pointers](https://datatracker.ietf.org/doc/html/rfc6901) identifying the JSON properties to which the attribution applies.\nExactly one of the \"pointers\" or \"expressions\" elements shall be present."
+              "description": "One or more [JSON Pointers](https://datatracker.ietf.org/doc/html/rfc6901) identifying the JSON properties to which the attribution applies.\nExactly one of the `pointers` or `expressions` elements shall be present."
             },
             "expressions": {
               "type": "array",
@@ -4196,7 +4207,7 @@
               },
               "minItems": 1,
               "title": "Path Expressions",
-              "description": "One or more path expressions used to locate values within a CycloneDX artifact or payload.\nExactly one of the \"pointers\" or \"expressions\" elements shall be present."
+              "description": "One or more path expressions used to locate values within a CycloneDX artifact or payload.\nExactly one of the `pointers` or `expressions` elements shall be present."
             },
             "timestamp": {
               "type": "string",
@@ -4207,12 +4218,12 @@
             "attributedTo": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Attributed To",
-              "description": "The `refId` of an object, such as a component, service, tool, organisational entity, or person that supplied the cited information.\nAt least one of the \"attributedTo\" or \"process\" elements shall be present."
+              "description": "The `refId` of an object, such as a component, service, tool, organisational entity, or person that supplied the cited information.\nAt least one of the `attributedTo` or `process` elements shall be present."
             },
             "process": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Process Reference",
-              "description": "The `refId` to a process (such as a formula, workflow, task, or step) defined in the `formulation` section that executed or generated the attributed data.\nAt least one of the \"attributedTo\" or \"process\" elements shall be present."
+              "description": "The `refId` to a process (such as a formula, workflow, task, or step) defined in the `formulation` section that executed or generated the attributed data.\nAt least one of the `attributedTo` or `process` elements shall be present."
             },
             "note": {
               "type": "string",
@@ -4274,7 +4285,7 @@
       "title": "CycloneDX Common Module",
       "$defs": {
         "refIdType": {
-          "description": "Identifier for referable and therefore interlinkable elements.\nValue shall not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links.",
+          "description": "Identifier for referable and therefore interlinkable elements.\nValue shall not start with the BOM-Link intro `\"urn:cdx:\"` to avoid conflicts with BOM-Links.",
           "type": "string",
           "minLength": 1,
           "pattern": "^(?!urn:cdx:)"
@@ -4286,7 +4297,7 @@
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             }
           ],
-          "$comment": "value-range is same as 'refIdType'"
+          "$comment": "value-range is same as `refIdType`"
         },
         "bomLinkDocumentType": {
           "title": "BOM-Link Document",
@@ -4406,7 +4417,7 @@
             },
             "encoding": {
               "title": "Encoding",
-              "description": "Specifies the optional encoding the text is represented in.",
+              "description": "Specifies the encoding the text is represented in.",
               "enum": [
                 "base64"
               ],
@@ -4529,9 +4540,9 @@
                 "chat": "Real-time chat platform",
                 "documentation": "Documentation, guides, or how-to instructions",
                 "support": "Community or commercial support",
-                "source-distribution": "The location where the source code distributable can be obtained. This is often an archive format such as zip or tgz. The source-distribution type complements use of the version control (vcs) type.",
+                "source-distribution": "The location where the source code distributable can be obtained. This is often an archive format such as zip or tgz. The `\"source-distribution\"` type complements use of the version control (`\"vcs\"`) type.",
                 "distribution": "Direct or repository download location",
-                "distribution-intake": "The location where a component was published to. This is often the same as \"distribution\" but may also include specialized publishing processes that act as an intermediary.",
+                "distribution-intake": "The location where a component was published to. This is often the same as `\"distribution\"` but may also include specialized publishing processes that act as an intermediary.",
                 "license": "The reference to the license file. If a license URL has been defined in the license node, it should also be defined as an external reference for completeness.",
                 "build-meta": "Build-system specific meta file (i.e. pom.xml, package.json, .nuspec, etc)",
                 "build-system": "Reference to an automated build system",
@@ -4561,7 +4572,7 @@
                 "certification-report": "Industry, regulatory, or other certification from an accredited (if applicable) certification body.",
                 "codified-infrastructure": "Code or configuration that defines and provisions virtualized infrastructure, commonly referred to as Infrastructure as Code (IaC).",
                 "quality-metrics": "Report or system in which quality metrics can be obtained.",
-                "poam": "Plans of Action and Milestones (POA&M) complement an \"attestation\" external reference. POA&M is defined by NIST as a \"document that identifies tasks needing to be accomplished. It details resources required to accomplish the elements of the plan, any milestones in meeting the tasks and scheduled completion dates for the milestones\".",
+                "poam": "Plans of Action and Milestones (POA&M) complement an `\"attestation\"` external reference. POA&M is defined by NIST as a \"document that identifies tasks needing to be accomplished. It details resources required to accomplish the elements of the plan, any milestones in meeting the tasks and scheduled completion dates for the milestones\".",
                 "perspective": "A CycloneDX perspective defines a domain-specific view, enabling different audiences to interpret and navigate the data through their own conceptual lens.",
                 "electronic-signature": "An e-signature is commonly a scanned representation of a written signature or a stylized script of the person's name.",
                 "digital-signature": "A signature that leverages cryptography, typically public/private key pairs, which provides strong authenticity verification.",
@@ -4570,7 +4581,7 @@
                 "patent-family": "References information about a patent family which may be defined in human-readable documents or in machine-readable formats such as CycloneDX or ST.96. A patent family is a group of related patent applications or granted patents that cover the same or similar invention. For detailed patent family information or to reference the information provided directly by patent offices, it is recommended to leverage standards from the World Intellectual Property Organization (WIPO) such as [ST.96](https://www.wipo.int/standards/en/st96).",
                 "patent-assertion": "References assertions made regarding patents associated with a component or service. Assertions distinguish between ownership, licensing, and other relevant interactions with patents.",
                 "citation": "A reference to external citations applicable to the object identified in a CycloneDX artifact or payload or the CycloneDX artifact or payload itself. When used with a BOM-Link, this allows offloading citations into a separate CycloneDX artifacts or payloads.",
-                "swid-tag": "A Software Identification (SWID) tag document conforming to ISO/IEC 19770-2. The reference resolves to the XML SoftwareIdentity document itself, including all of its metadata (entities, evidence, payload, links, and meta elements). This is distinct from the `swid` identifier scheme, which carries only the tagId of a SWID tag.",
+                "swid-tag": "A Software Identification (SWID) tag document conforming to ISO/IEC 19770-2. The reference resolves to the XML SoftwareIdentity document itself, including all of its metadata (entities, evidence, payload, links, and meta elements). This is distinct from the `\"swid\"` identifier scheme, which carries only the `tagId` of a SWID tag.",
                 "gs1-digital-link": "A [GS1 Digital Link URI](https://ref.gs1.org/standards/digital-link/uri-syntax/) that connects the component's GS1 identification key, such as a GTIN, to online sources of information, including product data, safety documentation, digital product passports, and recall status. The URI may include key qualifiers, such as a batch or serial number, enabling identification at the class, batch, or individual item level. Component identity shall be derived from the component's identifiers, not from keys embedded in this URI.",
                 "other": "Use this if no other types accurately describe the purpose of the external reference."
               }
@@ -4596,7 +4607,7 @@
           "properties": {
             "refId": {
               "title": "Reference Identifier",
-              "description": "An optional identifier which can be used to reference the address elsewhere in the document. Every `refId` shall be unique within the document.",
+              "description": "An identifier which can be used to reference the address elsewhere in the document. Every `refId` shall be unique within the document.",
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType"
             },
             "country": {
@@ -4654,7 +4665,7 @@
             "refId": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
               "title": "Reference Identifier",
-              "description": "An optional identifier which can be used to reference the object elsewhere in the document. Every `refId` shall be unique within the document."
+              "description": "An identifier which can be used to reference the object elsewhere in the document. Every `refId` shall be unique within the document."
             },
             "name": {
               "type": "string",
@@ -4708,7 +4719,7 @@
             "refId": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
               "title": "Reference Identifier",
-              "description": "An optional identifier which can be used to reference the object elsewhere in the document. Every `refId` shall be unique within the document."
+              "description": "An identifier which can be used to reference the object elsewhere in the document. Every `refId` shall be unique within the document."
             },
             "name": {
               "type": "string",
@@ -4840,7 +4851,7 @@
             "distribution": {
               "type": "array",
               "title": "Origin Distribution",
-              "description": "The distribution of the origin across regions. The percentages of all entries shall total 100, within rounding of the stated precision.",
+              "description": "The distribution of the origin across regions. The percentages of all entries shall total `100`, within rounding of the stated precision.",
               "minItems": 1,
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/originRegion"
@@ -4861,7 +4872,7 @@
             "isoCode": {
               "type": "string",
               "title": "ISO Code",
-              "description": "The country or subdivision of origin, expressed as an ISO 3166-1 alpha-2 country code (for example, 'CA' for Canada) or an ISO 3166-2 subdivision code (for example, 'US-CA' for California, United States).",
+              "description": "The country or subdivision of origin, expressed as an ISO 3166-1 alpha-2 country code (for example, `\"CA\"` for Canada) or an ISO 3166-2 subdivision code (for example, `\"US-CA\"` for California, United States).",
               "pattern": "^[A-Z]{2}(-[A-Z0-9]{1,3})?$",
               "examples": [
                 "CA",
@@ -4877,7 +4888,7 @@
             "percentage": {
               "type": "number",
               "title": "Percentage",
-              "description": "The percentage of the whole attributable to this region. The percentages of all entries in a distribution shall total 100, within rounding of the stated precision.",
+              "description": "The percentage of the whole attributable to this region. The percentages of all entries in a distribution shall total `100`, within rounding of the stated precision.",
               "minimum": 0,
               "maximum": 100
             },
@@ -4920,12 +4931,11 @@
         "extensibleProperties": {
           "type": "object",
           "title": "Extensible Properties",
-          "$comment": "This is a mixin. It intentionally does NOT restrict additional/unevaluated properties itself; schemas composing it via `allOf` are expected to close themselves with `unevaluatedProperties: false` so that both their own defined properties and these patternProperties remain usable.",
+          "$comment": "This is a mixin. It intentionally does NOT restrict additional/unevaluated properties itself; schemas composing it via `allOf` are expected to close themselves with `\"unevaluatedProperties\": false` so that both their own defined properties and these patternProperties remain usable.",
           "patternProperties": {
             "^ext:[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}:.+$": {
-              "description": "CycloneDX supports a structured and namespace-aware mechanism for extensibility through the use of extensible properties. This mechanism enables organizations, ecosystems, and tool vendors to safely introduce custom properties without conflicting with the core schema or other extensions.\n\nExtensible properties are defined as a JSON object whose keys shall conform to a strict pattern that resembles a reverse domain name structure, prefixed with ext:. This pattern provides a namespacing convention that aligns with well-established practices in other structured formats (e.g., XML namespaces).\n\nValues that are objects shall declare the schema they conform to via `$schema`. This requirement applies recursively to objects contained in arrays, at any nesting depth.",
+              "description": "CycloneDX supports a structured and namespace-aware mechanism for extensibility through the use of extensible properties. This mechanism enables organizations, ecosystems, and tool vendors to safely introduce custom properties without conflicting with the core schema or other extensions.\n\nExtensible properties are defined as a JSON object whose keys shall conform to a strict pattern that resembles a reverse domain name structure, prefixed with `\"ext:\"`. This pattern provides a namespacing convention that aligns with well-established practices in other structured formats (e.g., XML namespaces).\n\nValues that are objects shall declare the schema they conform to via `$schema`. This requirement applies recursively to objects contained in arrays, at any nesting depth.",
               "examples": [
-                "ext:<domain>:<name>",
                 "ext:example.org:myExtension"
               ],
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/extensibleProperties/$defs/propertyValue"
@@ -4935,7 +4945,7 @@
             "propertyObject": {
               "type": "object",
               "title": "Extensible Property Object",
-              "$comment": "Internal helper for extensibleProperties. Not part of the public schema API — do not reference externally; may change without notice.\n\nThis is a mixin.",
+              "$comment": "Internal helper for `extensibleProperties`. Not part of the public schema API — do not reference externally; may change without notice.\n\nThis is a mixin.",
               "required": [
                 "$schema"
               ],
@@ -4948,7 +4958,7 @@
             },
             "propertyValue": {
               "title": "Extensible Property Value",
-              "$comment": "Internal helper for extensibleProperties. Not part of the public schema API — do not reference externally; may change without notice.\nRecursive: objects must declare a `$schema`, arrays may nest arbitrarily deep with the same rule applied to every item, all other values are plain scalars.",
+              "$comment": "Internal helper for `extensibleProperties`. Not part of the public schema API — do not reference externally; may change without notice.\nRecursive: objects must declare a `$schema`, arrays may nest arbitrarily deep with the same rule applied to every item, all other values are plain scalars.",
               "if": {
                 "type": "object"
               },
@@ -5208,7 +5218,7 @@
           "properties": {
             "text": {
               "title": "Diff text",
-              "description": "Specifies the optional text of the diff.",
+              "description": "Specifies the text of the diff.",
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/attachment"
             },
             "url": {
@@ -5324,7 +5334,13 @@
           "type": "string",
           "pattern": "^([a-z]{2})(-[A-Z]{2})?$",
           "title": "Locale",
-          "description": "Defines a syntax for representing two character language code (ISO-639) followed by an optional two character country code. The language code shall be lower case. If the country code is specified, the country code shall be upper case. The language code and country code shall be separated by a minus sign. Examples: en, en-US, fr, fr-CA."
+          "description": "Defines a syntax for representing two character language code (ISO-639) followed by an optional two character country code. The language code shall be lower case. If the country code is specified, the country code shall be upper case. The language code and country code shall be separated by a minus sign.",
+          "examples": [
+            "en",
+            "en-US",
+            "fr",
+            "fr-CA"
+          ]
         },
         "signatures": {
           "$ref": "#/$defs/cyclonedx-jss_X590_2023_10-2.0/$defs/signatures",
@@ -5334,7 +5350,7 @@
         "measure": {
           "type": "object",
           "title": "Measure",
-          "description": "A quantity expressed as a numeric value and a unit. Contexts that use this definition may constrain the permitted units, as the energy and carbon dioxide equivalent measures do. Dimensionless quantities and counts use the unit one, written as 1.",
+          "description": "A quantity expressed as a numeric value and a unit. Contexts that use this definition may constrain the permitted units, as the energy and carbon dioxide equivalent measures do. Dimensionless quantities and counts use the unit one, written as `\"1\"`.",
           "additionalProperties": false,
           "required": [
             "value",
@@ -5368,7 +5384,7 @@
         },
         "unitSymbol": {
           "title": "Unit Symbol",
-          "description": "A predefined unit symbol. The symbols cover time, data size, throughput, compute, energy, carbon dioxide equivalent, and ratio quantities. The unit one, written as 1, is used for counts and dimensionless quantities. Where a symbol differs from its UCUM code, the code is noted in its definition.",
+          "description": "A predefined unit symbol. The symbols cover time, data size, throughput, compute, energy, carbon dioxide equivalent, and ratio quantities. The unit one, written as `\"1\"`, is used for counts and dimensionless quantities. Where a symbol differs from its UCUM code, the code is noted in its definition.",
           "type": "string",
           "enum": [
             "ns",
@@ -5469,7 +5485,7 @@
                   ],
                   "meta:enum": {
                     "ucum": "The [Unified Code for Units of Measure](https://ucum.org/), whose codes are case-sensitive strings such as kg, By, or {token}/s.",
-                    "unece-rec20": "[UN/ECE Recommendation 20](https://unece.org/trade/uncefact/cl-recommendations), whose codes are two or three character strings such as KWH or C26.",
+                    "unece-rec20": "[UN/ECE Recommendation 20](https://unece.org/trade/uncefact/cl-recommendations), whose codes are two or three character strings such as `\"KWH\"` or `\"C26\"`.",
                     "qudt": "The [QUDT](https://qudt.org/) unit vocabulary, whose codes are the unit identifiers in IRI form."
                   }
                 },
@@ -5818,14 +5834,14 @@
                 "container": "A packaging and/or runtime format, not specific to any particular technology, which isolates software inside the container from software outside of a container through virtualization technology. Refer to <https://en.wikipedia.org/wiki/OS-level_virtualization>.",
                 "platform": "A runtime environment that interprets or executes software. This may include runtimes such as those that execute bytecode, just-in-time compilers, interpreters, or low-code/no-code application platforms.",
                 "operating-system": "A software operating system without regard to deployment model (i.e. installed on physical hardware, virtual machine, image, etc) Refer to <https://en.wikipedia.org/wiki/Operating_system>.",
-                "device": "A hardware device such as a processor or chip-set. A hardware device containing firmware SHOULD include a component for the physical hardware itself and another component of type 'firmware' or 'operating-system' (whichever is relevant), describing information about the software running on the device. See also the list of [known device properties](https://github.com/CycloneDX/cyclonedx-property-taxonomy/blob/main/cdx/device.md).",
+                "device": "A hardware device such as a processor or chip-set. A hardware device containing firmware SHOULD include a component for the physical hardware itself and another component with `type=\"firmware\"` or `type=\"operating-system\"` (whichever is relevant), describing information about the software running on the device. See also the list of [known device properties](https://github.com/CycloneDX/cyclonedx-property-taxonomy/blob/main/cdx/device.md).",
                 "device-driver": "A special type of software that operates or controls a particular type of device. Refer to <https://en.wikipedia.org/wiki/Device_driver>.",
                 "firmware": "A special type of software that provides low-level control over a device's hardware. Refer to <https://en.wikipedia.org/wiki/Firmware>.",
                 "file": "A computer file. Refer to <https://en.wikipedia.org/wiki/Computer_file> for information about files.",
                 "machine-learning-model": "A model based on training data that can make predictions or decisions without being explicitly programmed to do so.",
                 "data": "A collection of discrete values that convey information.",
                 "cryptographic-asset": "A cryptographic asset including algorithms, protocols, certificates, keys, tokens, and secrets.",
-                "material": "A physical substance in raw or processed form that is used to make, maintain, or repair an item, such as a metal, alloy, polymer, chemical, or other matter. Materials are commonly tracked for sourcing, provenance, and regulatory compliance. A finished physical item should be classified as 'device' instead.",
+                "material": "A physical substance in raw or processed form that is used to make, maintain, or repair an item, such as a metal, alloy, polymer, chemical, or other matter. Materials are commonly tracked for sourcing, provenance, and regulatory compliance. A finished physical item should be classified with `type=\"device\"` instead.",
                 "service": "A service, including microservices, function-as-a-service, and other types of network or intra-process services. Service-specific attributes, endpoints and the data profiles characterizing the data the service handles, apply exclusively to this component type."
               },
               "title": "Component Type",
@@ -5857,33 +5873,38 @@
             "group": {
               "type": "string",
               "title": "Component Group",
-              "description": "The grouping name or identifier. This will often be a shortened, single name of the company or project that produced the component, or the source package or domain name. Whitespace and special characters should be avoided. Examples include: apache, org.apache.commons, and apache.org.",
+              "description": "The grouping name or identifier. This will often be a shortened, single name of the company or project that produced the component, or the source package or domain name. Whitespace and special characters should be avoided.",
               "examples": [
-                "com.acme"
+                "com.acme",
+                "apache",
+                "org.apache.commons",
+                "apache.org"
               ]
             },
             "name": {
               "type": "string",
               "title": "Component Name",
-              "description": "The name of the component. This will often be a shortened, single name of the component. Examples: commons-lang3 and jquery.",
+              "description": "The name of the component. This will often be a shortened, single name of the component.",
               "examples": [
-                "tomcat-catalina"
+                "tomcat-catalina",
+                "commons-lang3",
+                "jquery"
               ]
             },
             "version": {
               "$ref": "#/$defs/cyclonedx-component-2.0/$defs/version",
               "title": "Component Version",
-              "description": "The component version. The version should ideally comply with semantic versioning but is not enforced.\nShall be used exclusively, either 'version' or 'versionRange', but not both."
+              "description": "The component version. The version should ideally comply with semantic versioning but is not enforced.\nShall be used exclusively, either `version` or `versionRange`, but not both."
             },
             "versionRange": {
               "$ref": "#/$defs/cyclonedx-component-2.0/$defs/versionRange",
               "title": "Component Version Range",
-              "description": "For an external component, this specifies the accepted version range.\nThe value shall adhere to the Package URL Version Range syntax (vers), as defined at <https://github.com/package-url/vers-spec>.\nMay only be used if `.isExternal` is set to `true`.\nShall be used exclusively, either 'version' or 'versionRange', but not both."
+              "description": "For an external component, this specifies the accepted version range.\nThe value shall adhere to the Package URL Version Range syntax (vers), as defined at <https://github.com/package-url/vers-spec>.\nMay only be used if `isExternal=true`.\nShall be used exclusively, either `version` or `versionRange`, but not both."
             },
             "isExternal": {
               "type": "boolean",
               "title": "Component Is External",
-              "description": "Determine whether this component is external.\nAn external component is one that is not part of an assembly, but is expected to be provided by the environment, regardless of the component's `.scope`. This setting can be useful for distinguishing which components are bundled with the product and which can be relied upon to be present in the deployment environment.\nThis may be set to `true` for runtime components only. For the subject of an inventory statement, it shall be `false`.",
+              "description": "Determine whether this component is external.\nAn external component is one that is not part of an assembly, but is expected to be provided by the environment, regardless of the component's `scope`. This setting can be useful for distinguishing which components are bundled with the product and which can be relied upon to be present in the deployment environment.\nThis may be set to `true` for runtime components only. For the subject of an inventory statement, it shall be `false`.",
               "default": false
             },
             "description": {
@@ -5899,11 +5920,11 @@
               ],
               "meta:enum": {
                 "required": "The component is required for runtime",
-                "optional": "The component is optional at runtime. Optional components are components that are not capable of being called due to them not being installed or otherwise accessible by any means. Components that are installed but due to configuration or other restrictions are prohibited from being called must be scoped as 'required'.",
+                "optional": "The component is optional at runtime. Optional components are components that are not capable of being called due to them not being installed or otherwise accessible by any means. Components that are installed but due to configuration or other restrictions are prohibited from being called must be scoped as `\"required\"`.",
                 "excluded": "Components that are excluded provide the ability to document component usage for test and other non-runtime purposes. Excluded components are not reachable within a call graph at runtime."
               },
               "title": "Component Scope",
-              "description": "Specifies the scope of the component. If scope is not specified, 'required' scope SHOULD be assumed by the consumer of the BOM.",
+              "description": "Specifies the scope of the component. If scope is not specified, `\"required\"` scope SHOULD be assumed by the consumer of the BOM.",
               "default": "required"
             },
             "hashes": {
@@ -6023,7 +6044,7 @@
               },
               "uniqueItems": true,
               "title": "Components",
-              "description": "A list of entries included in the parent component, including software, hardware, and services. Entries may be concrete components, references to components declared elsewhere, or component-choice wrappers expressing conditional or alternate relationships. This is not a dependency tree. It provides a way to specify a hierarchical representation of component assemblies, similar to system &#8594; subsystem &#8594; parts assembly in physical supply chains."
+              "description": "A list of entries included in the parent component, including software, hardware, and services. Entries may be concrete components, references to components declared elsewhere, or component-choice wrappers expressing conditional or alternate relationships. This is not a dependency tree. It provides a way to specify a hierarchical representation of component assemblies, similar to system → subsystem → parts assembly in physical supply chains."
             },
             "evidence": {
               "$ref": "#/$defs/cyclonedx-component-2.0/$defs/componentEvidence",
@@ -6045,7 +6066,7 @@
             "modelProperties": {
               "$ref": "#/$defs/cyclonedx-ai-ml-2.0/$defs/modelProperties",
               "title": "AI/ML Model Properties",
-              "description": "Intrinsic technical characteristics of a machine learning model. This object SHOULD be specified for any component of type `machine-learning-model` and shall not be specified for other component types."
+              "description": "Intrinsic technical characteristics of a machine learning model. This object SHOULD be specified for any component with `type=\"machine-learning-model\"` and shall not be specified for other component types."
             },
             "data": {
               "type": "array",
@@ -6053,7 +6074,7 @@
                 "$ref": "#/$defs/cyclonedx-component-2.0/$defs/componentData"
               },
               "title": "Data",
-              "description": "This object SHOULD be specified for any component of type `data` and shall not be specified for other component types."
+              "description": "This object SHOULD be specified for any component with `type=\"data\"` and shall not be specified for other component types."
             },
             "cryptoProperties": {
               "$ref": "#/$defs/cyclonedx-cryptography-2.0/$defs/cryptoProperties",
@@ -6065,32 +6086,32 @@
             "classification": {
               "$ref": "#/$defs/cyclonedx-physical-2.0/$defs/classification",
               "title": "Classification",
-              "description": "Hierarchical classification of the item, with optional taxonomy codes from external standards. This object may only be specified for components of type `device` or `material` and shall not be specified for other component types."
+              "description": "Hierarchical classification of the item, with optional taxonomy codes from external standards. This object may only be specified for components with `type=\"device\"` or `type=\"material\"`, and shall not be specified for other component types."
             },
             "boardLocation": {
               "$ref": "#/$defs/cyclonedx-physical-2.0/$defs/boardLocation",
               "title": "Board Location",
-              "description": "Placement of the item on a printed circuit board, panel, or assembly. This object may only be specified for components of type `device` and shall not be specified for other component types."
+              "description": "Placement of the item on a printed circuit board, panel, or assembly. This object may only be specified for components with `type=\"device\"` and shall not be specified for other component types."
             },
             "deviceType": {
               "$ref": "#/$defs/cyclonedx-physical-2.0/$defs/deviceType",
               "title": "Device Type",
-              "description": "Package or mounting style of the physical item, expressed as a predefined device type or a custom device type. This object may only be specified for components of type `device` and shall not be specified for other component types."
+              "description": "Package or mounting style of the physical item, expressed as a predefined device type or a custom device type. This object may only be specified for components with `type=\"device\"` and shall not be specified for other component types."
             },
             "leadTime": {
               "$ref": "#/$defs/cyclonedx-physical-2.0/$defs/leadTime",
               "title": "Lead Time",
-              "description": "Supplier lead time for procuring the item. This object may only be specified for components of type `device` or `material` and shall not be specified for other component types."
+              "description": "Supplier lead time for procuring the item. This object may only be specified for components with `type=\"device\"` or `type=\"material\"`, and shall not be specified for other component types."
             },
             "materialForm": {
               "$ref": "#/$defs/cyclonedx-physical-2.0/$defs/materialForm",
               "title": "Material Form",
-              "description": "Physical form in which the material is supplied, expressed as a predefined material form or a custom material form. This object may only be specified for components of type `material` and shall not be specified for other component types."
+              "description": "Physical form in which the material is supplied, expressed as a predefined material form or a custom material form. This object may only be specified for components with `type=\"material\"`, and shall not be specified for other component types."
             },
             "quantity": {
               "$ref": "#/$defs/cyclonedx-physical-2.0/$defs/quantity",
               "title": "Quantity",
-              "description": "The quantity of the item in the context in which it is declared, such as the number of identical parts within the enclosing assembly or the amount of material in the described lot. This object may only be specified for components of type `device` or `material` and shall not be specified for other component types."
+              "description": "The quantity of the item in the context in which it is declared, such as the number of identical parts within the enclosing assembly or the amount of material in the described lot. This object may only be specified for components with `type=\"device\"` or `type=\"material\"`, and shall not be specified for other component types."
             },
             "certifications": {
               "type": "array",
@@ -6115,7 +6136,7 @@
                 "format": "iri-reference"
               },
               "title": "Endpoints",
-              "description": "The endpoint URIs of the service. Multiple endpoints are allowed. May only be used for components of type `service`.",
+              "description": "The endpoint URIs of the service. Multiple endpoints are allowed. May only be used for components with `type=\"service\"`.",
               "examples": [
                 "https://example.com/api/v1/ticker"
               ]
@@ -6127,7 +6148,7 @@
                 "$ref": "#/$defs/cyclonedx-data-2.0/$defs/dataProfileChoice"
               },
               "title": "Data Profiles",
-              "description": "The data handled by the service, characterized by data profiles. Each entry is either an inline profile object or a reference using bom-link or `refId` to a previously declared profile, typically declared in the definitions. May only be used for components of type `service`. Data movement is intentionally not expressed here: flow direction, sources, destinations, authentication, and boundary crossings are modelled via blueprint flows, assets, and boundaries, which reference this component by `refId`."
+              "description": "The data handled by the service, characterized by data profiles. Each entry is either an inline profile object or a reference using bom-link or `refId` to a previously declared profile, typically declared in the definitions. May only be used for components with `type=\"service\"`. Data movement is intentionally not expressed here: flow direction, sources, destinations, authentication, and boundary crossings are modelled via blueprint flows, assets, and boundaries, which reference this component by `refId`."
             },
             "tags": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/tags",
@@ -6158,7 +6179,7 @@
               }
             },
             {
-              "description": "Requirement: 'versionRange' shall not be present when 'isExternal' is `false`.",
+              "description": "Requirement: `versionRange` shall not be present when `isExternal=false`.",
               "if": {
                 "properties": {
                   "isExternal": {
@@ -6176,7 +6197,7 @@
               "else": true
             },
             {
-              "description": "Requirement: `classification`, `leadTime`, and `quantity` may only be present when `type` is `device` or `material`.",
+              "description": "Requirement: `classification`, `leadTime`, and `quantity` may only be present when `type=\"device\"` or `type=\"material\"`.",
               "if": {
                 "properties": {
                   "type": {
@@ -6200,7 +6221,7 @@
               }
             },
             {
-              "description": "Requirement: `boardLocation` and `deviceType` may only be present when `type` is `device`.",
+              "description": "Requirement: `boardLocation` and `deviceType` may only be present when `type=\"device\"`.",
               "if": {
                 "properties": {
                   "type": {
@@ -6220,7 +6241,7 @@
               }
             },
             {
-              "description": "Requirement: `materialForm` may only be present when `type` is `material`.",
+              "description": "Requirement: `materialForm` may only be present when `type=\"material\"`.",
               "if": {
                 "properties": {
                   "type": {
@@ -6240,7 +6261,7 @@
             },
             {
               "title": "Service Requirement",
-              "description": "Requirement: endpoints and dataProfiles may only be used for components of type `service`.",
+              "description": "Requirement: `endpoints` and `dataProfiles` may only be used for components with `type=\"service\"`.",
               "if": {
                 "properties": {
                   "type": {
@@ -6276,7 +6297,7 @@
         },
         "componentEntry": {
           "title": "Component Entry",
-          "description": "An entry in a components array. A concrete component, a reference to a component declared elsewhere, or a component-choice wrapper that expresses a conditional or alternate relationship between two or more entries. An entry with a `ref` property is a reference; an entry whose `type` is `component-choice` is a choice; any other entry is a component.",
+          "description": "An entry in a `components` array. A concrete component, a reference to a component declared elsewhere, or a component-choice wrapper that expresses a conditional or alternate relationship between two or more entries. An entry with a `ref` property is a reference; an entry with `type=\"component-choice\"` is a choice; any other entry is a component.",
           "oneOf": [
             {
               "$ref": "#/$defs/cyclonedx-component-2.0/$defs/component"
@@ -6303,7 +6324,7 @@
             "type": {
               "const": "component-choice",
               "title": "Type",
-              "description": "Discriminator for a component-choice entry. The value shall be the literal string `component-choice`."
+              "description": "Discriminator for a component-choice entry. The value shall be the literal string `\"component-choice\"`."
             },
             "refId": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
@@ -6490,7 +6511,7 @@
               "minimum": 0,
               "maximum": 1,
               "title": "Confidence",
-              "description": "The overall confidence of the detection from 0 to 1, where 1 is 100% confidence."
+              "description": "The overall confidence of the detection from `0` to `1`, where `1` is 100% confidence."
             },
             "methods": {
               "type": "array",
@@ -6562,7 +6583,7 @@
               "minimum": 0,
               "maximum": 1,
               "title": "Confidence",
-              "description": "The overall confidence of the detection from 0 to 1, where 1 is 100% confidence."
+              "description": "The overall confidence of the detection from `0` to `1`, where `1` is 100% confidence."
             },
             "methods": {
               "type": "array",
@@ -6627,7 +6648,7 @@
               "minimum": 0,
               "maximum": 1,
               "title": "Confidence",
-              "description": "The overall confidence of the evidence from 0 - 1, where 1 is 100% confidence."
+              "description": "The overall confidence of the evidence from `0` to `1`, where `1` is 100% confidence."
             },
             "concludedValue": {
               "type": "string",
@@ -6762,12 +6783,12 @@
             "configurationRef": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Configuration Reference",
-              "description": "The `refId` of the configuration that determines this component's configuration. Typically points to a component of type 'data' whose data type is 'configuration'."
+              "description": "The `refId` of the configuration that determines this component's configuration. Typically points to a component with `type=\"data\"` whose `data` entry has `type=\"configuration\"`."
             },
             "changeMechanism": {
               "type": "array",
               "title": "Change Mechanism",
-              "description": "The step or steps required to apply a change to this component's configuration. When more than one value is present, all are required (for example, a software update followed by a restart). Values are roughly ordered from least to most disruptive. Use a single value of 'not-possible' when the configuration cannot be changed.",
+              "description": "The step or steps required to apply a change to this component's configuration. When more than one value is present, all are required (for example, a software update followed by a restart). Values are roughly ordered from least to most disruptive. Use a single value of `\"not-possible\"` when the configuration cannot be changed.",
               "uniqueItems": true,
               "items": {
                 "enum": [
@@ -7605,7 +7626,7 @@
               "minimum": 0,
               "maximum": 1,
               "title": "Percentage",
-              "description": "Effectiveness as a decimal from 0 to 1."
+              "description": "Effectiveness as a decimal from `0` to `1`."
             },
             "rating": {
               "title": "Rating",
@@ -7646,7 +7667,7 @@
           "properties": {
             "assetType": {
               "title": "Asset Type",
-              "description": "Cryptographic assets occur in several forms. Algorithms and protocols are most commonly implemented in specialized cryptographic libraries. They may, however, also be 'hardcoded' in software components. Certificates and related cryptographic material like keys, tokens, secrets or passwords are other cryptographic assets to be modelled.",
+              "description": "Cryptographic assets occur in several forms. Algorithms and protocols are most commonly implemented in specialized cryptographic libraries. They may, however, also be \"hardcoded\" in software components. Certificates and related cryptographic material like keys, tokens, secrets or passwords are other cryptographic assets to be modelled.",
               "enum": [
                 "algorithm",
                 "certificate",
@@ -7668,7 +7689,7 @@
               "properties": {
                 "primitive": {
                   "title": "primitive",
-                  "description": "Cryptographic building blocks used in higher-level cryptographic systems and protocols. Primitives represent different cryptographic routines: deterministic random bit generators (drbg, e.g. CTR_DRBG from NIST SP800-90A-r1), message authentication codes (mac, e.g. HMAC-SHA-256), blockciphers (e.g. AES), streamciphers (e.g. Salsa20), signatures (e.g. ECDSA), hash functions (e.g. SHA-256), public-key encryption schemes (pke, e.g. RSA), extended output functions (xof, e.g. SHAKE256), key derivation functions (e.g. pbkdf2), key agreement algorithms (e.g. ECDH), key encapsulation mechanisms (e.g. ML-KEM), authenticated encryption (ae, e.g. AES-GCM) and the combination of multiple algorithms (combiner, e.g. SP800-56Cr2).",
+                  "description": "Cryptographic building blocks used in higher-level cryptographic systems and protocols. Primitives represent different cryptographic routines: deterministic random bit generators (`\"drbg\"`, e.g. CTR_DRBG from NIST SP800-90A-r1), message authentication codes (`\"mac\"`, e.g. HMAC-SHA-256), blockciphers (`\"block-cipher\"`, e.g. AES), streamciphers (`\"stream-cipher\"`, e.g. Salsa20), signatures (`\"signature\"`, e.g. ECDSA), hash functions (`\"hash\"`, e.g. SHA-256), public-key encryption schemes (`\"pke\"`, e.g. RSA), extended output functions (`\"xof\"`, e.g. SHAKE256), key derivation functions (`\"kdf\"`, e.g. pbkdf2), key agreement algorithms (`\"key-agree\"`, e.g. ECDH), key encapsulation mechanisms (`\"kem\"`, e.g. ML-KEM), authenticated encryption (`\"ae\"`, e.g. AES-GCM) and the combination of multiple algorithms (`\"combiner\"`, e.g. SP800-56Cr2).",
                   "enum": [
                     "drbg",
                     "mac",
@@ -7693,7 +7714,7 @@
                     "block-cipher": "A block cipher is a symmetric key algorithm that operates on fixed-size blocks of data. It encrypts or decrypts the data in block units, providing confidentiality. Block ciphers are widely used in various cryptographic modes and protocols for secure data transmission.",
                     "stream-cipher": "A stream cipher is a symmetric key cipher where plaintext digits are combined with a pseudorandom cipher digit stream (keystream).",
                     "signature": "In cryptography, a signature is a digital representation of a message or data that proves its origin, identity, and integrity. Digital signatures are generated using cryptographic algorithms and are widely used for authentication and verification in secure communication.",
-                    "hash": "A hash function is a mathematical algorithm that takes an input (or 'message') and produces a fixed-size string of characters, which is typically a hash value. Hash functions are commonly used in various cryptographic applications, including data integrity verification and password hashing.",
+                    "hash": "A hash function is a mathematical algorithm that takes an input (or \"message\") and produces a fixed-size string of characters, which is typically a hash value. Hash functions are commonly used in various cryptographic applications, including data integrity verification and password hashing.",
                     "pke": "Public Key Encryption (PKE) is a type of encryption that uses a pair of public and private keys for secure communication. The public key is used for encryption, while the private key is used for decryption. PKE is a fundamental component of public-key cryptography.",
                     "xof": "An XOF is an extendable output function that can take arbitrary input and creates a stream of output, up to a limit determined by the size of the internal state of the hash function that underlies the XOF.",
                     "kdf": "A Key Derivation Function (KDF) derives key material from another source of entropy while preserving the entropy of the input.",
@@ -7719,7 +7740,7 @@
                 "parameterSetIdentifier": {
                   "type": "string",
                   "title": "Parameter Set Identifier",
-                  "description": "An identifier for the parameter set of the cryptographic algorithm. Examples: in AES128, '128' identifies the key length in bits, in SHA256, '256' identifies the digest length, '128' in SHAKE128 identifies its maximum security level in bits, and 'SHA2-128s' identifies a parameter set used in SLH-DSA (FIPS205)."
+                  "description": "An identifier for the parameter set of the cryptographic algorithm. Examples: in AES128, `\"128\"` identifies the key length in bits, in SHA256, `\"256\"` identifies the digest length, `\"128\"` in SHAKE128 identifies its maximum security level in bits, and `\"SHA2-128s\"` identifies a parameter set used in SLH-DSA (FIPS205)."
                 },
                 "ellipticCurve": {
                   "$ref": "../cryptography-defs.schema.json#/definitions/ellipticCurvesEnum",
@@ -7749,7 +7770,7 @@
                 "implementationPlatform": {
                   "type": "array",
                   "title": "Implementation platforms",
-                  "description": "The target platforms for which the algorithm is implemented. The implementation can be 'generic', running on any platform or for a specific platform.",
+                  "description": "The target platforms for which the algorithm is implemented. The implementation can be `\"generic\"`, running on any platform or for a specific platform.",
                   "items": {
                     "title": "Platform",
                     "description": "The target platform for the implementation.",
@@ -7886,7 +7907,7 @@
                 "nistQuantumSecurityLevel": {
                   "type": "integer",
                   "title": "NIST security strength category",
-                  "description": "The NIST security strength category as defined in <https://csrc.nist.gov/projects/post-quantum-cryptography/post-quantum-cryptography-standardization/evaluation-criteria/security-(evaluation-criteria)>. NIST defines categories 1 through 5. CycloneDX uses 0 to indicate that none of these categories are met. Omission makes no category assertion and does not establish whether an assessment was performed.",
+                  "description": "The NIST security strength category as defined in <https://csrc.nist.gov/projects/post-quantum-cryptography/post-quantum-cryptography-standardization/evaluation-criteria/security-(evaluation-criteria)>. NIST defines categories `1` through `5`. CycloneDX uses `0` to indicate that none of these categories are met. Omission makes no category assertion and does not establish whether an assessment was performed.",
                   "minimum": 0,
                   "maximum": 5
                 },
@@ -7914,7 +7935,7 @@
             "certificateProperties": {
               "type": "object",
               "title": "Certificate Properties",
-              "description": "Properties for cryptographic assets of asset type 'certificate'.",
+              "description": "Properties for cryptographic assets with `assetType=\"certificate\"`.",
               "additionalProperties": false,
               "properties": {
                 "serialNumber": {
@@ -8162,12 +8183,12 @@
             "relatedCryptoMaterialProperties": {
               "type": "object",
               "title": "Related Cryptographic Material Properties",
-              "description": "Properties for cryptographic assets of asset type: `related-crypto-material`. Depending on the described use case, an entry may represent a particular material instance or a variable or placeholder with known cryptographic characteristics. For example, a BOM produced by source code analysis may describe a private-key parameter, while an operational BOM may describe a particular key held in an HSM. The material type identifies the kind of material in either case. Omission of `value` does not imply that the entry represents a placeholder.",
+              "description": "Properties for cryptographic assets with `assetType=\"related-crypto-material\"`. Depending on the described use case, an entry may represent a particular material instance or a variable or placeholder with known cryptographic characteristics. For example, a BOM produced by source code analysis may describe a private-key parameter, while an operational BOM may describe a particular key held in an HSM. The material type identifies the kind of material in either case. Omission of `value` does not imply that the entry represents a placeholder.",
               "additionalProperties": false,
               "properties": {
                 "type": {
                   "title": "relatedCryptoMaterialType",
-                  "description": "The type for the related cryptographic material. Select the most specific applicable type according to the role of the material in the described cryptographic context. Broader categories, such as `key` and `credential`, can be used when a more specific classification is unavailable or does not apply. Types can overlap; for example, a password is also a credential, but should be classified as `password` when that type is known.",
+                  "description": "The type for the related cryptographic material. Select the most specific applicable type according to the role of the material in the described cryptographic context. Broader categories, such as `\"key\"` and `\"credential\"`, can be used when a more specific classification is unavailable or does not apply. Types can overlap; for example, a password is also a credential, but should be classified as `\"password\"` when that type is known.",
                   "enum": [
                     "private-key",
                     "public-key",
@@ -8193,7 +8214,7 @@
                     "private-key": "The confidential key of a key pair used in asymmetric cryptography.",
                     "public-key": "The non-confidential key of a key pair used in asymmetric cryptography.",
                     "secret-key": "A key used with a symmetric cryptographic algorithm, for example for encryption, message authentication, key wrapping, or key derivation.",
-                    "key": "A cryptographic key whose more specific type is unknown or is not covered by the available key types. Use `private-key`, `public-key`, or `secret-key` when that classification is known and applicable.",
+                    "key": "A cryptographic key whose more specific type is unknown or is not covered by the available key types. Use `\"private-key\"`, `\"public-key\"`, or `\"secret-key\"` when that classification is known and applicable.",
                     "ciphertext": "The result of encryption performed on plaintext using an algorithm (or cipher).",
                     "signature": "A cryptographic value that is calculated from the data and a key known only by the signer.",
                     "digest": "The output of the hash function.",
@@ -8201,7 +8222,7 @@
                     "nonce": "A value used only once within a defined cryptographic context, such as encryption operations under a particular key.",
                     "seed": "The input to a pseudo-random number generator. Different seeds generate different pseudo-random sequences.",
                     "salt": "A value used to diversify a cryptographic computation, such as password hashing, key derivation, or randomized signing.",
-                    "shared-secret": "Secret data shared between parties, for example material established through key agreement or key encapsulation and used as input to key derivation. When describing its role as a symmetric key, use `secret-key`.",
+                    "shared-secret": "Secret data shared between parties, for example material established through key agreement or key encapsulation and used as input to key derivation. When describing its role as a symmetric key, use `\"secret-key\"`.",
                     "tag": "A message authentication code (MAC), sometimes known as an authentication tag, is a short piece of information used for authenticating and integrity-checking a message.",
                     "additional-data": "An unspecified collection of data with relevance to cryptographic activity.",
                     "password": "A secret word, phrase, or sequence of characters used during authentication or authorization.",
@@ -8270,7 +8291,12 @@
                 "format": {
                   "type": "string",
                   "title": "Format",
-                  "description": "The format of the related cryptographic material (e.g. P8, PEM, DER)."
+                  "description": "The format of the related cryptographic material.",
+                  "examples": [
+                    "P8",
+                    "PEM",
+                    "DER"
+                  ]
                 },
                 "securedBy": {
                   "$ref": "#/$defs/cyclonedx-cryptography-2.0/$defs/securedBy",
@@ -8298,7 +8324,7 @@
             "protocolProperties": {
               "type": "object",
               "title": "Protocol Properties",
-              "description": "Properties specific to cryptographic assets of type: `protocol`.",
+              "description": "Properties specific to cryptographic assets with `assetType=\"protocol\"`.",
               "additionalProperties": false,
               "properties": {
                 "type": {
@@ -8897,11 +8923,11 @@
             },
             "jurisdictions": {
               "$ref": "#/$defs/cyclonedx-data-2.0/$defs/jurisdictions",
-              "description": "The jurisdictions whose laws and regulations apply to this data based on its nature, classification, or how it is processed and stored. See also subject.jurisdictions for jurisdictions that apply because of who the data is about."
+              "description": "The jurisdictions whose laws and regulations apply to this data based on its nature, classification, or how it is processed and stored. See also `subject.jurisdictions` for jurisdictions that apply because of who the data is about."
             },
             "regulations": {
               "$ref": "#/$defs/cyclonedx-data-2.0/$defs/regulations",
-              "description": "The regulations that apply to this data based on its nature, classification, or processing context. See also subject.regulations for regulations that apply because of who the data is about."
+              "description": "The regulations that apply to this data based on its nature, classification, or processing context. See also `subject.regulations` for regulations that apply because of who the data is about."
             },
             "dataFormats": {
               "type": "array",
@@ -9108,7 +9134,7 @@
                 "mediaType": {
                   "type": "string",
                   "title": "Media Type",
-                  "description": "Media type of the schema, for example application/schema+json, application/xml, or application/vnd.apache.avro+json.",
+                  "description": "Media type of the schema.",
                   "examples": [
                     "application/schema+json",
                     "application/xml",
@@ -9125,7 +9151,7 @@
             "format": {
               "type": "object",
               "title": "Format",
-              "description": "The serialisation or encoding format of this object, such as application/json, text/csv, or application/hl7-v2.",
+              "description": "The serialisation or encoding format of this object, such as `\"application/json\"`, `\"text/csv\"`, or `\"application/hl7-v2\"`.",
               "additionalProperties": false,
               "properties": {
                 "url": {
@@ -9439,7 +9465,7 @@
             "party": {
               "$ref": "#/$defs/cyclonedx-party-2.0/$defs/party",
               "title": "Party",
-              "description": "An inline party object identifying the subject. Use this when the subject is best modelled as a party (organization, person, system, or persona) and has not been declared elsewhere in the document. The party's `roles` should include `data-subject`."
+              "description": "An inline party object identifying the subject. Use this when the subject is best modelled as a party (organization, person, system, or persona) and has not been declared elsewhere in the document. The party's `roles` should include `\"data-subject\"`."
             },
             "ref": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
@@ -9449,15 +9475,15 @@
             "protectedClass": {
               "type": "boolean",
               "title": "Protected Class",
-              "description": "Indicates whether this subject represents or includes a legally protected class under applicable regulations. Protected classes are groups defined by characteristics such as race, ethnicity, religion, gender, age, disability, sexual orientation, national origin, or genetic information. When true, additional regulatory obligations may apply to the collection, processing, and sharing of data about this subject, including GDPR special category data provisions, US civil rights protections, COPPA requirements for children, and HIPAA protections for health information."
+              "description": "Indicates whether this subject represents or includes a legally protected class under applicable regulations. Protected classes are groups defined by characteristics such as race, ethnicity, religion, gender, age, disability, sexual orientation, national origin, or genetic information. When `true`, additional regulatory obligations may apply to the collection, processing, and sharing of data about this subject, including GDPR special category data provisions, US civil rights protections, COPPA requirements for children, and HIPAA protections for health information."
             },
             "jurisdictions": {
               "$ref": "#/$defs/cyclonedx-data-2.0/$defs/jurisdictions",
-              "description": "The jurisdictions whose laws and regulations apply specifically because of this subject. See also dataProfile.jurisdictions for jurisdictions that apply to the data itself."
+              "description": "The jurisdictions whose laws and regulations apply specifically because of this subject. See also `dataProfile.jurisdictions` for jurisdictions that apply to the data itself."
             },
             "regulations": {
               "$ref": "#/$defs/cyclonedx-data-2.0/$defs/regulations",
-              "description": "The regulations that apply specifically because of this subject. See also dataProfile.regulations for regulations that apply to the data itself."
+              "description": "The regulations that apply specifically because of this subject. See also `dataProfile.regulations` for regulations that apply to the data itself."
             },
             "description": {
               "type": "string",
@@ -9493,8 +9519,8 @@
         },
         "regulations": {
           "type": "array",
-          "title": "Data flow direction",
-          "description": "Specifies the flow direction of the data. Direction is relative to the service.",
+          "title": "Regulations",
+          "description": "The specific laws, regulations, or compliance frameworks that apply.",
           "uniqueItems": true,
           "items": {
             "type": "string",
@@ -9652,7 +9678,7 @@
         "dataGovernance": {
           "type": "array",
           "title": "Data Governance",
-          "description": "Parties responsible for the data throughout its lifecycle. Each entry is either an inline party object or a reference to a previously declared party. The party's `roles` carry the governance relationship (`owner` for ownership and risk accountability, `steward` for content and business rules, `custodian` for safe custody, transport, and storage, `data-controller`, `data-processor`, `data-recipient`, or a custom role). Multiple parties may share the same role; preference among them is expressed via `role.order`.",
+          "description": "Parties responsible for the data throughout its lifecycle. Each entry is either an inline party object or a reference to a previously declared party. The party's `roles` carry the governance relationship (`\"owner\"` for ownership and risk accountability, `\"steward\"` for content and business rules, `\"custodian\"` for safe custody, transport, and storage, `\"data-controller\"`, `\"data-processor\"`, `\"data-recipient\"`, or a custom role). Multiple parties may share the same role; preference among them is expressed via `roles[].order`.",
           "uniqueItems": true,
           "items": {
             "$ref": "#/$defs/cyclonedx-party-2.0/$defs/partyChoice"
@@ -9760,7 +9786,7 @@
                   "thirdParty": {
                     "type": "boolean",
                     "title": "Third Party",
-                    "description": "The boolean indicating if the assessor is outside the organization generating claims. A value of false indicates a self assessor."
+                    "description": "The boolean indicating if the assessor is outside the organization generating claims. A value of `false` indicates a self assessor."
                   },
                   "organization": {
                     "$ref": "#/$defs/cyclonedx-common-2.0/$defs/organizationalEntity",
@@ -9830,7 +9856,7 @@
                               "minimum": 0,
                               "maximum": 1,
                               "title": "Score",
-                              "description": "The conformance of the claim between and inclusive of 0 and 1, where 1 is 100% conformance."
+                              "description": "The conformance of the claim between and inclusive of `0` and `1`, where `1` is 100% conformance."
                             },
                             "rationale": {
                               "type": "string",
@@ -9858,7 +9884,7 @@
                               "minimum": 0,
                               "maximum": 1,
                               "title": "Score",
-                              "description": "The confidence of the claim between and inclusive of 0 and 1, where 1 is 100% confidence."
+                              "description": "The confidence of the claim between and inclusive of `0` and `1`, where `1` is 100% confidence."
                             },
                             "rationale": {
                               "type": "string",
@@ -9924,7 +9950,7 @@
                   "counterEvidence": {
                     "type": "array",
                     "title": "Counter Evidence",
-                    "description": "The list of `refId` to counterEvidence that supports this claim.",
+                    "description": "The list of `refId` to `counterEvidence` that supports this claim.",
                     "items": {
                       "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
                     }
@@ -10324,7 +10350,12 @@
             "location": {
               "type": "string",
               "title": "Location",
-              "description": "The location or path at which the subject was found, for example a file path, a URL, or a package coordinate."
+              "description": "The location or path at which the subject was found, for example a file path, a URL, or a package coordinate.",
+              "examples": [
+                "src/authentication/login.py",
+                "https://example.com/login",
+                "docker.io/library/nginx:1.25"
+              ]
             },
             "line": {
               "type": "integer",
@@ -10437,12 +10468,12 @@
             "name": {
               "type": "string",
               "title": "Name",
-              "description": "An optional name or label for this path, for example the entry point through which the subject is reached."
+              "description": "A name or label for this path, for example the entry point through which the subject is reached."
             },
             "description": {
               "type": "string",
               "title": "Description",
-              "description": "An optional description of this path."
+              "description": "A description of this path."
             },
             "frames": {
               "type": "array",
@@ -10522,7 +10553,7 @@
               "minimum": 0,
               "maximum": 1,
               "title": "Confidence",
-              "description": "The confidence of the evidence from 0 to 1, where 1 is 100% confidence. Confidence is specific to the technique used. Each technique of analysis can have independent confidence."
+              "description": "The confidence of the evidence from `0` to `1`, where `1` is 100% confidence. Confidence is specific to the technique used. Each technique of analysis can have independent confidence."
             },
             "value": {
               "type": "string",
@@ -10598,7 +10629,7 @@
             "text": {
               "type": "string",
               "title": "Text",
-              "description": "The rule, policy, or query text. Large or sensitive rule content should instead be referenced through supporting data of type `rule`."
+              "description": "The rule, policy, or query text. Large or sensitive rule content should instead be referenced through supporting data with `type=\"rule\"`."
             }
           }
         },
@@ -10674,7 +10705,7 @@
         },
         "assessmentMethod": {
           "title": "Assessment Method",
-          "description": "A method of analysis used to assess a vulnerability. The technique is constrained to those meaningful for assessment; the identification-only `filename` technique is not permitted.",
+          "description": "A method of analysis used to assess a vulnerability. The technique is constrained to those meaningful for assessment; the identification-only `\"filename\"` technique is not permitted.",
           "allOf": [
             {
               "$ref": "#/$defs/cyclonedx-evidence-2.0/$defs/analysisMethod"
@@ -10728,7 +10759,7 @@
             "role": {
               "$ref": "#/$defs/cyclonedx-party-2.0/$defs/role",
               "title": "Role",
-              "description": "The role or vantage in which the party was involved, for example supplier, manufacturer, distributor, operator, customer, end-user, asserter, auditor, reviewer, or researcher."
+              "description": "The role or vantage in which the party was involved."
             }
           }
         },
@@ -10831,7 +10862,13 @@
             "name": {
               "type": "string",
               "title": "Name",
-              "description": "The name or label of the data, for example 'attack prompt', 'model response', 'HTTP request', or 'scanner report'."
+              "description": "The name or label of the data.",
+              "examples": [
+                "attack prompt",
+                "model response",
+                "HTTP request",
+                "scanner report"
+              ]
             },
             "ref": {
               "anyOf": [
@@ -10845,7 +10882,7 @@
                 }
               ],
               "title": "Reference",
-              "description": "An optional reference, by `refId`, to the specific determination this material corroborates, for example a presence evidence entry. This links proof to a particular claim and perspective rather than leaving it pooled and unattributed."
+              "description": "A reference, by `refId`, to the specific determination this material corroborates, for example a presence evidence entry. This links proof to a particular claim and perspective rather than leaving it pooled and unattributed."
             },
             "type": {
               "$ref": "#/$defs/cyclonedx-evidence-2.0/$defs/evidenceDataType",
@@ -10986,7 +11023,7 @@
         "workflow": {
           "title": "Workflow",
           "description": "A specialized orchestration task.",
-          "$comment": "Workflow are as task themselves and can trigger other workflow tasks.  These relationships can be modeled in the taskDependencies graph.",
+          "$comment": "Workflow are as task themselves and can trigger other workflow tasks.  These relationships can be modeled in the `taskDependencies` graph.",
           "type": "object",
           "required": [
             "refId",
@@ -11794,7 +11831,7 @@
         "resourceReferenceChoice": {
           "title": "Resource reference choice",
           "description": "A reference to a locally defined resource (e.g., a `refId`) or an externally accessible resource.",
-          "$comment": "Enables reference to a resource that participates in a workflow; using either internal (refId) or external (externalReference) types.",
+          "$comment": "Enables reference to a resource that participates in a workflow; using either internal (`refId`) or external (`externalReference`) types.",
           "type": "object",
           "additionalProperties": false,
           "properties": {
@@ -11941,7 +11978,7 @@
       "$defs": {
         "timestamp": {
           "title": "Timestamp",
-          "description": "An RFC 3339 timestamp in the UTC+0 time zone. Must use the 'Z' suffix. Sub-second precision, when present, MUST be exactly three digits (millisecond precision). If no sub-second digits are included, the decimal point MUST NOT be present. Matches the pattern: yyyy-mm-ddThh:mm:ss[.sss]Z",
+          "description": "An RFC 3339 timestamp in the UTC+0 time zone. Must use the `\"Z\"` suffix. Sub-second precision, when present, MUST be exactly three digits (millisecond precision). If no sub-second digits are included, the decimal point MUST NOT be present. Matches the pattern: `yyyy-mm-ddThh:mm:ss[.sss]Z`.",
           "$comment": "Normative source: ITU-T X.590 clause 6.1",
           "type": "string",
           "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\\.[0-9]+)?Z$",
@@ -11954,7 +11991,7 @@
             "withMilliseconds": {
               "$comment": "Internal helper for timestamp. Not part of the public schema API — do not reference externally; may change without notice.",
               "title": "Timestamp with Milliseconds",
-              "description": "An RFC 3339 timestamp in the UTC+0 time zone. Must use the 'Z' suffix. Sub-second precision MUST be exactly three digits (millisecond precision). Matches the pattern: yyyy-mm-ddThh:mm:ss.sssZ",
+              "description": "An RFC 3339 timestamp in the UTC+0 time zone. Must use the `\"Z\"` suffix. Sub-second precision MUST be exactly three digits (millisecond precision). Matches the pattern: `yyyy-mm-ddThh:mm:ss.sssZ`.",
               "type": "string",
               "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9][0-9][0-9]Z$",
               "examples": [
@@ -11966,7 +12003,7 @@
         },
         "identifier": {
           "title": "Identifier",
-          "description": "A Universally Unique Identifier (UUID) conformant with RFC 4122. Used to uniquely identify a signature object. Signatures sharing the same 'id' are treated as versions of the same logical signature, differentiated by their 'modified' timestamp.",
+          "description": "A Universally Unique Identifier (UUID) conformant with RFC 4122. Used to uniquely identify a signature object. Signatures sharing the same `id` are treated as versions of the same logical signature, differentiated by their `modified` timestamp.",
           "$comment": "Normative source: ITU-T X.590 clause 6.1",
           "type": "string",
           "format": "uuid",
@@ -11977,7 +12014,7 @@
         },
         "hashAlgorithm": {
           "title": "Hash Algorithm",
-          "description": "This property identifies the hashing algorithm, as defined by the Internet Assigned Numbers Authority (IANA)…, that was used to hash the JCS version of the full JSON object (JSON Object + JSS Signature) and is a case-sensitive ASCII string. Implementations MAY use any current and widely accepted hashing algorithm (e.g., sha-256, sha-512) that is defined in the IANA registry. The actual signing process, defined in the algorithm property, sometimes uses an internal hashing algorithm inside the signing process itself, this property MAY identify the same hashing algorithm as the signing process or MAY identify a different hashing algorithm.",
+          "description": "This property identifies the hashing algorithm, as defined by the Internet Assigned Numbers Authority (IANA)…, that was used to hash the JCS version of the full JSON object (JSON Object + JSS Signature) and is a case-sensitive ASCII string. Implementations MAY use any current and widely accepted hashing algorithm (e.g., `\"sha-256\"`, `\"sha-512\"`) that is defined in the IANA registry. The actual signing process, defined in the `algorithm` property, sometimes uses an internal hashing algorithm inside the signing process itself, this property MAY identify the same hashing algorithm as the signing process or MAY identify a different hashing algorithm.",
           "$comment": "Normative source: ITU-T X.590 clause 6.2.1",
           "type": "string",
           "pattern": "^[a-z0-9-]+$",
@@ -12040,7 +12077,7 @@
         },
         "publicKey": {
           "title": "Public Key (PEM, header-stripped)",
-          "description": "This property contains a privacy enhanced mail (PEM) encoded public key without the header and footer for the algorithm selected in the algorithm property.",
+          "description": "This property contains a privacy enhanced mail (PEM) encoded public key without the header and footer for the algorithm selected in the `algorithm` property.",
           "$comment": "Normative source: ITU-T X.590 clause 6.2.1",
           "type": "string",
           "pattern": "^[A-Za-z0-9+/]+={0,2}$",
@@ -12050,7 +12087,7 @@
         },
         "publicCertChain": {
           "title": "Public Certificate Chain",
-          "description": "This property contains a public key certificate for the algorithm selected in the algorithm property and MUST follow the requirements defined in section 4.7 of [IETF RFC 7517] as quoted here. This property \"contains a chain (X.509 certificate chain) of one or more PKIX certificates [IETF RFC 5280]. The certificate chain is represented as a JSON array of certificate value strings. Each string in the array is a base64-encoded (section 4 of [IETF RFC 4648] – not base64URL.encoded) DER [b-ITU-T X.690] PKIX certificate value. The PKIX certificate containing the key value MUST be the first certificate. This MAY be followed by additional certificates, with each subsequent certificate being the one used to certify the previous one. The key in the first certificate MUST match the public key.\" This property is called \"x5c\" in section 4.7 of [IETF RFC 7517].",
+          "description": "This property contains a public key certificate for the algorithm selected in the `algorithm` property and MUST follow the requirements defined in section 4.7 of [IETF RFC 7517] as quoted here. This property \"contains a chain (X.509 certificate chain) of one or more PKIX certificates [IETF RFC 5280]. The certificate chain is represented as a JSON array of certificate value strings. Each string in the array is a base64-encoded (section 4 of [IETF RFC 4648] – not base64URL.encoded) DER [b-ITU-T X.690] PKIX certificate value. The PKIX certificate containing the key value MUST be the first certificate. This MAY be followed by additional certificates, with each subsequent certificate being the one used to certify the previous one. The key in the first certificate MUST match the public key.\" This property is called `\"x5c\"` in section 4.7 of [IETF RFC 7517].",
           "$comment": "Normative source: ITU-T X.590 clause 6.2.1",
           "type": "array",
           "items": {
@@ -12061,7 +12098,7 @@
         },
         "certUrl": {
           "title": "Certificate URL",
-          "description": "This property contains a uniform resource identifier (URI) [IETF RFC 3986] that refers to a resource for an X.509 public key certificate or certificate chain [IETF RFC 5280] for the algorithm selected in the algorithm property and MUST follow the requirements defined in section 4.6 of [IETF RFC 7517] as quoted here. \"The identified resource MUST provide a representation of the certificate or certificate chain that conforms to RFC 5280 [IETF RFC 5280] in PEM-encoded form, with each certificate delimited as specified in section 6.1 of RFC 4945 [IETF RFC 4945]. The key in the first certificate MUST match the public key. The protocol used to acquire the resource MUST provide integrity protection; an HTTP GET request to retrieve the certificate MUST use TLS [IETF RFC 2818] [IETF RFC 5246]; the identity of the server MUST be validated, as per section 6 of RFC 6125 [IETF RFC 6125].\" This property is called \"x5u\" in section 4.6 of [IETF RFC 7517].",
+          "description": "This property contains a uniform resource identifier (URI) [IETF RFC 3986] that refers to a resource for an X.509 public key certificate or certificate chain [IETF RFC 5280] for the algorithm selected in the `algorithm` property and MUST follow the requirements defined in section 4.6 of [IETF RFC 7517] as quoted here. \"The identified resource MUST provide a representation of the certificate or certificate chain that conforms to RFC 5280 [IETF RFC 5280] in PEM-encoded form, with each certificate delimited as specified in section 6.1 of RFC 4945 [IETF RFC 4945]. The key in the first certificate MUST match the public key. The protocol used to acquire the resource MUST provide integrity protection; an HTTP GET request to retrieve the certificate MUST use TLS [IETF RFC 2818] [IETF RFC 5246]; the identity of the server MUST be validated, as per section 6 of RFC 6125 [IETF RFC 6125].\" This property is called `\"x5u\"` in section 4.6 of [IETF RFC 7517].",
           "$comment": "Normative source: ITU-T X.590 clause 6.2.1",
           "type": "string",
           "format": "uri",
@@ -12072,7 +12109,7 @@
         },
         "thumbprint": {
           "title": "Certificate Thumbprint",
-          "description": "This property contains a fingerprint of a public key or public key certificate for the algorithm selected in the algorithm property and MUST follow the requirements defined in section 4.9 of [IETF RFC 7517] as quoted here. This property \"is a base64URL.encoded SHA-256 thumbprint (a.k.a. digest, X.509 certificate SHA-256 thumbprint) of the DER encoding of an X.509 certificate [IETF RFC 5280]. Note that certificate thumbprints are also sometimes known as certificate fingerprints. The key in the certificate MUST match the public key.\" This property is called \"x5t#S256\" in section 4.9 of [IETF RFC 7517].",
+          "description": "This property contains a fingerprint of a public key or public key certificate for the algorithm selected in the `algorithm` property and MUST follow the requirements defined in section 4.9 of [IETF RFC 7517] as quoted here. This property \"is a base64URL.encoded SHA-256 thumbprint (a.k.a. digest, X.509 certificate SHA-256 thumbprint) of the DER encoding of an X.509 certificate [IETF RFC 5280]. Note that certificate thumbprints are also sometimes known as certificate fingerprints. The key in the certificate MUST match the public key.\" This property is called `\"x5t#S256\"` in section 4.9 of [IETF RFC 7517].",
           "$comment": "Normative source: ITU-T X.590 clause 6.2.1",
           "type": "string",
           "pattern": "^[A-Za-z0-9_-]{43}$",
@@ -12082,8 +12119,8 @@
         },
         "signatureObject": {
           "title": "Signature Object",
-          "description": "A JSS signature object as defined in ITU-T X.590 clause 6.2. Captures the hashing algorithm, signing algorithm, public key material (in one of four forms), the base64URL-encoded digital signature value, and optional metadata. May nest a child 'signature' property to form a counter-signature chain.",
-          "$comment": "This is a mixin: ITU-T X.590 clause 6.2 explicitly states that implementers MAY add additional properties to satisfy meta-data requirements for their application. The clause 6.3 properties (type, id, related_to, etc.) are themselves defined as non-exhaustive examples of such extensions.",
+          "description": "A JSS signature object as defined in ITU-T X.590 clause 6.2. Captures the hashing algorithm, signing algorithm, public key material (in one of four forms), the base64URL-encoded digital signature value, and optional metadata. May nest a child `signature` property to form a counter-signature chain.",
+          "$comment": "This is a mixin: ITU-T X.590 clause 6.2 explicitly states that implementers MAY add additional properties to satisfy meta-data requirements for their application. The clause 6.3 properties (`type`, `id`, `related_to`, etc.) are themselves defined as non-exhaustive examples of such extensions.",
           "type": "object",
           "properties": {
             "hash_algorithm": {
@@ -12106,7 +12143,7 @@
             },
             "value": {
               "title": "Signature Value",
-              "description": "A base64URL.encoded signature that was created using the signature algorithm defined in the algorithm property and a key. In pseudo code it is defined as: base64URL.encode(sign(algorithm, key, hash(jcs(<JSONObject with Signature Object>)))).",
+              "description": "A base64URL.encoded signature that was created using the signature algorithm defined in the `algorithm` property and a key. In pseudo code it is defined as: `base64URL.encode(sign(algorithm, key, hash(jcs(<JSONObject with Signature Object>))))`.",
               "$comment": "Normative source: ITU-T X.590 clause 6.2.1",
               "type": "string",
               "pattern": "^[A-Za-z0-9_-]+={0,2}$"
@@ -12119,14 +12156,14 @@
             },
             "type": {
               "title": "Type Indicator",
-              "description": "The value of this property MUST be jss.",
+              "description": "The value of this property MUST be `\"jss\"`.",
               "$comment": "Normative source: ITU-T X.590 clause 6.3.1",
               "const": "jss"
             },
             "id": {
               "$ref": "#/$defs/cyclonedx-jss_X590_2023_10-2.0/$defs/identifier",
               "title": "Signature Identifier",
-              "description": "A value that uniquely identifies the signature. All signatures with the same ID are considered different versions of the same signature and the version of the signature is identified by its modified property.",
+              "description": "A value that uniquely identifies the signature. All signatures with the same ID are considered different versions of the same signature and the version of the signature is identified by its `modified` property.",
               "$comment": "Normative source: ITU-T X.590 clause 6.3.1"
             },
             "related_to": {
@@ -12144,18 +12181,18 @@
             "created": {
               "$ref": "#/$defs/cyclonedx-jss_X590_2023_10-2.0/$defs/timestamp/$defs/withMilliseconds",
               "title": "Created Timestamp",
-              "description": "The time at which this signature was originally created. The creator can use any time it deems most appropriate as the time the signature was created, but it MUST be precise to the nearest millisecond (exactly three digits after the decimal place in seconds). The created property MUST NOT be changed when creating a new version of the signature.",
+              "description": "The time at which this signature was originally created. The creator can use any time it deems most appropriate as the time the signature was created, but it MUST be precise to the nearest millisecond (exactly three digits after the decimal place in seconds). The `created` property MUST NOT be changed when creating a new version of the signature.",
               "$comment": "Normative source: ITU-T X.590 clause 6.3.1"
             },
             "modified": {
               "$ref": "#/$defs/cyclonedx-jss_X590_2023_10-2.0/$defs/timestamp/$defs/withMilliseconds",
               "title": "Modified Timestamp",
-              "description": "The time that this particular version of the signature was last modified. The creator can use any time it deems most appropriate as the time that this version of the signature was modified, but it MUST be precise to the nearest millisecond (exactly three digits after the decimal place in seconds). The modified property MUST be later than or equal to the value of the created property. If the created and modified properties are the same, then this is the first version of the signature.",
-              "$comment": "Normative source: ITU-T X.590 clause 6.3.1. Cross-field invariant: 'modified' MUST be greater than or equal to 'created'. JSON Schema 2020-12 cannot compare two sibling property values, so this constraint is NOT enforced by this schema and MUST be validated by the consuming tool or conformance suite."
+              "description": "The time that this particular version of the signature was last modified. The creator can use any time it deems most appropriate as the time that this version of the signature was modified, but it MUST be precise to the nearest millisecond (exactly three digits after the decimal place in seconds). The `modified` property MUST be later than or equal to the value of the `created` property. If the `created` and `modified` properties are the same, then this is the first version of the signature.",
+              "$comment": "Normative source: ITU-T X.590 clause 6.3.1. Cross-field invariant: `modified` MUST be greater than or equal to `created`. JSON Schema 2020-12 cannot compare two sibling property values, so this constraint is NOT enforced by this schema and MUST be validated by the consuming tool or conformance suite."
             },
             "revoked": {
               "title": "Revoked Flag",
-              "description": "A boolean that identifies if the signature creator deems that this signature is no longer valid. The default value is false.",
+              "description": "A boolean that identifies if the signature creator deems that this signature is no longer valid. The default value is `false`.",
               "$comment": "Normative source: ITU-T X.590 clause 6.3.1",
               "type": "boolean",
               "default": false
@@ -12169,14 +12206,14 @@
             "valid_from": {
               "$ref": "#/$defs/cyclonedx-jss_X590_2023_10-2.0/$defs/timestamp",
               "title": "Valid From",
-              "description": "The time from which this signature is considered valid. If omitted, the signature is valid at all times or until the timestamp defined by valid_until. If the revoked property is true then this property MUST be ignored.",
+              "description": "The time from which this signature is considered valid. If omitted, the signature is valid at all times or until the timestamp defined by `valid_until`. If `revoked=true` then this property MUST be ignored.",
               "$comment": "Normative source: ITU-T X.590 clause 6.3.1"
             },
             "valid_until": {
               "$ref": "#/$defs/cyclonedx-jss_X590_2023_10-2.0/$defs/timestamp",
               "title": "Valid Until",
-              "description": "The time at which this signature is no longer considered valid. If the valid_until property is omitted, then there is no constraint on the latest time for which the signature is valid. This property MUST be greater than the timestamp in the valid_from property if the valid_from property is defined. If the revoked property is true then this property MUST be ignored.",
-              "$comment": "Normative source: ITU-T X.590 clause 6.3.1. Cross-field invariant: when 'valid_from' is present, 'valid_until' MUST be greater than 'valid_from'. JSON Schema 2020-12 cannot compare two sibling property values, so this constraint is NOT enforced by this schema and MUST be validated by the consuming tool or conformance suite."
+              "description": "The time at which this signature is no longer considered valid. If the `valid_until` property is omitted, then there is no constraint on the latest time for which the signature is valid. This property MUST be greater than the timestamp in the `valid_from` property if the `valid_from` property is defined. If `revoked=true` then this property MUST be ignored.",
+              "$comment": "Normative source: ITU-T X.590 clause 6.3.1. Cross-field invariant: when `valid_from` is present, `valid_until` MUST be greater than `valid_from`. JSON Schema 2020-12 cannot compare two sibling property values, so this constraint is NOT enforced by this schema and MUST be validated by the consuming tool or conformance suite."
             }
           },
           "required": [
@@ -12226,8 +12263,8 @@
         },
         "signatures": {
           "title": "Signatures Array",
-          "description": "A JSON array of one or more signature objects. MUST be located at the top-level of the signed JSON object. The property name used to hold this array SHOULD be 'signatures', but implementations MAY use a different name provided it does not conflict with any other top-level property name in the host JSON object. All signature objects in this array are independent parallel signatures over the same JSON object; for chained counter-signatures, use the nested 'signature' property within an individual signature object.",
-          "$comment": "Normative source: ITU-T X.590 clause 6 – 'The property that holds the signature MUST be a JSON list property and MUST be located at the top-level of the original JSON object.'",
+          "description": "A JSON array of one or more signature objects. MUST be located at the top-level of the signed JSON object. The property name used to hold this array SHOULD be `signatures`, but implementations MAY use a different name provided it does not conflict with any other top-level property name in the host JSON object. All signature objects in this array are independent parallel signatures over the same JSON object; for chained counter-signatures, use the nested `signature` property within an individual signature object.",
+          "$comment": "Normative source: ITU-T X.590 clause 6 – \"The property that holds the signature MUST be a JSON list property and MUST be located at the top-level of the original JSON object.\"",
           "type": "array",
           "items": {
             "$ref": "#/$defs/cyclonedx-jss_X590_2023_10-2.0/$defs/signatureObject"
@@ -12360,7 +12397,7 @@
             "url": {
               "type": "string",
               "title": "License URL",
-              "description": "The URL to the license file. If specified, a 'license' externalReference should also be specified for completeness.",
+              "description": "The URL to the license file. If specified, an `externalReferences` entry with `type=\"license\"` should also be specified for completeness.",
               "examples": [
                 "https://www.apache.org/licenses/LICENSE-2.0.txt"
               ],
@@ -12421,7 +12458,7 @@
                   "url": {
                     "type": "string",
                     "title": "License URL",
-                    "description": "The URL to the license file. If specified, a 'license' externalReference should also be specified for completeness.",
+                    "description": "The URL to the license file. If specified, an `externalReferences` entry with `type=\"license\"` should also be specified for completeness.",
                     "examples": [
                       "https://www.apache.org/licenses/LICENSE-2.0.txt"
                     ],
@@ -12449,7 +12486,7 @@
         },
         "licenseAcknowledgementEnumeration": {
           "title": "License Acknowledgement",
-          "description": "Declared licenses and concluded licenses represent two different stages in the licensing process within software development. Declared licenses refer to the initial intention of the software authors regarding the licensing terms under which their code is released. On the other hand, concluded licenses are the result of a comprehensive analysis of the project's codebase to identify and confirm the actual licenses of the components used, which may differ from the initially declared licenses. While declared licenses provide an upfront indication of the licensing intentions, concluded licenses offer a more thorough understanding of the actual licensing within a project, facilitating proper compliance and risk management. Observed licenses are defined in `@.evidence.licenses`. Observed licenses form the evidence necessary to substantiate a concluded license.",
+          "description": "Declared licenses and concluded licenses represent two different stages in the licensing process within software development. Declared licenses refer to the initial intention of the software authors regarding the licensing terms under which their code is released. On the other hand, concluded licenses are the result of a comprehensive analysis of the project's codebase to identify and confirm the actual licenses of the components used, which may differ from the initially declared licenses. While declared licenses provide an upfront indication of the licensing intentions, concluded licenses offer a more thorough understanding of the actual licensing within a project, facilitating proper compliance and risk management. Observed licenses are defined in `evidence.licenses`. Observed licenses form the evidence necessary to substantiate a concluded license.",
           "enum": [
             "declared",
             "concluded"
@@ -12680,13 +12717,13 @@
             },
             "manufacturer": {
               "title": "BOM Manufacturer",
-              "description": "The organization that created the BOM.\nManufacturer is common in BOMs created through automated processes. BOMs created through manual means may have `@.authors` instead.",
+              "description": "The organization that created the BOM.\nManufacturer is common in BOMs created through automated processes. BOMs created through manual means may have `authors` instead.",
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/organizationalEntity"
             },
             "authors": {
               "type": "array",
               "title": "BOM Authors",
-              "description": "The person(s) who created the BOM.\nAuthors are common in BOMs created through manual processes. BOMs created through automated means may have `@.manufacturer` instead.",
+              "description": "The person(s) who created the BOM.\nAuthors are common in BOMs created through manual processes. BOMs created through automated means may have `manufacturer` instead.",
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/organizationalContact"
               }
@@ -12718,7 +12755,7 @@
         },
         "tlpClassification": {
           "title": "Traffic Light Protocol (TLP) Classification",
-          "description": "Traffic Light Protocol (TLP) is a classification system for identifying the potential risk associated with artefact, including whether it is subject to certain types of legal, financial, or technical threats. Refer to <https://www.first.org/tlp/> for further information.\nThe default classification is \"CLEAR\".",
+          "description": "Traffic Light Protocol (TLP) is a classification system for identifying the potential risk associated with artefact, including whether it is subject to certain types of legal, financial, or technical threats. Refer to <https://www.first.org/tlp/> for further information.\nThe default classification is `\"CLEAR\"`.",
           "default": "CLEAR",
           "enum": [
             "CLEAR",
@@ -12746,7 +12783,7 @@
         "party": {
           "type": "object",
           "title": "Party",
-          "description": "Identifies an organization, individual, system, or abstract archetype that participates in supplying, producing, attesting, operating, owning, regulating, or otherwise relating to the subject. Each party plays one or more named roles. Roles may carry preference order (`role.order`) to express primary, alternate, and secondary rankings among parties sharing the same role.\n\nExactly one identity sub-shape (`organization`, `person`, `system`, or `persona`) shall be present. Optional sub-objects layer inter-party relationships and standard extension data.",
+          "description": "Identifies an organization, individual, system, or abstract archetype that participates in supplying, producing, attesting, operating, owning, regulating, or otherwise relating to the subject. Each party plays one or more named roles. Roles may carry preference order (`roles[].order`) to express primary, alternate, and secondary rankings among parties sharing the same role.\n\nExactly one identity sub-shape (`organization`, `person`, `system`, or `persona`) shall be present. Optional sub-objects layer inter-party relationships and standard extension data.",
           "required": [
             "roles"
           ],
@@ -12837,7 +12874,7 @@
         "parties": {
           "type": "array",
           "title": "Parties",
-          "description": "Parties associated with the subject. Each item identifies an organization, individual, system, or abstract archetype playing one or more named roles such as manufacturer, supplier, author, integrator, quality-control, or any custom role. The same party can hold multiple roles, each independently ranked via `role.order` to express preference (for example, primary supplier with order 1 and alternate supplier with order 2). Items may be inline party objects or references to parties declared elsewhere.",
+          "description": "Parties associated with the subject. Each item identifies an organization, individual, system, or abstract archetype playing one or more named roles such as `\"manufacturer\"`, `\"supplier\"`, `\"author\"`, `\"integrator\"`, `\"quality-control\"`, or any custom role. The same party can hold multiple roles, each independently ranked via `roles[].order` to express preference (for example, primary supplier with order `1` and alternate supplier with order `2`). Items may be inline party objects or references to parties declared elsewhere.",
           "items": {
             "$ref": "#/$defs/cyclonedx-party-2.0/$defs/partyChoice"
           }
@@ -12881,7 +12918,7 @@
         },
         "role": {
           "title": "Role",
-          "description": "A role that a party fulfils. May be a predefined role from the CycloneDX role taxonomy or a custom role definition. The optional `order` property ranks parties that share the same role, supporting use cases such as primary versus alternate suppliers in hardware manufacturing supply chains.",
+          "description": "A role that a party fulfils. May be a predefined role from the CycloneDX role taxonomy or a custom role definition. The `order` property ranks parties that share the same role, supporting use cases such as primary versus alternate suppliers in hardware manufacturing supply chains.",
           "oneOf": [
             {
               "$ref": "#/$defs/cyclonedx-party-2.0/$defs/preDefinedRole"
@@ -13072,7 +13109,7 @@
               "type": "integer",
               "minimum": 1,
               "title": "Order",
-              "description": "Preference order among parties sharing this role. Lower values indicate higher preference. Ties are permitted. Absence means unranked. For example, a primary supplier may have `order: 1` while an alternate supplier has `order: 2`.",
+              "description": "Preference order among parties sharing this role. Lower values indicate higher preference. Ties are permitted. Absence means unranked. For example, a primary supplier may have `order=1` while an alternate supplier has `order=2`.",
               "examples": [
                 1,
                 2,
@@ -13192,7 +13229,7 @@
                   "name": {
                     "type": "string",
                     "title": "Name",
-                    "description": "Label describing the URL, such as `homepage`, `support`, `press`, `status`, or `repository`.",
+                    "description": "Label describing the URL.",
                     "examples": [
                       "homepage",
                       "support",
@@ -13240,7 +13277,7 @@
             "sortName": {
               "type": "string",
               "title": "Sort Name",
-              "description": "Optional sortable form of the name for catalog and index views. Use when the natural form of `name` does not sort intuitively, for example a comma-separated last-name-first form.",
+              "description": "Sortable form of the name for catalog and index views. Use when the natural form of `name` does not sort intuitively, for example a comma-separated last-name-first form.",
               "examples": [
                 "Lovelace, Ada",
                 "García López, Maria del Carmen"
@@ -13293,7 +13330,7 @@
                   "name": {
                     "type": "string",
                     "title": "Name",
-                    "description": "Label describing the email, such as `work`, `personal`, `support`, or `security`.",
+                    "description": "Label describing the email.",
                     "examples": [
                       "work",
                       "personal",
@@ -13323,7 +13360,7 @@
                   "name": {
                     "type": "string",
                     "title": "Name",
-                    "description": "Label describing the phone, such as `office`, `mobile`, `fax`, or `pager`.",
+                    "description": "Label describing the phone.",
                     "examples": [
                       "office",
                       "mobile",
@@ -13356,11 +13393,12 @@
                   "name": {
                     "type": "string",
                     "title": "Name",
-                    "description": "Label describing the URL, such as `homepage`, `github`, `linkedin`, `mastodon`, or `orcid`.",
+                    "description": "Label describing the URL.",
                     "examples": [
                       "homepage",
                       "github",
                       "linkedin",
+                      "mastodon",
                       "orcid"
                     ]
                   },
@@ -13402,7 +13440,7 @@
             },
             "kind": {
               "title": "Kind",
-              "description": "The kind of system the party represents. May be a predefined kind from the CycloneDX system-kind taxonomy expressed as a plain string, or a custom kind expressed as an object with `name` and optional `description`.",
+              "description": "The kind of system the party represents. May be a predefined kind from the CycloneDX system-kind taxonomy expressed as a plain string, or a custom kind expressed as an object with `name` and `description`.",
               "oneOf": [
                 {
                   "title": "Pre-Defined Kind",
@@ -13430,7 +13468,7 @@
                     "oracle": "External data feed or oracle, including blockchain oracles that bridge off-chain data into on-chain systems.",
                     "smart-contract": "On-chain program that executes deterministically.",
                     "device": "Physical end user device such as a phone or IoT device acting as a party in its own right.",
-                    "robot": "Physical robot or autonomous mechanical system. For software-only counterparts, see `bot`, `agent`, or `automation`."
+                    "robot": "Physical robot or autonomous mechanical system. For software-only counterparts, see `\"bot\"`, `\"agent\"`, or `\"automation\"`."
                   }
                 },
                 {
@@ -13507,7 +13545,7 @@
             },
             "archetype": {
               "title": "Archetype",
-              "description": "The persona archetype. May be a predefined archetype from the CycloneDX persona-archetype taxonomy expressed as a plain string, or a custom archetype expressed as an object with `name` and optional `description`.",
+              "description": "The persona archetype. May be a predefined archetype from the CycloneDX persona-archetype taxonomy expressed as a plain string, or a custom archetype expressed as an object with `name` and `description`.",
               "oneOf": [
                 {
                   "title": "Pre-Defined Archetype",
@@ -13627,7 +13665,7 @@
         "partyRelations": {
           "type": "object",
           "title": "Party Relations",
-          "description": "Links from this party to other parties. Captures hierarchical, organizational, and delegation relationships. Order ranking is on the role itself (`role.order`), not here.",
+          "description": "Links from this party to other parties. Captures hierarchical, organizational, and delegation relationships. Order ranking is on the role itself (`roles[].order`), not here.",
           "additionalProperties": false,
           "properties": {
             "parent": {
@@ -13654,7 +13692,7 @@
           "properties": {
             "scheme": {
               "title": "Scheme",
-              "description": "The identifier scheme. May be a predefined scheme from the CycloneDX identifier-scheme taxonomy expressed as a plain string, or a custom scheme expressed as an object with `name` and optional `description` and `url`.",
+              "description": "The identifier scheme. May be a predefined scheme from the CycloneDX identifier-scheme taxonomy expressed as a plain string, or a custom scheme expressed as an object with `name` and `description` and `url`.",
               "oneOf": [
                 {
                   "title": "Pre-Defined Scheme",
@@ -13781,12 +13819,12 @@
             "country": {
               "type": "string",
               "title": "Country",
-              "description": "The country name or the two-letter ISO 3166-1 country code. When the isoCode property is present, the value of isoCode is authoritative."
+              "description": "The country name or the two-letter ISO 3166-1 country code. When the `isoCode` property is present, the value of `isoCode` is authoritative."
             },
             "region": {
               "type": "string",
               "title": "Region",
-              "description": "The region or state in the country. When the isoCode property carries an ISO 3166-2 subdivision, the value of isoCode is authoritative.",
+              "description": "The region or state in the country. When the `isoCode` property carries an ISO 3166-2 subdivision, the value of `isoCode` is authoritative.",
               "examples": [
                 "Texas"
               ]
@@ -13829,7 +13867,7 @@
             "streetAddress": {
               "type": "string",
               "title": "Street Address",
-              "description": "The street address. Multi-line addresses are expressed as a single string with line breaks (`\\n`) between lines. Implementations and serialization formats are not required to preserve the order of elements in an array, so a multi-line address shall not be modeled as an array.",
+              "description": "The street address. Multi-line addresses are expressed as a single string with line breaks (`\"\\n\"`) between lines. Implementations and serialization formats are not required to preserve the order of elements in an array, so a multi-line address shall not be modeled as an array.",
               "examples": [
                 "100 Main Street",
                 "Acme Tower\nSuite 1200\n100 Main Street"
@@ -13862,7 +13900,7 @@
                 "altitude": {
                   "type": "number",
                   "title": "Altitude",
-                  "description": "Altitude in meters above the reference ellipsoid identified by the datum property."
+                  "description": "Altitude in meters above the reference ellipsoid identified by the `datum` property."
                 },
                 "datum": {
                   "type": "string",
@@ -13941,7 +13979,11 @@
               "type": "string",
               "pattern": "^[A-Za-z0-9][A-Za-z0-9\\-/.()\\s]{0,28}[A-Za-z0-9]$",
               "title": "Patent Publication Number",
-              "description": "This is the number assigned to a patent application once it is published. Patent applications are generally published 18 months after filing (unless an applicant requests non-publication). This number is distinct from the application number. \n\nPurpose: Identifies the publicly available version of the application. \n\nFormat: Varies by jurisdiction, often similar to application numbers but includes an additional suffix indicating publication. \n\nExample:\n - US: US20240000123A1 (indicates the first publication of application US20240000123) \n - Europe: EP23123456A1 (first publication of European application EP23123456). \n\nWIPO ST.96 v8.0: \n - Publication Number field: <https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/PublicationNumber.xsd>."
+              "description": "This is the number assigned to a patent application once it is published. Patent applications are generally published 18 months after filing (unless an applicant requests non-publication). This number is distinct from the application number. \n\nPurpose: Identifies the publicly available version of the application. \n\nFormat: Varies by jurisdiction, often similar to application numbers but includes an additional suffix indicating publication. \n\nExample:\n - US: `\"US20240000123A1\"` (indicates the first publication of application US20240000123) \n - Europe: `\"EP23123456A1\"` (first publication of European application EP23123456). \n\nWIPO ST.96 v8.0: \n - Publication Number field: <https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/PublicationNumber.xsd>.",
+              "examples": [
+                "US20240000123A1",
+                "EP23123456A1"
+              ]
             },
             "title": {
               "type": "string",
@@ -14085,7 +14127,7 @@
               },
               "assertionType": {
                 "title": "Assertion Type",
-                "description": "The type of assertion being made about the patent or patent family. Examples include ownership, licensing, and standards inclusion.",
+                "description": "The type of assertion being made about the patent or patent family.",
                 "enum": [
                   "ownership",
                   "license",
@@ -14170,7 +14212,7 @@
         "priorityApplication": {
           "type": "object",
           "title": "Priority Application",
-          "description": "The priorityApplication contains the essential data necessary to identify and reference an earlier patent filing for priority rights. In line with WIPO ST.96 guidelines, it includes the jurisdiction (office code), application number, and filing date-the three key elements that uniquely specify the priority application in a global patent context.",
+          "description": "The `priorityApplication` contains the essential data necessary to identify and reference an earlier patent filing for priority rights. In line with WIPO ST.96 guidelines, it includes the jurisdiction (office code), application number, and filing date-the three key elements that uniquely specify the priority application in a global patent context.",
           "required": [
             "applicationNumber",
             "jurisdiction",
@@ -14300,7 +14342,7 @@
             "weight": {
               "type": "number",
               "title": "Weight",
-              "description": "Describes the importance of a field in relation to other fields. Values shall be between 0.0 and 1.0. This allows for relative ranking of mappings, where higher values indicate greater importance.",
+              "description": "Describes the importance of a field in relation to other fields. Values shall be between `0.0` and `1.0`. This allows for relative ranking of mappings, where higher values indicate greater importance.",
               "minimum": 0,
               "maximum": 1
             },
@@ -14546,12 +14588,24 @@
               "type": "string",
               "minLength": 1,
               "title": "Category",
-              "description": "High-level category, such as `semiconductor`, `passive`, `connector`, `electromechanical`, or `optoelectronic`."
+              "description": "High-level category.",
+              "examples": [
+                "semiconductor",
+                "passive",
+                "connector",
+                "electromechanical",
+                "optoelectronic"
+              ]
             },
             "subcategory": {
               "type": "string",
               "title": "Subcategory",
-              "description": "More specific classification within the category, such as `microcontroller`, `voltage-regulator`, or `ceramic-resonator`."
+              "description": "More specific classification within the category.",
+              "examples": [
+                "microcontroller",
+                "voltage-regulator",
+                "ceramic-resonator"
+              ]
             },
             "codes": {
               "type": "array",
@@ -14625,10 +14679,13 @@
               "uniqueItems": true,
               "minItems": 1,
               "title": "Designators",
-              "description": "Reference designators identifying the placement on the assembly, such as U5, R12, C3.",
+              "description": "Reference designators identifying the placement on the assembly.",
               "examples": [
                 [
                   "U5"
+                ],
+                [
+                  "R12"
                 ],
                 [
                   "C3",
@@ -15037,7 +15094,7 @@
             "pre-release",
             "internal"
           ],
-          "description": "The software versioning type. It is recommended that the release type use one of 'major', 'minor', 'patch', 'pre-release', or 'internal'. Representing all possible software release types is not practical, so standardizing on the recommended values, whenever possible, is strongly encouraged.\n\n* __major__ = A major release may contain significant changes or may introduce breaking changes.\n* __minor__ = A minor release, also known as an update, may contain a smaller number of changes than major releases.\n* __patch__ = Patch releases are typically unplanned and may resolve defects or important security issues.\n* __pre-release__ = A pre-release may include alpha, beta, or release candidates and typically have limited support. They provide the ability to preview a release prior to its general availability.\n* __internal__ = Internal releases are not for public consumption and are intended to be used exclusively by the project or manufacturer that produced it."
+          "description": "The software versioning type. It is recommended that the release type use one of `\"major\"`, `\"minor\"`, `\"patch\"`, `\"pre-release\"`, or `\"internal\"`. Representing all possible software release types is not practical, so standardizing on the recommended values, whenever possible, is strongly encouraged.\n\n* `\"major\"` = A major release may contain significant changes or may introduce breaking changes.\n* `\"minor\"` = A minor release, also known as an update, may contain a smaller number of changes than major releases.\n* `\"patch\"` = Patch releases are typically unplanned and may resolve defects or important security issues.\n* `\"pre-release\"` = A pre-release may include alpha, beta, or release candidates and typically have limited support. They provide the ability to preview a release prior to its general availability.\n* `\"internal\"` = Internal releases are not for public consumption and are intended to be used exclusively by the project or manufacturer that produced it."
         },
         "note": {
           "type": "object",
@@ -15051,7 +15108,13 @@
             "locale": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/locale",
               "title": "Locale",
-              "description": "The ISO-639 (or higher) language code and optional ISO-3166 (or higher) country code. Examples include: \"en\", \"en-US\", \"fr\" and \"fr-CA\"."
+              "description": "The ISO-639 (or higher) language code and optional ISO-3166 (or higher) country code.",
+              "examples": [
+                "en",
+                "en-US",
+                "fr",
+                "fr-CA"
+              ]
             },
             "text": {
               "title": "Release note content",
@@ -15117,7 +15180,10 @@
             "id": {
               "type": "string",
               "title": "Identifier",
-              "description": "A unique identifier for the requirement, often used in requirement management systems (e.g., REQ-001)."
+              "description": "A unique identifier for the requirement, often used in requirement management systems.",
+              "examples": [
+                "REQ-001"
+              ]
             },
             "name": {
               "type": "string",
@@ -15186,7 +15252,7 @@
             "parent": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Parent Reference",
-              "description": "Optional reference using bom-link or `refId` to a parent requirement. Establishes a hierarchy of requirements."
+              "description": "Reference using bom-link or `refId` to a parent requirement. Establishes a hierarchy of requirements."
             },
             "rationale": {
               "type": "string",
@@ -15812,7 +15878,7 @@
             },
             "owner": {
               "$ref": "#/$defs/cyclonedx-party-2.0/$defs/partyChoice",
-              "description": "The party accountable for this risk. May be an inline party object or a reference to a previously declared party. The party's `roles` should include `owner`."
+              "description": "The party accountable for this risk. May be an inline party object or a reference to a previously declared party. The party's `roles` should include `\"owner\"`."
             },
             "externalReferences": {
               "type": "array",
@@ -15828,7 +15894,7 @@
         "rating": {
           "type": "object",
           "title": "Rating",
-          "description": "A methodology-neutral assessment of risk along likelihood and impact, with an overall score. The same shape expresses inherent, residual, and target risk so reductions can be compared. A rating can be qualitative (a `level`), semi-quantitative (a numeric `score` on a bounded scale), or quantitative (for example a probable monetary loss under [FAIR](https://www.fairinstitute.org/)). For a catalogue of assessment techniques, see [IEC 31010](https://www.iso.org/standard/72140.html).",
+          "description": "A methodology-neutral assessment of risk along likelihood and impact, with an overall score. The same shape expresses inherent, residual, and target risk so reductions can be compared. A rating can be qualitative (a `score.level`), semi-quantitative (a numeric `score.score` on a bounded scale), or quantitative (for example a probable monetary loss under [FAIR](https://www.fairinstitute.org/)). For a catalogue of assessment techniques, see [IEC 31010](https://www.iso.org/standard/72140.html).",
           "additionalProperties": false,
           "properties": {
             "likelihood": {
@@ -15886,7 +15952,7 @@
               "minimum": 0,
               "maximum": 1,
               "title": "Confidence",
-              "description": "Confidence in this rating, expressed as a decimal from 0 to 1, where 1 is full confidence. Supports quantitative methods that reason over uncertainty."
+              "description": "Confidence in this rating, expressed as a decimal from `0` to `1`, where `1` is full confidence. Supports quantitative methods that reason over uncertainty."
             },
             "rationale": {
               "type": "string",
@@ -15931,18 +15997,24 @@
               "type": "number",
               "minimum": 0,
               "maximum": 1,
-              "description": "Probability as a decimal from 0 to 1."
+              "description": "Probability as a decimal from `0` to `1`."
             },
             "frequency": {
               "type": "number",
               "minimum": 0,
               "title": "Frequency",
-              "description": "The expected number of events within the timeframe, for frequency-based methods such as the [FAIR](https://www.fairinstitute.org/) loss event frequency. Unlike a probability, a frequency may exceed 1."
+              "description": "The expected number of events within the timeframe, for frequency-based methods such as the [FAIR](https://www.fairinstitute.org/) loss event frequency. Unlike a probability, a frequency may exceed `1`."
             },
             "timeframe": {
               "type": "string",
               "title": "Timeframe",
-              "description": "The period over which the probability or frequency is assessed, expressed as an [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) duration, for example P1Y for one year."
+              "description": "The period over which the probability or frequency is assessed, expressed as an [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) duration, for example `\"P1Y\"` for one year.",
+              "examples": [
+                "P1Y",
+                "P1M",
+                "P23DT23H",
+                "PT1M"
+              ]
             },
             "range": {
               "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/estimateRange",
@@ -15974,8 +16046,13 @@
             "name": {
               "type": "string",
               "title": "Name",
-              "description": "The name of the likelihood factor being evaluated. Should clearly identify the dimension of likelihood being assessed, such as 'Threat Actor Capability', 'Exploit Availability', or 'Control Effectiveness'.",
-              "minLength": 1
+              "description": "The name of the likelihood factor being evaluated. Should clearly identify the dimension of likelihood being assessed.",
+              "minLength": 1,
+              "examples": [
+                "Threat Actor Capability",
+                "Exploit Availability",
+                "Control Effectiveness"
+              ]
             },
             "type": {
               "title": "Type",
@@ -16072,7 +16149,7 @@
             "weight": {
               "type": "number",
               "title": "Weight",
-              "description": "The relative importance or weight of this factor in the overall likelihood calculation, expressed as a decimal between 0 and 1. When multiple factors are present, weights can be used to produce a weighted average likelihood score. A weight of 1 indicates full importance; a weight of 0 indicates no importance.",
+              "description": "The relative importance or weight of this factor in the overall likelihood calculation, expressed as a decimal between `0` and `1`. When multiple factors are present, weights can be used to produce a weighted average likelihood score. A weight of `1` indicates full importance; a weight of `0` indicates no importance.",
               "minimum": 0,
               "maximum": 1
             },
@@ -16244,7 +16321,11 @@
               "type": "string",
               "minLength": 1,
               "title": "Name",
-              "description": "The name of the impact factor being evaluated, such as 'Financial damage' or 'Reputation damage'."
+              "description": "The name of the impact factor being evaluated.",
+              "examples": [
+                "Financial damage",
+                "Reputation damage"
+              ]
             },
             "category": {
               "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/impactCategory",
@@ -16261,7 +16342,7 @@
               "minimum": 0,
               "maximum": 1,
               "title": "Weight",
-              "description": "The relative importance of this factor in the overall impact calculation, expressed as a decimal from 0 to 1. OCTAVE Allegro, for example, ranks impact areas and multiplies the ranking by the factor value."
+              "description": "The relative importance of this factor in the overall impact calculation, expressed as a decimal from `0` to `1`. OCTAVE Allegro, for example, ranks impact areas and multiplies the ranking by the factor value."
             },
             "description": {
               "type": "string",
@@ -16338,7 +16419,7 @@
         "riskScore": {
           "type": "object",
           "title": "Risk Score",
-          "description": "The overall risk score, expressed as a qualitative `level`, a numeric `score`, or both, with `vector` and `methodology` recording how it was derived. The scale of `score` is defined by the methodology, since rating systems differ. For example, [OWASP Risk Rating](https://owasp.org/www-community/OWASP_Risk_Rating_Methodology) averages factors from 0 to 9, [DREAD](https://en.wikipedia.org/wiki/DREAD_%28risk_assessment_model%29) averages five 1 to 10 ratings, [FMEA](https://asq.org/quality-resources/fmea) multiplies three 1 to 10 axes into a 1 to 1000 risk priority number, and [FAIR](https://www.fairinstitute.org/) expresses probable loss in monetary terms.",
+          "description": "The overall risk score, expressed as a qualitative `level`, a numeric `score`, or both, with `vector` and `methodology` recording how it was derived. The scale of `score` is defined by the methodology, since rating systems differ. For example, [OWASP Risk Rating](https://owasp.org/www-community/OWASP_Risk_Rating_Methodology) averages factors from `0` to `9`, [DREAD](https://en.wikipedia.org/wiki/DREAD_%28risk_assessment_model%29) averages five `1` to `10` ratings, [FMEA](https://asq.org/quality-resources/fmea) multiplies three `1` to `10` axes into a `1` to `1000` risk priority number, and [FAIR](https://www.fairinstitute.org/) expresses probable loss in monetary terms.",
           "required": [
             "level"
           ],
@@ -16392,13 +16473,13 @@
                 "qualitative-matrix"
               ],
               "meta:enum": {
-                "dread": "[DREAD](https://en.wikipedia.org/wiki/DREAD_%28risk_assessment_model%29) risk rating model, the average of five ratings (damage, reproducibility, exploitability, affected users, discoverability) each scored 1 to 10.",
+                "dread": "[DREAD](https://en.wikipedia.org/wiki/DREAD_%28risk_assessment_model%29) risk rating model, the average of five ratings (damage, reproducibility, exploitability, affected users, discoverability) each scored `1` to `10`.",
                 "fair": "[Factor Analysis of Information Risk (FAIR)](https://www.fairinstitute.org/), a quantitative methodology expressing risk as loss event frequency multiplied by loss magnitude.",
                 "fmea": "[Failure Mode and Effects Analysis (FMEA)](https://asq.org/quality-resources/fmea), using a risk priority number of severity multiplied by occurrence multiplied by detection.",
                 "nist-sp-800-30": "[NIST SP 800-30](https://csrc.nist.gov/pubs/sp/800/30/r1/final) guide for conducting risk assessments, using its exemplary likelihood and impact scales.",
                 "octave": "[OCTAVE Allegro](https://www.sei.cmu.edu/documents/786/2007_005_001_14885.pdf), using its relative risk score.",
-                "owasp-risk-rating": "[OWASP Risk Rating](https://owasp.org/www-community/OWASP_Risk_Rating_Methodology), averaging likelihood and impact factors each scored 0 to 9.",
-                "qualitative-matrix": "A qualitative risk matrix that derives a risk level by plotting a likelihood band against an impact band, such as a five by five matrix producing a score from 1 to 25."
+                "owasp-risk-rating": "[OWASP Risk Rating](https://owasp.org/www-community/OWASP_Risk_Rating_Methodology), averaging likelihood and impact factors each scored `0` to `9`.",
+                "qualitative-matrix": "A qualitative risk matrix that derives a risk level by plotting a likelihood band against an impact band, such as a five by five matrix producing a score from `1` to `25`."
               }
             },
             {
@@ -16469,7 +16550,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
               },
-              "description": "References using bom-link or `refId` to the controls that implement this response. Where a control is declared in the same document, its appliesTo property may also record the relationship."
+              "description": "References using bom-link or `refId` to the controls that implement this response. Where a control is declared in the same document, its `appliesTo` property may also record the relationship."
             },
             "status": {
               "title": "Status",
@@ -16782,7 +16863,7 @@
               "items": {
                 "$ref": "#/$defs/cyclonedx-party-2.0/$defs/partyChoice"
               },
-              "description": "The parties that performed the assessment. Each may be an inline party or a reference to a previously declared party, and may be a person or an automated system, agent, or tool. Automated assessors support continuous and automated assessment, as in a GRC engineering practice. A party's `roles` should include `auditor` or `assessor`."
+              "description": "The parties that performed the assessment. Each may be an inline party or a reference to a previously declared party, and may be a person or an automated system, agent, or tool. Automated assessors support continuous and automated assessment, as in a GRC engineering practice. A party's `roles` should include `\"auditor\"` or `\"assessor\"`."
             },
             "summary": {
               "type": "string",
@@ -16850,7 +16931,7 @@
                 },
                 "description": {
                   "type": "string",
-                  "description": "An optional explanation for custom aggregation approaches."
+                  "description": "An explanation for custom aggregation approaches."
                 }
               },
               "description": "The aggregated risk result for this assessment."
@@ -17021,7 +17102,13 @@
             },
             "horizon": {
               "type": "string",
-              "description": "The time horizon over which this appetite applies, expressed as an [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) duration, for example P1Y for one year."
+              "description": "The time horizon over which this appetite applies, expressed as an [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) duration, for example `\"P1Y\"` for one year.",
+              "examples": [
+                "P1Y",
+                "P1M",
+                "P23DT23H",
+                "PT1M"
+              ]
             },
             "nextReview": {
               "type": "string",
@@ -17242,7 +17329,7 @@
         "threats": {
           "type": "object",
           "title": "Threats",
-          "description": "Threat-modelling content, including the documented threats, the threat scenarios that realize them, the attack patterns and attack trees that describe how they are carried out, and the trust boundaries they cross. Control references throughout this model point at controls that mitigate the referencing element. Where a control is declared in the same document, its appliesTo property may also record the relationship; the reference here is intended primarily for controls defined elsewhere.",
+          "description": "Threat-modelling content, including the documented threats, the threat scenarios that realize them, the attack patterns and attack trees that describe how they are carried out, and the trust boundaries they cross. Control references throughout this model point at controls that mitigate the referencing element. Where a control is declared in the same document, its `appliesTo` property may also record the relationship; the reference here is intended primarily for controls defined elsewhere.",
           "additionalProperties": false,
           "properties": {
             "threats": {
@@ -18170,7 +18257,7 @@
             "root": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
               "title": "Root Reference",
-              "description": "Optional reference using bom-link or `refId` to the root node within nodes, representing the attacker goal. When omitted, the root is the node that no other node lists as a child."
+              "description": "Reference using bom-link or `refId` to the root node within nodes, representing the attacker goal. When omitted, the root is the node that no other node lists as a child."
             },
             "nodes": {
               "type": "array",
@@ -18210,7 +18297,7 @@
             },
             "operator": {
               "title": "Operator",
-              "description": "Specifies how the nodes listed in 'children' combine to achieve this node. A value of 'and' requires every child node; a value of 'or' requires any single child node. For example, a node whose children are a phishing node and a credential-stuffing node uses 'or' when either alone achieves it, or 'and' when both are needed together. A node with no children is a leaf and omits this property.",
+              "description": "Specifies how the nodes listed in `children` combine to achieve this node. A value of `\"and\"` requires every child node; a value of `\"or\"` requires any single child node. For example, a node whose children are a phishing node and a credential-stuffing node uses `\"or\"` when either alone achieves it, or `\"and\"` when both are needed together. A node with no children is a leaf and omits this property.",
               "enum": [
                 "and",
                 "or"
@@ -18778,7 +18865,11 @@
               "type": "string",
               "title": "Name",
               "minLength": 1,
-              "description": "The name or title of the use case, typically expressed as a verb phrase that captures the goal from the actor's perspective (e.g., 'Place Order', 'Reset Password')."
+              "description": "The name or title of the use case, typically expressed as a verb phrase that captures the goal from the actor's perspective.",
+              "examples": [
+                "Place Order",
+                "Reset Password"
+              ]
             },
             "description": {
               "type": "string",
@@ -18894,13 +18985,13 @@
               "type": "integer",
               "title": "Number",
               "minimum": 1,
-              "description": "The sequence number indicating the ordinal position of this step within its flow, starting at 1."
+              "description": "The sequence number indicating the ordinal position of this step within its flow, starting at `1`."
             },
             "description": {
               "type": "string",
               "title": "Description",
               "minLength": 1,
-              "description": "A clear, action-oriented statement describing what the actor does in this step and the expected system response, written in the form 'The [actor] [action]'."
+              "description": "A clear, action-oriented statement describing what the actor does in this step and the expected system response, written in the form `The [actor] [action]`."
             },
             "actor": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType",
@@ -18922,7 +19013,11 @@
               "type": "string",
               "title": "Name",
               "minLength": 1,
-              "description": "A short, descriptive name identifying this alternative flow (e.g., 'Payment Declined', 'Guest Checkout')."
+              "description": "A short, descriptive name identifying this alternative flow.",
+              "examples": [
+                "Payment Declined",
+                "Guest Checkout"
+              ]
             },
             "description": {
               "type": "string",
@@ -18959,7 +19054,12 @@
               "type": "string",
               "title": "Name",
               "minLength": 1,
-              "description": "A short, descriptive name identifying this exception scenario (e.g., 'Session Timeout', 'Insufficient Funds', 'Service Unavailable')."
+              "description": "A short, descriptive name identifying this exception scenario.",
+              "examples": [
+                "Session Timeout",
+                "Insufficient Funds",
+                "Service Unavailable"
+              ]
             },
             "description": {
               "type": "string",
@@ -19266,7 +19366,7 @@
                   "items": {
                     "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refLinkType"
                   },
-                  "description": "References using bom-link or `refId` to the controls that prevent or reduce the exploitability or impact of the vulnerability. Substantiates justifications such as protected_by_mitigating_control, protected_at_perimeter, and protected_at_runtime."
+                  "description": "References using bom-link or `refId` to the controls that prevent or reduce the exploitability or impact of the vulnerability. Substantiates justifications such as `\"protected_by_mitigating_control\"`, `\"protected_at_perimeter\"`, and `\"protected_at_runtime\"`."
                 },
                 "response": {
                   "type": "array",
@@ -19310,7 +19410,7 @@
             },
             "evidence": {
               "$ref": "#/$defs/cyclonedx-vulnerability-2.0/$defs/vulnerabilityEvidence",
-              "description": "Evidence collected through extraction or analysis that substantiates the presence, absence, or exploitability of the vulnerability in the affected components. Evidence supports both positive determinations, such as a confirmed exploitable finding, and negative determinations, such as a `not_affected` conclusion, and complements the impact analysis and the proof of concept."
+              "description": "Evidence collected through extraction or analysis that substantiates the presence, absence, or exploitability of the vulnerability in the affected components. Evidence supports both positive determinations, such as a confirmed exploitable finding, and negative determinations, such as a `\"not_affected\"` conclusion, and complements the impact analysis and the proof of concept."
             },
             "affects": {
               "type": "array",
@@ -19495,7 +19595,7 @@
             "exploitable": "The vulnerability may be directly or indirectly exploitable.",
             "in_triage": "The vulnerability is being investigated.",
             "false_positive": "The vulnerability is not specific to the component or service and was falsely identified or associated.",
-            "not_affected": "The component or service is not affected by the vulnerability. Justification should be specified for all not_affected cases."
+            "not_affected": "The component or service is not affected by the vulnerability. Justification should be specified for all `\"not_affected\"` cases."
           }
         },
         "impactAnalysisJustification": {
@@ -19521,7 +19621,7 @@
             "protected_by_compiler": "Exploitability requires a compiler flag to be set/unset.",
             "protected_at_runtime": "Exploits are prevented at runtime.",
             "protected_at_perimeter": "Attacks are blocked at physical, logical, or network perimeter.",
-            "protected_by_mitigating_control": "Preventive measures have been implemented that reduce the likelihood or impact of the vulnerability, or both. The controls may be referenced using the mitigatingControls property."
+            "protected_by_mitigating_control": "Preventive measures have been implemented that reduce the likelihood or impact of the vulnerability, or both. The controls may be referenced using the `mitigatingControls` property."
           }
         },
         "rating": {
@@ -19630,9 +19730,9 @@
                     "rank"
                   ],
                   "meta:enum": {
-                    "probability": "The likelihood of the scored outcome within the period defined by the method, expressed as a decimal from 0 to 1.",
-                    "percentile": "The proportion of the scored population at or below this subject, expressed as a decimal from 0 to 1.",
-                    "confidence": "The degree of certainty in the score, expressed as a decimal from 0 to 1.",
+                    "probability": "The likelihood of the scored outcome within the period defined by the method, expressed as a decimal from `0` to `1`.",
+                    "percentile": "The proportion of the scored population at or below this subject, expressed as a decimal from `0` to `1`.",
+                    "confidence": "The degree of certainty in the score, expressed as a decimal from `0` to `1`.",
                     "rank": "The position of the subject within the scored population."
                   }
                 },
@@ -19695,7 +19795,7 @@
           }
         },
         "affectedStatus": {
-          "description": "The vulnerability status of a given version or range of versions of a product. The statuses 'affected' and 'unaffected' indicate that the version is affected or unaffected by the vulnerability. The status 'unknown' indicates that it is unknown or unspecified whether the given version is affected. There can be many reasons for an 'unknown' status, including that an investigation has not been undertaken or that a vendor has not disclosed the status.",
+          "description": "The vulnerability status of a given version or range of versions of a product. The statuses `\"affected\"` and `\"unaffected\"` indicate that the version is affected or unaffected by the vulnerability. The status `\"unknown\"` indicates that it is unknown or unspecified whether the given version is affected. There can be many reasons for an `\"unknown\"` status, including that an investigation has not been undertaken or that a vendor has not disclosed the status.",
           "enum": [
             "affected",
             "unaffected",
@@ -19793,7 +19893,7 @@
               "minimum": 0,
               "maximum": 1,
               "title": "Confidence",
-              "description": "The overall confidence of the determination from 0 to 1, where 1 is 100% confidence."
+              "description": "The overall confidence of the determination from `0` to `1`, where `1` is 100% confidence."
             },
             "concludedValue": {
               "type": "string",
@@ -19985,7 +20085,7 @@
           "properties": {
             "refId": {
               "$ref": "#/$defs/cyclonedx-common-2.0/$defs/refIdType",
-              "description": "An optional identifier which can be used to reference the weakness elsewhere using a `refId` or bom-link."
+              "description": "An identifier which can be used to reference the weakness elsewhere using a `refId` or bom-link."
             },
             "kind": {
               "title": "Kind",
@@ -20151,13 +20251,20 @@
               "type": "string",
               "minLength": 1,
               "title": "Scheme Version",
-              "description": "The version or edition of the registry that issued the identifier, for example 4.20 for CWE or 8.0 for HFACS."
+              "description": "The version or edition of the registry that issued the identifier, for example `\"4.20\"` for CWE or `\"8.0\"` for HFACS.",
+              "examples": [
+                "4.20",
+                "8.0"
+              ]
             },
             "value": {
               "type": "string",
               "minLength": 1,
               "title": "Value",
-              "description": "The identifier value as issued by the registry, for example CWE-502."
+              "description": "The identifier value as issued by the registry.",
+              "examples": [
+                "CWE-502"
+              ]
             }
           },
           "allOf": [
