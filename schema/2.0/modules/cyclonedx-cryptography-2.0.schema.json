@@ -752,6 +752,59 @@
                 }
               }
             },
+            "sshAlgorithms": {
+              "type": "object",
+              "title": "SSH Algorithms",
+              "description": "The SSH algorithms, grouped by the name-list categories of the key exchange initialization message (`SSH_MSG_KEXINIT`) defined in [RFC 4253 section 7.1](https://www.rfc-editor.org/rfc/rfc4253#section-7.1), as configured or observed for the subject of this BOM. Array order does not convey negotiation preference. The lists do not identify which algorithms were selected in a particular connection. Name-lists that SSH negotiates separately for each direction (encryption, MAC, and compression) are recorded here without distinguishing the direction. Algorithms used for user authentication ([RFC 4252](https://www.rfc-editor.org/rfc/rfc4252)) are not part of these lists.",
+              "additionalProperties": false,
+              "properties": {
+                "kex": {
+                  "type": "array",
+                  "title": "Key Exchange Algorithms",
+                  "description": "SSH key exchange methods (`kex_algorithms`). Extension indicators carried in the same name-list, such as `ext-info-s` ([RFC 8308](https://www.rfc-editor.org/rfc/rfc8308)), are not key exchange methods and are not recorded here.",
+                  "items": {
+                    "$ref": "#/$defs/sshAlgorithm",
+                    "title": "Key Exchange Algorithm"
+                  }
+                },
+                "hostKey": {
+                  "type": "array",
+                  "title": "Host Key Algorithms",
+                  "description": "SSH server host key algorithms (`server_host_key_algorithms`): the algorithms a server offers, or a client accepts, for authenticating the server.",
+                  "items": {
+                    "$ref": "#/$defs/sshAlgorithm",
+                    "title": "Host Key Algorithm"
+                  }
+                },
+                "encryption": {
+                  "type": "array",
+                  "title": "Encryption Algorithms",
+                  "description": "SSH encryption algorithms (`encryption_algorithms_client_to_server` and `encryption_algorithms_server_to_client`).",
+                  "items": {
+                    "$ref": "#/$defs/sshAlgorithm",
+                    "title": "Encryption Algorithm"
+                  }
+                },
+                "mac": {
+                  "type": "array",
+                  "title": "MAC Algorithms",
+                  "description": "SSH message authentication code algorithms (`mac_algorithms_client_to_server` and `mac_algorithms_server_to_client`).",
+                  "items": {
+                    "$ref": "#/$defs/sshAlgorithm",
+                    "title": "MAC Algorithm"
+                  }
+                },
+                "compression": {
+                  "type": "array",
+                  "title": "Compression Algorithms",
+                  "description": "SSH compression algorithms (`compression_algorithms_client_to_server` and `compression_algorithms_server_to_client`).",
+                  "items": {
+                    "$ref": "#/$defs/sshAlgorithm",
+                    "title": "Compression Algorithm"
+                  }
+                }
+              }
+            },
             "relatedCryptographicAssets": {
               "$ref": "#/$defs/relatedCryptographicAssets"
             }
@@ -929,6 +982,34 @@
           "type": "string",
           "title": "Name",
           "description": "A name for the authentication method."
+        },
+        "algorithm": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "title": "Algorithm reference",
+          "description": "The `refId` to algorithm cryptographic asset."
+        }
+      }
+    },
+    "sshAlgorithm": {
+      "type": "object",
+      "title": "SSH Algorithm",
+      "description": "Object representing an algorithm name as it appears in an SSH name-list.",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The algorithm name as it appears in the SSH name-list. Where a registered name exists, the name from the IANA Secure Shell (SSH) Protocol Parameters registry should be used.",
+          "examples": [
+            "mlkem768x25519-sha256",
+            "ssh-ed25519",
+            "aes256-gcm@openssh.com",
+            "hmac-sha2-256",
+            "none"
+          ]
         },
         "algorithm": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
