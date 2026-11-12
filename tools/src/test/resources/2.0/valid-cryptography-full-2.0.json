@@ -86,19 +86,18 @@
           { "ref": "cert-fips140-3-l1" }
         ],
         "type": "cryptographic-asset",
-        "refId": "algorithm-sha256",
-        "name": "SHA-256",
+        "refId": "algorithm-hkdf-sha256",
+        "name": "HKDF-SHA-256",
         "cryptoProperties": {
           "assetType": "algorithm",
           "algorithmProperties": {
-            "primitive": "hash",
-            "algorithmFamily": "SHA-2",
-            "parameterSetIdentifier": "256",
+            "primitive": "kdf",
+            "algorithmFamily": "HKDF",
             "executionEnvironment": "software-plain-ram",
             "implementationPlatform": [ "x86_64" ],
-            "cryptoFunctions": ["digest"]
+            "cryptoFunctions": ["keyderive"]
           },
-          "oid": "2.16.840.1.101.3.4.2.1"
+          "oid": "1.2.840.113549.1.9.16.3.28"
         }
       },
       {
@@ -106,19 +105,18 @@
           { "ref": "cert-fips140-3-l1" }
         ],
         "type": "cryptographic-asset",
-        "refId": "algorithm-sha384",
-        "name": "SHA-384",
+        "refId": "algorithm-hkdf-sha384",
+        "name": "HKDF-SHA-384",
         "cryptoProperties": {
           "assetType": "algorithm",
           "algorithmProperties": {
-            "primitive": "hash",
-            "algorithmFamily": "SHA-2",
-            "parameterSetIdentifier": "384",
+            "primitive": "kdf",
+            "algorithmFamily": "HKDF",
             "executionEnvironment": "software-plain-ram",
             "implementationPlatform": [ "x86_64" ],
-            "cryptoFunctions": ["digest"]
+            "cryptoFunctions": ["keyderive"]
           },
-          "oid": "2.16.840.1.101.3.4.2.2"
+          "oid": "1.2.840.113549.1.9.16.3.29"
         }
       },
       {
@@ -167,8 +165,27 @@
           { "ref": "cert-fips140-3-l1" }
         ],
         "type": "cryptographic-asset",
+        "refId": "algorithm-hmac-sha256",
+        "name": "HMAC-SHA-256",
+        "cryptoProperties": {
+          "assetType": "algorithm",
+          "algorithmProperties": {
+            "primitive": "mac",
+            "algorithmFamily": "HMAC",
+            "executionEnvironment": "software-plain-ram",
+            "implementationPlatform": [ "x86_64" ],
+            "cryptoFunctions": ["tag"]
+          },
+          "oid": "1.2.840.113549.2.9"
+        }
+      },
+      {
+        "certifications": [
+          { "ref": "cert-fips140-3-l1" }
+        ],
+        "type": "cryptographic-asset",
         "refId": "algorithm-ffdh-group14",
-        "name": "FFDH Group 14",
+        "name": "FFDHE-modp2048",
         "cryptoProperties": {
           "assetType": "algorithm",
           "algorithmProperties": {
@@ -187,7 +204,7 @@
         ],
         "type": "cryptographic-asset",
         "refId": "algorithm-ecdsa-p256",
-        "name": "ECDSA-P256",
+        "name": "ECDSA-secp256r1-SHA-256",
         "cryptoProperties": {
           "assetType": "algorithm",
           "algorithmProperties": {
@@ -352,72 +369,37 @@
           "protocolProperties": {
             "type": "tls",
             "version": "1.3",
-            "cipherSuites": [
+            "composition": [
               {
-                "name": "TLS_AES_128_GCM_SHA256",
-                "algorithms": [
-                  "algorithm-aes-128-gcm",
-                  "algorithm-sha256"
-                ],
-                "identifiers": [
-                  "0x13,0x01"
-                ]
-              },
-              {
-                "name": "TLS_AES_256_GCM_SHA384",
-                "algorithms": [
-                  "algorithm-aes-256-gcm",
-                  "algorithm-sha384"
-                ],
-                "identifiers": [
-                  "0x13,0x02"
-                ]
-              },
-              {
-                "name": "TLS_CHACHA20_POLY1305_SHA256",
-                "algorithms": [
-                  "algorithm-chacha20-poly1305",
-                  "algorithm-sha256"
-                ],
-                "identifiers": [
-                  "0x13,0x03"
+                "role": "encryption",
+                "selection": "one-of",
+                "selectedBy": "negotiation",
+                "selectingParty": "server",
+                "algorithmSet": [
+                  {
+                    "name": "TLS_AES_128_GCM_SHA256",
+                    "algorithms": [
+                      "AES-128-GCM-128-96",
+                      "HKDF-SHA-256"
+                    ]
+                  },
+                  {
+                    "name": "TLS_AES_256_GCM_SHA384",
+                    "algorithms": [
+                      "AES-256-GCM-128-96",
+                      "HKDF-SHA-384"
+                    ]
+                  },
+                  {
+                    "name": "TLS_CHACHA20_POLY1305_SHA256",
+                    "algorithms": [
+                      "ChaCha20-Poly1305",
+                      "HKDF-SHA-256"
+                    ]
+                  }
                 ]
               }
             ],
-            "ikev2TransformTypes": {
-              "encr": [
-                {
-                  "name": "ENCR_AES_GCM_16",
-                  "keyLength": 128,
-                  "algorithm": "algorithm-aes-128-gcm"
-                }
-              ],
-              "prf": [
-                {
-                  "name": "PRF_HMAC_SHA2_256",
-                  "algorithm": "algorithm-sha256"
-                }
-              ],
-              "integ": [
-                {
-                  "name": "AUTH_HMAC_SHA2_256_128",
-                  "algorithm": "algorithm-sha256"
-                }
-              ],
-              "ke": [
-                {
-                  "group": 14,
-                  "algorithm": "algorithm-ffdh-group14"
-                }
-              ],
-              "esn": true,
-              "auth": [
-                {
-                  "name": "ECDSA",
-                  "algorithm": "algorithm-ecdsa-p256"
-                }
-              ]
-            },
             "relatedCryptographicAssets": [
               {
                 "type": "algorithm",
@@ -429,11 +411,11 @@
               },
               {
                 "type": "algorithm",
-                "ref": "algorithm-sha256"
+                "ref": "algorithm-hkdf-sha256"
               },
               {
                 "type": "algorithm",
-                "ref": "algorithm-sha384"
+                "ref": "algorithm-hkdf-sha384"
               },
               {
                 "type": "algorithm",
@@ -442,6 +424,107 @@
             ]
           },
           "oid": "1.3.6.1.5.5.7.3.1"
+        }
+      },
+      {
+        "type": "cryptographic-asset",
+        "refId": "protocol-ike-2",
+        "name": "IKEv2 Configuration",
+        "cryptoProperties": {
+          "assetType": "protocol",
+          "protocolProperties": {
+            "type": "ike",
+            "version": "2",
+            "composition": [
+              {
+                "role": "encryption",
+                "selection": "one-of",
+                "selectedBy": "negotiation",
+                "selectingParty": "responder",
+                "algorithmSet": [
+                  {
+                    "name": "ENCR_AES_GCM_16",
+                    "algorithms": [
+                      "AES-128-GCM-128-96"
+                    ]
+                  }
+                ]
+              },
+              {
+                "role": "prf",
+                "selection": "one-of",
+                "selectedBy": "negotiation",
+                "selectingParty": "responder",
+                "algorithmSet": [
+                  {
+                    "name": "PRF_HMAC_SHA2_256",
+                    "algorithms": [
+                      "HMAC-SHA-256"
+                    ]
+                  }
+                ]
+              },
+              {
+                "role": "integrity",
+                "selection": "one-of",
+                "selectedBy": "negotiation",
+                "selectingParty": "responder",
+                "algorithmSet": [
+                  {
+                    "name": "AUTH_HMAC_SHA2_256_128",
+                    "algorithms": [
+                      "HMAC-SHA-256-128"
+                    ]
+                  }
+                ]
+              },
+              {
+                "role": "key-exchange",
+                "selection": "one-of",
+                "selectedBy": "negotiation",
+                "selectingParty": "responder",
+                "algorithmSet": [
+                  {
+                    "name": "2048-bit MODP Group",
+                    "algorithms": [
+                      "FFDHE-modp2048"
+                    ]
+                  }
+                ]
+              },
+              {
+                "role": "authentication",
+                "selection": "one-of",
+                "selectedBy": "configuration",
+                "algorithmSet": [
+                  {
+                    "name": "ECDSA with SHA-256 on the P-256 curve",
+                    "algorithms": [
+                      "ECDSA-secp256r1-SHA-256"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "relatedCryptographicAssets": [
+              {
+                "type": "algorithm",
+                "ref": "algorithm-aes-128-gcm"
+              },
+              {
+                "type": "algorithm",
+                "ref": "algorithm-hmac-sha256"
+              },
+              {
+                "type": "algorithm",
+                "ref": "algorithm-ffdh-group14"
+              },
+              {
+                "type": "algorithm",
+                "ref": "algorithm-ecdsa-p256"
+              }
+            ]
+          }
         }
       }
     ]

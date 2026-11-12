@@ -1,0 +1,216 @@
+{
+  "$schema": "https://cyclonedx.org/schema/2.0/cyclonedx-2.0.schema.json",
+  "specFormat": "CycloneDX",
+  "specVersion": "2.0",
+  "version": 1,
+  "serialNumber": "urn:uuid:f952d999-2ace-4d4b-840c-b5d3c00c3c18",
+  "inventories": [
+    {
+      "subject": {
+        "refId": "subject-1",
+        "type": "application",
+        "name": "Acme Gateway",
+        "version": "1.0"
+      },
+      "components": [
+        {
+          "type": "cryptographic-asset",
+          "refId": "protocol-tls-server",
+          "name": "TLS 1.3 server",
+          "cryptoProperties": {
+            "assetType": "protocol",
+            "protocolProperties": {
+              "type": "tls",
+              "version": "1.3",
+              "composition": [
+                {
+                  "role": "key-exchange",
+                  "selection": "one-of",
+                  "selectedBy": "negotiation",
+                  "selectingParty": "server",
+                  "algorithmSet": [
+                    {
+                      "name": "X25519MLKEM768",
+                      "algorithms": [
+                        "x25519",
+                        "ML-KEM-768"
+                      ]
+                    },
+                    {
+                      "name": "x25519",
+                      "algorithms": [
+                        "x25519"
+                      ]
+                    },
+                    {
+                      "name": "secp256r1",
+                      "algorithms": [
+                        "ECDHE-secp256r1"
+                      ]
+                    },
+                    {
+                      "name": "ffdhe2048",
+                      "algorithms": [
+                        "FFDHE-ffdhe2048"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "signature",
+                  "selection": "one-of",
+                  "selectedBy": "negotiation",
+                  "selectingParty": "server",
+                  "algorithmSet": [
+                    {
+                      "name": "ecdsa_secp256r1_sha256",
+                      "algorithms": [
+                        "ECDSA-secp256r1-SHA-256"
+                      ]
+                    },
+                    {
+                      "name": "rsa_pss_rsae_sha256",
+                      "algorithms": [
+                        "RSA-PSS-SHA-256-MGF1-SHA-256-32"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "cert-chain-signature",
+                  "selection": "any-of",
+                  "selectedBy": "configuration",
+                  "algorithmSet": [
+                    {
+                      "name": "ecdsa_secp256r1_sha256",
+                      "algorithms": [
+                        "ECDSA-secp256r1-SHA-256"
+                      ]
+                    },
+                    {
+                      "name": "rsa_pkcs1_sha256",
+                      "algorithms": [
+                        "RSA-PKCS1-1.5-SHA-256"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "encryption",
+                  "selection": "one-of",
+                  "selectedBy": "negotiation",
+                  "selectingParty": "server",
+                  "algorithmSet": [
+                    {
+                      "name": "TLS_AES_128_GCM_SHA256",
+                      "algorithms": [
+                        "AES-128-GCM-128-96",
+                        "HKDF-SHA-256"
+                      ]
+                    },
+                    {
+                      "name": "TLS_AES_256_GCM_SHA384",
+                      "algorithms": [
+                        "AES-256-GCM-128-96",
+                        "HKDF-SHA-384"
+                      ]
+                    },
+                    {
+                      "name": "TLS_CHACHA20_POLY1305_SHA256",
+                      "algorithms": [
+                        "ChaCha20-Poly1305",
+                        "HKDF-SHA-256"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "cryptographic-asset",
+          "refId": "protocol-tls-observed",
+          "name": "TLS endpoint, partly observed",
+          "cryptoProperties": {
+            "assetType": "protocol",
+            "protocolProperties": {
+              "type": "tls",
+              "composition": [
+                {
+                  "role": "key-exchange",
+                  "selection": "one-of",
+                  "selectedBy": "negotiation",
+                  "selectingParty": "server",
+                  "algorithmSet": [
+                    {
+                      "name": "x25519",
+                      "algorithms": [
+                        "x25519"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "signature",
+                  "selection": "one-of",
+                  "selectedBy": "negotiation",
+                  "selectingParty": "server",
+                  "algorithmSet": [
+                    {
+                      "name": "ed25519",
+                      "algorithms": [
+                        "Ed25519"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "cryptographic-asset",
+          "refId": "protocol-tls-client",
+          "name": "TLS 1.3 client (embedded)",
+          "cryptoProperties": {
+            "assetType": "protocol",
+            "protocolProperties": {
+              "type": "tls",
+              "version": "1.3",
+              "composition": [
+                {
+                  "role": "key-exchange",
+                  "selection": "one-of",
+                  "selectedBy": "build-time",
+                  "algorithmSet": [
+                    {
+                      "name": "secp256r1",
+                      "algorithms": [
+                        "ECDHE-secp256r1"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "encryption",
+                  "selection": "one-of",
+                  "selectedBy": "build-time",
+                  "algorithmSet": [
+                    {
+                      "name": "TLS_AES_128_CCM_SHA256",
+                      "algorithms": [
+                        "AES-128-CCM-128-96",
+                        "HKDF-SHA-256"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

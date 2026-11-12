@@ -1,0 +1,228 @@
+{
+  "$schema": "https://cyclonedx.org/schema/2.0/cyclonedx-2.0.schema.json",
+  "specFormat": "CycloneDX",
+  "specVersion": "2.0",
+  "version": 1,
+  "serialNumber": "urn:uuid:37ec656d-b55f-442f-830d-ebd3b48a99a0",
+  "inventories": [
+    {
+      "subject": {
+        "refId": "subject-1",
+        "type": "application",
+        "name": "Acme VPN Gateway",
+        "version": "1.0"
+      },
+      "components": [
+        {
+          "type": "cryptographic-asset",
+          "refId": "protocol-ike-configured",
+          "name": "IKEv2 configured IKE SA",
+          "cryptoProperties": {
+            "assetType": "protocol",
+            "protocolProperties": {
+              "type": "ike",
+              "version": "2",
+              "composition": [
+                {
+                  "role": "encryption",
+                  "selection": "one-of",
+                  "selectedBy": "negotiation",
+                  "selectingParty": "responder",
+                  "algorithmSet": [
+                    {
+                      "name": "ENCR_AES_GCM_16",
+                      "algorithms": [
+                        "AES-256-GCM-128-96"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "prf",
+                  "selection": "one-of",
+                  "selectedBy": "negotiation",
+                  "selectingParty": "responder",
+                  "algorithmSet": [
+                    {
+                      "name": "PRF_HMAC_SHA2_256",
+                      "algorithms": [
+                        "HMAC-SHA-256"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "key-exchange",
+                  "selection": "any-of",
+                  "selectedBy": "negotiation",
+                  "selectingParty": "responder",
+                  "algorithmSet": [
+                    {
+                      "name": "256-bit random ECP group",
+                      "algorithms": [
+                        "ECDHE-secp256r1"
+                      ]
+                    },
+                    {
+                      "name": "ml-kem-768",
+                      "algorithms": [
+                        "ML-KEM-768"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "role": "authentication",
+                  "selection": "one-of",
+                  "selectedBy": "configuration",
+                  "algorithmSet": [
+                    {
+                      "name": "ECDSA with SHA-256 on the P-256 curve",
+                      "algorithms": [
+                        "ECDSA-secp256r1-SHA-256"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "cryptographic-asset",
+          "refId": "protocol-esp-child-a-configured",
+          "name": "ESP Child SA A (site-to-site), configured",
+          "cryptoProperties": {
+            "assetType": "protocol",
+            "protocolProperties": {
+              "type": "esp",
+              "composition": [
+                {
+                  "role": "encryption",
+                  "selection": "one-of",
+                  "selectedBy": "negotiation",
+                  "selectingParty": "responder",
+                  "algorithmSet": [
+                    {
+                      "name": "ENCR_AES_GCM_16",
+                      "algorithms": [
+                        "AES-256-GCM-128-96"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "cryptographic-asset",
+          "refId": "protocol-esp-child-b-configured",
+          "name": "ESP Child SA B (remote-access), configured",
+          "cryptoProperties": {
+            "assetType": "protocol",
+            "protocolProperties": {
+              "type": "esp",
+              "composition": [
+                {
+                  "role": "encryption",
+                  "selection": "one-of",
+                  "selectedBy": "negotiation",
+                  "selectingParty": "responder",
+                  "algorithmSet": [
+                    {
+                      "name": "ENCR_AES_GCM_16",
+                      "algorithms": [
+                        "AES-128-GCM-128-96"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "cryptographic-asset",
+          "refId": "protocol-esp-child-a-observed",
+          "name": "ESP Child SA A (site-to-site), observed",
+          "cryptoProperties": {
+            "assetType": "protocol",
+            "protocolProperties": {
+              "type": "esp",
+              "composition": [
+                {
+                  "role": "encryption",
+                  "selection": "one-of",
+                  "selectedBy": "negotiation",
+                  "selectingParty": "responder",
+                  "algorithmSet": [
+                    {
+                      "name": "ENCR_AES_GCM_16",
+                      "algorithms": [
+                        "AES-256-GCM-128-96"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "cryptographic-asset",
+          "refId": "protocol-ipsec",
+          "name": "IPsec",
+          "cryptoProperties": {
+            "assetType": "protocol",
+            "protocolProperties": {
+              "type": "ipsec",
+              "version": "3",
+              "composition": [
+                {
+                  "role": "key-management",
+                  "selection": "one-of",
+                  "selectedBy": "configuration",
+                  "algorithmSet": [
+                    {
+                      "protocol": "ike",
+                      "version": "2"
+                    }
+                  ]
+                },
+                {
+                  "role": "packet-protection",
+                  "selection": "any-of",
+                  "selectedBy": "configuration",
+                  "algorithmSet": [
+                    {
+                      "protocol": "esp"
+                    }
+                  ]
+                }
+              ],
+              "relatedCryptographicAssets": [
+                {
+                  "type": "protocol",
+                  "ref": "protocol-ike-configured"
+                },
+                {
+                  "type": "protocol",
+                  "ref": "protocol-esp-child-a-configured"
+                },
+                {
+                  "type": "protocol",
+                  "ref": "protocol-esp-child-b-configured"
+                },
+                {
+                  "type": "protocol",
+                  "ref": "protocol-esp-child-a-observed"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
