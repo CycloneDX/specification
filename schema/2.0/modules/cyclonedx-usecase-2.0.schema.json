@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cyclonedx.org/schema/2.0/modules/cyclonedx-usecase-2.0.schema.json",
-  "type": "null",
+  "not": { "$comment": "This schema provides definitions only and is not intended for direct validation or instantiation." },
   "title": "CycloneDX Use Case Module",
   "$comment": "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
@@ -19,19 +19,20 @@
       "title": "Use Case",
       "description": "A structured description of how one or more actors interact with the system to achieve a specific goal, including the primary flow, alternative paths, and exception scenarios.",
       "required": [
-        "bom-ref",
+        "refId",
         "name"
       ],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType"
         },
         "name": {
           "type": "string",
           "title": "Name",
           "minLength": 1,
-          "description": "The name or title of the use case, typically expressed as a verb phrase that captures the goal from the actor's perspective (e.g., 'Place Order', 'Reset Password')."
+          "description": "The name or title of the use case, typically expressed as a verb phrase that captures the goal from the actor's perspective.",
+          "examples": ["Place Order", "Reset Password"]
         },
         "description": {
           "type": "string",
@@ -45,7 +46,7 @@
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "References using bom-link or bom-ref to the actors that participate in this use case, representing anyone or anything that initiates or interacts with the described flow."
+          "description": "References using bom-link or `refId` to the actors that participate in this use case, representing anyone or anything that initiates or interacts with the described flow."
         },
         "preconditions": {
           "type": "array",
@@ -108,7 +109,7 @@
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "References using bom-link or bom-ref to the requirements that are implemented, validated, or addressed by this use case."
+          "description": "References using bom-link or `refId` to the requirements that are implemented, validated, or addressed by this use case."
         },
         "businessObjectives": {
           "type": "array",
@@ -117,7 +118,7 @@
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "References using bom-link or bom-ref to the business objectives this use case supports."
+          "description": "References using bom-link or `refId` to the business objectives this use case supports."
         },
         "notes": {
           "type": "array",
@@ -147,17 +148,17 @@
           "type": "integer",
           "title": "Number",
           "minimum": 1,
-          "description": "The sequence number indicating the ordinal position of this step within its flow, starting at 1."
+          "description": "The sequence number indicating the ordinal position of this step within its flow, starting at `1`."
         },
         "description": {
           "type": "string",
           "title": "Description",
           "minLength": 1,
-          "description": "A clear, action-oriented statement describing what the actor does in this step and the expected system response, written in the form 'The [actor] [action]'."
+          "description": "A clear, action-oriented statement describing what the actor does in this step and the expected system response, written in the form `The [actor] [action]`."
         },
         "actor": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
-          "description": "Reference using bom-link or bom-ref to the actor who initiates or performs this step, which may be a human user, an external system, or the system under design."
+          "description": "Reference using bom-link or `refId` to the actor who initiates or performs this step, which may be a human user, an external system, or the system under design."
         }
       }
     },
@@ -175,7 +176,8 @@
           "type": "string",
           "title": "Name",
           "minLength": 1,
-          "description": "A short, descriptive name identifying this alternative flow (e.g., 'Payment Declined', 'Guest Checkout')."
+          "description": "A short, descriptive name identifying this alternative flow.",
+          "examples": ["Payment Declined", "Guest Checkout"]
         },
         "description": {
           "type": "string",
@@ -212,7 +214,8 @@
           "type": "string",
           "title": "Name",
           "minLength": 1,
-          "description": "A short, descriptive name identifying this exception scenario (e.g., 'Session Timeout', 'Insufficient Funds', 'Service Unavailable')."
+          "description": "A short, descriptive name identifying this exception scenario.",
+          "examples": ["Session Timeout", "Insufficient Funds", "Service Unavailable"]
         },
         "description": {
           "type": "string",
@@ -247,10 +250,10 @@
         ],
         "additionalProperties": false,
         "properties": {
-          "bom-ref": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-            "title": "BOM Reference",
-            "description": "An identifier which can be used to reference the assertion elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
+          "refId": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+            "title": "Reference Identifier",
+            "description": "An identifier which can be used to reference the assertion elsewhere in the document. Every `refId` shall be unique within the document."
           },
           "assertionType": {
             "title": "Assertion Type",
@@ -283,7 +286,7 @@
           "useCaseRefs": {
             "type": "array",
             "title": "Use Case References",
-            "description": "A list of BOM references linking to use case objects defined in the BOM.",
+            "description": "The `refId`s of the use case objects.",
             "uniqueItems": true,
             "items": {
               "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"

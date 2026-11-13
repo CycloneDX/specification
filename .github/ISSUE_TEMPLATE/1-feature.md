@@ -19,7 +19,7 @@ Please include scopes and out-of-scopes.
 ## Possible solutions
 
 Do you have a solution in mind? Please describe.
-What is to be considdered? Any draw-backs?
+What is to be considered? Any draw-backs?
 
 ## Alternatives
 

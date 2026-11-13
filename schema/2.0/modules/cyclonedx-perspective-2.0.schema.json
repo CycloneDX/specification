@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cyclonedx.org/schema/2.0/modules/cyclonedx-perspective-2.0.schema.json",
-  "type": "null",
+  "not": { "$comment": "This schema provides definitions only and is not intended for direct validation or instantiation." },
   "title": "CycloneDX Perspective Module",
   "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
@@ -23,8 +23,8 @@
         "mappings"
       ],
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType"
         },
         "name": {
           "type": "string",
@@ -80,9 +80,9 @@
           "title": "Path Expression",
           "description": "A [JSONPath](https://datatracker.ietf.org/doc/html/rfc9535) expression that identifies the types of data relevant to this perspective.",
           "examples": [
-            "$.components[*].pedigree",
-            "$.components[?(@.type=='machine-learning-model')].modelCard",
-            "$.components[?(@.type=='cryptographic-asset')]",
+            "$.inventories[*].components[*].pedigree",
+            "$.inventories[*].components[?(@.type=='machine-learning-model')].modelProperties",
+            "$.definitions.components[?(@.type=='cryptographic-asset')]",
             "$.vulnerabilities"
           ]
         },
@@ -108,7 +108,7 @@
         "weight": {
           "type": "number",
           "title": "Weight",
-          "description": "Describes the importance of a field in relation to other fields. Values shall be between 0.0 and 1.0. This allows for relative ranking of mappings, where higher values indicate greater importance.",
+          "description": "Describes the importance of a field in relation to other fields. Values shall be between `0.0` and `1.0`. This allows for relative ranking of mappings, where higher values indicate greater importance.",
           "minimum": 0.0,
           "maximum": 1.0
         },

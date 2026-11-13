@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cyclonedx.org/schema/2.0/modules/cyclonedx-annotation-2.0.schema.json",
-  "type": "null",
+  "not": { "$comment": "This schema provides definitions only and is not intended for direct validation or instantiation." },
   "title": "CycloneDX Annotation Module",
   "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
@@ -10,7 +10,7 @@
       "items": {"$ref": "#/$defs/annotation"},
       "uniqueItems": true,
       "title": "Annotations",
-      "description": "Comments made by people, organizations, or tools about any object with a bom-ref, such as components, services, vulnerabilities, or the BOM itself. Unlike inventory information, annotations may contain opinions or commentary from various stakeholders. Annotations may be inline (with inventory) or externalized via BOM-Link and may optionally be signed."
+      "description": "Comments made by people, organizations, or tools about any object with a `refId`, such as components, services, vulnerabilities, or the BOM itself. Unlike inventory information, annotations may contain opinions or commentary from various stakeholders. Annotations may be inline (with inventory) or externalized via BOM-Link and may optionally be signed."
     },
     "annotation": {
       "type": "object",
@@ -24,10 +24,10 @@
       ],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference the annotation elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the annotation elsewhere in the document. Every `refId` shall be unique within the document."
         },
         "subjects": {
           "type": "array",
@@ -36,7 +36,7 @@
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/elementLink"
           },
           "title": "Subjects",
-          "description": "The object in the BOM identified by its bom-ref. This is often a component or service, but may be any object type supporting bom-refs."
+          "description": "The object in the BOM identified by its `refId`. This is often a component or service, but may be any object type supporting `refId`s."
         },
         "annotator": {
           "type": "object",
@@ -71,16 +71,16 @@
           "additionalProperties": false,
           "properties": {
             "organization": {
-              "description": "The organization that created the annotation",
+              "description": "The organization that created the annotation.",
               "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntity"
             },
             "individual": {
-              "description": "The person that created the annotation",
+              "description": "The person that created the annotation.",
               "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalContact"
             },
             "component": {
-              "description": "The tool or component that created the annotation",
-              "$ref": "cyclonedx-component-2.0.schema.json#/$defs/component"
+              "description": "The tool or component that created the annotation.",
+              "$ref": "cyclonedx-component-2.0.schema.json#/$defs/componentEntry"
             }
           }
         },

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cyclonedx.org/schema/2.0/modules/cyclonedx-release-notes-2.0.schema.json",
-  "type": "null",
+  "not": { "$comment": "This schema provides definitions only and is not intended for direct validation or instantiation." },
   "title": "CycloneDX Release Notes Module",
   "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
@@ -13,6 +13,11 @@
       ],
       "additionalProperties": false,
       "properties": {
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the release notes elsewhere in the document. Every `refId` shall be unique within the document."
+        },
         "type": {
           "$ref": "#/$defs/releaseType",
           "title": "Type",
@@ -87,7 +92,7 @@
         "pre-release",
         "internal"
       ],
-      "description": "The software versioning type. It is recommended that the release type use one of 'major', 'minor', 'patch', 'pre-release', or 'internal'. Representing all possible software release types is not practical, so standardizing on the recommended values, whenever possible, is strongly encouraged.\n\n* __major__ = A major release may contain significant changes or may introduce breaking changes.\n* __minor__ = A minor release, also known as an update, may contain a smaller number of changes than major releases.\n* __patch__ = Patch releases are typically unplanned and may resolve defects or important security issues.\n* __pre-release__ = A pre-release may include alpha, beta, or release candidates and typically have limited support. They provide the ability to preview a release prior to its general availability.\n* __internal__ = Internal releases are not for public consumption and are intended to be used exclusively by the project or manufacturer that produced it."
+      "description": "The software versioning type. It is recommended that the release type use one of `\"major\"`, `\"minor\"`, `\"patch\"`, `\"pre-release\"`, or `\"internal\"`. Representing all possible software release types is not practical, so standardizing on the recommended values, whenever possible, is strongly encouraged.\n\n* `\"major\"` = A major release may contain significant changes or may introduce breaking changes.\n* `\"minor\"` = A minor release, also known as an update, may contain a smaller number of changes than major releases.\n* `\"patch\"` = Patch releases are typically unplanned and may resolve defects or important security issues.\n* `\"pre-release\"` = A pre-release may include alpha, beta, or release candidates and typically have limited support. They provide the ability to preview a release prior to its general availability.\n* `\"internal\"` = Internal releases are not for public consumption and are intended to be used exclusively by the project or manufacturer that produced it."
     },
     "note": {
       "type": "object",
@@ -101,12 +106,38 @@
         "locale": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/locale",
           "title": "Locale",
-          "description": "The ISO-639 (or higher) language code and optional ISO-3166 (or higher) country code. Examples include: \"en\", \"en-US\", \"fr\" and \"fr-CA\""
+          "description": "The ISO-639 (or higher) language code and optional ISO-3166 (or higher) country code.",
+          "examples": ["en", "en-US", "fr", "fr-CA"]
         },
         "text": {
           "title": "Release note content",
           "description": "Specifies the full content of the release note.",
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/attachment"
+        }
+      }
+    },
+    "releaseNotesReference": {
+      "type": "object",
+      "title": "Release Notes Reference",
+      "description": "A reference to release notes defined elsewhere, such as in the definitions or in another document via BOM-Link. A reference includes the referenced release notes exactly as defined: every position that references the same release notes includes identical release notes.",
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "title": "Reference",
+          "description": "Reference using bom-link or `refId` to the release notes.",
+          "anyOf": [
+            {
+              "title": "Ref",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+            },
+            {
+              "title": "BOM-Link Element",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+            }
+          ]
         }
       }
     }

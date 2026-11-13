@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cyclonedx.org/schema/2.0/modules/cyclonedx-standard-2.0.schema.json",
-  "type": "null",
+  "not": { "$comment": "This schema provides definitions only and is not intended for direct validation or instantiation." },
   "title": "CycloneDX Standard Module",
   "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
@@ -19,10 +19,10 @@
       "description": "A standard may consist of regulations, industry or organizational-specific standards, maturity models, best practices, or any other requirements which can be evaluated against or attested to.",
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the object elsewhere in the document. Every `refId` shall be unique within the document."
         },
         "name": {
           "type": "string",
@@ -71,15 +71,15 @@
       "title": "Requirement",
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the object elsewhere in the document. Every `refId` shall be unique within the document."
         },
         "identifier": {
           "type": "string",
           "title": "Identifier",
-          "description": "The unique identifier used in the standard to identify a specific requirement. This should match what is in the standard and should not be the requirements bom-ref."
+          "description": "The unique identifier used in the standard to identify a specific requirement. This should match what is in the standard and should not be the requirements `refId`."
         },
         "title": {
           "type": "string",
@@ -113,8 +113,8 @@
         },
         "parent": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
-          "title": "Parent BOM Reference",
-          "description": "The `bom-ref` to a parent requirement. This establishes a hierarchy of requirements. Top-level requirements must not define a parent. Only child requirements should define parents."
+          "title": "Parent Reference",
+          "description": "The `refId` to a parent requirement. This establishes a hierarchy of requirements. Top-level requirements shall not define a parent. Only child requirements should define parents."
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
@@ -137,10 +137,10 @@
       "title": "Level",
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the object elsewhere in the document. Every `refId` shall be unique within the document."
         },
         "identifier": {
           "type": "string",
@@ -160,7 +160,7 @@
         "requirements": {
           "type": "array",
           "title": "Requirements",
-          "description": "The list of requirement `bom-ref`s that comprise the level.",
+          "description": "The list of requirement `refId`s that comprise the level.",
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           }

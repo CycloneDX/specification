@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cyclonedx.org/schema/2.0/modules/cyclonedx-control-2.0.schema.json",
-  "type": "null",
+  "not": { "$comment": "This schema provides definitions only and is not intended for direct validation or instantiation." },
   "title": "CycloneDX Control Module",
   "$comment": "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
@@ -19,14 +19,14 @@
       "title": "Control",
       "description": "A safeguard or countermeasure that protects systems, data, or operations. A control binds the elements that implement it to the requirements it satisfies, and records its implementation status and assessed effectiveness.",
       "required": [
-        "bom-ref",
+        "refId",
         "name"
       ],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "description": "An identifier which can be used to reference the control elsewhere using a bom-ref or bom-link."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "description": "An identifier which can be used to reference the control elsewhere using a `refId` or bom-link."
         },
         "name": {
           "type": "string",
@@ -98,7 +98,7 @@
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "References using bom-link or bom-ref to the elements the control protects, such as components, services, zones, or boundaries. A control without this property applies to the organization or system as a whole."
+          "description": "References using bom-link or `refId` to the elements the control protects, such as components, services, zones, or boundaries. A control without this property applies to the organization or system as a whole."
         },
         "implementedBy": {
           "type": "array",
@@ -108,7 +108,7 @@
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "References using bom-link or bom-ref to the components, services, formulation workflows, or parties that implement the control."
+          "description": "References using bom-link or `refId` to the components, services, formulation workflows, or parties that implement the control."
         },
         "satisfies": {
           "type": "array",
@@ -118,7 +118,7 @@
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
           },
-          "description": "References using bom-link or bom-ref to the requirements the control satisfies, including requirements defined within standards."
+          "description": "References using bom-link or `refId` to the requirements the control satisfies, including requirements defined within standards."
         },
         "effectiveness": {
           "title": "Effectiveness",
@@ -200,7 +200,7 @@
           "minimum": 0,
           "maximum": 1,
           "title": "Percentage",
-          "description": "Effectiveness as a decimal from 0 to 1."
+          "description": "Effectiveness as a decimal from `0` to `1`."
         },
         "rating": {
           "title": "Rating",

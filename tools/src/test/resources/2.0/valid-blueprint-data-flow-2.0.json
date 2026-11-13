@@ -6,7 +6,7 @@
   "version": 1,
   "blueprints": [
     {
-      "bom-ref": "bp-data-flow",
+      "refId": "bp-data-flow",
       "name": "Online banking funds transfer data flow",
       "description": "How a customer's login and transfer request moves through the portal, authentication, and transfer services to the account store and audit log, across trust boundaries.",
       "modelTypes": [
@@ -14,7 +14,7 @@
       ],
       "zones": [
         {
-          "bom-ref": "zone-internet",
+          "refId": "zone-internet",
           "name": "Internet",
           "type": "trust",
           "characteristics": [
@@ -22,12 +22,12 @@
           ]
         },
         {
-          "bom-ref": "zone-dmz",
+          "refId": "zone-dmz",
           "name": "DMZ",
           "type": "trust"
         },
         {
-          "bom-ref": "zone-core",
+          "refId": "zone-core",
           "name": "Core banking",
           "type": "trust",
           "characteristics": [
@@ -37,7 +37,7 @@
       ],
       "boundaries": [
         {
-          "bom-ref": "bnd-internet-dmz",
+          "refId": "bnd-internet-dmz",
           "name": "Internet to DMZ",
           "type": "trust",
           "zones": [
@@ -70,7 +70,7 @@
           }
         },
         {
-          "bom-ref": "bnd-dmz-core",
+          "refId": "bnd-dmz-core",
           "name": "DMZ to core",
           "type": "trust",
           "zones": [
@@ -81,7 +81,7 @@
       ],
       "actors": [
         {
-          "bom-ref": "act-customer",
+          "refId": "act-customer",
           "party": {
             "roles": [
               {
@@ -93,6 +93,7 @@
             }
           },
           "description": "A retail banking customer initiating a transfer.",
+          "inScope": false,
           "zone": "zone-internet",
           "permissions": [
             "initiate-transfer"
@@ -101,19 +102,20 @@
       ],
       "assets": [
         {
-          "bom-ref": "asset-portal",
+          "refId": "asset-portal",
           "type": "service",
           "name": "Web portal",
+          "inScope": true,
           "zone": "zone-dmz"
         },
         {
-          "bom-ref": "asset-auth",
+          "refId": "asset-auth",
           "type": "service",
           "name": "Authentication service",
           "zone": "zone-core"
         },
         {
-          "bom-ref": "asset-transfer",
+          "refId": "asset-transfer",
           "type": "service",
           "name": "Transfer service",
           "zone": "zone-core",
@@ -122,7 +124,7 @@
           }
         },
         {
-          "bom-ref": "asset-accounts",
+          "refId": "asset-accounts",
           "type": "data-store",
           "name": "Account store",
           "zone": "zone-core",
@@ -131,7 +133,7 @@
           }
         },
         {
-          "bom-ref": "asset-audit",
+          "refId": "asset-audit",
           "type": "data-store",
           "name": "Audit log",
           "zone": "zone-core"
@@ -139,9 +141,10 @@
       ],
       "flows": [
         {
-          "bom-ref": "df-login",
+          "refId": "df-login",
           "name": "Login and transfer request",
           "type": "data",
+          "inScope": true,
           "source": "act-customer",
           "destination": "asset-portal",
           "synchronous": true,
@@ -162,7 +165,7 @@
           ]
         },
         {
-          "bom-ref": "df-authenticate",
+          "refId": "df-authenticate",
           "name": "Authenticate session",
           "type": "data",
           "source": "asset-portal",
@@ -173,7 +176,7 @@
           ]
         },
         {
-          "bom-ref": "df-debit-credit",
+          "refId": "df-debit-credit",
           "name": "Debit and credit accounts",
           "type": "data",
           "source": "asset-transfer",
@@ -189,7 +192,7 @@
           ]
         },
         {
-          "bom-ref": "df-audit",
+          "refId": "df-audit",
           "name": "Write audit record",
           "type": "data",
           "source": "asset-transfer",
@@ -200,7 +203,7 @@
       ],
       "assumptions": [
         {
-          "bom-ref": "asm-tls",
+          "refId": "asm-tls",
           "description": "All flows that cross a trust boundary are protected with mutually authenticated TLS.",
           "topic": "security",
           "validity": "verified"

@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cyclonedx.org/schema/2.0/modules/cyclonedx-component-2.0.schema.json",
-  "type": "null",
+  "not": { "$comment": "This schema provides definitions only and is not intended for direct validation or instantiation." },
   "title": "CycloneDX Component Module",
   "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
     "components": {
       "type": "array",
-      "items": {"$ref": "#/$defs/componentOrChoice"},
+      "items": {"$ref": "#/$defs/componentEntry"},
       "uniqueItems": true,
       "title": "Components"
     },
@@ -39,37 +39,33 @@
             "service"
           ],
           "meta:enum": {
-            "application": "A software application. Refer to [https://en.wikipedia.org/wiki/Application_software](https://en.wikipedia.org/wiki/Application_software) for information about applications.",
-            "framework": "A software framework. Refer to [https://en.wikipedia.org/wiki/Software_framework](https://en.wikipedia.org/wiki/Software_framework) for information on how frameworks vary slightly from libraries.",
-            "library": "A software library. Refer to [https://en.wikipedia.org/wiki/Library_(computing)](https://en.wikipedia.org/wiki/Library_(computing)) for information about libraries. All third-party and open source reusable components will likely be a library. If the library also has key features of a framework, then it should be classified as a framework. If not, or is unknown, then specifying library is recommended.",
-            "container": "A packaging and/or runtime format, not specific to any particular technology, which isolates software inside the container from software outside of a container through virtualization technology. Refer to [https://en.wikipedia.org/wiki/OS-level_virtualization](https://en.wikipedia.org/wiki/OS-level_virtualization).",
+            "application": "A software application. Refer to <https://en.wikipedia.org/wiki/Application_software> for information about applications.",
+            "framework": "A software framework. Refer to <https://en.wikipedia.org/wiki/Software_framework> for information on how frameworks vary slightly from libraries.",
+            "library": "A software library. Refer to <https://en.wikipedia.org/wiki/Library_(computing)> for information about libraries. All third-party and open source reusable components will likely be a library. If the library also has key features of a framework, then it should be classified as a framework. If not, or is unknown, then specifying library is recommended.",
+            "container": "A packaging and/or runtime format, not specific to any particular technology, which isolates software inside the container from software outside of a container through virtualization technology. Refer to <https://en.wikipedia.org/wiki/OS-level_virtualization>.",
             "platform": "A runtime environment that interprets or executes software. This may include runtimes such as those that execute bytecode, just-in-time compilers, interpreters, or low-code/no-code application platforms.",
-            "operating-system": "A software operating system without regard to deployment model (i.e. installed on physical hardware, virtual machine, image, etc) Refer to [https://en.wikipedia.org/wiki/Operating_system](https://en.wikipedia.org/wiki/Operating_system).",
-            "device": "A hardware device such as a processor or chip-set. A hardware device containing firmware SHOULD include a component for the physical hardware itself and another component of type 'firmware' or 'operating-system' (whichever is relevant), describing information about the software running on the device. See also the list of [known device properties](https://github.com/CycloneDX/cyclonedx-property-taxonomy/blob/main/cdx/device.md).",
-            "device-driver": "A special type of software that operates or controls a particular type of device. Refer to [https://en.wikipedia.org/wiki/Device_driver](https://en.wikipedia.org/wiki/Device_driver).",
-            "firmware": "A special type of software that provides low-level control over a device's hardware. Refer to [https://en.wikipedia.org/wiki/Firmware](https://en.wikipedia.org/wiki/Firmware).",
-            "file": "A computer file. Refer to [https://en.wikipedia.org/wiki/Computer_file](https://en.wikipedia.org/wiki/Computer_file) for information about files.",
+            "operating-system": "A software operating system without regard to deployment model (i.e. installed on physical hardware, virtual machine, image, etc) Refer to <https://en.wikipedia.org/wiki/Operating_system>.",
+            "device": "A hardware device such as a processor or chip-set. A hardware device containing firmware SHOULD include a component for the physical hardware itself and another component with `type=\"firmware\"` or `type=\"operating-system\"` (whichever is relevant), describing information about the software running on the device. See also the list of [known device properties](https://github.com/CycloneDX/cyclonedx-property-taxonomy/blob/main/cdx/device.md).",
+            "device-driver": "A special type of software that operates or controls a particular type of device. Refer to <https://en.wikipedia.org/wiki/Device_driver>.",
+            "firmware": "A special type of software that provides low-level control over a device's hardware. Refer to <https://en.wikipedia.org/wiki/Firmware>.",
+            "file": "A computer file. Refer to <https://en.wikipedia.org/wiki/Computer_file> for information about files.",
             "machine-learning-model": "A model based on training data that can make predictions or decisions without being explicitly programmed to do so.",
             "data": "A collection of discrete values that convey information.",
             "cryptographic-asset": "A cryptographic asset including algorithms, protocols, certificates, keys, tokens, and secrets.",
-            "material": "A physical substance in raw or processed form that is used to make, maintain, or repair an item, such as a metal, alloy, polymer, chemical, or other matter. Materials are commonly tracked for sourcing, provenance, and regulatory compliance. A finished physical item should be classified as 'device' instead.",
+            "material": "A physical substance in raw or processed form that is used to make, maintain, or repair an item, such as a metal, alloy, polymer, chemical, or other matter. Materials are commonly tracked for sourcing, provenance, and regulatory compliance. A finished physical item should be classified with `type=\"device\"` instead.",
             "service": "A service, including microservices, function-as-a-service, and other types of network or intra-process services. Service-specific attributes, endpoints and the data profiles characterizing the data the service handles, apply exclusively to this component type."
           },
           "title": "Component Type",
           "description": "Specifies the type of component. For software components, classify as application if no more specific appropriate classification is available or cannot be determined for the component.",
           "examples": ["library"]
         },
-        "mime-type": {
-          "type": "string",
-          "title": "Mime-Type",
-          "description": "The mime-type of the component. When used on file components, the mime-type can provide additional context about the kind of file being represented, such as an image, font, or executable. Some library or framework components may also have an associated mime-type.",
-          "examples": ["image/jpeg"],
-          "pattern": "^[-+a-z0-9.]+/[-+a-z0-9.]+$"
+        "mediaType": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/mediaType"
         },
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference the component elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the component elsewhere in the document. Every `refId` shall be unique within the document."
         },
         "parties": {
           "$ref": "cyclonedx-party-2.0.schema.json#/$defs/parties"
@@ -84,35 +80,35 @@
         "group": {
           "type": "string",
           "title": "Component Group",
-          "description": "The grouping name or identifier. This will often be a shortened, single name of the company or project that produced the component, or the source package or domain name. Whitespace and special characters should be avoided. Examples include: apache, org.apache.commons, and apache.org.",
-          "examples": ["com.acme"]
+          "description": "The grouping name or identifier. This will often be a shortened, single name of the company or project that produced the component, or the source package or domain name. Whitespace and special characters should be avoided.",
+          "examples": ["com.acme", "apache", "org.apache.commons", "apache.org"]
         },
         "name": {
           "type": "string",
           "title": "Component Name",
-          "description": "The name of the component. This will often be a shortened, single name of the component. Examples: commons-lang3 and jquery",
-          "examples": ["tomcat-catalina"]
+          "description": "The name of the component. This will often be a shortened, single name of the component.",
+          "examples": ["tomcat-catalina", "commons-lang3", "jquery"]
         },
         "version": {
           "$ref": "#/$defs/version",
           "title": "Component Version",
-          "description": "The component version. The version should ideally comply with semantic versioning but is not enforced.\nMust be used exclusively, either 'version' or 'versionRange', but not both."
+          "description": "The component version. The version should ideally comply with semantic versioning but is not enforced.\nShall be used exclusively, either `version` or `versionRange`, but not both."
         },
         "versionRange": {
           "$ref": "#/$defs/versionRange",
           "title": "Component Version Range",
-          "description": "For an external component, this specifies the accepted version range.\nThe value must adhere to the Package URL Version Range syntax (vers), as defined at <https://github.com/package-url/vers-spec\nMay only be used if `.isExternal` is set to `true`.\nMust be used exclusively, either 'version' or 'versionRange', but not both."
+          "description": "For an external component, this specifies the accepted version range.\nThe value shall adhere to the Package URL Version Range syntax (vers), as defined at <https://github.com/package-url/vers-spec>.\nMay only be used if `isExternal=true`.\nShall be used exclusively, either `version` or `versionRange`, but not both."
         },
         "isExternal": {
           "type": "boolean",
           "title": "Component Is External",
-          "description": "Determine whether this component is external.\nAn external component is one that is not part of an assembly, but is expected to be provided by the environment, regardless of the component's `.scope`. This setting can be useful for distinguishing which components are bundled with the product and which can be relied upon to be present in the deployment environment.\nThis may be set to `true` for runtime components only. For `$.metadata.component`, it must be set to `false`.",
+          "description": "Determine whether this component is external.\nAn external component is one that is not part of an assembly, but is expected to be provided by the environment, regardless of the component's `scope`. This setting can be useful for distinguishing which components are bundled with the product and which can be relied upon to be present in the deployment environment.\nThis may be set to `true` for runtime components only. For the subject of an inventory statement, it shall be `false`.",
           "default": false
         },
         "description": {
           "type": "string",
           "title": "Component Description",
-          "description": "Specifies a description for the component"
+          "description": "Specifies a description for the component."
         },
         "scope": {
           "enum": [
@@ -122,11 +118,11 @@
           ],
           "meta:enum": {
             "required": "The component is required for runtime",
-            "optional": "The component is optional at runtime. Optional components are components that are not capable of being called due to them not being installed or otherwise accessible by any means. Components that are installed but due to configuration or other restrictions are prohibited from being called must be scoped as 'required'.",
+            "optional": "The component is optional at runtime. Optional components are components that are not capable of being called due to them not being installed or otherwise accessible by any means. Components that are installed but due to configuration or other restrictions are prohibited from being called must be scoped as `\"required\"`.",
             "excluded": "Components that are excluded provide the ability to document component usage for test and other non-runtime purposes. Excluded components are not reachable within a call graph at runtime."
           },
           "title": "Component Scope",
-          "description": "Specifies the scope of the component. If scope is not specified, 'required' scope SHOULD be assumed by the consumer of the BOM.",
+          "description": "Specifies the scope of the component. If scope is not specified, `\"required\"` scope SHOULD be assumed by the consumer of the BOM.",
           "default": "required"
         },
         "hashes": {
@@ -134,6 +130,10 @@
           "title": "Component Hashes",
           "description": "The hashes of the component.",
           "items": {"$ref": "cyclonedx-common-2.0.schema.json#/$defs/hash"}
+        },
+        "measurements": {
+          "$ref": "#/$defs/measurements",
+          "title": "Component Measurements"
         },
         "licenses": {
           "$ref": "cyclonedx-license-2.0.schema.json#/$defs/licenseChoice",
@@ -167,19 +167,34 @@
               "type": "array",
               "title": "Ancestors",
               "description": "Describes zero or more components in which a component is derived from. This is commonly used to describe forks from existing projects where the forked version contains an ancestor node containing the original component it was forked from. For example, Component A is the original component. Component B is the component being used and documented in the BOM. However, Component B contains a pedigree node with a single ancestor documenting Component A - the original component from which Component B is derived from.",
-              "items": {"$ref": "#/$defs/component"}
+              "items": {
+                "oneOf": [
+                  {"$ref": "#/$defs/component"},
+                  {"$ref": "#/$defs/componentReference"}
+                ]
+              }
             },
             "descendants": {
               "type": "array",
               "title": "Descendants",
               "description": "Descendants are the exact opposite of ancestors. This provides a way to document all forks (and their forks) of an original or root component.",
-              "items": {"$ref": "#/$defs/component"}
+              "items": {
+                "oneOf": [
+                  {"$ref": "#/$defs/component"},
+                  {"$ref": "#/$defs/componentReference"}
+                ]
+              }
             },
             "variants": {
               "type": "array",
               "title": "Variants",
               "description": "Variants describe relations where the relationship between the components is not known. For example, if Component A contains nearly identical code to Component B. They are both related, but it is unclear if one is derived from the other, or if they share a common ancestor.",
-              "items": {"$ref": "#/$defs/component"}
+              "items": {
+                "oneOf": [
+                  {"$ref": "#/$defs/component"},
+                  {"$ref": "#/$defs/componentReference"}
+                ]
+              }
             },
             "commits": {
               "type": "array",
@@ -190,22 +205,22 @@
             "patches": {
               "type": "array",
               "title": "Patches",
-              "description": ">A list of zero or more patches describing how the component deviates from an ancestor, descendant, or variant. Patches may be complementary to commits or may be used in place of commits.",
-              "items": {"$ref": "cyclonedx-common-2.0.schema.json#/$defs/patch"}
-            },
-            "notes": {
-              "type": "string",
-              "title": "Notes",
-              "description": "Notes, observations, and other non-structured commentary describing the components pedigree."
+              "description": "A list of zero or more patches describing how the component deviates from an ancestor, descendant, or variant. Patches may be complementary to commits or may be used in place of commits.",
+              "items": {
+                "oneOf": [
+                  {"$ref": "cyclonedx-common-2.0.schema.json#/$defs/patch"},
+                  {"$ref": "cyclonedx-common-2.0.schema.json#/$defs/patchReference"}
+                ]
+              }
             }
           }
         },
         "components": {
           "type": "array",
-          "items": {"$ref": "#/$defs/componentOrChoice"},
+          "items": {"$ref": "#/$defs/componentEntry"},
           "uniqueItems": true,
           "title": "Components",
-          "description": "A list of components included in the parent component, including software, hardware, and services. Entries may be concrete components or component-choice wrappers expressing conditional or alternate relationships. This is not a dependency tree. It provides a way to specify a hierarchical representation of component assemblies, similar to system &#8594; subsystem &#8594; parts assembly in physical supply chains."
+          "description": "A list of entries included in the parent component, including software, hardware, and services. Entries may be concrete components, references to components declared elsewhere, or component-choice wrappers expressing conditional or alternate relationships. This is not a dependency tree. It provides a way to specify a hierarchical representation of component assemblies, similar to system → subsystem → parts assembly in physical supply chains."
         },
         "evidence": {
           "$ref": "#/$defs/componentEvidence",
@@ -213,19 +228,27 @@
           "description": "Provides the ability to document evidence collected through various forms of extraction or analysis."
         },
         "releaseNotes": {
-          "$ref": "cyclonedx-release-notes-2.0.schema.json#/$defs/releaseNotes",
-          "title": "Release notes",
-          "description": "Specifies release notes."
+          "title": "Release Notes",
+          "description": "The release notes for the component. Either inline release notes or a reference using bom-link or `refId` to release notes defined elsewhere, such as in the definitions.",
+          "oneOf": [
+            {
+              "$ref": "cyclonedx-release-notes-2.0.schema.json#/$defs/releaseNotes"
+            },
+            {
+              "$ref": "cyclonedx-release-notes-2.0.schema.json#/$defs/releaseNotesReference"
+            }
+          ]
         },
-        "modelCard": {
-          "$ref": "cyclonedx-ai-modelcard-2.0.schema.json#/$defs/modelCard",
-          "title": "AI/ML Model Card"
+        "modelProperties": {
+          "$ref": "cyclonedx-ai-ml-2.0.schema.json#/$defs/modelProperties",
+          "title": "AI/ML Model Properties",
+          "description": "Intrinsic technical characteristics of a machine learning model. This object SHOULD be specified for any component with `type=\"machine-learning-model\"` and shall not be specified for other component types."
         },
         "data": {
           "type": "array",
           "items": {"$ref": "#/$defs/componentData"},
           "title": "Data",
-          "description": "This object SHOULD be specified for any component of type `data` and must not be specified for other component types."
+          "description": "This object SHOULD be specified for any component with `type=\"data\"` and shall not be specified for other component types."
         },
         "cryptoProperties": {
           "$ref": "cyclonedx-cryptography-2.0.schema.json#/$defs/cryptoProperties",
@@ -237,37 +260,48 @@
         "classification": {
           "$ref": "cyclonedx-physical-2.0.schema.json#/$defs/classification",
           "title": "Classification",
-          "description": "Hierarchical classification of the item, with optional taxonomy codes from external standards. This object may only be specified for components of type `device` or `material` and shall not be specified for other component types."
+          "description": "Hierarchical classification of the item, with optional taxonomy codes from external standards. This object may only be specified for components with `type=\"device\"` or `type=\"material\"`, and shall not be specified for other component types."
         },
         "boardLocation": {
           "$ref": "cyclonedx-physical-2.0.schema.json#/$defs/boardLocation",
           "title": "Board Location",
-          "description": "Placement of the item on a printed circuit board, panel, or assembly. This object may only be specified for components of type `device` and shall not be specified for other component types."
+          "description": "Placement of the item on a printed circuit board, panel, or assembly. This object may only be specified for components with `type=\"device\"` and shall not be specified for other component types."
         },
         "deviceType": {
           "$ref": "cyclonedx-physical-2.0.schema.json#/$defs/deviceType",
           "title": "Device Type",
-          "description": "Package or mounting style of the physical item, expressed as a predefined device type or a custom device type. This object may only be specified for components of type `device` and shall not be specified for other component types."
+          "description": "Package or mounting style of the physical item, expressed as a predefined device type or a custom device type. This object may only be specified for components with `type=\"device\"` and shall not be specified for other component types."
         },
         "leadTime": {
           "$ref": "cyclonedx-physical-2.0.schema.json#/$defs/leadTime",
           "title": "Lead Time",
-          "description": "Supplier lead time for procuring the item. This object may only be specified for components of type `device` or `material` and shall not be specified for other component types."
+          "description": "Supplier lead time for procuring the item. This object may only be specified for components with `type=\"device\"` or `type=\"material\"`, and shall not be specified for other component types."
         },
         "materialForm": {
           "$ref": "cyclonedx-physical-2.0.schema.json#/$defs/materialForm",
           "title": "Material Form",
-          "description": "Physical form in which the material is supplied, expressed as a predefined material form or a custom material form. This object may only be specified for components of type `material` and shall not be specified for other component types."
+          "description": "Physical form in which the material is supplied, expressed as a predefined material form or a custom material form. This object may only be specified for components with `type=\"material\"`, and shall not be specified for other component types."
         },
         "quantity": {
           "$ref": "cyclonedx-physical-2.0.schema.json#/$defs/quantity",
           "title": "Quantity",
-          "description": "The quantity of the item in the context in which it is declared, such as the number of identical parts within the enclosing assembly or the amount of material in the described lot. This object may only be specified for components of type `device` or `material` and shall not be specified for other component types."
+          "description": "The quantity of the item in the context in which it is declared, such as the number of identical parts within the enclosing assembly or the amount of material in the described lot. This object may only be specified for components with `type=\"device\"` or `type=\"material\"`, and shall not be specified for other component types."
         },
         "certifications": {
-          "$ref": "cyclonedx-certification-2.0.schema.json#/$defs/certifications",
+          "type": "array",
+          "uniqueItems": true,
           "title": "Certifications",
-          "description": "Certifications held by or applicable to the component. Applicable to components of any type, hardware and software alike."
+          "description": "Certifications held by or applicable to the component. Each entry is either an inline certification or a reference using bom-link or `refId` to a certification defined elsewhere, such as in the definitions. Applicable to components of any type, hardware and software alike.",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "cyclonedx-certification-2.0.schema.json#/$defs/certification"
+              },
+              {
+                "$ref": "cyclonedx-certification-2.0.schema.json#/$defs/certificationReference"
+              }
+            ]
+          }
         },
         "endpoints": {
           "type": "array",
@@ -276,7 +310,7 @@
             "format": "iri-reference"
           },
           "title": "Endpoints",
-          "description": "The endpoint URIs of the service. Multiple endpoints are allowed. May only be used for components of type `service`.",
+          "description": "The endpoint URIs of the service. Multiple endpoints are allowed. May only be used for components with `type=\"service\"`.",
           "examples": ["https://example.com/api/v1/ticker"]
         },
         "dataProfiles": {
@@ -284,7 +318,7 @@
           "uniqueItems": true,
           "items": {"$ref": "cyclonedx-data-2.0.schema.json#/$defs/dataProfileChoice"},
           "title": "Data Profiles",
-          "description": "The data handled by the service, characterized by data profiles. Each entry is either an inline profile object or a reference using bom-link or bom-ref to a previously declared profile, typically declared in the root profiles catalogue. May only be used for components of type `service`. Data movement is intentionally not expressed here: flow direction, sources, destinations, authentication, and boundary crossings are modelled via blueprint flows, assets, and boundaries, which reference this component by bom-ref."
+          "description": "The data handled by the service, characterized by data profiles. Each entry is either an inline profile object or a reference using bom-link or `refId` to a previously declared profile, typically declared in the definitions. May only be used for components with `type=\"service\"`. Data movement is intentionally not expressed here: flow direction, sources, destinations, authentication, and boundary crossings are modelled via blueprint flows, assets, and boundaries, which reference this component by `refId`."
         },
         "tags": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/tags",
@@ -309,7 +343,7 @@
           }
         },
         {
-          "description": "Requirement: 'versionRange' must not be present when 'isExternal' is `false`.",
+          "description": "Requirement: `versionRange` shall not be present when `isExternal=false`.",
           "if": {
             "properties": { "isExternal": { "const": false } }
           },
@@ -319,7 +353,7 @@
           "else": true
         },
         {
-          "description": "Requirement: `classification`, `leadTime`, and `quantity` may only be present when `type` is `device` or `material`.",
+          "description": "Requirement: `classification`, `leadTime`, and `quantity` may only be present when `type=\"device\"` or `type=\"material\"`.",
           "if": {
             "properties": { "type": { "enum": ["device", "material"] } },
             "required": ["type"]
@@ -334,7 +368,7 @@
           }
         },
         {
-          "description": "Requirement: `boardLocation` and `deviceType` may only be present when `type` is `device`.",
+          "description": "Requirement: `boardLocation` and `deviceType` may only be present when `type=\"device\"`.",
           "if": {
             "properties": { "type": { "const": "device" } },
             "required": ["type"]
@@ -348,7 +382,7 @@
           }
         },
         {
-          "description": "Requirement: `materialForm` may only be present when `type` is `material`.",
+          "description": "Requirement: `materialForm` may only be present when `type=\"material\"`.",
           "if": {
             "properties": { "type": { "const": "material" } },
             "required": ["type"]
@@ -362,7 +396,7 @@
         },
         {
           "title": "Service Requirement",
-          "description": "Requirement: endpoints and dataProfiles may only be used for components of type `service`.",
+          "description": "Requirement: `endpoints` and `dataProfiles` may only be used for components with `type=\"service\"`.",
           "if": {
             "properties": { "type": { "const": "service" } }
           },
@@ -378,11 +412,12 @@
         }
       ]
     },
-    "componentOrChoice": {
-      "title": "Component or Component Choice",
-      "description": "An entry in a components array. May be a concrete component, or a component-choice wrapper that expresses a conditional or alternate relationship between two or more components. The discriminator is the `type` property: when `type` is `component-choice`, the entry shall conform to the `componentChoice` schema; otherwise it shall conform to the `component` schema.",
+    "componentEntry": {
+      "title": "Component Entry",
+      "description": "An entry in a `components` array. A concrete component, a reference to a component declared elsewhere, or a component-choice wrapper that expresses a conditional or alternate relationship between two or more entries. An entry with a `ref` property is a reference; an entry with `type=\"component-choice\"` is a choice; any other entry is a component.",
       "oneOf": [
         { "$ref": "#/$defs/component" },
+        { "$ref": "#/$defs/componentReference" },
         { "$ref": "#/$defs/componentChoice" }
       ]
     },
@@ -400,12 +435,12 @@
         "type": {
           "const": "component-choice",
           "title": "Type",
-          "description": "Discriminator for a component-choice entry. The value shall be the literal string `component-choice`."
+          "description": "Discriminator for a component-choice entry. The value shall be the literal string `\"component-choice\"`."
         },
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference the component-choice elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the component-choice elsewhere in the document. Every `refId` shall be unique within the document."
         },
         "name": {
           "type": "string",
@@ -436,7 +471,7 @@
           "type": "array",
           "minItems": 2,
           "uniqueItems": true,
-          "items": { "$ref": "#/$defs/componentOrChoice" },
+          "items": { "$ref": "#/$defs/componentEntry" },
           "title": "Components",
           "description": "Two or more alternate or grouped entries. Each entry may itself be a component-choice to express nested alternates, such as a choice between kits."
         },
@@ -462,7 +497,7 @@
       ]
     },
     "versionRange": {
-      "description": "A version range specified in Package-URL Version Range syntax (vers) which is defined at https://github.com/package-url/vers-spec",
+      "description": "A version range specified in Package-URL Version Range syntax (vers) which is defined at <https://github.com/package-url/vers-spec>.",
       "type": "string",
       "minLength": 1,
       "maxLength": 4096,
@@ -496,7 +531,7 @@
           "type": "array",
           "title": "Occurrences",
           "description": "Evidence of individual instances of a component spread across multiple locations.",
-          "items": { "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/occurrence" }
+          "items": { "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/occurrenceChoice" }
         },
         "callStacks": {
           "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/callStacks",
@@ -526,10 +561,10 @@
       ],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference this license evidence elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference this license evidence elsewhere in the document. Every `refId` shall be unique within the document."
         },
         "license": {
           "allOf": [
@@ -558,7 +593,7 @@
           "minimum": 0,
           "maximum": 1,
           "title": "Confidence",
-          "description": "The overall confidence of the detection from 0 to 1, where 1 is 100% confidence."
+          "description": "The overall confidence of the detection from `0` to `1`, where `1` is 100% confidence."
         },
         "methods": {
           "type": "array",
@@ -570,7 +605,7 @@
           "type": "array",
           "uniqueItems": true,
           "title": "Tools",
-          "description": "The tools that detected the license, referenced by `bom-ref`.",
+          "description": "The tools that detected the license, referenced by `refId`.",
           "items": {
             "anyOf": [
               { "title": "Ref", "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType" },
@@ -582,7 +617,7 @@
           "type": "array",
           "title": "Occurrences",
           "description": "The locations at which the license was detected, for example a license file or a source header.",
-          "items": { "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/occurrence" }
+          "items": { "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/occurrenceChoice" }
         },
         "assertion": {
           "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/assertion",
@@ -603,10 +638,10 @@
       "required": [ "text" ],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference this copyright evidence elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference this copyright evidence elsewhere in the document. Every `refId` shall be unique within the document."
         },
         "text": {
           "type": "string",
@@ -618,7 +653,7 @@
           "minimum": 0,
           "maximum": 1,
           "title": "Confidence",
-          "description": "The overall confidence of the detection from 0 to 1, where 1 is 100% confidence."
+          "description": "The overall confidence of the detection from `0` to `1`, where `1` is 100% confidence."
         },
         "methods": {
           "type": "array",
@@ -630,7 +665,7 @@
           "type": "array",
           "uniqueItems": true,
           "title": "Tools",
-          "description": "The tools that detected the copyright statement, referenced by `bom-ref`.",
+          "description": "The tools that detected the copyright statement, referenced by `refId`.",
           "items": {
             "anyOf": [
               { "title": "Ref", "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType" },
@@ -642,7 +677,7 @@
           "type": "array",
           "title": "Occurrences",
           "description": "The locations at which the copyright statement was detected.",
-          "items": { "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/occurrence" }
+          "items": { "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/occurrenceChoice" }
         },
         "assertion": {
           "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/assertion",
@@ -671,7 +706,7 @@
           "minimum": 0,
           "maximum": 1,
           "title": "Confidence",
-          "description": "The overall confidence of the evidence from 0 - 1, where 1 is 100% confidence."
+          "description": "The overall confidence of the evidence from `0` to `1`, where `1` is 100% confidence."
         },
         "concludedValue": {
           "type": "string",
@@ -690,8 +725,8 @@
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/elementLink"
           },
-          "title": "BOM References",
-          "description": "The object in the BOM identified by its bom-ref. This is often a component or service but may be any object type supporting bom-refs. Tools used for analysis should already be defined in the BOM, either in the metadata/tools, components, or formulation."
+          "title": "Tools",
+          "description": "The object in the BOM identified by its `refId`. This is often a component or service but may be any object type supporting `refId`s. Tools used for analysis should already be defined in the BOM, such as in the metadata tools, an inventory, or the definitions."
         },
         "assertion": {
           "$ref": "cyclonedx-evidence-2.0.schema.json#/$defs/assertion",
@@ -712,10 +747,10 @@
         "type"
       ],
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference the dataset elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the dataset elsewhere in the document. Every `refId` shall be unique within the document."
         },
         "type": {
           "title": "Type of Data",
@@ -756,7 +791,7 @@
             "type": "string"
           }
         },
-        "graphics": { "$ref": "cyclonedx-ai-modelcard-2.0.schema.json#/$defs/graphicsCollection" },
+        "graphics": { "$ref": "cyclonedx-common-2.0.schema.json#/$defs/graphicsCollection" },
         "description": {
           "title": "Dataset Description",
           "description": "A description of the dataset. Can describe size of dataset, whether it's used for source code, training, testing, or validation, etc.",
@@ -802,12 +837,12 @@
         "configurationRef": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "title": "Configuration Reference",
-          "description": "The bom-ref of the configuration that determines this component's configuration. Typically points to a component of type 'data' whose data type is 'configuration'."
+          "description": "The `refId` of the configuration that determines this component's configuration. Typically points to a component with `type=\"data\"` whose `data` entry has `type=\"configuration\"`."
         },
         "changeMechanism": {
           "type": "array",
           "title": "Change Mechanism",
-          "description": "The step or steps required to apply a change to this component's configuration. When more than one value is present, all are required (for example, a software update followed by a restart). Values are roughly ordered from least to most disruptive. Use a single value of 'not-possible' when the configuration cannot be changed.",
+          "description": "The step or steps required to apply a change to this component's configuration. When more than one value is present, all are required (for example, a software update followed by a restart). Values are roughly ordered from least to most disruptive. Use a single value of `\"not-possible\"` when the configuration cannot be changed.",
           "uniqueItems": true,
           "items": {
             "enum": [
@@ -853,13 +888,14 @@
       ],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "description": "An identifier which can be used to reference the element elsewhere in the document. Every `refId` shall be unique within the document."
         },
         "party": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "title": "Asserting Party",
-          "description": "Reference using bom-link or bom-ref to the party making the identity assertion."
+          "description": "Reference using bom-link or `refId` to the party making the identity assertion."
         },
         "identities": {
           "type": "array",
@@ -976,6 +1012,331 @@
       "minLength": 1,
       "title": "Identifier Value",
       "description": "The value of an identifier."
+    },
+    "componentReference": {
+      "type": "object",
+      "title": "Component Reference",
+      "description": "A reference to a component declared elsewhere, such as in the definitions registry, in another position of the same document, or in another document via BOM-Link. A reference includes the referenced component exactly as declared: every position that references the same component includes an identical component. Where the inclusion context differs, such as a different scope or quantity, declare the component inline instead.",
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "title": "Reference",
+          "description": "Reference using bom-link or `refId` to the component.",
+          "anyOf": [
+            {
+              "title": "Ref",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+            },
+            {
+              "title": "BOM-Link Element",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+            }
+          ]
+        }
+      }
+    },
+    "inventories": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/inventory"},
+      "uniqueItems": true,
+      "title": "Inventories",
+      "description": "The inventories of the subjects that the document describes. Each entry declares one subject and lists the entries included in it."
+    },
+    "inventory": {
+      "type": "object",
+      "title": "Inventory",
+      "description": "The declared inventory of one subject: the entries included in the subject. The completeness of the list is asserted through compositions.",
+      "required": [
+        "subject",
+        "components"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the inventory elsewhere in the document. Every `refId` shall be unique within the document."
+        },
+        "subject": {
+          "title": "Subject",
+          "description": "The subject whose inventory this statement declares. Either a concrete component or a reference using bom-link or `refId` to a component declared elsewhere, such as in the definitions.",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/component"
+            },
+            {
+              "$ref": "#/$defs/componentReference"
+            }
+          ]
+        },
+        "components": {
+          "$ref": "#/$defs/components",
+          "description": "The entries included in the subject. Entries may be concrete components, references to components declared elsewhere, or component-choice wrappers."
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        },
+        "signatures": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/signatures",
+          "description": "Enveloped signatures over the inventory statement. A signature binds reference entries by their identifiers; the content of a referenced component is covered by the hashes or signatures on the referenced component itself."
+        }
+      }
+    },
+    "measurements": {
+      "type": "array",
+      "title": "Measurements",
+      "uniqueItems": true,
+      "description": "Measured quantities of the component. An energy consumption records the energy consumed by a lifecycle activity of the component together with its providers and carbon dioxide equivalent. A performance metric records a benchmark or evaluation result of the component. Each record may carry graphics that support it.",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/energyConsumption"
+          },
+          {
+            "$ref": "cyclonedx-ai-ml-2.0.schema.json#/$defs/performanceMetric"
+          }
+        ]
+      }
+    },
+    "lifecycleActivity": {
+      "title": "Lifecycle Activity",
+      "description": "An activity in the lifecycle of a component that consumes energy, such as the manufacture of a device or the training of a model. Use the custom option for activities not covered by the predefined values.",
+      "oneOf": [
+        {
+          "title": "Predefined Activity",
+          "type": "string",
+          "enum": [
+            "design",
+            "data-collection",
+            "data-preparation",
+            "training",
+            "fine-tuning",
+            "validation",
+            "manufacturing",
+            "transport",
+            "deployment",
+            "operation",
+            "inference",
+            "end-of-life"
+          ],
+          "meta:enum": {
+            "design": "Design, including problem framing, goal definition, and algorithm or architecture selection.",
+            "data-collection": "Data acquisition, including search, selection, and transfer.",
+            "data-preparation": "Data preparation, including data cleaning, labelling, and conversion.",
+            "training": "Model building, training, and generalized tuning.",
+            "fine-tuning": "Refining a trained model to produce desired outputs for a given problem space.",
+            "validation": "Validation, including output evaluation and testing.",
+            "manufacturing": "Manufacture of a physical item, including fabrication and assembly.",
+            "transport": "Transport of a physical item between sites.",
+            "deployment": "Deployment to a target hosting infrastructure or site.",
+            "operation": "Operation of a deployed component over a stated period.",
+            "inference": "Generating an output response from a hosted model from a set of inputs.",
+            "end-of-life": "Decommissioning, recycling, or disposal of a component."
+          }
+        },
+        {
+          "type": "object",
+          "title": "Custom Activity",
+          "required": [
+            "name"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Name",
+              "description": "The name of the custom activity."
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the custom activity."
+            }
+          }
+        }
+      ]
+    },
+    "energyConsumption": {
+      "type": "object",
+      "title": "Energy Consumption",
+      "description": "The energy consumption incurred for a specific lifecycle activity of the component.",
+      "additionalProperties": false,
+      "required": [
+        "activity",
+        "activityEnergyCost"
+      ],
+      "properties": {
+        "activity": {
+          "title": "Activity",
+          "description": "The lifecycle activity that incurred the energy consumption.",
+          "$ref": "#/$defs/lifecycleActivity"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the energy consumption, including its scope and how it was measured or estimated."
+        },
+        "formula": {
+          "title": "Formula Reference",
+          "description": "References using bom-link or `refId` a formula, workflow, or task, defined in formulation, that captures the process which incurred this energy consumption, for example a training workflow or a manufacturing run.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+        },
+        "energyProviders": {
+          "type": "array",
+          "title": "Energy Providers",
+          "description": "The providers of the energy consumed by the activity.",
+          "items": {
+            "$ref": "#/$defs/energyProvider"
+          }
+        },
+        "activityEnergyCost": {
+          "title": "Activity Energy Cost",
+          "description": "The total energy cost associated with the activity.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/energyMeasure"
+        },
+        "co2CostEquivalent": {
+          "title": "CO2 Equivalent Cost",
+          "description": "The carbon dioxide equivalent cost of the total energy cost.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/co2Measure"
+        },
+        "co2CostOffset": {
+          "title": "CO2 Cost Offset",
+          "description": "The carbon dioxide offset credited against the carbon dioxide equivalent cost.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/co2Measure"
+        },
+        "graphics": {
+          "title": "Graphics",
+          "description": "Graphics that support the energy consumption, such as a load profile or a meter reading.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/graphics"
+        },
+        "externalReferences": {
+          "type": "array",
+          "title": "External References",
+          "description": "External references to resources that are relevant to the energy consumption but are not included with the BOM.",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference"
+          }
+        },
+        "properties": {
+          "title": "Properties",
+          "description": "Provides the ability to document name-value pairs for the energy consumption. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "energySource": {
+      "title": "Energy Source",
+      "description": "The source of the energy provided by an energy provider. Use the custom option for sources not covered by the predefined values.",
+      "oneOf": [
+        {
+          "title": "Predefined Energy Source",
+          "type": "string",
+          "enum": [
+            "coal",
+            "oil",
+            "natural-gas",
+            "nuclear",
+            "wind",
+            "solar",
+            "geothermal",
+            "hydropower",
+            "biofuel",
+            "biomass",
+            "hydrogen",
+            "tidal",
+            "unknown"
+          ],
+          "meta:enum": {
+            "coal": "Energy produced from coal.",
+            "oil": "Energy produced from petroleum products, primarily crude oil and its derivative fuel oils.",
+            "natural-gas": "Energy produced from hydrocarbon gases, including natural gas, ethane, and propane.",
+            "nuclear": "Energy produced from the cores of atoms through nuclear fission or fusion.",
+            "wind": "Energy produced from moving air.",
+            "solar": "Energy produced from solar radiation.",
+            "geothermal": "Energy produced from heat within the earth.",
+            "hydropower": "Energy produced from flowing water.",
+            "biofuel": "Energy produced from liquid fuels derived from biomass feedstocks.",
+            "biomass": "Energy produced from solid organic materials such as wood, agricultural crops, or organic waste.",
+            "hydrogen": "Energy produced from hydrogen fuel in fuel cells or combustion.",
+            "tidal": "Energy produced from the rise and fall of ocean tides and tidal currents.",
+            "unknown": "The energy source is unknown."
+          }
+        },
+        {
+          "type": "object",
+          "title": "Custom Energy Source",
+          "required": [
+            "name"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Name",
+              "description": "The name of the custom energy source."
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the custom energy source."
+            }
+          }
+        }
+      ]
+    },
+    "energyProvider": {
+      "type": "object",
+      "title": "Energy Provider",
+      "description": "The provider of energy consumed by a lifecycle activity of the component.",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "energySource",
+        "energyProvided"
+      ],
+      "properties": {
+        "refId": {
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the energy provider elsewhere using a `refId` or bom-link.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "A description of the energy provider."
+        },
+        "provider": {
+          "title": "Provider",
+          "description": "The party that provides the consumed energy, typically an organization.",
+          "$ref": "cyclonedx-party-2.0.schema.json#/$defs/partyChoice"
+        },
+        "energySource": {
+          "title": "Energy Source",
+          "description": "The source of the provided energy.",
+          "$ref": "#/$defs/energySource"
+        },
+        "energyProvided": {
+          "title": "Energy Provided",
+          "description": "The energy provided by the energy source for the associated activity.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/energyMeasure"
+        },
+        "externalReferences": {
+          "type": "array",
+          "title": "External References",
+          "description": "External references to resources that are relevant to the energy provider but are not included with the BOM.",
+          "items": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReference"
+          }
+        },
+        "properties": {
+          "title": "Properties",
+          "description": "Provides the ability to document name-value pairs for the energy provider. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
     }
   }
 }

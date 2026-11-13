@@ -1,108 +1,70 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cyclonedx.org/schema/2.0/modules/cyclonedx-license-2.0.schema.json",
-  "type": "null",
+  "not": { "$comment": "This schema provides definitions only and is not intended for direct validation or instantiation." },
   "title": "CycloneDX License Module",
   "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
     "licenseChoice": {
       "title": "License Choice",
-      "description": "A list of SPDX licenses and/or named licenses and/or SPDX License Expression.",
+      "description": "A list of SPDX licenses and/or named licenses and/or SPDX License Expression. Entries may be concrete license declarations or references to licenses defined elsewhere.",
       "type": "array",
       "items": {
         "oneOf": [
           {
-            "type": "object",
-            "title": "License",
-            "required": [
-              "license"
-            ],
-            "additionalProperties": false,
-            "properties": {
-              "license": {
-                "$ref": "#/$defs/license"
-              }
-            }
+            "$ref": "#/$defs/licenseDeclaration"
           },
           {
-            "title": "License Expression",
-            "description": "Specifies the details and attributes related to a software license.\nIt must be a valid SPDX license expression, along with additional properties such as license acknowledgment.",
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "expression"
-            ],
-            "properties": {
-              "expression": {
-                "type": "string",
-                "title": "SPDX License Expression",
-                "description": "A valid SPDX license expression.\nRefer to https://spdx.org/specifications for syntax requirements.",
-                "examples": [
-                  "Apache-2.0 AND (MIT OR GPL-2.0-only)",
-                  "GPL-3.0-only WITH Classpath-exception-2.0"
-                ]
-              },
-              "expressionDetails": {
-                "title": "Expression Details",
-                "description": "Details for parts of the `expression`.",
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "description": "This document specifies the details and attributes related to a software license identifier. An SPDX expression may be a compound of license identifiers.\nThe `license_identifier` property serves as the key that identifies each record. Note that this key is not required to be unique, as the same license identifier could apply to multiple, different but similar license details, texts, etc.",
-                  "required": [
-                    "licenseIdentifier"
-                  ],
-                  "properties": {
-                    "licenseIdentifier": {
-                      "title": "License Identifier",
-                      "description": "The valid SPDX license identifier. Refer to https://spdx.org/specifications for syntax requirements.\nThis property serves as the primary key, which uniquely identifies each record.",
-                      "type": "string",
-                      "examples": [
-                        "Apache-2.0",
-                        "GPL-3.0-only WITH Classpath-exception-2.0",
-                        "LicenseRef-my-custom-license"
-                      ]
-                    },
-                    "bom-ref": {
-                      "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-                      "title": "BOM Reference",
-                      "description": "An identifier which can be used to reference the license elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
-                    },
-                    "text": {
-                      "title": "License texts",
-                      "description": "A way to include the textual content of the license.",
-                      "$ref": "cyclonedx-common-2.0.schema.json#/$defs/attachment"
-                    },
-                    "url": {
-                      "type": "string",
-                      "title": "License URL",
-                      "description": "The URL to the license file. If specified, a 'license' externalReference should also be specified for completeness",
-                      "examples": [
-                        "https://www.apache.org/licenses/LICENSE-2.0.txt"
-                      ],
-                      "format": "iri-reference"
-                    }
-                  },
-                  "additionalProperties": false
-                }
-              },
-              "acknowledgement": {
-                "$ref": "#/$defs/licenseAcknowledgementEnumeration"
-              },
-              "bom-ref": {
-                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-                "title": "BOM Reference",
-                "description": "An identifier which can be used to reference the license elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
-              },
-              "licensing": {
-                "$ref": "#/$defs/licensing"
-              },
-              "properties": {
-                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
-              }
-            }
+            "$ref": "#/$defs/licenseReference"
           }
         ]
+      }
+    },
+    "licenseDeclaration": {
+      "title": "License Declaration",
+      "description": "A concrete license declaration: a single SPDX or named license, or an SPDX license expression.",
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "License",
+          "required": [
+            "license"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "license": {
+              "$ref": "#/$defs/license"
+            }
+          }
+        },
+        {
+          "$ref": "#/$defs/expression"
+        }
+      ]
+    },
+    "licenseReference": {
+      "type": "object",
+      "title": "License Reference",
+      "description": "A reference to a license declared elsewhere, such as in the definitions registry or in another document via BOM-Link. A reference includes the referenced license exactly as declared: every position that references the same license carries an identical license. Where the licensing context differs, such as a different acknowledgement, declare the license inline instead.",
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "title": "Reference",
+          "description": "Reference using bom-link or `refId` to the license. The referent is the `refId` of a license or of a license expression.",
+          "anyOf": [
+            {
+              "title": "Ref",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+            },
+            {
+              "title": "BOM-Link Element",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+            }
+          ]
+        }
       }
     },
     "license": {
@@ -121,15 +83,15 @@
       ],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference the license elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the license elsewhere in the document. Every `refId` shall be unique within the document."
         },
         "id": {
           "$ref": "../../spdx.schema.json",
           "title": "License ID (SPDX)",
-          "description": "A valid SPDX license identifier. If specified, this value must be one of the enumeration of valid SPDX license identifiers defined in the spdx.schema.json (or spdx.xml) subschema which is synchronized with the official SPDX license list.",
+          "description": "A valid SPDX license identifier. If specified, this value shall be one of the enumeration of valid SPDX license identifiers defined in the spdx.schema.json (or spdx.xml) subschema which is synchronized with the official SPDX license list.",
           "examples": ["Apache-2.0"]
         },
         "name": {
@@ -149,7 +111,7 @@
         "url": {
           "type": "string",
           "title": "License URL",
-          "description": "The URL to the license file. If specified, a 'license' externalReference should also be specified for completeness",
+          "description": "The URL to the license file. If specified, an `externalReferences` entry with `type=\"license\"` should also be specified for completeness.",
           "examples": ["https://www.apache.org/licenses/LICENSE-2.0.txt"],
           "format": "iri-reference"
         },
@@ -159,9 +121,82 @@
         }
       }
     },
+    "expression": {
+      "title": "License Expression",
+      "description": "Specifies the details and attributes related to a software license.\nIt shall be a valid SPDX license expression, along with additional properties such as license acknowledgment.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "expression"
+      ],
+      "properties": {
+        "expression": {
+          "type": "string",
+          "title": "SPDX License Expression",
+          "description": "A valid SPDX license expression.\nRefer to <https://spdx.org/specifications> for syntax requirements.",
+          "examples": [
+            "Apache-2.0 AND (MIT OR GPL-2.0-only)",
+            "GPL-3.0-only WITH Classpath-exception-2.0"
+          ]
+        },
+        "expressionDetails": {
+          "title": "Expression Details",
+          "description": "Details for parts of the `expression`.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "description": "This document specifies the details and attributes related to a software license identifier. An SPDX expression may be a compound of license identifiers.\nThe `license_identifier` property serves as the key that identifies each record. Note that this key is not required to be unique, as the same license identifier could apply to multiple, different but similar license details, texts, etc.",
+            "required": [
+              "licenseIdentifier"
+            ],
+            "properties": {
+              "licenseIdentifier": {
+                "title": "License Identifier",
+                "description": "The valid SPDX license identifier. Refer to <https://spdx.org/specifications> for syntax requirements.\nThis property serves as the primary key, which uniquely identifies each record.",
+                "type": "string",
+                "examples": [
+                  "Apache-2.0",
+                  "GPL-3.0-only WITH Classpath-exception-2.0",
+                  "LicenseRef-my-custom-license"
+                ]
+              },
+              "text": {
+                "title": "License texts",
+                "description": "A way to include the textual content of the license.",
+                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/attachment"
+              },
+              "url": {
+                "type": "string",
+                "title": "License URL",
+                "description": "The URL to the license file. If specified, an `externalReferences` entry with `type=\"license\"` should also be specified for completeness.",
+                "examples": [
+                  "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                ],
+                "format": "iri-reference"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "acknowledgement": {
+          "$ref": "#/$defs/licenseAcknowledgementEnumeration"
+        },
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the license elsewhere in the document. Every `refId` shall be unique within the document."
+        },
+        "licensing": {
+          "$ref": "#/$defs/licensing"
+        },
+        "properties": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
     "licenseAcknowledgementEnumeration": {
       "title": "License Acknowledgement",
-      "description": "Declared licenses and concluded licenses represent two different stages in the licensing process within software development. Declared licenses refer to the initial intention of the software authors regarding the licensing terms under which their code is released. On the other hand, concluded licenses are the result of a comprehensive analysis of the project's codebase to identify and confirm the actual licenses of the components used, which may differ from the initially declared licenses. While declared licenses provide an upfront indication of the licensing intentions, concluded licenses offer a more thorough understanding of the actual licensing within a project, facilitating proper compliance and risk management. Observed licenses are defined in `@.evidence.licenses`. Observed licenses form the evidence necessary to substantiate a concluded license.",
+      "description": "Declared licenses and concluded licenses represent two different stages in the licensing process within software development. Declared licenses refer to the initial intention of the software authors regarding the licensing terms under which their code is released. On the other hand, concluded licenses are the result of a comprehensive analysis of the project's codebase to identify and confirm the actual licenses of the components used, which may differ from the initially declared licenses. While declared licenses provide an upfront indication of the licensing intentions, concluded licenses offer a more thorough understanding of the actual licensing within a project, facilitating proper compliance and risk management. Observed licenses are defined in `evidence.licenses`. Observed licenses form the evidence necessary to substantiate a concluded license.",
       "enum": [
         "declared",
         "concluded"
@@ -174,31 +209,31 @@
     "licensing": {
       "type": "object",
       "title": "Licensing information",
-      "description": "Licensing details describing the licensor/licensee, license type, renewal and expiration dates, and other important metadata",
+      "description": "Licensing details describing the licensor/licensee, license type, renewal and expiration dates, and other important metadata.",
       "additionalProperties": false,
       "properties": {
         "altIds": {
           "type": "array",
           "title": "Alternate License Identifiers",
-          "description": "License identifiers that may be used to manage licenses and their lifecycle",
+          "description": "License identifiers that may be used to manage licenses and their lifecycle.",
           "items": {
             "type": "string"
           }
         },
         "licensor": {
           "title": "Licensor",
-          "description": "The individual or organization that grants a license to another individual or organization",
+          "description": "The individual or organization that grants a license to another individual or organization.",
           "type": "object",
           "additionalProperties": false,
           "properties": {
             "organization": {
               "title": "Licensor (Organization)",
-              "description": "The organization that granted the license",
+              "description": "The organization that granted the license.",
               "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntity"
             },
             "individual": {
               "title": "Licensor (Individual)",
-              "description": "The individual, not associated with an organization, that granted the license",
+              "description": "The individual, not associated with an organization, that granted the license.",
               "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalContact"
             }
           },
@@ -215,18 +250,18 @@
         },
         "licensee": {
           "title": "Licensee",
-          "description": "The individual or organization for which a license was granted to",
+          "description": "The individual or organization for which a license was granted to.",
           "type": "object",
           "additionalProperties": false,
           "properties": {
             "organization": {
               "title": "Licensee (Organization)",
-              "description": "The organization that was granted the license",
+              "description": "The organization that was granted the license.",
               "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntity"
             },
             "individual": {
               "title": "Licensee (Individual)",
-              "description": "The individual, not associated with an organization, that was granted the license",
+              "description": "The individual, not associated with an organization, that was granted the license.",
               "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalContact"
             }
           },
@@ -243,18 +278,18 @@
         },
         "purchaser": {
           "title": "Purchaser",
-          "description": "The individual or organization that purchased the license",
+          "description": "The individual or organization that purchased the license.",
           "type": "object",
           "additionalProperties": false,
           "properties": {
             "organization": {
               "title": "Purchaser (Organization)",
-              "description": "The organization that purchased the license",
+              "description": "The organization that purchased the license.",
               "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntity"
             },
             "individual": {
               "title": "Purchaser (Individual)",
-              "description": "The individual, not associated with an organization, that purchased the license",
+              "description": "The individual, not associated with an organization, that purchased the license.",
               "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalContact"
             }
           },
@@ -272,7 +307,7 @@
         "purchaseOrder": {
           "type": "string",
           "title": "Purchase Order",
-          "description": "The purchase order identifier the purchaser sent to a supplier or vendor to authorize a purchase"
+          "description": "The purchase order identifier the purchaser sent to a supplier or vendor to authorize a purchase."
         },
         "licenseTypes": {
           "type": "array",

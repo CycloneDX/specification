@@ -5,12 +5,32 @@
   "title": "Main",
   "description": "Root document of the bundler test fixtures.",
   "type": "object",
+  "required": [
+    "whole"
+  ],
+  "examples": [
+    {
+      "whole": {}
+    }
+  ],
+  "$comment": "FIXTURE: root schema; entry point of the bundle. This $comment is the only one that survives minification. The root title/description must survive in both outputs. The root `required`/`examples` are data arrays inside the (reached) root schema and must survive the tree-shaker untouched.",
   "properties": {
+    "$comment": {
+      "$comment": "the comment property is expected to stay - but this comment might be removed.",
+      "type": "string",
+      "title": "Comment"
+    },
     "whole": {
       "$comment": "External ref without fragment -> module is kept as a whole.",
       "title": "Whole",
       "description": "A module referenced in its entirety.",
       "$ref": "modules/used-whole.schema.json"
+    },
+    "wholeData": {
+      "$comment": "External ref without fragment to a module whose reached schemas carry data arrays/maps/literals and boolean subschemas -> all of that must survive the sweep.",
+      "title": "Whole data",
+      "description": "A data-heavy module referenced in its entirety.",
+      "$ref": "modules/used-whole-data.schema.json"
     },
     "sub": {
       "$comment": "External ref into a sub-def -> only that sub-def (and what it reaches) is kept.",
@@ -23,6 +43,133 @@
       "title": "Local",
       "description": "A definition of this very schema.",
       "$ref": "#/$defs/mainLocal"
+    },
+    "composed": {
+      "$comment": "A new object defined inline in main, whose properties reference *properties* (not $defs) of another module -> only those property subtrees of used-properties-only are kept.",
+      "title": "Composed",
+      "description": "An object assembled from parts of another module.",
+      "type": "object",
+      "$defs": {
+        "rootNestedDropped": {
+          "$comment": "Nested $defs inside a REACHED property of the ROOT schema. Unreferenced -> must be removed; the root and its properties are reached, yet their $defs still need sweeping. The then-empty `$defs` object is removed too.",
+          "title": "Root nested dropped",
+          "description": "An unreferenced nested definition of the root.",
+          "type": "null"
+        }
+      },
+      "properties": {
+        "street": {
+          "$comment": "Ref into a nested property of the module -> #/properties/address/properties/street.",
+          "title": "Street",
+          "description": "The street, taken from the module's address.",
+          "$ref": "modules/used-properties-only.schema.json#/properties/address/properties/street"
+        },
+        "latitude": {
+          "$comment": "Ref into a three-level deep nested property -> transitively keeps $defs/degrees; sibling 'lon' must be dropped.",
+          "title": "Latitude",
+          "description": "The latitude, taken from the module's address.geo.",
+          "$ref": "modules/used-properties-only.schema.json#/properties/address/properties/geo/properties/lat"
+        },
+        "contact": {
+          "$comment": "Ref to a whole top-level property (with children) of the module -> kept with all its children.",
+          "title": "Contact",
+          "description": "The contact block of the module, as is.",
+          "$ref": "modules/used-properties-only.schema.json#/properties/contact"
+        },
+        "nested": {
+          "$comment": "Ref into the nested $defs of a REACHED property of another module -> only that nested def is kept, its sibling is removed.",
+          "title": "Nested",
+          "description": "A value defined in a property-level $defs.",
+          "$ref": "modules/used-whole.schema.json#/properties/withDefs/$defs/nestedKept"
+        }
+      }
+    },
+    "middle": {
+      "$comment": "Ref INTO a schema array (allOf/1 and allOf/3) of a module -> siblings allOf/0 and allOf/2 must become void placeholders or stay boolean, not null; the indexes must stay; the rest can be safely removed.",
+      "title": "Middle",
+      "description": "The middle part of the module's combined schema.",
+      "anyOf": [
+        {
+          "$ref": "modules/used-array-items.schema.json#/properties/combined/allOf/1"
+        },
+        {
+          "$ref": "modules/used-array-items.schema.json#/properties/combined/allOf/3"
+        }
+      ]
+    },
+    "lastChoice": {
+      "$comment": "Ref INTO the last item of a oneOf -> the preceding item must become a void placeholder.",
+      "title": "Last choice",
+      "description": "The last alternative of the module's choice.",
+      "$ref": "modules/used-array-items.schema.json#/properties/choice/oneOf/1"
+    },
+    "anyValue": {
+      "$comment": "Ref to an EMPTY schema `{}`. Reached -> must survive the sweep even though it has no keys at all.",
+      "title": "Any value",
+      "description": "Accepts anything.",
+      "$ref": "modules/used-subdefs-only.schema.json#/$defs/keptEmpty"
+    },
+    "todoValue": {
+      "$comment": "Ref to a `$comment`-only schema. Reached -> must survive and must NOT be hollowed. Becomes `{}` in the minified output.",
+      "title": "Todo value",
+      "description": "A placeholder.",
+      "$ref": "modules/used-subdefs-only.schema.json#/$defs/keptCommentOnly"
+    },
+    "annotatedValue": {
+      "$comment": "Ref to a title/description-only schema. Reached -> must survive and must NOT be hollowed.",
+      "title": "Annotated value",
+      "description": "An annotation-only schema.",
+      "$ref": "modules/used-subdefs-only.schema.json#/$defs/keptAnnotationsOnly"
+    },
+    "customDef": {
+      "$comment": "Ref into a NON-STANDARD definitions container (`custom-defs`, not `$defs`) of a module, which itself refs into yet another non-standard container (`even-more-custom-defs`). Both must be followed; unreferenced siblings in both containers and the module body are dropped.",
+      "title": "Custom def",
+      "description": "A value defined in a non-standard definitions container of another module.",
+      "$ref": "modules/used-custom-defs.schema.json#/custom-defs/customKept"
+    },
+    "used-not-keyword": {
+      "$comment": "Refs to schemas that carry a `not`, see module used-not-keyword.",
+      "title": "Used not keyword",
+      "description": "Values defined by schemas that carry a `not` keyword.",
+      "type": "object",
+      "properties": {
+        "hotNot": {
+          "$comment": "Ref to a schema that carries a `not`. Reached -> the `not` survives untouched; only the unreferenced `$defs` inside that `not` are dropped.",
+          "title": "Hot not",
+          "description": "A value constrained by a `not`.",
+          "$ref": "modules/used-not-keyword.schema.json#/$defs/hotWithNot"
+        },
+        "innerOfHollowedNot": {
+          "$comment": "Ref into the nested `$defs` of a schema that carries its own `not` but is NOT reached itself. That parent must be hollowed: its original `not` is dropped first, then the hollow marker `not` is written - no collision.",
+          "title": "Inner of hollowed not",
+          "description": "A value defined inside a hollowed schema that used to have a `not`.",
+          "$ref": "modules/used-not-keyword.schema.json#/$defs/hollowedWithNot/$defs/inner"
+        },
+        "hotBooleanNot": {
+          "$comment": "Ref to a schema whose `not` is the boolean `true`. Reached -> the boolean must survive byte-for-byte.",
+          "title": "Hot boolean not",
+          "description": "A value negated by a boolean schema.",
+          "$ref": "modules/used-not-keyword.schema.json#/$defs/hotWithBooleanNot"
+        },
+        "innerOfHollowedBooleanNot": {
+          "$comment": "Ref into the nested `$defs` of a schema whose own `not` is the boolean `false` and which is NOT reached itself. The boolean is dropped, then the hollow marker `not` (an object) is written.",
+          "title": "Inner of hollowed boolean not",
+          "description": "A value defined inside a hollowed schema that used to have a boolean `not`.",
+          "$ref": "modules/used-not-keyword.schema.json#/$defs/hollowedWithBooleanNot/$defs/inner"
+        },
+        "innerOfAlreadyHollowTrueNot": {
+          "$comment": "Ref into the nested `$defs` of a schema whose own `not` is the boolean `true` and which is NOT reached itself. It already rejected everything -> the marker replaces the boolean, but the schema is NOT reported as hollowed and `…/not` is NOT reported as removed.",
+          "title": "Inner of already hollow true not",
+          "description": "A value defined inside a schema that was already hollow via `not: true`.",
+          "$ref": "modules/used-not-keyword.schema.json#/$defs/alreadyHollowTrueNot/$defs/inner"
+        },
+        "innerOfAlreadyHollowEmptyNot": {
+          "$comment": "Same as above, but the `not` is the empty object schema `{}` with annotations only. Also already hollow -> marker written silently.",
+          "title": "Inner of already hollow empty not",
+          "description": "A value defined inside a schema that was already hollow via `not: {}`.",
+          "$ref": "modules/used-not-keyword.schema.json#/$defs/alreadyHollowEmptyNot/$defs/inner"
+        }
+      }
     }
   },
   "$defs": {

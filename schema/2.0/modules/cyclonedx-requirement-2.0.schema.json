@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cyclonedx.org/schema/2.0/modules/cyclonedx-requirement-2.0.schema.json",
-  "type": "null",
+  "not": { "$comment": "This schema provides definitions only and is not intended for direct validation or instantiation." },
   "title": "CycloneDX Engineering Requirement Module",
   "$comment": "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
@@ -19,17 +19,18 @@
       "title": "Requirement",
       "description": "A requirement represents a specific need, constraint, or capability that must be met.",
       "required": [
-        "bom-ref"
+        "refId"
       ],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType"
         },
         "id": {
           "type": "string",
           "title": "Identifier",
-          "description": "A unique identifier for the requirement, often used in requirement management systems (e.g., REQ-001)."
+          "description": "A unique identifier for the requirement, often used in requirement management systems.",
+          "examples": ["REQ-001"]
         },
         "name": {
           "type": "string",
@@ -97,8 +98,8 @@
         },
         "parent": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
-          "title": "Parent BOM Reference",
-          "description": "Optional reference using bom-link or bom-ref to a parent requirement. Establishes a hierarchy of requirements."
+          "title": "Parent Reference",
+          "description": "Reference using bom-link or `refId` to a parent requirement. Establishes a hierarchy of requirements."
         },
         "rationale": {
           "type": "string",
@@ -164,6 +165,7 @@
         "privacy",
         "regulatory",
         "reliability",
+        "safety",
         "scalability",
         "security",
         "system",
@@ -190,6 +192,7 @@
         "privacy": "Requirements specifically addressing the handling and protection of personal and sensitive data.",
         "regulatory": "Requirements necessary for legal compliance, dictated by laws, regulations, or standards.",
         "reliability": "Requirements ensuring the system consistently performs under specified conditions and duration.",
+        "safety": "Requirements that address the prevention of harm to people, property, or the environment, such as functional safety requirements.",
         "scalability": "Requirements focused on the ability of the system to grow and manage increased demand effectively.",
         "security": "Requirements intended to protect systems, data, and users from malicious actions or threats.",
         "system": "Technical requirements defining infrastructure, architecture, or underlying technologies.",
@@ -247,7 +250,7 @@
       "additionalProperties": false,
       "properties": {
         "ref": {
-          "oneOf": [
+          "anyOf": [
             {
               "title": "Ref",
               "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
@@ -291,10 +294,10 @@
         ],
         "additionalProperties": false,
         "properties": {
-          "bom-ref": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-            "title": "BOM Reference",
-            "description": "An identifier which can be used to reference the assertion elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
+          "refId": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+            "title": "Reference Identifier",
+            "description": "An identifier which can be used to reference the assertion elsewhere in the document. Every `refId` shall be unique within the document."
           },
           "assertionType": {
             "title": "Assertion Type",
@@ -321,7 +324,7 @@
           "requirementRefs": {
             "type": "array",
             "title": "Requirement References",
-            "description": "A list of BOM references linking to requirement objects defined in the BOM.",
+            "description": "The `refId`s of the requirement objects.",
             "uniqueItems": true,
             "items": {
               "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cyclonedx.org/schema/2.0/modules/cyclonedx-patent-2.0.schema.json",
-  "type": "null",
+  "not": { "$comment": "This schema provides definitions only and is not intended for direct validation or instantiation." },
   "title": "CycloneDX Patent Module",
   "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
@@ -23,10 +23,10 @@
       "required": ["patentNumber", "jurisdiction", "patentLegalStatus"],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `bom-ref` must be unique within the BOM."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the object elsewhere in the document. Every `refId` shall be unique within the document."
         },
         "patentNumber": {
           "type": "string",
@@ -48,7 +48,11 @@
           "type": "string",
           "pattern": "^[A-Za-z0-9][A-Za-z0-9\\-/.()\\s]{0,28}[A-Za-z0-9]$",
           "title": "Patent Publication Number",
-          "description": "This is the number assigned to a patent application once it is published. Patent applications are generally published 18 months after filing (unless an applicant requests non-publication). This number is distinct from the application number. \n\nPurpose: Identifies the publicly available version of the application. \n\nFormat: Varies by jurisdiction, often similar to application numbers but includes an additional suffix indicating publication. \n\nExample:\n - US: US20240000123A1 (indicates the first publication of application US20240000123) \n - Europe: EP23123456A1 (first publication of European application EP23123456). \n\nWIPO ST.96 v8.0: \n - Publication Number field: https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/PublicationNumber.xsd"
+          "description": "This is the number assigned to a patent application once it is published. Patent applications are generally published 18 months after filing (unless an applicant requests non-publication). This number is distinct from the application number. \n\nPurpose: Identifies the publicly available version of the application. \n\nFormat: Varies by jurisdiction, often similar to application numbers but includes an additional suffix indicating publication. \n\nExample:\n - US: `\"US20240000123A1\"` (indicates the first publication of application US20240000123) \n - Europe: `\"EP23123456A1\"` (first publication of European application EP23123456). \n\nWIPO ST.96 v8.0: \n - Publication Number field: <https://www.wipo.int/standards/XMLSchema/ST96/V8_0/Patent/PublicationNumber.xsd>.",
+          "examples": [
+            "US20240000123A1",
+            "EP23123456A1"
+          ]
         },
         "title": {
           "type": "string",
@@ -141,10 +145,10 @@
       "required": ["familyId"],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference the object elsewhere in the BOM. Every `bom-ref` must be unique within the BOM. \n\nFor a patent, it might be a good idea to use a patent number as the BOM reference ID."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the object elsewhere in the document. Every `refId` shall be unique within the document. \n\nFor a patent, the patent number is a suitable `refId`."
         },
         "familyId": {
           "type": "string",
@@ -157,11 +161,11 @@
         "members": {
           "type": "array",
           "title": "Family Members",
-          "description": "A collection of patents or applications that belong to this family, each identified by a `bom-ref` pointing to a patent object defined elsewhere in the BOM.",
+          "description": "A collection of patents or applications that belong to this family, each identified by a `refId` pointing to a patent object defined elsewhere in the document.",
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
-            "title": "BOM Reference",
-            "description": "A `bom-ref` linking to a patent or application object within the BOM."
+            "title": "Reference",
+            "description": "A `refId` linking to a patent or application object within the BOM."
           }
         },
         "externalReferences": {
@@ -180,14 +184,14 @@
         "required": ["assertionType", "asserter"],
         "additionalProperties": false,
         "properties": {
-          "bom-ref": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-            "title": "BOM Reference",
-            "description": "A reference to the patent or patent family object within the BOM. This must match the `bom-ref` of a `patent` or `patentFamily` object."
+          "refId": {
+            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+            "title": "Reference Identifier",
+            "description": "A reference to the patent or patent family object within the BOM. This shall match the `refId` of a `patent` or `patentFamily` object."
           },
           "assertionType": {
             "title": "Assertion Type",
-            "description": "The type of assertion being made about the patent or patent family. Examples include ownership, licensing, and standards inclusion.",
+            "description": "The type of assertion being made about the patent or patent family.",
             "enum": [
               "ownership",
               "license",
@@ -212,7 +216,7 @@
           "patentRefs": {
             "type": "array",
             "title": "Patent References",
-            "description": "A list of BOM references (`bom-ref`) linking to patents or patent families associated with this assertion.",
+            "description": "The `refId`s of the patents or patent families associated with this assertion.",
             "items": {
               "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
             }
@@ -230,7 +234,7 @@
               {
                 "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
                 "title": "Reference",
-                "description": "A reference to a previously defined `organizationalContact` or `organizationalEntity` object in the BOM. The value must be a valid `bom-ref` pointing to one of these objects."
+                "description": "A reference to a previously defined `organizationalContact` or `organizationalEntity` object in the BOM. The value shall be a valid `refId` pointing to one of these objects."
               }
             ]
           },
@@ -265,7 +269,7 @@
     "priorityApplication": {
       "type": "object",
       "title": "Priority Application",
-      "description": "The priorityApplication contains the essential data necessary to identify and reference an earlier patent filing for priority rights. In line with WIPO ST.96 guidelines, it includes the jurisdiction (office code), application number, and filing date-the three key elements that uniquely specify the priority application in a global patent context.",
+      "description": "The `priorityApplication` contains the essential data necessary to identify and reference an earlier patent filing for priority rights. In line with WIPO ST.96 guidelines, it includes the jurisdiction (office code), application number, and filing date-the three key elements that uniquely specify the priority application in a global patent context.",
       "required": ["applicationNumber", "jurisdiction", "filingDate"],
       "additionalProperties": false,
       "properties": {

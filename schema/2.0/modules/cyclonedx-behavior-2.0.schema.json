@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cyclonedx.org/schema/2.0/modules/cyclonedx-behavior-2.0.schema.json",
-  "type": "null",
+  "not": { "$comment": "This schema provides definitions only and is not intended for direct validation or instantiation." },
   "title": "CycloneDX Behavior Module",
   "$comment": "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
@@ -36,10 +36,10 @@
       "title": "Behavior Instance",
       "description": "A behavior performed by one or more objects within the BOM.",
       "additionalProperties": false,
-      "required": ["bom-ref", "behavior"],
+      "required": ["refId", "behavior"],
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType"
         },
         "behavior": {
           "$ref": "../../behavior-taxonomy.schema.json",
@@ -55,7 +55,7 @@
         "actors": {
           "type": "array",
           "title": "Actors",
-          "description": "References using bom-link or bom-ref to objects that perform this behavior.",
+          "description": "References using bom-link or `refId` to objects that perform this behavior.",
           "uniqueItems": true,
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
@@ -64,7 +64,7 @@
         "targets": {
           "type": "array",
           "title": "Targets",
-          "description": "References using bom-link or bom-ref to objects affected by this behavior.",
+          "description": "References using bom-link or `refId` to objects affected by this behavior.",
           "uniqueItems": true,
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
@@ -138,12 +138,12 @@
       "description": "A graph of nodes joined by transitions that models behaviour over time. A node may be an activity, a state, an event, a gateway, or a start or end point, so the same construct expresses an activity or process flow (where the nodes are activities), a state machine (where the nodes are states), or a mixture of the two.",
       "additionalProperties": false,
       "required": [
-        "bom-ref",
+        "refId",
         "nodes"
       ],
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType"
         },
         "name": {
           "type": "string",
@@ -157,7 +157,7 @@
         },
         "kind": {
           "title": "Kind",
-          "description": "An optional hint at the intent of the graph.",
+          "description": "A hint at the intent of the graph.",
           "enum": [
             "activity",
             "state-machine",
@@ -172,7 +172,7 @@
         "subject": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "title": "Subject",
-          "description": "Reference using bom-link or bom-ref to the object whose behaviour this graph describes."
+          "description": "Reference using bom-link or `refId` to the object whose behaviour this graph describes."
         },
         "acknowledgment": {
           "$ref": "#/$defs/acknowledgment"
@@ -241,12 +241,12 @@
       "description": "A single node in a behavior graph. The kind determines what the node represents and which additional properties apply.",
       "additionalProperties": false,
       "required": [
-        "bom-ref",
+        "refId",
         "kind"
       ],
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType"
         },
         "kind": {
           "title": "Kind",
@@ -261,7 +261,7 @@
           ],
           "meta:enum": {
             "activity": "An action that is performed, identified by a behavior, a behavior-instance reference, or a nested graph. The activity-flow counterpart of a step.",
-            "state": "A durable condition the subject rests in until a transition fires. The state-machine counterpart of a node. A composite state references its nested region through 'graph'.",
+            "state": "A durable condition the subject rests in until a transition fires. The state-machine counterpart of a node. A composite state references its nested region through `graph`.",
             "event": "An intermediate event that occurs during the graph.",
             "gateway": "A branch or merge point whose outgoing transitions carry the guards.",
             "initial": "The starting point of the graph or of a composite node.",
@@ -282,27 +282,27 @@
           "type": "integer",
           "title": "Ordinal",
           "minimum": 1,
-          "description": "Position within a sequential graph. Required when the graph ordering is 'sequential'. Ignored when transitions define the order."
+          "description": "Position within a sequential graph. Required when the containing graph has `ordering=\"sequential\"`. Ignored when transitions define the order."
         },
         "behavior": {
           "$ref": "../../behavior-taxonomy.schema.json",
           "title": "Behavior",
-          "description": "For an activity node, the behavior performed, drawn from the taxonomy. Mutually exclusive with 'ref' and 'graph'."
+          "description": "For an activity node, the behavior performed, drawn from the taxonomy. Mutually exclusive with `ref` and `graph`."
         },
         "ref": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "title": "Behavior Reference",
-          "description": "For an activity node, a reference to a behavior instance. Mutually exclusive with 'behavior' and 'graph'."
+          "description": "For an activity node, a reference to a behavior instance. Mutually exclusive with `behavior` and `graph`."
         },
         "graph": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "title": "Graph Reference",
-          "description": "A reference to a nested behavior graph. For an activity node it is the sub-process performed and is mutually exclusive with 'behavior' and 'ref'; for a composite node it is the nested region."
+          "description": "A reference to a nested behavior graph. For an activity node it is the sub-process performed and is mutually exclusive with `behavior` and `ref`; for a composite node it is the nested region."
         },
         "actors": {
           "type": "array",
           "title": "Actors",
-          "description": "References using bom-link or bom-ref to objects that perform this node.",
+          "description": "References using bom-link or `refId` to objects that perform this node.",
           "uniqueItems": true,
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
@@ -311,7 +311,7 @@
         "targets": {
           "type": "array",
           "title": "Targets",
-          "description": "References using bom-link or bom-ref to objects affected by this node.",
+          "description": "References using bom-link or `refId` to objects affected by this node.",
           "uniqueItems": true,
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
@@ -320,7 +320,7 @@
         "eventType": {
           "$ref": "#/$defs/trigger",
           "title": "Event Type",
-          "description": "For an event node, the nature of the event, reusing the trigger vocabulary, such as signal, scheduled, or event-driven."
+          "description": "For an event node, the nature of the event, reusing the trigger vocabulary, such as `\"signal\"`, `\"scheduled\"`, or `\"event-driven\"`."
         },
         "gatewayKind": {
           "title": "Gateway Kind",
@@ -386,8 +386,8 @@
         "target"
       ],
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType"
         },
         "name": {
           "type": "string",
@@ -415,7 +415,7 @@
         "guard": {
           "type": "string",
           "title": "Guard",
-          "description": "A guard condition; the transition fires only when it evaluates to true."
+          "description": "A guard condition; the transition fires only when it evaluates to `true`."
         },
         "default": {
           "type": "boolean",

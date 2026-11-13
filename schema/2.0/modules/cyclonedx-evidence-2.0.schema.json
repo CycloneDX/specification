@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cyclonedx.org/schema/2.0/modules/cyclonedx-evidence-2.0.schema.json",
-  "type": "null",
+  "not": { "$comment": "This schema provides definitions only and is not intended for direct validation or instantiation." },
   "title": "CycloneDX Evidence Module",
   "$comment" : "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
@@ -14,15 +14,20 @@
       ],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference the occurrence elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the occurrence elsewhere in the document. Every `refId` shall be unique within the document."
         },
         "location": {
           "type": "string",
           "title": "Location",
-          "description": "The location or path at which the subject was found, for example a file path, a URL, or a package coordinate."
+          "description": "The location or path at which the subject was found, for example a file path, a URL, or a package coordinate.",
+          "examples": [
+            "src/authentication/login.py",
+            "https://example.com/login",
+            "docker.io/library/nginx:1.25"
+          ]
         },
         "line": {
           "type": "integer",
@@ -76,6 +81,43 @@
         }
       }
     },
+    "occurrenceChoice": {
+      "title": "Occurrence Choice",
+      "description": "An occurrence represented either as a complete inline object or as a reference to an occurrence declared elsewhere, such as an occurrence recorded in the evidence of a component.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/occurrence"
+        },
+        {
+          "$ref": "#/$defs/occurrenceReference"
+        }
+      ]
+    },
+    "occurrenceReference": {
+      "type": "object",
+      "title": "Occurrence Reference",
+      "description": "A reference to an occurrence declared elsewhere, such as in another position of the same document or in another document via BOM-Link. A reference includes the referenced occurrence exactly as declared: every position that references the same occurrence includes an identical occurrence. Where the context differs, declare the occurrence inline instead.",
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "title": "Reference",
+          "description": "Reference using bom-link or `refId` to the occurrence.",
+          "anyOf": [
+            {
+              "title": "Ref",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+            },
+            {
+              "title": "BOM-Link Element",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+            }
+          ]
+        }
+      }
+    },
     "callStacks": {
       "type": "array",
       "title": "Call Stacks",
@@ -88,20 +130,20 @@
       "description": "A single call stack or data flow path by which the subject is reached.",
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference this call stack elsewhere in the BOM. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference this call stack elsewhere in the document. Every `refId` shall be unique within the document."
         },
         "name": {
           "type": "string",
           "title": "Name",
-          "description": "An optional name or label for this path, for example the entry point through which the subject is reached."
+          "description": "A name or label for this path, for example the entry point through which the subject is reached."
         },
         "description": {
           "type": "string",
           "title": "Description",
-          "description": "An optional description of this path."
+          "description": "A description of this path."
         },
         "frames": {
           "type": "array",
@@ -179,7 +221,7 @@
           "minimum": 0,
           "maximum": 1,
           "title": "Confidence",
-          "description": "The confidence of the evidence from 0 to 1, where 1 is 100% confidence. Confidence is specific to the technique used. Each technique of analysis can have independent confidence."
+          "description": "The confidence of the evidence from `0` to `1`, where `1` is 100% confidence. Confidence is specific to the technique used. Each technique of analysis can have independent confidence."
         },
         "value": {
           "type": "string",
@@ -196,8 +238,15 @@
           "description": "The outcome of applying this method, distinguishing a positive detection from a method that ran and found nothing or was inconclusive. This makes negative evidence machine actionable."
         },
         "rule": {
-          "$ref": "#/$defs/detectionRule",
-          "description": "The rule, policy, or query that produced this method's result. Recording it, together with the version of the ruleset or policy bundle that contains it, supports reproducibility, which matters most for findings in custom code that will never receive a CVE."
+          "oneOf": [
+            {
+              "$ref": "#/$defs/detectionRule"
+            },
+            {
+              "$ref": "#/$defs/detectionRuleReference"
+            }
+          ],
+          "description": "The rule, policy, or query that produced this method's result, either inline or as a reference to a rule declared elsewhere. Recording it, together with the version of the ruleset or policy bundle that contains it, supports reproducibility, which matters most for findings in custom code that will never receive a CVE."
         },
         "externalReferences": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/externalReferences",
@@ -211,10 +260,10 @@
       "description": "A rule, policy, or query that identified a finding, for example a static or dynamic analysis rule, a policy, or a query. The scanner, engine, and ruleset are versioned components referenced from `tools`; this object identifies the specific rule and binds it to that ruleset.",
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
-          "title": "BOM Reference",
-          "description": "An identifier which can be used to reference the rule elsewhere in the BOM, for example when the same rule produces many findings. Every `bom-ref` must be unique within the BOM.\nValue SHOULD not start with the BOM-Link intro 'urn:cdx:' to avoid conflicts with BOM-Links."
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the rule elsewhere in the document, for example when the same rule produces many findings. Every `refId` shall be unique within the document."
         },
         "id": {
           "type": "string",
@@ -243,12 +292,37 @@
             }
           ],
           "title": "Ruleset",
-          "description": "A reference, by `bom-ref`, to the ruleset or policy bundle that contains this rule, typically modelled as a versioned component or service in `tools`."
+          "description": "A reference, by `refId`, to the ruleset or policy bundle that contains this rule, typically modelled as a versioned component or service in `tools`."
         },
         "text": {
           "type": "string",
           "title": "Text",
-          "description": "The rule, policy, or query text. Large or sensitive rule content should instead be referenced through supporting data of type `rule`."
+          "description": "The rule, policy, or query text. Large or sensitive rule content should instead be referenced through supporting data with `type=\"rule\"`."
+        }
+      }
+    },
+    "detectionRuleReference": {
+      "type": "object",
+      "title": "Detection Rule Reference",
+      "description": "A reference to a detection rule declared elsewhere, such as in the definitions registry, in another position of the same document, or in another document via BOM-Link. A reference includes the referenced detection rule exactly as declared: every position that references the same detection rule includes an identical detection rule. Where the context differs, declare the detection rule inline instead.",
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "title": "Reference",
+          "description": "Reference using bom-link or `refId` to the detection rule.",
+          "anyOf": [
+            {
+              "title": "Ref",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+            },
+            {
+              "title": "BOM-Link Element",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+            }
+          ]
         }
       }
     },
@@ -297,7 +371,7 @@
     },
     "assessmentMethod": {
       "title": "Assessment Method",
-      "description": "A method of analysis used to assess a vulnerability. The technique is constrained to those meaningful for assessment; the identification-only `filename` technique is not permitted.",
+      "description": "A method of analysis used to assess a vulnerability. The technique is constrained to those meaningful for assessment; the identification-only `\"filename\"` technique is not permitted.",
       "allOf": [
         { "$ref": "#/$defs/analysisMethod" },
         {
@@ -347,7 +421,7 @@
         "role": {
           "$ref": "cyclonedx-party-2.0.schema.json#/$defs/role",
           "title": "Role",
-          "description": "The role or vantage in which the party was involved, for example supplier, manufacturer, distributor, operator, customer, end-user, asserter, auditor, reviewer, or researcher."
+          "description": "The role or vantage in which the party was involved."
         }
       }
     },
@@ -450,7 +524,13 @@
         "name": {
           "type": "string",
           "title": "Name",
-          "description": "The name or label of the data, for example 'attack prompt', 'model response', 'HTTP request', or 'scanner report'."
+          "description": "The name or label of the data.",
+          "examples": [
+            "attack prompt",
+            "model response",
+            "HTTP request",
+            "scanner report"
+          ]
         },
         "ref": {
           "anyOf": [
@@ -464,7 +544,7 @@
             }
           ],
           "title": "Reference",
-          "description": "An optional reference, by `bom-ref`, to the specific determination this material corroborates, for example a presence evidence entry. This links proof to a particular claim and perspective rather than leaving it pooled and unattributed."
+          "description": "A reference, by `refId`, to the specific determination this material corroborates, for example a presence evidence entry. This links proof to a particular claim and perspective rather than leaving it pooled and unattributed."
         },
         "type": {
           "$ref": "#/$defs/evidenceDataType",

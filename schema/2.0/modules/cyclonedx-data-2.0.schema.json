@@ -1,14 +1,14 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cyclonedx.org/schema/2.0/modules/cyclonedx-data-2.0.schema.json",
-  "type": "null",
+  "not": { "$comment": "This schema provides definitions only and is not intended for direct validation or instantiation." },
   "title": "CycloneDX Data Module",
   "$comment": "OWASP CycloneDX is an Ecma International standard (ECMA-424) developed in collaboration between the OWASP Foundation and Ecma Technical Committee 54 (TC54). The standard is published under a royalty-free patent policy. This JSON schema is the reference implementation and is licensed under the Apache License 2.0.",
   "$defs": {
     "dataProfiles": {
       "type": "array",
       "title": "Data Profiles",
-      "description": "A catalogue of reusable data profile definitions. Each entry is a complete inline data profile carrying its own bom-ref so other objects may reference it.",
+      "description": "A catalogue of reusable data profile definitions. Each entry is a complete inline data profile carrying its own `refId` so other objects may reference it.",
       "uniqueItems": true,
       "items": {
         "$ref": "#/$defs/dataProfile"
@@ -23,8 +23,8 @@
       ],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
           "description": "Unique identifier for this data profile."
         },
         "name": {
@@ -132,11 +132,11 @@
         },
         "jurisdictions": {
           "$ref": "#/$defs/jurisdictions",
-          "description": "The jurisdictions whose laws and regulations apply to this data based on its nature, classification, or how it is processed and stored. See also subject.jurisdictions for jurisdictions that apply because of who the data is about."
+          "description": "The jurisdictions whose laws and regulations apply to this data based on its nature, classification, or how it is processed and stored. See also `subject.jurisdictions` for jurisdictions that apply because of who the data is about."
         },
         "regulations": {
           "$ref": "#/$defs/regulations",
-          "description": "The regulations that apply to this data based on its nature, classification, or processing context. See also subject.regulations for regulations that apply because of who the data is about."
+          "description": "The regulations that apply to this data based on its nature, classification, or processing context. See also `subject.regulations` for regulations that apply because of who the data is about."
         },
         "dataFormats": {
           "type": "array",
@@ -249,17 +249,40 @@
     },
     "dataProfileChoice": {
       "title": "Data Profile Choice",
-      "description": "A data profile represented either as a complete inline object or as a reference to a previously declared profile. References use bom-link or bom-ref to point at a profile declared in the root profiles catalogue or elsewhere in the document.",
+      "description": "A data profile represented either as a complete inline object or as a reference to a previously declared profile. References use bom-link or `refId` to point at a profile declared in the definitions or elsewhere in the document.",
       "oneOf": [
         {
           "$ref": "#/$defs/dataProfile"
         },
         {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
-          "title": "Reference",
-          "description": "Reference using bom-link or bom-ref to a previously declared data profile."
+          "$ref": "#/$defs/dataProfileReference"
         }
       ]
+    },
+    "dataProfileReference": {
+      "type": "object",
+      "title": "Data Profile Reference",
+      "description": "A reference to a data profile declared elsewhere, such as in the definitions registry, in another position of the same document, or in another document via BOM-Link. A reference includes the referenced data profile exactly as declared: every position that references the same data profile includes an identical data profile. Where the context differs, declare the data profile inline instead.",
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "title": "Reference",
+          "description": "Reference using bom-link or `refId` to the data profile.",
+          "anyOf": [
+            {
+              "title": "Ref",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+            },
+            {
+              "title": "BOM-Link Element",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+            }
+          ]
+        }
+      }
     },
     "dataObject": {
       "type": "object",
@@ -270,8 +293,8 @@
       ],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
           "description": "Unique identifier for this data object."
         },
         "name": {
@@ -293,7 +316,7 @@
         "profile": {
           "$ref": "#/$defs/dataProfileChoice",
           "title": "Profile",
-          "description": "The data profile that governs this object's classification, information types, and lifecycle requirements. May be an inline profile object or a reference using bom-link or bom-ref to a previously declared profile."
+          "description": "The data profile that governs this object's classification, information types, and lifecycle requirements. May be an inline profile object or a reference using bom-link or `refId` to a previously declared profile."
         },
         "informationTypes": {
           "type": "array",
@@ -320,7 +343,7 @@
             "mediaType": {
               "type": "string",
               "title": "Media Type",
-              "description": "Media type of the schema, for example application/schema+json, application/xml, or application/vnd.apache.avro+json.",
+              "description": "Media type of the schema.",
               "examples": [
                 "application/schema+json",
                 "application/xml",
@@ -337,7 +360,7 @@
         "format": {
           "type": "object",
           "title": "Format",
-          "description": "The serialisation or encoding format of this object, such as application/json, text/csv, or application/hl7-v2.",
+          "description": "The serialisation or encoding format of this object, such as `\"application/json\"`, `\"text/csv\"`, or `\"application/hl7-v2\"`.",
           "additionalProperties": false,
           "properties": {
             "url": {
@@ -379,6 +402,43 @@
         }
       }
     },
+    "dataObjectChoice": {
+      "title": "Data Object Choice",
+      "description": "A data object represented either as a complete inline object or as a reference to a data object declared elsewhere.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/dataObject"
+        },
+        {
+          "$ref": "#/$defs/dataObjectReference"
+        }
+      ]
+    },
+    "dataObjectReference": {
+      "type": "object",
+      "title": "Data Object Reference",
+      "description": "A reference to a data object declared elsewhere, such as in the definitions registry, in another position of the same document, or in another document via BOM-Link. A reference includes the referenced data object exactly as declared: every position that references the same data object includes an identical data object. Where the context differs, declare the data object inline instead.",
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "title": "Reference",
+          "description": "Reference using bom-link or `refId` to the data object.",
+          "anyOf": [
+            {
+              "title": "Ref",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+            },
+            {
+              "title": "BOM-Link Element",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+            }
+          ]
+        }
+      }
+    },
     "dataAttribute": {
       "type": "object",
       "title": "Data Attribute",
@@ -388,8 +448,8 @@
       ],
       "additionalProperties": false,
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType",
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
           "description": "Unique identifier for this attribute, enabling it to be referenced as a key target."
         },
         "name": {
@@ -441,7 +501,7 @@
         "references": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "title": "References",
-          "description": "For a foreign key, a reference using bom-link or bom-ref to the data object or attribute it refers to."
+          "description": "For a foreign key, a reference using bom-link or `refId` to the data object or attribute it refers to."
         },
         "properties": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
@@ -458,8 +518,8 @@
         "cardinality"
       ],
       "properties": {
-        "bom-ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refType"
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType"
         },
         "name": {
           "type": "string",
@@ -474,7 +534,7 @@
         "target": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "title": "Target",
-          "description": "Reference using bom-link or bom-ref to the related data object."
+          "description": "Reference using bom-link or `refId` to the related data object."
         },
         "cardinality": {
           "title": "Cardinality",
@@ -495,7 +555,7 @@
         "sourceAttributes": {
           "type": "array",
           "title": "Source Attributes",
-          "description": "References using bom-link or bom-ref to the attributes on this data object that participate in the relationship, such as the foreign key columns.",
+          "description": "References using bom-link or `refId` to the attributes on this data object that participate in the relationship, such as the foreign key columns.",
           "uniqueItems": true,
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
@@ -504,7 +564,7 @@
         "targetAttributes": {
           "type": "array",
           "title": "Target Attributes",
-          "description": "References using bom-link or bom-ref to the attributes on the target data object that the relationship refers to, such as the primary key columns.",
+          "description": "References using bom-link or `refId` to the attributes on the target data object that the relationship refers to, such as the primary key columns.",
           "uniqueItems": true,
           "items": {
             "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
@@ -518,7 +578,7 @@
     "subject": {
       "type": "object",
       "title": "Subject",
-      "description": "An entity, group, category, or thing that the data is about or pertains to. Subjects identify who or what the data describes, which is critical for determining applicable regulations, privacy obligations, and handling requirements. A subject is identified in one of three ways: inline by `name` and `type`, by an inline `party` object, or by `ref` pointing at any bom-ref'd element declared elsewhere in the document (a party, component, service, asset, dataset, or other element). At least one of these forms shall be supplied. Subject-context attributes such as protected-class status, applicable jurisdictions, and applicable regulations are carried here regardless of which identification form is used.",
+      "description": "An entity, group, category, or thing that the data is about or pertains to. Subjects identify who or what the data describes, which is critical for determining applicable regulations, privacy obligations, and handling requirements. A subject is identified in one of three ways: inline by `name` and `type`, by an inline `party` object, or by `ref` pointing at any element carrying a `refId` declared elsewhere in the document (a party, component, service, asset, dataset, or other element). At least one of these forms shall be supplied. Subject-context attributes such as protected-class status, applicable jurisdictions, and applicable regulations are carried here regardless of which identification form is used.",
       "additionalProperties": false,
       "anyOf": [
         {
@@ -594,25 +654,25 @@
         "party": {
           "$ref": "cyclonedx-party-2.0.schema.json#/$defs/party",
           "title": "Party",
-          "description": "An inline party object identifying the subject. Use this when the subject is best modelled as a party (organization, person, system, or persona) and has not been declared elsewhere in the document. The party's `roles` should include `data-subject`."
+          "description": "An inline party object identifying the subject. Use this when the subject is best modelled as a party (organization, person, system, or persona) and has not been declared elsewhere in the document. The party's `roles` should include `\"data-subject\"`."
         },
         "ref": {
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
           "title": "Reference",
-          "description": "Reference using bom-link or bom-ref to any element declared elsewhere in the document that identifies the subject, such as a party, component, service, asset, dataset, or other bom-ref'd element. Use this when the subject is already represented elsewhere and you want to point at it rather than redeclare it."
+          "description": "Reference using bom-link or `refId` to any element declared elsewhere in the document that identifies the subject, such as a party, component, service, asset, dataset, or other element carrying a `refId`. Use this when the subject is already represented elsewhere and you want to point at it rather than redeclare it."
         },
         "protectedClass": {
           "type": "boolean",
           "title": "Protected Class",
-          "description": "Indicates whether this subject represents or includes a legally protected class under applicable regulations. Protected classes are groups defined by characteristics such as race, ethnicity, religion, gender, age, disability, sexual orientation, national origin, or genetic information. When true, additional regulatory obligations may apply to the collection, processing, and sharing of data about this subject, including GDPR special category data provisions, US civil rights protections, COPPA requirements for children, and HIPAA protections for health information."
+          "description": "Indicates whether this subject represents or includes a legally protected class under applicable regulations. Protected classes are groups defined by characteristics such as race, ethnicity, religion, gender, age, disability, sexual orientation, national origin, or genetic information. When `true`, additional regulatory obligations may apply to the collection, processing, and sharing of data about this subject, including GDPR special category data provisions, US civil rights protections, COPPA requirements for children, and HIPAA protections for health information."
         },
         "jurisdictions": {
           "$ref": "#/$defs/jurisdictions",
-          "description": "The jurisdictions whose laws and regulations apply specifically because of this subject. See also dataProfile.jurisdictions for jurisdictions that apply to the data itself."
+          "description": "The jurisdictions whose laws and regulations apply specifically because of this subject. See also `dataProfile.jurisdictions` for jurisdictions that apply to the data itself."
         },
         "regulations": {
           "$ref": "#/$defs/regulations",
-          "description": "The regulations that apply specifically because of this subject. See also dataProfile.regulations for regulations that apply to the data itself."
+          "description": "The regulations that apply specifically because of this subject. See also `dataProfile.regulations` for regulations that apply to the data itself."
         },
         "description": {
           "type": "string",
@@ -659,9 +719,7 @@
           "HIPAA",
           "PCI-DSS"
         ]
-      },
-      "title": "Data flow direction",
-      "description": "Specifies the flow direction of the data. Direction is relative to the service."
+      }
     },
     "dataContents": {
       "type": "object",
@@ -805,7 +863,7 @@
     "dataGovernance": {
       "type": "array",
       "title": "Data Governance",
-      "description": "Parties responsible for the data throughout its lifecycle. Each entry is either an inline party object or a reference to a previously declared party. The party's `roles` carry the governance relationship (`owner` for ownership and risk accountability, `steward` for content and business rules, `custodian` for safe custody, transport, and storage, `data-controller`, `data-processor`, `data-recipient`, or a custom role). Multiple parties may share the same role; preference among them is expressed via `role.order`.",
+      "description": "Parties responsible for the data throughout its lifecycle. Each entry is either an inline party object or a reference to a previously declared party. The party's `roles` carry the governance relationship (`\"owner\"` for ownership and risk accountability, `\"steward\"` for content and business rules, `\"custodian\"` for safe custody, transport, and storage, `\"data-controller\"`, `\"data-processor\"`, `\"data-recipient\"`, or a custom role). Multiple parties may share the same role; preference among them is expressed via `roles[].order`.",
       "uniqueItems": true,
       "items": {
         "$ref": "cyclonedx-party-2.0.schema.json#/$defs/partyChoice"
