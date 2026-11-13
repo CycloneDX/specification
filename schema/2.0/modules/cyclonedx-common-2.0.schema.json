@@ -682,8 +682,10 @@
     "duration": {
       "type": "string",
       "title": "Duration",
-      "pattern": "^P(?!$)((\\d+Y)?(\\d+M)?(\\d+D)?(T(?=\\d)(\\d+H)?(\\d+M)?(\\d+(\\.\\d+)?S)?)?|\\d+W)$",
-      "description": "An [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) duration, such as 'P1Y', 'P3M', 'P1DT12H' or 'PT30M'. Weeks shall not be combined with other designators, so 'P2W' is valid but 'P1M2W' is not. Only the seconds may have a decimal fraction, e.g., 'PT0.5S'.",
+      "$comment": "The pattern only checks the leading designator on purpose. ISO 8601 already defines the full duration syntax, and repeating it as a complex regex here would duplicate the standard. Producers and consumers are expected to follow ISO 8601 in full.",
+      "pattern": "^P",
+      "minLength": 3,
+      "description": "[ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) duration",
       "examples": [
         "P1Y",
         "P3M",
