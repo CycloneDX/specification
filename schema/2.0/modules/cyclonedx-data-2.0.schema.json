@@ -687,10 +687,17 @@
     "jurisdictions": {
       "type": "array",
       "title": "Jurisdictions",
-      "description": "The geographic or political jurisdictions whose laws and regulations apply.",
+      "description": "The geographic or political jurisdictions whose laws and regulations apply. Values should use ISO 3166-1 alpha-2 country codes or ISO 3166-2 subdivision codes for subnational jurisdictions.",
       "uniqueItems": true,
       "items": {
-        "$ref": "cyclonedx-common-2.0.schema.json#/$defs/countryOrSubdivision"
+        "anyOf": [
+          {"$ref": "cyclonedx-common-2.0.schema.json#/$defs/countryOrSubdivision"},
+          {
+            "title": "Free text",
+            "description": "Values like supranational identifier such as `\"EU\"`.",
+            "type": "string"
+          }
+        ]
       }
     },
     "regulations": {
