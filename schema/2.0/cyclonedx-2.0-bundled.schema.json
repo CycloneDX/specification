@@ -2015,16 +2015,9 @@
               "description": "When the blueprint expires."
             },
             "reviewFrequency": {
-              "type": "string",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/duration",
               "title": "Review Frequency",
-              "pattern": "^P(?!$)(\\d+Y)?(\\d+M)?(\\d+W)?(\\d+D)?$",
-              "description": "ISO 8601 duration for review frequency (e.g., `\"P3M\"` for quarterly).",
-              "examples": [
-                "P1Y",
-                "P3M",
-                "P5W",
-                "P23D"
-              ]
+              "description": "How often the blueprint is reviewed, as an [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) duration, for example `\"P3M\"` for quarterly."
             }
           }
         },
@@ -4987,6 +4980,21 @@
               }
             }
           }
+        },
+        "duration": {
+          "type": "string",
+          "title": "Duration",
+          "$comment": "The pattern only checks the leading designator on purpose. ISO 8601 already defines the full duration syntax, and repeating it as a complex regex here would duplicate the standard. Producers and consumers are expected to follow ISO 8601 in full.",
+          "pattern": "^P",
+          "minLength": 3,
+          "description": "[ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) duration.",
+          "examples": [
+            "P1Y",
+            "P3M",
+            "P2W",
+            "P1DT12H",
+            "PT30M"
+          ]
         },
         "ordinalVersion": {
           "title": "Ordinal Version",
@@ -16010,15 +16018,9 @@
               "description": "The expected number of events within the timeframe, for frequency-based methods such as the [FAIR](https://www.fairinstitute.org/) loss event frequency. Unlike a probability, a frequency may exceed `1`."
             },
             "timeframe": {
-              "type": "string",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/duration",
               "title": "Timeframe",
-              "description": "The period over which the probability or frequency is assessed, expressed as an [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) duration, for example `\"P1Y\"` for one year.",
-              "examples": [
-                "P1Y",
-                "P1M",
-                "P23DT23H",
-                "PT1M"
-              ]
+              "description": "The period over which the probability or frequency is assessed, expressed as an [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) duration, for example `\"P1Y\"` for one year."
             },
             "range": {
               "$ref": "#/$defs/cyclonedx-risk-2.0/$defs/estimateRange",
@@ -16396,8 +16398,7 @@
               "description": "The number of affected users."
             },
             "downtime": {
-              "type": "string",
-              "pattern": "^P(?!$)(\\d+Y)?(\\d+M)?(\\d+W)?(\\d+D)?(T(\\d+H)?(\\d+M)?(\\d+(\\.\\d+)?S)?)?$",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/duration",
               "description": "The expected downtime, as an [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) duration."
             },
             "dataRecords": {
@@ -16405,8 +16406,7 @@
               "description": "The number of data records affected."
             },
             "recovery": {
-              "type": "string",
-              "pattern": "^P(?!$)(\\d+Y)?(\\d+M)?(\\d+W)?(\\d+D)?(T(\\d+H)?(\\d+M)?(\\d+(\\.\\d+)?S)?)?$",
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/duration",
               "description": "The recovery time, as an [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) duration."
             },
             "financialLossRange": {
@@ -17105,14 +17105,8 @@
               "description": "The party accountable for setting and approving this appetite, such as a board or risk committee. May be an inline party object or a reference to a previously declared party."
             },
             "horizon": {
-              "type": "string",
-              "description": "The time horizon over which this appetite applies, expressed as an [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) duration, for example `\"P1Y\"` for one year.",
-              "examples": [
-                "P1Y",
-                "P1M",
-                "P23DT23H",
-                "PT1M"
-              ]
+              "$ref": "#/$defs/cyclonedx-common-2.0/$defs/duration",
+              "description": "The time horizon over which this appetite applies, expressed as an [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) duration, for example `\"P1Y\"` for one year."
             },
             "nextReview": {
               "type": "string",
