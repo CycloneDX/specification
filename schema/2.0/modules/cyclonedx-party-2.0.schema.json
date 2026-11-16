@@ -882,10 +882,17 @@
           "description": "An identifier that can be used to reference the address from elsewhere. Every `refId` shall be unique within the containing instance."
         },
         "country": {
-          "type": "string",
           "title": "Country",
-          "description": "The country name or the two-letter ISO 3166-1 country code. When the `isoCode` property is present, the value of `isoCode` is authoritative.",
-          "examples": [ "Germany", "DE" ]
+          "description": "The country name or the two-letter ISO 3166-1 alpha-2 country code. When the `isoCode` property is present, the value of `isoCode` is authoritative.",
+          "anyOf": [
+            {
+              "title": "Country name",
+              "type": "string",
+              "minLength": 1,
+              "examples": [ "Germany" ]
+            },
+            { "$ref": "cyclonedx-common-2.0.schema.json#/$defs/ISO_3166/$defs/alpha-2" }
+          ]
         },
         "region": {
           "type": "string",
