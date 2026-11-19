@@ -680,7 +680,7 @@
             "version": {
               "type": "string",
               "title": "Protocol Version",
-              "description": "The version of the protocol. Together with the type, it identifies the corresponding protocol entry, by exact match, in the `cryptography-defs.schema.json` subschema.",
+              "description": "The version of the protocol. Together with the type, it identifies the corresponding entry in the cryptography registry (`cryptography-defs.json`) when an exact match exists.",
               "examples": [
                 "1.0",
                 "1.2",
@@ -690,9 +690,9 @@
             "composition": {
               "type": "array",
               "title": "Composition",
-              "description": "The composition of the protocol as implemented, configured or observed for the subject of this BOM, using the structure of the protocol entries in the `cryptography-defs.schema.json` subschema. A slot corresponds to the slot of the protocol entry, identified by `type` and `version`, with the same role, and with the same selecting party where several slots share the role. The algorithm set holds the algorithms of the subject, named by the variant patterns of the algorithm families. A named bundle keeps the protocol's own identifier, such as an IANA-registered cipher suite, group or algorithm name, also for a single algorithm. The selection and the selection mechanism are those of the subject, which can be narrower than the protocol's: a negotiated slot can be fixed at build time, for example.",
+              "description": "The composition of the protocol as implemented, configured or observed for the subject of this BOM. Roles and selection semantics are shared with the protocol registry. Algorithm names describe registry variants; they do not identify components in the BOM. Explicit references identify BOM assets. A missing protocol version, registry entry or matching slot does not prevent reporting a composition and shall not be interpreted as absence of the capability. Matching by role and selecting party is possible only when it identifies a unique registry slot; otherwise the match remains unresolved.",
               "items": {
-                "$ref": "../../cryptography-defs.schema.json#/definitions/compositionSlot",
+                "$ref": "#/$defs/protocolCompositionSlot",
                 "title": "Composition Slot"
               }
             },
@@ -707,6 +707,152 @@
           "description": "The object identifier (OID) of the cryptographic asset."
         }
       }
+    },
+    "protocolCompositionSlot": {
+      "type": "object",
+      "title": "Protocol Composition Slot",
+      "description": "A functional slot of the subject protocol. Use the role spelling from the registry entry when a matching slot exists. Selection describes how many members are used. A single observed member does not establish that no other options are supported.",
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "$ref": "../../cryptography-defs.schema.json#/definitions/compositionSlot/properties/role"
+        },
+        "selection": {
+          "$ref": "../../cryptography-defs.schema.json#/definitions/compositionSlot/properties/selection"
+        },
+        "selectedBy": {
+          "$ref": "../../cryptography-defs.schema.json#/definitions/compositionSlot/properties/selectedBy"
+        },
+        "selectingParty": {
+          "$ref": "../../cryptography-defs.schema.json#/definitions/compositionSlot/properties/selectingParty"
+        },
+        "algorithmSet": {
+          "type": "array",
+          "minItems": 1,
+          "title": "Algorithm Set",
+          "description": "The known options for this slot. Each option is an algorithm, a named or identified bundle, or a sub-protocol.",
+          "items": {
+            "$ref": "#/$defs/protocolCompositionMember"
+          }
+        }
+      },
+      "required": [
+        "role",
+        "selection",
+        "algorithmSet"
+      ]
+    },
+    "protocolCompositionMember": {
+      "title": "Protocol Composition Member",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/protocolCompositionAlgorithm"
+        },
+        {
+          "type": "object",
+          "title": "Protocol Composition Option",
+          "description": "An option selected as one unit, such as a cipher suite or hybrid group. Report its protocol name, identifier or both. Omit algorithms if the constituent algorithms are unknown. When supplied, they are used together.",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Protocol Name",
+              "description": "The protocol-specific name of this option."
+            },
+            "identifier": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Protocol Identifier",
+              "description": "The value assigned to this option by the protocol in this composition slot. Preserve the spelling and case of textual identifiers. Encode numeric codepoints as unsigned decimal strings without leading zeroes, except for zero itself. The identifier may be omitted when name already contains the protocol identifier."
+            },
+            "algorithms": {
+              "type": "array",
+              "minItems": 1,
+              "title": "Bundled Algorithms",
+              "description": "The algorithms used together by this option, when known.",
+              "items": {
+                "$ref": "#/$defs/protocolCompositionAlgorithm"
+              }
+            },
+            "relatedCryptographicAssets": {
+              "$ref": "#/$defs/protocolCompositionAssetLinks"
+            }
+          },
+          "anyOf": [
+            { "required": ["name"], "properties": { "name": true } },
+            { "required": ["identifier"], "properties": { "identifier": true } }
+          ]
+        },
+        {
+          "type": "object",
+          "title": "Protocol Asset Reference",
+          "description": "A sub-protocol identified by family and optionally version, with an optional reference to the specific protocol asset described in this BOM.",
+          "additionalProperties": false,
+          "properties": {
+            "protocol": {
+              "$ref": "../../cryptography-defs.schema.json#/definitions/protocolFamiliesEnum"
+            },
+            "version": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Version",
+              "description": "The version of the sub-protocol."
+            },
+            "ref": {
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+              "title": "Protocol Reference",
+              "description": "Reference to a protocol component in this BOM. Its protocol family and any stated version shall agree with this member."
+            },
+            "relatedCryptographicAssets": {
+              "$ref": "#/$defs/protocolCompositionAssetLinks"
+            }
+          },
+          "required": [
+            "protocol"
+          ]
+        }
+      ]
+    },
+    "protocolCompositionAssetLinks": {
+      "type": "array",
+      "title": "Composition Member Asset Links",
+      "description": "References to assets associated with this composition member, such as its keys or certificates.",
+      "items": {
+        "type": "object",
+        "allOf": [{ "$ref": "#/$defs/relatedCryptographicAsset" }],
+        "properties": { "ref": true },
+        "required": ["ref"],
+        "unevaluatedProperties": false
+      }
+    },
+    "protocolCompositionAlgorithm": {
+      "title": "Composition Algorithm",
+      "description": "A registry variant name or a reference to an algorithm component in this BOM.",
+      "oneOf": [
+        {
+          "$ref": "../../cryptography-defs.schema.json#/definitions/algorithmName"
+        },
+        {
+          "type": "object",
+          "title": "Algorithm Asset Reference",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "$ref": "../../cryptography-defs.schema.json#/definitions/algorithmName",
+              "description": "The registry variant name, when known. If a name and reference are both supplied, they shall describe the same algorithm and compatible parameters. The referenced component display name need not equal this name."
+            },
+            "ref": {
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+              "title": "Algorithm Reference",
+              "description": "Reference to a component with cryptoProperties.assetType=\"algorithm\" in this BOM. Reference existence and asset type require semantic validation."
+            }
+          },
+          "required": [
+            "ref"
+          ]
+        }
+      ]
     },
     "cryptographicFunction": {
       "title": "Cryptographic Function",
