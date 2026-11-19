@@ -278,12 +278,7 @@
                   "description": "List of standards defining or relating to this protocol version."
                 },
                 "composition": {
-                  "type": "array",
-                  "title": "Composition",
-                  "description": "The algorithm composition of this protocol version, as a list of functional slots that all apply together. It describes the protocol as specified: the algorithms a conforming implementation can support or negotiate.",
-                  "items": {
-                    "$ref": "#/definitions/compositionSlot"
-                  }
+                  "$ref": "#/definitions/composition"
                 }
               },
               "required": [
@@ -677,7 +672,8 @@
         "ssh",
         "sstp",
         "tls",
-        "wpa"
+        "wpa",
+        "x509"
       ],
       "meta:enum": {
         "5g-aka": "Authentication and Key Agreement for 5G.",
@@ -693,7 +689,8 @@
         "ssh": "Secure Shell.",
         "sstp": "Secure Socket Tunneling Protocol.",
         "tls": "Transport Layer Security.",
-        "wpa": "Wi-Fi Protected Access."
+        "wpa": "Wi-Fi Protected Access.",
+        "x509": "X.509 public key certificates, as profiled for the Internet PKI. Its composition describes signature algorithms used by the certificate format. Model an individual certificate as a certificate asset."
       }
     },
     "standardRefs": {
@@ -724,16 +721,25 @@
         ]
       }
     },
+    "composition": {
+      "type": "array",
+      "title": "Protocol Composition",
+      "description": "The functional slots of a protocol and the options for each slot. The registry describes the options a conforming implementation can support or negotiate. A BOM reports the options known for its subject. Which slots apply depends on how the protocol is used.",
+      "items": {
+        "$ref": "#/definitions/compositionSlot"
+      }
+    },
     "compositionSlot": {
       "type": "object",
       "title": "Composition Slot",
-      "description": "A functional slot of a protocol, holding the set of algorithms that can fill it. All slots of a composition apply together; within a slot, the selection states how many algorithms of the set are used at runtime.",
+      "description": "A functional slot of a protocol and the options that can fill it. For example, the TLS client signature slot applies when the client authenticates with a certificate.",
       "additionalProperties": false,
       "properties": {
         "role": {
           "type": "string",
-          "title": "Role",
-          "description": "The functional role this slot fills within the protocol.",
+          "minLength": 1,
+          "title": "Composition Role",
+          "description": "The function this slot serves in the protocol. Producers should use the registry spelling when it applies and qualify producer-defined roles with an organization namespace. A role with no matching registry slot may be reported and remains unresolved.",
           "examples": [
             "authentication",
             "cert-chain-signature",
@@ -747,7 +753,7 @@
         },
         "selection": {
           "title": "Selection",
-          "description": "Specifies how many algorithms of the set are used at runtime: all of them together (all-of), one or more, possibly simultaneously (any-of), or exactly one (one-of).",
+          "description": "When the protocol uses this slot, all-of means that all members are used together, any-of means that one or more are used, and one-of means that exactly one is used.",
           "enum": [
             "all-of",
             "any-of",
@@ -774,13 +780,12 @@
             "server",
             "initiator",
             "responder",
-            "group-creator"
+            "group-creator",
+            "issuer"
           ]
         },
         "algorithmSet": {
-          "$ref": "#/definitions/algorithmSet",
-          "title": "Algorithm Set",
-          "description": "The set of algorithms that can fill this slot."
+          "$ref": "#/definitions/algorithmSet"
         }
       },
       "required": [
@@ -788,6 +793,12 @@
         "selection",
         "algorithmSet"
       ]
+    },
+    "protocolIdentifier": {
+      "type": "string",
+      "minLength": 1,
+      "title": "Protocol Identifier",
+      "description": "The value assigned to this option by the protocol in this composition slot. If name and identifier both resolve in the same registry slot, they shall identify the same option. Preserve the spelling and case of textual identifiers. Encode numeric codepoints as unsigned decimal strings without leading zeroes, except for zero itself. The identifier may be omitted when name already contains the protocol identifier."
     },
     "algorithmName": {
       "type": "string",
@@ -797,55 +808,88 @@
     },
     "algorithmSet": {
       "type": "array",
+      "minItems": 1,
       "title": "Algorithm Set",
-      "description": "The set of algorithms that can fill a composition slot. How many of them are used at runtime is stated by the slot's selection. Each member is the concrete name of an algorithm, a named bundle of algorithms, or a reference to a sub-protocol.",
+      "description": "The options for this slot. Each member is an algorithm, a protocol option or a sub-protocol.",
       "items": {
         "title": "Algorithm Set Member",
-        "description": "A member of an algorithm set: an algorithm name, a named bundle, or a sub-protocol reference.",
         "oneOf": [
           {
-            "$ref": "#/definitions/algorithmName"
+            "$ref": "#/definitions/compositionAlgorithm"
           },
           {
             "type": "object",
-            "title": "Named Bundle",
-            "description": "A named bundle of algorithms, such as a cipher suite or a hybrid key exchange group: it is selected as one unit, and all bundled algorithms are used together.",
+            "title": "Protocol Composition Option",
+            "description": "An option selected as one unit, such as a cipher suite or hybrid group. Registry authors should supply its protocol name, assigned identifier and constituent algorithms where known. BOM producers may report only the name or identifier they observed and may link to specific assets in the BOM.",
             "additionalProperties": false,
             "properties": {
               "name": {
                 "type": "string",
-                "title": "Bundle Name",
-                "description": "The common name of the bundle, preferably the identifier assigned by the registry of the protocol, such as the IANA-registered cipher suite or named group, so that names observed in a BOM resolve against this document."
+                "minLength": 1,
+                "title": "Protocol Name",
+                "description": "The protocol-specific name of this option."
+              },
+              "identifier": {
+                "$ref": "#/definitions/protocolIdentifier"
               },
               "algorithms": {
                 "type": "array",
+                "minItems": 1,
                 "title": "Bundled Algorithms",
-                "description": "The concrete names of the algorithms composing this bundle, each matching a variant pattern of an algorithm family defined in this document.",
+                "description": "The algorithms used together by this option, when known.",
                 "items": {
-                  "$ref": "#/definitions/algorithmName"
+                  "$ref": "#/definitions/compositionAlgorithm"
                 }
+              },
+              "relatedCryptographicAssets": {
+                "$ref": "#/definitions/compositionAssetLinks"
               }
             },
-            "required": [
-              "name",
-              "algorithms"
+            "anyOf": [
+              {
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": true
+                }
+              },
+              {
+                "required": [
+                  "identifier"
+                ],
+                "properties": {
+                  "identifier": true
+                }
+              }
             ]
           },
           {
             "type": "object",
             "title": "Sub-Protocol Reference",
-            "description": "A reference to a sub-protocol, by protocol family and optionally version. The composition of the sub-protocol is given by its own protocol entry in this document, which may itself reference further sub-protocols.",
+            "description": "A sub-protocol identified by family and optionally version. A BOM can also identify the specific protocol component.",
             "additionalProperties": false,
             "properties": {
               "protocol": {
-                "$ref": "#/definitions/protocolFamiliesEnum",
-                "title": "Protocol Family",
-                "description": "The protocol family of the referenced sub-protocol."
+                "$ref": "#/definitions/protocolFamiliesEnum"
               },
               "version": {
                 "type": "string",
+                "minLength": 1,
                 "title": "Version",
-                "description": "The version of the referenced sub-protocol."
+                "description": "The version of the sub-protocol."
+              },
+              "ref": {
+                "title": "Protocol Reference",
+                "description": "Reference to a protocol component in this BOM. Its family and any stated version shall agree with this member.",
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/assetRef"
+                  }
+                ]
+              },
+              "relatedCryptographicAssets": {
+                "$ref": "#/definitions/compositionAssetLinks"
               }
             },
             "required": [
@@ -854,6 +898,90 @@
           }
         ]
       }
+    },
+    "compositionAlgorithm": {
+      "title": "Composition Algorithm",
+      "description": "A registry variant name or a reference to an algorithm component in this BOM.",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/algorithmName"
+        },
+        {
+          "type": "object",
+          "title": "Algorithm Asset Reference",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "description": "The registry variant name, when known. If a name and reference are both supplied, they shall describe the same algorithm and compatible parameters. The referenced component display name need not equal this name.",
+              "allOf": [
+                {
+                  "$ref": "#/definitions/algorithmName"
+                }
+              ]
+            },
+            "ref": {
+              "title": "Algorithm Reference",
+              "description": "Reference to a component with cryptoProperties.assetType=\"algorithm\" in this BOM. Reference existence and asset type require semantic validation.",
+              "allOf": [
+                {
+                  "$ref": "#/definitions/assetRef"
+                }
+              ]
+            }
+          },
+          "required": [
+            "ref"
+          ]
+        }
+      ]
+    },
+    "compositionAssetLinks": {
+      "type": "array",
+      "title": "Composition Member Asset Links",
+      "description": "References to assets associated with this composition member, such as its keys or certificates.",
+      "items": {
+        "allOf": [
+          {
+            "$ref": "#/definitions/relatedCryptographicAsset"
+          },
+          {
+            "type": "object",
+            "$comment": "This is a mixin. A composition member must identify the related asset.",
+            "properties": { "ref": true },
+            "required": ["ref"]
+          }
+        ]
+      }
+    },
+    "relatedCryptographicAsset": {
+      "type": "object",
+      "title": "Related Cryptographic Asset",
+      "description": "A cryptographic asset associated with the subject component or composition member.",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "title": "Type",
+          "description": "The kind of referenced cryptographic asset, such as an algorithm, certificate, public key, or private key.",
+          "examples": [
+            "public-key",
+            "private-key",
+            "algorithm",
+            "certificate"
+          ]
+        },
+        "ref": {
+          "$ref": "#/definitions/assetRef"
+        }
+      }
+    },
+    "assetRef": {
+      "title": "BOM Asset Reference",
+      "description": "The refId of a component in the same BOM.",
+      "$comment": "Uses the value constraints of the CycloneDX 2.0 refLinkType. The registry schema can be validated on its own.",
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!urn:cdx:)"
     }
   }
 }
