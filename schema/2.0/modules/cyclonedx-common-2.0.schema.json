@@ -1027,20 +1027,32 @@
       }
     },
     "locale": {
-      "type": "string",
       "title": "Locale",
-      "description": "A language, optionally narrowed to a country. The language is a lowercase two-letter [ISO 639-1](https://www.iso.org/iso-639-language-code) code. The optional country is an uppercase two-letter [ISO 3166-1](https://www.iso.org/iso-3166-country-codes.html) alpha-2 code, separated from the language by a minus sign.",
+      "description": "A language, optionally narrowed to a country, as a [BCP 47](https://www.rfc-editor.org/info/bcp47) language tag. The language is a lowercase two-letter [ISO 639-1](https://www.iso.org/iso-639-language-code) code. The optional country is an uppercase two-letter [ISO 3166-1](https://www.iso.org/iso-3166-country-codes.html) alpha-2 code, separated from the language by a minus sign.",
       "examples": [ "en", "en-US", "fr", "fr-CA" ],
-      "anyOf": [
-        { "$ref": "#/$defs/ISO_639/$defs/alpha-2" },
-        {
-          "title": "Language and country",
-          "$comment": "A single pattern cannot be composed from two references, so this repeats the patterns of the ISO 639-1 language code and of the ISO 3166-1 alpha-2 country code.",
-          "type": "string",
-          "pattern": "^[a-z]{2}-[A-Z]{2}$",
-          "examples": [ "en-US", "fr-CA" ]
+      "$ref": "#/$defs/BCP_47/$defs/language-tag"
+    },
+    "BCP_47": {
+      "title": "IETF BCP 47",
+      "description": "Internal helpers. Not part of the public schema API, do not reference externally; may change without notice.",
+      "not": { "$comment": "This schema provides definitions only and is not intended for direct validation or instantiation." },
+      "$defs": {
+        "language-tag": {
+          "title": "BCP 47 language tag",
+          "description": "A [BCP 47](https://www.rfc-editor.org/info/bcp47) language tag, limited to a lowercase two-letter [ISO 639-1](https://www.iso.org/iso-639-language-code) language subtag, optionally followed by a minus sign and an uppercase two-letter [ISO 3166-1](https://www.iso.org/iso-3166-country-codes.html) alpha-2 region subtag (for example, `\"en\"` or `\"en-US\"`).",
+          "$comment": "Only this subset of BCP 47 is accepted; script, variant, extension and private-use subtags, three-letter language subtags and numeric regions are not. A single pattern cannot be composed from two references, so the second branch repeats the patterns of the ISO 639-1 language code and of the ISO 3166-1 alpha-2 country code.",
+          "examples": [ "en", "en-US", "fr", "fr-CA" ],
+          "anyOf": [
+            { "$ref": "#/$defs/ISO_639/$defs/alpha-2" },
+            {
+              "title": "Language and region",
+              "type": "string",
+              "pattern": "^[a-z]{2}-[A-Z]{2}$",
+              "examples": [ "en-US", "fr-CA" ]
+            }
+          ]
         }
-      ]
+      }
     },
     "ISO_639": {
       "title": "ISO 639",
