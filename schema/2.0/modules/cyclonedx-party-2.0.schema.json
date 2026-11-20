@@ -337,10 +337,13 @@
           "description": "The date the organization was dissolved or wound down. When present, the organization is no longer active."
         },
         "jurisdiction": {
-          "type": "string",
           "title": "Jurisdiction",
-          "description": "Country of registration as an ISO 3166-1 alpha-2 or alpha-3 code, optionally followed by an ISO 3166-2 subdivision separated by a hyphen.",
-          "examples": [ "US-DE", "IT-BO", "CHE" ]
+          "description": "Country of registration as an ISO 3166-1 alpha-3, or an ISO 3166-1 alpha-2 code optionally followed by an ISO 3166-2 subdivision separated by a hyphen.",
+          "anyOf": [
+            { "$ref": "cyclonedx-common-2.0.schema.json#/$defs/ISO_3166/$defs/alpha-3" },
+            { "$ref": "cyclonedx-common-2.0.schema.json#/$defs/ISO_3166/$defs/alpha-2" },
+            { "$ref": "cyclonedx-common-2.0.schema.json#/$defs/ISO_3166/$defs/subdivision" }
+          ]
         },
         "identifiers": {
           "type": "array",
@@ -883,9 +886,17 @@
           "description": "An identifier that can be used to reference the address from elsewhere. Every `refId` shall be unique within the containing instance."
         },
         "country": {
-          "type": "string",
           "title": "Country",
-          "description": "The country name or the two-letter ISO 3166-1 country code. When the `isoCode` property is present, the value of `isoCode` is authoritative."
+          "description": "The country name or the two-letter ISO 3166-1 alpha-2 country code. When the `isoCode` property is present, the value of `isoCode` is authoritative.",
+          "anyOf": [
+            {
+              "title": "Country name",
+              "type": "string",
+              "minLength": 1,
+              "examples": [ "Germany" ]
+            },
+            { "$ref": "cyclonedx-common-2.0.schema.json#/$defs/ISO_3166/$defs/alpha-2" }
+          ]
         },
         "region": {
           "type": "string",
@@ -894,11 +905,9 @@
           "examples": [ "Texas" ]
         },
         "isoCode": {
-          "type": "string",
-          "pattern": "^[A-Z]{2}(-[A-Z0-9]{1,3})?$",
           "title": "ISO Code",
           "description": "An ISO 3166-1 alpha-2 country code, optionally followed by an ISO 3166-2 subdivision code separated by a hyphen. When present, this property is authoritative over the free-text country and region properties.",
-          "examples": [ "IT-BO", "US-CA", "DE-BY" ]
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/countryOrSubdivision"
         },
         "locality": {
           "type": "string",
