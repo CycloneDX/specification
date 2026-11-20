@@ -18,23 +18,16 @@
           "items": {
             "type": "object",
             "title": "Assessor",
-            "description": "The assessor who evaluates claims and determines conformance to requirements and confidence in that assessment.",
+            "description": "The assessor who evaluates claims and determines conformance to requirements and confidence in that assessment. The party's `roles` should include `\"???\"`.",
             "additionalProperties": false,
             "properties": {
-              "refId": {
-                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
-                "title": "Reference Identifier",
-                "description": "An identifier which can be used to reference the object elsewhere in the document. Every `refId` shall be unique within the document."
+              "actor": {
+                "$ref": "cyclonedx-party-2.0.schema.json#/$defs/partyChoice"
               },
               "thirdParty": {
                 "type": "boolean",
                 "title": "Third Party",
                 "description": "The boolean indicating if the assessor is outside the organization generating claims. A value of `false` indicates a self assessor."
-              },
-              "organization": {
-                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntity",
-                "title": "Organization",
-                "description": "The entity issuing the assessment."
               }
             }
           }
@@ -269,14 +262,14 @@
                 "description": "The date and time (timestamp) when the evidence is no longer valid."
               },
               "author": {
-                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalContact",
+                "$ref": "cyclonedx-party-2.0.schema.json#/$defs/partyChoice",
                 "title": "Author",
-                "description": "The author of the evidence."
+                "description": "The author of the evidence. The party's `roles` should include `\"???\"`."
               },
               "reviewer": {
-                "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalContact",
+                "$ref": "cyclonedx-party-2.0.schema.json#/$defs/partyChoice",
                 "title": "Reviewer",
-                "description": "The reviewer of the evidence."
+                "description": "The reviewer of the evidence. The party's `roles` should include `\"???\"`."
               },
               "signatures": {
                 "$ref": "cyclonedx-common-2.0.schema.json#/$defs/signatures"
@@ -291,10 +284,9 @@
           "additionalProperties": false,
           "properties": {
             "organizations": {
-              "type": "array",
               "title": "Organizations",
               "description": "The list of organizations which claims are made against.",
-              "items": {"$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntity"}
+              "$ref": "cyclonedx-party-2.0.schema.json#/$defs/parties"
             },
             "components": {
               "type": "array",
@@ -349,7 +341,7 @@
                     "$ref": "cyclonedx-common-2.0.schema.json#/$defs/signatures"
                   },
                   "organization": {
-                    "$ref": "cyclonedx-common-2.0.schema.json#/$defs/organizationalEntity",
+                    "$ref": "cyclonedx-party-2.0.schema.json#/$defs/partyChoice",
                     "title": "Organization",
                     "description": "The signatory's organization."
                   },

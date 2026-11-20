@@ -363,88 +363,6 @@
         }
       }
     },
-    "organizationalEntity": {
-      "type": "object",
-      "title": "Organizational Entity",
-      "additionalProperties": false,
-      "properties": {
-        "refId": {
-          "$ref": "#/$defs/refIdType",
-          "title": "Reference Identifier",
-          "description": "An identifier which can be used to reference the object elsewhere in the document. Every `refId` shall be unique within the document."
-        },
-        "name": {
-          "type": "string",
-          "title": "Organization Name",
-          "description": "The name of the organization.",
-          "examples": [
-            "Example Inc."
-          ]
-        },
-        "address": {
-          "$ref": "#/$defs/postalAddress",
-          "title": "Organization Address",
-          "description": "The physical address (location) of the organization."
-        },
-        "url": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "format": "iri-reference"
-          },
-          "title": "Organization URL(s)",
-          "description": "The URL of the organization. Multiple URLs are allowed.",
-          "examples": ["https://example.com"]
-        },
-        "contact": {
-          "type": "array",
-          "title": "Organizational Contact",
-          "description": "A contact at the organization. Multiple contacts are allowed.",
-          "items": {"$ref": "#/$defs/organizationalContact"}
-        },
-        "origins": {
-          "type": "array",
-          "title": "Organization Origins",
-          "description": "The geographic origins associated with the organization, such as the country or countries where its goods or services originate. Multiple origins are allowed, each calculated on a different basis.",
-          "minItems": 1,
-          "items": {"$ref": "#/$defs/origin"}
-        }
-      }
-    },
-    "organizationalContact": {
-      "type": "object",
-      "title": "Organizational Contact",
-      "additionalProperties": false,
-      "properties": {
-        "refId": {
-          "$ref": "#/$defs/refIdType",
-          "title": "Reference Identifier",
-          "description": "An identifier which can be used to reference the object elsewhere in the document. Every `refId` shall be unique within the document."
-        },
-        "name": {
-          "type": "string",
-          "title": "Name",
-          "description": "The name of a contact.",
-          "examples": ["Contact name"]
-        },
-        "email": {
-          "type": "string",
-          "format": "idn-email",
-          "title": "Email Address",
-          "description": "The email address of the contact.",
-          "examples": ["firstname.lastname@example.com"]
-        },
-        "phone": {
-          "type": "string",
-          "title": "Phone",
-          "description": "The phone number of the contact.",
-          "examples": ["800-555-1212"]
-        }
-      }
-    },
-    "organizationalEntityOrContact": {
-      "$comment": "TODO"
-    },
     "origin": {
       "type": "object",
       "title": "Origin",
@@ -805,12 +723,12 @@
         },
         "author": {
           "title": "Author",
-          "description": "The author who created the changes in the commit.",
+          "description": "The (main) author who created the changes in the commit. The `actor`'s `roles` should include `\"author\"`",
           "$ref": "#/$defs/identifiableAction"
         },
         "committer": {
           "title": "Committer",
-          "description": "The person who committed or pushed the commit.",
+          "description": "The party who committed or pushed the commit. The `actor`'s `roles` should include `\"committer\"`",
           "$ref": "#/$defs/identifiableAction"
         },
         "message": {
@@ -1004,7 +922,7 @@
     "identifiableAction": {
       "type": "object",
       "title": "Identifiable Action",
-      "description": "Specifies an individual commit.",
+      "description": "Specifies an individual action.",
       "additionalProperties": false,
       "properties": {
         "timestamp": {
@@ -1013,17 +931,7 @@
           "title": "Timestamp",
           "description": "The timestamp in which the action occurred."
         },
-        "name": {
-          "type": "string",
-          "title": "Name",
-          "description": "The name of the individual who performed the action."
-        },
-        "email": {
-          "type": "string",
-          "format": "idn-email",
-          "title": "E-mail",
-          "description": "The email address of the individual who performed the action."
-        }
+        "actor": { "$ref": "cyclonedx-party-2.0.schema.json#/$defs/partyChoice" }
       }
     },
     "locale": {
