@@ -65,7 +65,7 @@
         },
         "resolves": {
           "type": "array",
-          "items": {"$ref": "cyclonedx-common-2.0.schema.json#/$defs/issue"},
+          "items": {"$ref": "#/$defs/issue"},
           "title": "Resolves",
           "description": "A collection of issues that have been resolved."
         },
@@ -138,6 +138,80 @@
               "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
             }
           ]
+        }
+      }
+    },
+    "issue": {
+      "type": "object",
+      "title": "Issue",
+      "description": "An individual issue that has been resolved.",
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "defect",
+            "enhancement",
+            "security"
+          ],
+          "meta:enum": {
+            "defect": "A fault, flaw, or bug in software.",
+            "enhancement": "A new feature or behavior in software.",
+            "security": "A special type of defect which impacts security."
+          },
+          "title": "Issue Type",
+          "description": "Specifies the type of issue."
+        },
+        "id": {
+          "type": "string",
+          "title": "Issue ID",
+          "description": "The identifier of the issue assigned by the source of the issue."
+        },
+        "name": {
+          "type": "string",
+          "title": "Issue Name",
+          "description": "The name of the issue."
+        },
+        "description": {
+          "type": "string",
+          "title": "Issue Description",
+          "description": "A description of the issue."
+        },
+        "source": {
+          "type": "object",
+          "title": "Source",
+          "description": "The source of the issue where it is documented.",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Name",
+              "description": "The name of the source.",
+              "examples": [
+                "National Vulnerability Database",
+                "NVD",
+                "Apache"
+              ]
+            },
+            "url": {
+              "type": "string",
+              "title": "URL",
+              "description": "The url of the issue documentation as provided by the source.",
+              "format": "iri-reference"
+            }
+          }
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "iri-reference"
+          },
+          "title": "References",
+          "description": "A collection of URL's for reference. Multiple URLs are allowed.",
+          "examples": ["https://example.com"]
         }
       }
     }

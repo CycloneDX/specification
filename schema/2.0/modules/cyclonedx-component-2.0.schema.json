@@ -75,7 +75,7 @@
           "title": "Component Origins",
           "description": "The geographic origins of the component, each expressed as a distribution across one or more countries or subdivisions. Multiple origins are allowed, each calculated on a different basis.",
           "minItems": 1,
-          "items": { "$ref": "cyclonedx-common-2.0.schema.json#/$defs/origin" }
+          "items": { "$ref": "#/$defs/origin" }
         },
         "group": {
           "type": "string",
@@ -200,7 +200,7 @@
               "type": "array",
               "title": "Commits",
               "description": "A list of zero or more commits which provide a trail describing how the component deviates from an ancestor, descendant, or variant.",
-              "items": {"$ref": "cyclonedx-common-2.0.schema.json#/$defs/commit"}
+              "items": {"$ref": "#/$defs/commit"}
             },
             "patches": {
               "type": "array",
@@ -208,8 +208,8 @@
               "description": "A list of zero or more patches describing how the component deviates from an ancestor, descendant, or variant. Patches may be complementary to commits or may be used in place of commits.",
               "items": {
                 "oneOf": [
-                  {"$ref": "cyclonedx-common-2.0.schema.json#/$defs/patch"},
-                  {"$ref": "cyclonedx-common-2.0.schema.json#/$defs/patchReference"}
+                  {"$ref": "#/$defs/patch"},
+                  {"$ref": "#/$defs/patchReference"}
                 ]
               }
             }
@@ -1333,6 +1333,302 @@
           "title": "Properties",
           "description": "Provides the ability to document name-value pairs for the energy provider. Property names of interest to the general public are encouraged to be registered in the [CycloneDX Property Taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy). Formal registration is optional.",
           "$ref": "cyclonedx-common-2.0.schema.json#/$defs/properties"
+        }
+      }
+    },
+    "commit": {
+      "type": "object",
+      "title": "Commit",
+      "description": "Specifies an individual commit.",
+      "additionalProperties": false,
+      "properties": {
+        "uid": {
+          "type": "string",
+          "title": "UID",
+          "description": "A unique identifier of the commit. This may be version control specific. For example, Subversion uses revision numbers whereas git uses commit hashes."
+        },
+        "url": {
+          "type": "string",
+          "title": "URL",
+          "description": "The URL to the commit. This URL will typically point to a commit in a version control system.",
+          "format": "iri-reference"
+        },
+        "author": {
+          "title": "Author",
+          "description": "The author who created the changes in the commit.",
+          "$ref": "#/$defs/identifiableAction"
+        },
+        "committer": {
+          "title": "Committer",
+          "description": "The person who committed or pushed the commit.",
+          "$ref": "#/$defs/identifiableAction"
+        },
+        "message": {
+          "type": "string",
+          "title": "Message",
+          "description": "The text description of the contents of the commit."
+        }
+      }
+    },
+    "patch": {
+      "type": "object",
+      "title": "Patch",
+      "description": "Specifies an individual patch.",
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "refId": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refIdType",
+          "title": "Reference Identifier",
+          "description": "An identifier which can be used to reference the patch elsewhere in the document, such as from an annotation. Every `refId` shall be unique within the document."
+        },
+        "type": {
+          "enum": [
+            "unofficial",
+            "monkey",
+            "backport",
+            "cherry-pick"
+          ],
+          "meta:enum": {
+            "unofficial": "A patch which is not developed by the creators or maintainers of the software being patched. Refer to <https://en.wikipedia.org/wiki/Unofficial_patch>.",
+            "monkey": "A patch which dynamically modifies runtime behavior. Refer to <https://en.wikipedia.org/wiki/Monkey_patch>.",
+            "backport": "A patch which takes code from a newer version of the software and applies it to older versions of the same software. Refer to <https://en.wikipedia.org/wiki/Backporting>.",
+            "cherry-pick": "A patch created by selectively applying commits from other versions or branches of the same software."
+          },
+          "title": "Patch Type",
+          "description": "Specifies the purpose for the patch including the resolution of defects, security issues, or new behavior or functionality."
+        },
+        "diff": {
+          "title": "Diff",
+          "description": "The patch file (or diff) that shows changes. Refer to <https://en.wikipedia.org/wiki/Diff>.",
+          "$ref": "#/$defs/diff"
+        },
+        "resolves": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {"$ref": "cyclonedx-release-notes-2.0.schema.json#/$defs/issue"},
+              {
+                "type": "object",
+                "title": "Resolved Reference",
+                "description": "A reference to the item the patch resolves, such as a weakness, vulnerability, use case, requirement, or threat declared elsewhere.",
+                "required": [
+                  "ref"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "ref": {
+                    "title": "Reference",
+                    "description": "Reference using bom-link or `refId` to the resolved item.",
+                    "$ref": "cyclonedx-common-2.0.schema.json#/$defs/elementLink"
+                  }
+                }
+              }
+            ]
+          },
+          "title": "Resolves",
+          "description": "A collection of items the patch resolves. Each entry is an inline issue or a reference to the weakness, vulnerability, use case, requirement, or threat that the patch resolves."
+        }
+      }
+    },
+    "patchReference": {
+      "type": "object",
+      "title": "Patch Reference",
+      "description": "A reference to a patch declared elsewhere, such as in the definitions registry, in another position of the same document, or in another document via BOM-Link. A reference includes the referenced patch exactly as declared: every position that references the same patch includes an identical patch. Where the context differs, declare the patch inline instead.",
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "title": "Reference",
+          "description": "Reference using bom-link or `refId` to the patch.",
+          "anyOf": [
+            {
+              "title": "Ref",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType"
+            },
+            {
+              "title": "BOM-Link Element",
+              "$ref": "cyclonedx-common-2.0.schema.json#/$defs/bomLinkElementType"
+            }
+          ]
+        }
+      }
+    },
+    "diff": {
+      "type": "object",
+      "title": "Diff",
+      "description": "The patch file (or diff) that shows changes. Refer to <https://en.wikipedia.org/wiki/Diff>.",
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "title": "Diff text",
+          "description": "Specifies the text of the diff.",
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/attachment"
+        },
+        "url": {
+          "type": "string",
+          "title": "URL",
+          "description": "Specifies the URL to the diff.",
+          "format": "iri-reference"
+        }
+      }
+    },
+    "identifiableAction": {
+      "type": "object",
+      "title": "Identifiable Action",
+      "description": "Specifies an individual commit.",
+      "additionalProperties": false,
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Timestamp",
+          "description": "The timestamp in which the action occurred."
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "The name of the individual who performed the action."
+        },
+        "email": {
+          "type": "string",
+          "format": "idn-email",
+          "title": "E-mail",
+          "description": "The email address of the individual who performed the action."
+        }
+      }
+    },
+    "origin": {
+      "type": "object",
+      "title": "Origin",
+      "description": "Describes the geographic origin of the subject (for example, a component or party), expressed as a distribution across one or more countries or subdivisions, calculated on a stated basis. An origin may be scoped to a lifecycle or transformation stage, enabling stage-specific provenance such as distinguishing where a material was mined from where it was melted.",
+      "additionalProperties": false,
+      "required": [ "basis", "distribution" ],
+      "properties": {
+        "stage": {
+          "title": "Origin Stage",
+          "description": "The lifecycle or transformation stage of the subject to which this origin applies. When omitted, the origin describes the subject as a whole.",
+          "oneOf": [
+            {
+              "title": "Predefined Origin Stage",
+              "description": "An origin stage drawn from the predefined set.",
+              "enum": [
+                "designed",
+                "mined",
+                "harvested",
+                "recycled",
+                "refined",
+                "separated",
+                "smelted",
+                "melted",
+                "processed",
+                "manufactured",
+                "assembled",
+                "developed",
+                "built",
+                "tested",
+                "collected",
+                "trained",
+                "hosted",
+                "operated",
+                "maintained"
+              ],
+              "meta:enum": {
+                "designed": "Creation of the design, specifications, or intellectual property of the subject, such as product design or integrated circuit design.",
+                "mined": "Extraction of raw material from the earth, including ore mining and quarrying.",
+                "harvested": "Collection of biologically derived raw material, such as timber, fibres, or natural rubber.",
+                "recycled": "Recovery of material from scrap, waste, or previously used items.",
+                "refined": "Purification of material, including chemical refining and electrorefining.",
+                "separated": "Separation of individual elements or compounds from a mixed feedstock, such as rare earth element separation.",
+                "smelted": "Extraction of metal from ore or concentrate by smelting.",
+                "melted": "Melting of material into a homogeneous mass, such as an alloying melt or a remelt.",
+                "processed": "Intermediate transformation not covered by a more specific stage, such as milling, atomization, or heat treatment.",
+                "manufactured": "Fabrication of the item from its input materials or parts.",
+                "assembled": "Integration of constituent parts into the finished item.",
+                "developed": "Authoring of the source code of software or firmware.",
+                "built": "Production of software artifacts from source, including compilation, packaging, and container image assembly.",
+                "tested": "Verification of the subject against its requirements, such as software testing, hardware qualification, or final device test.",
+                "collected": "Gathering of data from its sources, such as measurements, records, or user generated content.",
+                "trained": "Training of a machine learning model, attributed to the regions where the training computation was performed.",
+                "hosted": "Provision of the infrastructure on which a service or data resides, such as data centre regions.",
+                "operated": "Operation and administration of the subject, attributed to the regions where operating personnel or systems are located.",
+                "maintained": "Ongoing maintenance of the subject after release, including updates, patches, and security fixes."
+              }
+            },
+            {
+              "type": "object",
+              "title": "Custom Origin Stage",
+              "description": "An origin stage that is not present in the predefined set.",
+              "required": [ "name" ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Name",
+                  "description": "The name of the custom origin stage.",
+                  "examples": [ "sintered", "coated", "packaged" ]
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "Description of the custom origin stage."
+                }
+              }
+            }
+          ]
+        },
+        "basis": {
+          "type": "string",
+          "title": "Origin Basis",
+          "description": "A free-form description of the methodology or unit on which the origin distribution is calculated. Each origin of the same subject shall use a distinct combination of stage and basis.",
+          "minLength": 1,
+          "examples": [ "number of parts", "manufacturing cost", "net weight" ]
+        },
+        "distribution": {
+          "type": "array",
+          "title": "Origin Distribution",
+          "description": "The distribution of the origin across regions. The percentages of all entries shall total `100`, within rounding of the stated precision.",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/originRegion" }
+        }
+      }
+    },
+    "originRegion": {
+      "type": "object",
+      "title": "Origin Region",
+      "description": "A single region of origin, its share of the whole, and optionally the party that performed the stage in that region.",
+      "additionalProperties": false,
+      "required": [ "isoCode", "percentage" ],
+      "properties": {
+        "isoCode": {
+          "type": "string",
+          "title": "ISO Code",
+          "description": "The country or subdivision of origin, expressed as an ISO 3166-1 alpha-2 country code (for example, `\"CA\"` for Canada) or an ISO 3166-2 subdivision code (for example, `\"US-CA\"` for California, United States).",
+          "pattern": "^[A-Z]{2}(-[A-Z0-9]{1,3})?$",
+          "examples": [ "CA", "US-CA" ]
+        },
+        "value": {
+          "type": "number",
+          "title": "Value",
+          "description": "The amount of the whole attributable to this region, expressed on the basis of the origin, for example a number of parts, a net weight, or a manufacturing cost. The values of all entries in a distribution sum to the whole, and each percentage is the value divided by that sum.",
+          "minimum": 0
+        },
+        "percentage": {
+          "type": "number",
+          "title": "Percentage",
+          "description": "The percentage of the whole attributable to this region. The percentages of all entries in a distribution shall total `100`, within rounding of the stated precision.",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "performedBy": {
+          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
+          "title": "Performed By",
+          "description": "Reference to the party that performed this stage of origin for this share of the distribution, such as the smelter that melted a material or the organization that developed a software component. Entries in a distribution may repeat a region in order to attribute shares to different parties."
         }
       }
     }
