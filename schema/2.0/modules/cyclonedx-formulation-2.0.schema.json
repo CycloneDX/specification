@@ -744,14 +744,39 @@
       "properties": {
         "type": {
           "title": "Type",
-          "description": "Describes the type of data output.",
-          "enum": [
-            "artifact",
-            "attestation",
-            "log",
-            "evidence",
-            "metrics",
-            "other"
+          "description": "Describes the type of data output. Use the custom option for output types not covered by the predefined values.",
+          "oneOf": [
+            {
+              "title": "Predefined Output Type",
+              "enum": [
+                "artifact",
+                "attestation",
+                "log",
+                "evidence",
+                "metrics"
+              ]
+            },
+            {
+              "type": "object",
+              "title": "Custom Output Type",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "title": "Name",
+                  "minLength": 1,
+                  "description": "The name of the custom output type."
+                },
+                "description": {
+                  "type": "string",
+                  "title": "Description",
+                  "description": "A description of the custom output type."
+                }
+              }
+            }
           ]
         },
         "source": {
@@ -841,34 +866,60 @@
       }
     },
     "taskType": {
-      "enum": [
-        "copy",
-        "clone",
-        "lint",
-        "scan",
-        "merge",
-        "build",
-        "test",
-        "deliver",
-        "deploy",
-        "release",
-        "clean",
-        "other"
-      ],
-      "meta:enum": {
-        "copy": "A task that copies software or data used to accomplish other tasks in the workflow.",
-        "clone": "A task that clones a software repository into the workflow in order to retrieve its source code or data for use in a build step.",
-        "lint": "A task that checks source code for programmatic and stylistic errors.",
-        "scan": "A task that performs a scan against source code, or built or deployed components and services. Scans are typically run to gather or test for security vulnerabilities or policy compliance.",
-        "merge": "A task that merges changes or fixes into source code prior to a build step in the workflow.",
-        "build": "A task that builds the source code, dependencies and/or data into an artifact that can be deployed to and executed on target systems.",
-        "test": "A task that verifies the functionality of a component or service.",
-        "deliver": "A task that delivers a built artifact to one or more target repositories or storage systems.",
-        "deploy": "A task that deploys a built artifact for execution on one or more target systems.",
-        "release": "A task that releases a built, versioned artifact to a target repository or distribution system.",
-        "clean": "A task that cleans unnecessary tools, build artifacts and/or data from workflow storage.",
-        "other": "A workflow task that does not match current task type definitions."
-      }
+      "title": "Task Type",
+      "description": "The type of activity performed by a workflow task. Use the custom option for activities not covered by the predefined values.",
+      "oneOf": [
+        {
+          "title": "Predefined Task Type",
+          "enum": [
+            "copy",
+            "clone",
+            "lint",
+            "scan",
+            "merge",
+            "build",
+            "test",
+            "deliver",
+            "deploy",
+            "release",
+            "clean"
+          ],
+          "meta:enum": {
+            "copy": "A task that copies software or data used to accomplish other tasks in the workflow.",
+            "clone": "A task that clones a software repository into the workflow in order to retrieve its source code or data for use in a build step.",
+            "lint": "A task that checks source code for programmatic and stylistic errors.",
+            "scan": "A task that performs a scan against source code, or built or deployed components and services. Scans are typically run to gather or test for security vulnerabilities or policy compliance.",
+            "merge": "A task that merges changes or fixes into source code prior to a build step in the workflow.",
+            "build": "A task that builds the source code, dependencies and/or data into an artifact that can be deployed to and executed on target systems.",
+            "test": "A task that verifies the functionality of a component or service.",
+            "deliver": "A task that delivers a built artifact to one or more target repositories or storage systems.",
+            "deploy": "A task that deploys a built artifact for execution on one or more target systems.",
+            "release": "A task that releases a built, versioned artifact to a target repository or distribution system.",
+            "clean": "A task that cleans unnecessary tools, build artifacts and/or data from workflow storage."
+          }
+        },
+        {
+          "type": "object",
+          "title": "Custom Task Type",
+          "required": [
+            "name"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Name",
+              "minLength": 1,
+              "description": "The name of the custom task type."
+            },
+            "description": {
+              "type": "string",
+              "title": "Description",
+              "description": "A description of the custom task type."
+            }
+          }
+        }
+      ]
     },
     "parameter": {
       "title": "Parameter",
