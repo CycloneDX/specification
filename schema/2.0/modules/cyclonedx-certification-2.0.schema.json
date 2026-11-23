@@ -59,10 +59,17 @@
           "description": "Description of the activities, facilities, products, services, or operations covered by the certification."
         },
         "jurisdiction": {
-          "type": "string",
           "title": "Jurisdiction",
           "description": "ISO 3166-1 alpha-2 country code, ISO 3166-2 subdivision, or supranational identifier such as `\"EU\"`, where the certification applies.",
-          "examples": [ "US", "EU", "GB", "AU", "US-CA" ]
+          "anyOf": [
+            { "$ref": "cyclonedx-common-2.0.schema.json#/$defs/countryOrSubdivision" },
+            {
+              "type": "string",
+              "title": "Supranational identifier",
+              "minLength": 1,
+              "examples": [ "EU" ]
+            }
+          ]
         },
         "level": {
           "type": "string",
