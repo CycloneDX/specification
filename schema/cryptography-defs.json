@@ -247,7 +247,7 @@
       ],
       "variant": [
         {
-          "pattern": "FFDH(E)[-{namedGroup}]",
+          "pattern": "FFDH[E][-{namedGroup}]",
           "primitive": "key-agree"
         }
       ]
@@ -426,6 +426,16 @@
             }
           ],
           "pattern": "AES[-(128|192|256)]-GCM-SIV[-{tagLength}][-{ivLength}]",
+          "primitive": "ae"
+        },
+        {
+          "standard": [
+            {
+              "name": "ISO/IEC 19772:2020",
+              "url": "https://www.iso.org/standard/81550.html"
+            }
+          ],
+          "pattern": "AES[-(128|192|256)]-EAX[-{tagLength}][-{nonceLength}]",
           "primitive": "ae"
         },
         {
@@ -747,6 +757,29 @@
       ]
     },
     {
+      "family": "Composite-ML-DSA",
+      "standard": [
+        {
+          "name": "RFC10073",
+          "url": "https://doi.org/10.17487/RFC10073"
+        }
+      ],
+      "variant": [
+        {
+          "pattern": "ML-DSA-44-(RSA-PSS-2048-SHA-256|RSA-PKCS1-1.5-2048-SHA-256|Ed25519-SHA-512|ECDSA-secp256r1-SHA-256)",
+          "primitive": "signature"
+        },
+        {
+          "pattern": "ML-DSA-65-(RSA-PSS-3072-SHA-512|RSA-PKCS1-1.5-3072-SHA-512|RSA-PSS-4096-SHA-512|RSA-PKCS1-1.5-4096-SHA-512|ECDSA-secp256r1-SHA-512|ECDSA-secp384r1-SHA-512|ECDSA-brainpoolP256r1-SHA-512|Ed25519-SHA-512)",
+          "primitive": "signature"
+        },
+        {
+          "pattern": "ML-DSA-87-(ECDSA-secp384r1-SHA-512|ECDSA-brainpoolP384r1-SHA-512|Ed448-SHAKE256|RSA-PSS-3072-SHA-512|RSA-PSS-4096-SHA-512|ECDSA-secp521r1-SHA-512)",
+          "primitive": "signature"
+        }
+      ]
+    },
+    {
       "family": "SLH-DSA",
       "standard": [
         {
@@ -802,15 +835,23 @@
         {
           "name": "RFC8554",
           "url": "https://doi.org/10.17487/RFC8554"
+        },
+        {
+          "name": "RFC9858",
+          "url": "https://doi.org/10.17487/RFC9858"
         }
       ],
       "variant": [
         {
-          "pattern": "LMS[_{hashAlgorithm}][_M{bytesPerNode}][_H{treeHeight}]",
+          "pattern": "LMS[_(SHA256|SHAKE)][_M{bytesPerNode}][_H{treeHeight}]",
           "primitive": "signature"
         },
         {
-          "pattern": "LMOTS[_{hashfun}][_N{bytespernode}][_H{treeheight}]",
+          "pattern": "LMOTS[_(SHA256|SHAKE)][_N{hashOutputLength}][_W{winternitzParameter}]",
+          "primitive": "signature"
+        },
+        {
+          "pattern": "HSS[_L{levels}][(_<LMS>_<LMOTS>)+]",
           "primitive": "signature"
         }
       ]
@@ -1772,7 +1813,7 @@
       ],
       "variant": [
         {
-          "pattern": "PBES1[-{encryptionAlgorithm}][-{kdf}][-{dkLen}][-{iterations}]",
+          "pattern": "PBES1[-{encryptionAlgorithm}][-{hashAlgorithm}][-{dkLen}][-{iterations}]",
           "primitive": "other"
         }
       ]
