@@ -58,10 +58,6 @@ abstract class AbstractJsonSchemaVerificationTest {
 
     private static final ObjectMapper MAPPER = new JsonMapper();
 
-    private static final String SPDX_NAMESPACE = "cyclonedx.org/schema/spdx.schema.json";
-    private static final String CRYPTO_DEF_NAMESPACE = "cyclonedx.org/schema/cryptography-defs.schema.json";
-    private static final String BEHAVIOR_TAXONOMY_NAMESPACE = "cyclonedx.org/schema/behavior-taxonomy.schema.json";
-
     private final String version;
 
     /** Compiled lazily in {@link #compileSchema()} for clear failure attribution. */
@@ -101,12 +97,12 @@ abstract class AbstractJsonSchemaVerificationTest {
                 .mapPrefix("https://cyclonedx.org/schema/" + version + "/modules/",
                     "classpath:" + version + "/modules/")
                 // version-independent externals
-                .mapPrefix("https://" + SPDX_NAMESPACE, "classpath:spdx.schema.json")
-                .mapPrefix("http://" + SPDX_NAMESPACE, "classpath:spdx.schema.json")
-                .mapPrefix("https://" + CRYPTO_DEF_NAMESPACE, "classpath:cryptography-defs.schema.json")
-                .mapPrefix("http://" + CRYPTO_DEF_NAMESPACE, "classpath:cryptography-defs.schema.json")
-                .mapPrefix("http://" + BEHAVIOR_TAXONOMY_NAMESPACE, "classpath:behavior-taxonomy.schema.json")
-                .mapPrefix("https://" + BEHAVIOR_TAXONOMY_NAMESPACE, "classpath:behavior-taxonomy.schema.json")
+                .mapPrefix("http://cyclonedx.org/schema/spdx.schema.json",
+                    "classpath:spdx.schema.json")
+                .mapPrefix("http://cyclonedx.org/schema/cryptography-defs.schema.json",
+                    "classpath:cryptography-defs.schema.json")
+                .mapPrefix("https://cyclonedx.org/schema/behavior-taxonomy.schema.json",
+                    "classpath:behavior-taxonomy.schema.json")
             ).build();
         SchemaValidatorsConfig config = SchemaValidatorsConfig.builder()
             // in 2020-12, "format" is annotation-only unless asserted

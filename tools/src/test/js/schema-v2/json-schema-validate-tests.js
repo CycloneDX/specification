@@ -101,9 +101,10 @@ function getAjv(bundled) {
     });
     // some ref'd schemas might be of draft-07
     ajv.addMetaSchema(draft7MetaSchema);
-    ajv.addSchema(spdxSchema, 'https://cyclonedx.org/schema/spdx.schema.json')
-    ajv.addSchema(cryptoDefsSchema, 'https://cyclonedx.org/schema/cryptography-defs.schema.json')
-    ajv.addSchema(behaviorTaxonomySchema, 'https://cyclonedx.org/schema/behavior-taxonomy.schema.json')
+    // shared schemas are registered under their own `$id`, so that refs to them resolve as for any consumer
+    ajv.addSchema(spdxSchema)
+    ajv.addSchema(cryptoDefsSchema)
+    ajv.addSchema(behaviorTaxonomySchema)
     if (!bundled) {
         for (const [f, s] of schemaModules) {
             ajv.addSchema(s, `https://cyclonedx.org/schema/${testschemaVersion}/modules/${basename(f)}`)

@@ -66,6 +66,7 @@ node cli.js schema.json
 | `schema-id-filepath` | Validates `$id` property matches the expected file path |
 | `schema-id-pattern` | Validates `$id` matches CycloneDX URL pattern |
 | `schema-ref-best-practice` | `$ref` usage must follow JSON Schema best practice: is string value, not absolute references, same-file references start with `#`, and no non-annotation siblings alongside `$ref`exist |
+| `schema-ref-no-externals` | `$ref` must not reference files outside the schema's directory: relative references must not contain `..`; schemas elsewhere are referenced by their `$id` (`http://` or `https://`) |
 | `title-formatting` | Titles must use sentence case |
 
 ## Configuration

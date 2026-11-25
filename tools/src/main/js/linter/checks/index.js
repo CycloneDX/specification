@@ -58,4 +58,5 @@ export * from './schema-draft.check.js';
 export * from './schema-id-filepath.check.js';
 export * from './schema-id-pattern.check.js';
 export * from './schema-ref-best-practice.check.js';
+export * from './schema-ref-no-externals.check.js';
 export * from './title-formatting.check.js';
