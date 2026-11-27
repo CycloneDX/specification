@@ -26,7 +26,7 @@
           "meta:enum": {
             "algorithm": "Mathematical function commonly used for data encryption, authentication, and digital signatures.",
             "certificate": "An electronic document that is used to provide the identity or validate a public key.",
-            "protocol": "A set of rules and guidelines that govern the behavior and communication with each other.",
+            "protocol": "Rules for selecting and combining cryptographic algorithms in communication protocols such as TLS or data formats such as X.509.",
             "related-crypto-material": "Other cryptographic assets related to algorithms, certificates, and protocols such as keys and tokens."
           }
         },
@@ -680,78 +680,17 @@
             "version": {
               "type": "string",
               "title": "Protocol Version",
-              "description": "The version of the protocol. Together with the type, it identifies the corresponding protocol entry, by exact match, in the `cryptography-defs.schema.json` subschema.",
+              "description": "The version of the protocol. Together with the type, it identifies the corresponding entry in the cryptography registry (`cryptography-defs.json`) when an exact match exists.",
               "examples": [
                 "1.0",
                 "1.2",
                 "1.99"
               ]
             },
-            "cipherSuites": {
-              "type": "array",
-              "title": "Cipher Suites",
-              "description": "A list of cipher suites related to the protocol, as configured or observed for the subject of this BOM. The protocol entry in the `cryptography-defs.schema.json` subschema describes what the protocol version itself can support or negotiate.",
-              "items": {
-                "$ref": "#/$defs/cipherSuite",
-                "title": "Cipher Suite"
-              }
-            },
-            "ikev2TransformTypes": {
-              "type": "object",
-              "title": "IKEv2 Transform Types",
-              "description": "The IKEv2 transform types supported (types 1-4), defined in [RFC 7296 section 3.3.2](https://www.ietf.org/rfc/rfc7296.html#section-3.3.2), and additional properties, as configured or observed for the subject of this BOM. The protocol entry in the `cryptography-defs.schema.json` subschema describes what the protocol version itself can support or negotiate.",
-              "additionalProperties": false,
-              "properties": {
-                "encr": {
-                  "type": "array",
-                  "title": "Encryption Algorithms (ENCR)",
-                  "description": "Transform Type 1: encryption algorithms.",
-                  "items": {
-                    "$ref": "#/$defs/ikeV2Enc",
-                    "title": "Encryption Algorithm (ENCR)"
-                  }
-                },
-                "prf": {
-                  "type": "array",
-                  "title": "Pseudorandom Functions (PRF)",
-                  "description": "Transform Type 2: pseudorandom functions.",
-                  "items": {
-                    "$ref": "#/$defs/ikeV2Prf",
-                    "title": "Pseudorandom Function (PRF)"
-                  }
-                },
-                "integ": {
-                  "type": "array",
-                  "title": "Integrity Algorithms (INTEG)",
-                  "description": "Transform Type 3: integrity algorithms.",
-                  "items": {
-                    "$ref": "#/$defs/ikeV2Integ",
-                    "title": "Integrity Algorithm (INTEG)"
-                  }
-                },
-                "ke": {
-                  "type": "array",
-                  "title": "Key Exchange Methods (KE)",
-                  "description": "Transform Type 4: Key Exchange Method (KE) per [RFC 9370](https://www.ietf.org/rfc/rfc9370.html), formerly called Diffie-Hellman Group (D-H).",
-                  "items": {
-                    "$ref": "#/$defs/ikeV2Ke"
-                  }
-                },
-                "esn": {
-                  "type": "boolean",
-                  "title": "Extended Sequence Number (ESN)",
-                  "description": "Specifies if an Extended Sequence Number (ESN) is used."
-                },
-                "auth": {
-                  "type": "array",
-                  "title": "IKEv2 Authentication methods",
-                  "description": "IKEv2 Authentication method per [RFC9593](https://www.ietf.org/rfc/rfc9593.html).",
-                  "items": {
-                    "$ref": "#/$defs/ikeV2Auth",
-                    "title": "IKEv2 Authentication Method"
-                  }
-                }
-              }
+            "composition": {
+              "$ref": "../../cryptography-defs.schema.json#/definitions/composition",
+              "title": "Composition",
+              "description": "The composition of the protocol as implemented, configured or observed for the subject of this BOM. A single observed option does not establish the full set of supported options. Algorithm names describe registry variants. Explicit references identify BOM assets. A producer may report an option by its observed identifier alone. A missing protocol version, registry entry or matching slot does not prevent reporting a composition and shall not be interpreted as absence of the capability. A slot matches the registry by role and, where needed, selecting party only when the match is unique. An unmatched slot or option remains unresolved."
             },
             "relatedCryptographicAssets": {
               "$ref": "#/$defs/relatedCryptographicAssets"
@@ -762,179 +701,6 @@
           "type": "string",
           "title": "OID",
           "description": "The object identifier (OID) of the cryptographic asset."
-        }
-      }
-    },
-    "cipherSuite": {
-      "type": "object",
-      "title": "Cipher Suite",
-      "description": "Object representing a cipher suite.",
-      "additionalProperties": false,
-      "properties": {
-        "name": {
-          "type": "string",
-          "title": "Common Name",
-          "description": "A common name for the cipher suite.",
-          "examples": [
-            "TLS_DHE_RSA_WITH_AES_128_CCM"
-          ]
-        },
-        "algorithms": {
-          "type": "array",
-          "title": "Related Algorithms",
-          "description": "A list of algorithms related to the cipher suite.",
-          "items": {
-            "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
-            "title": "Algorithm reference",
-            "description": "The `refId` to algorithm cryptographic asset."
-          }
-        },
-        "identifiers": {
-          "type": "array",
-          "title": "Cipher Suite Identifiers",
-          "description": "A list of common identifiers for the cipher suite.",
-          "items": {
-            "type": "string",
-            "title": "identifier",
-            "description": "Cipher suite identifier.",
-            "examples": [
-              "0xC0",
-              "0x9E"
-            ]
-          }
-        },
-        "tlsGroups": {
-          "type": "array",
-          "title": "TLS Groups",
-          "description": "A list of TLS named groups (formerly known as curves) for this cipher suite. These groups define the parameters for key exchange algorithms like ECDHE.",
-          "items": {
-            "type": "string",
-            "title": "Group Name",
-            "description": "The name of the TLS group.",
-            "examples": [
-              "x25519",
-              "ffdhe2048"
-            ]
-          }
-        },
-        "tlsSignatureSchemes": {
-          "type": "array",
-          "title": "TLS Signature Schemes",
-          "description": "A list of signature schemes supported for cipher suite. These schemes specify the algorithms used for digital signatures in TLS handshakes and certificate verification.",
-          "items": {
-            "type": "string",
-            "title": "Signature Scheme",
-            "description": "The name of the TLS signature scheme.",
-            "examples": [
-              "ecdsa_secp256r1_sha256",
-              "rsa_pss_rsae_sha256",
-              "ed25519"
-            ]
-          }
-        }
-      }
-    },
-    "ikeV2Enc": {
-      "type": "object",
-      "title": "Encryption Algorithm (ENCR)",
-      "description": "Object representing an encryption algorithm (ENCR).",
-      "additionalProperties": false,
-      "properties": {
-        "name": {
-          "type": "string",
-          "title": "Name",
-          "description": "A name for the encryption method.",
-          "examples": [
-            "ENCR_AES_GCM_16"
-          ]
-        },
-        "keyLength": {
-          "type": "integer",
-          "title": "Encryption algorithm key length",
-          "description": "The key length of the encryption algorithm."
-        },
-        "algorithm": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
-          "title": "Algorithm reference",
-          "description": "The `refId` to algorithm cryptographic asset."
-        }
-      }
-    },
-    "ikeV2Prf": {
-      "type": "object",
-      "title": "Pseudorandom Function (PRF)",
-      "description": "Object representing a pseudorandom function (PRF).",
-      "additionalProperties": false,
-      "properties": {
-        "name": {
-          "type": "string",
-          "title": "Name",
-          "description": "A name for the pseudorandom function.",
-          "examples": [
-            "PRF_HMAC_SHA2_256"
-          ]
-        },
-        "algorithm": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
-          "title": "Algorithm reference",
-          "description": "The `refId` to algorithm cryptographic asset."
-        }
-      }
-    },
-    "ikeV2Integ": {
-      "type": "object",
-      "title": "Integrity Algorithm (INTEG)",
-      "description": "Object representing an integrity algorithm (INTEG).",
-      "additionalProperties": false,
-      "properties": {
-        "name": {
-          "type": "string",
-          "title": "Name",
-          "description": "A name for the integrity algorithm.",
-          "examples": [
-            "AUTH_HMAC_SHA2_256_128"
-          ]
-        },
-        "algorithm": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
-          "title": "Algorithm reference",
-          "description": "The `refId` to algorithm cryptographic asset."
-        }
-      }
-    },
-    "ikeV2Ke": {
-      "type": "object",
-      "title": "Key Exchange Method (KE)",
-      "description": "Object representing a key exchange method (KE).",
-      "additionalProperties": false,
-      "properties": {
-        "group": {
-          "type": "integer",
-          "title": "Group Identifier",
-          "description": "A group identifier for the key exchange algorithm."
-        },
-        "algorithm": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
-          "title": "Algorithm reference",
-          "description": "The `refId` to algorithm cryptographic asset."
-        }
-      }
-    },
-    "ikeV2Auth": {
-      "type": "object",
-      "title": "IKEv2 Authentication method",
-      "description": "Object representing a IKEv2 Authentication method.",
-      "additionalProperties": false,
-      "properties": {
-        "name": {
-          "type": "string",
-          "title": "Name",
-          "description": "A name for the authentication method."
-        },
-        "algorithm": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
-          "title": "Algorithm reference",
-          "description": "The `refId` to algorithm cryptographic asset."
         }
       }
     },
@@ -1037,28 +803,7 @@
       }
     },
     "relatedCryptographicAsset": {
-      "type": "object",
-      "title": "Related Cryptographic Asset",
-      "description": "A cryptographic asset related to this component.",
-      "additionalProperties": false,
-      "properties": {
-        "type": {
-          "type": "string",
-          "title": "Type",
-          "description": "The kind of referenced cryptographic asset, such as an algorithm, certificate, public key, or private key.",
-          "examples": [
-            "public-key",
-            "private-key",
-            "algorithm",
-            "certificate"
-          ]
-        },
-        "ref": {
-          "$ref": "cyclonedx-common-2.0.schema.json#/$defs/refLinkType",
-          "title": "Reference to cryptographic asset",
-          "description": "The `refId` to cryptographic asset."
-        }
-      }
+      "$ref": "../../cryptography-defs.schema.json#/definitions/relatedCryptographicAsset"
     },
     "fingerprint": {
       "title": "Fingerprint",
